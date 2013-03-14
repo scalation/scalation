@@ -14,7 +14,9 @@ Requires: Scala 2.9 and Java 6 or 7
 
 1. Clone the repository:
 
-    $ git clone git://github.com/scalation/scalation.git scalation
+```
+$ git clone git://github.com/scalation/scalation.git scalation
+```
 
 2. Build the scalation system:
 
