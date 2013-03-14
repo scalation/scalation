@@ -2,11 +2,8 @@
 
 Welcome to ScalaTion, the Scala-based library for Analytics, Simulation and Optimization.
 
-This system coded in <a href = "http://www.scala-lang.org"> Scala </a> supports multi-paradigm
-simulation modeling including 'dynamics', 'activity', 'event', 'process' and 'state' oriented models.
-Scala is a modern object-oriented, functional programming language
-(see <a href = "feature_matrix.html"> feature matrix </a>)
-that is well-suited for developing simulation engines.
+This system coded in [Scala](http://www.scala-lang.org) supports multi-paradigm simulation modeling including 'dynamics', 'activity', 'event', 'process' and 'state' oriented models.
+Scala is a modern object-oriented, functional programming language that is well-suited for developing simulation engines.
 It also supports optimization and analytics.
 
 Future directions include adding 'scala3d' and 'physics' packages.
@@ -15,29 +12,17 @@ Requires: Scala 2.9 and Java 6 or 7
 
 ## Installation Instructions </h3>
 
-1. Download one of the following two file:
+1. Clone the repository:
 
-<p>
-<a href = "../scalation.tar.gz"> scalation.tar.gz </a>
-<br>
-<a href = "../scalation.zip"> scalation.zip </a>
+    $ git clone git://github.com/scalation/scalation.git scalation
 
-2. Unzip or untar the file:
+2. Build the scalation system:
 
-    > tar xvfz scalation.tar.gz
-    > unzip scalation.zip
-
-3. If necessary re-build the scalation system (it's pre-built):
-
-    > cd scalation
-    > scalac Build.scala
-    > scala Build
+    $ ./sbt compile
 
 4. Run examples (e.g., for process oriented):
 
-    > cd examples/process
-    > scalac -cp ../../classes -d classes Bank.scala
-    > scala -cp ../../classes:classes Bank
+    $ ./sbt run process.Bank
 
 Please read the <a href = LICENSE.html> LICENSE </a> file (an MIT style license).
 
