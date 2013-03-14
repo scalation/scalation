@@ -1,0 +1,48 @@
+
+class Vec [T]
+{
+   var v: Array [T] = new Array [T] (3)
+
+   def set (x: T): Unit = 
+   {
+       for (i <- 0 to 2) v(i) = x
+   } // set
+
+   def + (b: Vec [T])(implicit res: Numeric [T]): Vec [T] =
+   {
+       val c: Vec [T] = new Vec [T] ()
+       for (i <- 0 to 2) c.v(i) = res.plus (v(i), b.v(i))
+       c
+   } // +
+
+/*
+   implicit def castT2Numeric (x: T): Numeric[_] =
+   {
+	x.asInstanceOf [Numeric[_]]
+   } // castT2Numeric
+*/
+
+   override def toString (): String =
+   {
+       var s = "["
+       v.foreach (s += " " + _)
+       s + " ]"
+   } // toString
+  
+} // Vec
+
+object Test extends Application
+{
+    val a: Vec [Int] = new Vec [Int] ()
+    val b: Vec [Int] = new Vec [Int] ()
+    a.set (2)
+    b.set (3)
+    println ("a + b = " + (a + b))
+
+    val x: Vec [Double] = new Vec [Double] ()
+    val y: Vec [Double] = new Vec [Double] ()
+    x.set (2)
+    y.set (3)
+    println ("x + y = " + (x + y))
+} // Test
+

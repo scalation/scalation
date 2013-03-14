@@ -1,0 +1,32 @@
+
+class Source (name: String, makeEntity: () => SimActor, entityType: AnyRef, units: Int, iArrivalTime: Variate) extends Component (name)
+{
+    def act (): Unit =
+    {
+        println ("Source.act: generate " + units + " of " + entityType)
+        for (i <- 1 to units) {
+             val entity = makeEntity ()
+             val eType = entity.getClass ()
+             println ("Source.act: generate an entity of type " + entityType)
+             println ("Source.act: generate an entity of type " + eType)
+
+             entity.act ()
+
+//           val clazz = Class.forName (entityType.toString ())
+//           clazz.asInstanceOf [Class [T]]
+//           val entity = clazz.newInstance ()
+//           (entity.asInstanceOf [SimActor]).act ()
+//           (entity.asInstanceOf [T]).act ()
+             
+//           new scala.Symbol$class("name")
+//           Class.forName("mypackage.MyScalaServlet$class").newInstance();
+
+
+//           val entity = (Class [T]).newInstance ()
+//           val entity = new Bank.Customer ()
+//           entity.act ()
+        } // for
+    } // act
+    
+} // Source
+

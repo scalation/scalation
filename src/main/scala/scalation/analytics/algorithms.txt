@@ -1,0 +1,45 @@
+
+http://www.information-management.com/issues/20060301/1048507-1.html
+http://en.wikipedia.org/wiki/Predictive_analytics
+
+CART
+CHAID
+C4.5
+k-Nearest Neighbors
+Hierarchical Clustering
+Naive Bayes
+Decision Trees
+BIRCH
+CURE
+Association Rules
+Time Series Analysis: Exponential Smoothing
+Time Series Analysis: Box-Jenkins
+Linear Regression
+Nonlinear Regression
+Logistic Regression
+Neural networks
+Principal Component Analysis
+Factor Analysis
+Radial Basis Functions
+Support Vector Machines
+
+Modeling algorithms in SPSS Modeler
+
+    *  Decision tree algorithms, including interactive tree building (C&RT, C5.0, CHAID & QUEST).
+    * An interactive rule-building algorithm (Decision List).
+    * Clustering and segmentation algorithms (K-Means, Kohonen, Two Step, Discriminant, Support Vector Machine).
+    * Data reduction algorithms (Factor/PCA, Feature Selection).
+    * Linear equation modeling (Regression, Linear, GenLin).
+    * Bayesian model with incremental learning (self-learning response model).
+    * Time-series forecasting models.
+    * Neural Networks (multi-layer perceptrons with back-propagation learning, and radial basis function networks).
+    * An advanced algorithm for wide datasets (Support Vector Machine).
+    * Graphical probabilistic models (Bayesian networks).
+    * Calculate the likely time to an event (Cox regression).
+    * Cluster-based algorithm for detecting unusual results (anomaly detection).
+    * Nearest neighbor modeling and scoring algorithm (KNN).
+    * Association discovery algorithm with advanced evaluation functions (Apriori).
+    * Association algorithm that supports multiple consequents (CARMA).
+    * Sequential association algorithm for order-sensitive analyses (Sequence).
+
+

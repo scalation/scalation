@@ -1,0 +1,78 @@
+
+class Vector [T] (_length: Int = 3)
+{
+   var v: Array [T] = new Array [T] (_length)
+   val range = 0 to _length - 1
+
+   def set (x: T): Unit = 
+   {
+       for (i <- range) v(i) = x
+   } // set
+
+   def + (b: Vector [T]) (implicit res: Numeric [T]): Vector [T] =
+   {
+       val c = new Vector [T] ()
+       for (i <- range) c.v(i) = res.plus (v(i), b.v(i))
+       c
+   } // +
+
+   def - (b: Vector [T]) (implicit res: Numeric [T]): Vector [T] =
+   {
+       val c = new Vector [T] ()
+       for (i <- range) c.v(i) = res.minus (v(i), b.v(i))
+       c
+   } // -
+
+   def * (b: Vector [T]) (implicit res: Numeric [T]): Vector [T] =
+   {
+       val c = new Vector [T] ()
+       for (i <- range) c.v(i) = res.times (v(i), b.v(i))
+       c
+   } // *
+
+   def abs () (implicit res: Numeric [T]): Vector [T] =
+   {
+       val c = new Vector [T] ()
+       for (i <- range) c.v(i) = res.abs (v(i))
+       c
+   } // abs
+
+   def negate () (implicit res: Numeric [T]): Vector [T] =
+   {
+       val c = new Vector [T] ()
+       for (i <- range) c.v(i) = res.negate (v(i))
+       c
+   } // negate
+
+   override def toString (): String =
+   {
+       var s = "["
+       v.foreach (s += " " + _)
+       s + " ]"
+   } // toString
+  
+} // Vector
+
+object Test extends Application
+{
+    val a = new Vector [Int] ()
+    val b = new Vector [Int] ()
+    a.set (3)
+    b.set (2)
+    println ("a + b       = " + (a + b))
+    println ("a - b       = " + (a - b))
+    println ("a * b       = " + (a * b))
+    println ("a.abs ()    = " + a.abs ())
+    println ("a.negate () = " + a.negate ())
+
+    val x = new Vector [Double] ()
+    val y = new Vector [Double] ()
+    x.set (2)
+    y.set (3)
+    println ("x + y       = " + (x + y))
+    println ("x - y       = " + (x - y))
+    println ("x * y       = " + (x * y))
+    println ("x.abs ()    = " + x.abs ())
+    println ("x.negate () = " + x.negate ())
+} // Test
+

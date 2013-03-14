@@ -1,0 +1,1 @@
+java -Xmx2048M -jar `dirname $0`/sbt-launch.jar "$@"
