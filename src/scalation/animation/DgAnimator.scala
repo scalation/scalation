@@ -28,12 +28,12 @@ import scalation.util.Error
  *  @param title    the title for the display frame
  *  @param bgColor  the background color
  */
-class DgAnimator (_title: String, fgColor: Color, bgColor: Color)
+class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white)
       extends MainFrame with Actor with Error
 {
     /** Size/dimensions of the frame
      */
-    private val frameSize = new Dimension (700, 400)
+    private val frameSize = new Dimension (1200, 800)
 
     /** Clock for animation engine
      */
@@ -291,7 +291,7 @@ object DgAnimatorTest extends App
     } // loadCommandQueue
 
     println ("Run DgAnimatorTest")
-    val dga = new DgAnimator ("DgAnimator", white, black)
+    val dga = new DgAnimator ("DgAnimator")
     loadCommandQueue (dga.getCommandQueue)
     dga.animate (0, 100000)
 

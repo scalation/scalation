@@ -125,7 +125,7 @@ class Dgraph (name: String = "Dgraph", bipartite: Boolean = false)
     {
         /** A very small real number
          */
-        private val EPSILON = .000001
+        private val EPSILON = 1E-7
 
         {
             from.addEdge (this)              // add this edge to outgoing edges of from node
