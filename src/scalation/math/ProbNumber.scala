@@ -21,7 +21,7 @@ import scalation.util.Error
 case class ProbNumber (x: Double, p: Double = 1.)
      extends Numeric [ProbNumber] with Ordered [ProbNumber] with Error
 {
-    private val EPSILON = 1.E-10   // a value that's almost zero
+    private val EPSILON = 1E-9        // number close to zero
 
     if (p < 0. || p > 1.) flaw ("constructor", "p is not a probability " + p)
 

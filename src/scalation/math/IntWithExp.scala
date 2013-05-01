@@ -41,7 +41,6 @@ object IntWithExp
 object IntWithExpTest extends App
 {
     import IntWithExp._
-    //implicit def intWithExp (d: Int) = IntWithExp (d)
     println (2 ~^ 3)
 
 } // IntWithExpTest object

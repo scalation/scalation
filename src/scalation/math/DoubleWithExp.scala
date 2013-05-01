@@ -41,7 +41,6 @@ object DoubleWithExp
 object DoubleWithExpTest extends App
 {
     import DoubleWithExp._
-    //implicit def doubleWithExp (d: Double) = DoubleWithExp (d)
     println (2. ~^ 3.)
 
 } // DoubleWithExpTest object
