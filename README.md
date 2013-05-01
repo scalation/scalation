@@ -30,7 +30,7 @@ Requires: Scala 2.9 and Java 6 or 7
     $ ./sbt run process.Bank
     ```
 
-Please read the <a href = LICENSE.html> LICENSE </a> file (an MIT style license).
+Please read the [LICENSE](LICENSE) file (an MIT style license).
 
 ## Documentation/Papers
 
