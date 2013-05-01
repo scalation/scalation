@@ -1,0 +1,117 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                            %
+%     THESE COMMANDS ARE REQUIRED TO WORK WITH WSC.BST TO MAKE BIBLIO     %
+%                                                                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeatletter
+\let\@internalcite\cite
+%
+\def\cite{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{(##1\if@tempswa , ##2\fi)}%
+    \def\citeauthoryear##1##2##3{##1 ##3}\@internalcite}
+\def\citeNP{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{##1\if@tempswa , ##2\fi}%
+    \def\citeauthoryear##1##2##3{##1 ##3}\@internalcite}
+\def\citeN{\def\@citeseppen{-1000}%
+%  Pierre L'Ecuyer's fix for multiple cite bug
+%  Added by Paul J Sanchez on 4 October 2001
+%   \def\@cite##1##2{##1\if@tempswa , ##2)\else{)}\fi}%
+%   \def\citeauthoryear##1##2##3{##1 (##3}\@citedata}
+    \def\@cite##1##2{##1\if@tempswa, ##2)\else{}\fi}%
+    \def\citeauthoryear##1##2##3{##1 (##3)}\@citedata}
+\def\citeA{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{(##1\if@tempswa , ##2\fi)}%
+    \def\citeauthoryear##1##2##3{##1}\@internalcite}
+\def\citeANP{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{##1\if@tempswa , ##2\fi}%
+    \def\citeauthoryear##1##2##3{##1}\@internalcite}
+%
+\def\shortcite{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{(##1\if@tempswa , ##2\fi)}%
+    \def\citeauthoryear##1##2##3{##2 ##3}\@internalcite}
+\def\shortciteNP{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{##1\if@tempswa , ##2\fi}%
+    \def\citeauthoryear##1##2##3{##2 ##3}\@internalcite}
+\def\shortciteN{\def\@citeseppen{-1000}%
+%  Pierre L'Ecuyer's fix for multiple cite bug
+%  Added by Paul J Sanchez on 2 September 2002
+%  should have caught this last year...
+%   \def\@cite##1##2{##1\if@tempswa , ##2)\else{)}\fi}%
+%   \def\citeauthoryear##1##2##3{##2 (##3}\@citedata}
+% Shane G. Henderson fix for extra right bracket at end of optional material June 8, 2005
+%    \def\@cite##1##2{##1\if@tempswa, ##2)\else{}\fi}%
+    \def\@cite##1##2{##1\if@tempswa, ##2\else{}\fi}%
+    \def\citeauthoryear##1##2##3{##2 (##3)}\@citedata}
+\def\shortciteA{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{(##1\if@tempswa , ##2\fi)}%
+    \def\citeauthoryear##1##2##3{##2}\@internalcite}
+\def\shortciteANP{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{##1\if@tempswa , ##2\fi}%
+    \def\citeauthoryear##1##2##3{##2}\@internalcite}
+%
+\def\citeyear{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{(##1\if@tempswa , ##2\fi)}%
+    \def\citeauthoryear##1##2##3{##3}\@citedata}
+\def\citeyearNP{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{##1\if@tempswa , ##2\fi}%
+    \def\citeauthoryear##1##2##3{##3}\@citedata}
+%
+% \@citedata and \@citedatax:
+%
+% Place commas in-between citations in the same \citeyear, \citeyearNP,
+% \citeN, or \shortciteN command.
+% Use something like \citeN{ref1,ref2,ref3} and \citeN{ref4} for a list.
+%
+\def\@citedata{%
+    \@ifnextchar [{\@tempswatrue\@citedatax}%
+                  {\@tempswafalse\@citedatax[]}%
+}
+
+\def\@citedatax[#1]#2{%
+\if@filesw\immediate\write\@auxout{\string\citation{#2}}\fi%
+  \def\@citea{}\@cite{\@for\@citeb:=#2\do%
+    {\@citea\def\@citea{, }\@ifundefined% by Young
+       {b@\@citeb}{{\bf ?}%
+       \@warning{Citation `\@citeb' on page \thepage \space undefined}}%
+{\csname b@\@citeb\endcsname}}}{#1}}%
+
+% don't box citations, separate with ; and a space
+% also, make the penalty between citations negative: a good place to break.
+%
+\def\@citex[#1]#2{%
+\if@filesw\immediate\write\@auxout{\string\citation{#2}}\fi%
+  \def\@citea{}\@cite{\@for\@citeb:=#2\do%
+    {\@citea\def\@citea{, }\@ifundefined% by Young
+       {b@\@citeb}{{\bf ?}%
+       \@warning{Citation `\@citeb' on page \thepage \space undefined}}%
+{\csname b@\@citeb\endcsname}}}{#1}}%
+
+% (from apalike.sty)
+% No labels in the bibliography.
+%
+\def\@biblabel#1{}
+\makeatother
+
+%\newlength{\bibhang}
+%\setlength{\bibhang}{2em}
+
+% Indent second and subsequent lines of bibliographic entries. Taken
+% from openbib.sty: \newblock is set to {}.
+% \renewcommand{\refname}{REFERENCES}
+
+\newdimen\bibindent
+\bibindent=0.0em
+% SEC: was \def\thebibliography#1{\section*{\refname\@mkboth
+% SEC: was   {\uppercase{\refname}}{\uppercase{\refname}}}\list
+\def\thebibliography#1{\section*{\refname}\list
+   {}{\settowidth\labelwidth{[#1]}
+   \leftmargin\parindent
+   \itemindent -\parindent
+   \listparindent \itemindent
+   \itemsep 0pt
+   \parsep 0pt}
+   \def\newblock{}
+   \sloppy
+   \sfcode`\.=1000\relax}
+
+

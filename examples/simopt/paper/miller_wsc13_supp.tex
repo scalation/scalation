@@ -1,0 +1,467 @@
+
+%**************************************************************************
+%*
+%*  Paper: ``INSTRUCTIONS FOR AUTHORS OF LATEX DOCUMENTS''
+%*
+%*  Publication: 2013 Winter Simulation Conference Author Kit
+%*
+%*  Filename: wsc13paper.tex
+%*
+%*  Date: January 31, 2001   Time:  9:45 PM
+%*      BASE of current version: Feb 01, 2010 (primary WSC'10 LaTeX file)
+%*
+%*  Word Processing System: TeXnicCenter and MiKTeX
+%*
+%*
+%*  All files need the following
+\input{wsc13style.tex}     % download from author kit.  Style files for wsc formatting. Don't remove this line - required for generating the final paper!
+
+\documentclass{wscpaperproc}
+\usepackage{latexsym}
+%\usepackage{caption}
+\usepackage{graphicx}
+\usepackage{mathptmx}
+
+%
+%****************************************************************************
+% AUTHOR: You may want to use some of these packages. (Optional)
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsbsy}
+\usepackage{amsthm}
+%****************************************************************************
+
+
+
+%
+%****************************************************************************
+% AUTHOR: If you do not wish to use hyperlinks, then just comment
+% out the hyperref usepackage commands below.
+
+%% This version of the command is used if you use pdflatex. In this case you
+%% cannot use ps or eps files for graphics, but pdf, jpeg, png etc are fine.
+
+\usepackage[pdftex,colorlinks=true,urlcolor=blue,citecolor=black,anchorcolor=black,linkcolor=black]{hyperref}
+
+%% The next versions of the hyperref command are used if you adopt the
+%% outdated latex-dvips-ps2pdf route in generating your pdf file. In
+%% this case you can use ps or eps files for graphics, but not pdf, jpeg, png etc.
+%% However, the final pdf file should embed all fonts required which means that you have to use file
+%% formats which can embed fonts. Please note that the final PDF file will not be generated on your computer!
+%% If you are using WinEdt or PCTeX, then use the following. If you are using
+%% Y&Y TeX then replace "dvips" with "dvipsone"
+
+%%\usepackage[dvips,colorlinks=true,urlcolor=blue,citecolor=black,%
+%% anchorcolor=black,linkcolor=black]{hyperref}
+%****************************************************************************
+
+%
+%****************************************************************************
+%*
+%* AUTHOR: YOUR CALL!  Document-specific macros can come here.
+%*
+%****************************************************************************
+
+% If you use theoremes
+\newtheoremstyle{wsc}% hnamei
+{3pt}% hSpace abovei
+{3pt}% hSpace belowi
+{}% hBody fonti
+{}% hIndent amounti1
+{\bf}% hTheorem head fontbf
+{}% hPunctuation after theorem headi
+{.5em}% hSpace after theorem headi2
+{}% hTheorem head spec (can be left empty, meaning `normal')i
+
+\theoremstyle{wsc}
+\newtheorem{theorem}{Theorem}
+\renewcommand{\thetheorem}{ \arabic{theorem}}
+\newtheorem{corollary}[theorem]{Corollary}
+\renewcommand{\thecorollary}{\arabic{corollary}}
+\newtheorem{definition}{Definition}
+\renewcommand{\thedefinition}{\arabic{definition}}
+
+
+%#########################################################
+%*
+%*  The Document.
+%*
+\begin{document}
+
+%***************************************************************************
+% AUTHOR: AUTHOR NAMES GO HERE
+% FORMAT AUTHORS NAMES Like: Author1, Author2 and Author3 (last names)
+%
+%               You need to change the author listing below!
+%               Please list ALL authors using last name only, separate by a comma except
+%               for the last author, separate with "and"
+%
+\WSCpagesetup{Miller, Cotterell and Buckley}
+
+% AUTHOR: Enter the title, all letters in upper case
+\title{SUPPORTING A MODELING CONTINUUM IN SCALATION:\\FROM PREDICTIVE ANALYTICS TO SIMULATION MODELING\\SUPPLEMENT}
+
+% AUTHOR: Enter the authors of the article, see end of the example document for further examples
+\author{John A. Miller \\
+        Michael E. Cotterell \\
+        Stephen J. Buckley \\ [12pt]
+  Department of Computer Science \\
+  University of Georgia \\
+  Athens, GA 30602, USA \\ [12pt]
+  IBM Thomas J. Watson Research Center \\
+  Yorktown Heights, NY 10598, USA
+% Multiple authors are entered as follows.
+% You may also need to adjust the titlevbox size in the preamble - search for titlevboxsize
+}
+
+\maketitle
+
+\section*{ABSTRACT}
+
+Predictive analytics and simulation modeling are two complementary disciplines 
+that will increasingly be used together in the future.
+They share in common a focus on predicting how systems, existing or proposed, will function.
+The predictions may be values of quantifiable metrics or classification of outcomes.
+Both require collection of data to increase their validity and accuracy.
+The coming era of big data will be a boon to both and will accelerate the
+need to use them in conjunction.
+This paper discusses ways in which the two disciplines have been used
+together as well as how they can be viewed as belonging to the same modeling continuum.
+Various modeling techniques from both disciplines are reviewed using a common notation.
+Finally, examples are given to illustrate these notions.
+
+{\bf This supplememnt to the paper provides all figures, tables and substantial code listings, 
+all of which would not fit into the paper due to page limitations.
+First paragraphs of sections are included to establish proper context.}
+
+\section{INTRODUCTION}
+
+Two disciplines, predictive analytics and simulation modeling, are currently expanding their scope and
+are likely to increase their commonalities in the near future.
+On the one hand, predictive analytics attempts to make sense of data by finding patterns or fitting
+statistical models.
+On the other hand, simulation modeling attempts to mimic reality.
+Simulation requires data for fitting distributions and estimating parameters.
+One may view the two disciplines as two ends of the same continuum.
+Although somewhat of an overstatement, one end could be described as data-rich and knowledge-poor,
+while the other could be viewed knowledge-rich and data-poor.
+
+...
+
+The rest of the paper is organized as follows:
+Using a common notation, sections 2 and 3 provide some necessary background on
+predictive analytics and simulation modeling, respectively.
+Section 4 makes the case for a modeling continuum based on
+the richness of data and knowledge utilized by various
+modeling techniques.
+Example problems illustrating commonalities and trade-offs
+between the various techniques are discussed in sections 5 and 6.
+Finally, conclusions and future work are given in section 7.
+Due to space limitations, all figures and many code listings
+are provided in the on-line supplement
+(see \url{http://www.cs.uga.edu/~jam/scalation/examples/simopt}).
+
+\section{PREDICTIVE ANALYTICS}
+
+As the name predictive analytics indicates, the purpose of techniques
+that fall in this category is to develop models to predict outcomes.
+For example, the distance a golf ball travels $y$ when hit by a driver
+depends on several factors or inputs ${\bf x}$ such as club head speed,
+barometric pressure, and smash factor (how square the impact is).
+The models can be developed using a combination of data (e.g.,
+from experiments) and knowledge (e.g., Newton's Second Law).
+The modeling techniques discussed in this section tend to emphasize
+the use of data more than knowledge.
+
+...
+
+\subsection{Time-Independent Models}
+
+In time-independent models, the time argument $t$ is removed from the prediction function.
+Although these techniques are thought of as time-independent,
+it is still possible to interpret one of the $x_i$s as time.
+It is just that time is not a dominate feature as it is in the next
+section on time-dependent models.
+
+...
+
+\subsection{Time-Dependent Models}
+
+If time $t$ is a key feature involved in the modeling, there are a variety
+of modeling techniques that can be applied to time series data, starting
+with the classical ARMA models.
+
+...
+
+\subsection{Models Based on Classifiers}
+
+When the output/response $y$ is defined on small domains, e.g., ${\mathbb B}$
+or ${\mathbb Z}_k ~ = ~ \{0, ~ ... ~ k-1\}$, then some classifiers used in data mining can be used for
+predictive analytics.
+
+...
+
+\section{SIMULATION MODELING}
+
+The most recent version of the Discrete-event Modeling Ontology (DeMO)
+lists five modeling paradigms or world-views for simulation.
+So far in this paper, discussion has focused on functions with two
+vectors, the input ${\bf x}$ and output ${\bf y}$, and a scalar time $t$.
+Simulation modeling adds to these the notion of state,
+represented by a vector-valued function ${\bf s}(t)$.
+Knowledge about the internals of a system or process
+is used to define state as well as how state can change over time.
+Theoretically, this should make such models more accurate,
+more robust, and have more explanatory power.
+More about this in the next section. 
+Ultimately, we may still be interested in how inputs affect
+outputs, but to increase the realism of the model with the
+hope of improving its accuracy, much attention must be
+directed in the modeling effort to state and state transitions.
+This is true to a degree with most simulation modeling paradigms or world views.
+These paradigms are briefly discussed below and explained
+in detail in \shortcite{Silver2011}.
+
+\begin{small}
+\begin{verbatim}
+
+// Golf Ball Flight Dynamics Model
+val n  = 100                               // maximum number of time points
+val tm =   5.                              // simulate for a maximum of tm sec
+val g  =   9.80665                         // gravitational force in m/sec^2
+val m  =  45.93                            // mass of a golf ball in grams
+val aa =  15.00                            // launch angle in degrees
+val ss = 100.00                            // swing speed in miles/hour
+val sf =   1.49                            // smash factor
+val s  = ss * sf * 1609.344 / 3600         // initial ball speed in m/sec
+val a  = aa * Pi / 180.                    // launch angle in radians
+val y0 = new VectorD (0., 0.)              // initial position (y_0, y_1)
+val v0 = new VectorD (s*cos(a), s*sin(a))  // initial velocity at t0
+
+// define the system of Ordinary Differential Equations (ODEs)
+def dy1_dt (t: Double, y: VectorD) = v0(0)              // ODE 1
+def dy2_dt (t: Double, y: VectorD) = v0(1) - g * t      // ODE 2
+val odes: Array [Derivative] = Array (dy1_dt, dy2_dt)
+
+val dt = tm / n                                 // time step
+var t  = dt                                     // next time point to examine
+var y  = new VectorD (2)                        // current ball position
+
+breakable { for (i <- 1 to n) {
+   y = DormandPrince.integrateV (odes, y0, t)  // compute new position
+   if (y(1) < 0.) break                        // quit after hitting ground
+   println ("> at t = " + "%4.1f".format (t) + " y = " + y)
+   t += dt
+}} // for
+
+\end{verbatim}
+\end{small}
+
+...
+
+\subsection{Simulation Optimization}
+
+Simulation optimization is becoming more popular
+and may be used for optimizing designs or for improving the
+models themselves \shortcite{Pasupathy2011}.
+One can think of a simulation model as having a parameter vector ${\bf b}$ that
+needs to be estimated or fit based on pairings of input and output
+vectors $\{{\bf y}, ~ {\bf x}\}$.
+In some cases, such as biochemical pathways, kinetics parameters
+are hard to measure directly, so an alternative is to adjust
+them by using simulation optimization to bring simulation
+results in line with experimental data.
+This is completely analogous to want happens in machine learning, where
+a training set of data is used calibrate or adjust parameters in a model
+(e.g., the weights $W$ and $V$ in Neural Nets).
+The optimization techniques themselves may be very similar.
+ScalaTion supports the development of simulation optimization solutions
+and includes several optimization algorithms, e.g.,
+Linear Programming (Simplex),
+Integer Programming (Branch and Bound),
+Quadratic Programming (Quadratic Simplex),
+Nonlinear Programming (Steepest Descent, Conjugate Gradient and Quasi-Newton), and
+Heuristics (Tabu Search and Genetic Algorithm).
+Furthermore, the SoPT ontology \shortcite{Han2011} can assist users
+developing such solutions.
+
+\section{MODELING CONTINUUM}
+
+Having examined techniques in both predictive analytics and
+simulation modeling utilizing a common notation, the paper now
+considers how these techniques can be viewed to belong to the same continuum.
+
+...
+
+\section{APPLICATION TO HEALTHCARE}
+
+In the healthcare domain,
+one problem to be addressed for emergency departments/urgent care facilities
+is that of staffing.
+The solutions provided below are simplified to better illustrate the techniques.
+For more information on problem of this type, please see \shortcite{Tan2012}
+Given an estimated demand, how many of various types of staff members should be hired, i.e., how many
+triage nurses, registered nurses, nurse practitioners, doctors and administrative clerks
+should be hired.
+The model includes $l$ = 2 types of patients (regular and severe) and $m$ = 5 types of employees.
+
+\begin{table}[ht]
+\caption{Model Definitions}
+\centering
+\begin{tabular}{|c|c|l|c|} \hline
+{\bf Variable} & {\bf Obtained} & {\bf Description} & {\bf Units} \\ \hline \hline
+$\lambda_k$ & input & arrival rate for patients of type $k$ & ${\rm hr}^{-1}$ \\ \hline
+$\mu_{jk}$  & input & service rate at resource $j$ for patients of type $k$ & ${\rm hr}^{-1}$ \\ \hline
+$f_k$       & input & fee charged to patients of type $k$ & \$ \\ \hline
+$d$         & input & patients dis-utility of waiting & \$ / hr \\ \hline
+$s_j$       & input & salary/wage for staff of type $j$ & \$ / hr \\ \hline
+$x_j$       & optimize & staffing level for type $j$ employees & none \\ \hline
+$n$         & output & treatment rate for patients & ${\rm hr}^{-1}$ \\ \hline
+$w$         & output & waiting time for patients & hr \\ \hline
+$c$         & ${\bf s} \cdot {\bf x}$  & operating cost & \$ / hr \\ \hline
+$r$         & ${\bf f} \cdot {\bf n}$ & revenue for patient service & \$ / hr \\ \hline
+$p$         & $r - c$ & net profit & \$ / hr \\ \hline
+$u$         & $p -  d n w$ & overall utility & \$ / hr \\ \hline
+\end{tabular}
+\label{definitions}
+\end{table}
+
+% $n_k$       & output & treatment rate for patients of type $k$ & ${\rm hr}^{-1}$ \\ \hline
+% $w_k$       & output & waiting time for patients of type $k$ & hr \\ \hline
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[scale=0.5]{EROpt.png}
+\caption{Screenshot of the Animation Produced by ScalaTion.}
+\label{fig:ERModelPic}
+\end{figure}
+
+\noindent
+The goal is to maximize a utility function based on profit as well as patient satisfaction
+that factors in a dis-utility proportional to patient waiting times.
+The optimization problem may be formulated as follows:
+
+\begin{center}
+${\rm \bf max} ~ u({\bf x}) ~ {\rm \bf subject ~ to} ~ {\bf x} \in {\mathbb Z}_+^m$
+\end{center}
+
+\noindent
+This is Integer Nonlinear Programming Problem (INLP) where unless assumptions/approximations
+are made there is no closed-form expression for the objective function $u({\bf x})$.
+For this modeling/optimization problem, the following three techniques are utilized:
+Process-Interaction Simulation Models, Queueing Networks and Multiple Linear Regression.
+
+\begin{small}
+\begin{verbatim}
+
+\\ Utility Function for Healthcare Application
+def u (x: VectorI, s: Double, d: Double): Double = {
+    val m = new EmergencyModel(x)       // create model
+    val results = m.simulate()          // simulate and gather stats
+    val w = sumOfMeans(m.tnQ, m.rnQ,    // sum of average waiting times
+                       m.mdQ, m.npQ,
+                       m.acQ)
+    val n = new VectorD (m.low, m.high) // patients served of each type
+    val c = x dot s                     // operating cost
+    val r = f dot n                     // revenue for patient service
+    val p = r - c                       // net profit
+    p - d * w * n.mean                  // return overall utility
+} // u
+
+\end{verbatim}
+\end{small}
+
+...
+
+\section{APPLICATION TO SUPPLY CHAIN MANAGEMENT}
+
+In this paper we claim that predictive analytics is more reliant on data, while simulation modeling is more reliant on knowledge.
+Effectively combining data and knowledge can lead to more accurate and informative modeling.
+Supply chain management is one of the most mature fields of analytics and provides excellent support for our claims.
+A wide variety of time-dependent predictive analytics techniques are used in supply chain management to
+forecast product demand \shortcite{Box1976}.
+As shown in Figure 2 (see \url{http://www.cs.uga.edu/~jam/scalation/examples/simopt}), forecasts of product demand feed the overall supply chain process, whose goal is to provide inventory to satisfy demand on a continuing basis.
+Simulation is often used to assess whether a supply chain will truly satisfy demand in the presence of a variety of uncertainties such as forecast error, supplier lead time, manufacturing lead time, and manufacturing yield.
+Here are a few of the many examples of supply chain simulation:
+
+...
+
+\section{CONCLUSIONS AND FUTURE WORK}
+
+Analytics and modeling is a vast landscape with numerous
+competing and complementary techniques.
+Positioning these techniques along a modeling continuum as well as
+creating taxonomies and ontologies to describe and inter-relate them
+can help illuminate this vast landscape.
+From the available/obtainable knowledge and data and the purpose
+of a particular modeling study, appropriate techniques can
+be chosen from the modeling continuum.
+
+...
+
+\bibliographystyle{wsc}
+% AUTHOR: Include your bib file here
+\bibliography{miller_wsc13}
+
+\section*{APPENDIX: ENERGY INFORMATICS AND MODELING}
+
+Another interesting area where the modeling continuum can be applied is the
+Energy Informatics and Modeling domain.
+It is interesting due to the amount of data available.
+Recently, Independent System Operators (ISOs) for various Smart Grids such as
+California ISO have made big datasets publicly available
+(e.g., \url{http://oasis.caiso.com}) that provide both real-time and historical data
+for their ISO transmission systems (outages, congestion, etc.) as well as the
+Locational Marginal Prices (LMPs) for the electricity markets tied to those systems.
+Additionally, the United States Department of Energy (DOE) provides various
+energy consumption models (e.g., DOE-2) for prototypical buildings in different
+regions of the country.
+An interesting question to ask is, given such data, can we predict
+``Can we predict outages?'' or ``Can we predict unexpected increases in the
+demand for energy?''
+From a business perspective, this information can lead to an optimized schedule
+for the variable generation sources used by the ISO.
+This problem is particularly interesting not only as you increase the number of
+units available for generation, but as the number of types of generation
+increases as well (e.g., as is the case with adoption of renewables).
+The idea would be to formulate and maximize a function for the overall utility
+of a given schedule (which can be expressed as a matrix) for set of generation sources.
+This function would depend on statistics such as:  mean outage time, total number
+of outages, revenue, min/max/avg LMPs as well as various other parameters such
+as the cost of maintenance, potential refunds to customers and the cost of
+turning off and on the different types of generation sources.
+
+$$ {\rm \bf max} ~ u(X) ~ {\rm \bf subject ~ to} ~ \forall {\bf x} \in X ~ \left( {\bf x} \in {\mathbb Z}_+^m \right) $$
+
+A simulation model for the Smart Grid can be verified against the models
+provided by the DOE and validated using the data provided by an ISO.
+Various simulation models have already been defined for buildings connected to
+a Smart Grid as seen in~\cite{Bakker2010} and~\cite{Pan2011}.
+Models that includes demand-side generation, i.e., consumers generating their
+own electricity, have also been derived~\cite{Houwing2006}.
+Parameters to such models can include:
+the current and predicted LMP values (perhaps used to define a distribution);
+The input to the model would be the schedule for generation.
+Our modified version of RSM can be used to provide a response surface for the
+objective function.
+When defining the design points that will be used to fit the surface, statistics
+derived from the historical data are used if they are available for a particular
+input/parameter configuration and within a desired confidence interval.
+Otherwise, statistics from the validated simulation model are used for a
+particular design point.
+
+\subsection{Big Data and Open Data for Regression}
+
+Oftentimes, it's hard to find enough of the data needed to in order to supply
+models with appropriate parameter values and distributions.
+
+Recently, there have been some notable increases in the number of publicly
+available, big datasets (Open Data).
+
+For example, some groups that working on this include:
+the Open Data Group (http://opendatagroup.com) and the Open Government
+Initiative (http://data.gov).
+
+\end{document}
+

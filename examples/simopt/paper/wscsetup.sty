@@ -1,0 +1,52 @@
+%*******************************************************************************
+%*
+%* ***WSC Configuration File - Base for LaTeX Papers for the WinterSim ***
+%*
+%  Note to editors: The setup parameters section has to be changed for each conference!
+%*
+%
+% ---------------------------------------------------------------------------------------------------------------------
+% Setup parameters (new in '11 ) [single location, not in tex file to be edited by authors]
+%
+% How to use:
+% Add a macro per year at the end of the list. The history can be of use to check the editor lists
+% of WSC paper citations.
+% - The macro definition has the form: \def\editorsYYYY{}
+% - The new macro has to be used in the \currentEditors macro which is used by the style: so you
+%   have to replace the \editorsYYYY macro used in there by the new one
+% Update the \currentYear macro to contain the current year
+%
+% You can search for the places the updates have to be applied to by using the search term
+% "EDITOR".
+
+
+
+% -------------- history of editors ------------------
+
+\def\editors2000{J.~A.~Joines, R.~R.~Barton, K.~Kang, and P.~A.~Fishwick}
+\def\editors2001{B.~A.~Peters, J.~S.~Smith, D.~J.~Medeiros, and M.~W.~Rohrer}
+\def\editors2002{E.~Y\"ucesan, C.-H.~Chen, J.~L.~Snowdon, and J.~M.~Charnes}
+\def\editors2003{S.~Chick, P.~J.~S\`anchez, D.~Ferrin, and D.~J.~Morrice}
+\def\editors2004{R.~G.~Ingalls, M.~D.~Rossetti, J.~S.~Smith, and B.~A.~Peters}
+\def\editors2005{M.~E.~Kuhl, N.~M.~Steiger, F.~B.~Armstrong, and J.~A.~Joines}
+\def\editors2006{L.~F.~Perrone, F.~P.~Wieland, J.~Liu, B.~G.~Lawson, D.~M.~Nicol, and R.~M.~Fujimoto}
+\def\editors2007{S.~G.~Henderson, B.~Biller, M.-H.~Hsieh, J.~Shortle, J.~D.~Tew, and R.~R.~Barton}
+\def\editors2008{S.~J.~Mason, R.~R.~Hill, L.~M\"onch, O.~Rose, T.~Jefferson, J.~W.~Fowler}
+\def\editors2009{M.~D.~Rossetti, R.~R.~Hill, B.~Johansson, A.~Dunkin and R.~G.~Ingalls}
+\def\editors2010{B.~Johansson, S.~Jain, J.~Montoya-Torres, J.~Hugan, and E.~Y\"ucesan}
+\def\editors2011{S.~Jain, R.~R. Creasey, J.~Himmelspach, K.~P.~White, and M.~Fu}
+\def\editors2012{C.~Laroque, J.~Himmelspach, R.~Pasupathy, O.~Rose, and A.~M.~Uhrmacher}
+\def\editors2013{R.~Pasupathy, S.~-H.~Kim, A.~Tolk, R.~Hill, and M.~E.~Kuhl}
+% EDITOR: add new definition above this line
+
+
+
+% -------------- settings for the current year ------------------
+\def\currentYear {2013}               % EDITOR: update with current year
+\def\currentEditors {\editors2013} % EDITOR: update by current editor definition macro
+\def\currentCaption {Proceedings of the \currentYear{} Winter Simulation Conference}
+
+%
+% End of setup parameters
+% % ---------------------------------------------------------------------------------------------------------------------
+%

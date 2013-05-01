@@ -1,0 +1,86 @@
+\begin{thebibliography}{}
+
+\bibitem[\protect\citeauthoryear{Box and Jenkins}{Box and
+  Jenkins}{1976}]{Box1976}
+Box, G., and G.~Jenkins. 1976.
+\newblock {\em Time Series Analysis: Forecasting and Control}.
+\newblock Upper Saddle River, NJ, USA: Holden-Day.
+
+
+\bibitem[\protect\citeauthoryear{Chen-Ritzo, An, Buckley, Chowdhary, Ervolina,
+  Lamba, Lee, and Subramanian}{Chen-Ritzo et~al.}{2007}]{Chen-Ritzo2007}
+Chen-Ritzo, C., L.~An, S.~Buckley, P.~Chowdhary, T.~Ervolina, N.~Lamba, Y.~Lee,
+  and D.~Subramanian. 2007.
+\newblock ``Pandemic Business Impact Modeler''.
+\newblock In {\em Proceedings of the 2007 INFORMS Simulation Society Research
+  Workshop},  ?--?: The Society for Computer Simulation.
+
+\bibitem[\protect\citeauthoryear{Feigin, An, Connors, and Crawford}{Feigin
+  et~al.}{1996}]{Feigin1996}
+Feigin, G., C.~An, D.~Connors, and I.~Crawford. 1996.
+\newblock ``Shape Up, Ship Out''.
+\newblock {\em ORMS Today\/}.
+
+
+\bibitem[\protect\citeauthoryear{Fletcher}{Fletcher}{2012}]{Fletcher2012}
+Fletcher, C. 2012.
+\newblock ``Innovation Insight: Price Optimization Leverages CRM, Big Data and
+  In-Memory Computing to Increase Profits and Innovation in the Customer
+  Experience''.
+\newblock Technical report.
+\newblock Gartner Report G00234031.
+
+\bibitem[\protect\citeauthoryear{Glover and Laguna}{Glover and
+  Laguna}{1998}]{Glover1998}
+Glover, F., and M.~Laguna. 1998.
+\newblock {\em Tabu Search}, Volume~1.
+\newblock {Kluwer Academic Pub.}
+
+
+\bibitem[\protect\citeauthoryear{Han, Miller, and Silver}{Han
+  et~al.}{2011}]{Han2011}
+Han, J., J.~A. Miller, and G.~A. Silver. 2011.
+\newblock ``SoPT: Ontology for Simulation Optimization for Scientific
+  Experiments''.
+\newblock In {\em Proceedings of the 2011 Winter Simulation Conference},
+  2914--2925: IEEE.
+
+\bibitem[\protect\citeauthoryear{IBM}{IBM}{2012}]{IBM2012}
+IBM 2012.
+\newblock ``BM Quality Early Warning System''.
+\newblock Technical report.
+
+\bibitem[\protect\citeauthoryear{Lin, Ettl, Buckley, Bagchi, Yao, Naccarato,
+  Allan, Kim, and Koenig}{Lin et~al.}{2000}]{Lin2000}
+Lin, G., M.~Ettl, S.~Buckley, S.~Bagchi, D.~Yao, B.~Naccarato, R.~Allan,
+  K.~Kim, and L.~Koenig. 2000.
+\newblock ``Extended-enterprise supply-chain management at IBM personal systems
+  group and other divisions''.
+\newblock {\em Interfaces\/}~30 (1).
+
+
+\bibitem[\protect\citeauthoryear{Pasupathy and Henderson}{Pasupathy and
+  Henderson}{2011}]{Pasupathy2011}
+Pasupathy, R., and S.~Henderson. 2011.
+\newblock ``{SimOpt: A Library of Simulation Optimization Problems}''.
+\newblock In {\em Proceedings of the 2011 Winter Simulation Conference (WSC)},
+  4075--4085.
+\newblock IEEE.
+
+\bibitem[\protect\citeauthoryear{Silver, Miller, Hybinette, Baramidze, and
+  York}{Silver et~al.}{2011}]{Silver2011}
+Silver, G.~A., J.~A. Miller, M.~Hybinette, G.~Baramidze, and W.~S. York. 2011.
+\newblock ``DeMO: An Ontology for Discrete-event Modeling and Simulation''.
+\newblock {\em Simulation\/}~87 (9): 747--773.
+
+
+\bibitem[\protect\citeauthoryear{Tan, Haas, Mak, Kieliszewski, Selinger,
+  Maglio, Glissman, Cefkin, and Li}{Tan et~al.}{2012}]{Tan2012}
+Tan, W.-C., P.~J. Haas, R.~L. Mak, C.~A. Kieliszewski, P.~G. Selinger, P.~P.
+  Maglio, S.~Glissman, M.~Cefkin, and Y.~Li. 2012.
+\newblock ``{Splash: A Platform for Analysis and Simulation of Health}''.
+\newblock In {\em Proceedings of the 2nd ACM SIGHIT Symposium on International
+  Health Informatics},  543--552.
+\newblock ACM.
+
+\end{thebibliography}

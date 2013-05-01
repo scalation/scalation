@@ -1,0 +1,512 @@
+%*******************************************************************************
+%*
+%* ***WSC Style File - Base for LaTeX Papers for the WinterSim ***
+%*
+% Contains basic style elements valid for papers and for poster abstracts
+%
+%*
+%
+% HISTORY
+%
+% WSC 2012
+%  * fixed author font size bug
+% WSC 2011 - created this style file based on the templates for WSC 2010
+%  * outdated fancyheadings is from now on replaced by fancyhdr
+%  * introduced sections, added comments
+%  * includes wscsetup.sty -> contains year specific information (editors, etc ...)
+%  * modified page layout, line distances, paragraphs, itemize environments, etc to get closer to word
+%      template style
+%  * introduced command WSCpagesetup (author names) which setups the running header and many
+%      other things previously needed in each paper's first lines of document code
+%
+%
+% --------------------------------- REQUIRED PACKAGES ---------------------------------
+% This package is required for setting up the running page header (author names)
+\RequirePackage{fancyhdr}
+
+% WSC parameter setup (editors, year, proceedings name)
+\RequirePackage{wscsetup}
+
+% select times font (by including this here it will be hard for authors to change, font will be used in the end in anyway)
+\RequirePackage{times}
+
+% package for displaying urls
+\RequirePackage{url}
+% select times font for the url package
+\urlstyle{rm}
+
+% ?
+\def\draft{\overfullrule=6pt}
+
+% --------------------------------- SPECIAL COMMANDS ---------------------------------
+%Print an email address in the required style
+\def\email#1{\href{mailto://#1}{#1}}
+
+% No one needs to use the following commands, but if they are used they help to avoid the problem of using figure, table, and section instead of Figure, Table, and Section
+
+%Print Figure followed by the mark generated for the label passed
+\def\reffig#1{Figure~\ref{#1}}
+
+%Print Table followed by the mark generated for the label passed
+\def\reftab#1{Table~\ref{#1}}
+
+%Print Section followed by the mark generated for the label passed
+\def\refsec#1{Section~\ref{#1}}
+
+
+% --------------------------------- PAGE SETUP  ---------------------------------
+
+%\RequirePackage[nofoot,letterpaper,lmargin=1in,tmargin=1in,rmargin=1in,bmargin=1in]{geometry}
+
+\setlength\footskip{75\p@}
+
+%The width of the text area is 6.5 inches (16.0 cm)
+\setlength\textwidth{6.5in}
+
+%new for WSC-10
+\setlength\textheight{8.75in} %9.0125in
+
+%\headsep=12pt
+\headsep=12pt
+%\headheight = 11pt
+
+%left and right margins are 1 inch (2.54 cm)
+\setlength\oddsidemargin{0in}%{-0.2in}
+\setlength\evensidemargin{0in}%{-0.1in}
+%\setlength\oddsidemargin{-.25in} \setlength\evensidemargin{-.25in}
+
+\setlength\marginparwidth {\z@}
+
+%top margin is set to be 1 inch (2.54 cm)
+%\setlength\topmargin{2.54cm}%{-4pc}%
+%\setlength\topmargin{-2pc}
+\setlength\topmargin{-19pt}
+\setlength\columnsep{.375in}
+
+%\pdfpagewidth 8.5in
+%\pdfpageheight 11.0in
+
+% --------------------------------- FLOAT SETUP  ---------------------------------
+% Setting the spaces around float (i.e, Figures, Tables etc ...)
+
+
+% distance between two floats
+\setlength{\floatsep}{12pt}
+% dynamic variant (more flexibel) \setlength\floatsep    {12\p@\@plus 2\p@ minus 2pt}
+
+% distance between float and text (above & below)
+\setlength{\textfloatsep}{6pt}
+%\setlength\textfloatsep{12\p@ \@plus 2\p@minus 2pt}
+
+%\textfloatsep - space between last top float or first bottom float and the text
+% space left on top and bottom of an in-text float.
+\setlength{\intextsep}{6pt}
+% \setlength\intextsep   {12\p@ \@plus 2\p@ minus 2pt}
+
+% space above caption
+\setlength{\abovecaptionskip}{6pt}
+% space below caption
+\setlength{\belowcaptionskip}{6pt}
+
+\setcounter{dbltopnumber}{4}
+
+\setcounter{topnumber}{4}
+
+% settings for two column mode - distance between floats
+\setlength{\dblfloatsep}{6pt}
+% settings for two column mode - distance between float and text
+\setlength{\dbltextfloatsep}{6pt}
+
+% --------------------------------- FONT SETUP  ---------------------------------
+
+%\font\titlepageheadfont=tii at 10pt
+
+% --------------------------------- NAMES SETUP  ---------------------------------
+\renewcommand{\refname}{REFERENCES}
+\newcommand\pagename{Page}
+
+% --------------------------------- SPECIAL WORDS
+\newcommand{\BibTeX}{B{\small IB}$\!$\TeX}
+
+% --------------------------------- HEADER SETUP  ---------------------------------
+% --- header of first page (including proceedings caption and names of editors) ---
+% moving up 1st header by approx 6mm to match word template
+\def\firstPageHead {
+  %increase the head height for the two lines editors/proceedings header (to avoid warning by fancyhdr)
+  \setlength{\headheight}{26pt}
+ %setup the header (left, italics containing proceedings caption and editors in 2nd row)
+  \lhead{
+  \fancyplain{
+   \textit{\currentCaption\\
+      \currentEditors , eds.}}{}}
+} % end of firstPageHead definition
+
+%****WSC setup for Running Heads of LaTeX Papers from second page on***
+\def\WSCpagesetup#1{
+
+% setting up general page style
+\pagestyle{fancyplain}
+
+% setting up page style of first page
+\thispagestyle{plain}
+\firstPageHead{}
+
+% setting up running header (authors) of subsequent pages
+\chead{\fancyplain{}{\itshape #1}}
+
+% setting up seperation parameters
+%\headsep=72pt
+\rhead{}
+\cfoot{}
+\renewcommand{\headrulewidth}{0pt} % (renewcommand needed in fancyhdr to remove top decorative line)
+%\headrulewidth=0pt  % ("setlength" needed in fancyheading to remove top decorative line)
+
+\input{wscbib.tex}           % Set up BiBTeX macros
+
+% needed to make the tex document look more like the word counterpart :-(
+\setlength{\baselineskip}{12.7pt}
+}
+
+% --------------------------------- TITLE SETUP  ---------------------------------
+% *** WSC formatting of the title (redefinition of title command)
+\renewcommand\title[1]{\gdef\@title{\bf #1}}
+
+%space between title and the abstract, this case has been set to be 3.4 inches (two rows of authors).
+\newlength{\titlevboxsize}
+\setlength\titlevboxsize {3.4in}
+
+\def\authors#1{\gdef\theauthors{#1}}
+\let\aauthor\authors
+
+%definition of maketitle
+
+\def\maketitle{\par\global\titletrue
+ \begingroup
+   \renewcommand\thefootnote{\fnsymbol{footnote}}%
+    \def\@makefnmark{\rlap{\@textsuperscript{\normalfont\@thefnmark}}}%
+     \long\def\@makefntext##1{\parindent 1em\noindent
+             \hb@xt@1.8em{%
+                 \hss\@textsuperscript{\normalfont\@thefnmark}}##1}%
+  % \twocolumn[\@maketitle]%
+
+\@maketitle
+   \@thanks
+ \endgroup
+ \setcounter{footnote}{0}%
+ \let\maketitle\relax
+ \let\@maketitle\relax
+ \gdef\@thanks{}\gdef\@author{}\gdef\@title{}\let\thanks\relax}
+
+\def\@maketitle{%
+%\hbox to \titlevboxsize
+% \vbox  to \titlevboxsize
+
+   %Space between header and title
+   %\vskip 2pc % 1 pc = 12 pt
+{ \vspace*{1.5mm} %8.2mm
+    \hsize\textwidth
+    \linewidth\hsize
+%    \vfil
+    \centering
+    { \@title \par}
+    \vskip 24pt%Controls Text Between Title and Authors
+    { \begin{tabular}[t]{@{}c@{}}\@author \\
+\vrule width 3in height 0pt depth0pt\relax\end{tabular}\par %new for WSC-10: space between authors has been reduced to have the text of 6.5 inches
+
+}\vskip 12pt} }
+%\vrule width 3.5in height 0pt depth0pt\relax\end{tabular}\par
+
+% definition of \and
+
+\def\and{\\
+ \vrule width 3in height 0pt depth0pt\relax %new for WSC-10: space between authors has been reduced to have the text of 6.5 inches
+% \vrule width 3.5in height 0pt depth0pt\relax
+\end {tabular}\hfill%
+\begin{tabular}[t]{@{}c@{}}}
+
+% --------------------------------- EASY AUTHOR BIOGRAPHIES ---------------------------------
+
+\def\addBio#1#2{\noindent {\bf \uppercase{#1}} #2\\
+}
+
+% --------------------------------- SETTING UP COPYRIGHT SPACE ---------------------------------
+
+\def\copyrightspace{%
+  \footnotetext[0]{\mbox{}\vrule \@height 97\p@ \@width \z@}}
+
+% Redefine the abstract environment to be a normal section (without number)
+\renewenvironment{abstract}%
+  {\section*{\abstractname}}
+  {\par}
+
+
+% --------------------------------- SETTING UP ITEM ENVIRONMENTS
+
+
+\newdimen\labelwidthi
+\newdimen\labelwidthii
+\settowidth{\labelwidthi}{M}
+\settowidth{\labelwidthii}{(d)}
+%\leftmargini\labelwidthi    \advance\leftmargini\labelsep
+%\leftmarginii\labelwidthii  \advance\leftmarginii\labelsep
+
+%\leftmargin=.63cm
+\leftmargini=1.2cm
+\leftmarginii=4ex
+\leftmarginii=4ex
+
+% level 1
+\def\@listi{\leftmargin\leftmargini
+\rightmargin0pt
+            \parsep 0\p@
+            \topsep 10\p@
+            \itemsep0\p@}
+\let\@listI\@listi
+\@listi
+
+% level 2
+\def\@listii{\leftmargin\leftmarginii
+\rightmargin0pt
+            \labelsep 1ex
+            \parsep 0\p@
+            \topsep 0\p@
+            \itemsep0\p@}
+\let\@listII\@listii
+\@listii
+
+% level 3
+\def\@listiii{\leftmargin\leftmarginiii
+\rightmargin0pt
+            \parsep 0\p@
+            \topsep 0\p@
+            \itemsep0\p@}
+\let\@listIII\@listiii
+\@listiii
+
+\labelsep=.25in
+\setlength  \labelwidth{\leftmargini}
+\addtolength\labelwidth{-\labelsep}
+
+\renewcommand\labelenumi{\rlap{\rm\theenumi.}}
+
+\renewcommand\labelitemi{\rlap{\textbullet}}
+
+
+% SETTING UP SECTIONS
+
+\def\@seccntformat#1{\hbox to .25in{\csname the#1\endcsname\hss}\relax}
+
+\def\@sect#1#2#3#4#5#6[#7]#8{%
+\ifnum #2>\c@secnumdepth
+    \let\@svsec\@empty
+  \else
+    \refstepcounter{#1}%
+    \protected@edef\@svsec{\@seccntformat{#1}\relax}%
+  \fi
+  \@tempskipa #5\relax
+  \ifdim \@tempskipa>\z@
+    \begingroup
+      #6{%
+        \@hangfrom{\hskip #3\relax\@svsec}%
+          \interlinepenalty \@M #8\@@par}%
+    \endgroup
+    \csname #1mark\endcsname{#7}%
+    \addcontentsline{toc}{#1}{%
+      \ifnum #2>\c@secnumdepth \else
+        \protect\numberline{\csname the#1\endcsname}%
+      \fi
+      #7}%
+  \else
+    \def\@svsechd{%
+      #6{\hskip #3\relax
+      \@svsec #8}%
+      \csname #1mark\endcsname{#7}%
+      \addcontentsline{toc}{#1}{%
+        \ifnum #2>\c@secnumdepth \else
+          \protect\numberline{\csname the#1\endcsname}%
+        \fi
+        #7}}%
+  \fi
+  \@xsect{#5}}
+
+% XTABLE
+
+\def\xtable{table}
+\long\def\@makecaption#1#2{%
+\ifx\@captype\xtable \vskip3pt \else
+  \vskip\abovecaptionskip\fi
+  \sbox\@tempboxa{#1: #2}%
+  \ifdim \wd\@tempboxa >\hsize
+    #1: #2\par
+  \else
+    \global \@minipagefalse
+    \hb@xt@\hsize{\hfil\box\@tempboxa\hfil}%
+  \fi
+  \vskip\belowcaptionskip}
+
+% REDEFINITION OF THE SECTION COMMANDS (spacing around them)
+
+% new from WSC'11: 6 pts after Section
+
+\renewcommand\section{\@startsection {section}{1}{\z@}%
+                                  % {-3.5ex \@plus -1ex \@minus -.2ex}%
+ {-12pt}%
+                                   %{2.3ex \@plus.2ex}%
+{6pt}%
+                                   {\hyphenpenalty10000\normalfont\normalsize\bfseries}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+                         %       {-3.25ex\@plus -1ex \@minus -.2ex}%
+ {-12pt}%
+       %                                     {1.5ex \@plus .2ex}%
+{6pt}%
+                                     {\normalfont\normalsize\hyphenpenalty10000\bfseries}}
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+{-12pt}
+      %                               {-3.25ex\@plus -1ex \@minus -.2ex}%
+{6pt}
+     %                                {1.5ex \@plus .2ex}%
+                                     {\normalfont\normalsize\hyphenpenalty10000\bfseries}}
+
+\let\savesubsub\subsubsection
+\def\subsubsection#1{\savesubsub{\ \ #1}}
+
+% REDEFINITION OF FURTHER DOCUMENT LAYOUT PARAMETERS
+
+\parskip=0pt plus .01pt
+
+%\baselineskip=0mm
+
+\let\saveparagraph\paragraph
+\def\paragraph#1{\vskip1sp
+{\bf #1}\hskip1em\relax}
+
+
+\raggedbottom
+
+% hangref environment
+\newenvironment{hangref}{\begin{list}{}{\setlength{\itemsep}{0pt}
+\setlength{\parsep}{0pt}\setlength{\rightmargin}{0pt}
+\setlength{\leftmargin}{+\parindent}
+\setlength{\itemindent}{-\parindent}}}{\end{list}}
+
+
+\newif\iftitle
+\def\@oddhead{\iftitle\global\titlefalse
+\vtop to0pt{\hbox to.9\textwidth{\titlepageheadfont
+\currentCaption\hfill}%
+\vskip2pt \hbox to .9\textwidth{\titlepageheadfont
+\currentEditors , eds.\hfill}%
+\vss} \else \hbox
+to\textwidth{\titlepageheadfont\hfill\thetitle\hfill}\fi}
+
+\def\@evenhead{\iftitle\global\titlefalse\fi%
+\hbox to \textwidth{\hss\titlepageheadfont \theauthors\hss}}
+
+\let\@oddfoot\relax
+\let\@evenfoot\@oddfoot
+
+\def\ttitle#1{\gdef\thetitle{#1}}
+
+%\def\normalsize{%
+%\@setfontsize \normalsize \@xpt \@xiipt \abovedisplayskip 12pt
+%\abovedisplayshortskip 8pt \belowdisplayshortskip 8pt
+%\belowdisplayskip=\abovedisplayskip
+%\let \@listi \@listI}
+%\normalsize
+
+\def\sk{\vskip12pt}
+\let\vs\sk
+\def\bd{\vskip2pt\noindent} %belowdisplay
+
+\spaceskip=3.5pt plus 2pt minus2pt
+
+\parindent=.25in
+
+\hfuzz=1pt
+
+\widowpenalty=10000 \clubpenalty=10000
+
+\def\verbatim{\spaceskip=0pt
+\@verbatim \frenchspacing\@vobeyspaces \@xverbatim}
+
+\newcommand\smscriptsize{\@setfontsize\scriptsize\@vipt\@viipt}
+
+\def\nofloatfigure{\def\@captype{figure}}
+\let\endnofloatfigure\relax
+
+\def\nofloattable{\def\@captype{table}}
+\let\endnofloattable\relax
+
+\newcount\itemcount
+
+\def\spenumerate{\bgroup\leftskip=.25in
+\global\itemcount=0
+\def\item{\global\advance\itemcount by 1
+\vskip1sp \noindent\hskip-.25in\hbox to
+.25in{\the\itemcount.\hss}}}
+
+\def\endspenumerate{\vskip12pt\egroup}
+
+\newif\ifnoindent
+\def\@begintheorem#1#2{\vskip-12pt\vskip1sp
+\trivlist
+   \item[\ifnoindent\global\noindentfalse\else
+\hskip.25in\fi\hskip \labelsep{\bfseries #1\ #2}]\itshape}
+
+\def\@opargbegintheorem#1#2#3{\vskip-12pt\vskip1sp
+\trivlist
+      \item[\ifnoindent\global\noindentfalse\else\hskip.25in\fi%
+\hskip \labelsep{\bfseries #1\ #2\ (#3)}]\itshape}
+
+\def\@endtheorem{\vskip1sp}
+
+% (from apalike.sty)
+% Set length of hanging indentation for bibliography entries.
+%
+\newlength{\bibhang}
+\setlength{\bibhang}{2em}
+
+% Indent second and subsequent lines of bibliographic entries. Stolen
+% from openbib.sty: \newblock is set to {}.
+
+\newdimen\bibindent
+\bibindent=.25in
+\@ifundefined{refname}%
+   {\@ifundefined{chapter}%
+     {\newcommand{\refname}{References}}%
+     {\newcommand{\refname}{Bibliography}}%
+   }%
+   {}%
+
+
+\def\thebibliography#1{\section*{\refname\@mkboth
+   {\uppercase{\refname}}{\uppercase{\refname}}}\list
+   {[\arabic{enumi}]}{\settowidth\labelwidth{[#1]}
+\rightmargin=0pt \leftmargin=0pt
+   \leftmargin\labelwidth
+   \advance\leftmargin\labelsep
+   \advance\leftmargin\bibindent
+\advance\leftmargin-24pt
+   \itemindent -\bibindent
+   \listparindent \itemindent
+   \parsep \z@
+   \usecounter{enumi}}
+   \def\newblock{}
+   \sloppy
+   \sfcode`\.=1000\relax}
+
+\endinput
+
+\makeatletter
+\def\@lbibitem[#1]#2{\item[]%[\@biblabel {#1}\hfill ]
+\if@filesw {\let\protect\noexpand\immediate\write\@auxout{
+\string\bibcite {#2}{#1}}}\fi\ignorespaces}
+
+\def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+
+
+
+\def\Box{\vbox to 6pt{\hrule
+\hbox{\vrule height 4.8pt  \hskip 4.8pt \vrule } \hrule}}
+

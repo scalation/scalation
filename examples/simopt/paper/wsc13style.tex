@@ -1,0 +1,4221 @@
+%
+%
+% File contains:
+%   fancyhdr.sty
+%   psfig.sty
+%   url.sty
+%   wsc.bst
+%   wscpaperproc.cls
+%   wscsetup.sty
+%   wsc.sty
+%   wscbib.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{filecontents*}{fancyhdr.sty}
+% fancyhdr.sty version 3.2
+% Fancy headers and footers for LaTeX.
+% Piet van Oostrum, 
+% Dept of Computer and Information Sciences, University of Utrecht,
+% Padualaan 14, P.O. Box 80.089, 3508 TB Utrecht, The Netherlands
+% Telephone: +31 30 2532180. Email: piet@cs.uu.nl
+% ========================================================================
+% LICENCE:
+% This file may be distributed under the terms of the LaTeX Project Public
+% License, as described in lppl.txt in the base LaTeX distribution.
+% Either version 1 or, at your option, any later version.
+% ========================================================================
+% MODIFICATION HISTORY:
+% Sep 16, 1994
+% version 1.4: Correction for use with \reversemargin
+% Sep 29, 1994:
+% version 1.5: Added the \iftopfloat, \ifbotfloat and \iffloatpage commands
+% Oct 4, 1994:
+% version 1.6: Reset single spacing in headers/footers for use with
+% setspace.sty or doublespace.sty
+% Oct 4, 1994:
+% version 1.7: changed \let\@mkboth\markboth to
+% \def\@mkboth{\protect\markboth} to make it more robust
+% Dec 5, 1994:
+% version 1.8: corrections for amsbook/amsart: define \@chapapp and (more
+% importantly) use the \chapter/sectionmark definitions from ps@headings if
+% they exist (which should be true for all standard classes).
+% May 31, 1995:
+% version 1.9: The proposed \renewcommand{\headrulewidth}{\iffloatpage...
+% construction in the doc did not work properly with the fancyplain style. 
+% June 1, 1995:
+% version 1.91: The definition of \@mkboth wasn't restored on subsequent
+% \pagestyle{fancy}'s.
+% June 1, 1995:
+% version 1.92: The sequence \pagestyle{fancyplain} \pagestyle{plain}
+% \pagestyle{fancy} would erroneously select the plain version.
+% June 1, 1995:
+% version 1.93: \fancypagestyle command added.
+% Dec 11, 1995:
+% version 1.94: suggested by Conrad Hughes <chughes@maths.tcd.ie>
+% CJCH, Dec 11, 1995: added \footruleskip to allow control over footrule
+% position (old hardcoded value of .3\normalbaselineskip is far too high
+% when used with very small footer fonts).
+% Jan 31, 1996:
+% version 1.95: call \@normalsize in the reset code if that is defined,
+% otherwise \normalsize.
+% this is to solve a problem with ucthesis.cls, as this doesn't
+% define \@currsize. Unfortunately for latex209 calling \normalsize doesn't
+% work as this is optimized to do very little, so there \@normalsize should
+% be called. Hopefully this code works for all versions of LaTeX known to
+% mankind.  
+% April 25, 1996:
+% version 1.96: initialize \headwidth to a magic (negative) value to catch
+% most common cases that people change it before calling \pagestyle{fancy}.
+% Note it can't be initialized when reading in this file, because
+% \textwidth could be changed afterwards. This is quite probable.
+% We also switch to \MakeUppercase rather than \uppercase and introduce a
+% \nouppercase command for use in headers. and footers.
+% May 3, 1996:
+% version 1.97: Two changes:
+% 1. Undo the change in version 1.8 (using the pagestyle{headings} defaults
+% for the chapter and section marks. The current version of amsbook and
+% amsart classes don't seem to need them anymore. Moreover the standard
+% latex classes don't use \markboth if twoside isn't selected, and this is
+% confusing as \leftmark doesn't work as expected.
+% 2. include a call to \ps@empty in ps@@fancy. This is to solve a problem
+% in the amsbook and amsart classes, that make global changes to \topskip,
+% which are reset in \ps@empty. Hopefully this doesn't break other things.
+% May 7, 1996:
+% version 1.98:
+% Added % after the line  \def\nouppercase
+% May 7, 1996:
+% version 1.99: This is the alpha version of fancyhdr 2.0
+% Introduced the new commands \fancyhead, \fancyfoot, and \fancyhf.
+% Changed \headrulewidth, \footrulewidth, \footruleskip to
+% macros rather than length parameters, In this way they can be
+% conditionalized and they don't consume length registers. There is no need
+% to have them as length registers unless you want to do calculations with
+% them, which is unlikely. Note that this may make some uses of them
+% incompatible (i.e. if you have a file that uses \setlength or \xxxx=)
+% May 10, 1996:
+% version 1.99a:
+% Added a few more % signs
+% May 10, 1996:
+% version 1.99b:
+% Changed the syntax of \f@nfor to be resistent to catcode changes of :=
+% Removed the [1] from the defs of \lhead etc. because the parameter is
+% consumed by the \@[xy]lhead etc. macros.
+% June 24, 1997:
+% version 1.99c:
+% corrected \nouppercase to also include the protected form of \MakeUppercase
+% \global added to manipulation of \headwidth.
+% \iffootnote command added.
+% Some comments added about \@fancyhead and \@fancyfoot.
+% Aug 24, 1998
+% version 1.99d
+% Changed the default \ps@empty to \ps@@empty in order to allow
+% \fancypagestyle{empty} redefinition.
+% Oct 11, 2000
+% version 2.0
+% Added LPPL license clause.
+%
+% A check for \headheight is added. An errormessage is given (once) if the
+% header is too large. Empty headers don't generate the error even if
+% \headheight is very small or even 0pt. 
+% Warning added for the use of 'E' option when twoside option is not used.
+% In this case the 'E' fields will never be used.
+%
+% Mar 10, 2002
+% version 2.1beta
+% New command: \fancyhfoffset[place]{length}
+% defines offsets to be applied to the header/footer to let it stick into
+% the margins (if length > 0).
+% place is like in fancyhead, except that only E,O,L,R can be used.
+% This replaces the old calculation based on \headwidth and the marginpar
+% area.
+% \headwidth will be dynamically calculated in the headers/footers when
+% this is used.
+%
+% Mar 26, 2002
+% version 2.1beta2
+% \fancyhfoffset now also takes h,f as possible letters in the argument to
+% allow the header and footer widths to be different.
+% New commands \fancyheadoffset and \fancyfootoffset added comparable to
+% \fancyhead and \fancyfoot.
+% Errormessages and warnings have been made more informative.
+%
+% Dec 9, 2002
+% version 2.1
+% The defaults for \footrulewidth, \plainheadrulewidth and
+% \plainfootrulewidth are changed from \z@skip to 0pt. In this way when
+% someone inadvertantly uses \setlength to change any of these, the value
+% of \z@skip will not be changed, rather an errormessage will be given.
+
+% March 3, 2004
+% Release of version 3.0
+
+% Oct 7, 2004
+% version 3.1
+% Added '\endlinechar=13' to \fancy@reset to prevent problems with
+% includegraphics in header when verbatiminput is active.
+
+% March 22, 2005
+% version 3.2
+% reset \everypar (the real one) in \fancy@reset because spanish.ldf does
+% strange things with \everypar between << and >>.
+
+\def\ifancy@mpty#1{\def\temp@a{#1}\ifx\temp@a\@empty}
+
+\def\fancy@def#1#2{\ifancy@mpty{#2}\fancy@gbl\def#1{\leavevmode}\else
+                                   \fancy@gbl\def#1{#2\strut}\fi}
+
+\let\fancy@gbl\global
+
+\def\@fancyerrmsg#1{%
+        \ifx\PackageError\undefined
+        \errmessage{#1}\else
+        \PackageError{Fancyhdr}{#1}{}\fi}
+\def\@fancywarning#1{%
+        \ifx\PackageWarning\undefined
+        \errmessage{#1}\else
+        \PackageWarning{Fancyhdr}{#1}{}\fi}
+
+% Usage: \@forc \var{charstring}{command to be executed for each char}
+% This is similar to LaTeX's \@tfor, but expands the charstring.
+
+\def\@forc#1#2#3{\expandafter\f@rc\expandafter#1\expandafter{#2}{#3}}
+\def\f@rc#1#2#3{\def\temp@ty{#2}\ifx\@empty\temp@ty\else
+                                    \f@@rc#1#2\f@@rc{#3}\fi}
+\def\f@@rc#1#2#3\f@@rc#4{\def#1{#2}#4\f@rc#1{#3}{#4}}
+
+% Usage: \f@nfor\name:=list\do{body}
+% Like LaTeX's \@for but an empty list is treated as a list with an empty
+% element
+
+\newcommand{\f@nfor}[3]{\edef\@fortmp{#2}%
+    \expandafter\@forloop#2,\@nil,\@nil\@@#1{#3}}
+
+% Usage: \def@ult \cs{defaults}{argument}
+% sets \cs to the characters from defaults appearing in argument
+% or defaults if it would be empty. All characters are lowercased.
+
+\newcommand\def@ult[3]{%
+    \edef\temp@a{\lowercase{\edef\noexpand\temp@a{#3}}}\temp@a
+    \def#1{}%
+    \@forc\tmpf@ra{#2}%
+        {\expandafter\if@in\tmpf@ra\temp@a{\edef#1{#1\tmpf@ra}}{}}%
+    \ifx\@empty#1\def#1{#2}\fi}
+% 
+% \if@in <char><set><truecase><falsecase>
+%
+\newcommand{\if@in}[4]{%
+    \edef\temp@a{#2}\def\temp@b##1#1##2\temp@b{\def\temp@b{##1}}%
+    \expandafter\temp@b#2#1\temp@b\ifx\temp@a\temp@b #4\else #3\fi}
+
+\newcommand{\fancyhead}{\@ifnextchar[{\f@ncyhf\fancyhead h}%
+                                     {\f@ncyhf\fancyhead h[]}}
+\newcommand{\fancyfoot}{\@ifnextchar[{\f@ncyhf\fancyfoot f}%
+                                     {\f@ncyhf\fancyfoot f[]}}
+\newcommand{\fancyhf}{\@ifnextchar[{\f@ncyhf\fancyhf{}}%
+                                   {\f@ncyhf\fancyhf{}[]}}
+
+% New commands for offsets added
+
+\newcommand{\fancyheadoffset}{\@ifnextchar[{\f@ncyhfoffs\fancyheadoffset h}%
+                                           {\f@ncyhfoffs\fancyheadoffset h[]}}
+\newcommand{\fancyfootoffset}{\@ifnextchar[{\f@ncyhfoffs\fancyfootoffset f}%
+                                           {\f@ncyhfoffs\fancyfootoffset f[]}}
+\newcommand{\fancyhfoffset}{\@ifnextchar[{\f@ncyhfoffs\fancyhfoffset{}}%
+                                         {\f@ncyhfoffs\fancyhfoffset{}[]}}
+
+% The header and footer fields are stored in command sequences with
+% names of the form: \f@ncy<x><y><z> with <x> for [eo], <y> from [lcr]
+% and <z> from [hf].
+
+\def\f@ncyhf#1#2[#3]#4{%
+    \def\temp@c{}%
+    \@forc\tmpf@ra{#3}%
+        {\expandafter\if@in\tmpf@ra{eolcrhf,EOLCRHF}%
+            {}{\edef\temp@c{\temp@c\tmpf@ra}}}%
+    \ifx\@empty\temp@c\else
+        \@fancyerrmsg{Illegal char `\temp@c' in \string#1 argument:
+          [#3]}%
+    \fi
+    \f@nfor\temp@c{#3}%
+        {\def@ult\f@@@eo{eo}\temp@c
+         \if@twoside\else
+           \if\f@@@eo e\@fancywarning
+             {\string#1's `E' option without twoside option is useless}\fi\fi
+         \def@ult\f@@@lcr{lcr}\temp@c
+         \def@ult\f@@@hf{hf}{#2\temp@c}%
+         \@forc\f@@eo\f@@@eo
+             {\@forc\f@@lcr\f@@@lcr
+                 {\@forc\f@@hf\f@@@hf
+                     {\expandafter\fancy@def\csname
+                      f@ncy\f@@eo\f@@lcr\f@@hf\endcsname
+                      {#4}}}}}}
+
+\def\f@ncyhfoffs#1#2[#3]#4{%
+    \def\temp@c{}%
+    \@forc\tmpf@ra{#3}%
+        {\expandafter\if@in\tmpf@ra{eolrhf,EOLRHF}%
+            {}{\edef\temp@c{\temp@c\tmpf@ra}}}%
+    \ifx\@empty\temp@c\else
+        \@fancyerrmsg{Illegal char `\temp@c' in \string#1 argument:
+          [#3]}%
+    \fi
+    \f@nfor\temp@c{#3}%
+        {\def@ult\f@@@eo{eo}\temp@c
+         \if@twoside\else
+           \if\f@@@eo e\@fancywarning
+             {\string#1's `E' option without twoside option is useless}\fi\fi
+         \def@ult\f@@@lcr{lr}\temp@c
+         \def@ult\f@@@hf{hf}{#2\temp@c}%
+         \@forc\f@@eo\f@@@eo
+             {\@forc\f@@lcr\f@@@lcr
+                 {\@forc\f@@hf\f@@@hf
+                     {\expandafter\setlength\csname
+                      f@ncyO@\f@@eo\f@@lcr\f@@hf\endcsname
+                      {#4}}}}}%
+     \fancy@setoffs}
+
+% Fancyheadings version 1 commands. These are more or less deprecated,
+% but they continue to work.
+
+\newcommand{\lhead}{\@ifnextchar[{\@xlhead}{\@ylhead}}
+\def\@xlhead[#1]#2{\fancy@def\f@ncyelh{#1}\fancy@def\f@ncyolh{#2}}
+\def\@ylhead#1{\fancy@def\f@ncyelh{#1}\fancy@def\f@ncyolh{#1}}
+
+\newcommand{\chead}{\@ifnextchar[{\@xchead}{\@ychead}}
+\def\@xchead[#1]#2{\fancy@def\f@ncyech{#1}\fancy@def\f@ncyoch{#2}}
+\def\@ychead#1{\fancy@def\f@ncyech{#1}\fancy@def\f@ncyoch{#1}}
+
+\newcommand{\rhead}{\@ifnextchar[{\@xrhead}{\@yrhead}}
+\def\@xrhead[#1]#2{\fancy@def\f@ncyerh{#1}\fancy@def\f@ncyorh{#2}}
+\def\@yrhead#1{\fancy@def\f@ncyerh{#1}\fancy@def\f@ncyorh{#1}}
+
+\newcommand{\lfoot}{\@ifnextchar[{\@xlfoot}{\@ylfoot}}
+\def\@xlfoot[#1]#2{\fancy@def\f@ncyelf{#1}\fancy@def\f@ncyolf{#2}}
+\def\@ylfoot#1{\fancy@def\f@ncyelf{#1}\fancy@def\f@ncyolf{#1}}
+
+\newcommand{\cfoot}{\@ifnextchar[{\@xcfoot}{\@ycfoot}}
+\def\@xcfoot[#1]#2{\fancy@def\f@ncyecf{#1}\fancy@def\f@ncyocf{#2}}
+\def\@ycfoot#1{\fancy@def\f@ncyecf{#1}\fancy@def\f@ncyocf{#1}}
+
+\newcommand{\rfoot}{\@ifnextchar[{\@xrfoot}{\@yrfoot}}
+\def\@xrfoot[#1]#2{\fancy@def\f@ncyerf{#1}\fancy@def\f@ncyorf{#2}}
+\def\@yrfoot#1{\fancy@def\f@ncyerf{#1}\fancy@def\f@ncyorf{#1}}
+
+\newlength{\fancy@headwidth}
+\let\headwidth\fancy@headwidth
+\newlength{\f@ncyO@elh}
+\newlength{\f@ncyO@erh}
+\newlength{\f@ncyO@olh}
+\newlength{\f@ncyO@orh}
+\newlength{\f@ncyO@elf}
+\newlength{\f@ncyO@erf}
+\newlength{\f@ncyO@olf}
+\newlength{\f@ncyO@orf}
+\newcommand{\headrulewidth}{0.4pt}
+\newcommand{\footrulewidth}{0pt}
+\newcommand{\footruleskip}{.3\normalbaselineskip}
+
+% Fancyplain stuff shouldn't be used anymore (rather
+% \fancypagestyle{plain} should be used), but it must be present for
+% compatibility reasons.
+
+\newcommand{\plainheadrulewidth}{0pt}
+\newcommand{\plainfootrulewidth}{0pt}
+\newif\if@fancyplain \@fancyplainfalse
+\def\fancyplain#1#2{\if@fancyplain#1\else#2\fi}
+
+\headwidth=-123456789sp %magic constant
+
+% Command to reset various things in the headers:
+% a.o.  single spacing (taken from setspace.sty)
+% and the catcode of ^^M (so that epsf files in the header work if a
+% verbatim crosses a page boundary)
+% It also defines a \nouppercase command that disables \uppercase and
+% \Makeuppercase. It can only be used in the headers and footers.
+\let\fnch@everypar\everypar% save real \everypar because of spanish.ldf
+\def\fancy@reset{\fnch@everypar{}\restorecr\endlinechar=13
+ \def\baselinestretch{1}%
+ \def\nouppercase##1{{\let\uppercase\relax\let\MakeUppercase\relax
+     \expandafter\let\csname MakeUppercase \endcsname\relax##1}}%
+ \ifx\undefined\@newbaseline% NFSS not present; 2.09 or 2e
+   \ifx\@normalsize\undefined \normalsize % for ucthesis.cls
+   \else \@normalsize \fi
+ \else% NFSS (2.09) present
+  \@newbaseline%
+ \fi}
+
+% Initialization of the head and foot text.
+
+% The default values still contain \fancyplain for compatibility.
+\fancyhf{} % clear all
+% lefthead empty on ``plain'' pages, \rightmark on even, \leftmark on odd pages
+% evenhead empty on ``plain'' pages, \leftmark on even, \rightmark on odd pages
+\if@twoside
+  \fancyhead[el,or]{\fancyplain{}{\sl\rightmark}}
+  \fancyhead[er,ol]{\fancyplain{}{\sl\leftmark}}
+\else
+  \fancyhead[l]{\fancyplain{}{\sl\rightmark}}
+  \fancyhead[r]{\fancyplain{}{\sl\leftmark}}
+\fi
+\fancyfoot[c]{\rm\thepage} % page number
+
+% Use box 0 as a temp box and dimen 0 as temp dimen. 
+% This can be done, because this code will always
+% be used inside another box, and therefore the changes are local.
+
+\def\@fancyvbox#1#2{\setbox0\vbox{#2}\ifdim\ht0>#1\@fancywarning
+  {\string#1 is too small (\the#1): ^^J Make it at least \the\ht0.^^J
+    We now make it that large for the rest of the document.^^J
+    This may cause the page layout to be inconsistent, however\@gobble}%
+  \dimen0=#1\global\setlength{#1}{\ht0}\ht0=\dimen0\fi
+  \box0}
+
+% Put together a header or footer given the left, center and
+% right text, fillers at left and right and a rule.
+% The \lap commands put the text into an hbox of zero size,
+% so overlapping text does not generate an errormessage.
+% These macros have 5 parameters:
+% 1. LEFTSIDE BEARING % This determines at which side the header will stick
+%    out. When \fancyhfoffset is used this calculates \headwidth, otherwise
+%    it is \hss or \relax (after expansion).
+% 2. \f@ncyolh, \f@ncyelh, \f@ncyolf or \f@ncyelf. This is the left component.
+% 3. \f@ncyoch, \f@ncyech, \f@ncyocf or \f@ncyecf. This is the middle comp.
+% 4. \f@ncyorh, \f@ncyerh, \f@ncyorf or \f@ncyerf. This is the right component.
+% 5. RIGHTSIDE BEARING. This is always \relax or \hss (after expansion).
+
+\def\@fancyhead#1#2#3#4#5{#1\hbox to\headwidth{\fancy@reset
+  \@fancyvbox\headheight{\hbox
+    {\rlap{\parbox[b]{\headwidth}{\raggedright#2}}\hfill
+      \parbox[b]{\headwidth}{\centering#3}\hfill
+      \llap{\parbox[b]{\headwidth}{\raggedleft#4}}}\headrule}}#5}
+
+\def\@fancyfoot#1#2#3#4#5{#1\hbox to\headwidth{\fancy@reset
+    \@fancyvbox\footskip{\footrule
+      \hbox{\rlap{\parbox[t]{\headwidth}{\raggedright#2}}\hfill
+        \parbox[t]{\headwidth}{\centering#3}\hfill
+        \llap{\parbox[t]{\headwidth}{\raggedleft#4}}}}}#5}
+
+\def\headrule{{\if@fancyplain\let\headrulewidth\plainheadrulewidth\fi
+    \hrule\@height\headrulewidth\@width\headwidth \vskip-\headrulewidth}}
+
+\def\footrule{{\if@fancyplain\let\footrulewidth\plainfootrulewidth\fi
+    \vskip-\footruleskip\vskip-\footrulewidth
+    \hrule\@width\headwidth\@height\footrulewidth\vskip\footruleskip}}
+
+\def\ps@fancy{%
+\@ifundefined{@chapapp}{\let\@chapapp\chaptername}{}%for amsbook
+%
+% Define \MakeUppercase for old LaTeXen.
+% Note: we used \def rather than \let, so that \let\uppercase\relax (from
+% the version 1 documentation) will still work.
+%
+\@ifundefined{MakeUppercase}{\def\MakeUppercase{\uppercase}}{}%
+\@ifundefined{chapter}{\def\sectionmark##1{\markboth
+{\MakeUppercase{\ifnum \c@secnumdepth>\z@
+ \thesection\hskip 1em\relax \fi ##1}}{}}%
+\def\subsectionmark##1{\markright {\ifnum \c@secnumdepth >\@ne
+ \thesubsection\hskip 1em\relax \fi ##1}}}%
+{\def\chaptermark##1{\markboth {\MakeUppercase{\ifnum \c@secnumdepth>\m@ne
+ \@chapapp\ \thechapter. \ \fi ##1}}{}}%
+\def\sectionmark##1{\markright{\MakeUppercase{\ifnum \c@secnumdepth >\z@
+ \thesection. \ \fi ##1}}}}%
+%\csname ps@headings\endcsname % use \ps@headings defaults if they exist
+\ps@@fancy
+\gdef\ps@fancy{\@fancyplainfalse\ps@@fancy}%
+% Initialize \headwidth if the user didn't
+%
+\ifdim\headwidth<0sp
+%
+% This catches the case that \headwidth hasn't been initialized and the
+% case that the user added something to \headwidth in the expectation that
+% it was initialized to \textwidth. We compensate this now. This loses if
+% the user intended to multiply it by a factor. But that case is more
+% likely done by saying something like \headwidth=1.2\textwidth. 
+% The doc says you have to change \headwidth after the first call to
+% \pagestyle{fancy}. This code is just to catch the most common cases were
+% that requirement is violated.
+%
+    \global\advance\headwidth123456789sp\global\advance\headwidth\textwidth
+\fi}
+\def\ps@fancyplain{\ps@fancy \let\ps@plain\ps@plain@fancy}
+\def\ps@plain@fancy{\@fancyplaintrue\ps@@fancy}
+\let\ps@@empty\ps@empty
+\def\ps@@fancy{%
+\ps@@empty % This is for amsbook/amsart, which do strange things with \topskip
+\def\@mkboth{\protect\markboth}%
+\def\@oddhead{\@fancyhead\fancy@Oolh\f@ncyolh\f@ncyoch\f@ncyorh\fancy@Oorh}%
+\def\@oddfoot{\@fancyfoot\fancy@Oolf\f@ncyolf\f@ncyocf\f@ncyorf\fancy@Oorf}%
+\def\@evenhead{\@fancyhead\fancy@Oelh\f@ncyelh\f@ncyech\f@ncyerh\fancy@Oerh}%
+\def\@evenfoot{\@fancyfoot\fancy@Oelf\f@ncyelf\f@ncyecf\f@ncyerf\fancy@Oerf}%
+}
+% Default definitions for compatibility mode:
+% These cause the header/footer to take the defined \headwidth as width
+% And to shift in the direction of the marginpar area
+
+\def\fancy@Oolh{\if@reversemargin\hss\else\relax\fi}
+\def\fancy@Oorh{\if@reversemargin\relax\else\hss\fi}
+\let\fancy@Oelh\fancy@Oorh
+\let\fancy@Oerh\fancy@Oolh
+
+\let\fancy@Oolf\fancy@Oolh
+\let\fancy@Oorf\fancy@Oorh
+\let\fancy@Oelf\fancy@Oelh
+\let\fancy@Oerf\fancy@Oerh
+
+% New definitions for the use of \fancyhfoffset
+% These calculate the \headwidth from \textwidth and the specified offsets.
+
+\def\fancy@offsolh{\headwidth=\textwidth\advance\headwidth\f@ncyO@olh
+                   \advance\headwidth\f@ncyO@orh\hskip-\f@ncyO@olh}
+\def\fancy@offselh{\headwidth=\textwidth\advance\headwidth\f@ncyO@elh
+                   \advance\headwidth\f@ncyO@erh\hskip-\f@ncyO@elh}
+
+\def\fancy@offsolf{\headwidth=\textwidth\advance\headwidth\f@ncyO@olf
+                   \advance\headwidth\f@ncyO@orf\hskip-\f@ncyO@olf}
+\def\fancy@offself{\headwidth=\textwidth\advance\headwidth\f@ncyO@elf
+                   \advance\headwidth\f@ncyO@erf\hskip-\f@ncyO@elf}
+
+\def\fancy@setoffs{%
+% Just in case \let\headwidth\textwidth was used
+  \fancy@gbl\let\headwidth\fancy@headwidth
+  \fancy@gbl\let\fancy@Oolh\fancy@offsolh
+  \fancy@gbl\let\fancy@Oelh\fancy@offselh
+  \fancy@gbl\let\fancy@Oorh\hss
+  \fancy@gbl\let\fancy@Oerh\hss
+  \fancy@gbl\let\fancy@Oolf\fancy@offsolf
+  \fancy@gbl\let\fancy@Oelf\fancy@offself
+  \fancy@gbl\let\fancy@Oorf\hss
+  \fancy@gbl\let\fancy@Oerf\hss}
+
+\newif\iffootnote
+\let\latex@makecol\@makecol
+\def\@makecol{\ifvoid\footins\footnotetrue\else\footnotefalse\fi
+\let\topfloat\@toplist\let\botfloat\@botlist\latex@makecol}
+\def\iftopfloat#1#2{\ifx\topfloat\empty #2\else #1\fi}
+\def\ifbotfloat#1#2{\ifx\botfloat\empty #2\else #1\fi}
+\def\iffloatpage#1#2{\if@fcolmade #1\else #2\fi}
+
+\newcommand{\fancypagestyle}[2]{%
+  \@namedef{ps@#1}{\let\fancy@gbl\relax#2\relax\ps@fancy}}
+
+\end{filecontents*}
+
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{filecontents*}{psfig.sty}
+% Psfig/TeX
+\def\PsfigVersion{1.10}
+\def\setDriver{\DvipsDriver} % \DvipsDriver or \OzTeXDriver
+%
+% All software, documentation, and related files in this distribution of
+% psfig/tex are Copyright 1993 Trevor J. Darrell
+%
+% Permission is granted for use and non-profit distribution of psfig/tex
+% providing that this notice is clearly maintained. The right to
+% distribute any portion of psfig/tex for profit or as part of any commercial
+% product is specifically reserved for the author(s) of that portion.
+%
+% To use with LaTeX, use \documentstyle[psfig,...]{...}
+% To use with TeX, use \input psfig.sty
+%
+% Bugs and improvements to trevor@media.mit.edu.
+%
+% Thanks to Ned Batchelder, Greg Hager (GDH), J. Daniel Smith (JDS),
+% Tom Rokicki (TR), Robert Russell (RR), George V. Reilly (GVR),
+% Ken McGlothlen (KHC), Baron Grey (BG), Gerhard Tobermann (GT),
+% Jairo R. Montoya-Torres (JRMT).
+% and all others who have contributed code and comments to this project!
+%
+% ======================================================================
+% Modification History:
+%
+%  9 Oct 1990   JDS used more robust bbox reading code from Tom Rokicki
+% 29 Mar 1991   JDS implemented rotation= option
+% 25 Jun 1991   RR  if bb specified on cmd line don't check
+%           for .ps file.
+%  3 Jul 1991   JDS check if file already read in once
+%  4 Sep 1991   JDS fixed incorrect computation of rotated
+%           bounding box
+% 25 Sep 1991   GVR expanded synopsis of \psfig
+% 14 Oct 1991   JDS \fbox code from LaTeX so \psdraft works with TeX
+%           changed \typeout to \ps@typeout
+% 17 Oct 1991   JDS added \psscalefirst and \psrotatefirst
+% 23 Jun 1993   KHC     ``doclip'' must appear before ``rotate''
+% 27 Oct 1993   TJD removed printing of filename to avoid
+%           underscore problems. changed \frame to \fbox.
+%           Added OzTeX support from BG. Added new
+%           figure search path code from GT.
+% 01 Feb 2010   JRMT implemented the use of .eps figure format
+%
+% ======================================================================
+%
+% Command synopsis:
+%
+% \psdraft  draws an outline box, but doesn't include the figure
+%       in the DVI file.  Useful for previewing.
+%
+% \psfull   includes the figure in the DVI file (default).
+%
+% \psscalefirst width= or height= specifies the size of the figure
+%       before rotation.
+% \psrotatefirst (default) width= or height= specifies the size of the
+%        figure after rotation.  Asymetric figures will
+%        appear to shrink.
+%
+% \psfigurepath{dir:dir:...}  sets the path to search for the figure
+%
+% \psfig
+% usage: \psfig{file=, figure=, height=, width=,
+%           bbllx=, bblly=, bburx=, bbury=,
+%           rheight=, rwidth=, clip=, angle=, silent=}
+%
+%   "file" is the filename.  If no path name is specified and the
+%       file is not found in the current directory,
+%       it will be looked for in directory \psfigurepath.
+%   "figure" is a synonym for "file".
+%   By default, the width and height of the figure are taken from
+%       the BoundingBox of the figure.
+%   If "width" is specified, the figure is scaled so that it has
+%       the specified width.  Its height changes proportionately.
+%   If "height" is specified, the figure is scaled so that it has
+%       the specified height.  Its width changes proportionately.
+%   If both "width" and "height" are specified, the figure is scaled
+%       anamorphically.
+%   "bbllx", "bblly", "bburx", and "bbury" control the PostScript
+%       BoundingBox.  If these four values are specified
+%               *before* the "file" option, the PSFIG will not try to
+%               open the PostScript file.
+%   "rheight" and "rwidth" are the reserved height and width
+%       of the figure, i.e., how big TeX actually thinks
+%       the figure is.  They default to "width" and "height".
+%   The "clip" option ensures that no portion of the figure will
+%       appear outside its BoundingBox.  "clip=" is a switch and
+%       takes no value, but the `=' must be present.
+%   The "angle" option specifies the angle of rotation (degrees, ccw).
+%   The "silent" option makes \psfig work silently.
+%
+% ======================================================================
+% check to see if macros already loaded in (maybe some other file says
+% "\input psfig") ...
+\ifx\undefined\psfig\else\endinput\fi
+%
+% from a suggestion by eijkhout@csrd.uiuc.edu to allow
+% loading as a style file. Changed to avoid problems
+% with amstex per suggestion by jbence@math.ucla.edu
+
+\let\LaTeXAtSign=\@
+\let\@=\relax
+\edef\psfigRestoreAt{\catcode`\@=\number\catcode`@\relax}
+%\edef\psfigRestoreAt{\catcode`@=\number\catcode`@\relax}
+\catcode`\@=11\relax
+\newwrite\@unused
+\def\ps@typeout#1{{\let\protect\string\immediate\write\@unused{#1}}}
+
+\def\DvipsDriver{
+    \ps@typeout{psfig/tex \PsfigVersion -dvips}
+\def\PsfigSpecials{\DvipsSpecials}  \def\ps@dir{/}
+\def\ps@predir{} }
+\def\OzTeXDriver{
+    \ps@typeout{psfig/tex \PsfigVersion -oztex}
+    \def\PsfigSpecials{\OzTeXSpecials}
+    \def\ps@dir{:}
+    \def\ps@predir{:}
+    \catcode`\^^J=5
+}
+
+%% Here's how you define your figure path.  Should be set up with null
+%% default and a user useable definition.
+
+\def\figurepath{./:}
+\def\psfigurepath#1{\edef\figurepath{#1:}}
+
+%%% inserted for Searching Unixpaths
+%%% (the path must end with :)
+%%% (call: \DoPaths\figurepath )
+%%%------------------------------------------------------
+\def\DoPaths#1{\expandafter\EachPath#1\stoplist}
+%
+\def\leer{}
+\def\EachPath#1:#2\stoplist{% #1 part of the list (delimiter :)
+  \ExistsFile{#1}{\SearchedFile}
+  \ifx#2\leer
+  \else
+    \expandafter\EachPath#2\stoplist
+  \fi}
+%
+% exists the file (does not work for directories!)
+%
+\def\ps@dir{/}
+\def\ExistsFile#1#2{%
+   \openin1=\ps@predir#1\ps@dir#2
+   \ifeof1
+       \closein1
+       %\ps@typeout{...not: \ps@predir#1\ps@dir#2}
+   \else
+       \closein1
+       %\ps@typeout{...in:  \ps@predir#1\ps@dir#2}
+        \ifx\ps@founddir\leer
+          %\ps@typeout{set founddir #1}
+           \edef\ps@founddir{#1}
+        \fi
+   \fi}
+%------------------------------------------------------
+%
+% Get dir in path or error
+%
+\def\get@dir#1{%
+  \def\ps@founddir{}
+  \def\SearchedFile{#1}
+  \DoPaths\figurepath
+%  \fi
+}
+%------------------------------------------------------
+%%% END of Searching Unixpaths
+
+
+%
+% @psdo control structure -- similar to Latex @for.
+% I redefined these with different names so that psfig can
+% be used with TeX as well as LaTeX, and so that it will not
+% be vunerable to future changes in LaTeX's internal
+% control structure,
+%
+\def\@nnil{\@nil}
+\def\@empty{}
+\def\@psdonoop#1\@@#2#3{}
+\def\@psdo#1:=#2\do#3{\edef\@psdotmp{#2}\ifx\@psdotmp\@empty \else
+    \expandafter\@psdoloop#2,\@nil,\@nil\@@#1{#3}\fi}
+\def\@psdoloop#1,#2,#3\@@#4#5{\def#4{#1}\ifx #4\@nnil \else
+       #5\def#4{#2}\ifx #4\@nnil \else#5\@ipsdoloop #3\@@#4{#5}\fi\fi}
+\def\@ipsdoloop#1,#2\@@#3#4{\def#3{#1}\ifx #3\@nnil
+       \let\@nextwhile=\@psdonoop \else
+      #4\relax\let\@nextwhile=\@ipsdoloop\fi\@nextwhile#2\@@#3{#4}}
+\def\@tpsdo#1:=#2\do#3{\xdef\@psdotmp{#2}\ifx\@psdotmp\@empty \else
+    \@tpsdoloop#2\@nil\@nil\@@#1{#3}\fi}
+\def\@tpsdoloop#1#2\@@#3#4{\def#3{#1}\ifx #3\@nnil
+       \let\@nextwhile=\@psdonoop \else
+      #4\relax\let\@nextwhile=\@tpsdoloop\fi\@nextwhile#2\@@#3{#4}}
+%
+% \fbox is defined in latex.tex; so if \fbox is undefined, assume that
+% we are not in LaTeX.
+% Perhaps this could be done better???
+\ifx\undefined\fbox
+% \fbox code from modified slightly from LaTeX
+\newdimen\fboxrule
+\newdimen\fboxsep
+\newdimen\ps@tempdima
+\newbox\ps@tempboxa
+\fboxsep = 3pt \fboxrule = .4pt
+\long\def\fbox#1{\leavevmode\setbox\ps@tempboxa\hbox{#1}\ps@tempdima\fboxrule
+    \advance\ps@tempdima \fboxsep \advance\ps@tempdima \dp\ps@tempboxa
+   \hbox{\lower \ps@tempdima\hbox
+  {\vbox{\hrule height \fboxrule
+          \hbox{\vrule width \fboxrule \hskip\fboxsep
+          \vbox{\vskip\fboxsep \box\ps@tempboxa\vskip\fboxsep}\hskip
+                 \fboxsep\vrule width \fboxrule}
+                 \hrule height \fboxrule}}}}
+\fi
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% file reading stuff from epsf.tex
+%   EPSF.TEX macro file:
+%   Written by Tomas Rokicki of Radical Eye Software, 29 Mar 1989.
+%   Revised by Don Knuth, 3 Jan 1990.
+%   Revised by Tomas Rokicki to accept bounding boxes with no
+%      space after the colon, 18 Jul 1990.
+%   Portions modified/removed for use in PSFIG package by
+%      J. Daniel Smith, 9 October 1990.
+%
+\newread\ps@stream
+\newif\ifnot@eof       % continue looking for the bounding box?
+\newif\if@noisy        % report what you're making?
+\newif\if@atend        % %%BoundingBox: has (at end) specification
+\newif\if@psfile       % does this look like a PostScript file?
+%
+% PostScript files should start with `%!'
+%
+{\catcode`\%=12\global\gdef\epsf@start{%!}}
+\def\epsf@PS{PS}
+%
+\def\epsf@getbb#1{%
+%
+%   The first thing we need to do is to open the
+%   PostScript file, if possible.
+%
+\openin\ps@stream=\ps@predir#1 \ifeof\ps@stream\ps@typeout{Error,
+File #1 not found}\else
+%
+%   Okay, we got it. Now we'll scan lines until we find one that doesn't
+%   start with %. We're looking for the bounding box comment.
+%
+   {\not@eoftrue \chardef\other=12
+    \def\do##1{\catcode`##1=\other}\dospecials \catcode`\ =10
+    \loop
+       \if@psfile
+      \read\ps@stream to \epsf@fileline
+       \else{
+      \obeyspaces
+          \read\ps@stream to \epsf@tmp\global\let\epsf@fileline\epsf@tmp}
+       \fi
+       \ifeof\ps@stream\not@eoffalse\else
+%
+%   Check the first line for `%!'.  Issue a warning message if its not
+%   there, since the file might not be a PostScript file.
+%
+       \if@psfile\else
+       \expandafter\epsf@test\epsf@fileline:. \\%
+       \fi
+%
+%   We check to see if the first character is a % sign;
+%   if so, we look further and stop only if the line begins with
+%   `%%BoundingBox:' and the `(atend)' specification was not found.
+%   That is, the only way to stop is when the end of file is reached,
+%   or a `%%BoundingBox: llx lly urx ury' line is found.
+%
+          \expandafter\epsf@aux\epsf@fileline:. \\%
+       \fi
+   \ifnot@eof\repeat
+   }\closein\ps@stream\fi}%
+%
+% This tests if the file we are reading looks like a PostScript file.
+%
+\long\def\epsf@test#1#2#3:#4\\{\def\epsf@testit{#1#2}
+            \ifx\epsf@testit\epsf@start\else
+\ps@typeout{Warning! File does not start with `\epsf@start'.  It
+may not be a PostScript file.}
+            \fi
+            \@psfiletrue} % don't test after 1st line
+%
+%   We still need to define the tricky \epsf@aux macro. This requires
+%   a couple of magic constants for comparison purposes.
+%
+{\catcode`\%=12\global\let\epsf@percent=%\global\def\epsf@bblit{%BoundingBox}}
+%
+%
+%   So we're ready to check for `%BoundingBox:' and to grab the
+%   values if they are found.  We continue searching if `(at end)'
+%   was found after the `%BoundingBox:'.
+%
+\long\def\epsf@aux#1#2:#3\\{\ifx#1\epsf@percent
+   \def\epsf@testit{#2}\ifx\epsf@testit\epsf@bblit
+    \@atendfalse
+        \epsf@atend #3 . \\%
+    \if@atend
+       \if@verbose{
+        \ps@typeout{psfig: found `(atend)'; continuing search}
+       }\fi
+        \else
+        \epsf@grab #3 . . . \\%
+        \not@eoffalse
+        \global\no@bbfalse
+        \fi
+   \fi\fi}%
+%
+%   Here we grab the values and stuff them in the appropriate definitions.
+%
+\def\epsf@grab #1 #2 #3 #4 #5\\{%
+   \global\def\epsf@llx{#1}\ifx\epsf@llx\empty
+      \epsf@grab #2 #3 #4 #5 .\\\else
+   \global\def\epsf@lly{#2}%
+   \global\def\epsf@urx{#3}\global\def\epsf@ury{#4}\fi}%
+%
+% Determine if the stuff following the %%BoundingBox is `(atend)'
+% J. Daniel Smith.  Copied from \epsf@grab above.
+%
+\def\epsf@atendlit{(atend)}
+\def\epsf@atend #1 #2 #3\\{%
+   \def\epsf@tmp{#1}\ifx\epsf@tmp\empty
+      \epsf@atend #2 #3 .\\\else
+   \ifx\epsf@tmp\epsf@atendlit\@atendtrue\fi\fi}
+
+
+% End of file reading stuff from epsf.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% trigonometry stuff from "trig.tex"
+\chardef\psletter = 11 % won't conflict with \begin{letter} now...
+\chardef\other = 12
+
+\newif \ifdebug %%% turn me on to see TeX hard at work ...
+\newif\ifc@mpute %%% don't need to compute some values
+\c@mputetrue % but assume that we do
+
+\let\then = \relax
+\def\r@dian{pt }
+\let\r@dians = \r@dian
+\let\dimensionless@nit = \r@dian
+\let\dimensionless@nits = \dimensionless@nit
+\def\internal@nit{sp }
+\let\internal@nits = \internal@nit
+\newif\ifstillc@nverging
+\def \Mess@ge #1{\ifdebug \then \message {#1} \fi}
+
+{ %%% Things that need abnormal catcodes %%%
+    \catcode `\@ = \psletter
+    \gdef \nodimen {\expandafter \n@dimen \the \dimen}
+    \gdef \term #1 #2 #3%
+           {\edef \t@ {\the #1}%%% freeze parameter 1 (count, by value)
+        \edef \t@@ {\expandafter \n@dimen \the #2\r@dian}%
+                   %%% freeze parameter 2 (dimen, by value)
+        \t@rm {\t@} {\t@@} {#3}%
+           }
+    \gdef \t@rm #1 #2 #3%
+           {{%
+        \count 0 = 0
+        \dimen 0 = 1 \dimensionless@nit
+        \dimen 2 = #2\relax
+        \Mess@ge {Calculating term #1 of \nodimen 2}%
+        \loop
+        \ifnum  \count 0 < #1
+        \then   \advance \count 0 by 1
+            \Mess@ge {Iteration \the \count 0 \space}%
+            \Multiply \dimen 0 by {\dimen 2}%
+            \Mess@ge {After multiplication, term = \nodimen 0}%
+            \Divide \dimen 0 by {\count 0}%
+            \Mess@ge {After division, term = \nodimen 0}%
+        \repeat
+        \Mess@ge {Final value for term #1 of
+                \nodimen 2 \space is \nodimen 0}%
+        \xdef \Term {#3 = \nodimen 0 \r@dians}%
+        \aftergroup \Term
+           }}
+    \catcode `\p = \other
+    \catcode `\t = \other
+    \gdef \n@dimen #1pt{#1} %%% throw away the ``pt''
+}
+
+\def \Divide #1by #2{\divide #1 by #2} %%% just a synonym
+
+\def \Multiply #1by #2%%% allows division of a dimen by a dimen
+       {{%%% should really freeze parameter 2 (dimen, passed by value)
+    \count 0 = #1\relax
+    \count 2 = #2\relax
+    \count 4 = 65536
+    \Mess@ge {Before scaling, count 0 = \the \count 0 \space and
+            count 2 = \the \count 2}%
+    \ifnum  \count 0 > 32767 %%% do our best to avoid overflow
+    \then   \divide \count 0 by 4
+        \divide \count 4 by 4
+    \else   \ifnum  \count 0 < -32767
+        \then   \divide \count 0 by 4
+            \divide \count 4 by 4
+        \else
+        \fi
+    \fi
+    \ifnum  \count 2 > 32767 %%% while retaining reasonable accuracy
+    \then   \divide \count 2 by 4
+        \divide \count 4 by 4
+    \else   \ifnum  \count 2 < -32767
+        \then   \divide \count 2 by 4
+            \divide \count 4 by 4
+        \else
+        \fi
+    \fi
+    \multiply \count 0 by \count 2
+    \divide \count 0 by \count 4
+    \xdef \product {#1 = \the \count 0 \internal@nits}%
+    \aftergroup \product
+       }}
+
+\def\r@duce{\ifdim\dimen0 > 90\r@dian \then   % sin(x+90) = sin(180-x)
+        \multiply\dimen0 by -1
+        \advance\dimen0 by 180\r@dian
+        \r@duce
+        \else \ifdim\dimen0 < -90\r@dian \then  % sin(-x) = sin(360+x)
+        \advance\dimen0 by 360\r@dian
+        \r@duce
+        \fi
+        \fi}
+
+\def\Sine#1%
+       {{%
+    \dimen 0 = #1 \r@dian
+    \r@duce
+    \ifdim\dimen0 = -90\r@dian \then
+       \dimen4 = -1\r@dian
+       \c@mputefalse
+    \fi
+    \ifdim\dimen0 = 90\r@dian \then
+       \dimen4 = 1\r@dian
+       \c@mputefalse
+    \fi
+    \ifdim\dimen0 = 0\r@dian \then
+       \dimen4 = 0\r@dian
+       \c@mputefalse
+    \fi
+%
+    \ifc@mpute \then
+            % convert degrees to radians
+        \divide\dimen0 by 180
+        \dimen0=3.141592654\dimen0
+%
+        \dimen 2 = 3.1415926535897963\r@dian %%% a well-known constant
+        \divide\dimen 2 by 2 %%% we only deal with -pi/2 : pi/2
+        \Mess@ge {Sin: calculating Sin of \nodimen 0}%
+        \count 0 = 1 %%% see power-series expansion for sine
+        \dimen 2 = 1 \r@dian %%% ditto
+        \dimen 4 = 0 \r@dian %%% ditto
+        \loop
+            \ifnum  \dimen 2 = 0 %%% then we've done
+            \then   \stillc@nvergingfalse
+            \else   \stillc@nvergingtrue
+            \fi
+            \ifstillc@nverging %%% then calculate next term
+            \then   \term {\count 0} {\dimen 0} {\dimen 2}%
+                \advance \count 0 by 2
+                \count 2 = \count 0
+                \divide \count 2 by 2
+                \ifodd  \count 2 %%% signs alternate
+                \then   \advance \dimen 4 by \dimen 2
+                \else   \advance \dimen 4 by -\dimen 2
+                \fi
+        \repeat
+    \fi
+            \xdef \sine {\nodimen 4}%
+       }}
+
+% Now the Cosine can be calculated easily by calling \Sine
+\def\Cosine#1{\ifx\sine\UnDefined\edef\Savesine{\relax}\else
+                     \edef\Savesine{\sine}\fi
+    {\dimen0=#1\r@dian\advance\dimen0 by 90\r@dian
+     \Sine{\nodimen 0}
+     \xdef\cosine{\sine}
+     \xdef\sine{\Savesine}}}
+% end of trig stuff
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\psdraft{
+    \def\@psdraft{0}
+    %\ps@typeout{draft level now is \@psdraft \space . }
+}
+\def\psfull{
+    \def\@psdraft{100}
+    %\ps@typeout{draft level now is \@psdraft \space . }
+}
+
+\psfull
+
+\newif\if@scalefirst
+\def\psscalefirst{\@scalefirsttrue}
+\def\psrotatefirst{\@scalefirstfalse}
+\psrotatefirst
+
+\newif\if@draftbox
+\def\psnodraftbox{
+    \@draftboxfalse
+}
+\def\psdraftbox{
+    \@draftboxtrue
+} \@draftboxtrue
+
+\newif\if@prologfile
+\newif\if@postlogfile
+\def\pssilent{
+    \@noisyfalse
+}
+\def\psnoisy{
+    \@noisytrue
+} \psnoisy
+%%% These are for the option list.
+%%% A specification of the form a = b maps to calling \@p@@sa{b}
+\newif\if@bbllx
+\newif\if@bblly
+\newif\if@bburx
+\newif\if@bbury
+\newif\if@height
+\newif\if@width
+\newif\if@rheight
+\newif\if@rwidth
+\newif\if@angle
+\newif\if@clip
+\newif\if@verbose
+\def\@p@@sclip#1{\@cliptrue}
+%
+%
+\newif\if@decmpr
+%
+\def\@p@@sfigure#1{\def\@p@sfile{null}\def\@p@sbbfile{null}\@decmprfalse
+   % look directly for file (e.g. absolute path)
+   \openin1=\ps@predir#1
+   \ifeof1
+    \closein1
+    % failed, search directories for file
+    \get@dir{#1}
+    \ifx\ps@founddir\leer
+        % failed, search directly for file.bb
+        \openin1=\ps@predir#1.bb
+        \ifeof1
+            \closein1
+            % failed, search directories for file.bb
+            \get@dir{#1.bb}
+            \ifx\ps@founddir\leer
+                % failed, lose.
+                \ps@typeout{Can't find #1 in \figurepath}
+            \else
+                % found file.bb in search dir
+                \@decmprtrue
+                \def\@p@sfile{\ps@founddir\ps@dir#1}
+                \def\@p@sbbfile{\ps@founddir\ps@dir#1.bb}
+            \fi
+        \else
+            \closein1
+            %found file.bb directly
+            \@decmprtrue
+            \def\@p@sfile{#1}
+            \def\@p@sbbfile{#1.bb}
+        \fi
+    \else
+        % found file in search dir
+        \def\@p@sfile{\ps@founddir\ps@dir#1}
+        \def\@p@sbbfile{\ps@founddir\ps@dir#1}
+    \fi
+   \else
+    % found file directly
+    \closein1
+    \def\@p@sfile{#1}
+    \def\@p@sbbfile{#1}
+   \fi
+}
+%
+%
+%
+\def\@p@@sfile#1{\@p@@sfigure{#1}}
+%
+\def\@p@@sbbllx#1{
+        %\ps@typeout{bbllx is #1}
+        \@bbllxtrue
+        \dimen100=#1
+        \edef\@p@sbbllx{\number\dimen100}
+}
+\def\@p@@sbblly#1{
+        %\ps@typeout{bblly is #1}
+        \@bbllytrue
+        \dimen100=#1
+        \edef\@p@sbblly{\number\dimen100}
+}
+\def\@p@@sbburx#1{
+        %\ps@typeout{bburx is #1}
+        \@bburxtrue
+        \dimen100=#1
+        \edef\@p@sbburx{\number\dimen100}
+}
+\def\@p@@sbbury#1{
+        %\ps@typeout{bbury is #1}
+        \@bburytrue
+        \dimen100=#1
+        \edef\@p@sbbury{\number\dimen100}
+}
+\def\@p@@sheight#1{
+        \@heighttrue
+        \dimen100=#1
+        \edef\@p@sheight{\number\dimen100}
+        %\ps@typeout{Height is \@p@sheight}
+}
+\def\@p@@swidth#1{
+        %\ps@typeout{Width is #1}
+        \@widthtrue
+        \dimen100=#1
+        \edef\@p@swidth{\number\dimen100}
+}
+\def\@p@@srheight#1{
+        %\ps@typeout{Reserved height is #1}
+        \@rheighttrue
+        \dimen100=#1
+        \edef\@p@srheight{\number\dimen100}
+}
+\def\@p@@srwidth#1{
+        %\ps@typeout{Reserved width is #1}
+        \@rwidthtrue
+        \dimen100=#1
+        \edef\@p@srwidth{\number\dimen100}
+}
+\def\@p@@sangle#1{
+        %\ps@typeout{Rotation is #1}
+        \@angletrue
+%       \dimen100=#1
+        \edef\@p@sangle{#1} %\number\dimen100}
+}
+\def\@p@@ssilent#1{
+        \@verbosefalse
+}
+\def\@p@@sprolog#1{\@prologfiletrue\def\@prologfileval{#1}}
+\def\@p@@spostlog#1{\@postlogfiletrue\def\@postlogfileval{#1}}
+\def\@cs@name#1{\csname #1\endcsname}
+\def\@setparms#1=#2,{\@cs@name{@p@@s#1}{#2}}
+%
+% initialize the defaults (size the size of the figure)
+%
+\def\ps@init@parms{
+        \@bbllxfalse \@bbllyfalse
+        \@bburxfalse \@bburyfalse
+        \@heightfalse \@widthfalse
+        \@rheightfalse \@rwidthfalse
+        \def\@p@sbbllx{}\def\@p@sbblly{}
+        \def\@p@sbburx{}\def\@p@sbbury{}
+        \def\@p@sheight{}\def\@p@swidth{}
+        \def\@p@srheight{}\def\@p@srwidth{}
+        \def\@p@sangle{0}
+        \def\@p@sfile{} \def\@p@sbbfile{}
+        \def\@p@scost{10}
+        \def\@sc{}
+        \@prologfilefalse
+        \@postlogfilefalse
+        \@clipfalse
+        \if@noisy
+            \@verbosetrue
+        \else
+            \@verbosefalse
+        \fi
+}
+%
+% Go through the options setting things up.
+%
+\def\parse@ps@parms#1{
+        \@psdo\@psfiga:=#1\do
+           {\expandafter\@setparms\@psfiga,}}
+%
+% Compute bb height and width
+%
+\newif\ifno@bb
+\def\bb@missing{
+    \if@verbose{
+        \ps@typeout{psfig: searching \@p@sbbfile \space  for bounding box}
+    }\fi
+    \no@bbtrue
+    \epsf@getbb{\@p@sbbfile}
+        \ifno@bb \else \bb@cull\epsf@llx\epsf@lly\epsf@urx\epsf@ury\fi
+}
+\def\bb@cull#1#2#3#4{
+    \dimen100=#1 bp\edef\@p@sbbllx{\number\dimen100}
+    \dimen100=#2 bp\edef\@p@sbblly{\number\dimen100}
+    \dimen100=#3 bp\edef\@p@sbburx{\number\dimen100}
+    \dimen100=#4 bp\edef\@p@sbbury{\number\dimen100}
+    \no@bbfalse
+}
+% rotate point (#1,#2) about (0,0).
+% The sine and cosine of the angle are already stored in \sine and
+% \cosine.  The result is placed in (\p@intvaluex, \p@intvaluey).
+\newdimen\p@intvaluex
+\newdimen\p@intvaluey
+\def\rotate@#1#2{{\dimen0=#1 sp\dimen1=#2 sp
+%               calculate x' = x \cos\theta - y \sin\theta
+          \global\p@intvaluex=\cosine\dimen0
+          \dimen3=\sine\dimen1
+          \global\advance\p@intvaluex by -\dimen3
+%       calculate y' = x \sin\theta + y \cos\theta
+          \global\p@intvaluey=\sine\dimen0
+          \dimen3=\cosine\dimen1
+          \global\advance\p@intvaluey by \dimen3
+          }}
+\def\compute@bb{
+        \no@bbfalse
+        \if@bbllx \else \no@bbtrue \fi
+        \if@bblly \else \no@bbtrue \fi
+        \if@bburx \else \no@bbtrue \fi
+        \if@bbury \else \no@bbtrue \fi
+        \ifno@bb \bb@missing \fi
+        \ifno@bb \ps@typeout{FATAL ERROR: no bb supplied or found}
+            \no-bb-error
+        \fi
+        %
+%\ps@typeout{BB: \@p@sbbllx, \@p@sbblly, \@p@sbburx, \@p@sbbury}
+%
+% store height/width of original (unrotated) bounding box
+        \count203=\@p@sbburx
+        \count204=\@p@sbbury
+        \advance\count203 by -\@p@sbbllx
+        \advance\count204 by -\@p@sbblly
+        \edef\ps@bbw{\number\count203}
+        \edef\ps@bbh{\number\count204}
+        %\ps@typeout{ psbbh = \ps@bbh, psbbw = \ps@bbw }
+        \if@angle
+            \Sine{\@p@sangle}\Cosine{\@p@sangle}
+                {\dimen100=\maxdimen\xdef\r@p@sbbllx{\number\dimen100}
+                        \xdef\r@p@sbblly{\number\dimen100}
+                                \xdef\r@p@sbburx{-\number\dimen100}
+                        \xdef\r@p@sbbury{-\number\dimen100}}
+%
+% Need to rotate all four points and take the X-Y extremes of the new
+% points as the new bounding box.
+                        \def\minmaxtest{
+               \ifnum\number\p@intvaluex<\r@p@sbbllx
+                  \xdef\r@p@sbbllx{\number\p@intvaluex}\fi
+               \ifnum\number\p@intvaluex>\r@p@sbburx
+                  \xdef\r@p@sbburx{\number\p@intvaluex}\fi
+               \ifnum\number\p@intvaluey<\r@p@sbblly
+                  \xdef\r@p@sbblly{\number\p@intvaluey}\fi
+               \ifnum\number\p@intvaluey>\r@p@sbbury
+                  \xdef\r@p@sbbury{\number\p@intvaluey}\fi
+               }
+%           lower left
+            \rotate@{\@p@sbbllx}{\@p@sbblly}
+            \minmaxtest
+%           upper left
+            \rotate@{\@p@sbbllx}{\@p@sbbury}
+            \minmaxtest
+%           lower right
+            \rotate@{\@p@sbburx}{\@p@sbblly}
+            \minmaxtest
+%           upper right
+            \rotate@{\@p@sbburx}{\@p@sbbury}
+            \minmaxtest
+            \edef\@p@sbbllx{\r@p@sbbllx}\edef\@p@sbblly{\r@p@sbblly}
+            \edef\@p@sbburx{\r@p@sbburx}\edef\@p@sbbury{\r@p@sbbury}
+%\ps@typeout{rotated BB: \r@p@sbbllx, \r@p@sbblly, \r@p@sbburx, \r@p@sbbury}
+        \fi
+        \count203=\@p@sbburx
+        \count204=\@p@sbbury
+        \advance\count203 by -\@p@sbbllx
+        \advance\count204 by -\@p@sbblly
+        \edef\@bbw{\number\count203}
+        \edef\@bbh{\number\count204}
+        %\ps@typeout{ bbh = \@bbh, bbw = \@bbw }
+}
+%
+% \in@hundreds performs #1 * (#2 / #3) correct to the hundreds,
+%   then leaves the result in @result
+%
+\def\in@hundreds#1#2#3{\count240=#2 \count241=#3
+             \count100=\count240    % 100 is first digit #2/#3
+             \divide\count100 by \count241
+             \count101=\count100
+             \multiply\count101 by \count241
+             \advance\count240 by -\count101
+             \multiply\count240 by 10
+             \count101=\count240    %101 is second digit of #2/#3
+             \divide\count101 by \count241
+             \count102=\count101
+             \multiply\count102 by \count241
+             \advance\count240 by -\count102
+             \multiply\count240 by 10
+             \count102=\count240    % 102 is the third digit
+             \divide\count102 by \count241
+             \count200=#1\count205=0
+             \count201=\count200
+            \multiply\count201 by \count100
+            \advance\count205 by \count201
+             \count201=\count200
+            \divide\count201 by 10
+            \multiply\count201 by \count101
+            \advance\count205 by \count201
+            %
+             \count201=\count200
+            \divide\count201 by 100
+            \multiply\count201 by \count102
+            \advance\count205 by \count201
+            %
+             \edef\@result{\number\count205}
+}
+\def\compute@wfromh{
+        % computing : width = height * (bbw / bbh)
+        \in@hundreds{\@p@sheight}{\@bbw}{\@bbh}
+        %\ps@typeout{ \@p@sheight * \@bbw / \@bbh, = \@result }
+        \edef\@p@swidth{\@result}
+        %\ps@typeout{w from h: width is \@p@swidth}
+}
+\def\compute@hfromw{
+        % computing : height = width * (bbh / bbw)
+            \in@hundreds{\@p@swidth}{\@bbh}{\@bbw}
+        %\ps@typeout{ \@p@swidth * \@bbh / \@bbw = \@result }
+        \edef\@p@sheight{\@result}
+        %\ps@typeout{h from w : height is \@p@sheight}
+}
+\def\compute@handw{
+        \if@height
+            \if@width
+            \else
+                \compute@wfromh
+            \fi
+        \else
+            \if@width
+                \compute@hfromw
+            \else
+                \edef\@p@sheight{\@bbh}
+                \edef\@p@swidth{\@bbw}
+            \fi
+        \fi
+}
+\def\compute@resv{
+        \if@rheight \else \edef\@p@srheight{\@p@sheight} \fi
+        \if@rwidth \else \edef\@p@srwidth{\@p@swidth} \fi
+        %\ps@typeout{rheight = \@p@srheight, rwidth = \@p@srwidth}
+}
+%
+% Compute any missing values
+\def\compute@sizes{
+    \compute@bb
+    \if@scalefirst\if@angle
+% at this point the bounding box has been adjsuted correctly for
+% rotation.  PSFIG does all of its scaling using \@bbh and \@bbw.  If
+% a width= or height= was specified along with \psscalefirst, then the
+% width=/height= value needs to be adjusted to match the new (rotated)
+% bounding box size (specifed in \@bbw and \@bbh).
+%    \ps@bbw       width=
+%    -------  =  ----------
+%    \@bbw       new width=
+% so `new width=' = (width= * \@bbw) / \ps@bbw; where \ps@bbw is the
+% width of the original (unrotated) bounding box.
+    \if@width
+       \in@hundreds{\@p@swidth}{\@bbw}{\ps@bbw}
+       \edef\@p@swidth{\@result}
+    \fi
+    \if@height
+       \in@hundreds{\@p@sheight}{\@bbh}{\ps@bbh}
+       \edef\@p@sheight{\@result}
+    \fi
+    \fi\fi
+    \compute@handw
+    \compute@resv}
+%
+%
+%
+\def\OzTeXSpecials{
+    \special{empty.ps /@isp {true} def}
+    \special{empty.ps \@p@swidth \space \@p@sheight \space
+            \@p@sbbllx \space \@p@sbblly \space
+            \@p@sbburx \space \@p@sbbury \space
+            startTexFig \space }
+    \if@clip{
+        \if@verbose{
+            \ps@typeout{(clip)}
+        }\fi
+        \special{empty.ps doclip \space }
+    }\fi
+    \if@angle{
+        \if@verbose{
+            \ps@typeout{(rotate)}
+        }\fi
+        \special {empty.ps \@p@sangle \space rotate \space}
+    }\fi
+    \if@prologfile
+        \special{\@prologfileval \space } \fi
+    \if@decmpr{
+        \if@verbose{
+            \ps@typeout{psfig: Compression not available
+            in OzTeX version \space }
+        }\fi
+    }\else{
+        \if@verbose{
+            \ps@typeout{psfig: including \@p@sfile \space }
+        }\fi
+        \special{epsf=\@p@sfile \space }
+    }\fi
+    \if@postlogfile
+        \special{\@postlogfileval \space } \fi
+    \special{empty.ps /@isp {false} def}
+}
+\def\DvipsSpecials{
+    %
+    \special{ps::[begin]    \@p@swidth \space \@p@sheight \space
+            \@p@sbbllx \space \@p@sbblly \space
+            \@p@sbburx \space \@p@sbbury \space
+            startTexFig \space }
+    \if@clip{
+        \if@verbose{
+            \ps@typeout{(clip)}
+        }\fi
+        \special{ps:: doclip \space }
+    }\fi
+    \if@angle
+        \if@verbose{
+            \ps@typeout{(clip)}
+        }\fi
+        \special {ps:: \@p@sangle \space rotate \space}
+    \fi
+    \if@prologfile
+        \special{ps: plotfile \@prologfileval \space } \fi
+    \if@decmpr{
+        \if@verbose{
+            \ps@typeout{psfig: including \@p@sfile.Z \space }
+        }\fi
+        \special{ps: plotfile "`zcat \@p@sfile.Z" \space }
+    }\else{
+        \if@verbose{
+            \ps@typeout{psfig: including \@p@sfile \space }
+        }\fi
+        \special{ps: plotfile \@p@sfile \space }
+    }\fi
+    \if@postlogfile
+        \special{ps: plotfile \@postlogfileval \space } \fi
+    \special{ps::[end] endTexFig \space }
+}
+%
+% \psfig
+% usage : \psfig{file=, height=, width=, bbllx=, bblly=, bburx=, bbury=,
+%           rheight=, rwidth=, clip=}
+%
+% "clip=" is a switch and takes no value, but the `=' must be present.
+\def\psfig#1{\vbox {
+    % do a zero width hard space so that a single
+    % \psfig in a centering enviornment will behave nicely
+    %{\setbox0=\hbox{\ }\ \hskip-\wd0}
+    %
+    \ps@init@parms
+    \parse@ps@parms{#1}
+    \compute@sizes
+    %
+    \ifnum\@p@scost<\@psdraft{
+        \PsfigSpecials
+        % Create the vbox to reserve the space for the figure.
+        \vbox to \@p@srheight sp{
+        % 1/92 TJD Changed from "true sp" to "sp" for magnification.
+            \hbox to \@p@srwidth sp{
+                \hss
+            }
+        \vss
+        }
+    }\else{
+        % draft figure, just reserve the space and print the
+        % path name.
+        \if@draftbox{
+            % Verbose draft: print file name in box
+            % 10/93 TJD changed to fbox from frame
+            \hbox{\fbox{\vbox to \@p@srheight sp{
+            \vss
+            \hbox to \@p@srwidth sp{ \hss
+                    % 10/93 TJD deleted to avoid ``_'' problems
+                % \@p@sfile
+             \hss }
+            \vss
+            }}}
+        }\else{
+            % Non-verbose draft
+            \vbox to \@p@srheight sp{
+            \vss
+            \hbox to \@p@srwidth sp{\hss}
+            \vss
+            }
+        }\fi
+
+
+
+    }\fi
+}} \psfigRestoreAt \setDriver
+\let\@=\LaTeXAtSign
+\end{filecontents*}
+
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{filecontents*}{url.sty}
+% url.sty  ver 1.4    02-Mar-1999   Donald Arseneau   asnd@triumf.ca
+% Copyright 1996-1999 Donald Arseneau,  Vancouver, Canada.
+% This program can be used, distributed, and modified under the terms
+% of the LaTeX Project Public License.
+%
+% A form of \verb that allows linebreaks at certain characters or
+% combinations of characters, accepts reconfiguration, and can usually
+% be used in the argument to another command.  It is intended for email
+% addresses, hypertext links, directories/paths, etc., which normally
+% have no spaces.  The font may be selected using the \urlstyle command,
+% and new url-like commands can be defined using \urldef.
+%
+% Usage:    Conditions:
+% \url{ }   If the argument contains any "%", "#", or "^^", or ends with
+%           "\", it can't be used in the argument to another command.
+%           The argument must not contain unbalanced braces.
+% \url|  |  ...where "|" is any character not used in the argument and not
+%           "{" or a space.  The same restrictions as above except that the
+%           argument may contain unbalanced braces.
+% \xyz      for "\xyz" a defined-url;  this can be used anywhere, no matter
+%           what characters it contains.
+%
+% See further instructions after "\endinput"
+%
+\def\Url@ttdo{% style assignments for tt fonts or T1 encoding
+\def\UrlBreaks{\do\.\do\@\do\\\do\/\do\!\do\_\do\|\do\%\do\;\do\>\do\]%
+ \do\)\do\,\do\?\do\'\do\+\do\=}%
+\def\UrlBigBreaks{\do\:\do@url@hyp}%
+\def\UrlNoBreaks{\do\(\do\[\do\{\do\<}% (unnecessary)
+\def\UrlSpecials{\do\ {\ }}%
+\def\UrlOrds{\do\*\do\-\do\~}% any ordinary characters that aren't usually
+}
+\def\Url@do{% style assignments for OT1 fonts except tt
+\def\UrlBreaks{\do\.\do\@\do\/\do\!\do\%\do\;\do\]\do\)\do\,\do\?\do\+\do\=}%
+\def\UrlBigBreaks{\do\:\do@url@hyp}%
+\def\UrlNoBreaks{\do\(\do\[\do\{}% prevents breaks after *next* character
+\def\UrlSpecials{\do\<{\langle}\do\>{\mathbin{\rangle}}\do\_{\_%
+ \penalty\@m}\do\|{\mid}\do\{{\lbrace}\do\}{\mathbin{\rbrace}}\do
+ \\{\mathbin{\backslash}}\do\~{\raise.6ex\hbox{\m@th$\scriptstyle\sim$}}\do
+ \ {\ }}%
+\def\UrlOrds{\do\'\do\"\do\-}%
+}
+\def\url@ttstyle{%
+\@ifundefined{selectfont}{\def\UrlFont{\tt}}{\def\UrlFont{\ttfamily}}\Url@ttdo
+}
+\def\url@rmstyle{%
+\@ifundefined{selectfont}{\def\UrlFont{\rm}}{\def\UrlFont{\rmfamily}}\Url@do
+}
+\def\url@sfstyle{%
+\@ifundefined{selectfont}{\def\UrlFont{\sf}}{\def\UrlFont{\sffamily}}\Url@do
+}
+\def\url@samestyle{\ifdim\fontdimen\thr@@\font=\z@ \url@ttstyle \else
+  \url@rmstyle \fi \def\UrlFont{}}
+
+\@ifundefined{strip@prefix}{\def\strip@prefix#1>{}}{}
+\@ifundefined{verbatim@nolig@list}{\def\verbatim@nolig@list{\do\`}}{}
+
+\def\Url{%
+ \begingroup \let\url@moving\relax\relax \endgroup
+ \ifmmode\@nomatherr$\fi
+ \UrlFont $\fam\z@ \textfont\z@\font
+ \let\do\@makeother \dospecials % verbatim catcodes
+ \catcode`{\@ne \catcode`}\tw@ \catcode`\ 10 % except braces and spaces
+ \medmuskip0mu \thickmuskip\medmuskip \thinmuskip\medmuskip
+ \@tempcnta\fam\multiply\@tempcnta\@cclvi
+ \let\do\set@mathcode \UrlOrds % ordinary characters that were special
+ \advance\@tempcnta 8192 \UrlBreaks % bin
+ \advance\@tempcnta 4096 \UrlBigBreaks % rel
+ \advance\@tempcnta 4096 \UrlNoBreaks % open
+ \let\do\set@mathact \UrlSpecials % active
+ \let\do\set@mathnolig \verbatim@nolig@list % prevent ligatures
+ \@ifnextchar\bgroup\Url@z\Url@y}
+
+\def\Url@y#1{\catcode`{11 \catcode`}11
+  \def\@tempa##1#1{\Url@z{##1}}\@tempa}
+\def\Url@z#1{\def\@tempa{#1}\expandafter\expandafter\expandafter\Url@Hook
+  \expandafter\strip@prefix\meaning\@tempa\UrlRight\m@th$\endgroup}
+\def\Url@Hook{\UrlLeft}
+\let\UrlRight\@empty
+\let\UrlLeft\@empty
+
+\def\set@mathcode#1{\count@`#1\advance\count@\@tempcnta\mathcode`#1\count@}
+\def\set@mathact#1#2{\mathcode`#132768 \lccode`\~`#1\lowercase{\def~{#2}}}
+\def\set@mathnolig#1{\ifnum\mathcode`#1<32768
+   \lccode`\~`#1\lowercase{\edef~{\mathchar\number\mathcode`#1_{\/}}}%
+   \mathcode`#132768 \fi}
+
+\def\urldef#1#2{\begingroup \setbox\z@\hbox\bgroup
+  \def\Url@z{\Url@def{#1}{#2}}#2}
+\expandafter\ifx\csname DeclareRobustCommand\endcsname\relax
+  \def\Url@def#1#2#3{\m@th$\endgroup\egroup\endgroup
+    \def#1{#2{#3}}}
+\else
+  \def\Url@def#1#2#3{\m@th$\endgroup\egroup\endgroup
+    \DeclareRobustCommand{#1}{#2{#3}}}
+\fi
+
+\def\urlstyle#1{\csname url@#1style\endcsname}
+
+% Sample (and default) configuration:
+%
+\newcommand\url{\begingroup \Url}
+%
+% picTeX defines \path, so declare it optionally:
+\@ifundefined{path}{\newcommand\path{\begingroup
+\urlstyle{tt}\Url}}{}
+%
+% too many styles define \email like \address, so I will not define it.
+% \newcommand\email{\begingroup \urlstyle{rm}\Url}
+
+% Process LaTeX \package options
+%
+\urlstyle{tt}
+\let\Url@sppen\@M
+\def\do@url@hyp{}% by default, no breaks after hyphens
+
+\@ifundefined{ProvidesPackage}{}{
+  \ProvidesPackage{url}[1999/03/02 \space ver 1.4 \space
+       Verb mode for urls, email addresses, and file names]
+  \DeclareOption{hyphens}{\def\do@url@hyp{\do\-}}% allow breaks after hyphens
+  \DeclareOption{obeyspaces}{\let\Url@Hook\relax}% a flag for later
+  \DeclareOption{spaces}{\let\Url@sppen\relpenalty}
+  \DeclareOption{T1}{\let\Url@do\Url@ttdo}
+  \ProcessOptions
+\ifx\Url@Hook\relax % [obeyspaces] was declared
+  \def\Url@Hook#1\UrlRight\m@th{\edef\@tempa{\noexpand\UrlLeft
+    \Url@retain#1\Url@nosp\, }\@tempa\UrlRight\m@th}
+  \def\Url@retain#1 {#1\penalty\Url@sppen\ \Url@retain}
+  \def\Url@nosp\,#1\Url@retain{}
+\fi }
+
+\edef\url@moving{\csname Url Error\endcsname}
+\expandafter\edef\url@moving
+ {\csname url used in a moving argument.\endcsname}
+\expandafter\expandafter\expandafter \let \url@moving\undefined
+
+\endinput
+%
+% url.sty  ver 1.4   02-Mar-1999   Donald Arseneau   asnd@reg.triumf.ca
+%
+% This package defines "\url", a form of "\verb" that allows linebreaks,
+% and can often be used in the argument to another command.  It can be
+% configured to print in different formats, and is particularly useful for
+% hypertext links, email addresses, directories/paths, etc.  The font may
+% be selected using the "\urlstyle" command and pre-defined text can be
+% stored with the "\urldef" command. New url-like commands can be defined,
+% and a "\path" command is provided this way.
+%
+% Usage:    Conditions:
+% \url{ }   If the argument contains any "%", "#", or "^^", or ends with
+%           "\", it can't be used in the argument to another command.
+%           The argument must not contain unbalanced braces.
+% \url|  |  ...where "|" is any character not used in the argument and not
+%           "{" or a space.  The same restrictions as above except that the
+%           argument may contain unbalanced braces.
+% \xyz      for "\xyz" a defined-url;  this can be used anywhere, no matter
+%           what characters it contains.
+%
+% The "\url" command is fragile, and its argument is likely to be very
+% fragile, but a defined-url is robust.
+%
+% Package Option:  obeyspaces
+% Ordinarily, all spaces are ignored in the url-text.  The "[obeyspaces]"
+% option allows spaces, but may introduce spurious spaces when a url
+% containing "\" characters is given in the argument to another command.
+% So if you need to obey spaces you can say "\usepackage[obeyspaces]{url}",
+% and if you need both spaces and backslashes, use a `defined-url' for
+% anything with "\".
+%
+% Package Option:  hyphens
+% Ordinarily, breaks are not allowed after "-" characters because this
+% leads to confusion. (Is the "-" part of the address or just a hyphen?)
+% The package option "[hyphens]" allows breaks after explicit hyphen
+% characters.  The "\url" command will *never ever* hyphenate words.
+%
+% Package Option:  spaces
+% Likewise, breaks are not usually allowed after spaces under the
+% "[obeyspaces]" option, but giving the options "[obeyspaces,spaces]"
+% will allow breaks at those spaces.
+%
+% Package Option:  T1
+% This signifies that you will be using T1-encoded fonts which contain
+% some characters missing from most older (OT1) encoded TeX fonts.  This
+% changes the default definition for "\urlstyle{rm}".
+%
+% Defining a defined-url:
+% Take for example the email address "myself%node@gateway.net" which could
+% not be given (using "\url" or "\verb") in a caption or parbox due to the
+% percent sign.  This address can be predefined with
+%    \urldef{\myself}\url{myself%node@gateway.net}   or
+%    \urldef{\myself}\url|myself%node@gateway.net|
+% and then you may use "\myself" instead of "\url{myself%node@gateway.net}"
+% in an argument, and even in a moving argument like a caption because a
+% defined-url is robust.
+%
+% Style:
+% You can switch the style of printing using "\urlstyle{tt}", where "tt"
+% can be any defined style.  The pre-defined styles are "tt", "rm", "sf",
+% and "same" which all allow the same linebreaks but different fonts --
+% the first three select a specific font and the "same" style uses the
+% current text font.  You can define your own styles with different fonts
+% and/or line-breaking by following the explanations below.  The "\url"
+% command follows whatever the currently-set style dictates.
+%
+% Alternate commands:
+% It may be desireable to have different things treated differently, each
+% in a predefined style; e.g., if you want directory paths to always be
+% in tt and email addresses to be rm, then you would define new url-like
+% commands as follows:
+%
+%    \newcommand\email{\begingroup \urlstyle{rm}\Url}
+%    \newcommand\directory{\begingroup \urlstyle{tt}\Url}
+%
+% You must follow this format closely, and NOTE that the final command is
+% "\Url", not "\url".  In fact, the "\directory" example is exactly the
+% "\path" definition which is pre-defined in the package.  If you look
+% above, you will see that "\url" is defined with
+%    \newcommand\url{\begingroup \Url}
+% I.e., using whatever url-style has been selected.
+%
+% You can make a defined-url for these other styles, using the usual
+% "\urldef" command as in this example:
+%
+%    \urldef{\myself}{\email}{myself%node.domain@gateway.net}
+%
+% which makes "\myself" act like "\email{myself%node.domain@gateway.net}",
+% if the "\email" command is defined as above.  The "\myself" command
+% would then be robust.
+%
+% Defining styles:
+% Before describing how to customize the printing style, it is best to
+% mention something about the unusual implementation of "\url".  Although
+% the material is textual in nature, and the font specification required
+% is a text-font command, the text is actually typeset in *math* mode.
+% This allows the context-sensitive linebreaking, but also accounts for
+% the default behavior of ignoring spaces.  Now on to defining styles.
+%
+% To change the font or the list of characters that allow linebreaks, you
+% could redefine the commands "\UrlFont", "\UrlBreaks", "\UrlSpecials" etc.
+% directly in the document, but it is better to define a new `url-style'
+% (following the example of "\url@ttstyle" and "\url@rmstyle") which defines
+% all of "\UrlBigbreaks", "\UrlNoBreaks", "\UrlBreaks", "\UrlSpecials", and
+% "\UrlFont".
+%
+% Changing font:
+% The "\UrlFont" command selects the font.  The definition of "\UrlFont"
+% done by the pre-defined styles varies to cope with a variety of LaTeX
+% font selection schemes, but it could be as simple as "\def\UrlFont{\tt}".
+% Depending on the font selected, some characters may need to be defined
+% in the "\UrlSpecials" list because many fonts don't contain all the
+% standard input characters.
+%
+% Changing linebreaks:
+% The list of characters that allow line-breaks is given by "\UrlBreaks"
+% and "\UrlBigBreaks", which have the format "\do\c" for character "c".
+% The differences are that `BigBreaks' have a lower penalty and have
+% different breakpoints when in sequence (as in "http://"): `BigBreaks'
+% are treated as mathrels while `Breaks' are mathbins (see The TeXbook,
+% p.170). In particular, a series of `BigBreak' characters will break at
+% the end and only at the end; a series of `Break' characters will break
+% after the first and after every following *pair*; there will be no
+% break after a `Break' character if a `BigBreak' follows.  In the case
+% of "http://" it doesn't matter whether ":" is a `Break' or `BigBreak' --
+% the breaks are the same in either case; but for DECnet nodes with "::"
+% it is important to prevent breaks *between* the colons, and that is why
+% colons are `BigBreaks'.
+%
+% It is possible for characters to prevent breaks after the next following
+% character (I use this for parentheses).  Specify these in "\UrlNoBreaks".
+%
+% You can do arbitrarily complex things with characters by making them
+% active in math mode (mathcode hex-8000) and specifying the definition(s)
+% in "\UrlSpecials".  This is used in the rm and sf styles for OT1 font
+% encoding to handle several characters that are not present in those
+% computer-modern style fonts.  See the definition of "\Url@do", which
+% is used by both "\url@rmstyle" and "\url@sfstyle"; it handles missing
+% characters via "\UrlSpecials".  The nominal format for setting each
+% special character "c" is: "\do\c{<definition>}", but you can include
+% other definitions too.
+%
+%
+% If all this sounds confusing ... well, it is!  But I hope you won't need
+% to redefine breakpoints -- the default assignments seem to work well for
+% a wide variety of applications.  If you do need to make changes, you can
+% test for breakpoints using regular math mode and the characters "+=(a".
+%
+% Yet more flexibility:
+% You can also customize the verbatim text by defining "\UrlRight" and/or
+% "\UrlLeft", e.g., for ISO formatting of urls surrounded by "<  >", define
+%
+%    \renewcommand\url{\begingroup \def\UrlLeft{<url: }\def\UrlRight{>}%
+%        \urlstyle{tt}\Url}
+%
+% The meanings of "\UrlLeft" and "\UrlRight" are *not* reproduced verbatim.
+% This lets you use formatting commands there, but you must be careful not
+% to use TeX's special characters ("\^_%~#$&{}" etc.) improperly.
+% You can also define "\UrlLeft" to reprocess the verbatim text, but the
+% format of the definition is special:
+%
+%    \def\UrlLeft#1\UrlRight{ ... do things with #1 ... }
+%
+% Yes, that is "#1" followed by "\UrlRight" then the definition.  For
+% example, to put a hyperTeX hypertext link in the DVI file:
+%
+%    \def\UrlLeft#1\UrlRight{\special{html:<a href="#1">}#1\special{html:</a>}}
+%
+% Using this technique, url.sty can provide a convenient interface for
+% performing various operations on verbatim text.  You don't even need
+% to print out the argument!  For greatest efficiency in such obscure
+% applications, you can define a null url-style where all the lists like
+% "\UrlBreaks" are empty.
+%
+% Revision History:
+% ver 1.1 6-Feb-1996:
+% Fix hyphens that wouldn't break and ligatures that weren't suppressed.
+% ver 1.2 19-Oct-1996:
+% Package option for T1 encoding; Hooks: "\UrlLeft" and "\UrlRight".
+% ver 1.3 21-Jul-1997:
+% Prohibit spaces as delimiter characters; change ascii tilde in OT1.
+% ver 1.4 02-Mar-1999
+% LaTeX license; moving-argument-error
+% The End
+
+Test file integrity:  ASCII 32-57, 58-126:  !"#$%&'()*+,-./0123456789
+:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
+\end{filecontents*}
+
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{filecontents*}{wsc.bst}
+%%% ====================================================================
+%%%  @BibTeX-style-file{
+%%%     author          = "Glenn Paulley",
+%%%     version         = "4",
+%%%     date            = "28 August 1992",
+%%%     time            = "10:24:38 199",
+%%%     filename        = "chicagoa.bst",
+%%%     address         = "Data Structuring Group
+%%%                        Department of Computer Science
+%%%                        University of Waterloo
+%%%                        Waterloo, Ontario, Canada
+%%%                        N2L 3G1",
+%%%     telephone       = "(519) 885-1211",
+%%%     FAX             = "(519) 885-1208",
+%%%     checksum        = "62428 1684 5231 38311",
+%%%     email           = "gnpaulle@bluebox.uwaterloo.ca",
+%%%     codetable       = "ISO/ASCII",
+%%%     keywords        = "",
+%%%     supported       = "yes",
+%%%     abstract        = "A BibTeX bibliography style that follows the
+%%%                        `B' reference style of the 13th Edition of
+%%%                        the Chicago Manual of Style. Supports annotated
+%%%                        bibliographies through the BibTeX field
+%%%                        `annotation'. A detailed feature list is given
+%%%                        below.",
+%%%     docstring       = "The checksum field above contains a CRC-16
+%%%                        checksum as the first value, followed by the
+%%%                        equivalent of the standard UNIX wc (word
+%%%                        count) utility output of lines, words, and
+%%%                        characters.  This is produced by Robert
+%%%                        Solovay's checksum utility.",
+%%%  }
+%%% ====================================================================
+%
+% WSC bibtex style.  Modified from chicagoa.bst to conform to Winter
+%  Simulation Conference standards.
+% last modified: July 10, 2000, S. Chick
+% last modified: Feb 13, 2001, S. Chick.  More compatible with WSC guidelines
+% Last modified: Feb 09, 2011, J. Himmelspach. Some adaptions toward 16th edition of Chicago Style
+% =====================================================================
+%
+%%% ====================================================================
+%
+% "Chicago" BibTeX style, chicagoa.bst - Chicago style with annotations
+% =====================================================================
+%
+% BibTeX `chicagoa' style file for BibTeX version 0.99c, LaTeX version 2.09
+% Place it in a file called chicagoa.bst in the BibTeX search path.
+% You need to include chicago.sty as a \documentstyle option.
+% (Placing it in the same directory as the LaTeX document should also work.)
+% This "chicago" style is based on newapa.bst (American Psych. Assoc.)
+% found at ymir.claremont.edu. Annotation support added 07/09/92.
+% Modifications are loosely based on Chicago Manual of Style.
+%
+%   Citation format: (author-last-name year)
+%             (author-last-name and author-last-name year)
+%             (author-last-name, author-last-name, and author-last-name year)
+%             (author-last-name et al. year)
+%             (author-last-name)
+%             author-last-name (year)
+%             (author-last-name and author-last-name)
+%             (author-last-name et al.)
+%             (year) or (year,year)
+%             year or year,year
+%
+%   Reference list ordering: alphabetical by author or whatever passes
+%    for author in the absence of one.
+%
+% This BibTeX style has support for abbreviated author lists and for
+%    year-only citations.  This is done by having the citations
+%    actually look like
+%
+%    \citeauthoryear{full-author-info}{abbrev-author-info}{year}
+%
+% The LaTeX style has to have the following (or similar)
+%
+%     \let\@internalcite\cite
+%     \def\fullcite{\def\citeauthoryear##1##2##3{##1, ##3}\@internalcite}
+%     \def\fullciteA{\def\citeauthoryear##1##2##3{##1}\@internalcite}
+%     \def\shortcite{\def\citeauthoryear##1##2##3{##2, ##3}\@internalcite}
+%     \def\shortciteA{\def\citeauthoryear##1##2##3{##2}\@internalcite}
+%     \def\citeyear{\def\citeauthoryear##1##2##3{##3}\@internalcite}
+%
+% These TeX macro definitions are found in chicago.sty. Additional
+% commands to manipulate different components of a citation can be defined
+% so that, for example, you can list author's names without parentheses
+% if using a citation as a noun or object in a sentence.
+%
+% This file was originally copied from newapa.bst at ymir.claremont.edu.
+%
+% Features of chicago.bst:
+% =======================
+%
+% - supports an "annotation" field for annotated bibliographies.
+% - full names used in citations, but abbreviated citations are available
+%   (see above)
+% - if an entry has a "month", then the month and year are also printed
+%   as part of that bibitem.
+% - all conjunctions use "and" instead of "\&"
+% - major modification from Chicago Manual of Style (13th ed.) is that
+%   only the first author in a reference appears last name first-
+%   additional authors appear as J. Q. Public.
+% - pages are listed as "pp. xx-xx" in all entry types except
+%   article entries.
+% - book, inbook, and manual use "location: publisher" (or organization)
+%   for address and publisher. All other types list publishers separately.
+% - "pp." are used to identify page numbers for all entry types except
+%   articles.
+% - organization is used as a citation label if neither author nor editor
+%   is present (for manuals).
+% - "et al." is used for long author and editor lists, or when "others"
+%   is used.
+%
+% Modifications and bug fixes from newapa.bst:
+% ===========================================
+%
+%   - added month, year to bib entries if month is present
+%   - fixed bug with In proceedings, added necessary comma after title
+%   - all conjunctions changed to "and" from "\&"
+%   - fixed bug with author labels in my.full.label: "et al." now is
+%        generated when "others" is an author name
+%   - major modification from Chicago Manual of Style (13th ed.) is that
+%     only the first author in a reference appears last name first-
+%     additional authors appear as J. Q. Public.
+%   - pages are listed as "pp. xx-xx" in all entry types except
+%     article entries. Unnecessary (IMHO) "()" around page numbers
+%     were removed, and page numbers now don't end with a period.
+%   - created chicago.sty for use with this bibstyle (required).
+%   - fixed bugs in FUNCTION {format.vol.num.pages} for missing volume,
+%     number, and /or pages. Renamed to format.jour.vol.
+%   - fixed bug in formatting booktitles: additional period an error if
+%     book has a volume.
+%   - fixed bug: editors usually given redundant period before next clause
+%     (format.editors.dot) removed.
+%   - added label support for organizations, if both author and editor
+%     are missing (from alpha.bst). If organization is too long, then
+%     the key field is used for abbreviated citations.
+%   - In proceedings or books of several volumes, no comma was written
+%     between the "Volume x" and the page numbers (this was intentional
+%     in newapa.bst). Fixed.
+%   - Some journals may not have volumes/numbers, only month/year (eg.
+%     IEEE Computer). Fixed bug in article style that assumed volume/number
+%     was always present.
+%
+% Original documentation for newapa.sty:
+% =====================================
+%
+% This version was made by modifying the master file made by
+% Oren Patashnik (PATASHNIK@SCORE.STANFORD.EDU), and the 'named' BibTeX
+% style of Peter F. Patel-Schneider.
+%
+% Copyright (C) 1985, all rights reserved.
+% Copying of this file is authorized only if either
+% (1) you make absolutely no changes to your copy, including name, or
+% (2) if you do make changes, you name it something other than 'newapa.bst'.
+% There are undoubtably bugs in this style.  If you make bug fixes,
+% improvements, etc.  please let me know.  My e-mail address is:
+%    spencer@cgrg.ohio.state.edu or 71160.3141@compuserve.com
+%
+% This style was made from 'plain.bst', 'named.bst', and 'apalike.bst',
+% with lots of tweaking to make it look like APA style, along with tips
+% from Young Ryu and Brian Reiser's modifications of 'apalike.bst'.
+
+ENTRY
+  { address
+    annotation
+    author
+    booktitle
+    chapter
+    edition
+    editor
+    howpublished
+    institution
+    journal
+    key
+    month
+    note
+    number
+    organization
+    pages
+    publisher
+    school
+    series
+    title
+    type
+    volume
+    year
+  }
+  {}
+  { label.year extra.label sort.year sort.label }
+
+INTEGERS { output.state before.all mid.sentence after.sentence
+after.block }
+
+FUNCTION {init.state.consts} { #0 'before.all :=
+  #1 'mid.sentence :=
+  #2 'after.sentence :=
+  #3 'after.block :=
+}
+
+STRINGS { s t u }
+
+FUNCTION {output.nonnull} { 's :=
+  output.state mid.sentence =
+    { ", " * write$ }
+    { output.state after.block =
+    { add.period$ write$
+      newline$
+      "\newblock " write$
+    }
+    { output.state before.all =
+        'write$
+        { add.period$ " " * write$ }
+      if$
+    }
+      if$
+      mid.sentence 'output.state :=
+    }
+  if$
+  s
+}
+
+% Use a colon to separate output. Used only for address/publisher
+% combination in book/inbook types, address/institution for manuals,
+% and organization:publisher for proceedings (inproceedings).
+%
+FUNCTION {output.nonnull.colon} { 's :=
+  output.state mid.sentence =
+    { ": " * write$ }
+    { output.state after.block =
+    { add.period$ write$
+      newline$
+      "\newblock " write$
+    }
+    { output.state before.all =
+        'write$
+        { add.period$ " " * write$ }
+      if$
+    }
+      if$
+      mid.sentence 'output.state :=
+    }
+  if$
+  s
+}
+
+FUNCTION {output} { duplicate$ empty$
+    'pop$
+    'output.nonnull
+  if$
+}
+
+FUNCTION {output.colon} { duplicate$ empty$
+    'pop$
+    'output.nonnull.colon
+  if$
+}
+
+FUNCTION {output.check} { 't :=
+  duplicate$ empty$
+    { pop$ "empty " t * " in " * cite$ * warning$ }
+    'output.nonnull
+  if$
+}
+
+FUNCTION {output.check.colon} { 't :=
+  duplicate$ empty$
+    { pop$ "empty " t * " in " * cite$ * warning$ }
+    'output.nonnull.colon
+  if$
+}
+
+%FUNCTION {output.year.check}
+%{ year empty$
+%     { "empty year in " cite$ * warning$ }
+%     { write$
+%        " (" year * extra.label *
+%       month empty$
+%          { ")" * }
+%          { ", " * month * ")" * }
+%       if$
+%       mid.sentence 'output.state :=
+%     }
+%  if$
+%}
+
+FUNCTION {output.year.check} { year empty$
+     { "empty year in " cite$ * warning$ }
+     { write$
+        " " year * extra.label *  % SEC
+       month empty$
+          { "." * }    % SEC
+          { ", " * month * "." * }  % SEC
+       if$
+       mid.sentence 'output.state :=
+     }
+  if$
+}
+
+
+FUNCTION {fin.entry} { add.period$
+  write$
+  newline$
+}
+
+FUNCTION {new.block} { output.state before.all =
+    'skip$
+    { after.block 'output.state := }
+  if$
+}
+
+FUNCTION {new.sentence} { output.state after.block =
+    'skip$
+    { output.state before.all =
+    'skip$
+    { after.sentence 'output.state := }
+      if$
+    }
+  if$
+}
+
+FUNCTION {not} {   { #0 }
+    { #1 }
+  if$
+}
+
+FUNCTION {and} {   'skip$
+    { pop$ #0 }
+  if$
+}
+
+FUNCTION {or} {   { pop$ #1 }
+    'skip$
+  if$
+}
+
+FUNCTION {new.block.checka} { empty$
+    'skip$
+    'new.block
+  if$
+}
+
+FUNCTION {new.block.checkb} { empty$
+  swap$ empty$
+  and
+    'skip$
+    'new.block
+  if$
+}
+
+FUNCTION {new.sentence.checka} { empty$
+    'skip$
+    'new.sentence
+  if$
+}
+
+FUNCTION {new.sentence.checkb} { empty$
+  swap$ empty$
+  and
+    'skip$
+    'new.sentence
+  if$
+}
+
+FUNCTION {field.or.null} { duplicate$ empty$
+    { pop$ "" }
+    'skip$
+  if$
+}
+
+%
+% Emphasize the top string on the stack.
+%
+FUNCTION {emphasize} { duplicate$ empty$
+    { pop$ "" }
+    { "{\em " swap$ * "}" * }
+  if$
+}
+
+%
+% Emphasize the top string on the stack, but add a trailing space.
+%
+FUNCTION {emphasize.space} { duplicate$ empty$
+    { pop$ "" }
+    { "{\em " swap$ * "\/}" * }
+  if$
+}
+
+INTEGERS { nameptr namesleft numnames }
+%
+% Format bibliographical entries with the first author last name first,
+% and subsequent authors with initials followed by last name.
+% All names are formatted in this routine.
+%
+FUNCTION {format.names} { 's :=
+  #1 'nameptr :=               % nameptr = 1;
+  s num.names$ 'numnames :=    % numnames = num.name$(s);
+  numnames 'namesleft :=
+    { namesleft #0 > }
+
+    { nameptr #1 =
+        {s nameptr "{vv~}{ll}{, jj}{, f.}" format.name$ 't := }
+        {s nameptr "{f.~}{vv~}{ll}{, jj}" format.name$ 't := }
+      if$
+      nameptr #1 >
+        { namesleft #1 >
+              { ", " * t * }   % SEC was a comma
+              { numnames #2 >
+                  { "" * }   % SEC removed a comma
+                  'skip$
+                if$
+                t "others" =
+                    { " et~al." * }
+                    { ", and " * t * "." *} % from Chicago Manual of Style % SEC added , and "." *
+                  if$
+               }
+               if$
+             }
+            't
+        if$
+        nameptr #1 + 'nameptr :=          % nameptr += 1;
+        namesleft #1 - 'namesleft :=      % namesleft =- 1;
+    }
+
+  while$
+}
+
+% Compute the label based on the names passed
+FUNCTION {my.full.label} { 's :=
+  #1 'nameptr :=               % nameptr = 1;
+  s num.names$ 'numnames :=    % numnames = num.name$(s);
+  numnames 'namesleft :=
+    { namesleft #0 > }
+
+    { s nameptr "{vv~}{ll}" format.name$ 't :=  % get the next name
+      nameptr #1 >
+        { namesleft #1 >
+              { ", " * t * }
+              { numnames #2 >
+                  { "," * }
+                  'skip$
+                if$
+                t "others" =
+                    { " et~al." * }
+                    { " and " * t * } % from Chicago Manual of Style
+                  if$
+               }
+               if$
+             }
+            't
+        if$
+        nameptr #1 + 'nameptr :=          % nameptr += 1;
+        namesleft #1 - 'namesleft :=      % namesleft =- 1;
+    }
+  while$
+}
+
+FUNCTION {format.names.fml}
+%
+% Format names in "familiar" format, with first initial followed by
+% last name. Like format.names, ALL names are formatted.
+%
+{ 's :=
+  #1 'nameptr :=               % nameptr = 1;
+  s num.names$ 'numnames :=    % numnames = num.name$(s);
+  numnames 'namesleft :=
+    { namesleft #0 > }
+
+    { s nameptr "{f.~}{vv~}{ll}{, jj}" format.name$ 't :=
+
+      nameptr #1 >
+        { namesleft #1 >
+              { ", " * t * }
+               { numnames #2 >
+                    { "," * }
+                    'skip$
+                  if$
+                  t "others" =
+                        { " et~al." * }
+                        { " and " * t * }
+%                       { " \& " * t * }
+                      if$
+                }
+               if$
+             }
+            't
+        if$
+        nameptr #1 + 'nameptr :=          % nameptr += 1;
+        namesleft #1 - 'namesleft :=      % namesleft =- 1;
+    }
+  while$
+}
+
+FUNCTION {format.annotation} { annotation empty$
+ { "" }
+ { " \begin{quotation}\noindent "
+   annotation
+   * " \end{quotation} " *
+ }
+      if$
+}
+
+FUNCTION {format.authors} { author empty$
+    { "" }
+    { author format.names }
+  if$
+}
+
+
+FUNCTION {format.misc.authors} { author empty$
+    { "" }
+    { author }
+  if$
+}
+
+
+FUNCTION {format.key} { empty$
+    { key field.or.null }
+    { "" }
+  if$
+}
+
+%
+% Format editor names for use in the "in" types: inbook, incollection,
+% inproceedings: first initial, then last names. When editors are the
+% LABEL for an entry, then format.editor is used which lists editors
+% by last name first.
+%
+%SEC: removed
+%      editor num.names$ #1 >
+%    { " (Eds.)" * }
+%    { " (Ed.)" * }
+%      if$
+FUNCTION {format.editors.fml} { editor empty$
+    { "" }
+    { editor format.names.fml
+    }
+  if$
+}
+
+%
+% Format editor names for use in labels, last names first.
+%
+FUNCTION {format.editors} { editor empty$
+    { "" }
+    { editor format.names
+      editor num.names$ #1 >
+    { " (Eds.)" * }
+    { " (Ed.)" * }
+      if$
+    }
+  if$
+}
+
+%FUNCTION {format.title} { title empty$
+    %{ "" }
+    %{ title "t" change.case$ } 
+  %if$
+%}
+
+FUNCTION {format.title} { title empty$
+    { "" }
+    { "``" title * "''" * } %  "`` " * "''" *     "t" change.case$
+  if$
+}
+
+FUNCTION {n.dashify} { 't :=
+  ""
+    { t empty$ not }
+    { t #1 #1 substring$ "-" =
+    { t #1 #2 substring$ "--" = not
+        { "--" *
+          t #2 global.max$ substring$ 't :=
+        }
+        {   { t #1 #1 substring$ "-" = }
+        { "-" *
+          t #2 global.max$ substring$ 't :=
+        }
+          while$
+        }
+      if$
+    }
+    { t #1 #1 substring$ *
+      t #2 global.max$ substring$ 't :=
+    }
+      if$
+    }
+  while$
+}
+
+FUNCTION {format.btitle} { edition empty$
+  { title emphasize }
+  { title empty$
+    { title emphasize }
+    { volume empty$     % gnp - check for volume, then don't need period
+       { "{\em " title * "\/}. " * edition * " ed" * "." * }
+       { "{\em " title * "\/}. " * edition * " ed" * }
+%SEC       { "{\em " title * "\/} (" * edition * " ed.)" * "." * }
+%SEC       { "{\em " title * "\/} (" * edition * " ed.)" * }
+      if$
+    }
+    if$
+  }
+  if$
+}
+
+FUNCTION {format.emphasize.booktitle} { edition empty$
+  { booktitle emphasize }
+  { booktitle empty$
+    { booktitle emphasize }
+    { volume empty$    % gnp - extra period an error if book has a volume
+        { "{\em " booktitle * "\/} (" * edition * " ed.)" * "." *}
+        { "{\em " booktitle * "\/} (" * edition * " ed.)" * }
+      if$
+      }
+    if$
+    }
+  if$
+  }
+
+
+FUNCTION {tie.or.space.connect} { duplicate$ text.length$ #3 <
+    { "~" }
+    { " " }
+  if$
+  swap$ * *
+}
+
+FUNCTION {either.or.check} { empty$
+    'pop$
+    { "can't use both " swap$ * " fields in " * cite$ * warning$ }
+  if$
+}
+
+FUNCTION {format.bvolume} { volume empty$
+    { "" }
+    { "Volume" volume tie.or.space.connect % gnp - changed to mixed case
+      series empty$
+        'skip$
+        { " of " * series emphasize * }
+      if$
+      "volume and number" number either.or.check
+    }
+  if$
+}
+
+FUNCTION {format.number.series} { volume empty$
+    { number empty$
+    { series field.or.null }
+    { output.state mid.sentence =
+        { "Number" } % gnp - changed to mixed case always
+        { "Number" }
+      if$
+      number tie.or.space.connect
+      series empty$
+        { "there's a number but no series in " cite$ * warning$ }
+        { " in " * series * }
+      if$
+    }
+      if$
+    }
+    { "" }
+  if$
+}
+
+INTEGERS { multiresult }
+
+FUNCTION {multi.page.check} { 't :=
+  #0 'multiresult :=
+    { multiresult not
+      t empty$ not
+      and
+    }
+    { t #1 #1 substring$
+      duplicate$ "-" =
+      swap$ duplicate$ "," =
+      swap$ "+" =
+      or or
+    { #1 'multiresult := }
+    { t #2 global.max$ substring$ 't := }
+      if$
+    }
+  while$
+  multiresult
+}
+
+%SEC { "pp.\ " pages n.dashify tie.or.space.connect } % gnp - removed ()% S
+%SEC { "pp.\ " pages tie.or.space.connect }
+FUNCTION {format.pages} { pages empty$
+  { "" }
+  { pages multi.page.check
+ { "" pages n.dashify tie.or.space.connect } % gnp - removed ()% S
+ { "" pages tie.or.space.connect }
+    if$
+  }
+  if$
+}
+
+% By Young (and Spencer)
+% GNP - fixed bugs with missing volume, number, and/or pages
+%
+% Format journal, volume, number, pages for article types.
+%
+FUNCTION {format.jour.vol} { journal empty$
+    { "no journal in " cite$ * warning$
+      "" }
+    { journal emphasize.space }
+    if$
+  number empty$
+    { volume empty$
+       { "no number and no volume in " cite$ * warning$
+         "" * }
+%SEC       { "~{\em " * Volume * "}" * }
+       { "~" * Volume * }
+      if$
+    }
+    { volume empty$
+      {"no volume for " cite$ * warning$
+       "~(" * number * ")" * }
+      { "~" *
+%SEC        volume emphasize.space
+        volume
+        " (" * number * ")" * * }   % added space before '(' per J. Wilson suggestion
+      if$
+    }
+  if$
+  pages empty$
+    {"page numbers missing in " cite$ * warning$
+     "" * } % gnp - place a null string on the stack for output
+    { duplicate$ empty$
+      { pop$ format.pages }
+%      { ": " *  pages n.dashify * } % SEC: changed , to :.  Also, gnp - removed pp. for articles
+   { number empty$     % SEC
+        { ":" *  pages n.dashify * }  % SEC
+        { ": " *  pages n.dashify * } % SEC
+       if$   % SEC
+   }    % SEC
+      if$
+    }
+  if$
+}
+
+FUNCTION {format.chapter.pages} { chapter empty$
+    'format.pages
+    { type empty$
+        { "Chapter" } % gnp - changed to mixed case
+        { type "t" change.case$ }
+      if$
+      chapter tie.or.space.connect
+      pages empty$
+        {"page numbers missing in " cite$ * warning$} % gnp - added check
+        { ", " * format.pages * }
+      if$
+    }
+  if$
+}
+
+% SEC: was    { "In " format.editors.fml * ", " * format.emphasize.booktitle * }
+FUNCTION {format.in.ed.booktitle} { booktitle empty$
+  { "" }
+  { editor empty$
+    { "In " format.emphasize.booktitle * }
+    { "In " format.emphasize.booktitle * ", edited by\ " * format.editors.fml * }
+    if$
+  }
+  if$
+}
+
+FUNCTION {format.thesis.type} { type empty$
+    'skip$
+    { pop$
+      type "t" change.case$
+    }
+  if$
+}
+
+FUNCTION {format.tr.number} { type empty$
+    { "Technical Report" }
+    'type
+  if$
+  number empty$
+    { "t" change.case$ }
+    { number tie.or.space.connect }
+  if$
+}
+
+FUNCTION {format.article.crossref} { "See"
+  "\citeN{" * crossref * "}" *
+}
+
+FUNCTION {format.crossref.editor} { editor #1 "{vv~}{ll}"
+format.name$
+  editor num.names$ duplicate$
+  #2 >
+    { pop$ " et~al." * }
+    { #2 <
+    'skip$
+    { editor #2 "{ff }{vv }{ll}{ jj}" format.name$ "others" =
+        { " et~al." * }
+        { " and " * editor #2 "{vv~}{ll}" format.name$ * }
+      if$
+    }
+      if$
+    }
+  if$
+}
+
+FUNCTION {format.book.crossref} { volume empty$
+    { "empty volume in " cite$ * "'s crossref of " * crossref * warning$
+      "In "
+    }
+    { "Volume" volume tie.or.space.connect % gnp - changed to mixed case
+      " of " *
+    }
+  if$
+  editor empty$
+  editor field.or.null author field.or.null =
+  or
+    { key empty$
+    { series empty$
+        { "need editor, key, or series for " cite$ * " to crossref " *
+          crossref * warning$
+          "" *
+        }
+        { "{\em " * series * "\/}" * }
+      if$
+    }
+    { key * }
+      if$
+    }
+    { format.crossref.editor * }
+  if$
+  " \citeN{" * crossref * "}" *
+}
+
+FUNCTION {format.incoll.inproc.crossref} { "See"
+  " \citeN{" * crossref * "}" *
+}
+
+% format.lab.names:
+%
+% determines "short" names for the abbreviated author information.
+% "Long" labels are created in calc.label, using the routine my.full.label
+% to format author and editor fields.
+%
+% There are 4 cases for labels.   (n=3 in the example)
+% a) one author             Foo
+% b) one to n               Foo, Bar and Baz
+% c) use of "and others"    Foo, Bar et al.
+% d) more than n            Foo et al.
+%
+FUNCTION {format.lab.names} { 's :=
+  s num.names$ 'numnames :=
+  numnames #2 >    % change number to number of others allowed before
+     % forcing "et al".
+    { s #1 "{vv~}{ll}" format.name$ " et~al." * }
+    {
+      numnames #1 - 'namesleft :=
+      #2 'nameptr :=
+      s #1 "{vv~}{ll}" format.name$
+ { namesleft #0 > }
+ { nameptr numnames =
+     { s nameptr "{ff }{vv }{ll}{ jj}" format.name$ "others" =
+  { " et~al." * }
+  { " and " * s nameptr "{vv~}{ll}" format.name$ * }
+       if$
+     }
+     { ", " * s nameptr "{vv~}{ll}" format.name$ * }
+   if$
+   nameptr #1 + 'nameptr :=
+   namesleft #1 - 'namesleft :=
+ }
+      while$
+    }
+  if$
+}
+
+FUNCTION {author.key.label} { author empty$
+    { key empty$
+          { "no key, author in " cite$ * warning$
+            cite$ #1 #3 substring$ }
+         'key
+      if$
+    }
+    { author format.lab.names }
+  if$
+}
+
+FUNCTION {editor.key.label} { editor empty$
+    { key empty$
+          { "no key, editor in " cite$ * warning$
+            cite$ #1 #3 substring$ }
+          'key
+        if$
+     }
+     { editor format.lab.names }
+  if$
+}
+
+FUNCTION {author.key.organization.label}
+%
+% added - gnp. Provide label formatting by organization if author is null.
+%
+{ author empty$
+    { organization empty$
+ { key empty$
+     { "no key, author or organization in " cite$ * warning$
+              cite$ #1 #3 substring$ }
+     'key
+   if$
+ }
+        { organization }
+      if$
+    }
+    { author format.lab.names }
+  if$
+}
+
+FUNCTION {editor.key.organization.label}
+%
+% added - gnp. Provide label formatting by organization if editor is null.
+%
+{ editor empty$
+    { organization empty$
+ { key empty$
+     { "no key, editor or organization in " cite$ * warning$
+              cite$ #1 #3 substring$ }
+     'key
+   if$
+ }
+        { organization }
+      if$
+    }
+    { editor format.lab.names }
+  if$
+}
+
+FUNCTION {author.editor.key.label} { author empty$
+    { editor empty$
+          { key empty$
+               { "no key, author, or editor in " cite$ * warning$
+                 cite$ #1 #3 substring$ }
+             'key
+           if$
+         }
+          { editor format.lab.names }
+      if$
+    }
+    { author format.lab.names }
+  if$
+}
+
+FUNCTION {misc.author.label} { author empty$
+    { key empty$
+          { "no key, author in " cite$ * warning$
+            cite$ #1 #3 substring$ }
+          'key
+        if$
+     }
+     { 
+		    author } %"test " author * "super " *} %format.lab.names ; 
+  if$
+}
+
+FUNCTION {calc.label}
+%
+% Changed - GNP. See also author.organization.sort, editor.organization.sort
+% Form label for BibTeX entry. The classification of which fields are used
+% for which type of entry (book, inbook, etc.) are taken from alpha.bst.
+% The change here from newapa is to also include organization as a
+% citation label if author or editor is missing.
+%
+{ % some entry types require a special treatment
+   type$ "book" =
+   type$ "inbook" =
+   or
+     'author.editor.key.label
+		 %else (!= book | inbook)
+   { type$ "proceedings" =
+        'editor.key.organization.label
+		 	  %else != proceedings
+      { type$ "manual" =
+           'author.key.organization.label
+					{ type$ "misc" =
+					    'misc.author.label
+              'author.key.label 
+						if$
+					}
+         if$ % manual
+      }
+      if$ % type$ "proceedings" =
+   }
+   if$ % or
+
+
+  author empty$  % generate the full label citation information.
+    { editor empty$
+        { organization empty$
+           { "no author, editor, or organization in " cite$ * warning$
+             "??" }
+           { organization }
+           if$
+        }
+        { editor my.full.label }
+        if$
+    }
+    { author my.full.label }
+  if$
+
+% leave label on the stack, to be popped when required.
+
+  "}{" * swap$ * "}{" *
+%  year field.or.null purify$ #-1 #4 substring$ *
+%
+% save the year for sort processing afterwards (adding a, b, c, etc.)
+%
+  year field.or.null purify$ #-1 #4 substring$
+  'label.year :=
+}
+
+FUNCTION {output.bibitem} { newline$
+
+  "\bibitem[\protect\citeauthoryear{" write$
+  calc.label write$
+  sort.year write$
+  "}]{" write$
+
+  cite$ write$
+  "}" write$
+  newline$
+  ""
+  before.all 'output.state :=
+}
+
+FUNCTION {article} { output.bibitem
+  format.authors
+  "author" output.check
+  author format.key output          % added
+  output.year.check                 % added
+  new.block
+  format.title
+  "title" output.check
+  new.block
+  crossref missing$
+    { format.jour.vol output
+    }
+    { format.article.crossref output.nonnull
+      format.pages output
+    }
+  if$
+  new.block
+  note output
+  fin.entry
+  format.annotation write$
+  newline$
+}
+
+FUNCTION {book} { output.bibitem
+  author empty$
+    { format.editors
+   "author and editor" output.check }
+    { format.authors
+   output.nonnull
+      crossref missing$
+     { "author and editor" editor either.or.check }
+     'skip$
+      if$
+    }
+  if$
+  output.year.check       % added
+  new.block
+  format.btitle
+  "title" output.check
+  crossref missing$
+    { format.bvolume output
+      new.block
+      format.number.series output
+      new.sentence
+      address output
+      publisher "publisher" output.check.colon
+    }
+    { new.block
+      format.book.crossref output.nonnull
+    }
+  if$
+  new.block
+  note output
+  fin.entry
+  format.annotation write$
+  newline$
+}
+
+FUNCTION {booklet} { output.bibitem
+  format.authors output
+  author format.key output          % added
+  output.year.check                 % added
+  new.block
+  format.title
+  "title" output.check
+  new.block
+  howpublished output
+  address output
+  new.block
+  note output
+  fin.entry
+  format.annotation write$
+}
+
+FUNCTION {inbook} { output.bibitem
+  author empty$
+    { format.editors
+      "author and editor" output.check
+    }
+    { format.authors output.nonnull
+      crossref missing$
+    { "author and editor" editor either.or.check }
+    'skip$
+      if$
+    }
+  if$
+  output.year.check                 % added
+  new.block
+  format.btitle
+  "title" output.check
+  crossref missing$
+    { format.bvolume output
+      format.chapter.pages
+      "chapter and pages" output.check
+      new.block
+      format.number.series output
+      new.sentence
+      address output
+      publisher
+      "publisher" output.check.colon
+    }
+    { format.chapter.pages "chapter and pages" output.check
+      new.block
+      format.book.crossref output.nonnull
+    }
+  if$
+  new.block
+  note output
+  fin.entry
+  format.annotation write$
+}
+
+FUNCTION {incollection} { output.bibitem
+  format.authors
+  "author" output.check
+  author format.key output       % added
+  output.year.check              % added
+  new.block
+  format.title
+  "title" output.check
+  new.block
+  crossref missing$
+  { format.in.ed.booktitle
+    "booktitle" output.check
+    format.bvolume output
+    format.number.series output
+    format.chapter.pages output % gnp - was special.output.nonnull
+%                                 left out comma before page numbers
+    new.sentence
+    address output
+    publisher "publisher" output.check.colon
+  }
+  { format.incoll.inproc.crossref
+ output.nonnull
+    format.chapter.pages output
+  }
+  if$
+  new.block
+  note output
+  fin.entry
+  format.annotation write$
+}
+
+%SEC: modified this quite a bit.
+FUNCTION {inproceedings} { output.bibitem
+  format.authors
+  "author" output.check
+  author format.key output            % added
+  output.year.check                   % added
+  new.block
+  format.title
+  "title" output.check
+  new.block
+  crossref missing$
+    { format.in.ed.booktitle
+   "booktitle" output.check
+      format.bvolume output
+      format.number.series output
+      format.pages output
+  organization address new.block.checkb
+% Reversed the order of "address" and "organization", added the ":".
+  address output
+  organization "organization" output.check.colon
+      publisher output.colon
+    }
+    { format.incoll.inproc.crossref output.nonnull
+      format.pages output
+    }
+  if$
+  new.block
+  note output
+  fin.entry
+  format.annotation write$
+}
+
+
+FUNCTION {conference} { inproceedings }
+
+FUNCTION {manual} { output.bibitem
+  author empty$
+    { editor empty$
+      { organization "organization" output.check
+        organization format.key output }  % if all else fails, use key
+      { format.editors "author and editor" output.check }
+      if$
+    }
+    { format.authors output.nonnull }
+    if$
+  output.year.check                 % added
+  new.block
+  format.btitle
+  "title" output.check
+  organization address new.block.checkb
+% Reversed the order of "address" and "organization", added the ":".
+  address output
+  organization "organization" output.check.colon
+%  address output
+%  ":" output
+%  organization output
+  new.block
+  note output
+  fin.entry
+  format.annotation write$
+}
+
+FUNCTION {mastersthesis} { output.bibitem
+  format.authors
+  "author" output.check
+  author format.key output          % added
+  output.year.check                 % added
+  new.block
+  format.title
+  "title" output.check
+  new.block
+  "Master's thesis" format.thesis.type output.nonnull
+  school "school" output.check
+  address output
+  new.block
+  note output
+  fin.entry
+  format.annotation write$
+}
+
+FUNCTION {misc} { output.bibitem
+  format.misc.authors output                      % replaced: format.authors output
+  author format.key output            % added
+  output.year.check                   % added
+  title howpublished new.block.checkb
+  format.title output
+  new.block
+  howpublished output
+  new.block
+  note output
+  fin.entry
+  format.annotation write$
+}
+
+FUNCTION {phdthesis} { output.bibitem
+  format.authors
+  "author" output.check
+  author format.key output            % added
+  output.year.check                   % added
+  new.block
+  format.btitle
+  "title" output.check
+  new.block
+  "Ph.\ D. thesis" format.thesis.type output.nonnull
+  school "school" output.check
+  address output
+  new.block
+  note output
+  fin.entry
+  format.annotation write$
+}
+
+FUNCTION {proceedings} { output.bibitem
+  editor empty$
+    { organization output
+      organization format.key output }  % gnp - changed from author format.key
+    { format.editors output.nonnull }
+  if$
+% author format.key output             % gnp - removed (should be either
+%                                        editor or organization
+  output.year.check                    % added (newapa)
+  new.block
+  format.btitle
+  "title" output.check
+  format.bvolume output
+  format.number.series output
+  address output
+  new.sentence
+  organization output
+  publisher output.colon
+  new.block
+  note output
+  fin.entry
+  format.annotation write$
+}
+
+FUNCTION {techreport} { output.bibitem
+  format.authors
+  "author" output.check
+  author format.key output             % added
+  output.year.check                    % added
+  new.block
+  format.title
+  "title" output.check
+  new.block
+  format.tr.number output.nonnull
+  institution
+  "institution" output.check
+  address output
+  new.block
+  note output
+  fin.entry
+  format.annotation write$
+}
+
+FUNCTION {unpublished} { output.bibitem
+  format.authors
+  "author" output.check
+  author format.key output              % added
+  output.year.check                      % added
+  new.block
+  format.title
+  "title" output.check
+  new.block
+  note "note" output.check
+  fin.entry
+  format.annotation write$
+}
+
+FUNCTION {default.type} { misc }
+
+MACRO {jan} {"January"}
+
+MACRO {feb} {"February"}
+
+MACRO {mar} {"March"}
+
+MACRO {apr} {"April"}
+
+MACRO {may} {"May"}
+
+MACRO {jun} {"June"}
+
+MACRO {jul} {"July"}
+
+MACRO {aug} {"August"}
+
+MACRO {sep} {"September"}
+
+MACRO {oct} {"October"}
+
+MACRO {nov} {"November"}
+
+MACRO {dec} {"December"}
+
+MACRO {acmcs} {"ACM Computing Surveys"}
+
+MACRO {acta} {"Acta Informatica"}
+
+MACRO {ai} {"Artificial Intelligence"}
+
+MACRO {cacm} {"Communications of the ACM"}
+
+MACRO {ibmjrd} {"IBM Journal of Research and Development"}
+
+MACRO {ibmsj} {"IBM Systems Journal"}
+
+MACRO {ieeese} {"IEEE Transactions on Software Engineering"}
+
+MACRO {ieeetc} {"IEEE Transactions on Computers"}
+
+MACRO {ieeetcad}
+ {"IEEE Transactions on Computer-Aided Design of Integrated Circuits"}
+
+MACRO {ipl} {"Information Processing Letters"}
+
+MACRO {jacm} {"Journal of the ACM"}
+
+MACRO {jcss} {"Journal of Computer and System Sciences"}
+
+MACRO {scp} {"Science of Computer Programming"}
+
+MACRO {sicomp} {"SIAM Journal on Computing"}
+
+MACRO {tocs} {"ACM Transactions on Computer Systems"}
+
+MACRO {tods} {"ACM Transactions on Database Systems"}
+
+MACRO {tog} {"ACM Transactions on Graphics"}
+
+MACRO {toms} {"ACM Transactions on Mathematical Software"}
+
+MACRO {toois} {"ACM Transactions on Office Information Systems"}
+
+MACRO {tcs} {"Theoretical Computer Science"}
+
+READ
+
+FUNCTION {sortify} { purify$
+  "l" change.case$
+}
+
+INTEGERS { len }
+
+FUNCTION {chop.word} { 's :=
+  'len :=
+  s #1 len substring$ =
+    { s len #1 + global.max$ substring$ }
+    's
+  if$
+}
+
+
+
+FUNCTION {sort.format.names} { 's :=
+  #1 'nameptr :=
+  ""
+  s num.names$ 'numnames :=
+  numnames 'namesleft :=
+    { namesleft #0 > }
+    { nameptr #1 >
+          { "   " * }
+         'skip$
+      if$
+      s nameptr "{vv{ } }{ll{ }}{  f{ }}{  jj{ }}" format.name$ 't :=
+      nameptr numnames = t "others" = and
+          { " et~al" * }
+          { t sortify * }
+      if$
+      nameptr #1 + 'nameptr :=
+      namesleft #1 - 'namesleft :=
+    }
+  while$
+}
+
+FUNCTION {sort.format.title} { 't :=
+  "A " #2
+    "An " #3
+      "The " #4 t chop.word
+    chop.word
+  chop.word
+  sortify
+  #1 global.max$ substring$
+}
+
+FUNCTION {author.sort} { author empty$
+    { key empty$
+         { "to sort, need author or key in " cite$ * warning$
+           "" }
+         { key sortify }
+      if$
+    }
+    { author sort.format.names }
+  if$
+}
+
+FUNCTION {editor.sort} { editor empty$
+    { key empty$
+         { "to sort, need editor or key in " cite$ * warning$
+           ""
+         }
+         { key sortify }
+      if$
+    }
+    { editor sort.format.names }
+  if$
+}
+
+FUNCTION {author.editor.sort} { author empty$
+    { "missing author in " cite$ * warning$
+      editor empty$
+         { key empty$
+             { "to sort, need author, editor, or key in " cite$ * warning$
+               ""
+             }
+             { key sortify }
+           if$
+         }
+         { editor sort.format.names }
+      if$
+    }
+    { author sort.format.names }
+  if$
+}
+
+FUNCTION {author.organization.sort}
+%
+% added - GNP. Stack author or organization for sorting (from alpha.bst).
+% Unlike alpha.bst, we need entire names, not abbreviations
+%
+{ author empty$
+    { organization empty$
+ { key empty$
+     { "to sort, need author, organization, or key in " cite$ * warning$
+       ""
+     }
+     { key sortify }
+   if$
+ }
+ { organization sortify }
+      if$
+    }
+    { author sort.format.names }
+  if$
+}
+
+FUNCTION {editor.organization.sort}
+%
+% added - GNP. Stack editor or organization for sorting (from alpha.bst).
+% Unlike alpha.bst, we need entire names, not abbreviations
+%
+{ editor empty$
+    { organization empty$
+ { key empty$
+     { "to sort, need editor, organization, or key in " cite$ * warning$
+       ""
+     }
+     { key sortify }
+   if$
+ }
+ { organization sortify }
+      if$
+    }
+    { editor sort.format.names }
+  if$
+}
+
+FUNCTION {presort}
+%
+% Presort creates the bibentry's label via a call to calc.label, and then
+% sorts the entries based on entry type. Chicago.bst adds support for
+% including organizations as the sort key; the following is stolen from
+% alpha.bst.
+%
+{ calc.label sortify % recalculate bibitem label
+  year field.or.null purify$ #-1 #4 substring$ * % add year
+  "    "
+  *
+  type$ "book" =
+  type$ "inbook" =
+  or
+    'author.editor.sort
+    { type$ "proceedings" =
+ 'editor.organization.sort
+ { type$ "manual" =
+     'author.organization.sort
+     'author.sort
+   if$
+ }
+      if$
+    }
+  if$
+  #1 entry.max$ substring$        % added for newapa
+  'sort.label :=                  % added for newapa
+  sort.label                      % added for newapa
+  *
+  "    "
+  *
+  title field.or.null
+  sort.format.title
+  *
+  #1 entry.max$ substring$
+  'sort.key$ :=
+}
+
+ITERATE {presort}
+
+SORT             % by label, year, author/editor, title
+
+STRINGS { last.label next.extra }
+
+INTEGERS { last.extra.num }
+
+FUNCTION {initialize.extra.label.stuff} { #0 int.to.chr$
+'last.label :=
+  "" 'next.extra :=
+  #0 'last.extra.num :=
+}
+
+FUNCTION {forward.pass}
+%
+% Pass through all entries, comparing current entry to last one.
+% Need to concatenate year to the stack (done by calc.label) to determine
+% if two entries are the same (see presort)
+%
+{ last.label
+  calc.label year field.or.null purify$ #-1 #4 substring$ * % add year
+  #1 entry.max$ substring$ =     % are they equal?
+     { last.extra.num #1 + 'last.extra.num :=
+       last.extra.num int.to.chr$ 'extra.label :=
+     }
+     { "a" chr.to.int$ 'last.extra.num :=
+       "" 'extra.label :=
+       calc.label year field.or.null purify$ #-1 #4 substring$ * % add year
+       #1 entry.max$ substring$ 'last.label := % assign to last.label
+     }
+  if$
+}
+
+FUNCTION {reverse.pass} { next.extra "b" =
+    { "a" 'extra.label := }
+     'skip$
+  if$
+  label.year extra.label * 'sort.year :=
+  extra.label 'next.extra :=
+}
+
+EXECUTE {initialize.extra.label.stuff}
+
+ITERATE {forward.pass}
+
+REVERSE {reverse.pass}
+
+FUNCTION {bib.sort.order} { sort.label
+  "    "
+  *
+  year field.or.null sortify
+  *
+  "    "
+  *
+  title field.or.null
+  sort.format.title
+  *
+  #1 entry.max$ substring$
+  'sort.key$ :=
+}
+
+ITERATE {bib.sort.order}
+
+SORT             % by sort.label, year, title --- giving final bib. order.
+
+FUNCTION {begin.bib}
+
+{ preamble$ empty$
+    'skip$
+    { preamble$ write$ newline$ }
+  if$
+  "\begin{thebibliography}{}" write$ newline$
+}
+
+
+EXECUTE {begin.bib}
+
+EXECUTE {init.state.consts}
+
+ITERATE {call.type$}
+
+FUNCTION {end.bib} { newline$
+  "\end{thebibliography}" write$ newline$
+}
+
+EXECUTE {end.bib}
+
+\end{filecontents*}
+
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{filecontents*}{wscpaperproc.cls}
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 					Class file for WSC proceedings paper
+%
+%  Effective with WSC 09, the two column format was replaced with 
+%  a single column format
+%
+% Parameters (like names of editors) have to be setup using the wscsetup.sty style file.
+%
+% All settings valid for papers and poster abstract should be placed into wsc.sty .
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ProvidesClass{wscpaperproc}
+\NeedsTeXFormat{LaTeX2e}
+\DeclareOption*{\PassOptionsToClass{\CurrentOption}{article}}
+\ProcessOptions 
+\LoadClass[11pt, twoside, onecolumn, letterpaper]{article}
+
+% --------------------------------- REQUIRED PACKAGES ---------------------------------
+\RequirePackage{wsc}
+\end{filecontents*}
+
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{filecontents*}{wscsetup.sty}
+%*******************************************************************************
+%*
+%* ***WSC Configuration File - Base for LaTeX Papers for the WinterSim ***
+%*
+%  Note to editors: The setup parameters section has to be changed for each conference!
+%*
+%
+% ---------------------------------------------------------------------------------------------------------------------
+% Setup parameters (new in '11 ) [single location, not in tex file to be edited by authors]
+%
+% How to use:
+% Add a macro per year at the end of the list. The history can be of use to check the editor lists 
+% of WSC paper citations.
+% - The macro definition has the form: \def\editorsYYYY{} 
+% - The new macro has to be used in the \currentEditors macro which is used by the style: so you 
+%   have to replace the \editorsYYYY macro used in there by the new one
+% Update the \currentYear macro to contain the current year
+% 
+% You can search for the places the updates have to be applied to by using the search term 
+% "EDITOR".
+
+
+
+% -------------- history of editors ------------------
+
+\def\editors2000{J.~A.~Joines, R.~R.~Barton, K.~Kang, and P.~A.~Fishwick}
+\def\editors2001{B.~A.~Peters, J.~S.~Smith, D.~J.~Medeiros, and M.~W.~Rohrer}
+\def\editors2002{E.~Y\"ucesan, C.-H.~Chen, J.~L.~Snowdon, and J.~M.~Charnes}
+\def\editors2003{S.~Chick, P.~J.~S\`anchez, D.~Ferrin, and D.~J.~Morrice}
+\def\editors2004{R.~G.~Ingalls, M.~D.~Rossetti, J.~S.~Smith, and B.~A.~Peters}
+\def\editors2005{M.~E.~Kuhl, N.~M.~Steiger, F.~B.~Armstrong, and J.~A.~Joines}
+\def\editors2006{L.~F.~Perrone, F.~P.~Wieland, J.~Liu, B.~G.~Lawson, D.~M.~Nicol, and R.~M.~Fujimoto}
+\def\editors2007{S.~G.~Henderson, B.~Biller, M.-H.~Hsieh, J.~Shortle, J.~D.~Tew, and R.~R.~Barton}
+\def\editors2008{S.~J.~Mason, R.~R.~Hill, L.~M\"onch, O.~Rose, T.~Jefferson, J.~W.~Fowler}
+\def\editors2009{M.~D.~Rossetti, R.~R.~Hill, B.~Johansson, A.~Dunkin and R.~G.~Ingalls}
+\def\editors2010{B.~Johansson, S.~Jain, J.~Montoya-Torres, J.~Hugan, and E.~Y\"ucesan}
+\def\editors2011{S.~Jain, R.~R. Creasey, J.~Himmelspach, K.~P.~White, and M.~Fu}
+\def\editors2012{C.~Laroque, J.~Himmelspach, R.~Pasupathy, O.~Rose, and A.~M.~Uhrmacher}
+\def\editors2013{R.~Pasupathy, S.~-H.~Kim, A.~Tolk, R.~Hill, and M.~E.~Kuhl}
+% EDITOR: add new definition above this line
+
+
+
+% -------------- settings for the current year ------------------
+\def\currentYear {2013}               % EDITOR: update with current year
+\def\currentEditors {\editors2013} % EDITOR: update by current editor definition macro
+\def\currentCaption {Proceedings of the \currentYear{} Winter Simulation Conference}
+
+%
+% End of setup parameters
+% % ---------------------------------------------------------------------------------------------------------------------
+%
+\end{filecontents*}
+
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{filecontents*}{wsc.sty}
+%*******************************************************************************
+%*
+%* ***WSC Style File - Base for LaTeX Papers for the WinterSim ***
+%*
+% Contains basic style elements valid for papers and for poster abstracts
+%	
+%*
+%
+% HISTORY
+%
+% WSC 2012
+%  * fixed author font size bug
+% WSC 2011 - created this style file based on the templates for WSC 2010
+%  * outdated fancyheadings is from now on replaced by fancyhdr
+%  * introduced sections, added comments
+%  * includes wscsetup.sty -> contains year specific information (editors, etc ...)
+%  * modified page layout, line distances, paragraphs, itemize environments, etc to get closer to word 
+%      template style
+%  * introduced command WSCpagesetup (author names) which setups the running header and many 
+%      other things previously needed in each paper's first lines of document code
+%   
+%
+% --------------------------------- REQUIRED PACKAGES ---------------------------------
+% This package is required for setting up the running page header (author names)
+\RequirePackage{fancyhdr} 	
+
+% WSC parameter setup (editors, year, proceedings name)
+\RequirePackage{wscsetup} 	
+
+% select times font (by including this here it will be hard for authors to change, font will be used in the end in anyway)
+\RequirePackage{times}
+
+% package for displaying urls
+\RequirePackage{url}
+% select times font for the url package
+\urlstyle{rm}
+
+% ?
+\def\draft{\overfullrule=6pt}
+
+% --------------------------------- SPECIAL COMMANDS ---------------------------------
+%Print an email address in the required style
+\def\email#1{\href{mailto://#1}{#1}}
+
+% No one needs to use the following commands, but if they are used they help to avoid the problem of using figure, table, and section instead of Figure, Table, and Section
+
+%Print Figure followed by the mark generated for the label passed
+\def\reffig#1{Figure~\ref{#1}}
+
+%Print Table followed by the mark generated for the label passed
+\def\reftab#1{Table~\ref{#1}}
+
+%Print Section followed by the mark generated for the label passed
+\def\refsec#1{Section~\ref{#1}}
+
+
+% --------------------------------- PAGE SETUP  ---------------------------------
+
+%\RequirePackage[nofoot,letterpaper,lmargin=1in,tmargin=1in,rmargin=1in,bmargin=1in]{geometry}
+
+\setlength\footskip{75\p@}
+
+%The width of the text area is 6.5 inches (16.0 cm)
+\setlength\textwidth{6.5in}
+
+%new for WSC-10
+\setlength\textheight{8.75in} %9.0125in
+
+%\headsep=12pt
+\headsep=12pt
+%\headheight = 11pt
+
+%left and right margins are 1 inch (2.54 cm)
+\setlength\oddsidemargin{0in}%{-0.2in}
+\setlength\evensidemargin{0in}%{-0.1in}
+%\setlength\oddsidemargin{-.25in} \setlength\evensidemargin{-.25in}
+
+\setlength\marginparwidth {\z@}
+
+%top margin is set to be 1 inch (2.54 cm)
+%\setlength\topmargin{2.54cm}%{-4pc}%
+%\setlength\topmargin{-2pc}
+\setlength\topmargin{-19pt}
+\setlength\columnsep{.375in}
+
+%\pdfpagewidth 8.5in
+%\pdfpageheight 11.0in
+
+% --------------------------------- FLOAT SETUP  ---------------------------------
+% Setting the spaces around float (i.e, Figures, Tables etc ...)
+
+
+% distance between two floats
+\setlength{\floatsep}{12pt}
+% dynamic variant (more flexibel) \setlength\floatsep    {12\p@\@plus 2\p@ minus 2pt} 
+
+% distance between float and text (above & below)
+\setlength{\textfloatsep}{6pt} 
+%\setlength\textfloatsep{12\p@ \@plus 2\p@minus 2pt} 
+
+%\textfloatsep - space between last top float or first bottom float and the text
+% space left on top and bottom of an in-text float.
+\setlength{\intextsep}{6pt} 
+% \setlength\intextsep   {12\p@ \@plus 2\p@ minus 2pt}
+
+% space above caption
+\setlength{\abovecaptionskip}{6pt}
+% space below caption
+\setlength{\belowcaptionskip}{6pt} 
+
+\setcounter{dbltopnumber}{4}
+
+\setcounter{topnumber}{4} 
+
+% settings for two column mode - distance between floats
+\setlength{\dblfloatsep}{6pt}
+% settings for two column mode - distance between float and text
+\setlength{\dbltextfloatsep}{6pt}
+
+% --------------------------------- FONT SETUP  ---------------------------------
+
+%\font\titlepageheadfont=tii at 10pt
+
+% --------------------------------- NAMES SETUP  ---------------------------------
+\renewcommand{\refname}{REFERENCES}
+\newcommand\pagename{Page}
+
+% --------------------------------- SPECIAL WORDS 
+\newcommand{\BibTeX}{B{\small IB}$\!$\TeX}
+
+% --------------------------------- HEADER SETUP  ---------------------------------
+% --- header of first page (including proceedings caption and names of editors) ---
+% moving up 1st header by approx 6mm to match word template
+\def\firstPageHead {
+  %increase the head height for the two lines editors/proceedings header (to avoid warning by fancyhdr)
+  \setlength{\headheight}{26pt} 
+	%setup the header (left, italics containing proceedings caption and editors in 2nd row)
+  \lhead{
+  \fancyplain{
+	  \textit{\currentCaption\\
+      \currentEditors , eds.}}{}}
+} % end of firstPageHead definition
+
+%****WSC setup for Running Heads of LaTeX Papers from second page on***
+\def\WSCpagesetup#1{
+
+% setting up general page style
+\pagestyle{fancyplain} 
+
+% setting up page style of first page
+\thispagestyle{plain}
+\firstPageHead{}
+
+% setting up running header (authors) of subsequent pages
+\chead{\fancyplain{}{\itshape #1}}
+
+% setting up seperation parameters
+%\headsep=72pt 
+\rhead{} 
+\cfoot{}
+\renewcommand{\headrulewidth}{0pt} % (renewcommand needed in fancyhdr to remove top decorative line)
+%\headrulewidth=0pt  % ("setlength" needed in fancyheading to remove top decorative line)
+
+\input{wscbib.tex}           % Set up BiBTeX macros
+
+% needed to make the tex document look more like the word counterpart :-(
+\setlength{\baselineskip}{12.7pt}
+}
+
+% --------------------------------- TITLE SETUP  ---------------------------------
+% *** WSC formatting of the title (redefinition of title command)
+\renewcommand\title[1]{\gdef\@title{\bf #1}}
+
+%space between title and the abstract, this case has been set to be 3.4 inches (two rows of authors).
+\newlength{\titlevboxsize}
+\setlength\titlevboxsize {3.4in} 
+
+\def\authors#1{\gdef\theauthors{#1}}
+\let\aauthor\authors
+
+%definition of maketitle	
+
+\def\maketitle{\par\global\titletrue
+ \begingroup
+   \renewcommand\thefootnote{\fnsymbol{footnote}}%
+    \def\@makefnmark{\rlap{\@textsuperscript{\normalfont\@thefnmark}}}%
+     \long\def\@makefntext##1{\parindent 1em\noindent
+             \hb@xt@1.8em{%
+                 \hss\@textsuperscript{\normalfont\@thefnmark}}##1}%
+  % \twocolumn[\@maketitle]%
+	
+\@maketitle
+   \@thanks
+ \endgroup
+ \setcounter{footnote}{0}%
+ \let\maketitle\relax
+ \let\@maketitle\relax
+ \gdef\@thanks{}\gdef\@author{}\gdef\@title{}\let\thanks\relax}
+
+\def\@maketitle{%
+%\hbox to \titlevboxsize
+% \vbox  to \titlevboxsize
+
+   %Space between header and title
+   %\vskip 2pc % 1 pc = 12 pt
+{ \vspace*{1.5mm} %8.2mm
+    \hsize\textwidth
+    \linewidth\hsize
+%    \vfil
+    \centering
+    { \@title \par}    
+    \vskip 24pt%Controls Text Between Title and Authors
+    { \begin{tabular}[t]{@{}c@{}}\@author \\
+\vrule width 3in height 0pt depth0pt\relax\end{tabular}\par %new for WSC-10: space between authors has been reduced to have the text of 6.5 inches
+
+}\vskip 12pt} }
+%\vrule width 3.5in height 0pt depth0pt\relax\end{tabular}\par
+
+% definition of \and
+
+\def\and{\\
+ \vrule width 3in height 0pt depth0pt\relax %new for WSC-10: space between authors has been reduced to have the text of 6.5 inches
+% \vrule width 3.5in height 0pt depth0pt\relax
+\end {tabular}\hfill%
+\begin{tabular}[t]{@{}c@{}}}
+
+% --------------------------------- EASY AUTHOR BIOGRAPHIES ---------------------------------
+
+\def\addBio#1#2{\noindent {\bf \uppercase{#1}} #2\\
+}
+
+% --------------------------------- SETTING UP COPYRIGHT SPACE ---------------------------------
+
+\def\copyrightspace{%
+  \footnotetext[0]{\mbox{}\vrule \@height 97\p@ \@width \z@}}
+	
+% Redefine the abstract environment to be a normal section (without number)
+\renewenvironment{abstract}%
+  {\section*{\abstractname}}
+  {\par}
+
+
+% --------------------------------- SETTING UP ITEM ENVIRONMENTS
+
+
+\newdimen\labelwidthi
+\newdimen\labelwidthii
+\settowidth{\labelwidthi}{M}
+\settowidth{\labelwidthii}{(d)}
+%\leftmargini\labelwidthi    \advance\leftmargini\labelsep
+%\leftmarginii\labelwidthii  \advance\leftmarginii\labelsep
+
+%\leftmargin=.63cm
+\leftmargini=1.2cm
+\leftmarginii=4ex
+\leftmarginii=4ex
+
+% level 1
+\def\@listi{\leftmargin\leftmargini
+\rightmargin0pt
+            \parsep 0\p@
+            \topsep 10\p@
+            \itemsep0\p@}
+\let\@listI\@listi
+\@listi
+
+% level 2
+\def\@listii{\leftmargin\leftmarginii
+\rightmargin0pt
+            \labelsep 1ex
+            \parsep 0\p@
+            \topsep 0\p@
+            \itemsep0\p@}
+\let\@listII\@listii
+\@listii
+
+% level 3
+\def\@listiii{\leftmargin\leftmarginiii
+\rightmargin0pt
+            \parsep 0\p@
+            \topsep 0\p@
+            \itemsep0\p@}
+\let\@listIII\@listiii
+\@listiii
+
+\labelsep=.25in 
+\setlength  \labelwidth{\leftmargini}
+\addtolength\labelwidth{-\labelsep}
+
+\renewcommand\labelenumi{\rlap{\rm\theenumi.}}
+
+\renewcommand\labelitemi{\rlap{\textbullet}}
+
+
+% SETTING UP SECTIONS
+
+\def\@seccntformat#1{\hbox to .25in{\csname the#1\endcsname\hss}\relax}
+
+\def\@sect#1#2#3#4#5#6[#7]#8{%
+\ifnum #2>\c@secnumdepth
+    \let\@svsec\@empty
+  \else
+    \refstepcounter{#1}%
+    \protected@edef\@svsec{\@seccntformat{#1}\relax}%
+  \fi
+  \@tempskipa #5\relax
+  \ifdim \@tempskipa>\z@
+    \begingroup
+      #6{%
+        \@hangfrom{\hskip #3\relax\@svsec}%
+          \interlinepenalty \@M #8\@@par}%
+    \endgroup
+    \csname #1mark\endcsname{#7}%
+    \addcontentsline{toc}{#1}{%
+      \ifnum #2>\c@secnumdepth \else
+        \protect\numberline{\csname the#1\endcsname}%
+      \fi
+      #7}%
+  \else
+    \def\@svsechd{%
+      #6{\hskip #3\relax
+      \@svsec #8}%
+      \csname #1mark\endcsname{#7}%
+      \addcontentsline{toc}{#1}{%
+        \ifnum #2>\c@secnumdepth \else
+          \protect\numberline{\csname the#1\endcsname}%
+        \fi
+        #7}}%
+  \fi
+  \@xsect{#5}}
+
+% XTABLE
+
+\def\xtable{table}
+\long\def\@makecaption#1#2{%
+\ifx\@captype\xtable \vskip3pt \else
+  \vskip\abovecaptionskip\fi
+  \sbox\@tempboxa{#1: #2}%
+  \ifdim \wd\@tempboxa >\hsize
+    #1: #2\par
+  \else
+    \global \@minipagefalse
+    \hb@xt@\hsize{\hfil\box\@tempboxa\hfil}%
+  \fi
+  \vskip\belowcaptionskip}
+
+% REDEFINITION OF THE SECTION COMMANDS (spacing around them)
+
+% new from WSC'11: 6 pts after Section
+
+\renewcommand\section{\@startsection {section}{1}{\z@}%
+                                  % {-3.5ex \@plus -1ex \@minus -.2ex}%
+ {-12pt}%
+                                   %{2.3ex \@plus.2ex}%
+{6pt}%
+                                   {\hyphenpenalty10000\normalfont\normalsize\bfseries}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+                         %       {-3.25ex\@plus -1ex \@minus -.2ex}%
+ {-12pt}%
+       %                                     {1.5ex \@plus .2ex}%
+{6pt}%
+                                     {\normalfont\normalsize\hyphenpenalty10000\bfseries}}
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+{-12pt}
+      %                               {-3.25ex\@plus -1ex \@minus -.2ex}%
+{6pt}
+     %                                {1.5ex \@plus .2ex}%
+                                     {\normalfont\normalsize\hyphenpenalty10000\bfseries}}
+
+\let\savesubsub\subsubsection
+\def\subsubsection#1{\savesubsub{\ \ #1}}
+
+% REDEFINITION OF FURTHER DOCUMENT LAYOUT PARAMETERS
+
+\parskip=0pt plus .01pt
+
+%\baselineskip=0mm
+
+\let\saveparagraph\paragraph
+\def\paragraph#1{\vskip1sp
+{\bf #1}\hskip1em\relax}
+
+
+\raggedbottom
+
+% hangref environment
+\newenvironment{hangref}{\begin{list}{}{\setlength{\itemsep}{0pt}
+\setlength{\parsep}{0pt}\setlength{\rightmargin}{0pt}
+\setlength{\leftmargin}{+\parindent}
+\setlength{\itemindent}{-\parindent}}}{\end{list}}
+
+
+\newif\iftitle
+\def\@oddhead{\iftitle\global\titlefalse
+\vtop to0pt{\hbox to.9\textwidth{\titlepageheadfont
+\currentCaption\hfill}%
+\vskip2pt \hbox to .9\textwidth{\titlepageheadfont
+\currentEditors , eds.\hfill}%
+\vss} \else \hbox
+to\textwidth{\titlepageheadfont\hfill\thetitle\hfill}\fi}
+
+\def\@evenhead{\iftitle\global\titlefalse\fi%
+\hbox to \textwidth{\hss\titlepageheadfont \theauthors\hss}}
+
+\let\@oddfoot\relax
+\let\@evenfoot\@oddfoot
+
+\def\ttitle#1{\gdef\thetitle{#1}}
+
+%\def\normalsize{%
+%\@setfontsize \normalsize \@xpt \@xiipt \abovedisplayskip 12pt
+%\abovedisplayshortskip 8pt \belowdisplayshortskip 8pt
+%\belowdisplayskip=\abovedisplayskip
+%\let \@listi \@listI}
+%\normalsize
+
+\def\sk{\vskip12pt}
+\let\vs\sk
+\def\bd{\vskip2pt\noindent} %belowdisplay
+
+\spaceskip=3.5pt plus 2pt minus2pt
+
+\parindent=.25in
+
+\hfuzz=1pt
+
+\widowpenalty=10000 \clubpenalty=10000
+
+\def\verbatim{\spaceskip=0pt
+\@verbatim \frenchspacing\@vobeyspaces \@xverbatim}
+
+\newcommand\smscriptsize{\@setfontsize\scriptsize\@vipt\@viipt}
+
+\def\nofloatfigure{\def\@captype{figure}}
+\let\endnofloatfigure\relax
+
+\def\nofloattable{\def\@captype{table}}
+\let\endnofloattable\relax
+
+\newcount\itemcount
+
+\def\spenumerate{\bgroup\leftskip=.25in
+\global\itemcount=0
+\def\item{\global\advance\itemcount by 1
+\vskip1sp \noindent\hskip-.25in\hbox to
+.25in{\the\itemcount.\hss}}}
+
+\def\endspenumerate{\vskip12pt\egroup}
+
+\newif\ifnoindent
+\def\@begintheorem#1#2{\vskip-12pt\vskip1sp
+\trivlist
+   \item[\ifnoindent\global\noindentfalse\else
+\hskip.25in\fi\hskip \labelsep{\bfseries #1\ #2}]\itshape}
+
+\def\@opargbegintheorem#1#2#3{\vskip-12pt\vskip1sp
+\trivlist
+      \item[\ifnoindent\global\noindentfalse\else\hskip.25in\fi%
+\hskip \labelsep{\bfseries #1\ #2\ (#3)}]\itshape}
+
+\def\@endtheorem{\vskip1sp}
+
+% (from apalike.sty)
+% Set length of hanging indentation for bibliography entries.
+%
+\newlength{\bibhang}
+\setlength{\bibhang}{2em}
+
+% Indent second and subsequent lines of bibliographic entries. Stolen
+% from openbib.sty: \newblock is set to {}.
+
+\newdimen\bibindent
+\bibindent=.25in
+\@ifundefined{refname}%
+   {\@ifundefined{chapter}%
+     {\newcommand{\refname}{References}}%
+     {\newcommand{\refname}{Bibliography}}%
+   }%
+   {}%
+
+
+\def\thebibliography#1{\section*{\refname\@mkboth
+   {\uppercase{\refname}}{\uppercase{\refname}}}\list
+   {[\arabic{enumi}]}{\settowidth\labelwidth{[#1]}
+\rightmargin=0pt \leftmargin=0pt
+   \leftmargin\labelwidth
+   \advance\leftmargin\labelsep
+   \advance\leftmargin\bibindent
+\advance\leftmargin-24pt
+   \itemindent -\bibindent
+   \listparindent \itemindent
+   \parsep \z@
+   \usecounter{enumi}}
+   \def\newblock{}
+   \sloppy
+   \sfcode`\.=1000\relax}
+
+\endinput
+
+\makeatletter
+\def\@lbibitem[#1]#2{\item[]%[\@biblabel {#1}\hfill ]
+\if@filesw {\let\protect\noexpand\immediate\write\@auxout{
+\string\bibcite {#2}{#1}}}\fi\ignorespaces}
+
+\def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+
+
+
+\def\Box{\vbox to 6pt{\hrule
+\hbox{\vrule height 4.8pt  \hskip 4.8pt \vrule } \hrule}}
+
+\end{filecontents*}
+
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{filecontents*}{wscbib.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                            %
+%     THESE COMMANDS ARE REQUIRED TO WORK WITH WSC.BST TO MAKE BIBLIO     %
+%                                                                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeatletter
+\let\@internalcite\cite
+%
+\def\cite{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{(##1\if@tempswa , ##2\fi)}%
+    \def\citeauthoryear##1##2##3{##1 ##3}\@internalcite}
+\def\citeNP{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{##1\if@tempswa , ##2\fi}%
+    \def\citeauthoryear##1##2##3{##1 ##3}\@internalcite}
+\def\citeN{\def\@citeseppen{-1000}%
+%  Pierre L'Ecuyer's fix for multiple cite bug
+%  Added by Paul J Sanchez on 4 October 2001
+%   \def\@cite##1##2{##1\if@tempswa , ##2)\else{)}\fi}%
+%   \def\citeauthoryear##1##2##3{##1 (##3}\@citedata}
+    \def\@cite##1##2{##1\if@tempswa, ##2)\else{}\fi}%
+    \def\citeauthoryear##1##2##3{##1 (##3)}\@citedata}
+\def\citeA{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{(##1\if@tempswa , ##2\fi)}%
+    \def\citeauthoryear##1##2##3{##1}\@internalcite}
+\def\citeANP{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{##1\if@tempswa , ##2\fi}%
+    \def\citeauthoryear##1##2##3{##1}\@internalcite}
+%
+\def\shortcite{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{(##1\if@tempswa , ##2\fi)}%
+    \def\citeauthoryear##1##2##3{##2 ##3}\@internalcite}
+\def\shortciteNP{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{##1\if@tempswa , ##2\fi}%
+    \def\citeauthoryear##1##2##3{##2 ##3}\@internalcite}
+\def\shortciteN{\def\@citeseppen{-1000}%
+%  Pierre L'Ecuyer's fix for multiple cite bug
+%  Added by Paul J Sanchez on 2 September 2002
+%  should have caught this last year...
+%   \def\@cite##1##2{##1\if@tempswa , ##2)\else{)}\fi}%
+%   \def\citeauthoryear##1##2##3{##2 (##3}\@citedata}
+% Shane G. Henderson fix for extra right bracket at end of optional material June 8, 2005
+%    \def\@cite##1##2{##1\if@tempswa, ##2)\else{}\fi}%
+    \def\@cite##1##2{##1\if@tempswa, ##2\else{}\fi}%
+    \def\citeauthoryear##1##2##3{##2 (##3)}\@citedata}
+\def\shortciteA{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{(##1\if@tempswa , ##2\fi)}%
+    \def\citeauthoryear##1##2##3{##2}\@internalcite}
+\def\shortciteANP{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{##1\if@tempswa , ##2\fi}%
+    \def\citeauthoryear##1##2##3{##2}\@internalcite}
+%
+\def\citeyear{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{(##1\if@tempswa , ##2\fi)}%
+    \def\citeauthoryear##1##2##3{##3}\@citedata}
+\def\citeyearNP{\def\@citeseppen{-1000}%
+    \def\@cite##1##2{##1\if@tempswa , ##2\fi}%
+    \def\citeauthoryear##1##2##3{##3}\@citedata}
+%
+% \@citedata and \@citedatax:
+%
+% Place commas in-between citations in the same \citeyear, \citeyearNP,
+% \citeN, or \shortciteN command.
+% Use something like \citeN{ref1,ref2,ref3} and \citeN{ref4} for a list.
+%
+\def\@citedata{%
+    \@ifnextchar [{\@tempswatrue\@citedatax}%
+                  {\@tempswafalse\@citedatax[]}%
+}
+
+\def\@citedatax[#1]#2{%
+\if@filesw\immediate\write\@auxout{\string\citation{#2}}\fi%
+  \def\@citea{}\@cite{\@for\@citeb:=#2\do%
+    {\@citea\def\@citea{, }\@ifundefined% by Young
+       {b@\@citeb}{{\bf ?}%
+       \@warning{Citation `\@citeb' on page \thepage \space undefined}}%
+{\csname b@\@citeb\endcsname}}}{#1}}%
+
+% don't box citations, separate with ; and a space
+% also, make the penalty between citations negative: a good place to break.
+%
+\def\@citex[#1]#2{%
+\if@filesw\immediate\write\@auxout{\string\citation{#2}}\fi%
+  \def\@citea{}\@cite{\@for\@citeb:=#2\do%
+    {\@citea\def\@citea{, }\@ifundefined% by Young
+       {b@\@citeb}{{\bf ?}%
+       \@warning{Citation `\@citeb' on page \thepage \space undefined}}%
+{\csname b@\@citeb\endcsname}}}{#1}}%
+
+% (from apalike.sty)
+% No labels in the bibliography.
+%
+\def\@biblabel#1{}
+\makeatother
+
+%\newlength{\bibhang}
+%\setlength{\bibhang}{2em}
+
+% Indent second and subsequent lines of bibliographic entries. Taken
+% from openbib.sty: \newblock is set to {}.
+% \renewcommand{\refname}{REFERENCES}
+
+\newdimen\bibindent
+\bibindent=0.0em
+% SEC: was \def\thebibliography#1{\section*{\refname\@mkboth
+% SEC: was   {\uppercase{\refname}}{\uppercase{\refname}}}\list
+\def\thebibliography#1{\section*{\refname}\list
+   {}{\settowidth\labelwidth{[#1]}
+   \leftmargin\parindent
+   \itemindent -\parindent
+   \listparindent \itemindent
+   \itemsep 0pt
+   \parsep 0pt}
+   \def\newblock{}
+   \sloppy
+   \sfcode`\.=1000\relax}
+
+
+\end{filecontents*}

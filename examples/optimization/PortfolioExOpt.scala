@@ -1,5 +1,15 @@
 
-package simopt
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.0
+ *  @date    Sat Jan  5 14:10:45 EST 2013
+ *  @see     LICENSE (MIT style license file).
+ *  @see     http://reference.wolfram.com/mathematica/tutorial/ConstrainedOptimizationLocalNumerical.html
+ *  @compile scalac -cp ../../classes -d classes PortfolioExOpt.scala
+ *  @run     scala -cp ../../classes:classes simopt.PortfolioExOpt
+ */
+
+package optimization
 
 import math.{abs, sqrt}
 
@@ -7,11 +17,12 @@ import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.stat.StatVector
 import scalation.minima.ConjGradient
 
-class PortfolioOpt
-{
-} // PortfolioOpt
-
-object PortfolioOptTest extends App
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This object solves the following Quadratic Programming (QP) problem:
+ *  Given n investment instruments, find a combination/portfolio that
+ *  minimizes risk for a given expected return.
+ */
+object PortfolioExOpt extends App
 {
      val label = Array ("3m Tbill", "long Tbond", "SP500", "Wilt.5000", "Corp. Bond", "NASDQ", "EAFE", "Gold")
 
@@ -71,5 +82,5 @@ object PortfolioOptTest extends App
 
     //average	1.078	1.093	1.120	1.124	1.121	1.046	1.141 	1.130
 
-} // PortfolioOptTest
+} // PortfolioExOpt
 
