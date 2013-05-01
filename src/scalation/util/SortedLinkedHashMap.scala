@@ -19,8 +19,18 @@ import util.Random
  *  as those used for sparse matrices.
  */
 class SortedLinkedHashMap [A, B] (implicit val ordering: Ordering [A])
-      extends LinkedHashMap [A, B] with Serializable
+     extends LinkedHashMap [A, B] with Serializable
 {
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Construct a SortedLinkedHashMap and put all (key, value) pairs into this map.
+     *  @param pairs  the (key, value) pairs to put in this map
+     */
+    def this (pairs: List [Tuple2 [A, B]]) (implicit ordering: Ordering [A])
+    {
+        this ()
+        for ((k, v) <- pairs) put (k, v)
+    } // constructor
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the first entry in the SortedLinkedHashMap.
      */
@@ -45,7 +55,13 @@ class SortedLinkedHashMap [A, B] (implicit val ordering: Ordering [A])
             Some (v)                          // old value returned
         } // if
     } // put
-    
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Put all (key, value) pairs into this map.
+     *  @param pairs  the (key, value) pairs to put in this map
+     */
+    def += (pairs: List [Tuple2 [A, B]]) { for ((k, v) <- pairs) put (k, v) }
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compare the two keys (to establish the correct ordering).
      *  @param k0  the first key
@@ -54,7 +70,7 @@ class SortedLinkedHashMap [A, B] (implicit val ordering: Ordering [A])
     def compare (k0: A, k1: A): Int = ordering.compare (k0, k1)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Insert the new entry into the position which maintains the correct key order.
+    /** Insert a new entry into the position which maintains the correct key order.
      *  @param ent  the new entry to add
      */
     private def updateLinkedEntries (ent: Entry)
@@ -115,6 +131,10 @@ object SortedLinkedHashMapTest extends App
         println ("SortedLinkedHashMap: remove: smap = " + smap)
         insertOrder = ! insertOrder
     } // for
+
+    val smap2 = new SortedLinkedHashMap [Int, Double]
+    smap2 += List ((1, 2.), (2, 4.), (3, 8.), (5, 32.), (4, 16.))
+    println ("SortedLinkedHashMap: smap2 = " + smap2)
 
 } // SortedLinkedHashMapTest object
 
