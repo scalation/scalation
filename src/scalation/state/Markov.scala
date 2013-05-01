@@ -31,6 +31,10 @@ class Markov (tr: MatrixD) extends Error
         if ( ! isStochastic) flaw ("constructor", "transition matrices must be stochastic")
     } // primary constructor
 
+    /** A number close to zero
+     */
+    private val EPSILON = 1E-7
+
     /** The radius of the circle that the nodes are displayed on
      */
     private val radius = 200
@@ -62,10 +66,6 @@ class Markov (tr: MatrixD) extends Error
     /** Amount of bend in the QArrow
      */
     private val bend = .25
-
-    /** A very small real number
-     */
-    private val EPSILON = .000001
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the kth next probabilistic state (p * tr^k).
@@ -118,7 +118,7 @@ class Markov (tr: MatrixD) extends Error
                 println ("simulate: entered absorbing state " + i)
             } else {
                 clock    += 1
-                val rowi  = tr.row (i)
+                val rowi  = tr(i)
                 println ("rowi = " + rowi)
                 val disRV = Discrete (rowi)
                 i         = disRV.igen             // advance to the next state

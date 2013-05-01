@@ -29,6 +29,10 @@ import scalation.util.Error
  */
 class MarkovC (tr: MatrixD) extends Error
 {
+    /** A number close to zero
+     */
+    private val EPSILON = 1E-7
+
     /** The jump matrix derived from the transition rate matrix (tr)
      */
     val jump = new MatrixD (tr.dim1, tr.dim2)
@@ -36,7 +40,7 @@ class MarkovC (tr: MatrixD) extends Error
     {
         if ( ! tr.isSquare) flaw ("constructor", "transition rate matrices must be square")
         for (i <- 0 until jump.dim1) {
-            val s = tr.row (i).sum_ne (i)               // sum the ith row of tr skipping i
+            val s = tr(i).sum_ne (i)               // sum the ith row of tr skipping i
             for (j <- 0 until jump.dim2) {
                 if (i != j) {                                     // off-diagonal
                     jump(i, j) = if (s == 0.) 0. else tr(i, j) / s
@@ -78,10 +82,6 @@ class MarkovC (tr: MatrixD) extends Error
     /** Amount of bend in the QArrow
      */
     private val bend = .25
-
-    /** A very small real number
-     */
-    private val EPSILON = .000001
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the next probabilistic state at t time units in the future.
@@ -132,7 +132,7 @@ class MarkovC (tr: MatrixD) extends Error
             } else {
                 val expRV = Exponential (tr_i)
                 clock    += expRV.gen              // add holding time for state i
-                val rowi  = jump.row (i)
+                val rowi  = jump(i)
                 println ("rowi = " + rowi)
                 val disRV = Discrete (rowi)
                 i         = disRV.igen             // advance to the next state
