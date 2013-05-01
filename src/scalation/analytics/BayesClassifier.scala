@@ -35,11 +35,12 @@ class BayesClassifier (x: MatrixD, y: Array [Int], k: Int = 2)
 {
     if (k >= x.dim1) flaw ("constructor", "k must be less than the training-set size")
 
-    private val DEBUG = false                   // debug flag
-    private val m     = x.dim1                  // the number of data vectors in training-set
-    private val n     = x.dim2                  // the number of features
-    private val md    = m.toDouble              // training-set size as a Double
-    private val nd    = n.toDouble              // feature-set size as a Double
+    private val DEBUG   = false                 // debug flag
+    private val EPSILON = 1E-9                  // number close to zero
+    private val m       = x.dim1                // the number of data vectors in training-set
+    private val n       = x.dim2                // the number of features
+    private val md      = m.toDouble            // training-set size as a Double
+    private val nd      = n.toDouble            // feature-set size as a Double
 
     private val pop  = new VectorD (k)          // numbers in class 0, ..., k-1
     private val mean = new MatrixD (k, n)       // mean for each class, feature
@@ -99,11 +100,10 @@ class BayesClassifier (x: MatrixD, y: Array [Int], k: Int = 2)
      */
     def calcHistogram (x_j: VectorD, intervals: Int): VectorD =
     {
-        val EPSILON = 1E-9
-        val minVal  = floor (x_j.min ())
-        val maxVal  = ceil (x_j.max () + EPSILON)
-        val intWid  = (maxVal - minVal) / intervals.toDouble
-        val h       = new VectorD (intervals)
+        val minVal = floor (x_j.min ())
+        val maxVal = ceil (x_j.max () + EPSILON)
+        val intWid = (maxVal - minVal) / intervals.toDouble
+        val h      = new VectorD (intervals)
         for (xx <- x_j) {
             val i = (floor ((xx - minVal) / intWid)).toInt
             h(i) += 1.

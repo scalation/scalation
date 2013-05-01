@@ -11,7 +11,7 @@ package scalation.analytics
 import math.{ceil, floor}
 import scala.collection.mutable.HashMap
 
-import scalation.math.Log.log2
+import scalation.math.Basic.log2
 import scalation.linalgebra.VectorD
 import scalation.linalgebra_gen.Matrices.MatrixI
 import scalation.linalgebra_gen.Vectors.VectorI

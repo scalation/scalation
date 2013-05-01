@@ -14,7 +14,7 @@ import collection.mutable.{MutableList, Queue}
 import util.control.Breaks._
 import util.Sorting
 
-import scalation.math.Log.log2
+import scalation.math.Basic.log2
 import scalation.linalgebra.VectorD
 import scalation.linalgebra_gen.Matrices.MatrixI
 import scalation.linalgebra_gen.Vectors.VectorI

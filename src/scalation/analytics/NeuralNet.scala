@@ -2,8 +2,9 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 1.0
- *  @date    Wed Feb  8 11:43:38 EST 2012
+ *  @date    Mon Jan 21 14:43:50 EST 2013
  *  @see     LICENSE (MIT style license file).
+ *  @see     http://page.mi.fu-berlin.de/rojas/neural/chapter/K7.pdf
  */
 
 // U N D E R   D E V E L O P M E N T
@@ -13,6 +14,7 @@ package scalation.analytics
 import math.exp
 
 import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.random.Random
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -32,6 +34,10 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int)
     private val p = y.dim2            // dimensionality of the output
 
     if (y.dim1 != m) flaw ("constructor", "dimensions of x and y are incompatible")
+
+    println ("Create a Neural Net with " + n + " input, " +
+                                           h + " hidden, " + 
+                                           p + " output nodes")
 
     private var w:  MatrixD = null     // weight matrix between input and hidden layers
     private var v:  MatrixD = null     // weight matrix between hidden and output layers
@@ -55,7 +61,7 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int)
     } // sigmoid
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the initial weight matrices w and v.  This may be useful before training.
+    /** Set the initial weight matrices w and v manually before training.
      *  @param w0   the initial weights for w
      *  @param v0   the initial weights for v
      *  @param wb0  the initial bias for wb
@@ -70,16 +76,72 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int)
     } // setWeights
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the initial weight matrices w and v randomly with a value in (0, 1) before
+     *  training.
+     *  @param i  the random number stream to use
+     */
+    def setWeights (i: Int = 0)
+    {
+        val rn = new Random (i)          // change i to get different random numbers
+        w  = new MatrixD (n, h)
+        v  = new MatrixD (h, p)
+        wb = new VectorD (h)
+        vb = new VectorD (p)
+        for (i <- 0 until n; j <- 0 until h) w(i)(j) = rn.gen
+        for (i <- 0 until h; j <- 0 until p) v(i)(j) = rn.gen
+//      for (i <- 0 until h) wb(i) = rn.gen
+//      for (i <- 0 until p) vb(i) = rn.gen
+    } // setWeights
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given training data x and y, fit the weight matrices w and v.
      */
     def train ()
     {
-        if (w == null) {
-            w = new MatrixD (n, h)
-            v = new MatrixD (h, p)
-        } // if
-        // FIX: perform back propogation  (to be implemented)
+        if (w == null) setWeights ()
+        backProp ()
     } // train
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Use back propogation to adjust the weight matrices w and v to make the
+     *  predictions more accurate.  The implementation uses vector operations.
+     *  @see http://www4.rgu.ac.uk/files/chapter3%20-%20bp.pdf
+     */
+    def backProp ()
+    {
+        val eta = 1.                                       // the learning rate
+        val _1h = new VectorD (h); _1h.set (1.)            // one vector for hidden layer
+        val _1o = new VectorD (p); _1o.set (1.)            // one vector for output layer
+        val y_h = new VectorD (h)                          // predicted hidden layer value
+        val y_o = new VectorD (p)                          // predicted output layer value
+ 
+        for (i <- 0 until m) {                             // each example in training set
+            val x_i = x(i)                                 // ith input value (vector)
+            val y_i = y(i)                                 // ith target output value (vector)
+
+            for (k <- 0 until h) y_h(k) = sigmoid ((w.col(k) dot x_i) + wb(k))  // predicted at hidden layer
+            for (k <- 0 until p) y_o(k) = sigmoid ((v.col(k) dot y_h) + vb(k))  // predicted at output layer
+
+            println ("y_h = " + y_h)
+            println ("y_o = " + y_o)
+
+            val e_o = y_i - y_o                            // error at output layer
+            val d_o = y_o * (_1o - y_o) * e_o              // delta for output layer
+            for (k <- 0 until h) v(k) += d_o * y_h * eta   // adjust v weights (hidden -> output)
+
+            println ("e_o = " + e_o)
+            println ("d_o = " + d_o)
+            println ("v = " + v)
+
+            val e_h = v * d_o                              // weighted error at hidden layer
+            val d_h = y_h * (_1h - y_h) * e_h              // delta for hidden layer
+            for (k <- 0 until h) w(k) += d_h * x_i * eta   // adjust w weights (input -> hidden)
+
+            println ("e_h = " + e_h)
+            println ("d_h = " + d_h)
+            println ("w = " + w)
+        } // for
+    } // backProp
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the fit (weigth matrix w, weigth matrix v, bias vector wb, bias vector vb)
@@ -92,8 +154,12 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int)
      */
     def predictAll (z_i: VectorD): VectorD =
     {
-        val z_h = sigmoid (w * z_i + wb)          // hidden layer
-        sigmoid (v * z_h + vb)                    // output layer
+        val z_h = new VectorD (h)
+        val z_o = new VectorD (p)
+
+        for (k <- 0 until h) z_h(k) = sigmoid ((w.col(k) dot z_i) + wb(k))   // hidden layer
+        for (k <- 0 until p) z_o(k) = sigmoid ((v.col(k) dot z_h) + vb(k))   // output layer
+        z_o
     } // predictAll
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -128,14 +194,14 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int)
  */
 object NeuralNetTest extends App
 {
-    val x = new MatrixD (1, 2)                 // training data - input vectors (not used)
-    val y = new MatrixD (1, 2)                 // training data - output vectors (not used)
+    val x   = new MatrixD (1, 2)               // training data - input vectors (not used)
+    val y   = new MatrixD (1, 2)               // training data - output vectors (not used)
     val ann = new NeuralNet (x, y, 2)          // create a Neural Net
 
-    val w = new MatrixD ((2, 2), 0.5, 0.0,     // weight matrix w (input to hidden layer)
-                                 0.5, 0.5)
-    val v = new MatrixD ((2, 2), 0.5, 0.5,     // weight matrix v (hidden to output layer)
-                                 0.0, 0.0)
+    val w  = new MatrixD ((2, 2), 0.5, 0.0,     // weight matrix w (input to hidden layer)
+                                  0.5, 0.5)
+    val v  = new MatrixD ((2, 2), 0.5, 0.5,     // weight matrix v (hidden to output layer)
+                                  0.0, 0.0)
     val wb = new VectorD (0., 0.)              // bias vector wb (input to hidden layer)
     val vb = new VectorD (0., 0.)              // bias vector vb (hidden to output layer)
     ann.setWeights (w, v, wb, vb)              // set intial weights and biases
@@ -150,19 +216,29 @@ object NeuralNetTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This object is used to test the NeuralNet class.  For this test, training
  *  data is used to fit the weights before using them for prediction.
+ *  @see http://www4.rgu.ac.uk/files/chapter3%20-%20bp.pdf
  */
 object NeuralNetTest2 extends App
 {
-    val x = new MatrixD (10, 2)                // FIX: training data - input vectors
-    val y = new MatrixD (10, 2)                // FIX: training data - output vectors
+    val x   = new MatrixD ((1, 2), .35, .9)    // training data - input vectors
+    val y   = new MatrixD ((1, 1), .5)         // training data - output vectors
     val ann = new NeuralNet (x, y, 2)          // create a Neural Net
 
-    ann.train ()                               // fit the weights/biases using training data
-    println ("fit = " + ann.fit)
+    val w  = new MatrixD ((2, 2), 0.1, 0.4,    // weight matrix w (input to hidden layer)
+                                  0.8, 0.6)
+    val v  = new MatrixD ((2, 1), 0.3, 0.9)    // weight matrix v (hidden to output layer)
 
-    val z_i = new VectorD (1., 1.)             // predict output z_o from input z_i
-    println ("input vector:  z_i = " + z_i)
-    println ("output vector: z_o = " + ann.predictAll (z_i))
+    val wb = new VectorD (0., 0.)              // bias vector wb (input to hidden layer)
+    val vb = new VectorD (0., 0.)              // bias vector vb (hidden to output layer)
+    ann.setWeights (w, v, wb, vb)              // set intial weights and biases
+
+    println ("input vector:  x(0) = " + x(0))
+    println ("=== target output vector: y(0) = " + y(0))
+    println ("--- initial output vector: z_o = " + ann.predictAll (x(0)))
+
+    ann.train ()                               // fit the weights/biases using training data
+
+    println ("+++ trained output vector: z_o = " + ann.predictAll (x(0)))
 
 } // NeuralNetTest2 object
 

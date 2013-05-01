@@ -38,8 +38,8 @@ class MarkovClustering (t: MatrixD, k: Int = 2, r: Double = 2.)
       extends Clustering with Error
 {
     private val DEBUG    = false           // debug flag
+    private val EPSILON  = 1E-7            // number close to zero
     private val MAX_ITER = 100             // maximum number of iterations
-    private val EPSILON  = 1E-6            // a number close to zero
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add self-loops by setting the main diagonal to the weight parameter.
