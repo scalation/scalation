@@ -216,7 +216,7 @@ object Quantile
             // println ("x = " + x + " y = " + y + " p = " + p)
             if (y + .0005 < p)      x1 = x
             else if (y - .0005 > p) x2 = x
-            else                    cont = false  // done
+            else                    cont = false              // done
         } // while
         x
     } // fisherInv
