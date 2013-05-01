@@ -1,6 +1,6 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  John Miller
+/** @author  John Miller, Yung-Long Li
  *  @version 1.0
  *  @date    Jan 11 18:34:25 EST 2013
  *  @see     LICENSE (MIT style license file).
@@ -8,8 +8,9 @@
 
 package scalation.linalgebra
 
-import math.abs
+import math.{abs, max, pow}
 
+import scalation.math.Basic.oneIf
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -25,13 +26,15 @@ class ParMatrixD (val d1: Int,
        private var v:  Array [Array [Double]] = null)
       extends Matrix with Error with Serializable
 {
+    // Note: implementations for the following methods are from the Matrix trait:
+    // foreach, mag, rank, sameDimensions, leDimensions, sameCrossDimensions,
+    // isSquare, isSymmetric
+
     lazy val dim1 = d1
     lazy val dim2 = d2
-    
-    val processors = Runtime.getRuntime().availableProcessors()
-    var granularity = 0
-    if (dim1 > dim2) granularity = (math.pow (dim1, 0.5)).toInt
-    else granularity = (math.pow (dim2, 0.5)).toInt
+
+//  val processors  = Runtime.getRuntime ().availableProcessors ()
+    val granularity = (pow ((dim1 max dim2), 0.5)).toInt
     
     if (v == null) {
         v = Array.ofDim [Double] (dim1, dim2)
@@ -39,8 +42,6 @@ class ParMatrixD (val d1: Int,
         flaw ("constructor", "dimensions are wrong")
     } // if
     
-    def this (dim1: Int, dim2: Int) { this (dim1, dim2, null) }
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a dim1 by dim1 square matrix.
      *  @param dim1  the row and column dimension
@@ -55,7 +56,7 @@ class ParMatrixD (val d1: Int,
      */
     def this (dim1: Int, dim2: Int, x: Double)
     {
-        this (dim1, dim2)                          // invoke primary constructor
+        this (dim1, dim2)
         for (i <- range1; j <- range2) v(i)(j) = x
     } // constructor
 
@@ -69,7 +70,7 @@ class ParMatrixD (val d1: Int,
      */
     def this (dim1: Int, x: Double, y: Double)
     {
-        this (dim1, dim1)                          // invoke primary constructor
+        this (dim1, dim1)
         for (i <- range1; j <- range1) v(i)(j) = if (i == j) x else y
     } // constructor
 
@@ -86,7 +87,7 @@ class ParMatrixD (val d1: Int,
      */
     def this (dim: Tuple2 [Int, Int], u: Double*)
     {
-        this (dim._1, dim._2)                      // invoke primary constructor
+        this (dim._1, dim._2)
         for (i <- range1; j <- range2) v(i)(j) = u(i * dim2 + j)
     } // constructor
 
@@ -96,7 +97,7 @@ class ParMatrixD (val d1: Int,
      */
     def this (u: Array [VectorD])
     {
-        this (u.length, u(0).dim)                  // invoke primary constructor
+        this (u.length, u(0).dim)
         for (i <- range1; j <- range2) v(i)(j) = u(i)(j)
     } // constructor
 
@@ -106,7 +107,7 @@ class ParMatrixD (val d1: Int,
      */
     def this (u: ParMatrixD)
     {
-        this (u.d1, u.d2)                        // invoke primary constructor
+        this (u.d1, u.d2)
         for (i <- range1; j <- range2) v(i)(j) = u.v(i)(j)
     } // constructor
 
@@ -122,6 +123,30 @@ class ParMatrixD (val d1: Int,
      *  @param i  the row index
      */
     def apply (i: Int): VectorD = new VectorD (v(i))
+
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise on range ir and column-wise on range jr.
+     *  Ex: b = a(2..4, 3..5)
+     *  @param ir  the row range
+     *  @param jr  the column range
+     */
+    def apply (ir: Range, jr: Range): ParMatrixD = slice (ir.start, ir.end, jr.start, jr.end)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise on range ir and column-wise at index j.
+     *  Ex: u = a(2..4, 3)
+     *  @param ir  the row range
+     *  @param j   the column index
+     */
+    def apply (ir: Range, j: Int): VectorD = col(j)(ir)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise at index i and column-wise on range jr.
+     *  Ex: u = a(2, 3..5)
+     *  @param i   the row index
+     *  @param jr  the column range
+     */
+    def apply (i: Int, jr: Range): VectorD = this(i)(jr)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set this matrix's element at the i,j-th index position to the scalar x.
@@ -139,12 +164,57 @@ class ParMatrixD (val d1: Int,
     def update (i: Int, u: VectorD) { v(i) = u() }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set this matrix's row at the i-th index position to the vector u.
-     *  @param i  the row index
-     *  @param j  the starting column index
-     *  @param u  the vector value to assign
+    /** Set a slice this matrix row-wise on range ir and column-wise on range jr.
+     *  Ex: a(2..4, 3..5) = b
+     *  @param ir  the row range
+     *  @param jr  the column range
+     *  @param b   the matrix to assign
      */
-    def set (i: Int, j: Int, u: VectorD)
+    def update (ir: Range, jr: Range, b: ParMatrixD)
+    {
+        for (i <- ir; j <- jr) v(i)(j) = b.v(i - ir.start)(j - jr.start)
+    } // update
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set a slice this matrix row-wise on range ir and column-wise at index j.
+     *  Ex: a(2..4, 3) = u
+     *  @param ir  the row range
+     *  @param j   the column index
+     *  @param u   the vector to assign
+     */
+    def update (ir: Range, j: Int, u: VectorD) { col(j)(ir) = u }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set a slice this matrix row-wise at index i and column-wise on range jr.
+     *  Ex: a(2, 3..5) = u
+     *  @param i   the row index
+     *  @param jr  the column range
+     *  @param u   the vector to assign
+     */
+    def update (i: Int, jr: Range, u: VectorD) { this(i)(jr) = u }
+
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set all the elements in this matrix to the scalar x.
+     *  @param x  the scalar value to assign
+     */
+    def set (x: Double) { for (i <- range1; j <- range2) v(i)(j) = x }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set all the values in this matrix as copies of the values in 2D array u.
+     *  @param u  the 2D array of values to assign
+     */
+    def set (u: Array [Array [Double]])
+    {
+        for (i <- range1; j <- range2) v(i)(j) = u(i)(j)
+    } // set
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set this matrix's ith row starting at column j to the vector u.
+     *  @param i  the row index
+     *  @param u  the vector value to assign
+     *  @param j  the starting column index
+     */
+    def set (i: Int, u: VectorD, j: Int = 0)
     {
         for (k <- 0 until u.dim) v(i)(j + k) = u(k)
     } // set
@@ -188,25 +258,13 @@ class ParMatrixD (val d1: Int,
     } // sliceExclude
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get row 'r' from the matrix, returning it as a vector.
-     *  @param r     the row to extract from the matrix
-     *  @param from  the position to start extracting from
-     */
-    def row (r: Int, from: Int = 0): VectorD =
-    {
-        val u = new VectorD (dim2 - from)
-        for (j <- from until dim2) u(j-from) = v(r)(j)
-        u
-    } // row
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select rows from this matrix according a basis. 
      *  @param basis  the row index positions (e.g., (0, 2, 5))
      */
     def selectRows (basis: Array [Int]): ParMatrixD =
     {
         val c = new ParMatrixD (basis.length)
-        for (i <- c.range1) c.setRow (i, col(basis(i)))
+        for (i <- c.range1) c(i) = col(basis(i))
         c
     } // selectRows
 
@@ -223,6 +281,13 @@ class ParMatrixD (val d1: Int,
     } // col
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set column 'c' of the matrix to a vector.
+     *  @param c  the column to set
+     *  @param u  the vector to assign to the column
+     */
+    def setCol (c: Int, u: VectorD) { for (i <- range1) v(i)(c) = u(i) }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select columns from this matrix according a basis. 
      *  @param basis  the column index positions (e.g., (0, 2, 5))
      */
@@ -234,18 +299,6 @@ class ParMatrixD (val d1: Int,
     } // selectCols
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate this matrix and vector b.
-     *  @param b  the vector to be concatenated as the new last row in matrix
-     */
-    def ++ (b: VectorD): ParMatrixD =
-    {
-        if (b.dim != dim2) flaw ("++", "vector does not match row dimension")
-        val c = new ParMatrixD (dim1 + 1, dim2)
-        for (i <- c.range1) c(i) = if (i < dim1) this(i) else b
-        c
-    } // ++
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Transpose this matrix (rows => columns).
      */
     def t: ParMatrixD =
@@ -253,12 +306,23 @@ class ParMatrixD (val d1: Int,
         val b = new ParMatrixD (dim2, dim1)
         for (i <- (0 until dim2 by granularity).par){
             var end = i + granularity; if (i + granularity >= dim2) end = dim2 
-            for (ii <- i until end) 
-                for (j <- range1) 
-                    b.v(ii)(j) = v(j)(ii)
+            for (ii <- i until end; j <- range1) b.v(ii)(j) = v(j)(ii)
         } // for
         b
     } // t
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate this matrix and vector u.
+     *  @param u  the vector to be concatenated as the new last row in matrix
+     */
+    def ++ (u: VectorD): ParMatrixD =
+    {
+        if (u.dim != dim2) flaw ("++", "vector does not match row dimension")
+
+        val c = new ParMatrixD (dim1 + 1, dim2)
+        for (i <- c.range1) c(i) = if (i < dim1) this(i) else u
+        c
+    } // ++
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add this matrix and matrix b.
@@ -269,13 +333,25 @@ class ParMatrixD (val d1: Int,
         val c = new ParMatrixD (dim1, dim2)
         for (i <- (0 until dim1 by granularity).par){
             var end = i + granularity; if (i + granularity >= dim1) end = dim1 
-            for (ii <- i until end)
-                for (j <- range2)
-                    c.v(ii)(j) = v(ii)(j) + b.v(ii)(j)
+            for (ii <- i until end; j <- range2) c.v(ii)(j) = v(ii)(j) + b.v(ii)(j)
         } // for
         c
     } // +
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add this matrix and scalar x.
+     *  @param x  the scalar to add
+     */
+    def + (x: Double): ParMatrixD =
+    {
+        val c = new ParMatrixD (dim1, dim2)
+        for (i <- (0 until dim1 by granularity).par){
+            var end = i + granularity; if (i + granularity >= dim1) end = dim1 
+            for (ii <- i until end; j <- range2) c.v(ii)(j) = v(ii)(j) + x
+        } // for
+        c
+    } // +
+ 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place this matrix and matrix b.
      *  @param b  the matrix to add (requires leDimensions)
@@ -284,39 +360,19 @@ class ParMatrixD (val d1: Int,
     {
         for (i <- (0 until dim1 by granularity).par) {
             var end = i + granularity; if (i + granularity >= dim1) end = dim1 
-            for (ii <- i until end)
-                for (j <- range2)
-                    v(ii)(j) = v(ii)(j) + b.v(ii)(j)
+            for (ii <- i until end; j <- range2) v(ii)(j) = v(ii)(j) + b.v(ii)(j)
         } // for
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add this matrix and scalar s.
-     *  @param s  the scalar to add
+    /** Add in-place this matrix and scalar x.
+     *  @param x  the scalar to add
      */
-    def + (s: Double): ParMatrixD =
-    {
-        val c = new ParMatrixD (dim1, dim2)
-        for (i <- (0 until dim1 by granularity).par){
-            var end = i + granularity; if (i + granularity >= dim1) end = dim1 
-            for (ii <- i until end)
-                for (j <- range2)
-                    c.v(ii)(j) = v(ii)(j) + s
-        } // for
-        c
-    } // +
- 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add in-place this matrix and scalar s.
-     *  @param s  the scalar to add
-     */
-    def += (s: Double)
+    def += (x: Double)
     {
         for (i <- (0 until dim1 by granularity).par) {
             var end = i + granularity; if (i + granularity >= dim1) end = dim1 
-            for (ii <- i until end)
-                for (j <- range2)
-                    v(ii)(j) = v(ii)(j) + s
+            for (ii <- i until end; j <- range2) v(ii)(j) = v(ii)(j) + x
         } // for
     } // +=
  
@@ -329,9 +385,21 @@ class ParMatrixD (val d1: Int,
         val c = new ParMatrixD (dim1, dim2)
         for (i <- (0 until dim1 by granularity).par){
             var end = i + granularity; if (i + granularity >= dim1) end = dim1 
-            for (ii <- i until end)
-                for (j <- range2)
-                    c.v(ii)(j) = v(ii)(j) - b.v(ii)(j)
+            for (ii <- i until end; j <- range2) c.v(ii)(j) = v(ii)(j) - b.v(ii)(j)
+        } // for
+        c
+    } // -
+ 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** From this matrix subtract scalar x.
+     *  @param x  the scalar to subtract
+     */
+    def - (x: Double): ParMatrixD =
+    {
+        val c = new ParMatrixD (dim1, dim2)
+        for (i <- (0 until dim1 by granularity).par){
+            var end = i + granularity; if (i + granularity >= dim1) end = dim1 
+            for (ii <- i until end; j <- range2) c.v(ii)(j) = v(ii)(j) - x
         } // for
         c
     } // -
@@ -344,72 +412,25 @@ class ParMatrixD (val d1: Int,
     {
         for (i <- (0 until dim1 by granularity).par) {
             var end = i + granularity; if (i + granularity >= dim1) end = dim1 
-            for (ii <- i until end)
-                for (j <- range2)
-                    v(ii)(j) = v(ii)(j) - b.v(ii)(j)
+            for (ii <- i until end; j <- range2) v(ii)(j) = v(ii)(j) - b.v(ii)(j)
         } // for
     } // -=
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract scalar s.
-     *  @param s  the scalar to subtract
+    /** From this matrix subtract in-place scalar x.
+     *  @param x  the scalar to subtract
      */
-    def - (s: Double): ParMatrixD =
-    {
-        val c = new ParMatrixD (dim1, dim2)
-        for (i <- (0 until dim1 by granularity).par){
-            var end = i + granularity; if (i + granularity >= dim1) end = dim1 
-            for (ii <- i until end)
-                for (j <- range2)
-                    c.v(ii)(j) = v(ii)(j) - s
-        } // for
-        c
-    } // -
- 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract in-place scalar s.
-     *  @param s  the scalar to subtract
-     */
-    def -= (s: Double)
+    def -= (x: Double)
     {
         for (i <- (0 until dim1 by granularity).par) {
             var end = i + granularity; if (i + granularity >= dim1) end = dim1 
-            for (ii <- i until end)
-                for (j <- range2)
-                    v(ii)(j) = v(ii)(j) - s
+            for (ii <- i until end; j <- range2) v(ii)(j) = v(ii)(j) - x
         } // for
     } // -=
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by matrix b (concise solution).
-     *  @param b  the matrix to multiply by (requires sameCrossDimensions)
-     *
-    def * (b: Matrix): ParMatrixD =
-    {
-        val c = new ParMatrixD (dim1, b.dim2)
-        for (i <- range1; j <- c.range2) c.v(i)(j) = row(i) dot b.col(j)
-        c
-    } // *
-     */
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by matrix b (efficient solution).
-     *  @param b  the matrix to multiply by (requires sameCrossDimensions)
-     */
-    def mult (b: ParMatrixD): ParMatrixD =
-    {
-        val c = new ParMatrixD (dim1, b.dim2)
-        for (i <- range1.par; j <- c.range2.par) {
-            var sum = 0.
-            for (k <- range2) sum += v(i)(k) * b.v(k)(j)
-            c.v(i)(j) = sum
-        } // for
-        c
-    } // mult
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by matrix b (to further improve performance, first
-     *  transpose the b matrix).
+    /** Multiply this matrix by matrix b, transposing b to improve performance.
+     *  Use 'times' method to skip the transpose.
      *  @param b  the matrix to multiply by (requires sameCrossDimensions)
      */
     def * (b: ParMatrixD): ParMatrixD =
@@ -423,128 +444,109 @@ class ParMatrixD (val d1: Int,
         } // for
         c
     } // *
-    
-    def newx (b: ParMatrixD): ParMatrixD =
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply this matrix by vector u.
+     *  @param u  the vector to multiply by
+     */
+    def * (u: VectorD): VectorD =
     {
-        val c = new ParMatrixD (dim1, b.dim2)
-        val Bcolj = new VectorD(dim1)
-        for (j <- b.range2) {
-            for (k <- range2) Bcolj(k) = b.v(k)(j)
-            for (i <- range1) {
-                val Arowi = this(i)
-                var s = 0.0
-                for (k <- range2) s += Arowi(k) * Bcolj(k)
-                c(i, j) = s
-            }
-        }
+        val c = new VectorD (dim1)
+        for (i <- (0 until dim1 by granularity).par) {
+            var end = i + granularity; if (i + granularity >= dim1) end = dim1
+            for (ii <- i until end) {
+                var sum = 0.
+                for (k <- range2) sum += v(ii)(k) * u(k)
+                c(ii) = sum
+            } // for
+        } // for
         c
     } // *
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply this matrix by scalar x.
+     *  @param x  the scalar to multiply by
+     */
+    def * (x: Double): ParMatrixD =
+    {
+        val c = new ParMatrixD (dim1, dim2)
+        for (i <- (0 until dim1 by granularity).par) {
+            var end = i + granularity; if (i + granularity >= dim1) end = dim1
+            for (ii <- i until end; j <- range2) c.v(ii)(j) = v(ii)(j) * x
+        } // for
+        c
+    } // *
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply in-place this matrix by matrix b, transposing b to improve
+     *  efficiency.  Use 'times_ip' method to skip the transpose step.
+     *  @param b  the matrix to multiply by (requires square and sameCrossDimensions)
+     */
+    def *= (b: ParMatrixD)
+    {
+        if (! b.isSquare)   flaw ("*=", "matrix b must be square")
+        if (dim2 != b.dim1) flaw ("*=", "matrix *= matrix - incompatible cross dimensions")
+
+        val bt = b.t                                  // use the transpose of b
+        for (i <- range1.par) {
+            val row_i = new VectorD (dim2)            // save ith row so not overwritten
+            for (j <- range2) row_i(j) = v(i)(j)      // copy values from ith row of this matrix
+            for (j <- range2) {
+                var sum = 0.
+                for (k <- range2) sum += row_i(k) * t.v(j)(k)
+                v(i)(j) = sum
+            } // for
+        } // for
+    } // *=
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply in-place this matrix by scalar x.
+     *  @param x  the scalar to multiply by
+     */
+    def *= (x: Double)
+    {
+        for (i <- (0 until dim1 by granularity).par) {
+            var end = i + granularity; if (i + granularity >= dim1) end = dim1
+            for (ii <- i until end; j <- range2) v(ii)(j) = v(ii)(j) * x
+        } // for
+    } // *=
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply this matrix by matrix b without transposing b.
+     *  @param b  the matrix to multiply by (requires sameCrossDimensions)
+     */
+    def times (b: ParMatrixD): ParMatrixD =
+    {
+        val c = new ParMatrixD (dim1, b.dim2)
+        for (i <- range1.par; j <- c.range2.par) {
+            var sum = 0.
+            for (k <- range2) sum += v(i)(k) * b.v(k)(j)
+            c.v(i)(j) = sum
+        } // for
+        c
+    } // times
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place this matrix by matrix b.  If b and this reference the
      *  same matrix (b == this), a copy of the this matrix is made.
      *  @param b  the matrix to multiply by (requires square and sameCrossDimensions)
      */
-    def mult_ip (b: ParMatrixD)
+    def times_ip (b: ParMatrixD)
     {
-        val c = if (b == this) new ParMatrixD (this) else b
+        if (! b.isSquare)   flaw ("times_ip", "matrix b must be square")
+        if (dim2 != b.dim1) flaw ("times_ip", "matrix * matrix - incompatible cross dimensions")
+
+        val bb = if (b == this) new ParMatrixD (this) else b
         for (i <- range1.par) {
-            val row_i = new VectorD (row(i))          // save so not overwritten
-            for (j <- range1) {
+            val row_i = new VectorD (dim2)            // save ith row so not overwritten
+            for (j <- range2) row_i(j) = v(i)(j)      // copy values from ith row of this matrix
+            for (j <- range2) {
                 var sum = 0.
-                for (k <- range1) sum += row_i(k) * b.v(k)(j)
+                for (k <- range2) sum += row_i(k) * bb.v(k)(j)
                 v(i)(j) = sum
             } // for
         } // for
-    } // mult_ip
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by matrix b.  If b and this reference the
-     *  same matrix (b == this), a copy of the this matrix is made.  First,
-     *  matrix b is transposed for efficiency.
-     *  @param b  the matrix to multiply by (requires square and sameCrossDimensions)
-     */
-    def *= (b: ParMatrixD)
-    {
-        val c = if (b == this) new ParMatrixD (this) else b
-        val t = b.t
-        for (i <- range1.par) {
-            val row_i = new VectorD (row(i))          // save so not overwritten
-            for (j <- range1) {
-                var sum = 0.
-                for (k <- range1) sum += row_i(k) * t.v(j)(k)
-                v(i)(j) = sum
-            } // for
-        } // for
-    } // *=
-    
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector b (concise solution).
-     *  @param b  the vector to multiply by
-     *
-    def * (b: VectorD): VectorD =
-    {
-        val c = new VectorD (dim1)
-        for (i <- range1) c(i) = row(i) dot b
-        c
-    } // *
-     */
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector b (efficient solution).
-     *  @param b  the vector to multiply by
-     */
-    def * (b: VectorD): VectorD =
-    {
-        val c = new VectorD (dim1)
-        for (i <- (0 until dim1 by granularity).par) {
-            var end = i + granularity; if (i + granularity >= dim1) end = dim1 
-            for (ii <- i until end) {
-                var sum = 0.
-                for (k <- range2) sum += v(ii)(k) * b(k)
-                c(ii) = sum
-            }
-        }
-        
-        /*
-        for (i <- range1.par) {
-            var sum = 0.
-            for (k <- range2) sum += v(i)(k) * b(k)
-            c(i) = sum
-        } // for
-        */
-        c
-    } // *
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by scalar s.
-     *  @param s  the scalar to multiply by
-     */
-    def * (s: Double): ParMatrixD =
-    {
-        val c = new ParMatrixD (dim1, dim2)
-        for (i <- (0 until dim1 by granularity).par) {
-            var end = i + granularity; if (i + granularity >= dim1) end = dim1 
-            for (ii <- i until end)
-                for (j <- range2)
-                    c.v(ii)(j) = v(ii)(j) * s
-        } // for
-        c
-    } // *
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by scalar s.
-     *  @param s  the scalar to multiply by
-     */
-    def *= (s: Double)
-    {
-        for (i <- (0 until dim1 by granularity).par) {
-            var end = i + granularity; if (i + granularity >= dim1) end = dim1 
-            for (ii <- i until end)
-                for (j <- range2)
-                    v(ii)(j) = v(ii)(j) * s
-        } // for
-    } // *=
+    } // times_ip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply this matrix by matrix b using the Strassen matrix multiplication
@@ -555,12 +557,14 @@ class ParMatrixD (val d1: Int,
      *  @see http://en.wikipedia.org/wiki/Strassen_algorithm
      *  @param b  the matrix to multiply by (it has to be a square matrix)
      */
-    def strassenMult (b: ParMatrixD): ParMatrixD = 
+    def times_s (b: ParMatrixD): ParMatrixD = 
     {
+        if (dim2 != b.dim1) flaw ("*", "matrix * matrix - incompatible cross dimensions")
+
         val c = new ParMatrixD (dim1, dim1)  // allocate result matrix
-        var d = dim1 / 2                  // half dim1
-        if (d + d < dim1) d += 1          // if not even, increment by 1
-        val evenDim = d + d               // equals dim1 if even, else dim1 + 1
+        var d = dim1 / 2                     // half dim1
+        if (d + d < dim1) d += 1             // if not even, increment by 1
+        val evenDim = d + d                  // equals dim1 if even, else dim1 + 1
         
         // decompose to blocks (use vslice method if available)
         val a11 = slice (0, d, 0, d)
@@ -588,65 +592,57 @@ class ParMatrixD (val d1: Int,
                    else                      p1.v(i-d)(j-d) - p2.v(i-d)(j-d) + p3.v(i-d)(j-d) + p6.v(i-d)(j-d)
         } // for
         c                                    // return result matrix
-    } // strassenMult
+    } // times_s
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector b to produce another matrix (a_ij * b_j)
-     *  @param b  the vector to multiply by
+    /** Multiply this matrix by vector u to produce another matrix (a_ij * u_j)
+     *  @param u  the vector to multiply by
      */
-    def ** (b: VectorD): ParMatrixD =
+    def ** (u: VectorD): ParMatrixD =
     {
         val c = new ParMatrixD (dim1, dim2)
         for (i <- (0 until dim1 by granularity).par) {
             var end = i + granularity; if (i + granularity >= dim1) end = dim1 
-            for (ii <- i until end)
-                for (j <- range2)
-                    c.v(ii)(j) = v(ii)(j) * b(j)
+            for (ii <- i until end; j <- range2) c.v(ii)(j) = v(ii)(j) * u(j)
         } // for
         c
     } // **
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by vector b to produce another matrix (a_ij * b_j)
-     *  @param b  the vector to multiply by
+    /** Multiply in-place this matrix by vector u to produce another matrix (a_ij * u_j)
+     *  @param u  the vector to multiply by
      */
-    def **= (b: VectorD)
+    def **= (u: VectorD)
     {
         for (i <- (0 until dim1 by granularity).par) {
             var end = i + granularity; if (i + granularity >= dim1) end = dim1 
-            for (ii <- i until end)
-                for (j <- range2)
-                    v(ii)(j) = v(ii)(j) * b(j)
+            for (ii <- i until end; j <- range2) v(ii)(j) = v(ii)(j) * u(j)
         } // for
     } // **=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide this matrix by scalar s.
-     *  @param s  the scalar to divide by
+    /** Divide this matrix by scalar x.
+     *  @param x  the scalar to divide by
      */
-    def / (s: Double): ParMatrixD =
+    def / (x: Double): ParMatrixD =
     {
         val c = new ParMatrixD (dim1, dim2)
         for (i <- (0 until dim1 by granularity).par) {
             var end = i + granularity; if (i + granularity >= dim1) end = dim1 
-            for (ii <- i until end)
-                for (j <- range2)
-                    c.v(ii)(j) = v(ii)(j) / s
+            for (ii <- i until end; j <- range2) c.v(ii)(j) = v(ii)(j) / x
         } // for
         c
     } // /
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide in-place this matrix by scalar s.
-     *  @param s  the scalar to divide by
+    /** Divide in-place this matrix by scalar x.
+     *  @param x  the scalar to divide by
      */
-    def /= (s: Double)
+    def /= (x: Double)
     {
         for (i <- (0 until dim1 by granularity).par) {
             var end = i + granularity; if (i + granularity >= dim1) end = dim1 
-            for (ii <- i until end)
-                for (j <- range2)
-                    v(ii)(j) = v(ii)(j) / s
+            for (ii <- i until end; j <- range2) v(ii)(j) = v(ii)(j) / x
         } // for
     } // /=
 
@@ -659,6 +655,7 @@ class ParMatrixD (val d1: Int,
     {
         if (p < 2)      flaw ("~^", "p must be an integer >= 2")
         if (! isSquare) flaw ("~^", "only defined on square matrices")
+
         val c = new ParMatrixD (dim1, dim1)
         for (i <- range1.par; j <- range1) {
             var sum = 0.
@@ -873,6 +870,7 @@ class ParMatrixD (val d1: Int,
     def diag (p: Int, q: Int): ParMatrixD =
     {
         if (! isSymmetric) flaw ("diag", "this matrix must be symmetric")
+
         val n = dim1 + p + q 
         val c = new ParMatrixD (n, n)
 
@@ -884,14 +882,33 @@ class ParMatrixD (val d1: Int,
     } // diag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the main diagonal of this matrix.  Assumes dim2 >= dim1.
+    /** Get the kth diagonal of this matrix.  Assumes dim2 >= dim1.
+     *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
-    def getDiag (): VectorD =
+    def getDiag (k: Int = 0): VectorD =
     {
-        val c = new VectorD (dim1)
-        for (i <- range1) c(i) = v(i)(i)
+        val mm = dim1 - abs (k)
+        val c = new VectorD (mm)
+        for (i <- 0 until mm) c(i) = v(i)(i+k)
         c
     } // getDiag
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the kth diagonal of this matrix to the vector u.  Assumes dim2 >= dim1.
+     *  @param u  the vector to set the diagonal to
+     *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
+     */
+    def setDiag (u: VectorD, k: Int = 0)
+    {
+        val mm = dim1 - abs (k)
+        for (i <- 0 until mm) v(i)(i+k) = u(i)
+    } // setDiag
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the main diagonal of this matrix to the scalar x.  Assumes dim2 >= dim1.
+     *  @param x  the scalar to set the diagonal to
+     */
+    def setDiag (x: Double) { for (i <- range1) v(i)(i) = x }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Invert this matrix (requires a squareMatrix) and does not use partial pivoting.
@@ -990,8 +1007,8 @@ class ParMatrixD (val d1: Int,
     def reduce: ParMatrixD =
     {
         if (dim2 < dim1) flaw ("reduce", "requires n (columns) >= m (rows)")
-        val b = new ParMatrixD (this)    // copy this matrix into b
 
+        val b = new ParMatrixD (this)    // copy this matrix into b
         for (i <- b.range1) {
             var pivot = b.v(i)(i)
             if (pivot == 0.) {
@@ -1015,8 +1032,8 @@ class ParMatrixD (val d1: Int,
     def reduce_ip
     {
         if (dim2 < dim1) flaw ("reduce", "requires n (columns) >= m (rows)")
-        val b = this         // use this matrix for b
 
+        val b = this         // use this matrix for b
         for (i <- b.range1) {
             var pivot = b.v(i)(i)
             if (pivot == 0.) {
@@ -1033,15 +1050,30 @@ class ParMatrixD (val d1: Int,
     } // reduce_ip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Clean values in matrix at or below the threshold by setting them to zero.
+     *  Iterative algorithms give approximate values and if very close to zero,
+     *  may throw off other calculations, e.g., in computing eigenvectors.
+     *  @param thres     the cutoff threshold (a small value)
+     *  @param relative  whether to use relative or absolute cutoff
+     */
+    def clean (thres: Double, relative: Boolean = true): ParMatrixD =
+    {
+        val s = if (relative) mag else 1.             // use matrix magnitude or 1
+        for (i <- range1; j <- range2) if (abs (v(i)(j)) <= thres * s) v(i)(j) = 0.
+        this
+    } // clean
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the (right) nullspace of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., s*v*a = 0.  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace: VectorD =
     {
         if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
+
         reduce.col(dim2 - 1) * -1. ++ 1.
     } // nullspace
 
@@ -1049,12 +1081,13 @@ class ParMatrixD (val d1: Int,
     /** Compute the (right) nullspace in-place of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., s*v*a = 0.  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace_ip: VectorD =
     {
         if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
+
         reduce_ip
         col(dim2 - 1) * -1. ++ 1.
     } // nullspace_ip
@@ -1067,8 +1100,9 @@ class ParMatrixD (val d1: Int,
     def trace: Double =
     {
         if ( ! isSquare) flaw ("trace", "trace only works on square matrices")
+
         var sum = 0.
-        for (i <- range1) sum += this(i, i)
+        for (i <- range1) sum += v(i)(i)
         sum
     } // trace
 
@@ -1078,7 +1112,7 @@ class ParMatrixD (val d1: Int,
     def sum: Double =
     {
         var sum = 0.
-        for (i <- range1; j <- range2) sum += this(i, i)
+        for (i <- range1; j <- range2) sum += v(i)(j)
         sum
     } // sum
 
@@ -1088,7 +1122,7 @@ class ParMatrixD (val d1: Int,
     def sumLower: Double =
     {
         var sum = 0.
-        for (i <- range1; j <- 0 until i) sum += this(i, i)
+        for (i <- range1; j <- 0 until i) sum += v(i)(j)
         sum
     } // sumLower
 
@@ -1100,6 +1134,7 @@ class ParMatrixD (val d1: Int,
     def det: Double =
     {
         if ( ! isSquare) flaw ("det", "determinant only works on square matrices")
+
         var sum = 0.
         var b: ParMatrixD = null
         for (j <- range2) {
@@ -1125,7 +1160,7 @@ class ParMatrixD (val d1: Int,
      */
     def isNonnegative: Boolean =
     {
-        for (i <- range1; j <- range2 if this(i, j) < 0.) return false
+        for (i <- range1; j <- range2 if v(i)(j) < 0.) return false
         true
     } // isNonegative
 
@@ -1165,11 +1200,8 @@ object ParMatrixD extends Error
         val c = new ParMatrixD (x.dim, y.dim)
         for (i <- (0 until x.dim by granularity).par) {
             var end = i + granularity; if (i + granularity >= x.dim) end = x.dim 
-            for (ii <- i until end) {
-               for (j <- 0 until y.dim) c(ii, j) = x(ii) * y(j)
-            }
-        }
-        //for (i <- 0 until x.dim par; j <- 0 until y.dim) c(i, j) = x(i) * y(j)
+            for (ii <- i until end; j <- 0 until y.dim) c(ii, j) = x(ii) * y(j)
+        } // for
         c
     } // outer
 
@@ -1181,6 +1213,7 @@ object ParMatrixD extends Error
     def form_rw (x: VectorD, y: VectorD): ParMatrixD =
     {
         if (x.dim != y.dim) flaw ("form_rw", "dimensions of x and y must be the same")
+
         val cols = x.dim
         val c = new ParMatrixD (2, cols)
         c(0) = x
@@ -1190,14 +1223,14 @@ object ParMatrixD extends Error
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Form a matrix from scalar and a vector, row-wise.
-     *  @param s  the first scalar -> row 0 (repeat s)
+     *  @param x  the first scalar -> row 0 (repeat scalar)
      *  @param y  the second vector -> row 1
      */
-    def form_rw (s: Double, y: VectorD): ParMatrixD =
+    def form_rw (x: Double, y: VectorD): ParMatrixD =
     {
         val cols = y.dim
         val c = new ParMatrixD (2, cols)
-        for  (j <- 0 until cols) c(0, j) = s
+        for  (j <- 0 until cols) c(0, j) = x
         c(1) = y
         c
     } // form_rw
@@ -1205,14 +1238,14 @@ object ParMatrixD extends Error
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Form a matrix from a vector and a scalar, row-wise.
      *  @param x  the first vector -> row 0
-     *  @param s  the second scalar -> row 1 (repeat scalar)
+     *  @param y  the second scalar -> row 1 (repeat scalar)
      */
-    def form_rw (x: VectorD, s: Double): ParMatrixD =
+    def form_rw (x: VectorD, y: Double): ParMatrixD =
     {
         val cols = x.dim
         val c = new ParMatrixD (2, cols)
         c(0) = x
-        for  (j <- 0 until cols) c(1, j) = s
+        for  (j <- 0 until cols) c(1, j) = y
         c
     } // form_rw
 
@@ -1224,6 +1257,7 @@ object ParMatrixD extends Error
     def form_cw (x: VectorD, y: VectorD): ParMatrixD =
     {
         if (x.dim != y.dim) flaw ("form_cw", "dimensions of x and y must be the same")
+
         val rows = x.dim
         val c = new ParMatrixD (rows, 2)
         c.setCol(0, x)
@@ -1233,14 +1267,14 @@ object ParMatrixD extends Error
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Form a matrix from a scalar and a vector, column-wise.
-     *  @param s  the first scalar -> column 0 (repeat s)
+     *  @param x  the first scalar -> column 0 (repeat scalar)
      *  @param y  the second vector -> column 1
      */
-    def form_cw (s: Double, y: VectorD): ParMatrixD =
+    def form_cw (x: Double, y: VectorD): ParMatrixD =
     {
         val rows = y.dim
         val c = new ParMatrixD (rows, 2)
-        for (i <- 0 until rows) c(i, 0) = s
+        for (i <- 0 until rows) c(i, 0) = x
         c.setCol(1, y)
         c
     } // form_cw
@@ -1248,14 +1282,14 @@ object ParMatrixD extends Error
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Form a matrix from a vector and a scalar, column-wise.
      *  @param x  the first vector -> column 0
-     *  @param s  the second scalar -> column 1 (repeat s)
+     *  @param y  the second scalar -> column 1 (repeat scalar)
      */
-    def form_cw (x: VectorD, s: Double): ParMatrixD =
+    def form_cw (x: VectorD, y: Double): ParMatrixD =
     {
         val rows = x.dim
         val c = new ParMatrixD (rows, 2)
         c.setCol(0, x)
-        for (i <- 0 until rows) c(i, 1) = s
+        for (i <- 0 until rows) c(i, 1) = y
         c
     } // form_cw
 

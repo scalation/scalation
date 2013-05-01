@@ -8,8 +8,9 @@
 
 package scalation.linalgebra
 
-import math.abs
+import math.{abs, max}
 
+import scalation.math.Basic.oneIf
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -24,6 +25,10 @@ class MatrixD (val d1: Int,
        private var v:  Array [Array [Double]] = null)
       extends Matrix with Error with Serializable
 {
+    // Note: implementations for the following methods are from the Matrix trait:
+    // foreach, mag, rank, sameDimensions, leDimensions, sameCrossDimensions,
+    // isSquare, isSymmetric
+
     lazy val dim1 = d1
     lazy val dim2 = d2
 
@@ -47,7 +52,7 @@ class MatrixD (val d1: Int,
      */
     def this (dim1: Int, dim2: Int, x: Double)
     {
-        this (dim1, dim2)                          // invoke primary constructor
+        this (dim1, dim2)
         for (i <- range1; j <- range2) v(i)(j) = x
     } // constructor
 
@@ -61,7 +66,7 @@ class MatrixD (val d1: Int,
      */
     def this (dim1: Int, x: Double, y: Double)
     {
-        this (dim1, dim1)                          // invoke primary constructor
+        this (dim1, dim1)
         for (i <- range1; j <- range1) v(i)(j) = if (i == j) x else y
     } // constructor
 
@@ -78,7 +83,7 @@ class MatrixD (val d1: Int,
      */
     def this (dim: Tuple2 [Int, Int], u: Double*)
     {
-        this (dim._1, dim._2)                      // invoke primary constructor
+        this (dim._1, dim._2)
         for (i <- range1; j <- range2) v(i)(j) = u(i * dim2 + j)
     } // constructor
 
@@ -88,18 +93,18 @@ class MatrixD (val d1: Int,
      */
     def this (u: Array [VectorD])
     {
-        this (u.length, u(0).dim)                  // invoke primary constructor
+        this (u.length, u(0).dim)
         for (i <- range1; j <- range2) v(i)(j) = u(i)(j)
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a matrix and assign values from matrix u.
-     *  @param u  the matrix of values to assign
+     *  @param b  the matrix of values to assign
      */
-    def this (u: MatrixD)
+    def this (b: MatrixD)
     {
-        this (u.d1, u.d2)                        // invoke primary constructor
-        for (i <- range1; j <- range2) v(i)(j) = u.v(i)(j)
+        this (b.d1, b.d2)
+        for (i <- range1; j <- range2) v(i)(j) = b.v(i)(j)
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -114,6 +119,30 @@ class MatrixD (val d1: Int,
      *  @param i  the row index
      */
     def apply (i: Int): VectorD = new VectorD (v(i))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise on range ir and column-wise on range jr.
+     *  Ex: b = a(2..4, 3..5)
+     *  @param ir  the row range
+     *  @param jr  the column range
+     */
+    def apply (ir: Range, jr: Range): MatrixD = slice (ir.start, ir.end, jr.start, jr.end)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise on range ir and column-wise at index j.
+     *  Ex: u = a(2..4, 3)
+     *  @param ir  the row range
+     *  @param j   the column index
+     */
+    def apply (ir: Range, j: Int): VectorD = col(j)(ir)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise at index i and column-wise on range jr.
+     *  Ex: u = a(2, 3..5)
+     *  @param i   the row index
+     *  @param jr  the column range
+     */
+    def apply (i: Int, jr: Range): VectorD = this(i)(jr)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set this matrix's element at the i,j-th index position to the scalar x.
@@ -131,14 +160,59 @@ class MatrixD (val d1: Int,
     def update (i: Int, u: VectorD) { v(i) = u() }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set this matrix's row at the i-th index position to the vector u.
-     *  @param i  the row index
-     *  @param j  the starting column index
-     *  @param u  the vector value to assign
+    /** Set a slice this matrix row-wise on range ir and column-wise on range jr.
+     *  Ex: a(2..4, 3..5) = b
+     *  @param ir  the row range
+     *  @param jr  the column range
+     *  @param b   the matrix to assign
      */
-    def set (i: Int, j: Int, u: VectorD)
+    def update (ir: Range, jr: Range, b: MatrixD)
     {
-        for (k <- 0 until u.dim) v(i)(j + k) = u(k)
+        for (i <- ir; j <- jr) v(i)(j) = b.v(i - ir.start)(j - jr.start)
+    } // update
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set a slice this matrix row-wise on range ir and column-wise at index j.
+     *  Ex: a(2..4, 3) = u
+     *  @param ir  the row range
+     *  @param j   the column index
+     *  @param u   the vector to assign
+     */
+    def update (ir: Range, j: Int, u: VectorD) { col(j)(ir) = u }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set a slice this matrix row-wise at index i and column-wise on range jr.
+     *  Ex: a(2, 3..5) = u
+     *  @param i   the row index
+     *  @param jr  the column range
+     *  @param u   the vector to assign
+     */
+    def update (i: Int, jr: Range, u: VectorD) { this(i)(jr) = u }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set all the elements in this matrix to the scalar x.
+     *  @param x  the scalar value to assign
+     */
+    def set (x: Double) { for (i <- range1; j <- range2) v(i)(j) = x }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set all the values in this matrix as copies of the values in 2D array u.
+     *  @param u  the 2D array of values to assign
+     */
+    def set (u: Array [Array [Double]])
+    {
+        for (i <- range1; j <- range2) v(i)(j) = u(i)(j)
+    } // set
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set this matrix's ith row starting at column j to the vector u.
+     *  @param i  the row index
+     *  @param u  the vector value to assign
+     *  @param j  the starting column index
+     */
+    def set (i: Int, u: VectorD, j: Int = 0)
+    {
+        for (k <- 0 until u.dim) v(i)(k+j) = u(k)
     } // set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -166,30 +240,18 @@ class MatrixD (val d1: Int,
     } // slice
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Slice this matrix excluding the given row and column.
-     *  @param row  the row to exclude
-     *  @param col  the column to exclude
+    /** Slice this matrix excluding the given row and/or column.
+     *  @param row  the row to exclude (0 until dim1, set to dim1 to keep all rows)
+     *  @param col  the column to exclude (0 until dim2, set to dim2 to keep all columns)
      */
     def sliceExclude (row: Int, col: Int): MatrixD =
     {
-        val c = new MatrixD (dim1 - 1, dim2 - 1)
+        val c = new MatrixD (dim1 - oneIf (row < dim1), dim2 - oneIf (col < dim2))
         for (i <- range1 if i != row) for (j <- range2 if j != col) {
             c.v(i - oneIf (i > row))(j - oneIf (j > col)) = v(i)(j)
         } // for
         c
     } // sliceExclude
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get row 'r' from the matrix, returning it as a vector.
-     *  @param r     the row to extract from the matrix
-     *  @param from  the position to start extracting from
-     */
-    def row (r: Int, from: Int = 0): VectorD =
-    {
-        val u = new VectorD (dim2 - from)
-        for (j <- from until dim2) u(j-from) = v(r)(j)
-        u
-    } // row
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select rows from this matrix according a basis. 
@@ -198,7 +260,7 @@ class MatrixD (val d1: Int,
     def selectRows (basis: Array [Int]): MatrixD =
     {
         val c = new MatrixD (basis.length)
-        for (i <- c.range1) c.setRow (i, col(basis(i)))
+        for (i <- c.range1) c(i) = col(basis(i))
         c
     } // selectRows
 
@@ -213,6 +275,13 @@ class MatrixD (val d1: Int,
         for (i <- from until dim1) u(i-from) = v(i)(c)
         u
     } // col
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set column 'c' of the matrix to a vector.
+     *  @param c  the column to set
+     *  @param u  the vector to assign to the column
+     */
+    def setCol (c: Int, u: VectorD) { for (i <- range1) v(i)(c) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select columns from this matrix according a basis. 
@@ -236,14 +305,15 @@ class MatrixD (val d1: Int,
     } // t
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate this matrix and vector b.
-     *  @param b  the vector to be concatenated as the new last row in matrix
+    /** Concatenate this matrix and vector u.
+     *  @param u  the vector to be concatenated as the new last row in matrix
      */
-    def ++ (b: VectorD): MatrixD =
+    def ++ (u: VectorD): MatrixD =
     {
-        if (b.dim != dim2) flaw ("++", "vector does not match row dimension")
+        if (u.dim != dim2) flaw ("++", "vector does not match row dimension")
+
         val c = new MatrixD (dim1 + 1, dim2)
-        for (i <- c.range1) c(i) = if (i < dim1) this(i) else b
+        for (i <- c.range1) c(i) = if (i < dim1) this(i) else u
         c
     } // ++
 
@@ -259,6 +329,28 @@ class MatrixD (val d1: Int,
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add this matrix and vector u.
+     *  @param u  the vector to add
+     */
+    def + (u: VectorD): MatrixD =
+    {
+        val c = new MatrixD (dim1, dim2)
+        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) + u(j)
+        c
+    } // +
+ 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add this matrix and scalar x.
+     *  @param x  the scalar to add
+     */
+    def + (x: Double): MatrixD =
+    {
+        val c = new MatrixD (dim1, dim2)
+        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) + x
+        c
+    } // +
+ 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place this matrix and matrix b.
      *  @param b  the matrix to add (requires leDimensions)
      */
@@ -268,23 +360,12 @@ class MatrixD (val d1: Int,
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add this matrix and scalar s.
-     *  @param s  the scalar to add
+    /** Add in-place this matrix and scalar x.
+     *  @param x  the scalar to add
      */
-    def + (s: Double): MatrixD =
+    def += (x: Double)
     {
-        val c = new MatrixD (dim1, dim2)
-        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) + s
-        c
-    } // +
- 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add in-place this matrix and scalar s.
-     *  @param s  the scalar to add
-     */
-    def += (s: Double)
-    {
-        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) + s
+        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) + x
     } // +=
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -299,6 +380,17 @@ class MatrixD (val d1: Int,
     } // -
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** From this matrix subtract scalar x.
+     *  @param x  the scalar to subtract
+     */
+    def - (x: Double): MatrixD =
+    {
+        val c = new MatrixD (dim1, dim2)
+        for (i <- c.range1; j <- c.range2) c.v(i)(j) = v(i)(j) - x
+        c
+    } // -
+ 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From this matrix subtract in-place matrix b.
      *  @param b  the matrix to subtract (requires leDimensions)
      */
@@ -308,79 +400,100 @@ class MatrixD (val d1: Int,
     } // -=
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract scalar s.
-     *  @param s  the scalar to subtract
+    /** From this matrix subtract in-place scalar x.
+     *  @param x  the scalar to subtract
      */
-    def - (s: Double): MatrixD =
+    def -= (x: Double)
     {
-        val c = new MatrixD (dim1, dim2)
-        for (i <- c.range1; j <- c.range2) c.v(i)(j) = v(i)(j) - s
-        c
-    } // -
- 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract in-place scalar s.
-     *  @param s  the scalar to subtract
-     */
-    def -= (s: Double)
-    {
-        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) - s
+        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) - x
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by matrix b (to further improve performance, first
-     *  transpose the b matrix).
+    /** Multiply this matrix by matrix b, transposing b to improve efficiency.
+     *  Use 'times' method to skip the transpose step.
      *  @param b  the matrix to multiply by (requires sameCrossDimensions)
      */
     def * (b: MatrixD): MatrixD =
     {
+        if (dim2 != b.dim1) flaw ("*", "matrix * matrix - incompatible cross dimensions")
+
         val c = new MatrixD (dim1, b.dim2)
-        val t = b.t                         // transpose the b matrix
+        val bt = b.t                         // transpose the b matrix
         for (i <- range1; j <- c.range2) {
             var sum = 0.
-            for (k <- range2) sum += v(i)(k) * t.v(j)(k)
+            for (k <- range2) sum += v(i)(k) * bt.v(j)(k)
             c.v(i)(j) = sum
         } // for
         c
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by matrix b.  If b and this reference the
-     *  same matrix (b == this), a copy of the this matrix is made.  First,
-     *  matrix b is transposed for efficiency.
+    /** Multiply this matrix by vector u.
+     *  @param u  the vector to multiply by
+     */
+    def * (u: VectorD): VectorD =
+    {
+        if (dim2 != u.dim) flaw ("*", "matrix * vector - incompatible cross dimensions")
+
+        val c = new VectorD (dim1)
+        for (i <- range1) {
+            var sum = 0.
+            for (k <- range2) sum += v(i)(k) * u(k)
+            c(i) = sum
+        } // for
+        c
+    } // *
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply this matrix by scalar x.
+     *  @param x  the scalar to multiply by
+     */
+    def * (x: Double): MatrixD =
+    {
+        val c = new MatrixD (dim1, dim2)
+        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) * x
+        c
+    } // *
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply in-place this matrix by matrix b, transposing b to improve
+     *  efficiency.  Use 'times_ip' method to skip the transpose step.
      *  @param b  the matrix to multiply by (requires square and sameCrossDimensions)
      */
     def *= (b: MatrixD)
     {
-        val c = if (b == this) new MatrixD (this) else b
-        val t = b.t
+        if (! b.isSquare)   flaw ("*=", "matrix b must be square")
+        if (dim2 != b.dim1) flaw ("*=", "matrix *= matrix - incompatible cross dimensions")
+
+        val bt = b.t                                  // use the transpose of b
         for (i <- range1) {
-            val row_i = new VectorD (row(i))          // save so not overwritten
-            for (j <- range1) {
+            val row_i = new VectorD (dim2)            // save ith row so not overwritten
+            for (j <- range2) row_i(j) = v(i)(j)      // copy values from ith row of this matrix
+            for (j <- range2) {
                 var sum = 0.
-                for (k <- range1) sum += row_i(k) * t.v(j)(k)
+                for (k <- range2) sum += row_i(k) * bt.v(j)(k)
                 v(i)(j) = sum
             } // for
         } // for
     } // *=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by matrix b using dot product (concise solution).
-     *  @param b  the matrix to multiply by (requires sameCrossDimensions)
+    /** Multiply in-place this matrix by scalar x.
+     *  @param x  the scalar to multiply by
      */
-    def dot (b: Matrix): MatrixD =
+    def *= (x: Double)
     {
-        val c = new MatrixD (dim1, b.dim2)
-        for (i <- range1; j <- c.range2) c.v(i)(j) = row(i) dot b.col(j)
-        c
-    } // dot
+        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) * x
+    } // *=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by matrix b (efficient solution).
+    /** Multiply this matrix by matrix b without first transposing b.
      *  @param b  the matrix to multiply by (requires sameCrossDimensions)
      */
     def times (b: MatrixD): MatrixD =
     {
+        if (dim2 != b.dim1) flaw ("times", "matrix * matrix - incompatible cross dimensions")
+
         val c = new MatrixD (dim1, b.dim2)
         for (i <- range1; j <- c.range2) {
             var sum = 0.
@@ -391,22 +504,40 @@ class MatrixD (val d1: Int,
     } // times
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by matrix b.  If b and this reference the
-     *  same matrix (b == this), a copy of the this matrix is made.
+    /** Multiply in-place this matrix by matrix b without first transposing b.
+     *  If b and this reference the same matrix (b == this), a copy of the this
+     *  matrix is made.
      *  @param b  the matrix to multiply by (requires square and sameCrossDimensions)
      */
     def times_ip (b: MatrixD)
     {
-        val c = if (b == this) new MatrixD (this) else b
+        if (! b.isSquare)   flaw ("times_ip", "matrix b must be square")
+        if (dim2 != b.dim1) flaw ("times_ip", "matrix * matrix - incompatible cross dimensions")
+
+        val bb = if (b == this) new MatrixD (this) else b
         for (i <- range1) {
-            val row_i = new VectorD (row(i))          // save so not overwritten
-            for (j <- range1) {
+            val row_i = new VectorD (dim2)            // save ith row so not overwritten
+            for (j <- range2) row_i(j) = v(i)(j)      // copy values from ith row of this matrix
+            for (j <- range2) {
                 var sum = 0.
-                for (k <- range1) sum += row_i(k) * b.v(k)(j)
+                for (k <- range2) sum += row_i(k) * bb.v(k)(j)
                 v(i)(j) = sum
             } // for
         } // for
     } // times_ip
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply this matrix by matrix b using dot product (concise solution).
+     *  @param b  the matrix to multiply by (requires sameCrossDimensions)
+     */
+    def times_d (b: Matrix): MatrixD =
+    {
+        if (dim2 != b.dim1) flaw ("*", "matrix * matrix - incompatible cross dimensions")
+
+        val c = new MatrixD (dim1, b.dim2)
+        for (i <- range1; j <- c.range2) c.v(i)(j) = this(i) dot b.col(j)
+        c
+    } // times_d
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply this matrix by matrix b using the Strassen matrix multiplication
@@ -417,8 +548,10 @@ class MatrixD (val d1: Int,
      *  @see http://en.wikipedia.org/wiki/Strassen_algorithm
      *  @param b  the matrix to multiply by (it has to be a square matrix)
      */
-    def strassenMult (b: MatrixD): MatrixD = 
+    def times_s (b: MatrixD): MatrixD = 
     {
+        if (dim2 != b.dim1) flaw ("*", "matrix * matrix - incompatible cross dimensions")
+
         val c = new MatrixD (dim1, dim1)  // allocate result matrix
         var d = dim1 / 2                  // half dim1
         if (d + d < dim1) d += 1          // if not even, increment by 1
@@ -450,81 +583,46 @@ class MatrixD (val d1: Int,
                    else                      p1.v(i-d)(j-d) - p2.v(i-d)(j-d) + p3.v(i-d)(j-d) + p6.v(i-d)(j-d)
         } // for
         c                                    // return result matrix
-    } // strassenMult
+    } // times_s
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector b (efficient solution).
-     *  @param b  the vector to multiply by
+    /** Multiply this matrix by vector u to produce another matrix (a_ij * u_j)
+     *  @param u  the vector to multiply by
      */
-    def * (b: VectorD): VectorD =
-    {
-        val c = new VectorD (dim1)
-        for (i <- range1) {
-            var sum = 0.
-            for (k <- range2) sum += v(i)(k) * b(k)
-            c(i) = sum
-        } // for
-        c
-    } // *
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by scalar s.
-     *  @param s  the scalar to multiply by
-     */
-    def * (s: Double): MatrixD =
+    def ** (u: VectorD): MatrixD =
     {
         val c = new MatrixD (dim1, dim2)
-        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) * s
-        c
-    } // *
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by scalar s.
-     *  @param s  the scalar to multiply by
-     */
-    def *= (s: Double)
-    {
-        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) * s
-    } // *=
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector b to produce another matrix (a_ij * b_j)
-     *  @param b  the vector to multiply by
-     */
-    def ** (b: VectorD): MatrixD =
-    {
-        val c = new MatrixD (dim1, dim2)
-        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) * b(j)
+        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) * u(j)
         c
     } // **
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by vector b to produce another matrix (a_ij * b_j)
-     *  @param b  the vector to multiply by
+    /** Multiply in-place this matrix by vector u to produce another matrix (a_ij * u_j)
+     *  @param u  the vector to multiply by
      */
-    def **= (b: VectorD)
+    def **= (u: VectorD)
     {
-        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) * b(j)
+        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) * u(j)
     } // **=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide this matrix by scalar s.
-     *  @param s  the scalar to divide by
+    /** Divide this matrix by scalar x.
+     *  @param x  the scalar to divide by
      */
-    def / (s: Double): MatrixD =
+    def / (x: Double): MatrixD =
     {
         val c = new MatrixD (dim1, dim2)
-        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) / s
+        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) / x
         c
     } // /
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide in-place this matrix by scalar s.
-     *  @param s  the scalar to divide by
+    /** Divide in-place this matrix by scalar x.
+     *  @param x  the scalar to divide by
      */
-    def /= (s: Double)
+    def /= (x: Double)
     {
-        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) / s
+        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) / x
     } // /=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -536,6 +634,7 @@ class MatrixD (val d1: Int,
     {
         if (p < 2)      flaw ("~^", "p must be an integer >= 2")
         if (! isSquare) flaw ("~^", "only defined on square matrices")
+
         val c = new MatrixD (dim1, dim1)
         for (i <- range1; j <- range1) {
             var sum = 0.
@@ -578,14 +677,14 @@ class MatrixD (val d1: Int,
         val u = new MatrixD (this)          // upper triangular matrix (a copy of this)
 
         for (i <- u.range1) {
-            val pivot = u(i, i)
+            val pivot = u.v(i)(i)
             if (pivot == 0.) flaw ("lud_npp", "use lud since you have a zero pivot")
-            l(i, i) = 1.
-            for (j <- i + 1 until u.dim2) l(i, j) = 0.
+            l.v(i)(i) = 1.
+            for (j <- i + 1 until u.dim2) l.v(i)(j) = 0.
             for (k <- i + 1 until u.dim1) {
-                val mul = u(k, i) / pivot
-                l(k, i) = mul
-                for (j <- u.range2) u(k, j) = u(k, j) - mul * u(i, j)
+                val mul = u.v(k)(i) / pivot
+                l.v(k)(i) = mul
+                for (j <- u.range2) u.v(k)(j) = u.v(k)(j) - mul * u.v(i)(j)
             } // for
         } // for
         Tuple2 (l, u)
@@ -602,18 +701,18 @@ class MatrixD (val d1: Int,
         val u = new MatrixD (this)               // upper triangular matrix (a copy of this)
 
         for (i <- u.range1) {
-            var pivot = u(i, i)
+            var pivot = u.v(i)(i)
             if (pivot == 0.) {
                 val k = partialPivoting (u, i)   // find the maxiumum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
-                pivot = u(i, i)                  // reset the pivot
+                pivot = u.v(i)(i)                // reset the pivot
             } // if
-            l(i, i) = 1.
-            for (j <- i + 1 until u.dim2) l(i, j) = 0.
+            l.v(i)(i) = 1.
+            for (j <- i + 1 until u.dim2) l.v(i)(j) = 0.
             for (k <- i + 1 until u.dim1) {
-                val mul = u(k, i) / pivot
-                l(k, i) = mul
-                for (j <- u.range2) u(k, j) = u(k, j) - mul * u(i, j)
+                val mul = u.v(k)(i) / pivot
+                l.v(k)(i) = mul
+                for (j <- u.range2) u.v(k)(j) = u.v(k)(j) - mul * u.v(i)(j)
             } // for
         } // for
         Tuple2 (l, u)
@@ -630,18 +729,18 @@ class MatrixD (val d1: Int,
         val u = this                             // upper triangular matrix (this)
 
         for (i <- u.range1) {
-            var pivot = u(i, i)
+            var pivot = u.v(i)(i)
             if (pivot == 0.) {
                 val k = partialPivoting (u, i)   // find the maxiumum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
-                pivot = u(i, i)                  // reset the pivot
+                pivot = u.v(i)(i)                // reset the pivot
             } // if
-            l(i, i) = 1.
-            for (j <- i + 1 until u.dim2) l(i, j) = 0.
+            l.v(i)(i) = 1.
+            for (j <- i + 1 until u.dim2) l.v(i)(j) = 0.
             for (k <- i + 1 until u.dim1) {
-                val mul = u(k, i) / pivot
-                l(k, i) = mul
-                for (j <- u.range2) u(k, j) = u(k, j) - mul * u(i, j)
+                val mul = u.v(k)(i) / pivot
+                l.v(k)(i) = mul
+                for (j <- u.range2) u.v(k)(j) = u.v(k)(j) - mul * u.v(i)(j)
             } // for
         } // for
         Tuple2 (l, u)
@@ -655,14 +754,17 @@ class MatrixD (val d1: Int,
      */
     private def partialPivoting (a: MatrixD, i: Int): Int =
     {
-        var max  = a(i, i)   // initially set to the pivot
-        var kMax = i         // initially the pivot row
+        var max  = a.v(i)(i)   // initially set to the pivot
+        var kMax = i           // initially the pivot row
 
-        for (k <- i + 1 until a.dim1 if abs (a(k, i)) > max) {
-            max  = abs (a(k, i))
+        for (k <- i + 1 until a.dim1 if abs (a.v(k)(i)) > max) {
+            max  = abs (a.v(k)(i))
             kMax = k
         } // for
-        if (kMax == i) flaw ("partialPivoting", "unable to find a non-zero pivot")
+
+        if (kMax == i) {
+            flaw ("partialPivoting", "unable to find a non-zero pivot for row " + i)
+        } // if
         kMax
     } // partialPivoting
 
@@ -676,7 +778,7 @@ class MatrixD (val d1: Int,
     private def swap (a: MatrixD, i: Int, k: Int, col: Int)
     {
         for (j <- col until a.dim2) {
-            val tmp = a(k, j); a(k, j) = a(i, j); a(i, j) = tmp
+            val tmp = a.v(k)(j); a.v(k)(j) = a.v(i)(j); a.v(i)(j) = tmp
         } // for
     } // swap
 
@@ -739,14 +841,32 @@ class MatrixD (val d1: Int,
     } // diag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Form a matrix [Ip, this] where Ip is a p by p identity matrix, by
+     *  positioning the two matrices Ip and this along the diagonal.
+     *  Fill the rest of matrix with zeroes.
+     *  @param p  the size of identity matrix Ip
+     */
+    def diag (p: Int): MatrixD =
+    {
+        val m = dim1 + p                // new number of rows
+        val n = dim1 + p                // new number of columns
+        val c = new MatrixD (m, n)
+        for (i <- 0 until p) c.v(i)(i) = 1.
+        c(p until m, p until n) = this
+        c
+    } // diag
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Form a matrix [Ip, this, Iq] where Ir is a r by r identity matrix, by
      *  positioning the three matrices Ip, this and Iq along the diagonal.
+     *  Fill the rest of matrix with zeroes.
      *  @param p  the size of identity matrix Ip
      *  @param q  the size of identity matrix Iq
      */
     def diag (p: Int, q: Int): MatrixD =
     {
         if (! isSymmetric) flaw ("diag", "this matrix must be symmetric")
+
         val n = dim1 + p + q 
         val c = new MatrixD (n, n)
 
@@ -758,14 +878,33 @@ class MatrixD (val d1: Int,
     } // diag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the main diagonal of this matrix.  Assumes dim2 >= dim1.
+    /** Get the kth diagonal of this matrix.  Assumes dim2 >= dim1.
+     *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
-    def getDiag (): VectorD =
+    def getDiag (k: Int = 0): VectorD =
     {
-        val c = new VectorD (dim1)
-        for (i <- range1) c(i) = v(i)(i)
+        val mm = dim1 - abs (k)
+        val c = new VectorD (mm)
+        for (i <- 0 until mm) c(i) = v(i)(i+k)
         c
     } // getDiag
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the kth diagonal of this matrix to the vector u.  Assumes dim2 >= dim1.
+     *  @param u  the vector to set the diagonal to
+     *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
+     */
+    def setDiag (u: VectorD, k: Int = 0)
+    { 
+        val mm = dim1 - abs (k)
+        for (i <- 0 until mm) v(i)(i+k) = u(i)
+    } // setDiag
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the main diagonal of this matrix to the scalar x.  Assumes dim2 >= dim1.
+     *  @param x  the scalar to set the diagonal to
+     */
+    def setDiag (x: Double) { for (i <- range1) v(i)(i) = x }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Invert this matrix (requires a squareMatrix) and does not use partial pivoting.
@@ -862,6 +1001,7 @@ class MatrixD (val d1: Int,
     def reduce: MatrixD =
     {
         if (dim2 < dim1) flaw ("reduce", "requires n (columns) >= m (rows)")
+
         val b = new MatrixD (this)    // copy this matrix into b
 
         for (i <- b.range1) {
@@ -887,6 +1027,7 @@ class MatrixD (val d1: Int,
     def reduce_ip
     {
         if (dim2 < dim1) flaw ("reduce", "requires n (columns) >= m (rows)")
+
         val b = this         // use this matrix for b
 
         for (i <- b.range1) {
@@ -905,15 +1046,33 @@ class MatrixD (val d1: Int,
     } // reduce_ip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Clean values in matrix at or below the threshold by setting them to zero.
+     *  Iterative algorithms give approximate values and if very close to zero,
+     *  may throw off other calculations, e.g., in computing eigenvectors.
+     *  @param thres     the cutoff threshold (a small value)
+     *  @param relative  whether to use relative or absolute cutoff
+     */
+    def clean (thres: Double, relative: Boolean = true): MatrixD =
+    {
+        val s = if (relative) mag else 1.             // use matrix magnitude or 1
+        for (i <- range1; j <- range2) if (abs (v(i)(j)) <= thres * s) v(i)(j) = 0.
+        this
+    } // clean
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the (right) nullspace of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., s*v*a = 0.  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
+     *  FIX: need a more robust algorithm for computing nullspace (@see QRDecomp.scala)
+     *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
+     *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
     def nullspace: VectorD =
     {
         if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
+
         reduce.col(dim2 - 1) * -1. ++ 1.
     } // nullspace
 
@@ -921,12 +1080,13 @@ class MatrixD (val d1: Int,
     /** Compute the (right) nullspace in-place of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., s*v*a = 0.  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace_ip: VectorD =
     {
         if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
+
         reduce_ip
         col(dim2 - 1) * -1. ++ 1.
     } // nullspace_ip
@@ -939,6 +1099,7 @@ class MatrixD (val d1: Int,
     def trace: Double =
     {
         if ( ! isSquare) flaw ("trace", "trace only works on square matrices")
+
         var sum = 0.
         for (i <- range1) sum += v(i)(i)
         sum
@@ -972,6 +1133,7 @@ class MatrixD (val d1: Int,
     def det: Double =
     {
         if ( ! isSquare) flaw ("det", "determinant only works on square matrices")
+
         var sum = 0.
         var b: MatrixD = null
         for (j <- range2) {
@@ -1025,6 +1187,29 @@ class MatrixD (val d1: Int,
 object MatrixD extends Error
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an n-by-n identity matrix (ones on main diagonal, zeroes elsewhere).
+     */
+    def eye (n: Int): MatrixD = new MatrixD (n, 1., 0.)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply vector u by matrix a.  Treat u as a row vector.
+     *  @param u  the vector to multiply by
+     *  @param a  the matrix to multiply by (requires sameCrossDimensions)
+     */
+    def times  (u: VectorD, a: MatrixD): VectorD =
+    {
+        if (u.dim != a.dim1) flaw ("times", "vector * matrix - incompatible cross dimensions")
+
+        val c = new VectorD (a.dim2)
+        for (j <- a.range2) {
+            var sum = 0.
+            for (k <- a.range1) sum += u(k) * a.v(k)(j)
+            c(j) = sum
+        } // for
+        c
+    } // times
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the outer product of vector x and vector y.  The result of the
      *  outer product is a matrix where c(i, j) is the product of i-th element
      *  of x with the j-th element of y.
@@ -1046,6 +1231,7 @@ object MatrixD extends Error
     def form_rw (x: VectorD, y: VectorD): MatrixD =
     {
         if (x.dim != y.dim) flaw ("form_rw", "dimensions of x and y must be the same")
+
         val cols = x.dim
         val c = new MatrixD (2, cols)
         c(0) = x
@@ -1055,14 +1241,14 @@ object MatrixD extends Error
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Form a matrix from scalar and a vector, row-wise.
-     *  @param s  the first scalar -> row 0 (repeat s)
+     *  @param x  the first scalar -> row 0 (repeat scalar)
      *  @param y  the second vector -> row 1
      */
-    def form_rw (s: Double, y: VectorD): MatrixD =
+    def form_rw (x: Double, y: VectorD): MatrixD =
     {
         val cols = y.dim
         val c = new MatrixD (2, cols)
-        for  (j <- 0 until cols) c(0, j) = s
+        for  (j <- 0 until cols) c(0, j) = x
         c(1) = y
         c
     } // form_rw
@@ -1070,14 +1256,14 @@ object MatrixD extends Error
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Form a matrix from a vector and a scalar, row-wise.
      *  @param x  the first vector -> row 0
-     *  @param s  the second scalar -> row 1 (repeat scalar)
+     *  @param y  the second scalar -> row 1 (repeat scalar)
      */
-    def form_rw (x: VectorD, s: Double): MatrixD =
+    def form_rw (x: VectorD, y: Double): MatrixD =
     {
         val cols = x.dim
         val c = new MatrixD (2, cols)
         c(0) = x
-        for  (j <- 0 until cols) c(1, j) = s
+        for  (j <- 0 until cols) c(1, j) = y
         c
     } // form_rw
 
@@ -1089,6 +1275,7 @@ object MatrixD extends Error
     def form_cw (x: VectorD, y: VectorD): MatrixD =
     {
         if (x.dim != y.dim) flaw ("form_cw", "dimensions of x and y must be the same")
+
         val rows = x.dim
         val c = new MatrixD (rows, 2)
         c.setCol(0, x)
@@ -1098,14 +1285,14 @@ object MatrixD extends Error
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Form a matrix from a scalar and a vector, column-wise.
-     *  @param s  the first scalar -> column 0 (repeat s)
+     *  @param x  the first scalar -> column 0 (repeat scalar)
      *  @param y  the second vector -> column 1
      */
-    def form_cw (s: Double, y: VectorD): MatrixD =
+    def form_cw (x: Double, y: VectorD): MatrixD =
     {
         val rows = y.dim
         val c = new MatrixD (rows, 2)
-        for (i <- 0 until rows) c(i, 0) = s
+        for (i <- 0 until rows) c(i, 0) = x
         c.setCol(1, y)
         c
     } // form_cw
@@ -1113,14 +1300,14 @@ object MatrixD extends Error
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Form a matrix from a vector and a scalar, column-wise.
      *  @param x  the first vector -> column 0
-     *  @param s  the second scalar -> column 1 (repeat s)
+     *  @param y  the second scalar -> column 1 (repeat scalar)
      */
-    def form_cw (x: VectorD, s: Double): MatrixD =
+    def form_cw (x: VectorD, y: Double): MatrixD =
     {
         val rows = x.dim
         val c = new MatrixD (rows, 2)
         c.setCol(0, x)
-        for (i <- 0 until rows) c(i, 1) = s
+        for (i <- 0 until rows) c(i, 1) = y
         c
     } // form_cw
 
@@ -1180,6 +1367,18 @@ object MatrixDTest extends App
     println ("check left  nullspace = " + v.t.nullspace * v)
 
     for (row <- z) println ("row = " + row.deep)
+
+    val aa = new MatrixD ((3, 2), 1., 2.,
+                                  3., 4.,
+                                  5., 6.)
+    val bb = new MatrixD ((2, 2), 1., 2.,
+                                  3., 4.)
+
+    println ("aa * bb  = " + aa * bb)
+    println ("aa       = " + aa)
+    println ("bb       = " + bb)
+    aa *= bb
+    println ("aa *= bb = " + aa) 
 
 } // MatrixDTest object
 

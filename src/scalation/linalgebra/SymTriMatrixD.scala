@@ -9,7 +9,7 @@
 
 package scalation.linalgebra
 
-import math.{max, min}
+import math.{abs, max, min}
 
 import scalation.util.Error
 
@@ -22,6 +22,10 @@ import scalation.util.Error
 class SymTriMatrixD (val d1: Int)
       extends Matrix with Error with Serializable
 {
+    // Note: implementations for the following methods are from the Matrix trait:
+    // foreach, mag, rank, sameDimensions, leDimensions, sameCrossDimensions,
+    // isSquare, isSymmetric
+
     lazy val dim1 = d1
     lazy val dim2 = d1
 
@@ -59,13 +63,13 @@ class SymTriMatrixD (val d1: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a symmetric tridiagonal matrix from the given matrix.
-     *  @param a  the matrix of values to assign
+     *  @param b  the matrix of values to assign
      */
-    def this (a: Matrix)
+    def this (b: Matrix)
     {
-        this (a.dim1)
-        for (i <- range_d) _dg(i) = a(i, i)
-        for (i <- range_s) _sd(i) = a(i, i+1)
+        this (b.dim1)
+        for (i <- range_d) _dg(i) = b(i, i)
+        for (i <- range_s) _sd(i) = b(i, i+1)
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -109,12 +113,40 @@ class SymTriMatrixD (val d1: Int)
      */
     def apply (i: Int): VectorD =
     {
-        val v = new VectorD (d1)
-        v(i)  = _dg(i)
-        if (i > 0)    v(i-1) = _sd(i-1)
-        if (i < d1_1) v(i+1) = _sd(i)
-        v
+        val u = new VectorD (d1)
+        u(i)  = _dg(i)
+        if (i > 0)    u(i-1) = _sd(i-1)
+        if (i < d1_1) u(i+1) = _sd(i)
+        u
     } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise on range ir and column-wise on range jr.
+     *  Ex: b = a(2..4, 3..5)
+     *  @param ir  the row range
+     *  @param jr  the column range
+     */
+    def apply (ir: Range, jr: Range): SymTriMatrixD = 
+    {
+        if (ir != jr) flaw ("apply", "requires same ranges to maintain symmetry")
+        slice (ir.start, ir.end)
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise on range ir and column-wise at index j.
+     *  Ex: u = a(2..4, 3)
+     *  @param ir  the row range
+     *  @param j   the column index
+     */
+    def apply (ir: Range, j: Int): VectorD = col(j)(ir)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise at index i and column-wise on range jr.
+     *  Ex: u = a(2, 3..5)
+     *  @param i   the row index
+     *  @param jr  the column range
+     */
+    def apply (i: Int, jr: Range): VectorD = this(i)(jr)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set this matrix's element at the i,j-th index position to the scalar x.
@@ -144,10 +176,163 @@ class SymTriMatrixD (val d1: Int)
     } // update
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set a slice this matrix row-wise on range ir and column-wise on range jr.
+     *  Ex: a(2..4, 3..5) = b
+     *  @param ir  the row range
+     *  @param jr  the column range
+     *  @param b   the matrix to assign
+     */
+    def update (ir: Range, jr: Range, b: SymTriMatrixD)
+    {
+        if (ir != jr) flaw ("update", "requires same ranges to maintain symmetry")
+        for (i <- ir) {
+            _dg(i) = b.dg(i - ir.start)
+            if (i > ir.start) _sd(i-1) = b.sd(i - ir.start - 1)
+        } // for
+    } // update
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set a slice this matrix row-wise on range ir and column-wise at index j.
+     *  Ex: a(2..4, 3) = u
+     *  @param ir  the row range
+     *  @param j   the column index
+     *  @param u   the vector to assign
+     */
+    def update (ir: Range, j: Int, u: VectorD) { col(j)(ir) = u }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set a slice this matrix row-wise at index i and column-wise on range jr.
+     *  Ex: a(2, 3..5) = u
+     *  @param i   the row index
+     *  @param jr  the column range
+     *  @param u   the vector to assign
+     */
+    def update (i: Int, jr: Range, u: VectorD) { this(i)(jr) = u }
+
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set all the elements in this matrix to the scalar x.
+     *  @param x  the scalar value to assign
+     */
+    def set (x: Double)
+    {
+        for (i <- range1) {
+            _dg(i) = x
+            if (i > 0) _sd(i) = x
+        } // for
+    } // set
+
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set all the values in this matrix as copies of the values in 2D array u.
+     *  @param u  the 2D array of values to assign
+     */
+    def set (u: Array [Array [Double]])
+    {
+        throw new NoSuchMethodException ("values for SymTriMatrixD should be diagonal")
+    } // set
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set this matrix's ith row starting at column j to the vector u.
+     *  @param i  the row index
+     *  @param u  the vector value to assign
+     *  @param j  the starting column index
+     */
+    def set (i: Int, u: VectorD, j: Int = 0)
+    {
+        throw new NoSuchMethodException ("values for SymTriMatrixD should be diagonal")
+    } // set
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Slice this matrix row-wise from to end.
+     *  @param from  the start row of the slice (inclusive)
+     *  @param end   the end row of the slice (exclusive)
+     */
+    def slice (from: Int, end: Int): SymTriMatrixD =
+    {
+        val c = new SymTriMatrixD (end - from)
+        for (i <- c.range1) {
+            c._dg(i) = _dg(i + from)
+            if (i > 0) c._sd(i - 1) = _sd(i + from - 1)
+        } // for
+        c
+    } // slice
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Slice this matrix row-wise r_from to r_end and column-wise c_from to c_end.
+     *  @param r_from  the start of the row slice
+     *  @param r_end   the end of the row slice
+     *  @param c_from  the start of the column slice
+     *  @param c_end   the end of the column slice
+     */
+    def slice (r_from: Int, r_end: Int, c_from: Int, c_end: Int): SymTriMatrixD =
+    {
+        throw new NoSuchMethodException ("SymTriMatrixD must be symmetric")
+    } // slice
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Slice this matrix excluding the given row and column.
+     *  @param row  the row to exclude
+     *  @param col  the column to exclude
+     */
+    def sliceExclude (row: Int, col: Int): SymTriMatrixD =
+    {
+        throw new NoSuchMethodException ("SymTriMatrixD does not support sliceExclude")
+    } // sliceExclude
+
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Select rows from this matrix according a basis.
+     *  @param basis  the row index positions (e.g., (0, 2, 5))
+     */
+    def selectRows (basis: Array [Int]): SymTriMatrixD =
+    {
+        throw new NoSuchMethodException ("SymTriMatrixD does not support selectRows")
+    } // selectRows
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get column 'c' from the matrix, returning it as a vector.
+     *  @param c     the column to extract from the matrix
+     *  @param from  the position to start extracting from
+     */
+    def col (c: Int, from: Int = 0): VectorD =
+    {
+        val u = new VectorD (dim1 - from)
+        for (i <- (from max c-1) until (dim1 min c+2)) u(i-from) = this(i, c)
+        u
+    } // col
+
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set column 'c' of the matrix to a vector.
+     *  @param c  the column to set
+     *  @param u  the vector to assign to the column
+     */
+    def setCol (c: Int, u: VectorD)
+    {
+        _dg(c) = u(c)
+        if (c > 0) _sd(c-1) = u(c-1)
+    } // setCol
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Select columns from this matrix according a basis.
+     *  @param basis  the column index positions (e.g., (0, 2, 5))
+     */
+    def selectCols (basis: Array [Int]): SymTriMatrixD =
+    {
+        throw new NoSuchMethodException ("SymTriMatrixD does not support selectCol")
+    } // selectCols
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Transpose this matrix (rows => columns).  Note, since the matrix is
      *  symmetric, it returns itself.
      */
     def t: SymTriMatrixD = this
+
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate this matrix and vector u.
+     *  @param u  the vector to be concatenated as the new last row in matrix
+     */
+    def ++ (u: VectorD): Matrix =
+    {
+        throw new NoSuchMethodException ("SymTriMatrixD does not support ++")
+    } // ++
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add this matrix and matrix b.
@@ -165,6 +350,12 @@ class SymTriMatrixD (val d1: Int)
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add this matrix and scalar x.
+     *  @param x  the scalar to add
+     */
+    def + (x: Double): Matrix = new SymTriMatrixD (_dg + x, _sd + x)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place this matrix and matrix b.
      *  @param b  the matrix to add (requires leDimensions)
      */
@@ -180,16 +371,10 @@ class SymTriMatrixD (val d1: Int)
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add this matrix and scalar s.
-     *  @param s  the scalar to add
+    /** Add in-place this matrix and scalar x.
+     * @param x  the scalar to add
      */
-    def + (s: Double): Matrix = new SymTriMatrixD (_dg + s, _sd + s)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add in-place this matrix and scalar s.
-     * @param s  the scalar to add
-     */
-    def += (s: Double) = { _dg += s; _sd += s }
+    def += (x: Double) = { _dg += x; _sd += x }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From this matrix subtract matrix b.
@@ -207,6 +392,12 @@ class SymTriMatrixD (val d1: Int)
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** From this matrix subtract scalar x.
+     *  @param x  the scalar to subtract
+     */
+    def - (x: Double): Matrix = new SymTriMatrixD (_dg - x, _sd - x)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From this matrix subtract in-place matrix b.
      *  @param b  the matrix to subtract (requires leDimensions)
      */
@@ -222,45 +413,152 @@ class SymTriMatrixD (val d1: Int)
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract scalar s.
-     *  @param s  the scalar to subtract
+    /** From this matrix subtract in-place scalar x.
+     *  @param x  the scalar to subtract
      */
-    def - (s: Double): Matrix = new SymTriMatrixD (_dg - s, _sd - s)
+    def -= (x: Double) = { _dg -= x; _sd -= x }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract in-place scalar s.
-     *  @param s  the scalar to subtract
+    /** Multiply this matrix by matrix b.
+     *  @param b  the matrix to multiply by
      */
-    def -= (s: Double) = { _dg -= s; _sd -= s }
+    def * (b: Matrix): Matrix = 
+    {
+        throw new NoSuchMethodException ("matrix multiplication not yet implemented")
+    } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector b.
-     *  @param b  the vector to multiply by
+    /** Multiply this matrix by vector u.
+     *  @param u  the vector to multiply by
      */
-    def * (b: VectorD): VectorD = 
+    def * (u: VectorD): VectorD = 
     {
         val c = new VectorD (d1)
-        c(0)  = b(0) * _dg(0) + _sd(0) * b(1)
+        c(0)  = u(0) * _dg(0) + _sd(0) * u(1)
         for (i <- 1 until d1_1) {
-            c(i) = _sd(i-1) * b(i-1)
-            c(i) = c(i) + _dg(i) * b(i)
-            c(i) = c(i) + _sd(i+1) * b(i+1)
+            c(i) = _sd(i-1) * u(i-1)
+            c(i) = c(i) + _dg(i) * u(i)
+            c(i) = c(i) + _sd(i+1) * u(i+1)
         } // for
-        c(d1-1) = _sd(d1-2) * b(d1-2) + _dg(d1-1) * b(d1-1)
+        c(d1-1) = _sd(d1-2) * u(d1-2) + _dg(d1-1) * u(d1-1)
         c
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by scalar s.
-     *  @param s  the scalar to multiply by
+    /** Multiply this matrix by scalar x.
+     *  @param x  the scalar to multiply by
      */
-    def * (s: Double): Matrix = new SymTriMatrixD (_dg * s, _sd * s)
+    def * (x: Double): Matrix = new SymTriMatrixD (_dg * x, _sd * x)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by scalar s.
-     *  @param s  the scalar to multiply by
+    /** Multiply in-place this matrix by matrix b
+     *  @param b  the matrix to multiply by
      */
-    def *= (s: Double) = { _dg *= s; _sd *= s }
+    def *= (b: Matrix)
+    {
+        throw new NoSuchMethodException ("inplace matrix multiplication not yet implemented")
+    } // *=
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply in-place this matrix by scalar x.
+     *  @param x  the scalar to multiply by
+     */
+    def *= (x: Double) = { _dg *= x; _sd *= x }
+
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply this matrix by vector u to produce another matrix (a_ij * u_j)
+     *  @param u  the vector to multiply by
+     */
+    def ** (u: VectorD): Matrix = 
+    {
+        throw new NoSuchMethodException ("matrix * vector -> matrix not implemented yet")
+    } // **
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply in-place this matrix by vector u to produce another matrix (a_ij * u_j)
+     *  @param u  the vector to multiply by
+     */
+    def **= (u: VectorD)
+    {
+        throw new NoSuchMethodException ("inplace matrix * vector -> matrix not implemented yet")
+    } // **=
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide this matrix by scalar x.
+     *  @param x  the scalar to divide by
+     */
+    def / (x: Double): Matrix = new SymTriMatrixD (_dg / x, _sd / x)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide in-place this matrix by scalar x.
+     *  @param x  the scalar to divide by
+     */
+    def /= (x: Double) = { _dg /= x; _sd /= x }
+
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Raise this matrix to the pth power (for some integer p >= 2).
+     *  @param p  the power to raise this matrix to
+     */
+    def ~^ (p: Int): MatrixD =
+    {
+        throw new NoSuchMethodException ("matrix power function (~^) not implemented")
+    } // ~^
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the maximum element in this matrix.
+     *  @param e  the ending row index (exclusive) for the search
+     */
+    def max (e: Int = dim1): Double = _dg(0 until e).max() max _sd(0 until e).max()
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the minimum element in this matrix.
+     *  @param e  the ending row index (exclusive) for the search
+     */
+    def min (e: Int = dim1): Double = _dg(0 until e).min() min _sd(0 until e).min()
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get the kth diagonal of this matrix.  Assumes dim2 >= dim1.
+     *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
+     */
+    def getDiag (k: Int = 0): VectorD =
+    {
+        if (k == 0) _dg
+        else if (abs (k) == 1) _sd
+        else { flaw ("getDiag", "nothing stored for diagonal " + k); null }
+    } // getDiag
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the kth diagonal of this matrix to the vector u.  Assumes dim2 >= dim1.
+     *  @param u  the vector to set the diagonal to
+     *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
+     */
+    def setDiag (u: VectorD, k: Int = 0)
+    {
+        if (k == 0) _dg = u
+        else if (abs (k) == 1) _sd = u
+        else flaw ("setDiag", "nothing stored for diagonal " + k)
+    } // setDiag
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the main diagonal of this matrix to the scalar x.  Assumes dim2 >= dim1.
+     *  @param x  the scalar to set the diagonal to
+     */
+    def setDiag (x: Double) { _dg.set (x) }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Clean values in matrix at or below the threshold by setting them to zero.
+     *  Iterative algorithms give approximate values and if very close to zero,
+     *  may throw off other calculations, e.g., in computing eigenvectors.
+     *  @param thres     the cutoff threshold (a small value)
+     *  @param relative  whether to use relative or absolute cutoff
+     */
+    def clean (thres: Double, relative: Boolean = true): Matrix =
+    {
+        val s = if (relative) mag else 1.             // use matrix magnitude or 1
+        for (i <- range_d) if (abs (_dg(i)) <= thres * s) _dg(i) = 0. 
+        for (i <- range_s) if (abs (_sd(i)) <= thres * s) _sd(i) = 0.
+        this
+    } // clean
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check whether this matrix is rectangular (all rows have the same number
@@ -275,7 +573,7 @@ class SymTriMatrixD (val d1: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for x in the equation a*x = d where a is this matrix
-     * @param d  the constant vector.
+     *  @param d  the constant vector.
      */
     def solve (d: VectorD): VectorD =
     {
@@ -318,34 +616,10 @@ class SymTriMatrixD (val d1: Int)
     } // detHelper
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get row 'r' from the matrix, returning it as a vector.
-     *  @param r     the row to extract from the matrix
-     *  @param from  the position to start extracting from
-     */
-    def row (r: Int, from: Int = 0): VectorD =
-    {
-        val u = new VectorD (dim2 - from)
-        for (j <- max (from, r-1) until min (dim2, r+2)) u(j-from) = this(r, j)
-        u
-    } // row
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get column 'c' from the matrix, returning it as a vector.
-     *  @param c     the column to extract from the matrix
-     *  @param from  the position to start extracting from
-     */
-    def col (c: Int, from: Int = 0): VectorD =
-    {
-        val u = new VectorD (dim1 - from)
-        for (i <- max (from, c-1) until min (dim1, c+2)) u(i-from) = this(i, c)
-        u
-    } // col
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the (right) nullspace of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., s*v*a = 0.  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace: VectorD =
@@ -358,7 +632,7 @@ class SymTriMatrixD (val d1: Int)
     /** Compute the (right) nullspace in-place of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., s*v*a = 0.  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace_ip: VectorD =
@@ -390,103 +664,58 @@ class SymTriMatrixD (val d1: Int)
      */
     def isNonnegative: Boolean = _dg.isNonnegative && _sd.isNonnegative
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the main diagonal of this matrix.  Assumes dim2 >= dim1.
-     */
-    def getDiag (): VectorD = _dg
-
     //--------------------------------------------------------------------------
     // The following methods are not useful for Symmetric Tridiagonal matrices:
     //--------------------------------------------------------------------------
 
-    def slice (from: Int, end: Int): Matrix = 
-    {
-        throw new NoSuchMethodException ("convert to other matrix type first")
-    } // slice
-
-    def slice (r_from: Int, r_end: Int, c_from: Int, c_end: Int): Matrix = 
-    {
-        throw new NoSuchMethodException ("convert to other matrix type first")
-    } // slice
-
-    def sliceExclude (row: Int, col: Int): Matrix =
-    {
-        throw new NoSuchMethodException ("convert to other matrix type first")
-    } // sliceExclude
-
-    def * (b: Matrix): Matrix = 
-    {
-        throw new Exception("convert to other matrix type first")
-    } // *
-
-    def *= (b: Matrix)
-    {
-        throw new Exception("convert to other matrix type first")
-    } // *=
-
-    def ** (b: VectorD): Matrix = 
-    {
-        throw new NoSuchMethodException ("convert to other matrix type first")
-    } // **
-
-    def **= (b: VectorD)
-    {
-        throw new NoSuchMethodException ("convert to other matrix type first")
-    } // **=
-
     def lud: Tuple2 [Matrix, Matrix] =
     {
-        throw new NoSuchMethodException ("not implemented")
+        throw new NoSuchMethodException ("lud not implemented")
     } // lud
 
     def lud_ip: Tuple2 [Matrix, Matrix] = 
     {
-        throw new NoSuchMethodException ("not implemented")
+        throw new NoSuchMethodException ("lud_ip not implemented")
     } // lud_ip
 
     def solve (l: Matrix, u: Matrix, b: VectorD): VectorD = 
     {
-        throw new NoSuchMethodException ("not implemented")
+        throw new NoSuchMethodException ("solve lu not implemented")
     } // solve
 
     def solve (lu: Tuple2 [Matrix, Matrix], b: VectorD): VectorD = 
     {
-        throw new NoSuchMethodException ("not implemented")
+        throw new NoSuchMethodException ("solve lu not implemented")
     } // solve
 
     def diag (b: Matrix): Matrix = 
     {
-        throw new NoSuchMethodException ("not implemented")
+        throw new NoSuchMethodException ("diag not implemented")
     } // diag
 
     def diag (p: Int, q: Int): Matrix = 
     {
-        throw new NoSuchMethodException("not implemented")
+        throw new NoSuchMethodException ("diag not implemented")
     } // diag
-
-    def inverse_npp: Matrix = 
-    {
-        throw new NoSuchMethodException("not implemented")
-    } // inverse_npp
 
     def inverse: Matrix = 
     {
-        throw new NoSuchMethodException("not implemented")
+        throw new NoSuchMethodException ("inverse: not implemented")
     } // inverse
 
     def inverse_ip: Matrix = 
     {
-        throw new NoSuchMethodException("not implemented")
+        throw new NoSuchMethodException ("inverse_ip not implemented")
     } // inverse_ip
 
     def reduce: Matrix = 
     {
-        throw new NoSuchMethodException("not implemented")
+        throw new NoSuchMethodException ("reduce not implemented")
     } // reduce
 
     def reduce_ip
     {
-        throw new NoSuchMethodException("not implemented")
+        throw new NoSuchMethodException ("reduce_ip not implemented")
     } // reduce_ip
 
 } // SymTriMatrixD class

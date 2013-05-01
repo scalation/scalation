@@ -8,7 +8,7 @@
 
 package scalation.linalgebra
 
-import math.{ceil, sqrt}
+import math.{ceil, max, sqrt}
 import util.Sorting.quickSort
 
 import scalation.math.DoubleWithExp._
@@ -34,6 +34,10 @@ class VectorD (val dim: Int,
     /** Range for the storage array
      */
     private val range = 0 until dim
+
+    /** Format string used for printing vector values (change using setFormat)
+     */
+    private var fString = "%12.6f"
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a vector from an array of values.
@@ -157,7 +161,7 @@ class VectorD (val dim: Int,
      *  @param r  the given range
      *  @param u  the vector to assign
      */
-    def update (r: Range, u: VectorD) { for (i <- r) v(i) = u(i) }
+    def update (r: Range, u: VectorD) { for (i <- r) v(i) = u(i - r.start) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set each value in this vector to x.
@@ -467,6 +471,11 @@ class VectorD (val dim: Int,
     def normalize: VectorD = this * (1./sum)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Normalize this vector so its length is one (unit vector).
+     */
+    def normalizeU: VectorD = this * (1./norm)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize this vector to have a maximum of one.
      */
     def normalize1: VectorD = this * (1./max ())
@@ -535,6 +544,11 @@ class VectorD (val dim: Int,
         for (i <- range) c.v(i) = if (b.v(i) < v(i)) b.v(i) else v(i)
         c
     } // min
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the element with the greatest magnitude in this vector.
+     */
+    def mag: Double = math.abs (max ()) max math.abs (min ())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the argument maximum of this vector (index of maximum element).
@@ -693,12 +707,18 @@ class VectorD (val dim: Int,
      */
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the format to the newFormat.
+     *  @param  newFormat  the new format string
+     */
+    def setFormat (newFormat: String) { fString = newFormat }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert this vector to a string.
      */
     override def toString: String = 
     {
         val sb = new StringBuilder ("VectorD (")
-        for (i <- range) { sb.append (v(i)); sb.append("\t") } 
+        for (i <- range) { sb.append (fString.format (v(i))); sb.append("\t") } 
         sb.replace (sb.length - 1, sb.length, ")").mkString
     } // toString
   
