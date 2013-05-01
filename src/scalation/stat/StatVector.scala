@@ -21,23 +21,19 @@ import scalation.random.Quantile.studentTInv
  *  @param dim       the dimension/size of the vector
  *  @param unbiased  whether the estimators are restricted to be unbiased.
  */
-class StatVector (dim: Int, unbiased: Boolean = false)
+class StatVector (dim: Int, private var unbiased: Boolean = false)
       extends VectorD (dim)
 {
     /** The number of samples
      */
     private val n = dim.toDouble
 
-    /** The denominator is one less for unbiased vs. maximum likelihood estimators
-     */
-    private val den = if (unbiased) n - 1. else n
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a StatVector from an Array.
      *  @param u  the array to initialize StatVector
     def this (u: Array [Double])
     {
-        this (u.length)              // invoke primary constructor
+        this (u.length)
         setAll (u)
     } // constructor
      */
@@ -50,7 +46,7 @@ class StatVector (dim: Int, unbiased: Boolean = false)
      */
     def this (u0: Double, u1: Double, u: Double*)
     {
-        this (u.length + 2)          // invoke primary constructor
+        this (u.length + 2)
         this(0) = u0; this(1) = u1
         for (i <- 2 until dim) this(i) = u(i - 2)
     } // constructor
@@ -61,9 +57,21 @@ class StatVector (dim: Int, unbiased: Boolean = false)
      */
     def this (u: VectorD)
     {
-        this (u.dim)                 // invoke primary constructor
+        this (u.dim)
         setAll (u())
     } // constructor
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Toggle/flip the bias flag for the estimators.
+     */
+    def toggleBias () { unbiased = ! unbiased }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The denominator for sample variance and covariance is one less for
+     *  unbiased (n-1) vs. maximum likelihood (n) estimators.  Also use n for
+     *  population statistics.
+     */
+    private def den: Double = if (unbiased) n - 1. else n
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the number of samples.
@@ -94,6 +102,19 @@ class StatVector (dim: Int, unbiased: Boolean = false)
     def cov (y: VectorD): Double = ((this dot y) - sum * y.sum / n) / den
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the k-lag auto-covariance of this vector.
+     *  @param k  the lag parameter
+     */
+    def acov (k: Int = 1): Double =
+    {
+        val mu  = mean
+        val num = dim - k
+        var sum = 0.
+        for (i <- 0 until num) sum += (v(i) - mu) * (v(i+k) - mu)
+        sum / num
+    } // acorr
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute Pearson's correlation of this vector with vector y.
      *  @param y  the other vector
      */
@@ -103,14 +124,7 @@ class StatVector (dim: Int, unbiased: Boolean = false)
     /** Compute the k-lag auto-correlation of this vector.
      *  @param k  the lag parameter
      */
-    def acorr (k: Int = 1): Double =
-    {
-        val mu  = mean
-        val num = dim - k
-        var sum = 0.
-        for (i <- 0 until num) sum += (v(i) - mu) * (v(i+k) - mu)
-        sum / (variance * num)
-    } // acorr
+    def acorr (k: Int = 1): Double = acov (k) / variance
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the standard deviation of this vector.

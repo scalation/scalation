@@ -24,8 +24,8 @@ class Anova (x: MatrixD)
 {
     private val m   = x.dim1                    // m rows (groups)
     private val n   = x.dim2                    // n columns (replicas)
-    private val md  = m.asInstanceOf [Double]   // m as a Double
-    private val nd  = n.asInstanceOf [Double]   // n as a Double
+    private val md  = m.toDouble                // m as a Double
+    private val nd  = n.toDouble                // n as a Double
             val dfg = md - 1.                   // degrees of freedom, group
             val dfe = md * nd - md              // degrees of freedom, error
             val mui = mu_i                      // vector of group means
@@ -84,7 +84,7 @@ class Anova (x: MatrixD)
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Returns the critcal value from the Fisher (F) Distribution.
      */
-    def f_crit = Quantile.fisherInv (.95, dfg.asInstanceOf [Int], dfe.asInstanceOf [Int])
+    def f_crit = Quantile.fisherInv (.95, dfg.toInt, dfe.toInt)
         
 } // Anova class
 

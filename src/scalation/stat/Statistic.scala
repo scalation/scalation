@@ -17,7 +17,7 @@ import scalation.util.Error
 /** This class is used to collect values and compute sample statistics on them
  *  (e.g., Waiting Time).  Contrast with TimeStatistic defined below.
  *  @param name      the name for this statistic (e.g., WatingTime or tellerQ)
- *  @param unbiased  whether the estimators are restricted to be unbiased.
+ *  @param unbiased  whether the estimators are restricted to be unbiased
  */
 class Statistic (val name: String = "stat", unbiased: Boolean = false)
       extends Error
@@ -41,10 +41,6 @@ class Statistic (val name: String = "stat", unbiased: Boolean = false)
     /** the maximum sample value
      */
     protected var maxX = 0.
-
-    /** The denominator is one less for unbiased vs. maximum likelihood estimators
-     */
-    private val den = (if (unbiased) n - 1. else n).toDouble
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Tally the next value and update accumulators.
@@ -80,9 +76,15 @@ class Statistic (val name: String = "stat", unbiased: Boolean = false)
     def mean: Double = if (n == 0) 0. else sum / n.toDouble
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute/estimate the sample variance.
+    /** Compute/estimate the sample variance.  The denominator is one less for
+     *  unbiased (n-1) vs. maximum likelihood (n) estimators.  Also use n for
+     *  population variance.
      */
-    def variance: Double = if (n == 0) 0. else sumSq / den - mean * mean
+    def variance: Double =
+    {
+        if (n == 0) 0.
+        else sumSq / (if (unbiased) n - 1. else n).toDouble - mean * mean
+    } // variance
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute/estimate the sample standard deviation.
