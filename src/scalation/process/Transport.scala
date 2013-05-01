@@ -32,9 +32,9 @@ class Transport (name: String, tripTime: Variate, from: Component, to: Component
 {
     initComponent (name, Array ())
 
-    /** A very small real number
+    /** A number close to zero
      */
-    private val EPSILON = .000001
+    private val EPSILON = 1E-7
 
     /** A shadow QCurve for computing locations as tokens move along the curve
      */

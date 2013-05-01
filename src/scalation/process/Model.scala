@@ -11,7 +11,7 @@ package scalation.process
 import actors.Actor
 import collection.mutable.{ListBuffer, PriorityQueue}
 
-import scalation.ModelT
+import scalation.model.ModelT
 import scalation.animation.{AnimateCommand, DgAnimator}
 import scalation.animation.CommandType._
 import scalation.random.{Uniform, Variate}

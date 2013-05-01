@@ -23,10 +23,18 @@ import scalation.util.Monitor.trace
  *  @param serviceTime  the service time distribution
  *  @param at           the location of the resource (x, y, w, h)
  */
-class Resource (name: String, line: WaitQueue, units: Int, serviceTime: Variate,
+class Resource (name: String, line: WaitQueue, private var units: Int, serviceTime: Variate,
                 at: Array [Double])
       extends Component
 {
+    if (units < 0) flaw ("constructor", "resource may not have negative units")
+
+    initComponent (name, at)
+
+    /** Number of service units of this Resource currently in use (0 ... units)
+     */
+    private var inUse = 0
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Auxiliary constructor that uses defaults for width (w) and height (h).
      *  @param name  the name of the resource
@@ -38,11 +46,17 @@ class Resource (name: String, line: WaitQueue, units: Int, serviceTime: Variate,
         this (name, line, units, serviceTime, Array (xy._1, xy._2, 40., 30.))
     } // constructor
 
-    initComponent (name, at)
-
-    /** Number of service units of this Resource currently in use
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Change the number of units in this resourse (e.g., add a teller).
+     *  @param dUnits  the number of units to add (+ve) or remove (-ve)
      */
-    private var inUse = 0
+    def changeUnits (dUnits: Int)
+    {
+        val actor = director.theActor
+        trace (this, "change units by " + dUnits, actor, actor.time)
+        if (units + dUnits >= inUse) units += dUnits
+        else flaw ("changeUnits", "attempt to reduce the resource to negative units")
+    } // changeUnits
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Tell the animation engine to display this Resource.
@@ -59,17 +73,38 @@ class Resource (name: String, line: WaitQueue, units: Int, serviceTime: Variate,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Utilize the Resource for a period of time (models an activity).
+     *  The duration (service time) is randomly generated according to the
+     *  Resource's service time distribution.
      */
     def utilize ()
     {
         if (busy) flaw ("utilize", "no units available")
         val actor    = director.theActor
-        val duration = serviceTime.gen
+        val duration = serviceTime.gen                   // randomly generate
         tally (duration)
         trace (this, "serves for " + duration, actor, actor.time)
         director.animate (actor, MoveToken, null, null, 
                  Array (at(0) + DIAM, at(1) + at(3) / 2. - RAD))
-        inUse += 1
+        if (inUse < units) inUse += 1
+        else flaw ("utilize", "no units left")
+        actor.schedule (duration)
+        actor.yieldToDirector ()
+    } // utilize
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Utilize the Resource for a given period of time (models an activity).
+     *  @param duration  the given service time
+     */
+    def utilize (duration: Double)
+    {
+        if (busy) flaw ("utilize", "no units available")
+        val actor    = director.theActor
+        tally (duration)
+        trace (this, "serves for " + duration, actor, actor.time)
+        director.animate (actor, MoveToken, null, null, 
+                 Array (at(0) + DIAM, at(1) + at(3) / 2. - RAD))
+        if (inUse < units) inUse += 1
+        else flaw ("utilize", "no units left")
         actor.schedule (duration)
         actor.yieldToDirector ()
     } // utilize
@@ -85,7 +120,8 @@ class Resource (name: String, line: WaitQueue, units: Int, serviceTime: Variate,
             val waitingActor = line.dequeue ()
             waitingActor.schedule (0.0)
         } // if
-        inUse -= 1
+        if (inUse > 0) inUse -= 1
+        else flaw ("release", "no units currently in use")
     } // release
 
 } // Resource
