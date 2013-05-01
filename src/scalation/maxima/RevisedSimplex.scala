@@ -33,10 +33,10 @@ import scalation.util.Error
 class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] = null)
       extends Error
 {
-    private val MAX_ITER = 100                          // maximum number of iterations
-    private val EPSILON  = 1.E-10                       // constant for a value almost 0
+    private val EPSILON  = 1E-9                         // number close to zero
     private val M        = a.dim1                       // number of constraints (rows in a)
     private val N        = a.dim2                       // number of original variables (columns in a)
+    private val MAX_ITER = 200 * N                      // maximum number of iterations
 
     if (b.dim != M) flaw ("constructor", "b.dim = " + b.dim + " != " + M)
     if (c.dim != N) flaw ("constructor", "c.dim = " + c.dim + " != " + N)

@@ -37,7 +37,7 @@ class CheckLP (a: MatrixD, b: VectorD, c: VectorD)
       extends Error
 {
     private val DEBUG   = true           // debug flag
-    private val EPSILON = 1.E-10         // a value that's almost zero
+    private val EPSILON = 1E-9           // number close to zero
     private val M       = a.dim1         // the number of constraints (row in a matrix)
     private val N       = a.dim2         // the number of decision variabels (columns in a matrix)
 

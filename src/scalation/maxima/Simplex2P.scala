@@ -54,7 +54,6 @@ import scalation.util.Error
 class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
       extends Error
 {
-    private val MAX_ITER = 100                 // maximum number of iterations
     private val DEBUG    = false               // if in DEBUG mode, show all pivot step
     private val M        = a.dim1              // the number of constraints (row)
     private val N        = a.dim2              // the number of decision variables
@@ -64,6 +63,7 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
 
     private var nn       = MpN + R + 1         // # columns in tableau
     private var jj       = nn - 1              // the last column (b)
+    private val MAX_ITER = 200 * N             // maximum number of iterations
     private var flip     = 1.                  // 1(slack) or -1(surplus) depending on b_i
 
     if (b.dim != M) flaw ("constructor", "b.dim = " + b.dim + " != " + M)
@@ -73,7 +73,7 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
     private var jr = -1                                  // index counter for artificial variables
     for (i <- 0 until M) {
          flip = if (b(i) < 0.) -1. else 1.
-         t.set (i, 0, a(i))                              // col x: constraint matrix a
+         t.set (i, a(i))                                 // col x: constraint matrix a
          t(i, N + i) = flip                              // col y: slack/surplus variable matrix s
          if (flip < 0) { jr += 1; t(i, MpN + jr) = 1. }  // col r: artificial variable matrix r
          t(i, jj) = b(i) * flip                          // col b: limit/RHS vector b

@@ -36,8 +36,8 @@ class ConjGradient (f: FunctionV2S, g: FunctionV2S = null, ineq: Boolean = true)
       extends Error
 {
     private val DEBUG    = true              // the debug flag
-    private val EPSILON  = 1.E-10            // a value that is close to zero
-    private val MAX_ITER = 100               // maximum number of iterations
+    private val EPSILON  = 1E-9              // number close to zero
+    private val MAX_ITER = 500               // maximum number of iterations
     private val WEIGHT   = 1000.             // weight on penalty for constraint violation
 
     private var df: Array [FunctionV2S] = null   // array of partials
