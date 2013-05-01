@@ -162,20 +162,57 @@ object Colors
     val yellow           = new Color (0xFFFF00)
     val yellowgreen      = new Color (0x9ACD32)
 
+    val hi = 0xE0        // high intensity
+    val md = 0x80        // mid intensity
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Based upon an object's id, generate (somewhat randomly) a color.
-     *  @param id  the identifier/index for some object
+    /** Based upon an object's id, generate (somewhat randomly) an RGB color.
+     *  It randomizes off of 27/25 base colors that include all the 16 colors
+     *  specified by W3C, except silver.
+     *  @see http://www.w3.org/TR/css3-color
+     *  @param id    the identifier/index for some object
+     *  @param full  whether to use all 27 color bases or exclude black and white
      */
-    def randomColor (id: Int) =
+    def randomColor (id: Int, full: Boolean = true) =
     {
-        val rc = Randi (0x1F, 0xB7)
-        id % 6 match {
-            case 0 => new Color (0xF7,    rc.igen, rc.igen)
-            case 1 => new Color (0xF7,    0xF7,    rc.igen)
-            case 2 => new Color (rc.igen, 0xF7,    rc.igen)
-            case 3 => new Color (rc.igen, 0xF7,    0xF7)
-            case 4 => new Color (rc.igen, rc.igen, 0xF7)
-            case _ => new Color (0xF7,    rc.igen, 0xF7)
+        val r     = Randi (0x0, 0x1F)
+        val bases = if (full) 27 else 25
+        id % bases match {
+            case  0 => new Color (hi+r.igen, r.igen,    r.igen)        // RED
+            case  1 => new Color (hi+r.igen, md+r.igen, r.igen)        // orange
+            case  2 => new Color (hi+r.igen, md+r.igen, md+r.igen)     // peach
+
+            case  3 => new Color (hi+r.igen, hi+r.igen, r.igen)        // YELLOW
+            case  4 => new Color (hi+r.igen, hi+r.igen, md+r.igen)     // light yellow
+            case  5 => new Color (md+r.igen, md+r.igen, r.igen)        // OLIVE
+
+            case  6 => new Color (md+r.igen, hi+r.igen, r.igen)        // Lime green
+            case  7 => new Color (md+r.igen, hi+r.igen, md+r.igen)     // light green
+            case  8 => new Color (r.igen,    hi+r.igen, r.igen)        // LIME
+
+            case  9 => new Color (r.igen,    hi+r.igen, md+r.igen)     // sea green
+            case 10 => new Color (r.igen,    md+r.igen, r.igen)        // GREEN
+            case 11 => new Color (r.igen,    md+r.igen, md+r.igen)     // TEAL
+
+            case 12 => new Color (md+r.igen, hi+r.igen, hi+r.igen)     // AQUA
+            case 13 => new Color (r.igen,    hi+r.igen, hi+r.igen)     // cyan
+            case 14 => new Color (r.igen,    md+r.igen, hi+r.igen)     // blue green
+
+            case 15 => new Color (md+r.igen, md+r.igen, hi+r.igen)     // periwinkle
+            case 16 => new Color (r.igen,    r.igen,    hi+r.igen)     // BLUE
+            case 17 => new Color (r.igen,    r.igen,    md+r.igen)     // NAVY
+
+            case 18 => new Color (md+r.igen, r.igen,    hi+r.igen)     // violet
+            case 19 => new Color (md+r.igen, r.igen,    md+r.igen)     // PURPLE
+            case 20 => new Color (hi+r.igen, r.igen,    hi+r.igen)     // FUCHSIA
+
+            case 21 => new Color (hi+r.igen, md+r.igen, hi+r.igen)     // pink
+            case 22 => new Color (md+r.igen, r.igen,    r.igen)        // MAROON
+            case 23 => new Color (hi+r.igen, r.igen,    md+r.igen)     // magenta
+
+            case 24 => new Color (md+r.igen, md+r.igen, md+r.igen)     // GRAY
+            case 25 => new Color (r.igen,    r.igen,    r.igen)        // BLACK
+            case 26 => new Color (hi+r.igen, hi+r.igen, hi+r.igen)     // WHITE
         } // match
     } // randomColor
 

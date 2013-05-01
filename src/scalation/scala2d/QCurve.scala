@@ -248,7 +248,7 @@ object QCurveCalc
 {
     /** Tolerance for comparing real numbers
      */
-    val EPSILON = 0.000001
+    private val EPSILON = 1E-7
 
     /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      * Compute the slope of the line defined by points p1 and p2.
