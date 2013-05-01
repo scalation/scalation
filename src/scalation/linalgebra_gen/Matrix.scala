@@ -283,9 +283,6 @@ trait Matrix [T]
     /** Get the main diagonal of this matrix.  Assumes dim2 >= dim1.
      */
     def getDiag (): VectorN [T]
-/*
-= for (i <- range1) yield this(i, i)
-*/
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the main diagonal of this matrix to the scalar value s.  Assumes dim2 >= dim1.
@@ -323,32 +320,19 @@ trait Matrix [T]
     /** Compute the (right) nullspace of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., s*v*a = 0.  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace (implicit fr: Fractional [T]): VectorN [T]
-/*
-    {
-        if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
-        reduce.col(dim2 - 1) * negate (one) ++ one
-    } // nullspace
-*/
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the (right) nullspace in-place of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., s*v*a = 0.  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace_ip (implicit fr: Fractional [T]): VectorN [T]
-/*
-    {
-        if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
-        reduce_ip
-        col(dim2 - 1) * negate (one) ++ one
-    } // nullspace_ip
-*/
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the trace of this matrix, i.e., the sum of the elements on the
@@ -356,38 +340,16 @@ trait Matrix [T]
      *  @see Eigen.scala
      */
     def trace: T
-/*
-    {
-        if ( ! isSquare) flaw ("trace", "trace only works on square matrices")
-        var sum = zero
-        for (i <- range1) sum += this(i, i)
-        sum
-    } // trace
-*/
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the sum of this matrix, i.e., the sum of its elements.
      */
     def sum: T
-/*
-    {
-        var sum = zero
-        for (i <- range1; j <- range2) sum += this(i, i)
-        sum
-    } // sum
-*/
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the sum of the lower triangular region of this matrix.
      */
     def sumLower: T
-/*
-    {
-        var sum = zero
-        for (i <- range1; j <- 0 until i) sum += this(i, i)
-        sum
-    } // sum
-*/
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the determinant of this matrix.
@@ -428,12 +390,6 @@ trait Matrix [T]
     /** Check whether this matrix is nonnegative (has no negative elements).
      */
     def isNonnegative: Boolean
-/*
-    {
-        for (i <- range1; j <- range2 if this(i, j) < zero) return false
-        true
-    } // isNonegative
-*/
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check whether this matrix is symmetric.

@@ -161,7 +161,7 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
         val c = new VectorD (dim)
         for (i <- range) c(i) = nu.toDouble (v(i))
         c
-    } // toInt
+    } // toDouble
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get this vector's element at the i-th index position. 
