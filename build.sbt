@@ -2,17 +2,22 @@ name := "scalation"
 
 version := "1.0"
 
+organization := "scalation"
+
 scalaVersion := "2.9.3"
+
+crossScalaVersions := Seq("2.9.2", "2.9.3")
 
 resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
 
-libraryDependencies += "com.typesafe.akka" % "akka-actor" % "2.0.3"
-
 libraryDependencies <+= scalaVersion { "org.scala-lang" % "scala-swing" % _ }
+
+libraryDependencies <+= scalaVersion { "org.scala-lang" % "scala-library" % _ }
+
+libraryDependencies <+= scalaVersion { "org.scala-lang" % "scala-compiler" % _ }
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-Xexperimental")
 
-sourceDirectory <<= baseDirectory( _ / "src" )
+sourceDirectory in Compile <<= baseDirectory( _ / "." )
 
-unmanagedSourceDirectories <<= baseDirectory( base => List("src", "examples") map (base / _ ))
-
+unmanagedSourceDirectories in Compile <<= baseDirectory(base => Seq("src", "examples") map (base / _))
