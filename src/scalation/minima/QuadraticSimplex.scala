@@ -39,12 +39,12 @@ class QuadraticSimplex (a: MatrixD, b: VectorD, q: MatrixD, c: VectorD, var x_B:
       extends Error
 {
     private val DEBUG    = true                      // if true, show each pivot
-    private val MAX_ITER = 100                       // maximum number of iterations
-    private val EPSILON  = 1.E-10                    // constant for a value almost 0
+    private val EPSILON  = 1E-9                      // number close to zero
     private val M        = a.dim1                    // number of constraints (rows in a)
     private val N        = a.dim2                    // number of original variables (columns in a)
     private val MM       = M + q.dim1                // # rows in tableau
     private val NN       = N + M + 2 * q.dim2 + 2    // # columns in tableau
+    private val MAX_ITER = 200 * N                   // maximum number of iterations
 
     if (b.dim != M) flaw ("constructor", "b.dim = " + b.dim + " != " + M)
     if (c.dim != N) flaw ("constructor", "c.dim = " + c.dim + " != " + N)
@@ -54,13 +54,13 @@ class QuadraticSimplex (a: MatrixD, b: VectorD, q: MatrixD, c: VectorD, var x_B:
      */
     private val t = new MatrixD (MM, NN)
     for (i <- 0 until M) {                 // fill the top part of the tableau
-        t.set (i, 0, a(i))                 // x: constraint matrix a
+        t.set (i, a(i))                    // x: constraint matrix a
         t(i, i+M+N) = 1.                   // y: slack identity matrix
         t(i, NN-1)  = b(i)                 // bc: constant vector b
     } // for
     for (i <- M until MM) {                // fill the bottom part of the tableau
-        t.set (i, 0, q(i-M) * -1.)         // x: cost matrix q (quadratic part)
-        t.set (i, N, a.col(i-M) * -1)      // w: multipliers for a x <= b (transpose of a)
+        t.set (i, q(i-M) * -1.)            // x: cost matrix q (quadratic part)
+        t.set (i, a.col(i-M) * -1, N)      // w: multipliers for a x <= b (transpose of a)
         t(i, i+M+N) = 1.                   // v: multipliers for a x >= 0
         t(i, NN-1)  = c(i-M)               // bc: cost vector c (linear part)
     } // for
@@ -209,7 +209,7 @@ class QuadraticSimplex (a: MatrixD, b: VectorD, q: MatrixD, c: VectorD, var x_B:
      */
     def showTableau
     {
-        println ("basis x_B = " + x_B)
+        println ("basis x_B = " + x_B.deep)
         println ("tableau t = " + t)
     } // showTableau
 

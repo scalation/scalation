@@ -44,7 +44,7 @@ class IntegerLP (a: MatrixD, b: VectorD, c: VectorD, excl: Set [Int] = Set ())
 {
     type Constraints = Tuple2 [MatrixD, VectorD]    // a x <= b (-b_i for >=)
 
-    private val EPSILON = 1E-10                     // a value almost zero
+    private val EPSILON = 1E-9                      // number close to zero
     private val M       = a.dim1                    // # rows in the original constraint matrix
     private val N       = a.dim2                    // # columns in the original constraint matrix
                                                     // N = # decision variables

@@ -8,6 +8,8 @@
 
 package scalation.minima
 
+// U N D E R   D E V E L O P M E N T
+
 import math.max
 import util.control.Breaks.{breakable, break}
 

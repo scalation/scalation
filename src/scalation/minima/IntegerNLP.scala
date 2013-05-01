@@ -16,21 +16,20 @@ import scalation.calculus.Calculus.FunctionV2S
 import scalation.linalgebra.VectorD
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class solves Integer Linear Programming (ILP) and Mixed Integer
- *  Linear Programming (MILP) problems recursively using the Simplex algorithm.
- *  First, an LP problem is solved.  If the optimal solution vector x is
- *  entirely integer valued, the ILP is solved.  If not, pick the first x_j
- *  that is not integer valued.  Define two new LP problems which bound x_j
+/** This class solves Integer Non-Linear Programming (INLP) and Mixed Integer
+ *  Linear Non-Programming (MINLP) problems recursively using the Simplex algorithm.
+ *  First, an NLP problem is solved.  If the optimal solution vector x is
+ *  entirely integer valued, the INLP is solved.  If not, pick the first x_j
+ *  that is not integer valued.  Define two new NLP problems which bound x_j
  *  to the integer below and above, respectively.  Branch by solving each of
- *  these LP problems in turn.  Prune by not exploring branches less optimal
+ *  these NLP problems in turn.  Prune by not exploring branches less optimal
  *  than the currently best integer solution.  This technique is referred to
  *  as Branch and Bound.  An exclusion set may be optionally provided for
- *  MILP problems.
- *  TODO: Use the Dual Simplex Algorithm for better performance.
+ *  MINLP problems.
  *
- *  Given a constraint matrix 'a', limit/RHS vector 'b' and cost vector 'c',
- *  find values for the solution/decision vector 'x' that maxmize the
- *  objective function f(x), while satisfying all of the constraints, i.e.,
+ *  Given an objective function f(x) and a constraint function g(x),
+ *  find values for the solution/decision vector 'x' that minimize the
+ *  objective function f(x), while satisfying the constraint function, i.e.,
  *
  *  minimize    f(x) 
  *  subject to  g(x) <= 0, some x_i must integer-valued
@@ -43,7 +42,7 @@ import scalation.linalgebra.VectorD
  */
 class IntegerNLP (f: FunctionV2S, n: Int, var g: FunctionV2S = null, excl: Set [Int] = Set ())
 {
-    private val EPSILON = 1E-6                     // a value almost zero
+    private val EPSILON = 1E-7                     // number close to zero
     private val SQRT_EPSILON = sqrt (EPSILON)      // square root of EPSILON
 
     // best integer solution so far

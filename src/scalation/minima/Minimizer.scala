@@ -28,9 +28,9 @@ import scalation.linalgebra.VectorD
  */
 trait Minimizer
 {
-    val EPSILON  = 1.E-9             // a value that is close to zero
-    val STEP     = 1.                // default initial step size
-    val MAX_ITER = 200               // maximum number of major steps/iterations 
+    protected val EPSILON  = 1E-9          // number close to zero
+    protected val STEP     = 1.            // default initial step size
+    protected val MAX_ITER = 500           // maximum number of major steps/iterations 
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The objective function f plus a weighted penalty based on the constraint

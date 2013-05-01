@@ -14,7 +14,7 @@ package scalation.minima
  */
 trait LineSearch
 {
-    val EPSILON = 1.E-6                     // a value that is almost zero
+    protected val EPSILON = 1E-7             // number close to zero
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform Line Search (LS) using a line search algorithm.
