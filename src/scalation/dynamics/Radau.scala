@@ -8,6 +8,8 @@
  *  @see     http://www.dm.uniba.it/~testset/solvers/radau5.php
  */
 
+// U N D E R   D E V E L O P M E N T
+
 package scalation.dynamics
 
 import math.sqrt
@@ -25,14 +27,14 @@ object Radau
 {
     import Derivatives._
 
-    val EPSILON  = 1E-6
-    val MAX_ITER = 100
-    val root6    = sqrt (6.)
-    val _1_3     = 1. / 3.
-    val _1_4     = 1. / 4.
-    val _3_4     = 3. / 4.
-    val _1_12    = 1. / 12.
-    val _5_12    = 5. / 12.
+    private val EPSILON  = 1E-7
+    private val MAX_ITER = 100
+    private val root6    = sqrt (6.)
+    private val _1_3     = 1. / 3.
+    private val _1_4     = 1. / 4.
+    private val _3_4     = 3. / 4.
+    private val _1_12    = 1. / 12.
+    private val _5_12    = 5. / 12.
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /**
