@@ -59,21 +59,21 @@ object NLPTestCases1 extends App
     def test1 
     {
         println ("\nMinimize f(x)  = (x_0 - 3)^2 + (x_1 - 4)^2 + 1")
-        def f (x: VectorD): Double = (x(0) - 3.) * (x(0) - 3.) + (x(1) - 4.) * (x(1) - 4.) + 1.
+        def f (x: VectorD): Double = (x(0) - 3.0) * (x(0) - 3.0) + (x(1) - 4.0) * (x(1) - 4.0) + 1.0
         test (f, 2)
     } // test1
 
     def test2 
     {
         println ("\nMinimize f(x)  = (x_0 - 30)^2 + (x_1 - 40)^2 + 1")
-        def f (x: VectorD): Double = (x(0) - 30.) * (x(0) - 30.) + (x(1) - 40.) * (x(1) - 40.) + 1.
+        def f (x: VectorD): Double = (x(0) - 30.0) * (x(0) - 30.0) + (x(1) - 40.0) * (x(1) - 40.0) + 1.0
         test (f, 2)
     } // test2
 
     def test3
     {
         println ("\nMinimize f(x)  = x_0^4 + (x_0 - 3)^2 + (x_1 - 4)^2 + 1")
-        def f (x: VectorD): Double = pow (x(0), 4.) + (x(0) - 3.) * (x(0) - 3.) + (x(1) - 4.) * (x(1) - 4.) + 1.
+        def f (x: VectorD): Double = pow (x(0), 4.0) + (x(0) - 3.0) * (x(0) - 3.0) + (x(1) - 4.0) * (x(1) - 4.0) + 1.0
         test (f, 2)
     } // test3
 
@@ -81,8 +81,8 @@ object NLPTestCases1 extends App
     def test4
     {
         println ("\nMinimize f(x)  = x_0/4 + 5x_0^2 + x_0^4 - 9x_0^2 x_1 + 3x_1^2 + 2x_1^4")
-        def f (x: VectorD): Double = x(0)/4. + 5.*x(0)*x(0) + pow(x(0),4) -
-                                     9.*x(0)*x(0)*x(1) + 3.*x(1)*x(1) + 2.*pow(x(1),4)
+        def f (x: VectorD): Double = x(0)/4.0 + 5.0*x(0)*x(0) + pow(x(0),4) -
+                                     9.0*x(0)*x(0)*x(1) + 3.0*x(1)*x(1) + 2.0*pow(x(1),4)
         test (f, 2)
     } // test4
 
@@ -137,8 +137,8 @@ object NLPTestCases2 extends App
     {
         val f_str =  "f(x) = (x_0 - 3)^2 + (x_1 - 4)^2 + 1"
         val g_str =  "g(x) = x_0 <= 1"
-        def f (x: VectorD) = (x(0) - 3.)~^2 + (x(1) - 4.)~^2 + 1.
-        def g (x: VectorD) = x(0) - 1.
+        def f (x: VectorD) = (x(0) - 3.0)~^2 + (x(1) - 4.0)~^2 + 1.0
+        def g (x: VectorD) = x(0) - 1.0
         test (f, g, 2, f_str, g_str)
     } // test0
 
@@ -146,7 +146,7 @@ object NLPTestCases2 extends App
     {
         val f_str = "f(x)  = 100(x_1 - x_0^2)^2 + (1 - x_0)^2"
         val g_str = "g(x)  = x_1 >= -1.5"
-        def f (x: VectorD) = 100. * (x(1) - x(0)~^2)~^2 + (1. - x(0))~^2
+        def f (x: VectorD) = 100.0 * (x(1) - x(0)~^2)~^2 + (1.0 - x(0))~^2
         def g (x: VectorD) = -x(1) - 1.5
         test (f, g, 2, f_str, g_str)
     } // test1

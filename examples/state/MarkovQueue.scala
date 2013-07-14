@@ -15,8 +15,8 @@ import scalation.linalgebra.MatrixD
 
 /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  * This object finds the steady-state solution and simulates a simple Markovian
- * Queue (an M/M/1/2) where the arrival rate is 4 and the service rate is 5.
- * Note, each diagonal value must make their row sum to 0.
+ * Queue (an M/M/1/2) where the arrival rate is 4 and the service rate is 5.0
+ * Note, each diagonal value must make their row sum to 0.0
  * @see scalation.state.MarkovTest, scalation.state.MarkovCTest for example
  * test code for discrete-time and continuous-time Markov chains, respectively.
  */
@@ -24,9 +24,9 @@ object MarkovQueue extends App
 {
     /** The transition rate matrix
      */
-    private val trMatrix = new MatrixD ((3, 3), -4.,  4.,  0.,
-                                                 5., -9.,  4.,
-                                                 0.,  5., -5.)
+    private val trMatrix = new MatrixD ((3, 3), -4.0,  4.0,  0.0,
+                                                 5.0, -9.0,  4.0,
+                                                 0.0,  5.0, -5.0)
 
     println ("\nTransition Rate Matrix trMatrix = " + trMatrix + "\n")
 
@@ -41,7 +41,7 @@ object MarkovQueue extends App
     println ("\nsteady-state \tp = " + mc.limit)
 
     println ("\nContinuous-Time Markov Chain: simulation:")
-    mc.simulate (0, 100.)
+    mc.simulate (0, 100.0)
 
 } // MarkovQueue object
 

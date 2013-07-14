@@ -38,8 +38,8 @@ class WolfeLS (f: FunctionS2S, c1: Double = .0001, c2: Double = .9)
 {
     private val DEBUG    = false                 // debug flag
     private val MAX_ITER = 20                    // maximum number of iterations
-    private val f0       = f(0.)                 // functional value at the origin
-    private val df0      = derivative (f, 0.)    // derivative at the origin f'(0)
+    private val f0       = f(0.0)                 // functional value at the origin
+    private val df0      = derivative (f, 0.0)    // derivative at the origin f'(0)
     private val c1_df0   = c1 * df0              // pre-multiplication for Wolfe condition 1
     private val c2_df0   = c2 * df0              // pre-multiplication for Wolfe condition 2
 
@@ -47,7 +47,7 @@ class WolfeLS (f: FunctionS2S, c1: Double = .0001, c2: Double = .9)
     /** Perform an inexact Line Search (LS) using the Wolfe approach with defaults.
      *  @param step  the initial step size
      */
-    def search (step: Double = 1.): Double = lsearch (step)
+    def search (step: Double = 1.0): Double = lsearch (step)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform an inexact Line Search (LS) on the function 'f' to find a point
@@ -56,7 +56,7 @@ class WolfeLS (f: FunctionS2S, c1: Double = .0001, c2: Double = .9)
      *  @param lo0   the lower bound for x
      *  @param weak  whether to use the weak (true) or strong (false) Wolfe conditions
      */
-    def lsearch (x0: Double = 1., lo0: Double = 0., weak: Boolean = true): Double =
+    def lsearch (x0: Double = 1.0, lo0: Double = 0.0, weak: Boolean = true): Double =
     {
         var lo  = lo0
         var x   = x0
@@ -73,7 +73,7 @@ class WolfeLS (f: FunctionS2S, c1: Double = .0001, c2: Double = .9)
                 lo = x
             else return x                                   // both conditions satisfied
 
-            x  = if (hi < Double.PositiveInfinity) (lo + hi) / 2. else x + x
+            x  = if (hi < Double.PositiveInfinity) (lo + hi) / 2.0 else x + x
             fx = f(x); dfx = derivative (f, x)              // recompute f(x) and f'(x)
             if (DEBUG) println ("WolfeLS.search: (k = " + k + ") x = " + x + ", f(x) = " + fx)
         } // for
@@ -88,8 +88,8 @@ class WolfeLS (f: FunctionS2S, c1: Double = .0001, c2: Double = .9)
  */
 object WolfeLSTest extends App
 {
-    def f (x: Double): Double = (x - 4.) * (x - 4.) + 1.         // no expansion phase
-//  def f (x: Double): Double = (x - 40.) * (x - 40.) + 1.       // requires expansion phase
+    def f (x: Double): Double = (x - 4.0) * (x - 4.0) + 1.0         // no expansion phase
+//  def f (x: Double): Double = (x - 40.0) * (x - 40.0) + 1.0       // requires expansion phase
     val solver = new WolfeLS (f)
     println ("\nProblem 1: (x - 40)^2 + 1") 
     println ("optimal solution = " + solver.search ())
@@ -102,15 +102,15 @@ object WolfeLSTest extends App
  */
 object WolfeLSTest2 extends App
 {
-    val zo   = new VectorD (0., 0.)                       // zero vector, the origin
-    val dir  = new VectorD (1., 1.)                       // direction to search in
-    var y    = 0.
+    val zo   = new VectorD (0.0, 0.0)                       // zero vector, the origin
+    val dir  = new VectorD (1.0, 1.0)                       // direction to search in
+    var y    = 0.0
     var x    = zo
 
-    def f (x: VectorD): Double  = (x(0) - 2.) * (x(0) - 2.) + (x(1) - 3.) * (x(1) - 3.) + 1.
+    def f (x: VectorD): Double  = (x(0) - 2.0) * (x(0) - 2.0) + (x(1) - 3.0) * (x(1) - 3.0) + 1.0
     def g (y: Double): Double = f(zo + dir * y)
-    def f2 (x: VectorD): Double = x(0)/4. + 5.*x(0)*x(0) + pow(x(0),4) -
-                                  9.*x(0)*x(0)*x(1) + 3.*x(1)*x(1) + 2.*pow(x(1),4)
+    def f2 (x: VectorD): Double = x(0)/4.0 + 5.0 * x(0)*x(0) + pow(x(0),4) -
+                                  9.0 *x(0)*x(0)*x(1) + 3.0 * x(1)*x(1) + 2.0*pow(x(1),4)
     def g2 (y: Double): Double = f2(zo + dir * y)
 
     val solver  = new WolfeLS (g)

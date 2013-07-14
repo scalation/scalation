@@ -26,16 +26,16 @@ object Householder
      */
     def house (x: VectorD): Tuple2 [VectorD, Double] =
     {
-        var b = 0.                                    // Householder scalar
+        var b = 0.0                                    // Householder scalar
         val v = new VectorD (x)                       // Householder vector
-        v(0)  = 1.                                    // reset first element to 1
-        val s = (v dot v) - 1.                        // sigma
-        if (s != 0.) {
+        v(0)  = 1.0                                    // reset first element to 1
+        val s = (v dot v) - 1.0                        // sigma
+        if (s != 0.0) {
             val y = x(0)
             val m = sqrt (y*y + s)                    // mu
             val z = if (y <= 0) y - m else -s / (y + m)
             v(0) = z
-            b = 2.*z*z / (s + z*z)
+            b = 2.0*z*z / (s + z*z)
             v /= z
         } // if
         Tuple2 (v, b)                         // return Householder vector & scalar
@@ -62,7 +62,7 @@ object Householder
     def houseR (x: VectorD): MatrixD =
     {
         val u = houseV (x)                     // unit Householder vector
-        eye (x.dim) - outer (u, u*2.)          // I - 2 * outer product
+        eye (x.dim) - outer (u, u*2.0)          // I - 2 * outer product
     } // houseR
 
 } // Householder object
@@ -76,8 +76,8 @@ object HouseholderTest extends App
 {
     import Householder.{house, houseR, houseV}
 
-    val x = new VectorD (2., 4., 6.)
-    val y = new VectorD (1., 2., 3., 4.)
+    val x = new VectorD (2.0, 4.0, 6.0)
+    val y = new VectorD (1.0, 2.0, 3.0, 4.0)
     
     println ("x          = " + x)
     println ("house (x)  = " + house (x))

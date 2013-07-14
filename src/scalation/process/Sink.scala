@@ -30,7 +30,7 @@ class Sink (name: String, at: Array [Double])
      */
     def this (name: String, xy: Tuple2 [Double, Double])
     {
-        this (name, Array (xy._1, xy._2, 30., 30.))
+        this (name, Array (xy._1, xy._2, 30.0, 30.0))
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -50,7 +50,7 @@ class Sink (name: String, at: Array [Double])
         tally (0.0)
         trace (this, "terminates", actor, actor.time)
         director.animate (actor, MoveToken, null, null, 
-                 Array (at(0) + DIAM, at(1) + at(3) / 2. - RAD))
+                 Array (at(0) + DIAM, at(1) + at(3) / 2.0 - RAD))
         actor.yieldToDirector (true)
     } // leave
     

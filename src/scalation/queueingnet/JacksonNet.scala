@@ -32,7 +32,7 @@ class JacksonNet (p: MatrixD, r: VectorD, mu: VectorD, private var k: Array [Int
 
      /** Identity matrix
       */
-     private val ident = new MatrixD (m, 1., 0.)
+     private val ident = new MatrixD (m, 1.0, 0.0)
 
      /** Effective arrival rates at each node
       */
@@ -70,7 +70,7 @@ class JacksonNet (p: MatrixD, r: VectorD, mu: VectorD, private var k: Array [Int
      {
          val rok = ro * kk
          val sum = (for (i <- 0 until kk) yield rok~^i / fac (i)).sum
-         1. / (sum + rok~^kk / (fac (kk) * (1. - ro)))
+         1.0 / (sum + rok~^kk / (fac (kk) * (1.0 - ro)))
      } // pi_0
 
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -81,7 +81,7 @@ class JacksonNet (p: MatrixD, r: VectorD, mu: VectorD, private var k: Array [Int
      {
         val ro = rho(j)
         val kk = k(j)
-        pi_0 (ro, kk) * kk~^kk * ro~^(kk+1) / (fac (kk) * (1. - ro)~^2)
+        pi_0 (ro, kk) * kk~^kk * ro~^(kk+1) / (fac (kk) * (1.0 - ro)~^2)
      } // nQueue
 
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -91,7 +91,7 @@ class JacksonNet (p: MatrixD, r: VectorD, mu: VectorD, private var k: Array [Int
      def nQueue1 (j: Int): Double = 
      {
         val ro = rho(j)
-        ro~^2 / (1. - ro)
+        ro~^2 / (1.0 - ro)
      } // nQueue1
 
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -123,10 +123,10 @@ class JacksonNet (p: MatrixD, r: VectorD, mu: VectorD, private var k: Array [Int
  */
 object JacksonNetTest extends App
 {
-    val p  = new MatrixD ((2, 2), 0., 1.,
-                                  0., 0.)
-    val r  = new VectorD (5., 0.)
-    val mu = new VectorD (8., 10.)
+    val p  = new MatrixD ((2, 2), 0.0, 1.0,
+                                  0.0, 0.0)
+    val r  = new VectorD (5.0, 0.0)
+    val mu = new VectorD (8.0, 10.0)
 
     val jqn = new JacksonNet (p, r, mu)
     jqn.check

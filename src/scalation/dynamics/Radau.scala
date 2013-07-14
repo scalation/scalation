@@ -29,28 +29,28 @@ object Radau
 
     private val EPSILON  = 1E-7
     private val MAX_ITER = 100
-    private val root6    = sqrt (6.)
-    private val _1_3     = 1. / 3.
-    private val _1_4     = 1. / 4.
-    private val _3_4     = 3. / 4.
-    private val _1_12    = 1. / 12.
-    private val _5_12    = 5. / 12.
+    private val root6    = sqrt (6.0)
+    private val _1_3     = 1.0 / 3.0
+    private val _1_4     = 1.0 / 4.0
+    private val _3_4     = 3.0 / 4.0
+    private val _1_12    = 1.0 / 12.0
+    private val _5_12    = 5.0 / 12.0
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /**
      */
     def integrate (f: Derivative, y0: Double, t: Double,
-                   t0: Double = 0., step: Double = defaultStepSize): Double =
+                   t0: Double = 0.0, step: Double = defaultStepSize): Double =
     {
         // TBD
-        0.
+        0.0
     } // integrate
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /**
      */
     def integrateVV (f: Array [DerivativeV], y0: VectorD, t: Double,
-                     t0: Double = 0., step: Double = defaultStepSize): VectorD =
+                     t0: Double = 0.0, step: Double = defaultStepSize): VectorD =
     {
         // TBD
         null
@@ -85,8 +85,8 @@ object Radau
         var yn    = yn_1 + fn_1 * h
 
         val jacob = jacobian (f, yn_1, tn_1)
-        val ident = new MatrixD (f.length, 1., 0.)
-        val lu    = ident - jacob * (root6 * h / 6.)
+        val ident = new MatrixD (f.length, 1.0, 0.0)
+        val lu    = ident - jacob * (root6 * h / 6.0)
 
         breakable { for (k <- 1 to MAX_ITER) {
             val fg = new VectorD (f.length)
@@ -94,12 +94,12 @@ object Radau
             val fy = new VectorD (f.length)
             for (i <- 0 until f.length) fy(i) = f(i) (tn, yn)
             val dg = lu.inverse * (yn_1 - gn + fg * h5_12 - fy * h1_12)
-            val dy = lu.inverse * (dg * (4. * root6 - 8.) + yn_1 - yn + fg * h3_4 + fy * h1_4)
+            val dy = lu.inverse * (dg * (4.0 * root6 - 8.0) + yn_1 - yn + fg * h3_4 + fy * h1_4)
     
             if (dy.norm < EPSILON) break
     
             gn += dg
-            yn += dg * (8. - 4. * root6) + dy
+            yn += dg * (8.0 - 4.0 * root6) + dy
         }} // for
 
         println ("yn = " + yn)

@@ -61,7 +61,7 @@ class Simplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int])
     private val NN       = MpN + 1             // # columns in tableau
     private val JJ       = NN - 1              // the last column (b)
     private val MAX_ITER = 200 * N             // maximum number of iterations
-    private var flip     = 1.                  // 1(slack) or -1(surplus) depending on b_i
+    private var flip     = 1.0                  // 1(slack) or -1(surplus) depending on b_i
 
     if (b.dim != M) flaw ("constructor", "b.dim = " + b.dim + " != " + M)
     if (c.dim != N) flaw ("constructor", "c.dim = " + c.dim + " != " + N)
@@ -69,7 +69,7 @@ class Simplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int])
 
     private val t = new MatrixD (MM, NN)             // the MM-by-NN simplex tableau
     for (i <- 0 until M) {
-         flip = if (b(i) < 0.) -1. else 1.
+         flip = if (b(i) < 0.0) -1.0 else 1.0
          t.set (i, a(i))                             // col x: constraint matrix a
          t(i, N+i) = flip                            // col y: slack/surplus variable matrix s
          t(i, JJ)  = b(i) * flip                     // col b: limit/RHS vector b
@@ -109,7 +109,7 @@ class Simplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int])
     {
         val b_ = t.col (JJ)                                      // updated b column (RHS)
         var k  = -1
-//      for (i <- 0 until M if t(i, l) > 0.) {                   // find the pivot row
+//      for (i <- 0 until M if t(i, l) > 0.0) {                   // find the pivot row
         for (i <- 0 until M if t(i, l) > EPSILON) {              // find the pivot row
             if (k == -1) k = i
             else if (b_(i) / t(i, l) <= b_(k) / t(k, l)) k = i   // lower ratio => reset k
@@ -249,11 +249,11 @@ object SimplexTest extends App
      */
     def test1 ()
     {
-        val a = new MatrixD ((3, 3), 1., 1.,  2.,       // constraint matrix
-                                     1., 1., -1.,
-                                    -1., 1.,  1.)
-        val c   = new VectorD       (1., 1., -4.)       // cost vector
-        val b   = new VectorD (9., 2., 4.)              // constant vector
+        val a = new MatrixD ((3, 3), 1.0, 1.0,  2.0,       // constraint matrix
+                                     1.0, 1.0, -1.0,
+                                    -1.0, 1.0,  1.0)
+        val c   = new VectorD       (1.0, 1.0, -4.0)       // cost vector
+        val b   = new VectorD (9.0, 2.0, 4.0)              // constant vector
         val x_B = Array (3, 4, 5)                       // starting basis
         test (a, b, c, x_B)
     } // test1
@@ -265,11 +265,11 @@ object SimplexTest extends App
      */
     def test2 ()
     {
-        val a = new MatrixD ((3, 3), 1., 1.,  1.,       // constraint matrix
-                                    -1., 2., -2.,
-                                     2., 1.,  0)
-        val c = new VectorD        (-1., -2., 1.)       // cost vector
-        val b = new VectorD (4., 6., 5.)                // constant vector
+        val a = new MatrixD ((3, 3), 1.0, 1.0,  1.0,       // constraint matrix
+                                    -1.0, 2.0, -2.0,
+                                     2.0, 1.0,  0)
+        val c = new VectorD        (-1.0, -2.0, 1.0)       // cost vector
+        val b = new VectorD (4.0, 6.0, 5.0)                // constant vector
         val x_B = Array (3, 4, 5)                       // starting basis
         test (a, b, c, x_B)
     } // test2
@@ -285,8 +285,8 @@ object SimplexTest extends App
         val b = new VectorD (m)
         val c = new VectorD (n)
         for (i <- 0 until m; j <- 0 until n) a(i, j) = rn.igen
-        for (i <- 0 until m) b(i) = 100. * (rn.igen + 1)
-        for (j <- 0 until n) c(j) = -10. * (rn.igen + 1)
+        for (i <- 0 until m) b(i) = 100.0 * (rn.igen + 1)
+        for (j <- 0 until n) c(j) = -10.0 * (rn.igen + 1)
         test (a, b, c, null)
     } // test3
 

@@ -122,7 +122,7 @@ class Transition (val x: Double, val y: Double, firingDist: Variate, colors: Arr
 
     /** The firing delay for this transition
      */
-    var firingDelay: Double = 0.
+    var firingDelay: Double = 0.0
 
     /** Token vector for transition
      */
@@ -365,7 +365,7 @@ class Transition (val x: Double, val y: Double, firingDist: Variate, colors: Arr
  *  @param scaleFactor  the scale factor for the firing delay
  */
 class ArcI (val place: PlaceI, val transition: Transition, incoming: Boolean, val minTokens: VectorI,
-            rates: VectorI = null, testArc: Boolean = false, scaleFactor: Double = 1.)
+            rates: VectorI = null, testArc: Boolean = false, scaleFactor: Double = 1.0)
       extends PetriNetRules with Identity
 {
     {
@@ -403,7 +403,7 @@ class ArcI (val place: PlaceI, val transition: Transition, incoming: Boolean, va
  */
 class ArcD (val place: PlaceD, val transition: Transition, incoming: Boolean, val minFluids: VectorD,
             rates: VectorD = null, derv: Array [Derivative] = null, testArc: Boolean = false,
-            scaleFactor: Double = 1.)
+            scaleFactor: Double = 1.0)
       extends PetriNetRules with Identity
 {
     {
@@ -467,7 +467,7 @@ class PetriNet (colors: Array [Color], placeI: Array [PlaceI], placeD: Array [Pl
 
     /** The current time
      */
-    private var _clock = 0.
+    private var _clock = 0.0
 
     /** The Petri net directed graph animator
      */
@@ -532,14 +532,14 @@ class PetriNet (colors: Array [Color], placeI: Array [PlaceI], placeD: Array [Pl
      *                             i.e., discrete-places, continuous-places, transitions and arcs
      */
     def initAnimation (gColors: Array [Color] = Array (yellow, gold, silver, lightyellow),
-                       timeDilationFactor: Double = 1000.)
+                       timeDilationFactor: Double = 1000.0)
     {
         println ("PetriNet.initAnimation: begin drawing the Petri net graph")
 
         //:: Draw the discrete places along with their initial tokens.
 
         cqueue += AnimateCommand (TimeDilation, -1, null, null, true, null,
-                                  Array [Double] (timeDilationFactor), 0.)
+                                  Array [Double] (timeDilationFactor), 0.0)
 
         for (pI <- placeI) {
             cqueue += AnimateCommand (CreateNode, pI.id, Ellipse (),
@@ -614,7 +614,7 @@ class PetriNet (colors: Array [Color], placeI: Array [PlaceI], placeD: Array [Pl
         _clock       = tStart
         var continue = true
 
-        println ("PetriNet.simulate: initialize animation of the Petri net at " + 0.)
+        println ("PetriNet.simulate: initialize animation of the Petri net at " + 0.0)
         initAnimation ()
 
         println ("PetriNet.simulate: start simulation at " + _clock)
@@ -648,7 +648,7 @@ class PetriNet (colors: Array [Color], placeI: Array [PlaceI], placeD: Array [Pl
                  " with firing list = " + firingList)
 
         println ("PetriNet.simulate: start animation")
-        pna.animate (0., tStop)
+        pna.animate (0.0, tStop)
     } // simulate
 
 
@@ -682,8 +682,8 @@ object PetriNetTest extends App
     val placeI = Array [PlaceI] (new PlaceI (100, 100, new VectorI (2, 2, 0)),
                                  new PlaceI (500, 100, new VectorI (0, 0, 0)))
 
-    val placeD = Array [PlaceD] (new PlaceD (100, 400, new VectorD (0., 0., 10.5)),
-                                 new PlaceD (500, 400, new VectorD (0., 0., 0.)))
+    val placeD = Array [PlaceD] (new PlaceD (100, 400, new VectorD (0.0, 0.0, 10.5)),
+                                 new PlaceD (500, 400, new VectorD (0.0, 0.0, 0.0)))
 
     //:: Define the transitions.
 
@@ -698,9 +698,9 @@ object PetriNetTest extends App
 
     transt(0).connect (pnet,
         Array [ArcI] (new ArcI (placeI(0), transt(0), true,  new VectorI (1, 1, 0))),
-        Array [ArcD] (new ArcD (placeD(0), transt(0), true,  new VectorD (0., 0., 5.5))),
+        Array [ArcD] (new ArcD (placeD(0), transt(0), true,  new VectorD (0.0, 0.0, 5.5))),
         Array [ArcI] (new ArcI (placeI(1), transt(0), false, new VectorI (1, 1, 0))),
-        Array [ArcD] (new ArcD (placeD(1), transt(0), false, new VectorD (0., 0., 5.5))))
+        Array [ArcD] (new ArcD (placeD(1), transt(0), false, new VectorD (0.0, 0.0, 5.5))))
 
     println (pnet)
     pnet.simulate (2, 10)

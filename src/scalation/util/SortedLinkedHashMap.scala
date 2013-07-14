@@ -122,8 +122,8 @@ object SortedLinkedHashMapTest extends App
         while (it.hasNext) println ("SortedLinkedHashMap: iterate: entry = " + it.next) 
         
         // put new entries in the map
-        smap += 14 -> 1.
-        smap += 11 -> 2.
+        smap += 14 -> 1.0
+        smap += 11 -> 2.0
         println ("SortedLinkedHashMap: put: smap = " + smap)
         
         // remove entry from map according its key
@@ -133,7 +133,7 @@ object SortedLinkedHashMapTest extends App
     } // for
 
     val smap2 = new SortedLinkedHashMap [Int, Double]
-    smap2 += List ((1, 2.), (2, 4.), (3, 8.), (5, 32.), (4, 16.))
+    smap2 += List ((1, 2.0), (2, 4.0), (3, 8.0), (5, 32.0), (4, 16.0))
     println ("SortedLinkedHashMap: smap2 = " + smap2)
 
 } // SortedLinkedHashMapTest object

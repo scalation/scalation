@@ -69,7 +69,7 @@ class BayesClassifier (x: MatrixD, y: Array [Int], k: Int = 2)
     {
         for (i <- 0 until m) {                  // for each data vector in training-set
             val c = y(i)                        // given classification for ith data vector
-            pop(c) += 1.                        // count the number in each class
+            pop(c) += 1.0                        // count the number in each class
             for (j <- 0 until n) {              // for each feature
                 val d = x(i, j)                 // jth data value
                 mean(c, j) += d                 // running total for sum
@@ -81,7 +81,7 @@ class BayesClassifier (x: MatrixD, y: Array [Int], k: Int = 2)
             val pc = pop(c)                     // population of class c in training-set
             for (j <- 0 until n) {              // for each feature
                 mean(c, j) /= pc                                             // compute mean
-                varc(c, j) =  (varc(c, j) - pc * mean(c, j)~^2) / (pc - 1.)  // compute variance
+                varc(c, j) =  (varc(c, j) - pc * mean(c, j)~^2) / (pc - 1.0)  // compute variance
             } // for
         } // for
     
@@ -106,7 +106,7 @@ class BayesClassifier (x: MatrixD, y: Array [Int], k: Int = 2)
         val h      = new VectorD (intervals)
         for (xx <- x_j) {
             val i = (floor ((xx - minVal) / intWid)).toInt
-            h(i) += 1.
+            h(i) += 1.0
         } // for
         h
     } // calcHistogram
@@ -151,14 +151,14 @@ object BayesClassifierTest extends App
 {
     // training-set -----------------------------------------------------------
     // features:                 height, weight, foot-size
-    val x = new MatrixD ((8, 3), 6.00,   180.,   12.,     // data matrix
-                                 5.92,   190.,   11.,
-                                 5.58,   170.,   12.,
-                                 5.92,   165.,   10.,
-                                 5.00,   100.,    6.,
-                                 5.50,   150.,    8.,
-                                 5.42,   130.,    7.,
-                                 5.75,   150.,    9.)
+    val x = new MatrixD ((8, 3), 6.00,   180.0,   12.0,     // data matrix
+                                 5.92,   190.0,   11.0,
+                                 5.58,   170.0,   12.0,
+                                 5.92,   165.0,   10.0,
+                                 5.00,   100.0,    6.0,
+                                 5.50,   150.0,    8.0,
+                                 5.42,   130.0,    7.0,
+                                 5.75,   150.0,    9.0)
     val y = Array (0, 0, 0, 0, 1, 1, 1, 1)          // classification vector: 0(M), 1(F))
     println ("x = " + x)
     println ("y = " + y)
@@ -172,7 +172,7 @@ object BayesClassifierTest extends App
     cl.train ()
 
     // test sample ------------------------------------------------------------
-    val z = new VectorD (6., 130, 8.)                     // new data vector to classify
+    val z = new VectorD (6.0, 130, 8.0)                     // new data vector to classify
     println ("--- classify " + z + " = " + cl.classify (z) + "\n")
 
 } // BayesClassifierTest object

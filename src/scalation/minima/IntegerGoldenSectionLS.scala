@@ -28,8 +28,8 @@ class IntegerGoldenSectionLS (f: Int => Double)
 {
     private val DEBUG     = true                      // debug flag
     private val MAX_ITER  = 10                        // maximum number of expansion iterations
-    private val G_RATIO   = (1. + sqrt (5.)) / 2.     // the golden ratio (1.618033988749895)
-    private val G_SECTION = G_RATIO / (1. + G_RATIO)  // the golden section number (0.6180339887498949)
+    private val G_RATIO   = (1.0 + sqrt (5.0)) / 2.0     // the golden ratio (1.618033988749895)
+    private val G_SECTION = G_RATIO / (1.0 + G_RATIO)  // the golden section number (0.6180339887498949)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** A recursive golden section search requiring only one functional evaluation
@@ -43,7 +43,7 @@ class IntegerGoldenSectionLS (f: Int => Double)
     def gsection (left: Boolean, x1: Int, x2: Int, x3: Int, f2: Double): Int =
     {
         var x4 = x2
-        var f4 = 0.
+        var f4 = 0.0
 
         if (DEBUG) println ("gsection: left = " + left + ", x1 = " + x1 + ", x2 = " + x2 +
                                                          ", x3 = " + x3 + ", f2 = " + f2)
@@ -73,9 +73,9 @@ class IntegerGoldenSectionLS (f: Int => Double)
     {
         val f1 = f(x1)
         var x2 = x1
-        var f2 = 0.
+        var f2 = 0.0
         var x3 = xmax
-        var f3 = 0.
+        var f3 = 0.0
         var matched = false
         breakable { for (k <- 1 to MAX_ITER) {   // expand right to try to find a down-up pattern
             val dist = x3 - x1
@@ -128,13 +128,13 @@ object IntegerGoldenSectionLSTest extends App
  *
 object IntegerGoldenSectionLSTest2 extends App
 {
-    val zo   = new VectorD (0., 0.)                       // zero vector, the origin
-    val dir  = new VectorD (1., 1.)                       // direction to search in
-    val ymax = 5.
-    var y    = 0.
+    val zo   = new VectorD (0.0, 0.0)                       // zero vector, the origin
+    val dir  = new VectorD (1.0, 1.0)                       // direction to search in
+    val ymax = 5.0
+    var y    = 0.0
     var x    = zo
 
-    def f (x: VectorD): Double  = (x(0) - 2.) * (x(0) - 2.) + (x(1) - 3.) * (x(1) - 3.) + 1.
+    def f (x: VectorD): Double  = (x(0) - 2.0) * (x(0) - 2.0) + (x(1) - 3.0) * (x(1) - 3.0) + 1.
     def g (y: Double): Double = f(zo + dir * y)
     def f2 (x: VectorD): Double = x(0)/4. + 5.*x(0)*x(0) + pow(x(0),4) -
                                   9.*x(0)*x(0)*x(1) + 3.*x(1)*x(1) + 2.*pow(x(1),4)

@@ -34,7 +34,7 @@ import scalation.util.Error
  *  @param k  the strength of expansion
  *  @param r  the strength of inflation
  */
-class MarkovClustering (t: MatrixD, k: Int = 2, r: Double = 2.)
+class MarkovClustering (t: MatrixD, k: Int = 2, r: Double = 2.0)
       extends Clustering with Error
 {
     private val DEBUG    = false           // debug flag
@@ -45,7 +45,7 @@ class MarkovClustering (t: MatrixD, k: Int = 2, r: Double = 2.)
     /** Add self-loops by setting the main diagonal to the weight parameter.
      *  @param weight  the edge weight on self-loops to be added.
      */
-    def addSelfLoops (weight: Double = 1.)
+    def addSelfLoops (weight: Double = 1.0)
     {
         t.setDiag (weight)                 // add self-loops (make diagonal 1)
     } // addSelfLoops
@@ -81,18 +81,18 @@ class MarkovClustering (t: MatrixD, k: Int = 2, r: Double = 2.)
     {
         var done = true
         for (j <- 0 until t.dim2) {
-            var sum   = 0.                        // column sum
-            var sumSq = 0.                        // column sum of sqaures
-            var n     = 0.                        // number of non-zero entries in column
+            var sum   = 0.0                        // column sum
+            var sumSq = 0.0                        // column sum of sqaures
+            var n     = 0.0                        // number of non-zero entries in column
 
             for (i <- 0 until t.dim1) {
                 if (t(i, j) < EPSILON) {
-                    t(i, j) = 0.                  // prune this cell
+                    t(i, j) = 0.0                  // prune this cell
                 } else {
                     t(i, j) = t(i, j) ~^ r        // raise cell (i, j) to the r-th power
                     sum   += t(i, j)              // collect sum
                     sumSq += t(i, j) * t(i, j)    // collect sum of squares
-                    n += 1.
+                    n += 1.0
                 } // if
             } // for
 
@@ -162,18 +162,18 @@ object MarkovClusteringTest extends App
 
 /***
     val g = new MatrixD ((12, 12),
-        0., 1., 0., 0., 0., 1., 1., 0., 0., 1., 0.,  0.,
-        1., 0., 1., 0., 1., 0., 0., 0., 0., 0., 0.,  0.,
-        0., 1., 0., 1., 1., 0., 0., 0., 0., 0., 0.,  0.,
-        0., 0., 1., 0., 0., 0., 0., 1., 1., 0., 1.,  0.,
-        0., 1., 1., 0., 0., 0., 1., 1., 0., 0., 0.,  0.,
-        1., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0.,  0.,
-        1., 0., 0., 0., 1., 0., 0., 0., 0., 1., 0.,  0.,
-        0., 0., 0., 1., 1., 0., 0., 0., 1., 0., 1.,  0.,
-        0., 0., 0., 1., 0., 0., 0., 1., 0., 0., 1.,  1.,
-        1., 0., 0., 0., 0., 1., 1., 0., 0., 0., 0.,  0.,
-        0., 0., 0., 1., 0., 0., 0., 1., 1., 0., 0.,  1.,
-        0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0.,  0.) 
+        0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0,  0.0,
+        1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  0.0,
+        0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  0.0,
+        0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0,  0.0,
+        0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0,  0.0,
+        1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,  0.0,
+        1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,  0.0,
+        0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0,  0.0,
+        0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0,  1.0,
+        1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0,  0.0,
+        0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0,  1.0,
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,  0.0)
 
     println ("-----------------------------------------------------------")
     println ("g = " + g)
@@ -207,19 +207,19 @@ object MarkovClusteringTest extends App
 
     // Test the MCL Algorithm on a graph represented as a sparse adjacency matrix.
 
-    val x = new SparseMatrixD (12, 0.)
-    x(0)  = ListMap ((1, 1.), (5, 1.), (6, 1.), (9, 1.))
-    x(1)  = ListMap ((0, 1.), (2, 1.), (4, 1.))
-    x(2)  = ListMap ((1, 1.), (3, 1.), (4, 1.))
-    x(3)  = ListMap ((2, 1.), (7, 1.), (8, 1.), (10, 1.))
-    x(4)  = ListMap ((1, 1.), (2, 1.), (6, 1.), (7, 1.))
-    x(5)  = ListMap ((0, 1.), (9, 1.))
-    x(6)  = ListMap ((0, 1.), (4, 1.), (9, 1.))
-    x(7)  = ListMap ((3, 1.), (4, 1.), (8, 1.), (10, 1.))
-    x(8)  = ListMap ((3, 1.), (7, 1.), (10, 1.), (11, 1.))
-    x(9)  = ListMap ((0, 1.), (5, 1.), (6, 1.))
-    x(10) = ListMap ((3, 1.), (7, 1.), (8, 1.), (11, 1.))
-    x(11) = ListMap ((8, 1.))
+    val x = new SparseMatrixD (12, 0.0)
+    x(0)  = ListMap ((1, 1.0), (5, 1.0), (6, 1.0), (9, 1.0))
+    x(1)  = ListMap ((0, 1.0), (2, 1.0), (4, 1.0))
+    x(2)  = ListMap ((1, 1.0), (3, 1.0), (4, 1.0))
+    x(3)  = ListMap ((2, 1.0), (7, 1.0), (8, 1.0), (10, 1.0))
+    x(4)  = ListMap ((1, 1.0), (2, 1.0), (6, 1.0), (7, 1.0))
+    x(5)  = ListMap ((0, 1.0), (9, 1.0))
+    x(6)  = ListMap ((0, 1.0), (4, 1.0), (9, 1.0))
+    x(7)  = ListMap ((3, 1.0), (4, 1.0), (8, 1.0), (10, 1.0))
+    x(8)  = ListMap ((3, 1.0), (7, 1.0), (10, 1.0), (11, 1.0))
+    x(9)  = ListMap ((0, 1.0), (5, 1.0), (6, 1.0))
+    x(10) = ListMap ((3, 1.0), (7, 1.0), (8, 1.0), (11, 1.0))
+    x(11) = ListMap ((8, 1.0))
 
     println ("-----------------------------------------------------------")
     println ("x = " + x)

@@ -37,7 +37,7 @@ object RungeKutta
      *  @param step  the step size
      */
     def integrate (f: Derivative, y0: Double, t: Double,
-                   t0: Double = 0., step: Double = defaultStepSize): Double =
+                   t0: Double = 0.0, step: Double = defaultStepSize): Double =
     {
         val t_t0       = t - t0                                    // time interval
    	val steps: Int = (round (t_t0 / step)).asInstanceOf [Int]  // number of steps
@@ -45,19 +45,19 @@ object RungeKutta
         var ti         = t0                                        // initialize ith time ti to t0
    	var y          = y0                                        // initialize y = f(t) to y0
 
-        var a = 0.; var b = 0.; var c = 0.; var d = 0.
+        var a = 0.0; var b = 0.0; var c = 0.0; var d = 0.0
 
    	for (i <- 1 to steps) {
             ti += h                                       // take the next step
             if (ti > t) { h -= ti - t; ti = t }           // don't go past t
 
             a = f (ti, y)
-            b = f (ti + h/2., y + a/2.)
-            c = f (ti + h/2., y + b/2.)
+            b = f (ti + h/2.0, y + a/2.0)
+            c = f (ti + h/2.0, y + b/2.0)
             d = f (ti + h, y + c)
-            y += h/6. * (a + 2*b + 2*c + d)
+            y += h/6.0 * (a + 2*b + 2*c + d)
 
-            if (abs (y) > Double.MaxValue / 10.) flaw ("integrate", "probable overflow since y = " + y)
+            if (abs (y) > Double.MaxValue / 10.0) flaw ("integrate", "probable overflow since y = " + y)
             if (i % 1000 == 0) println ("integrate: iteration " + i + " ti = " + ti + " y = " + y)
    	} // for
 
@@ -75,7 +75,7 @@ object RungeKutta
      *  @param step  the step size
      */
     def integrateVV (f: Array [DerivativeV], y0: VectorD, t: Double,
-                     t0: Double = 0., step: Double = defaultStepSize): VectorD =
+                     t0: Double = 0.0, step: Double = defaultStepSize): VectorD =
     {
         val t_t0       = t - t0                                    // time interval
    	val steps: Int = (round (t_t0 / step)).asInstanceOf [Int]  // number of steps
@@ -93,12 +93,12 @@ object RungeKutta
             if (ti > t) { h -= ti - t; ti = t }           // don't go past t
 
             for (j <- 0 until y.dim) a(j) = f(j) (ti, y)
-            for (j <- 0 until y.dim) b(j) = f(j) (ti + h/2., y + a * h/2.)
-            for (j <- 0 until y.dim) c(j) = f(j) (ti + h/2., y + b * h/2.)
+            for (j <- 0 until y.dim) b(j) = f(j) (ti + h/2.0, y + a * h/2.0)
+            for (j <- 0 until y.dim) c(j) = f(j) (ti + h/2.0, y + b * h/2.0)
             for (j <- 0 until y.dim) d(j) = f(j) (ti + h, y + c * h)
-            for (j <- 0 until y.dim) y(j) += h/6. * (a(j) + 2.*b(j) + 2.*c(j) + d(j))
+            for (j <- 0 until y.dim) y(j) += h/6.0 * (a(j) + 2.0*b(j) + 2.0*c(j) + d(j))
 
-            if (abs (y(0)) > Double.MaxValue / 10.) flaw ("integrateVV", "probable overflow since y = " + y)
+            if (abs (y(0)) > Double.MaxValue / 10.0) flaw ("integrateVV", "probable overflow since y = " + y)
             if (i % 1000 == 0) println ("integrateVV: iteration " + i + " ti = " + ti + " y = " + y)
         } // for
 
@@ -116,10 +116,10 @@ object RungeKuttaTest extends App
     import Derivatives.{Derivative, DerivativeV}
     import RungeKutta._
 
-    val y0 = 1.
-    val t  = 2.
+    val y0 = 1.0
+    val t  = 2.0
 
-    def derv1 (t: Double, y: Double) = 2. * t  // solution to differential equation is t^2
+    def derv1 (t: Double, y: Double) = 2.0 * t  // solution to differential equation is t^2
     println ("\n==> at t = " + t + " y = " + integrate (derv1, y0, t))
     println ("\n==> t^2 + c = " + 5)
 
@@ -131,7 +131,7 @@ object RungeKuttaTest extends App
     println ("\n==> at t = " + t + " y = " + integrate (derv3, y0, t))
 
     println ("\n==> at t = " + t + " y = " + 
-             integrateV (Array (derv1, derv2), new VectorD (1., 2.), t))
+             integrateV (Array (derv1, derv2), new VectorD (1.0, 2.0), t))
 
     // @see http://www.mathworks.com/help/techdoc/ref/ode23.html (Example 1)
 
@@ -141,9 +141,9 @@ object RungeKuttaTest extends App
     val odes = Array [DerivativeV] (dx_dt, dy_dt, dz_dt)
 
     var ti  = .2
-    var p   = new VectorD (0., 1., 1.)
+    var p   = new VectorD (0.0, 1.0, 1.0)
     val p_r = new MatrixD (61, 3); for (k <- 0 until p.dim) p_r(0, k) = p(k)
-    var tt  = new VectorD (61); tt(0)  = 0.
+    var tt  = new VectorD (61); tt(0)  = 0.0
     for (i <- 1 to 60) {
         tt(i) = ti * i
         p = integrateVV (odes, p, ti)

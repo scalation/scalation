@@ -37,11 +37,11 @@ class Regression (x: MatrixD, y: VectorD, useQR: Boolean = true)
     private val DEBUG      = false                   // debug flag
     private val k          = x.dim2 - 1              // number of variables 
     private val n          = x.dim1.toDouble         // number of data points (rows)
-    private val r_df       = (n-1.) / (n-k-1.)       // ratio of degrees of freedom
+    private val r_df       = (n-1.0) / (n-k-1.0)       // ratio of degrees of freedom
     private var b: VectorD = null                    // parameter vector (b0, b1, ... bk)
-    private var rSquared   = -1.                     // coefficient of determination (quality of fit)
-    private var rBarSq     = -1.                     // Adjusted R-squared
-    private var fStat      = -1.                     // F statistic (quality of fit)
+    private var rSquared   = -1.0                     // coefficient of determination (quality of fit)
+    private var rBarSq     = -1.0                     // Adjusted R-squared
+    private var fStat      = -1.0                     // F statistic (quality of fit)
 
     private val x_pinv  = if (useQR) {               // pseudo-inverse of x
                               val (q, r) = (new QRDecomp (x)).getQR; r.inverse * q.t
@@ -52,7 +52,7 @@ class Regression (x: MatrixD, y: VectorD, useQR: Boolean = true)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  multiple regression equation
-     *      y = b dot x + e  =  (b0, ... bk) dot (1., x1 , ... xk) + e
+     *      y = b dot x + e  =  (b0, ... bk) dot (1.0, x1 , ... xk) + e
      *  using the least squares method.
      */
     def train ()
@@ -60,17 +60,17 @@ class Regression (x: MatrixD, y: VectorD, useQR: Boolean = true)
         b        = x_pinv * y                        // parameter vector (b0, b1, ... bk)
         val e    = y - x * b                         // residual/error vector
         val sse  = e dot e                           // residual/error sum of squares
-        val sst  = (y dot y) - y.sum~^2. / n         // total sum of squares
+        val sst  = (y dot y) - y.sum~^2.0 / n         // total sum of squares
         val ssr  = sst - sse                         // regression sum of squares
         rSquared = ssr / sst                         // coefficient of determination (R-squared)
-        rBarSq   = 1. - (1.-rSquared) * r_df         // R-bar-squared (adjusted R-squared)
-        fStat    = ssr * (n-k-1.)  / (sse * k)       // F statistic (msr / mse)
+        rBarSq   = 1.0 - (1.0-rSquared) * r_df         // R-bar-squared (adjusted R-squared)
+        fStat    = ssr * (n-k-1.0)  / (sse * k)       // F statistic (msr / mse)
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Retrain the predictor by fitting the parameter vector (b-vector) in the
      *  multiple regression equation
-     *      yy = b dot x + e  =  (b0, ... bk) dot (1., x1 , ... xk) + e
+     *      yy = b dot x + e  =  (b0, ... bk) dot (1.0, x1 , ... xk) + e
      *  using the least squares method.
      *  @param yy  the new response vector
      */
@@ -79,11 +79,11 @@ class Regression (x: MatrixD, y: VectorD, useQR: Boolean = true)
         b        = x_pinv * yy                       // parameter vector (b0, b1, ... bk)
         val e    = yy - x * b                        // residual/error vector
         val sse  = e dot e                           // residual/error sum of squares
-        val sst  = (yy dot yy) - yy.sum~^2. / n      // total sum of squares
+        val sst  = (yy dot yy) - yy.sum~^2.0 / n      // total sum of squares
         val ssr  = sst - sse                         // regression sum of squares
         rSquared = ssr / sst                         // coefficient of determination
-        rBarSq   = 1. - (1.-rSquared) * r_df         // R-bar-squared (adjusted R-squared)
-        fStat    = ssr * (n-k-1.)  / (sse * k)       // F statistic (msr / mse)
+        rBarSq   = 1.0 - (1.0-rSquared) * r_df         // R-bar-squared (adjusted R-squared)
+        fStat    = ssr * (n-k-1.0)  / (sse * k)       // F statistic (msr / mse)
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -93,7 +93,7 @@ class Regression (x: MatrixD, y: VectorD, useQR: Boolean = true)
 
    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
-     *  i.e., (b0, b1) dot (1., z1).
+     *  i.e., (b0, b1) dot (1.0, z1).
      *  @param z  the new vector to predict
      */
     def predict (z: VectorD): Double = b dot z
@@ -114,8 +114,8 @@ class Regression (x: MatrixD, y: VectorD, useQR: Boolean = true)
     {
         var j_max   = -1                     // index of variable to eliminate
         var b_max: VectorD = null            // parameter values for best solution
-        var rSq_max = -1.                    // currently maximizing R squared
-        var fS_max  = -1.                    // could optimize on F statistic
+        var rSq_max = -1.0                    // currently maximizing R squared
+        var fS_max  = -1.0                    // could optimize on F statistic
 
         for (j <- 1 to k) {
             val keep = n.toInt               // i-value large enough to not exclude any rows in slice
@@ -141,7 +141,7 @@ class Regression (x: MatrixD, y: VectorD, useQR: Boolean = true)
             val x_j  = x.col(j)                                           // x_j is jth column in x
             val rg_j = new Regression (x.sliceExclude (keep, j), x_j)     // regress with x_j removed
             rg_j.train ()
-            vifV(j-1) =  1. / (1. - rg_j.fit._2)                      // store vif for x_1 in vifV(0)
+            vifV(j-1) =  1.0 / (1.0 - rg_j.fit._2)                      // store vif for x_1 in vifV(0)
         } // for
         vifV
     } // vif
@@ -157,12 +157,12 @@ class Regression (x: MatrixD, y: VectorD, useQR: Boolean = true)
 object RegressionTest extends App
 {
     // 5 data points: constant term, x1 coordinate, x2 coordinate
-    val x = new MatrixD ((5, 3), 1., 36.,  66.,               // 5-by-3 matrix
-                                 1., 37.,  68.,
-                                 1., 47.,  64.,
-                                 1., 32.,  53.,
-                                 1.,  1., 101.)
-    val y = new VectorD (745., 895., 442., 440., 1598.)
+    val x = new MatrixD ((5, 3), 1.0, 36.0,  66.0,               // 5-by-3 matrix
+                                 1.0, 37.0,  68.0,
+                                 1.0, 47.0,  64.0,
+                                 1.0, 32.0,  53.0,
+                                 1.0,  1.0, 101.0)
+    val y = new VectorD (745.0, 895.0, 442.0, 440.0, 1598.0)
 
     println ("x = " + x)
     println ("y = " + y)
@@ -171,7 +171,7 @@ object RegressionTest extends App
     rg.train ()
     println ("fit = " + rg.fit)
 
-    val z  = new VectorD (1., 20., 80.)         // predict y for one point
+    val z  = new VectorD (1.0, 20.0, 80.0)         // predict y for one point
     val yp = rg.predict (z)
     println ("predict (" + z + ") = " + yp)
 
@@ -194,11 +194,11 @@ object RegressionTest extends App
 object RegressionTest2 extends App
 {
     // 4 data points: constant term, x1 coordinate, x2 coordinate
-    val x = new MatrixD ((4, 3), 1., 1., 1.,                  // 4-by-3 matrix
-                                 1., 1., 2.,
-                                 1., 2., 1.,
-                                 1., 2., 2.)
-    val y = new VectorD (6., 8., 7., 9.)
+    val x = new MatrixD ((4, 3), 1.0, 1.0, 1.0,                  // 4-by-3 matrix
+                                 1.0, 1.0, 2.0,
+                                 1.0, 2.0, 1.0,
+                                 1.0, 2.0, 2.0)
+    val y = new VectorD (6.0, 8.0, 7.0, 9.0)
 
     println ("x = " + x)
     println ("y = " + y)
@@ -207,7 +207,7 @@ object RegressionTest2 extends App
     rg.train ()
     println ("fit = " + rg.fit)
 
-    val z  = new VectorD (1., 2., 3.)        // predict y for one point
+    val z  = new VectorD (1.0, 2.0, 3.0)        // predict y for one point
     val yp = rg.predict (z)
     println ("predict (" + z + ") = " + yp)
 
@@ -233,29 +233,29 @@ object  RegressionTest3 extends App
 {
     // 20 data points:     Constant     x1       x2     x3     x4
     //                                 Age   Weight    Dur Stress
-    val x = new MatrixD ((20, 5), 1.,   47.,   85.4,   5.1,    33.,
-                                  1.,   49.,   94.2,   3.8,    14.,
-                                  1.,   49.,   95.3,   8.2,    10.,
-                                  1.,   50.,   94.7,   5.8,    99.,
-                                  1.,   51.,   89.4,   7.0,    95.,
-                                  1.,   48.,   99.5,   9.3,    10.,
-                                  1.,   49.,   99.8,   2.5,    42.,
-                                  1.,   47.,   90.9,   6.2,     8.,
-                                  1.,   49.,   89.2,   7.1,    62.,
-                                  1.,   48.,   92.7,   5.6,    35.,
-                                  1.,   47.,   94.4,   5.3,    90.,
-                                  1.,   49.,   94.1,   5.6,    21.,
-                                  1.,   50.,   91.6,  10.2,    47.,
-                                  1.,   45.,   87.1,   5.6,    80.,
-                                  1.,   52.,  101.3,  10.0,    98.,
-                                  1.,   46.,   94.5,   7.4,    95.,
-                                  1.,   46.,   87.0,   3.6,    18.,
-                                  1.,   46.,   94.5,   4.3,    12.,
-                                  1.,   48.,   90.5,   9.0,    99.,
-                                  1.,   56.,   95.7,   7.0,    99.)
+    val x = new MatrixD ((20, 5), 1.0,   47.0,   85.4,   5.1,    33.0,
+                                  1.0,   49.0,   94.2,   3.8,    14.0,
+                                  1.0,   49.0,   95.3,   8.2,    10.0,
+                                  1.0,   50.0,   94.7,   5.8,    99.0,
+                                  1.0,   51.0,   89.4,   7.0,    95.0,
+                                  1.0,   48.0,   99.5,   9.3,    10.0,
+                                  1.0,   49.0,   99.8,   2.5,    42.0,
+                                  1.0,   47.0,   90.9,   6.2,     8.0,
+                                  1.0,   49.0,   89.2,   7.1,    62.0,
+                                  1.0,   48.0,   92.7,   5.6,    35.0,
+                                  1.0,   47.0,   94.4,   5.3,    90.0,
+                                  1.0,   49.0,   94.1,   5.6,    21.0,
+                                  1.0,   50.0,   91.6,  10.2,    47.0,
+                                  1.0,   45.0,   87.1,   5.6,    80.0,
+                                  1.0,   52.0,  101.3,  10.0,    98.0,
+                                  1.0,   46.0,   94.5,   7.4,    95.0,
+                                  1.0,   46.0,   87.0,   3.6,    18.0,
+                                  1.0,   46.0,   94.5,   4.3,    12.0,
+                                  1.0,   48.0,   90.5,   9.0,    99.0,
+                                  1.0,   56.0,   95.7,   7.0,    99.0)
     //  response BP
-    val y = new VectorD (105., 115., 116., 117., 112., 121., 121., 110., 110., 114.,
-                         114., 115., 114., 106., 125., 114., 106., 113., 110., 122.)
+    val y = new VectorD (105.0, 115.0, 116.0, 117.0, 112.0, 121.0, 121.0, 110.0, 110.0, 114.0,
+                         114.0, 115.0, 114.0, 106.0, 125.0, 114.0, 106.0, 113.0, 110.0, 122.0)
 
     val rg = new Regression (x, y)
     rg.train ()

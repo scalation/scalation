@@ -55,17 +55,17 @@ class QuadraticSimplex (a: MatrixD, b: VectorD, q: MatrixD, c: VectorD, var x_B:
     private val t = new MatrixD (MM, NN)
     for (i <- 0 until M) {                 // fill the top part of the tableau
         t.set (i, a(i))                    // x: constraint matrix a
-        t(i, i+M+N) = 1.                   // y: slack identity matrix
+        t(i, i+M+N) = 1.0                   // y: slack identity matrix
         t(i, NN-1)  = b(i)                 // bc: constant vector b
     } // for
     for (i <- M until MM) {                // fill the bottom part of the tableau
-        t.set (i, q(i-M) * -1.)            // x: cost matrix q (quadratic part)
+        t.set (i, q(i-M) * -1.0)            // x: cost matrix q (quadratic part)
         t.set (i, a.col(i-M) * -1, N)      // w: multipliers for a x <= b (transpose of a)
-        t(i, i+M+N) = 1.                   // v: multipliers for a x >= 0
+        t(i, i+M+N) = 1.0                   // v: multipliers for a x >= 0
         t(i, NN-1)  = c(i-M)               // bc: cost vector c (linear part)
     } // for
 
-    for (i <- 0 until MM if t(i, NN - 1) < 0) t(i, NN - 2) = -1.   // r: artificial variable
+    for (i <- 0 until MM if t(i, NN - 1) < 0) t(i, NN - 2) = -1.0   // r: artificial variable
 
     if (x_B == null) x_B = setBasis (MM, MM)
 
@@ -149,9 +149,9 @@ class QuadraticSimplex (a: MatrixD, b: VectorD, q: MatrixD, c: VectorD, var x_B:
         for (i <- 0 until MM; j <- 0 until NN if i != k && j != l)
             t(i, j) -= t(k, j) * t(i, l) / t(k, l)
 
-        for (i <- 0 until MM if i != k) t(i, l) = 0.          // zero out column l
+        for (i <- 0 until MM if i != k) t(i, l) = 0.0          // zero out column l
         for (j <- 0 until NN if j != l) t(k, j) /= t(k, l)    // scale row k
-        t(k, l) = 1.
+        t(k, l) = 1.0
         x_B(k) = l                                  // update basis (l replaces k)
         if (DEBUG) showTableau
     } // pivot
@@ -248,17 +248,17 @@ object QuadraticSimplexTest extends App
      */
     def test1 ()
     {
-        val a = new MatrixD ((2, 2),  2., 1.,
-                                     -1., 1.)
-        val b = new VectorD (2., 4.)
-        val q = new MatrixD ((2, 2),  2., -2,
-                                     -2.,  2)
-        val c = new VectorD (-4., -6.)
+        val a = new MatrixD ((2, 2),  2.0, 1.0,
+                                     -1.0, 1.0)
+        val b = new VectorD (2.0, 4.0)
+        val q = new MatrixD ((2, 2),  2.0, -2,
+                                     -2.0,  2)
+        val c = new VectorD (-4.0, -6.0)
         test (a, b, q, c)
     } // test1
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Test case 2: solution x = (0, 5), z = 20.
+    /** Test case 2: solution x = (0, 5), z = 20.0
      *  @see http://courses.csail.mit.edu/6.867/wiki/images/a/a7/Qp-cvxopt.pdf
      *  min .5x^2 + 3x + 4y
      *  st    x + 3y >=  15
@@ -267,13 +267,13 @@ object QuadraticSimplexTest extends App
      */
     def test2 ()
     {
-        val a = new MatrixD ((3, 2), -1., -3.,
-                                      2.,  5,
-                                      3.,  4.)
-        val b = new VectorD (-15.,  100., 80.)
-        val q = new MatrixD ((2, 2),  1.,  0.,
-                                      0.,  0.)
-        val c = new VectorD (3., 4)
+        val a = new MatrixD ((3, 2), -1.0, -3.0,
+                                      2.0,  5,
+                                      3.0,  4.0)
+        val b = new VectorD (-15.0,  100.0, 80.0)
+        val q = new MatrixD ((2, 2),  1.0,  0.0,
+                                      0.0,  0.0)
+        val c = new VectorD (3.0, 4)
         test (a, b, q, c)
     } // test2
 

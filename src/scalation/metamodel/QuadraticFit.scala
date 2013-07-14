@@ -46,7 +46,7 @@ class QuadraticFit (f: FunctionV2S, n: Int = 2)
      *  @param d  the distance to move on each step
      *  @param m  move m steps above and below x(i) for each dimension i
      */
-    def formGrid (x: VectorD, i: Int, d: Double = 1., m: Int = 2)
+    def formGrid (x: VectorD, i: Int, d: Double = 1.0, m: Int = 2)
     {
         if (i == 0) {              // the first dimension
             grid = new ArrayBuffer [VectorD] (((2*m + 1) ~^ n).toInt)
@@ -77,13 +77,13 @@ class QuadraticFit (f: FunctionV2S, n: Int = 2)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a vector 'x', compute the values for all of its quadratic, linear
      *  and constant forms/terms, returning them as a vector.
-     *  for 1D:  VectorD (1., x(0), x(0)~^2.)
-     *  for 2D:  VectorD (1., x(0), x(0)~^2., x(1), x(1)*x(0), x(1)~^2.)
+     *  for 1D:  VectorD (1.0, x(0), x(0)~^2.0)
+     *  for 2D:  VectorD (1.0, x(0), x(0)~^2.0, x(1), x(1)*x(0), x(1)~^2.0)
      *  @param x  the source vector for creating forms/terms
      */
     def qForms (x: VectorD): VectorD =
     {
-        val y  = x.oneAt (0, 1) ++ x    // augmented vector: [ 1., x(0), ..., x(n-1) ]
+        val y  = x.oneAt (0, 1) ++ x    // augmented vector: [ 1.0, x(0), ..., x(n-1) ]
         val z  = new VectorD (nt)       // vector of all forms/terms
         var k  = 0;
         for (i <- 0 to n; j <- 0 to i) { z(k) = y(i) * y(j); k += 1 }
@@ -99,9 +99,9 @@ class QuadraticFit (f: FunctionV2S, n: Int = 2)
      */
     def qFormsEval (x: VectorD): Double =
     {
-        val y   = x.oneAt (0, 1) ++ x    // augmented vector: [ 1., x(0), ..., x(n-1) ]
+        val y   = x.oneAt (0, 1) ++ x    // augmented vector: [ 1.0, x(0), ..., x(n-1) ]
         var k   = 0
-        var sum = 0.
+        var sum = 0.0
         for (i <- 0 to n; j <- 0 to i) { sum += b(k) * y(i) * y(j); k += 1 }
         sum
     } // qFormsEval
@@ -128,16 +128,16 @@ class QuadraticFit (f: FunctionV2S, n: Int = 2)
  */
 object QuadraticFitTest extends App
 {
-    def f(x: VectorD): Double = (x(0) - 10.)~^2. + (x(1) - 20.)~^2. + 1.
+    def f(x: VectorD): Double = (x(0) - 10.0)~^2.0 + (x(1) - 20.0)~^2.0 + 1.0
 
-    val x0 = new VectorD (5., 10.)                   // center of the grid
+    val x0 = new VectorD (5.0, 10.0)                   // center of the grid
     val qf = new QuadraticFit (f)                    // construct a quadratic fit object
     qf.formGrid (x0, 0)                              // form a grid around point x0
     val result = qf.response ()                      // compute the response surface for the grid
     println (result)        
     qf.fit (result)                                  // use multiple regression to fit surface
 
-    val x1 = new VectorD (6., 9.)                    // test the fit for point x1
+    val x1 = new VectorD (6.0, 9.0)                    // test the fit for point x1
     val yp = qf.qFormsEval (x1)                      // evaluate using regression equation
     println ("y  = " + f(x1))                        // actual y value at x1
     println ("yp = " + yp)                           // predicted y value at x1

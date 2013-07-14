@@ -55,7 +55,7 @@ class MatrixC (val d1: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a dim1 by dim1 square matrix with x assigned on the diagonal
      *  and y assigned off the diagonal.  To obtain an identity matrix, let x = 1
-     *  and y = 0.
+     *  and y = 0.0
      *  @param dim1  the row and column dimension
      *  @param x     the scalar value to assign on the diagonal
      *  @param y     the scalar value to assign off the diagonal
@@ -862,7 +862,7 @@ class MatrixC (val d1: Int,
     /** Compute the (right) nullspace of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.0  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace: VectorC =
@@ -875,7 +875,7 @@ class MatrixC (val d1: Int,
     /** Compute the (right) nullspace in-place of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.0  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace_ip: VectorC =
@@ -1093,19 +1093,19 @@ object MatrixCTest extends App
         println ("\n\tTest MatrixC on real matrices of dim " + l)
         val x = new MatrixC (l, l)
         val y = new MatrixC (l, l)
-        x.set (2.)
-        y.set (3.)
+        x.set (2.0)
+        y.set (3.0)
         println ("x + y  = " + (x + y))
         println ("x - y  = " + (x - y))
         println ("x * y  = " + (x * y))
-        println ("x * 4. = " + (x * Complex (4.)))
+        println ("x * 4. = " + (x * Complex (4.0)))
     } // for
 
     println ("\n\tTest MatrixC on additional operations")
 
-    val z = new MatrixC ((2, 2), 1., 2.,
-                                 3., 2.)
-    val b = new VectorC (8., 7.)
+    val z = new MatrixC ((2, 2), 1.0, 2.0,
+                                 3.0, 2.0)
+    val b = new VectorC (8.0, 7.0)
     val lu  = z.lud
     val lu2 = z.lud_npp
 
@@ -1121,11 +1121,11 @@ object MatrixCTest extends App
     z *= z                             // in-place matrix multiplication
     println ("z squared = " + z)
 
-    val w = new MatrixC ((2, 3), 2., 3., 5.,
-                                -4., 2., 3.)
-    val v = new MatrixC ((3, 2), 2., -4.,
-                                 3.,  2.,
-                                 5.,  3.)
+    val w = new MatrixC ((2, 3), 2.0, 3.0, 5.0,
+                                -4.0, 2.0, 3.0)
+    val v = new MatrixC ((3, 2), 2.0, -4.0,
+                                 3.0,  2.0,
+                                 5.0,  3.0)
 
     println ("w         = " + w)
     println ("v         = " + v)

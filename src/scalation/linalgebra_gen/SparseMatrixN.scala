@@ -78,7 +78,7 @@ class SparseMatrixN [T: ClassManifest: Numeric] (d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a dim1 by dim1 square sparse matrix with x assigned on the diagonal
-     *  and 0 assigned off the diagonal.  To obtain an identity matrix, let x = 1.
+     *  and 0 assigned off the diagonal.  To obtain an identity matrix, let x = 1.0
      *  @param dim1  the row and column dimension
      *  @param x     the scalar value to assign on the diagonal
      *  @param _0    the value zero for type T
@@ -445,7 +445,7 @@ class SparseMatrixN [T: ClassManifest: Numeric] (d1: Int,
 
         for (i <- u.range1) {
             var pivot = u(i, i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (u, i)   // find the maxiumum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u(i, i)                  // reset the pivot
@@ -474,7 +474,7 @@ class SparseMatrixN [T: ClassManifest: Numeric] (d1: Int,
 
         for (i <- u.range1) {
             var pivot = u(i, i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (u, i)   // find the maxiumum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u(i, i)                  // reset the pivot
@@ -630,7 +630,7 @@ class SparseMatrixN [T: ClassManifest: Numeric] (d1: Int,
 
         for (i <- b.range1) {
             val pivot = b(i, i)
-            if (pivot == 0.) flaw ("inverse_npp", "use inverse since you have a zero pivot")
+            if (pivot == 0.0) flaw ("inverse_npp", "use inverse since you have a zero pivot")
             for (j <- b.range2) {
                 b(i, j) = b(i, j) / pivot
                 c(i, j) = c(i, j) / pivot
@@ -657,7 +657,7 @@ class SparseMatrixN [T: ClassManifest: Numeric] (d1: Int,
 
         for (i <- b.range1) {
             var pivot = b(i, i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 swap (c, i, k, 0)               // in c, swap rows i and k from column 0
@@ -690,7 +690,7 @@ class SparseMatrixN [T: ClassManifest: Numeric] (d1: Int,
 
         for (i <- b.range1) {
             var pivot = b(i, i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 swap (c, i, k, 0)               // in c, swap rows i and k from column 0
@@ -723,7 +723,7 @@ class SparseMatrixN [T: ClassManifest: Numeric] (d1: Int,
 
         for (i <- b.range1) {
             var pivot = b(i, i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b(i, i)                 // reset the pivot
@@ -753,7 +753,7 @@ class SparseMatrixN [T: ClassManifest: Numeric] (d1: Int,
 
         for (i <- b.range1) {
             var pivot = b(i, i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b(i, i)                 // reset the pivot
@@ -774,7 +774,7 @@ class SparseMatrixN [T: ClassManifest: Numeric] (d1: Int,
     /** Compute the (right) nullspace of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.0  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace (implicit fr: Fractional [T]): VectorN [T] =
@@ -787,7 +787,7 @@ class SparseMatrixN [T: ClassManifest: Numeric] (d1: Int,
     /** Compute the (right) nullspace in-place of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.0  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace_ip (implicit fr: Fractional [T]): VectorN [T] =
@@ -903,8 +903,8 @@ object SparseMatrixNTest extends App
 {
      import SparseMatrices._
 
-     val y = new SparseMatrixF (3, 3, 7.f, 0.f)
-     val z = new SparseMatrixF (3, 8.f, 0.f)
+     val y = new SparseMatrixF (3, 3, 7.0f, 0.0f)
+     val z = new SparseMatrixF (3, 8.0f, 0.0f)
      val a = y + z
      val b = y - z
      val c = y * z
@@ -915,19 +915,19 @@ object SparseMatrixNTest extends App
      println ("y - z = " + b); b.showAll
      println ("y * z = " + c); c.showAll
 
-     val x = new SparseMatrixF (12, 0.f)
-     x(0)  = ListMap ((1, 1.f), (5, 1.f), (6, 1.f), (9, 1.f))
-     x(1)  = ListMap ((0, 1.f), (2, 1.f), (4, 1.f))
-     x(2)  = ListMap ((1, 1.f), (3, 1.f), (4, 1.f))
-     x(3)  = ListMap ((2, 1.f), (7, 1.f), (8, 1.f), (10, 1.f))
-     x(4)  = ListMap ((1, 1.f), (2, 1.f), (6, 1.f), (7, 1.f))
-     x(5)  = ListMap ((0, 1.f), (9, 1.f))
-     x(6)  = ListMap ((0, 1.f), (4, 1.f), (9, 1.f))
-     x(7)  = ListMap ((3, 1.f), (4, 1.f), (8, 1.f), (10, 1.f))
-     x(8)  = ListMap ((3, 1.f), (7, 1.f), (10, 1.f), (11, 1.f))
-     x(9)  = ListMap ((0, 1.f), (5, 1.f), (6, 1.f))
-     x(10) = ListMap ((3, 1.f), (7, 1.f), (8, 1.f), (11, 1.f))
-     x(11) = ListMap ((8, 1.f))
+     val x = new SparseMatrixF (12, 0.0f)
+     x(0)  = ListMap ((1, 1.0f), (5, 1.0f), (6, 1.0f), (9, 1.0f))
+     x(1)  = ListMap ((0, 1.0f), (2, 1.0f), (4, 1.0f))
+     x(2)  = ListMap ((1, 1.0f), (3, 1.0f), (4, 1.0f))
+     x(3)  = ListMap ((2, 1.0f), (7, 1.0f), (8, 1.0f), (10, 1.0f))
+     x(4)  = ListMap ((1, 1.0f), (2, 1.0f), (6, 1.0f), (7, 1.0f))
+     x(5)  = ListMap ((0, 1.0f), (9, 1.0f))
+     x(6)  = ListMap ((0, 1.0f), (4, 1.0f), (9, 1.0f))
+     x(7)  = ListMap ((3, 1.0f), (4, 1.0f), (8, 1.0f), (10, 1.0f))
+     x(8)  = ListMap ((3, 1.0f), (7, 1.0f), (10, 1.0f), (11, 1.0f))
+     x(9)  = ListMap ((0, 1.0f), (5, 1.0f), (6, 1.0f))
+     x(10) = ListMap ((3, 1.0f), (7, 1.0f), (8, 1.0f), (11, 1.0f))
+     x(11) = ListMap ((8, 1.0f))
 
      println ("x     = " + x); x.showAll
 

@@ -52,14 +52,14 @@ class IntegerLP (a: MatrixD, b: VectorD, c: VectorD, excl: Set [Int] = Set ())
     // best integer solution so far
     private var best: Tuple2 [VectorD, Double] = (null, Double.PositiveInfinity)
 
-    val x_le = new VectorD (N); x_le.set (-1.)      // constraint x_j <= value 
-    val x_ge = new VectorD (N); x_ge.set (-1.)      // constraint x_j >= value
+    val x_le = new VectorD (N); x_le.set (-1.0)      // constraint x_j <= value
+    val x_ge = new VectorD (N); x_ge.set (-1.0)      // constraint x_j >= value
 
     println (">>>>>>>>>>>>>> root: dp = 0")
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add a new constraint to the current set of bounding constraints: x_j <= bound
-     *  or x_j >= bound (e.g., x_1 <= 2. or x_0 >= 4.).
+     *  or x_j >= bound (e.g., x_1 <= 2.0 or x_0 >= 4.0).
      *  @param j      the index of variable x_j
      *  @param le     whether it is a "less than or equal to" (le) constraint
      *  @param bound  the bounding value
@@ -69,13 +69,13 @@ class IntegerLP (a: MatrixD, b: VectorD, c: VectorD, excl: Set [Int] = Set ())
         val low = x_le(j)
         val hi  = x_ge(j)
         if (le) {
-            if (low < 0. && hi < 0.) x_le(j) = bound                   // add "<=" constraint
+            if (low < 0.0 && hi < 0.0) x_le(j) = bound                   // add "<=" constraint
             else if (bound >= hi)    x_le(j) = bound                   // add "<=" constraint
             else if (bound < hi)   { x_le(j) = bound; x_ge(j) = -1 }   // replace ">=" constraint
             else if (bound < low)    x_le(j) = bound                   // replace "<=" constraint
             else return false
         } else {
-            if (low < 0. && hi < 0.) x_ge(j) = bound                   // add ">=" constraint
+            if (low < 0.0 && hi < 0.0) x_ge(j) = bound                   // add ">=" constraint
             else if (bound <= low)   x_ge(j) = bound                   // add ">=" constraint
             else if (bound > low)  { x_ge(j) = bound; x_le(j) = -1 }   // replace "<=" constraint
             else if (bound > hi)     x_ge(j) = bound                   // replace ">=" constraint
@@ -92,13 +92,13 @@ class IntegerLP (a: MatrixD, b: VectorD, c: VectorD, excl: Set [Int] = Set ())
     {
         var aa = a; var bb = b                          // start with the original constraints
         for (j <- 0 until N) {                          // loop over the variables x_j
-            if (x_le(j) >= 0.) {                        // check for x_j <= bound
+            if (x_le(j) >= 0.0) {                        // check for x_j <= bound
                 println ("x_" + j + " <= " + x_le(j))
                 aa = aa ++ c.oneAt (j)                  // add row to constraint matrix
                 bb = bb ++ x_le(j)                      // add element to limit vector
             } // if
                 
-            if (x_ge(j) >= 0.) {                        // check for x_j >= bound
+            if (x_ge(j) >= 0.0) {                        // check for x_j >= bound
                 println ("x_" + j + " >= " + x_ge(j))
                 aa = aa ++ c.oneAt (j)                  // add row to constraint matrix
                 bb = bb ++ -x_ge(j)                     // add element to limit vector
@@ -133,7 +133,7 @@ class IntegerLP (a: MatrixD, b: VectorD, c: VectorD, excl: Set [Int] = Set ())
         val f = lp.objective                          // optimum objective function value for this LP
         
         val j = fractionalVar (x)                     // find j such that x_j is not an integer
-        var bound = 0.
+        var bound = 0.0
 
         println ("IntegerLP.solve: x = " + x + " f = " + f + ", j = " + j)
 
@@ -180,10 +180,10 @@ class IntegerLP (a: MatrixD, b: VectorD, c: VectorD, excl: Set [Int] = Set ())
  */
 object IntegerLPTest extends App
 {
-    val a = new MatrixD ((2, 2), 3., 1.,
-                                 1., 2.)
-    val c = new VectorD         (3., 4.) 
-    val b = new VectorD (-4., -4.)
+    val a = new MatrixD ((2, 2), 3.0, 1.0,
+                                 1.0, 2.0)
+    val c = new VectorD         (3.0, 4.0)
+    val b = new VectorD (-4.0, -4.0)
 
     val ilp = new IntegerLP (a, b, c)
     ilp.solve (0, (a, b))

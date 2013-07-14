@@ -68,9 +68,9 @@ class DecisionTreeID3 (x: MatrixI, y: Array [Int], vc: Array [Int], k: Int = 2)
     def frequency (dset: Array[Tuple2[Int,Int]], value: Int): Tuple2 [Double, VectorD] =
     {
         val prob  = new VectorD (k)     // probability vector for a given feature and value
-        var count = 0.
+        var count = 0.0
         for ((i,j) <- dset if i == value) {
-            count      += 1.
+            count      += 1.0
             prob(j) += 1
         } // for
         (count / dset.size, prob /= count)     // return the fraction and the probability vector 
@@ -84,8 +84,8 @@ class DecisionTreeID3 (x: MatrixI, y: Array [Int], vc: Array [Int], k: Int = 2)
      */
     def entropy (prob: VectorD): Double =
     {
-        var sum = 0.
-        for (p <- prob) if (p > 0.) sum -= p * log2 (p)
+        var sum = 0.0
+        for (p <- prob) if (p > 0.0) sum -= p * log2 (p)
         sum             // return entropy, a number in the interval [0, 1]
     } // entropy
 
@@ -121,7 +121,7 @@ class DecisionTreeID3 (x: MatrixI, y: Array [Int], vc: Array [Int], k: Int = 2)
         val dset = dataset (f, path)                  // extract values from column f indata matrix x
 //      val vals = dset.map (_._1).toSet.size
         val vals = vc(f)                              // number of distinct values for feature f
-        var sum  = 0.
+        var sum  = 0.0
         for (i <- 0 until vals) {
             val (coun_fi, prob_fi) = frequency (dset, i)
             val entr_fi = entropy (prob_fi)           // entropy for feature f value i

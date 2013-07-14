@@ -208,14 +208,14 @@ object Primes
     def genPrimesSoE (lb: Int = 1000, ub: Int = 10000): ArrayBuffer [Int] =
     {
         val primes = ArrayBuffer [Int] ()      // array to hold prime numbers
-        var jroot  = 0.                        // floor of square root of j
-        var sum    = 0.                        // sum of terms
+        var jroot  = 0.0                        // floor of square root of j
+        var sum    = 0.0                        // sum of terms
 
         for (j <- lb to ub) {                  // if integer j is prime, add to array
             jroot = floor (sqrt (j))
-            sum   = 0.
-            for (s <- 2. to jroot by 1.) sum += floor (j / s) - floor ((j-1) / s)
-            if ((floor (-1. * sum / j)).toInt == 0) primes += j
+            sum   = 0.0
+            for (s <- 2.0 to jroot by 1.0) sum += floor (j / s) - floor ((j-1) / s)
+            if ((floor (-1.0 * sum / j)).toInt == 0) primes += j
         } // for
         primes                                 // return the array of primes
     } // genPrimesSoE

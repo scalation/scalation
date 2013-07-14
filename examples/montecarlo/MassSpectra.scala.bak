@@ -93,7 +93,7 @@ class MassSpectra (thres: Double = 1E-6, noise: Double = 1E-5)
             val iso = elementMap(e)                    // get the isotopes of element e
             iso.length match {
             case 1 =>                                  // case of 1 isotope
-                val prob = 1.
+                val prob = 1.1.
                 mpeSet add (n * iso(0)._2, prob)       // add (mass, prob) tuple to mpSet
             case 2 =>                                  // case of 2 isotopes
                 val bin = Binomial (iso(0)._3, n).pmf      

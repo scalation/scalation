@@ -56,10 +56,10 @@ class Hessenburg (a: MatrixD)
 
         for (j <- 0 until n) {                // for each column j
             val x  = h.col(j, j)              // jth column from jth position
-            val u  = x + x.oneAt (0) * x.norm * (if (x(0) < 0.) -1. else 1.)
-            val ident1 = new MatrixD (n - j, 1., 0.)
-            val ident2 = new MatrixD (j, 1., 0.)
-            val pp = ident1 - outer (u, u) * (2. / u.normSq)
+            val u  = x + x.oneAt (0) * x.norm * (if (x(0) < 0.0) -1.0 else 1.0)
+            val ident1 = new MatrixD (n - j, 1.0, 0.0)
+            val ident2 = new MatrixD (j, 1.0, 0.0)
+            val pp = ident1 - outer (u, u) * (2.0 / u.normSq)
             val p  = ident2 diag pp
             h = p.t * h * p
         } // for
@@ -105,7 +105,7 @@ class Eigenvalue (a: MatrixD)
             converging = true
             for (l <- 0 until ITERATIONS) {            // minor iterations
                 val s = g(n - 1, n - 1)                // the shift parameter
-                val ident = new MatrixD (g.dim1, 1., 0.)
+                val ident = new MatrixD (g.dim1, 1.0, 0.0)
                 val qr = new QRDecomp (g - ident * s)
                 g = qr.getR * qr.getQ + ident * s
             } // for
@@ -194,13 +194,13 @@ object SymmetricQRstep
     def qRStep (t: SymTriMatrixD, p: Int, q: Int) = 
     {
         val n   = t.dg.dim - q - 1               // the last index
-        val d   = (t.dg(n-1) - t.dg(n)) / 2.     // Wilkinson shift
-        val t2  = t.sd(n-1) ~^ 2.
+        val d   = (t.dg(n-1) - t.dg(n)) / 2.0     // Wilkinson shift
+        val t2  = t.sd(n-1) ~^ 2.0
         val d2  = t.dg(n) - t2 / (d + signum (d) * sqrt (d * d + t2))
         var g   = t.dg(0) - d2 
-        var s   = 1.
-        var c   = 1.
-        var phi = 0.
+        var s   = 1.0
+        var c   = 1.0
+        var phi = 0.0
 
         for (k <- p until n) {
             var f   = s * (t.sd(k))
@@ -210,7 +210,7 @@ object SymmetricQRstep
             s       = f / r
             if (k != 0) t.sd(k-1) = r
             g       = t.dg(k) - phi
-            r       = (t.dg(k+1) - g) * s + 2. * c * b
+            r       = (t.dg(k+1) - g) * s + 2.0 * c * b
             phi     = s * r
             t.dg(k) = g + phi
             g       = c * r - b
@@ -232,13 +232,13 @@ object SymmetricQRstep
     {
         val aa = abs (a)
         val ba = abs (b)
-        var c  = 1.          // cos (theta)
-        var s  = 0.          // sin (theta)
-        var r  = 0.
+        var c  = 1.0          // cos (theta)
+        var s  = 0.0          // sin (theta)
+        var r  = 0.0
         if (ba > aa) {
-            r = -a/b; s = 1. / sqrt (1. + r*r); c = s*r
+            r = -a/b; s = 1.0 / sqrt (1.0 + r*r); c = s*r
         } else if (ba > EPSILON) {
-            r = -b/a; c = 1. / sqrt (1. + r*r); s = c*r
+            r = -b/a; c = 1.0 / sqrt (1.0 + r*r); s = c*r
         } // if
         (c, s)
     } // givens
@@ -270,10 +270,10 @@ class EigenvalueSym (a: MatrixD)
         d = (new HouseholderT (a)).getT          // make symmetric tridiagonal matrix
 
         while (q < m) {
-            for (i <- 0 to m-2 if abs (d(i, i+1)) <=  EPSILON) d(i, i+1) = 0.   // clean d
+            for (i <- 0 to m-2 if abs (d(i, i+1)) <=  EPSILON) d(i, i+1) = 0.0   // clean d
             q = 0; p = m-1
-            while (p > 0 && d(p, p-1) == 0. && q < m) { q += 1; p -= 1 }
-            while (p > 0 && d(p, p-1) != 0.) p -= 1
+            while (p > 0 && d(p, p-1) == 0.0 && q < m) { q += 1; p -= 1 }
+            while (p > 0 && d(p, p-1) != 0.0) p -= 1
             if (q < m) SymmetricQRstep.qRStep (d, p, q)
         } // while
     } // primary constructor
@@ -300,7 +300,7 @@ class Eigenvector (a: MatrixD, _e: VectorD = null)
     private val m = a.dim1                                 // number of rows
     if (a.dim2 != m) flaw ("constructor", "must have m == n")
     private val v = new MatrixD (m, m)                     // eigenvectors matrix (each row)
-    private val ident = new MatrixD (m, 1., 0.)            // identity matrix
+    private val ident = new MatrixD (m, 1.0, 0.0)            // identity matrix
     private val e = if (_e == null) (new Eigenvalue (a)).getE else _e
 
     {
@@ -332,7 +332,7 @@ class Eigenvector (a: MatrixD, _e: VectorD = null)
                 println ("a_Ie = " + a_Ie)
                 val y = (new QRDecomp (a_Ie)).solve (y_k)         // solve [a - Ie]y = y_k
                 y_l   = y / y.norm               // normalize
-                e(i) += 1. / (y_k dot y)         // improve the eigenvalue
+                e(i) += 1.0 / (y_k dot y)         // improve the eigenvalue
                 if ((y_l - y_k).norm < EPSILON) break
                 y_k = y_l                        // update the eigenvector
             }} // for
@@ -376,17 +376,17 @@ object EigenTest extends App
     } // test
 
     // @see http://www.mathworks.com/help/symbolic/eigenvalue-trajectories.html
-    // should give e = (3., 2., 1.)
-    val b = new MatrixD ((3, 3), -149., -50., -154.,            // 3-by-3 matrix
-                                  537., 180.,  546.,
-                                  -27.,  -9.,  -25.)
+    // should give e = (3.0, 2.0, 1.0)
+    val b = new MatrixD ((3, 3), -149.0, -50.0, -154.0,            // 3-by-3 matrix
+                                  537.0, 180.0,  546.0,
+                                  -27.0,  -9.0,  -25.0)
     test (b)
 
     // @see http://www.math.hmc.edu/calculus/tutorials/eigenstuff/eigenstuff.pdf
-    // should give e = (1., -3., -3.)
-    val c = new MatrixD ((3, 3), 5.,  8.,  16.,                  // 3-by-3 matrix
-                                 4.,  1.,   8.,
-                                -4., -4., -11.)
+    // should give e = (1.0, -3.0, -3.0)
+    val c = new MatrixD ((3, 3), 5.0,  8.0,  16.0,                  // 3-by-3 matrix
+                                 4.0,  1.0,   8.0,
+                                -4.0, -4.0, -11.0)
     test (c)
 
 } // EigenTest object
