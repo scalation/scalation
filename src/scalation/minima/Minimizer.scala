@@ -29,7 +29,7 @@ import scalation.linalgebra.VectorD
 trait Minimizer
 {
     protected val EPSILON  = 1E-9          // number close to zero
-    protected val STEP     = 1.0            // default initial step size
+    protected val STEP     = 1.            // default initial step size
     protected val MAX_ITER = 500           // maximum number of major steps/iterations 
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

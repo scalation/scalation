@@ -86,7 +86,7 @@ class VectorD (val dim: Int,
     def oneAt (j: Int, size: Int = dim): VectorD =
     {
         val c = new VectorD (size)
-        for (i <- c.range) c.v(i) = if (i == j) 1.0 else 0.0
+        for (i <- c.range) c.v(i) = if (i == j) 1. else 0.
         c
     } // oneAt
 
@@ -98,7 +98,7 @@ class VectorD (val dim: Int,
     def _oneAt (j: Int, size: Int = dim): VectorD =
     {
         val c = new VectorD (size)
-        for (i <- c.range) c.v(i) = if (i == j) -1.0 else 0.0
+        for (i <- c.range) c.v(i) = if (i == j) -1. else 0.
         c
     } // _oneAt
 
@@ -435,7 +435,7 @@ class VectorD (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of this vector.
      */
-    def sum: Double = v.foldLeft (0.0) (_ + _)
+    def sum: Double = v.foldLeft (0.) (_ + _)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of this vector skipping the i-th element.
@@ -448,8 +448,8 @@ class VectorD (val dim: Int,
      */
     def sum_pos: Double =
     {
-        var sum = 0.0
-        for (i <- range if v(i) > 0.0) sum += v(i)
+        var sum = 0.
+        for (i <- range if v(i) > 0.) sum += v(i)
         sum
     } // sum_pos
 
@@ -460,7 +460,7 @@ class VectorD (val dim: Int,
     def cumulate: VectorD =
     {
         val c    = new VectorD (dim)
-        var sum = 0.0
+        var sum = 0.
         for (i <- range) { sum += v(i); c.v(i) = sum }
         c
     } // cumulate
@@ -468,17 +468,17 @@ class VectorD (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize this vector so that it sums to one (like a probability vector).
      */
-    def normalize: VectorD = this * (1.0/sum)
+    def normalize: VectorD = this * (1./sum)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize this vector so its length is one (unit vector).
      */
-    def normalizeU: VectorD = this * (1.0/norm)
+    def normalizeU: VectorD = this * (1./norm)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize this vector to have a maximum of one.
      */
-    def normalize1: VectorD = this * (1.0/max ())
+    def normalize1: VectorD = this * (1./max ())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the dot product (or inner product) of this vector with vector b.
@@ -486,7 +486,7 @@ class VectorD (val dim: Int,
      */
     def dot (b: VectorD): Double =
     {
-        var s = 0.0
+        var s = 0.
         for (i <- range) s += v(i) * b.v(i)
         s
     } // dot
@@ -578,7 +578,7 @@ class VectorD (val dim: Int,
      */
     def argminNeg (e: Int = dim): Int =
     {
-        val j = argmin (e); if (v(j) < 0.0) j else -1
+        val j = argmin (e); if (v(j) < 0.) j else -1
     } // argmaxNeg
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -587,7 +587,7 @@ class VectorD (val dim: Int,
      */
     def argmaxPos (e: Int = dim): Int =
     {
-        val j = argmax (e); if (v(j) > 0.0) j else -1
+        val j = argmax (e); if (v(j) > 0.) j else -1
     } // argmaxPos
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -596,7 +596,7 @@ class VectorD (val dim: Int,
      */
     def firstNeg (e: Int = dim): Int =
     {
-        for (i <- 0 until e if v(i) < 0.0) return i; -1
+        for (i <- 0 until e if v(i) < 0.) return i; -1
     } // firstNeg
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -605,7 +605,7 @@ class VectorD (val dim: Int,
      */
     def firstPos (e: Int = dim): Int =
     {
-        for (i <- 0 until e if v(i) > 0.0) return i; -1
+        for (i <- 0 until e if v(i) > 0.) return i; -1
     } // firstPos
 
    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -614,7 +614,7 @@ class VectorD (val dim: Int,
     def countNeg: Int =
     {
         var count = 0
-        for (i <- 0 until dim if v(i) < 0.0) count += 1
+        for (i <- 0 until dim if v(i) < 0.) count += 1
         count
     } // countNeg
 
@@ -624,13 +624,13 @@ class VectorD (val dim: Int,
     def countPos: Int =
     {
         var count = 0
-        for (i <- 0 until dim if v(i) > 0.0) count += 1
+        for (i <- 0 until dim if v(i) > 0.) count += 1
         count
     } // countPos
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether the predicate pred holds for some element in this vector.
-     *  @param pred  the predicate to test (e.g., "_ == 5.0")
+     *  @param pred  the predicate to test (e.g., "_ == 5.")
      */
     def exists (pred: (Double) => Boolean): Boolean = v.exists (pred)
 
@@ -656,7 +656,7 @@ class VectorD (val dim: Int,
      */
     def isNonnegative: Boolean =
     {
-        for (i <- range if v(i) < 0.0) return false
+        for (i <- range if v(i) < 0.) return false
         true
     } // isNonnegative
 

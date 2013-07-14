@@ -267,7 +267,7 @@ trait Matrix [T]
         val max   = if (dim1 < dim2) dim1 else dim2   // rank <= min (m, n)
         val u     = lud._2                            // upper triangular matrix
         var count = 0
-        for (i <- 0 until max if this(i, i) != 0.0) count += 1
+        for (i <- 0 until max if this(i, i) != 0.) count += 1
         count
     } // rank
 
@@ -320,7 +320,7 @@ trait Matrix [T]
     /** Compute the (right) nullspace of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.0  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace (implicit fr: Fractional [T]): VectorN [T]
@@ -329,7 +329,7 @@ trait Matrix [T]
     /** Compute the (right) nullspace in-place of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.0  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace_ip (implicit fr: Fractional [T]): VectorN [T]

@@ -39,15 +39,15 @@ class RandomGraph (n: Int, p: Double, c: Int)
             var jc = 0
             do jc = pick.igen while (abs (jc - ic) < 3)
             println ("cluster " + k + " at (" + ic, ", " + jc + ")")
-            g(ic, jc) = 1.0
-            if (ic > 0)   { g(ic-1, jc) = 1.0 - coin.gen; g(jc, ic-1) = g(ic-1, jc) }
-            if (ic > 1)   { g(ic-2, jc) = 1.0 - coin.gen; g(jc, ic-2) = g(ic-2, jc) }
-            if (ic < n-1) { g(ic+1, jc) = 1.0 - coin.gen; g(jc, ic+1) = g(ic+1, jc) }
-            if (ic < n-2) { g(ic+2, jc) = 1.0 - coin.gen; g(jc, ic+2) = g(ic+2, jc) }
-            if (jc > 0)   { g(ic, jc-1) = 1.0 - coin.gen; g(jc-1, ic) = g(ic, jc-1) }
-            if (jc > 1)   { g(ic, jc-2) = 1.0 - coin.gen; g(jc-2, ic) = g(ic, jc-2) }
-            if (jc < n-1) { g(ic, jc+1) = 1.0 - coin.gen; g(jc+1, ic) = g(ic, jc+1) }
-            if (jc < n-2) { g(ic, jc+2) = 1.0 - coin.gen; g(jc+2, ic) = g(ic, jc+2) }
+            g(ic, jc) = 1.
+            if (ic > 0)   { g(ic-1, jc) = 1. - coin.gen; g(jc, ic-1) = g(ic-1, jc) }
+            if (ic > 1)   { g(ic-2, jc) = 1. - coin.gen; g(jc, ic-2) = g(ic-2, jc) }
+            if (ic < n-1) { g(ic+1, jc) = 1. - coin.gen; g(jc, ic+1) = g(ic+1, jc) }
+            if (ic < n-2) { g(ic+2, jc) = 1. - coin.gen; g(jc, ic+2) = g(ic+2, jc) }
+            if (jc > 0)   { g(ic, jc-1) = 1. - coin.gen; g(jc-1, ic) = g(ic, jc-1) }
+            if (jc > 1)   { g(ic, jc-2) = 1. - coin.gen; g(jc-2, ic) = g(ic, jc-2) }
+            if (jc < n-1) { g(ic, jc+1) = 1. - coin.gen; g(jc+1, ic) = g(ic, jc+1) }
+            if (jc < n-2) { g(ic, jc+2) = 1. - coin.gen; g(jc+2, ic) = g(ic, jc+2) }
         } // for
         g
     } // gen

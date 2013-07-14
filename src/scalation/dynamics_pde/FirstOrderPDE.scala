@@ -19,7 +19,7 @@ import scalation.util.Error
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class is used to solve first order partial differential equations like
  *  the Advection Equation.  Let u(x, t) = concentration in a fluid with velocity
- *  v at position 0 <= x <= xm and time t > 0.0  Numerically solve the
+ *  v at position 0 <= x <= xm and time t > 0.  Numerically solve the
  *  Advection Equation:      u_t + v(x, t) * u_x = 0
  *  with initial conditions  u(x, 0) = ic(x)
  *      boundary conditions  (u(0, t), u(xm, t)) = bc
@@ -64,9 +64,9 @@ class FirstOrderPDE (v: (Double, Double) => Double, dt: Double, dx: Double, xm: 
                 val a = r * v(x, t)
                                                              // explicit recurrence equation
 //              uu(i) = u(i) - a * (u(i) - u(i-1))
-//              uu(i) = .5 * ((1.0 - a) * u(i+1) + (1.0 + a) * u(i-1))
+//              uu(i) = .5 * ((1. - a) * u(i+1) + (1. + a) * u(i-1))
 //              uu(i) = u(i) - .5 * a * u(i+1) + .5 * a * u(i-1)
-                uu(i) = u(i) - .5 * a * (u(i+1) - u(i-1)) + .5 * a*a * (u(i+1) - 2.0*u(i) + u(i-1))  // L-W
+                uu(i) = u(i) - .5 * a * (u(i+1) - u(i-1)) + .5 * a*a * (u(i+1) - 2.*u(i) + u(i-1))  // L-W
 
             } // for
 
@@ -86,19 +86,19 @@ class FirstOrderPDE (v: (Double, Double) => Double, dt: Double, dx: Double, xm: 
  */
 object FirstOrderPDETest extends App
 {
-    val dt = 1.0                                              // delta t in sec
-    val dx = 1.0                                              // delta x in cm
-    val xm = 100.0                                            // length of column in cm
+    val dt = 1.                                              // delta t in sec
+    val dx = 1.                                              // delta x in cm
+    val xm = 100.                                            // length of column in cm
 
-    def ic (x: Double): Double = if (x < 30.0) 1.0 else 0.0     // initial conditions
-    val bc = (1.0, 0.0)                                        // boundary conditions - only a left bc
+    def ic (x: Double): Double = if (x < 30.) 1. else 0.     // initial conditions
+    val bc = (1., 0.)                                        // boundary conditions - only a left bc
 
-    def v (x: Double, t: Double): Double = 1.0                // the velocity field
+    def v (x: Double, t: Double): Double = 1.                // the velocity field
 
     val pde = new FirstOrderPDE (v, dt, dx, xm, ic, bc)
 
     println (" Explicit Finite Difference ------------------------------------------")
-    println ("solution = " + pde.solve (30.0))           // solve for t = 1, 2, ... sec
+    println ("solution = " + pde.solve (30.))           // solve for t = 1, 2, ... sec
 
 } // FirstOrderPDETest
 
@@ -110,25 +110,25 @@ object FirstOrderPDETest2 extends App
 {
     val dt = .2                                              // delta t in sec
     val dx = .2                                              // delta x in cm
-    val xm = 3.0                                              // length/height of column in cm
+    val xm = 3.                                              // length/height of column in cm
     val d  = 0.5                                             // decay width
-    val x0 = 0.0
+    val x0 = 0.
 
     def ic (x: Double): Double =                             // initial conditions
     {
-        xm / (1.0 + exp ((x - x0) / d))                       // logistic function
+        xm / (1. + exp ((x - x0) / d))                       // logistic function
     } // ic
 
     for (i <- 0 to 15) printf ("x = %4.1f, \t%6.3f\n", i*dx, ic (i*dx)) 
 
-    val bc = (ic (0.0), 0.0)                                   // boundary conditions - only a left bc
+    val bc = (ic (0.), 0.)                                   // boundary conditions - only a left bc
 
-    def v (x: Double, t: Double): Double = 1.0                // the velocity field
+    def v (x: Double, t: Double): Double = 1.                // the velocity field
 
     val pde = new FirstOrderPDE (v, dt, dx, xm, ic, bc)
 
     println (" Explicit Finite Difference ------------------------------------------")
-    println ("solution = " + pde.solve (4.0))           // solve for t = 2.0, .4 ... sec
+    println ("solution = " + pde.solve (4.))           // solve for t = 2., .4 ... sec
 
 } // FirstOrderPDETest2
 
@@ -143,21 +143,21 @@ object FirstOrderPDETest3 extends App
 
     val dt = .1                                              // delta t in sec
     val dx = .2                                              // delta x in cm
-    val xm = 2.0                                              // length/height of column in cm
+    val xm = 2.                                              // length/height of column in cm
 
     def ic (x: Double): Double =                             // initial conditions
     {
-        if (abs (x - .8) < EPSILON) 1.0 else 0.0
+        if (abs (x - .8) < EPSILON) 1. else 0.
     } // ic
 
-    val bc = (ic (0.0), 0.0)                                   // boundary conditions - only a left bc
+    val bc = (ic (0.), 0.)                                   // boundary conditions - only a left bc
 
-    def v (x: Double, t: Double): Double = -1.0               // the velocity field
+    def v (x: Double, t: Double): Double = -1.               // the velocity field
 
     val pde = new FirstOrderPDE (v, dt, dx, xm, ic, bc)
 
     println (" Explicit Finite Difference ------------------------------------------")
-    println ("solution = " + pde.solve (2.0))           // solve for t = .1, .2, ... sec
+    println ("solution = " + pde.solve (2.))           // solve for t = .1, .2, ... sec
 
 } // FirstOrderPDETest3
 

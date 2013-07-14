@@ -18,10 +18,11 @@ object ParMatrixTest extends App
 {
     val n   = 1000
     val rep = 10 
-    val ran = Uniform (0.0, n)
+    val ran = Uniform (0., n)
     var t0  = 0l
     var dt  = 0l
-    var r   = 0.0
+    var r   = 0.
+
     val x = new math.Vectors.VectorD (n)
     val a = new math.Matrices.MatrixD (n, n)
     val b = new math.Matrices.MatrixD (n, n)

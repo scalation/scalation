@@ -23,7 +23,7 @@ import scalation.util.Error
  *  (CTMC).  Note: the transition matrix tr gives the state transition rates
  *  off-diagonal.  The diagonal elements must equal minus the sum of the rest
  *  of their row.  Transient solution: Solve the Chapman-Kolmogorov differemtial
- *  equations.  Equilibrium solution (steady-state): solve for p in p * tr = 0.0
+ *  equations.  Equilibrium solution (steady-state): solve for p in p * tr = 0.
  *  See: www.math.wustl.edu/~feres/Math450Lect05.pdf
  *  @param tr  the transition rate matrix
  */
@@ -43,9 +43,9 @@ class MarkovC (tr: MatrixD) extends Error
             val s = tr(i).sum_ne (i)               // sum the ith row of tr skipping i
             for (j <- 0 until jump.dim2) {
                 if (i != j) {                                     // off-diagonal
-                    jump(i, j) = if (s == 0.0) 0.0 else tr(i, j) / s
+                    jump(i, j) = if (s == 0.) 0. else tr(i, j) / s
                 } else {                                          // on-diagonal
-                    jump(i, i) = if (s == 0.0) 1.0 else 0.0
+                    jump(i, i) = if (s == 0.) 1. else 0.
                 } // if
             } // for
         } // for
@@ -88,7 +88,7 @@ class MarkovC (tr: MatrixD) extends Error
      *  @param p  the current state probability vector
      *  @param t  compute for time t
      */
-    def next (p: VectorD, t: Double = 1.0): VectorD =
+    def next (p: VectorD, t: Double = 1.): VectorD =
     {
         null  // FIX, not implemented yet
     } // next
@@ -96,7 +96,7 @@ class MarkovC (tr: MatrixD) extends Error
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the limiting probabilistic state as t -> infinity, by finding the
      *  left nullspace of the tr matrix: solve for p such that p * tr = 0 and
-     *  normalize p, i.e., ||p|| = 1.0
+     *  normalize p, i.e., ||p|| = 1.
      */
     def limit: VectorD =
     {
@@ -112,21 +112,21 @@ class MarkovC (tr: MatrixD) extends Error
      */
     def simulate (i0: Int, endTime: Double)
     {
-        var clock    = 0.0                 // current continuous time
+        var clock    = 0.                 // current continuous time
         var i        = i0                 // current state = start state
         var absorbed = false              // whether it has entered an absorbing state
         val tk_id      = tr.dim1          // the identifier for the token
-        val ms_per_sec = 1000.0            // 1000 milliseconds per second (animate using seconds)
+        val ms_per_sec = 1000.            // 1000 milliseconds per second (animate using seconds)
 
         animate ()
-        aniQ += AnimateCommand (CreateToken, tk_id, Ellipse (), "tk" + tk_id, false, black, null, 0.0, i0)
+        aniQ += AnimateCommand (CreateToken, tk_id, Ellipse (), "tk" + tk_id, false, black, null, 0., i0)
 
         println ("simulate: start simulation of Continuous-Time Markov Chain at time " + clock)
         println ("simulate: at time " + clock + " the state is " + i)
 
         while (clock < endTime && ! absorbed) {
             val tr_i = - tr(i, i)                  // holding rate for state i
-            if (tr_i == 0.0) {
+            if (tr_i == 0.) {
                 absorbed = true
                 println ("simulate: entered absorbing state " + i)
             } else {
@@ -158,7 +158,7 @@ class MarkovC (tr: MatrixD) extends Error
             //:: Display the nodes for the continuous-time Markov Chain
 
             for (i <- 0 until n) {
-                val theta = -Pi + 2.0 * Pi * (i / n.asInstanceOf [Double])
+                val theta = -Pi + 2. * Pi * (i / n.asInstanceOf [Double])
                 val shape = Ellipse ()
                 val label = "n" + i
                 val color = lightblue
@@ -166,7 +166,7 @@ class MarkovC (tr: MatrixD) extends Error
                                    yCenter + radius * sin (theta), size, size)
                 println ("MarkovC.animate: " + label + "." + i + " " + CreateNode + " " + color +
                          " " + shape + " " + at.deep)
-                aniQ += AnimateCommand (CreateNode, i, shape, label, true, color, at, 0.0)
+                aniQ += AnimateCommand (CreateNode, i, shape, label, true, color, at, 0.)
             } // for
 
             //:: Display the edges for the continuous-time Markov Chain
@@ -180,7 +180,7 @@ class MarkovC (tr: MatrixD) extends Error
                    println ("MarkovC.animate: " + label + "." + eid + " " + CreateEdge +
                             " " + color + " " + shape + " " + i + " " + j)
                    aniQ += AnimateCommand (CreateEdge, eid, shape, label, true, color,
-                                           Array (bend), 0.0, i, j)
+                                           Array (bend), 0., i, j)
                 } // for
             } // for
 
@@ -200,10 +200,10 @@ class MarkovC (tr: MatrixD) extends Error
  */
 object MarkovCTest extends App
 {
-    val endTime = 200.0     // number of time units (e.g., milliseconds)
+    val endTime = 200.     // number of time units (e.g., milliseconds)
 
-    val mc = new MarkovC (new MatrixD ((2, 2), -4.0,  4.0,        // 2-by-2 matrix
-                                                5.0, -5.0))
+    val mc = new MarkovC (new MatrixD ((2, 2), -4.,  4.,        // 2-by-2 matrix
+                                                5., -5.))
 
     println ("\nContinuous-Time Markov Chain mc = " + mc + "\n")
     println ("\nContinuous-Time Markov Chain: transient solution:")
@@ -213,12 +213,12 @@ object MarkovCTest extends App
     println ("\njump matrix  \tj = " + mc.jump)
     println ("\nsteady-state \tp = " + mc.limit)
 
-    val mc2 = new MarkovC (new MatrixD ((6, 6), -2.0, 1.0,  0.0,  1.0,  0.0, 0.0,   // 6-by-6 matrix
-                                                 0.0, 0.0,  0.0,  0.0,  0.0, 0.0,
-                                                 0.0, 1.0, -4.0,  0.0,  0.0, 3.0,
-                                                 2.0, 0.0,  0.0, -4.0,  2.0, 0.0,
-                                                 0.0, 3.0,  1.0,  0.0, -5.0, 1.0,
-                                                 0.0, 0.0,  0.0,  0.0,  0.0, 0.0))
+    val mc2 = new MarkovC (new MatrixD ((6, 6), -2., 1.,  0.,  1.,  0., 0.,   // 6-by-6 matrix
+                                                 0., 0.,  0.,  0.,  0., 0.,
+                                                 0., 1., -4.,  0.,  0., 3.,
+                                                 2., 0.,  0., -4.,  2., 0.,
+                                                 0., 3.,  1.,  0., -5., 1.,
+                                                 0., 0.,  0.,  0.,  0., 0.))
 
     println ("\nContinuous-Time Markov Chain mc2 = " + mc2 + "\n")
     println ("\nContinuous-Time Markov Chain: simulation:")

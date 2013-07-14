@@ -62,12 +62,12 @@ class Histogram (value: VectorD, numIntervals: Int, _title: String = "Histogram"
             super.paintComponent (g2d)
             var x_pos = 0
             var y_pos = 0
-            var step  = 0.0
+            var step  = 0.
 
             //:: Draw the axes
 
             g2d.setPaint (black)
-            g2d.setStroke (new BasicStroke (2.0f))
+            g2d.setStroke (new BasicStroke (2.f))
             axis.setLine (baseX - 1, baseY + 1, baseX + 10 + frameW - 2 * offset, baseY + 1)
             g2d.draw (axis)
             axis.setLine (baseX - 1, offset - 10, baseX - 1, baseY + 1)
@@ -76,7 +76,7 @@ class Histogram (value: VectorD, numIntervals: Int, _title: String = "Histogram"
             //:: Draw the labels on the axes
 
             y_pos = baseY + 15
-            step  = (maxValue - minValue) / 10.0
+            step  = (maxValue - minValue) / 10.
             for (j <- 0 to 10) {
                 val x_val = clip (minValue + j * step)
                 x_pos = offset - 8 + j * (frameW - 2 * offset) / 10 
@@ -168,14 +168,14 @@ object HistogramTest extends App
     val samples    = 40000
 
 /*
-    val h1 = new Histogram (new VectorD (0.0, 2.0, 3.0, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 8.0, 9.0), 5, "Simple Histogram")
+    val h1 = new Histogram (new VectorD (0., 2., 3., 4., 4.5, 5., 5.5, 6., 6.5, 7., 8., 9.), 5, "Simple Histogram")
     println ("histogram = " + h1)
 */
 
     val uniformRV   = Uniform (0, 1)
     val uniformDist = new VectorD (samples)
     for (i <- 0 until samples) {
-        var sum = 0.0
+        var sum = 0.
         for (j <- 0 until 1) {
             sum += uniformRV.gen
         } // for

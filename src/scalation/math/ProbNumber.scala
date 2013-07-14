@@ -18,12 +18,12 @@ import scalation.util.Error
  *  @param x  the real number (double precision)
  *  @param p  the probability of its occurrence [0, 1]
  */
-case class ProbNumber (x: Double, p: Double = 1.0)
+case class ProbNumber (x: Double, p: Double = 1.)
      extends Numeric [ProbNumber] with Ordered [ProbNumber] with Error
 {
     private val EPSILON = 1E-9        // number close to zero
 
-    if (p < 0.0 || p > 1.0) flaw ("constructor", "p is not a probability " + p)
+    if (p < 0. || p > 1.) flaw ("constructor", "p is not a probability " + p)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the unary minus (-).
@@ -59,7 +59,7 @@ case class ProbNumber (x: Double, p: Double = 1.0)
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether the probabilistic number is certain (probability = 1).
      */
-    def isCertain = p >= 1.0 - EPSILON
+    def isCertain = p >= 1. - EPSILON
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compare two probabilistic numbers (negative for <, zero for ==, positive for >).
@@ -102,7 +102,7 @@ case class ProbNumber (x: Double, p: Double = 1.0)
     /** Create a probabilistic number from an Int.
      *  @param n  the integer used to create the probabilistic number.
      */
-    def fromInt (n: Int) = ProbNumber (n, 0.0)
+    def fromInt (n: Int) = ProbNumber (n, 0.)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert this probabilistic number to a String.
@@ -119,8 +119,8 @@ object ProbNumberTest extends App
 {
     import scalation.math.ProbNumber._
 
-    val xp = ProbNumber (2.0, .5)
-    val yq = ProbNumber (4.0, .5)
+    val xp = ProbNumber (2., .5)
+    val yq = ProbNumber (4., .5)
     println ("xp = " + xp)
     println ("yq = " + yq)
     println ("xp + yq = " + (xp + yq))

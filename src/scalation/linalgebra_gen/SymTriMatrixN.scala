@@ -365,7 +365,7 @@ class SymTriMatrixN [T: ClassManifest: Numeric] (val d1: Int)
     /** Compute the (right) nullspace of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.0  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace (implicit fr: Fractional [T]): VectorN [T] =
@@ -378,7 +378,7 @@ class SymTriMatrixN [T: ClassManifest: Numeric] (val d1: Int)
     /** Compute the (right) nullspace in-place of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.0  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace_ip (implicit fr: Fractional [T]): VectorN [T] =
@@ -519,11 +519,11 @@ class SymTriMatrixN [T: ClassManifest: Numeric] (val d1: Int)
  */
 object SymTriMatrixNtest extends App
 {
-    val a = new SymTriMatrixN [Float] (new VectorN [Float] (1.0f, 2.0f, 3.0f),
-                                       new VectorN [Float] (4.0f, 5.0f))
+    val a = new SymTriMatrixN [Float] (new VectorN [Float] (1.f, 2.f, 3.f),
+                                       new VectorN [Float] (4.f, 5.f))
 
-    val b = new SymTriMatrixN [Float] (new VectorN [Float] (2.0f, 3.0f, 4.0f),
-                                       new VectorN [Float] (5.0f, 6.0f))
+    val b = new SymTriMatrixN [Float] (new VectorN [Float] (2.f, 3.f, 4.f),
+                                       new VectorN [Float] (5.f, 6.f))
 
     println ("a     = " + a)
     println ("b     = " + b)

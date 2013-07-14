@@ -32,7 +32,7 @@ class WaitQueue (name: String, at: Array [Double])
      */
     def this (name: String, xy: Tuple2 [Double, Double])
     {
-        this (name, Array (xy._1, xy._2, 70.0, 20.0))
+        this (name, Array (xy._1, xy._2, 70., 20.))
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -65,7 +65,7 @@ class WaitQueue (name: String, at: Array [Double])
      */
     def noWait ()
     {
-        tally (0.0)
+        tally (0.)
     } // noWait
 
 } // WaitQueue class

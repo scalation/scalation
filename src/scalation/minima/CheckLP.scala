@@ -53,7 +53,7 @@ class CheckLP (a: MatrixD, b: VectorD, c: VectorD)
         if (x.dim != N) flaw ("constructor", "x.dim = " + x.dim + " != " + N)
 
         // non-negativity constraints: check that x >= 0
-        for (j <- 0 until N if x(j) < 0.0) {
+        for (j <- 0 until N if x(j) < 0.) {
             flaw ("isPrimalFeasible", "x(" + j + ") = " + x(j) + " is negative")
             return false
         } // for
@@ -63,12 +63,12 @@ class CheckLP (a: MatrixD, b: VectorD, c: VectorD)
         for (i <- 0 until M) {
             val ax_i = ax(i)
             val b_i  = b(i)
-            if (b_i >= 0.0 && ax_i >  b_i + EPSILON) {
+            if (b_i >= 0. && ax_i >  b_i + EPSILON) {
                 flaw ("isPrimalFeasible", "constraint ax_i <= b_i violated for row " + i + ": "
                                                     + ax_i + " > " + b_i)
                 return false
             } // if
-            if (b_i <  0.0 && ax_i < -b_i - EPSILON) {
+            if (b_i <  0. && ax_i < -b_i - EPSILON) {
                 flaw ("isPrimalFeasible", "constraint ax_i >= -b_i violated for row " + i + ": "
                                                     + ax_i + " < " + -b_i)
                 return false
@@ -86,7 +86,7 @@ class CheckLP (a: MatrixD, b: VectorD, c: VectorD)
         if (y.dim != M) flaw ("constructor", "y.dim = " + y.dim + " != " + M)
 
         // non-positivity constraints: check that y <= 0
-        for (i <- 0 until M if y(i) > 0.0) {
+        for (i <- 0 until M if y(i) > 0.) {
             flaw ("isDualFeasible", "y(" + i + ") = " + y(i) + " is positive")
             return false
         } // for

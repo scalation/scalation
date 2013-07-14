@@ -86,8 +86,8 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
                 g2d.fill (node.shape)
                 g2d.setPaint (black)
                 g2d.draw (node.shape)
-                val x = node.shape.getCenterX ().asInstanceOf [Float] - 20.0f
-                val y = node.shape.getMaxY ().asInstanceOf [Float] + 12.0f
+                val x = node.shape.getCenterX ().asInstanceOf [Float] - 20.f
+                val y = node.shape.getMaxY ().asInstanceOf [Float] + 12.f
                 g2d.drawString (node.label, x, y)
                 for (token <- node.tokens) {
                     g2d.setPaint (token.color)
@@ -101,10 +101,10 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             for (edge <- graph.edges) {
                 g2d.setPaint (edge.color)
                 g2d.draw (edge.shape)
-                val x = edge.shape.getCenterX ().asInstanceOf [Float] - 30.0f
+                val x = edge.shape.getCenterX ().asInstanceOf [Float] - 30.f
                 val y = edge.shape.getCenterY ().asInstanceOf [Float]
                 g2d.drawString (edge.label, x, y)
-                for (token <- edge.tokens if token.shape.getWidth () > 0.0) {
+                for (token <- edge.tokens if token.shape.getWidth () > 0.) {
                     g2d.setPaint (token.color)
                     g2d.fill (token.shape)
                 } // for
@@ -113,7 +113,7 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
             //:: Display all free tokens in the graph.
 
             // println ("paintComponent: paint " + graph.freeTokens.length + " free tokens")
-            for (token <- graph.freeTokens if token.shape.getWidth () > 0.0) {
+            for (token <- graph.freeTokens if token.shape.getWidth () > 0.) {
                 g2d.setPaint (token.color)
                 g2d.fill (token.shape)
             } // for

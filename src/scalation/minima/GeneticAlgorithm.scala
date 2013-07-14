@@ -87,8 +87,8 @@ class GeneticAlgorithm (f:       VectorI => Double,
         if (g == null) {                  // unconstrained
             f(x)
         } else {                          // constrained, g(x) <= 0
-            val penalty = max (g(x), 0.0)
-            f(x) * (1.0 + WEIGHT * penalty * penalty)
+            val penalty = max (g(x), 0.)
+            f(x) * (1. + WEIGHT * penalty * penalty)
         } // if
     } // fg
 

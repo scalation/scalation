@@ -89,7 +89,7 @@ class Model (name: String, animation: Boolean = true)
      *  statistics.
      *  @param startTime the time at which the simulation is to begin
      */
-    def simulate (startTime: Double = 0.0): ListBuffer [Statistic] =
+    def simulate (startTime: Double = 0.): ListBuffer [Statistic] =
     {
         _clock = startTime
         trace (this, "starts", this, _clock)
@@ -238,8 +238,8 @@ object ModelTest extends App
     class RoadModel (name: String, nArrivals: Int, iArrivalRV: Variate, moveRV: Variate)
           extends Model (name, false)
     {
-        val onRamp  = new Source ("onRamp", this, Car, nArrivals, iArrivalRV, Array (100.0, 200.0, 30.0, 30.0))
-        val offRamp = new Sink ("offRamp", Array (400.0, 200.0, 30.0, 30.0))
+        val onRamp  = new Source ("onRamp", this, Car, nArrivals, iArrivalRV, Array (100., 200., 30., 30.))
+        val offRamp = new Sink ("offRamp", Array (400., 200., 30., 30.))
         val road    = new Transport ("road", moveRV, onRamp, offRamp, .25)
   
         addComponents (List (onRamp, road, offRamp))

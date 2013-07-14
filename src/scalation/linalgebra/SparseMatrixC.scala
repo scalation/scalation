@@ -71,7 +71,7 @@ class SparseMatrixC (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a dim1 by dim1 square sparse matrix with x assigned on the diagonal
-     *  and 0 assigned off the diagonal.  To obtain an identity matrix, let x = 1.0
+     *  and 0 assigned off the diagonal.  To obtain an identity matrix, let x = 1.
      *  @param dim1  the row and column dimension
      *  @param x     the scalar value to assign on the diagonal
      */
@@ -1035,7 +1035,7 @@ class SparseMatrixC (val d1: Int,
     /** Compute the (right) nullspace of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.0  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace: VectorC =
@@ -1051,7 +1051,7 @@ class SparseMatrixC (val d1: Int,
     /** Compute the (right) nullspace in-place of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.0  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace_ip: VectorC =
@@ -1165,19 +1165,19 @@ object SparseMatrixCTest extends App
         println ("\n\tTest SparseMatrixC on real matrices of dim " + l)
         val x = new SparseMatrixC (l, l)
         val y = new SparseMatrixC (l, l)
-        x.set (2.0)
-        y.set (3.0)
+        x.set (2.)
+        y.set (3.)
         println ("x + y  = " + (x + y))
         println ("x - y  = " + (x - y))
         println ("x * y  = " + (x * y))
-        println ("x * 4. = " + (x * Complex (4.0)))
+        println ("x * 4. = " + (x * Complex (4.)))
     } // for
 
     println ("\n\tTest SparseMatrixC on additional operations")
 
-    val z  = new SparseMatrixC ((2, 2), 1.0, 2.0,
-                                        3.0, 2.0)
-    val b  = new VectorC (8.0, 7.0)
+    val z  = new SparseMatrixC ((2, 2), 1., 2.,
+                                        3., 2.)
+    val b  = new VectorC (8., 7.)
     val lu = z.lud
 
     println ("z         = " + z)
@@ -1189,11 +1189,11 @@ object SparseMatrixCTest extends App
     println ("z.det     = " + z.det)
     println ("z         = " + z)
 
-    val w = new SparseMatrixC ((2, 3), 2.0, 3.0, 5.0,
-                                      -4.0, 2.0, 3.0)
-    val v = new MatrixC ((3, 2), 2.0, -4.0,
-                                 3.0,  2.0,
-                                 5.0,  3.0)
+    val w = new SparseMatrixC ((2, 3), 2., 3., 5.,
+                                      -4., 2., 3.)
+    val v = new MatrixC ((3, 2), 2., -4.,
+                                 3.,  2.,
+                                 5.,  3.)
     
     println ("w         = " + w)
     println ("v         = " + v)

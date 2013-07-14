@@ -82,19 +82,19 @@ class SparseMatrixD (val d1: Int,
     def this (dim1: Int, dim2: Int, x: Double)
     {
         this (dim1, dim2)
-        if (x != 0.0) for (i <- range1; j <- range2.reverse) v(i)(j) = x
+        if (x != 0.) for (i <- range1; j <- range2.reverse) v(i)(j) = x
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a dim1 by dim1 square sparse matrix with x assigned on the diagonal
-     *  and 0 assigned off the diagonal.  To obtain an identity matrix, let x = 1.0
+     *  and 0 assigned off the diagonal.  To obtain an identity matrix, let x = 1.
      *  @param dim1  the row and column dimension
      *  @param x     the scalar value to assign on the diagonal
      */
     def this (dim1: Int, x: Double)
     {
         this (dim1, dim1)
-        if (x != 0.0) for (i <- range1) v(i)(i) = x
+        if (x != 0.) for (i <- range1) v(i)(i) = x
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -151,7 +151,7 @@ class SparseMatrixD (val d1: Int,
      *  @param i  the row index
      *  @param j  the column index
      */
-    def apply (i: Int, j: Int): Double = if (v(i) contains j) v(i)(j) else 0.0
+    def apply (i: Int, j: Int): Double = if (v(i) contains j) v(i)(j) else 0.
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get this sparse matrix's vector at the i-th index position (i-th row).
@@ -173,7 +173,7 @@ class SparseMatrixD (val d1: Int,
         val a = Array.ofDim [Double] (dim2)
         for (j <- 0 until dim2) {
             try a(j) = v(i)(j)
-            catch { case nsee: NoSuchElementException => a(j) = 0.0 }
+            catch { case nsee: NoSuchElementException => a(j) = 0. }
         } // for
         new VectorD (a)
     } // apply
@@ -210,7 +210,7 @@ class SparseMatrixD (val d1: Int,
      *  @param j  the column index
      *  @param x  the scalar value to assign
      */
-    def update (i: Int, j: Int, x: Double) { if (x != 0.0) v(i)(j) = x else v(i) -= j }
+    def update (i: Int, j: Int, x: Double) { if (x != 0.) v(i)(j) = x else v(i) -= j }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set this sparse matrix's row at the i-th index position to the vector u.
@@ -221,7 +221,7 @@ class SparseMatrixD (val d1: Int,
     {
         for (j <- 0 until u.dim) {
             val x = u(j)
-            if (x != 0.0) v(i)(j) = x else v(i) -= j
+            if (x != 0.) v(i)(j) = x else v(i) -= j
         } // for
     } // update
 
@@ -540,7 +540,7 @@ class SparseMatrixD (val d1: Int,
                 var cont = false
                 var itaNext = false               // more elements in row of this matrix?
                 var itbNext = false               // more elements in row of bt matrix?
-                var sum = 0.0
+                var sum = 0.
                 if (ea != null && eb != null) cont = true
                 while (cont) {
                     if (itaNext) ea = ea.later
@@ -556,7 +556,7 @@ class SparseMatrixD (val d1: Int,
                     if (itaNext && ea.later == null) cont = false
                     if (itbNext && eb.later == null) cont = false
                 } // while
-                if (sum != 0.0) c(i, j) = sum         // assign if non-zero
+                if (sum != 0.) c(i, j) = sum         // assign if non-zero
             } // for
         } // for
         c
@@ -572,7 +572,7 @@ class SparseMatrixD (val d1: Int,
 
         val c = new SparseMatrixD (dim1, b.dim2)
         for (i <- c.range1; j <- c.range2) {
-            var sum = 0.0
+            var sum = 0.
             for (e <- v(i)) sum += e._2 * b(e._1, j)
             c(i, j) = sum
         } // for
@@ -589,7 +589,7 @@ class SparseMatrixD (val d1: Int,
 
         val c = new VectorD (dim1)
         for (i <- range1) {
-            var sum = 0.0
+            var sum = 0.
             for (e <- v(i)) sum += e._2 * u(e._1)
             c(i) = sum
         } // for
@@ -630,7 +630,7 @@ class SparseMatrixD (val d1: Int,
                 var cont = false
                 var itaNext = false               // more elements in row of this matrix?
                 var itbNext = false               // more elements in row of bt matrix?
-                var sum = 0.0
+                var sum = 0.
                 if (ea != null && eb != null) cont = true
                 while (cont) {
                     if (itaNext) ea = ea.later
@@ -664,7 +664,7 @@ class SparseMatrixD (val d1: Int,
             val temp = new RowMap ()   // save so not overwritten
             for (e <- v(i)) temp(e._1) = e._2
             for (j <- range2) {
-                var sum = 0.0
+                var sum = 0.
                 for (e <- temp) sum += e._2 * b(e._1, j)
                 this(i, j) = sum
             } // for
@@ -802,7 +802,7 @@ class SparseMatrixD (val d1: Int,
      */
     private def getMaxVal (u: RowMap): Double =
     {
-        var x = if (u contains 0) u(0) else 0.0
+        var x = if (u contains 0) u(0) else 0.
         for (e <- u) if (e._2 > x) x = e._2
         x
     } // getMaxVal
@@ -827,7 +827,7 @@ class SparseMatrixD (val d1: Int,
      */
     private def getMinVal (u: RowMap): Double =
     {
-        var x = if (u contains 0) u(0) else 0.0
+        var x = if (u contains 0) u(0) else 0.
         for (e <- u) if (e._2 < x) x = e._2
         x
     } // getMinVal
@@ -843,13 +843,13 @@ class SparseMatrixD (val d1: Int,
         val u = new SparseMatrixD (this)         // upper triangular matrix (a copy of this)
         for (i <- u.range1) {
             var pivot = u(i, i)
-            if (pivot == 0.0) {
+            if (pivot == 0.) {
                 val k = partialPivoting (u, i)   // find the maxiumum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u(i, i)                  // reset the pivot
             } // if
-            l(i, i) = 1.0
-            for (j <- i + 1 until u.dim2) l(i, j) = 0.0
+            l(i, i) = 1.
+            for (j <- i + 1 until u.dim2) l(i, j) = 0.
             for (k <- i + 1 until u.dim1) {
                 val mul = u(k, i) / pivot
                 l(k, i) = mul
@@ -870,13 +870,13 @@ class SparseMatrixD (val d1: Int,
         val u = this                             // upper triangular matrix (this)
         for (i <- u.range1) {
             var pivot = u(i, i)
-            if (pivot == 0.0) {
+            if (pivot == 0.) {
                 val k = partialPivoting (u, i)   // find the maxiumum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u(i, i)                  // reset the pivot
             } // if
-            l(i, i) = 1.0
-            for (j <- i + 1 until u.dim2) l(i, j) = 0.0
+            l(i, i) = 1.
+            for (j <- i + 1 until u.dim2) l(i, j) = 0.
             for (k <- i + 1 until u.dim1) {
                 val mul = u(k, i) / pivot
                 l(k, i) = mul
@@ -928,13 +928,13 @@ class SparseMatrixD (val d1: Int,
     {
         val y = new VectorD (l.dim2)       
         for (k <- 0 until y.dim) {                   // solve for y in l*y = b
-            var sum = 0.0
+            var sum = 0.
             for (j <- 0 until k) sum = sum + l(k, j) * y(j)
             y(k) = b(k) - sum
         } // for
         val x = new VectorD (u.dim2)
         for (k <- x.dim - 1 to 0 by -1) {            // solve for x in u*x = y
-            var sum = 0.0
+            var sum = 0.
             for (j <- k + 1 until u.dim2) sum = sum + u(k, j) * x(j)
             x(k) = (y(k) - sum) / u(k, k)
         } // for
@@ -967,7 +967,7 @@ class SparseMatrixD (val d1: Int,
         for (i <- 0 until m; j <- 0 until n) {
             c(i, j) = if (i <  dim1 && j <  dim2) this(i, j)
                  else if (i >= dim1 && j >= dim2) b(i-dim1, j-dim2)
-                    else                          0.0
+                    else                          0.
         } // for
         c
     } // diag
@@ -985,7 +985,7 @@ class SparseMatrixD (val d1: Int,
         val n  = dim1 + p + q
         val c  = new SparseMatrixD (n, n)
         for (i <- 0 until n; j <- 0 until n) {
-            c(i, j) = if (i < p || i > p + dim1) if (i == j) 1.0 else 0.0
+            c(i, j) = if (i < p || i > p + dim1) if (i == j) 1.0 else 0.
                     else                         this(i-p, j-p)
         } // for
         c
@@ -1026,10 +1026,10 @@ class SparseMatrixD (val d1: Int,
     def inverse: SparseMatrixD =
     {
         val b = new SparseMatrixD (this)           // copy this matrix into b
-        val c = new SparseMatrixD (dim1, 1.0)       // let c represent the augmentation
+        val c = new SparseMatrixD (dim1, 1.)       // let c represent the augmentation
         for (i <- b.range1) {
             var pivot = b(i, i)
-            if (pivot == 0.0) {
+            if (pivot == 0.) {
                 val k = partialPivoting (b, i)     // find the maxiumum element below pivot
                 swap (b, i, k, i)                  // in b, swap rows i and k from column i
                 swap (c, i, k, 0)                  // in c, swap rows i and k from column 0
@@ -1041,12 +1041,12 @@ class SparseMatrixD (val d1: Int,
             } // for
             for (k <- 0 until dim1 if k != i) {
                 val mul = b(k, i)
-                if (mul != 0.0) {
+                if (mul != 0.) {
                     for (j <- b.range2) {
                         val bval = b(i, j)
                         val cval = c(i, j)
-                        if (bval != 0.0) b(k, j) -= mul * bval
-                        if (cval != 0.0) c(k, j) -= mul * cval
+                        if (bval != 0.) b(k, j) -= mul * bval
+                        if (cval != 0.) c(k, j) -= mul * cval
                     } // for
                 } // if
             } // for
@@ -1061,10 +1061,10 @@ class SparseMatrixD (val d1: Int,
     def inverse_ip: SparseMatrixD =
     {
         val b = this                            // use this matrix for b
-        val c = new SparseMatrixD (dim1, 1.0)    // let c represent the augmentation
+        val c = new SparseMatrixD (dim1, 1.)    // let c represent the augmentation
         for (i <- b.range1) {
             var pivot = b(i, i)
-            if (pivot == 0.0) {
+            if (pivot == 0.) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 swap (c, i, k, 0)               // in c, swap rows i and k from column 0
@@ -1076,7 +1076,7 @@ class SparseMatrixD (val d1: Int,
             } // for
             for (k <- 0 until dim1 if k != i) {
                 val mul = b(k, i)
-                if (mul != 0.0) {
+                if (mul != 0.) {
                     for (j <- b.range2) {
                         b(k, j) = b(k, j) - mul * b(i, j)
                         c(k, j) = c(k, j) - mul * c(i, j)
@@ -1098,7 +1098,7 @@ class SparseMatrixD (val d1: Int,
         val b = new SparseMatrixD (this)        // copy this matrix into b
         for (i <- b.range1) {
             var pivot = b(i, i)
-            if (pivot == 0.0) {
+            if (pivot == 0.) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b(i, i)                 // reset the pivot
@@ -1125,7 +1125,7 @@ class SparseMatrixD (val d1: Int,
         val b = this                            // use this matrix for b
         for (i <- b.range1) {
             var pivot = b(i, i)
-            if (pivot == 0.0) {
+            if (pivot == 0.) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b(i, i)                 // reset the pivot
@@ -1133,7 +1133,7 @@ class SparseMatrixD (val d1: Int,
             for (j <- b.range2) b(i, j) = b(i, j) / pivot
             for (k <- 0 until dim1 if k != i) {
                 val mul = b(k, i)
-                if (mul != 0.0) {
+                if (mul != 0.) {
                     for (j <- b.range2) b(k, j) = b(k, j) - mul * b(i, j)
                 } // if
             } // for
@@ -1149,8 +1149,8 @@ class SparseMatrixD (val d1: Int,
      */
     def clean (thres: Double, relative: Boolean = true): SparseMatrixD =
     {
-        val s = if (relative) mag else 1.0             // use matrix magnitude or 1
-        for (i <- range1; j <- range2) if (abs (this(i, j)) <= thres * s) this(i, j) = 0.0
+        val s = if (relative) mag else 1.             // use matrix magnitude or 1
+        for (i <- range1; j <- range2) if (abs (this(i, j)) <= thres * s) this(i, j) = 0.
         this
     } // clean
 
@@ -1158,24 +1158,24 @@ class SparseMatrixD (val d1: Int,
     /** Compute the (right) nullspace of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.0  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace: VectorD =
     {
         if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
 
-        //reduce.col(dim2 - 1) * -1.0 ++ 1.0
+        //reduce.col(dim2 - 1) * -1. ++ 1.
         var r = reduce.col(dim2 - 1) 
-        r = r * -1.0
-        r ++ 1.0
+        r = r * -1. 
+        r ++ 1.
     } // nullspace
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the (right) nullspace in-place of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.0  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace_ip: VectorD =
@@ -1184,8 +1184,8 @@ class SparseMatrixD (val d1: Int,
 
         reduce_ip
         var c = col(dim2 - 1) 
-        c = c * -1.0
-        c ++ 1.0
+        c = c * -1. 
+        c ++ 1.
     } // nullspace_ip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1197,7 +1197,7 @@ class SparseMatrixD (val d1: Int,
     {
         if ( ! isSquare) flaw ("trace", "trace only works on square matrices")
 
-        var sum = 0.0
+        var sum = 0.
         for (i <- range1) sum += this(i, i)
         sum
     } // trace
@@ -1207,7 +1207,7 @@ class SparseMatrixD (val d1: Int,
      */
     def sum: Double =
     {
-        var sum = 0.0
+        var sum = 0.
         for (i <- range1; j <- range2) sum += this(i, j)
         sum
     } // sum
@@ -1217,7 +1217,7 @@ class SparseMatrixD (val d1: Int,
      */
     def sumLower: Double =
     {
-        var sum = 0.0
+        var sum = 0.
         for (i <- range1; j <- 0 until i) sum += this(i, j)
         sum
     } // sumLower
@@ -1229,7 +1229,7 @@ class SparseMatrixD (val d1: Int,
     {
         if ( ! isSquare) flaw ("det", "determinant only works on square matrices")
 
-        var sum = 0.0
+        var sum = 0.
         for (j <- range2) {
             val b = sliceExclude (0, j)   // the submatrix that excludes row 0 and column j
             sum += (if (j % 2 == 0) this(0, j) * (if (b.dim1 == 1) b(0, 0) else b.det)
@@ -1249,7 +1249,7 @@ class SparseMatrixD (val d1: Int,
      */
     def isNonnegative: Boolean =
     {
-        for (i <- range1; e <- v(i) if e._2 < 0.0) return false
+        for (i <- range1; e <- v(i) if e._2 < 0.) return false
         true
     } // isNonegative
     
@@ -1294,19 +1294,19 @@ object SparseMatrixDTest extends App
         println ("\n\tTest SparseMatrixD on real matrices of dim " + l)
         val x = new SparseMatrixD (l, l)
         val y = new SparseMatrixD (l, l)
-        x.set (2.0)
-        y.set (3.0)
+        x.set (2.)
+        y.set (3.)
         println ("x + y  = " + (x + y))
         println ("x - y  = " + (x - y))
         println ("x * y  = " + (x * y))
-        println ("x * 4. = " + (x * 4.0))
+        println ("x * 4. = " + (x * 4.))
     } // for
 
     println ("\n\tTest SparseMatrixD on additional operations")
 
-    val z  = new SparseMatrixD ((2, 2), 1.0, 2.0,
-                                        3.0, 2.0)
-    val b  = new VectorD (8.0, 7.0)
+    val z  = new SparseMatrixD ((2, 2), 1., 2.,
+                                        3., 2.)
+    val b  = new VectorD (8., 7.)
     val lu = z.lud
 
     println ("z         = " + z)
@@ -1318,11 +1318,11 @@ object SparseMatrixDTest extends App
     println ("z.det     = " + z.det)
     println ("z         = " + z)
 
-    val w = new SparseMatrixD ((2, 3), 2.0, 3.0, 5.0,
-                                      -4.0, 2.0, 3.0)
-    val v = new MatrixD ((3, 2), 2.0, -4.0,
-                                 3.0,  2.0,
-                                 5.0,  3.0)
+    val w = new SparseMatrixD ((2, 3), 2., 3., 5., 
+                                      -4., 2., 3.)
+    val v = new MatrixD ((3, 2), 2., -4., 
+                                 3.,  2., 
+                                 5.,  3.)
     
     println ("w         = " + w)
     println ("v         = " + v)
@@ -1336,9 +1336,9 @@ object SparseMatrixDTest extends App
 
     for (row <- z) println ("row = " + row.deep)
 
-    val sp = new SparseMatrixD (3, 3, Array (new RowMap (List ((1, 2.0),   (2, 100.0))),
-                                             new RowMap (List ((0, 100.0), (2, 3.0))),
-                                             new RowMap (List ((0, 4.0),   (1, 100.0)))))
+    val sp = new SparseMatrixD (3, 3, Array (new RowMap (List ((1, 2.),   (2, 100.))),
+                                             new RowMap (List ((0, 100.), (2, 3.))),
+                                             new RowMap (List ((0, 4.),   (1, 100.)))))
     println ("sp = " + sp)
      
 } // SparseMatrixDTest object

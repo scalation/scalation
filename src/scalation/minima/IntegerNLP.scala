@@ -48,7 +48,7 @@ class IntegerNLP (f: FunctionV2S, n: Int, var g: FunctionV2S = null, excl: Set [
     // best integer solution so far
     private var best: Tuple2 [VectorD, Double] = (null, Double.PositiveInfinity)
 
-    def g0 (x: VectorD): Double = 0.0
+    def g0 (x: VectorD): Double = 0.
 
     if (g == null) g = g0
 
@@ -91,16 +91,16 @@ class IntegerNLP (f: FunctionV2S, n: Int, var g: FunctionV2S = null, excl: Set [
      */
     def gBounds (x: VectorD): Double =
     {
-        var sum = 0.0
+        var sum = 0.
         for (j <- 0 until x.dim) {                             // loop over the variables x_j
             if (! x_le(j).isNaN) {                               // check for x_j <= bound
-                println ("x_" + j + " - " + x_le(j) + " <= 0.0")
-                sum += max (0.0, x(j) - x_le(j))
+                println ("x_" + j + " - " + x_le(j) + " <= 0.")
+                sum += max (0., x(j) - x_le(j))
             } // if
                 
             if (! x_ge(j).isNaN) {                               // check for x_j >= bound
-                println (x_ge(j) + " - x_" + j + " <= 0.0")
-                sum += max (0.0, x_ge(j) - x(j))
+                println (x_ge(j) + " - x_" + j + " <= 0.")
+                sum += max (0., x_ge(j) - x(j))
             } // if
         } // for
         sum
@@ -130,7 +130,7 @@ class IntegerNLP (f: FunctionV2S, n: Int, var g: FunctionV2S = null, excl: Set [
         val nlp   = new QuasiNewton (f, gg)              // set up a new NLP problem
         val x     = nlp.solve (x0)                       // solve the new NLP problem
         val j     = fractionalVar (x)                    // find j such that x_j is not an integer
-        var bound = 0.0
+        var bound = 0.
 
         println ("IntegerNLP.solve: x = " + x + " f(x) = " + f(x) + ", j = " + j)
 
@@ -180,7 +180,7 @@ class IntegerNLP (f: FunctionV2S, n: Int, var g: FunctionV2S = null, excl: Set [
 object IntegerNLPTest extends App
 {
     val x0 = new VectorD (2)
-    def f (x: VectorD): Double = (x(0) - 3.5) * (x(0) - 3.5) + (x(1) - 5) * (x(1) - 5) + 1.0
+    def f (x: VectorD): Double = (x(0) - 3.5) * (x(0) - 3.5) + (x(1) - 5) * (x(1) - 5) + 1.
 
     val inlp = new IntegerNLP (f, x0.dim)
     inlp.solve (x0, 0)

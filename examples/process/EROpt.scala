@@ -28,8 +28,8 @@ import scalation.util.Monitor
 object EROpt extends App
 {
     val nStop   = 100                             // simulation stopping rule (100 patients)
-    val cost    = new VectorD (240.0, 480.0, 10.0)   // cost coefficient vector
-    val PENALTY = 1.0E8                            // penalty for infeasibility (e.g., -1 tellers)
+    val cost    = new VectorD (240., 480., 10.)   // cost coefficient vector
+    val PENALTY = 1.E8                            // penalty for infeasibility (e.g., -1 tellers)
     var bm: ERModelOpt = null                     // instance of an ER model
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -87,12 +87,12 @@ class ERModelOpt (name: String, nArrivals: Int, iArrivalRV: Variate, nurses: Int
 {
     Monitor.traceOff ()
 
-    val entry     = new Source ("entry", this, Patient, nArrivals, iArrivalRV, (70.0, 185.0))
-    val nurseQ    = new WaitQueue ("nurseQ", (200.0, 190.0))
-    val nurse     = new Resource ("nurse", nurseQ, nurses, nurseRV, (270.0, 185.0))
-    val doctorQ   = new WaitQueue ("doctorQ", (410.0, 190.0))
-    val doctor    = new Resource ("doctor", doctorQ, doctors, doctorRV, (480.0, 190.0))
-    val door      = new Sink ("door", (620.0, 185.0))
+    val entry     = new Source ("entry", this, Patient, nArrivals, iArrivalRV, (70., 185.))
+    val nurseQ    = new WaitQueue ("nurseQ", (200., 190.))
+    val nurse     = new Resource ("nurse", nurseQ, nurses, nurseRV, (270., 185.))
+    val doctorQ   = new WaitQueue ("doctorQ", (410., 190.))
+    val doctor    = new Resource ("doctor", doctorQ, doctors, doctorRV, (480., 190.))
+    val door      = new Sink ("door", (620., 185.))
     val toNurseQ  = new Transport ("toNurseQ", moveRV, entry, nurseQ)
     val toDoctorQ = new Transport ("toDoctorQ", moveRV, nurse, doctorQ)
     val toDoor    = new Transport ("toDoor", moveRV, doctor, door)

@@ -43,7 +43,7 @@ class Resource (name: String, line: WaitQueue, private var units: Int, serviceTi
     def this (name: String, line: WaitQueue, units: Int, serviceTime: Variate,
               xy: Tuple2 [Double, Double])
     {
-        this (name, line, units, serviceTime, Array (xy._1, xy._2, 40.0, 30.0))
+        this (name, line, units, serviceTime, Array (xy._1, xy._2, 40., 30.))
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -84,7 +84,7 @@ class Resource (name: String, line: WaitQueue, private var units: Int, serviceTi
         tally (duration)
         trace (this, "serves for " + duration, actor, actor.time)
         director.animate (actor, MoveToken, null, null, 
-                 Array (at(0) + DIAM, at(1) + at(3) / 2.0 - RAD))
+                 Array (at(0) + DIAM, at(1) + at(3) / 2. - RAD))
         if (inUse < units) inUse += 1
         else flaw ("utilize", "no units left")
         actor.schedule (duration)
@@ -102,7 +102,7 @@ class Resource (name: String, line: WaitQueue, private var units: Int, serviceTi
         tally (duration)
         trace (this, "serves for " + duration, actor, actor.time)
         director.animate (actor, MoveToken, null, null, 
-                 Array (at(0) + DIAM, at(1) + at(3) / 2.0 - RAD))
+                 Array (at(0) + DIAM, at(1) + at(3) / 2. - RAD))
         if (inUse < units) inUse += 1
         else flaw ("utilize", "no units left")
         actor.schedule (duration)

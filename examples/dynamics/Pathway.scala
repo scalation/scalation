@@ -32,7 +32,7 @@ object Pathway extends App
 
     // concentrations    H2, O2, O,   H,  OH, H2O
     //                   0   1   2    3   4   5
-    var c = new VectorD (6.0, 6.0, 0.0, .01, 0.0, 1.0)
+    var c = new VectorD (6., 6., 0., .01, 0., 1.)
 
     // define the system of Ordinary Differential Equations (ODEs)
 
@@ -56,12 +56,12 @@ object Pathway extends App
 
     val odes: Array [DerivativeV] = Array (dh2_dt, do2_dt, do_dt, dh_dt, doh_dt, dh2o_dt)
 
-    println ("dh2_dt  = " + dh2_dt (0.0, c))
-    println ("do2_dt  = " + do2_dt (0.0, c))
-    println ("do_dt   = " + do_dt (0.0, c))
-    println ("dh_dt   = " + dh_dt (0.0, c))
-    println ("doh_dt  = " + doh_dt (0.0, c))
-    println ("dh2o_dt = " + dh2o_dt (0.0, c))
+    println ("dh2_dt  = " + dh2_dt (0., c))
+    println ("do2_dt  = " + do2_dt (0., c))
+    println ("do_dt   = " + do_dt (0., c))
+    println ("dh_dt   = " + dh_dt (0., c))
+    println ("doh_dt  = " + doh_dt (0., c))
+    println ("dh2o_dt = " + dh2o_dt (0., c))
 
     println ("                           H2,  O2,   O,    H,  OH,  H2O")
     println ("> at t = " + "%6.3f".format (t0) + " c = " + c)

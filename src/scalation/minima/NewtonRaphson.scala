@@ -32,8 +32,8 @@ class NewtonRaphson (f: FunctionS2S)
     def solve (x0: Double): Double =
     {
         var x    = x0                                   // current point
-        var f_x  = -1.0                                  // function value at x
-        var df_x = -1.0                                  // derivative value at x
+        var f_x  = -1.                                  // function value at x
+        var df_x = -1.                                  // derivative value at x
         breakable { for (it <- 0 until MAX_ITER) {
             f_x = f(x)
             if (abs (f_x) < EPSILON) break              // close to zero => quit
@@ -53,11 +53,11 @@ class NewtonRaphson (f: FunctionS2S)
  */
 object NewtonRaphsonTest extends App
 {
-    def f (x: Double): Double = 2.0 * (x - 3.0)
+    def f (x: Double): Double = 2. * (x - 3.)
 
     val nr = new NewtonRaphson (f)
     
-    nr.solve (0.0)
+    nr.solve (0.)
 
 } // NewtonRaphsonTest
 

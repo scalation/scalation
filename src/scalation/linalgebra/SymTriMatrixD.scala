@@ -554,9 +554,9 @@ class SymTriMatrixD (val d1: Int)
      */
     def clean (thres: Double, relative: Boolean = true): Matrix =
     {
-        val s = if (relative) mag else 1.0             // use matrix magnitude or 1
-        for (i <- range_d) if (abs (_dg(i)) <= thres * s) _dg(i) = 0.0
-        for (i <- range_s) if (abs (_sd(i)) <= thres * s) _sd(i) = 0.0
+        val s = if (relative) mag else 1.             // use matrix magnitude or 1
+        for (i <- range_d) if (abs (_dg(i)) <= thres * s) _dg(i) = 0. 
+        for (i <- range_s) if (abs (_sd(i)) <= thres * s) _sd(i) = 0.
         this
     } // clean
 
@@ -587,7 +587,7 @@ class SymTriMatrixD (val d1: Int)
         c(0) = c(0) / b(0)
         d(0) = d(0) / b(0)
         for (i <- 1 until d1) {
-            val id = 1.0 / (b(i) - c(i-1) * a(i))
+            val id = 1. / (b(i) - c(i-1) * a(i))
             c(i)   = c(i) * id
             d(i)   = (d(i) - d(i-1) * a(i)) * id
         } // for
@@ -619,27 +619,27 @@ class SymTriMatrixD (val d1: Int)
     /** Compute the (right) nullspace of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.0  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace: VectorD =
     {
         if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
-        reduce.col(dim2 - 1) * -1.0 ++ 1.0
+        reduce.col(dim2 - 1) * -1. ++ 1.
     } // nullspace
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the (right) nullspace in-place of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.0  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace_ip: VectorD =
     {
         if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
         reduce_ip
-        col(dim2 - 1) * -1.0 ++ 1.0
+        col(dim2 - 1) * -1. ++ 1.
     } // nullspace_ip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -726,11 +726,11 @@ class SymTriMatrixD (val d1: Int)
  */
 object SymTriMatrixDTest extends App
 {
-    val a = new SymTriMatrixD (new VectorD (1.0, 2.0, 3.0),
-                               new VectorD (4.0, 5.0))
+    val a = new SymTriMatrixD (new VectorD (1., 2., 3.),
+                               new VectorD (4., 5.))
 
-    val b = new SymTriMatrixD (new VectorD (2.0, 3.0, 4.0),
-                               new VectorD (5.0, 6.0))
+    val b = new SymTriMatrixD (new VectorD (2., 3., 4.),
+                               new VectorD (5., 6.))
 
     println ("a     = " + a)
     println ("b     = " + b)

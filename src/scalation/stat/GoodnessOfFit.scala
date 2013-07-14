@@ -48,17 +48,17 @@ class GoodnessOfFit (d: StatVector, dmin: Double, dmax: Double, intervals: Int =
         println ("Test goodness of fit for " + rv.getClass.getSimpleName ())
         println ("-------------------------------------------------------------")
 
-        var x    = 0.0             // x coordinate
-        var o    = 0.0             // observed value: height of histogram
-        var e    = 0.0             // expected value: pf (x)
-        var chi2 = 0.0             // ChiSquare statistic
+        var x    = 0.             // x coordinate
+        var o    = 0.             // observed value: height of histogram
+        var e    = 0.             // expected value: pf (x)
+        var chi2 = 0.             // ChiSquare statistic
         var nz   = 0              // number of nonzero intervals
 
         for (j <- 0 until intervals) {
             x = j / ratio + dmin
             o = histo(j)
             e = round (n * rv.pf (x + .5) / ratio)
-            if (e >= 4) { chi2 += (o - e)~^2.0 / e; nz += 1 }         // big enough
+            if (e >= 4) { chi2 += (o - e)~^2. / e; nz += 1 }         // big enough
             println ("\thisto (" + x + ") = " + o + " : " + e + " ")
         } // for
 
@@ -79,16 +79,16 @@ class GoodnessOfFit (d: StatVector, dmin: Double, dmax: Double, intervals: Int =
  */
 object GoodnessOfFitTest extends App
 {
-    val d = new StatVector (36.0, 37.0, 38.0, 38.0, 39.0, 39.0, 40.0, 40.0, 40.0, 40.0,
-                            41.0, 41.0, 41.0, 41.0, 41.0, 41.0, 42.0, 42.0, 42.0, 42.0,
-                            42.0, 42.0, 42.0, 43.0, 43.0, 43.0, 43.0, 43.0, 43.0, 43.0,
-                            43.0, 44.0, 44.0, 44.0, 44.0, 44.0, 44.0, 44.0, 44.0, 44.0,
-                            45.0, 45.0, 45.0, 45.0, 45.0, 45.0, 45.0, 45.0, 45.0, 45.0,
-                            46.0, 46.0, 46.0, 46.0, 46.0, 46.0, 46.0, 46.0, 46.0, 46.0,
-                            47.0, 47.0, 47.0, 47.0, 47.0, 47.0, 47.0, 47.0, 47.0, 48.0,
-                            48.0, 48.0, 48.0, 48.0, 48.0, 48.0, 48.0, 49.0, 49.0, 49.0,
-                            49.0, 49.0, 49.0, 49.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0,
-                            51.0, 51.0, 51.0, 51.0, 52.0, 52.0, 53.0, 53.0, 54.0, 55.0)
+    val d = new StatVector (36., 37., 38., 38., 39., 39., 40., 40., 40., 40.,
+                            41., 41., 41., 41., 41., 41., 42., 42., 42., 42.,
+                            42., 42., 42., 43., 43., 43., 43., 43., 43., 43.,
+                            43., 44., 44., 44., 44., 44., 44., 44., 44., 44.,
+                            45., 45., 45., 45., 45., 45., 45., 45., 45., 45.,
+                            46., 46., 46., 46., 46., 46., 46., 46., 46., 46.,
+                            47., 47., 47., 47., 47., 47., 47., 47., 47., 48.,
+                            48., 48., 48., 48., 48., 48., 48., 49., 49., 49.,
+                            49., 49., 49., 49., 50., 50., 50., 50., 50., 50.,
+                            51., 51., 51., 51., 52., 52., 53., 53., 54., 55.)
 
     d.toggleBias ()              // use unbiased estimators on sample data
 

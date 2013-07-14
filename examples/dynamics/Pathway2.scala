@@ -38,7 +38,7 @@ object Pathway2 extends App
 
     // concentrations    A   B   C
     //                   0   1   2
-    var c = new VectorD (1.0, 0.0, 0.0)
+    var c = new VectorD (1., 0., 0.)
 
     // define the system of Ordinary Differential Equations (ODEs)
 
@@ -48,9 +48,9 @@ object Pathway2 extends App
 
     val odes: Array [DerivativeV] = Array (dA_dt, dB_dt, dC_dt)
 
-    println ("dA_dt = " + dA_dt (0.0, c))
-    println ("dB_dt = " + dB_dt (0.0, c))
-    println ("dC_dt = " + dC_dt (0.0, c))
+    println ("dA_dt = " + dA_dt (0., c))
+    println ("dB_dt = " + dB_dt (0., c))
+    println ("dC_dt = " + dC_dt (0., c))
 
     println ("                           A,  B,   C")
     println ("> at t = " + "%6.3f".format (t0) + " c = " + c)

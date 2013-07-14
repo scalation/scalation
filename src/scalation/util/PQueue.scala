@@ -18,7 +18,7 @@ trait PQItem extends Identity
 {
     /** The activation time for the item in the time-ordered priority queue
      */
-    var actTime: Double = 0.0
+    var actTime: Double = 0.
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compare two items (PQItems) based on their actTime.
@@ -130,9 +130,9 @@ object PQueueTest extends App
     for (i <- 1 to 10) pq += new Element (10.0 * random)
     while ( ! pq.isEmpty) println (pq.dequeue ())
 
-    val e1 = new Element (10.0)
-    val e2 = new Element (30.0)
-    val e3 = new Element (20.0)
+    val e1 = new Element (10.)
+    val e2 = new Element (30.)
+    val e3 = new Element (20.)
     pq += e1
     pq += e2
     pq += e3

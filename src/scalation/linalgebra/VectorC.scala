@@ -706,7 +706,7 @@ class VectorC (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether the predicate pred holds for some element in this vector.
-     *  @param pred  the predicate to test (e.g., "_ == 5.0")
+     *  @param pred  the predicate to test (e.g., "_ == 5.")
      */
     def exists (pred: (Complex) => Boolean): Boolean = v.exists (pred)
 
@@ -797,7 +797,7 @@ object VectorCTest extends App
 {
     var x: VectorC = null
     var y: VectorC = null
-    val c = Complex (4.0)
+    val c = Complex (4.)
 
     for (l <- 1 to 4) {
         println ("\n\tTest VectorC on complex vectors of dim " + l)

@@ -104,7 +104,7 @@ class KMeansClustering (x: MatrixD, k: Int, s: Int = 0, primary: Boolean = true)
         val cs = new VectorD (k)            // to hold number of vectors in each cluster
         for (i <- 0 until x.dim1) {
             cx(clustr(i)) += x(i)           // add the next vector in cluster
-            cs(clustr(i)) += 1.0             // add 1 to number in cluster
+            cs(clustr(i)) += 1.             // add 1 to number in cluster
         } // for
         for (c <- 0 until k) cent(c) = cx(c) / cs(c)   // divide to get averages/means
     } // calcCentroids
@@ -160,13 +160,13 @@ class KMeansClustering (x: MatrixD, k: Int, s: Int = 0, primary: Boolean = true)
  */
 object KMeansClusteringTest extends App
 {
-    val v = new MatrixD ((6, 2), 1.0, 2.0,
-                                 2.0, 1.0,
-                                 5.0, 4.0,
-                                 4.0, 5.0,
-                                 9.0, 8.0,
-                                 8.0, 9.0)
-    val y = new VectorD (10.0, 10.0)
+    val v = new MatrixD ((6, 2), 1., 2.,
+                                 2., 1.,
+                                 5., 4.,
+                                 4., 5.,
+                                 9., 8.,
+                                 8., 9.)
+    val y = new VectorD (10., 10.)
     println ("v = " + v)
     println ("y = " + y)
     println ("----------------------------------------------------")

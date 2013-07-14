@@ -22,7 +22,7 @@ object CallCenter extends App
     val lambda   = 6.0       // call arrival rate (per hour)
     val mu       = 7.50      // call service rate (per hour)
     val maxCalls = 1000      // stopping rule: simulate maxCalls calls
-    new CallCenterModel ("CallCenter", maxCalls, Exponential (60.0/lambda), Exponential (60.0/mu))
+    new CallCenterModel ("CallCenter", maxCalls, Exponential (60./lambda), Exponential (60./mu))
 } // CallCenter
 
 
@@ -39,10 +39,10 @@ class CallCenterModel (name: String, nArrivals: Int, arrivalRV: Variate, service
 {
     //:: define the state variables for the simulation
 
-    var nArr  = 0.0    // number of calls that have arrived
-    var nIn   = 0.0    // number of calls in progress
-    var nOut  = 0.0    // number of calls that have finished and hung up
-    var nLost = 0.0    // number of calls dropped
+    var nArr  = 0.    // number of calls that have arrived
+    var nIn   = 0.    // number of calls in progress
+    var nOut  = 0.    // number of calls that have finished and hung up
+    var nLost = 0.    // number of calls dropped
 
     //:: define the nodes in the event graph (event prototypes)
 
@@ -63,7 +63,7 @@ class CallCenterModel (name: String, nArrivals: Int, arrivalRV: Variate, service
      * @param call  the entity that arrives, in this case a call
      */
     case class Arrival (call: Entity)
-         extends Event (protoArrival, call, aLinks, this, Array (150.0, 200.0, 50.0, 50.0))
+         extends Event (protoArrival, call, aLinks, this, Array (150., 200., 50., 50.))
     {
         override def occur ()
         {
@@ -79,7 +79,7 @@ class CallCenterModel (name: String, nArrivals: Int, arrivalRV: Variate, service
      * @param call  the entity that departs, in this case a call
      */
     case class Departure (call: Entity)
-         extends Event (protoDeparture, call, null, this,  Array (450.0, 200.0, 50.0, 50.0))
+         extends Event (protoDeparture, call, null, this,  Array (450., 200., 50., 50.))
     {
         override def occur ()
         {
@@ -92,7 +92,7 @@ class CallCenterModel (name: String, nArrivals: Int, arrivalRV: Variate, service
 
     //:: start the simulation, passing the first priming event and the start time
 
-    simulate (Arrival (null), 0.0)
+    simulate (Arrival (null), 0.)
     Thread.sleep (20000)
     report (Array (("nArr", nArr), ("nIn", nIn), ("nLost", nLost), ("nOut", nOut)))
     report ("Arrival", aLinks)

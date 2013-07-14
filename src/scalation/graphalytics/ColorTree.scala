@@ -26,7 +26,7 @@ import scalation.util.Count
 class TreeNode (val id: Int, var colr: Color = null)
 {
      if (colr == null) colr = randomColor (id)
-     val loc   = R2 (0.0, 0.0)
+     val loc   = R2 (0., 0.)
      var child = new ListBuffer [TreeNode] ()
      var parent: TreeNode = null
 
@@ -55,9 +55,9 @@ class TreeNode (val id: Int, var colr: Color = null)
 class ColorTree (minOut: Int = 0, maxOut: Int = 2)
 {
     private val TAB    = "    "                        // spaces for TAB
-    private val MID    = 600.0                          // x coordinate for root
-    private val TOP    = 100.0                          // y coordinate for root
-    private val DIA    = 15.0                           // diameter for circles
+    private val MID    = 600.                          // x coordinate for root
+    private val TOP    = 100.                          // y coordinate for root
+    private val DIA    = 15.                           // diameter for circles
     private val rng    = new Randi (minOut, maxOut)    // random generator for # children
     private val nCount = Count ()                      // node counter for id auto-increment
     private val ani    = new DgAnimator ("ColorTree")  // tree animator
@@ -68,7 +68,7 @@ class ColorTree (minOut: Int = 0, maxOut: Int = 2)
     root.loc.x = MID
     root.loc.y = TOP
     cq += AnimateCommand (CreateNode, 0, Ellipse (), "no-0", true, root.colr,
-                          Array (root.loc.x, root.loc.y, DIA, DIA), 0.0)
+                          Array (root.loc.x, root.loc.y, DIA, DIA), 0.)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the ith node.
@@ -119,12 +119,12 @@ class ColorTree (minOut: Int = 0, maxOut: Int = 2)
         val n   = add (p)                                                // add node n to tree
         val k   = n.id                                                   // node's id
         val f   = depth + 1 - lev                                        // width factor
-        n.loc.x = p.loc.x + 3.0~^f * (1 + 2 * ord - sibs) * DIA / 2.0      // node's x coordinate
+        n.loc.x = p.loc.x + 3.~^f * (1 + 2 * ord - sibs) * DIA / 2.      // node's x coordinate
         n.loc.y = TOP + 4 * lev * DIA                                    // node's y coordinate
-        val t   = 500.0 * k                                               // node's display time
+        val t   = 500. * k                                               // node's display time
         cq += AnimateCommand (CreateNode, k, Ellipse (), "n-" + k, true, n.colr,
                               Array (n.loc.x, n.loc.y, DIA, DIA), t)
-        cq += AnimateCommand (CreateEdge, -k, QCurve (), "", true, black, null, t+100.0, p.id, k)
+        cq += AnimateCommand (CreateEdge, -k, QCurve (), "", true, black, null, t+100., p.id, k)
         if (lev < depth) {
             val imax = rng.igen
             for (i <- 0 until imax) genPre (depth, n, lev+1, i, imax)   // add n's children

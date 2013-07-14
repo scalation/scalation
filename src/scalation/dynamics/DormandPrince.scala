@@ -29,38 +29,38 @@ object DormandPrince
 
     /** Butcher tableau @see http://en.wikipedia.org/wiki/Dormand–Prince_method
      */
-    val a21 = 1.0/5.0
-    val a31 = 3.0/40.0;       val a32 = 9.0/40.0
-    val a41 = 44.0/45.0;      val a42 = -56.0/15.0;       val a43 = 32.0/9.0
-    val a51 = 19372.0/6561.0; val a52 = -25360.0/2187.0;  val a53 = 64448.0/6561.0
-    val a54 = -212.0/729.0
-    val a61 = 9017.0/3168.0;  val a62 = -355.0/33.0;      val a63 = 46732.0/5247.0
-    val a64 = 49.0/176.0;     val a65 = -5103.0/18656.0
-    val a71 = 35.0/384.0;     val a72 = 0.0;             val a73 = 500.0/1113.0
-    val a74 = 125.0/192.0;    val a75 = -2187.0/6784.0;   val a76 = 11.0/84.0
+    val a21 = 1./5.
+    val a31 = 3./40.;       val a32 = 9./40.
+    val a41 = 44./45.;      val a42 = -56./15.;       val a43 = 32./9.
+    val a51 = 19372./6561.; val a52 = -25360./2187.;  val a53 = 64448./6561.
+    val a54 = -212./729.
+    val a61 = 9017./3168.;  val a62 = -355./33.;      val a63 = 46732./5247.
+    val a64 = 49./176.;     val a65 = -5103./18656.
+    val a71 = 35./384.;     val a72 = 0.;             val a73 = 500./1113.
+    val a74 = 125./192.;    val a75 = -2187./6784.;   val a76 = 11./84.
  
-    val c2 = 1.0/5.0
-    val c3 = 3.0/10.0
-    val c4 = 4.0/5.0
-    val c5 = 8.0/9.0
-    val c6 = 1.0
-    val c7 = 1.0
+    val c2 = 1./5.
+    val c3 = 3./10.
+    val c4 = 4./5.
+    val c5 = 8./9.
+    val c6 = 1.
+    val c7 = 1.
  
-    val b1 = 35.0/384.0
-    val b2 = 0.0
-    val b3 = 500.0/1113.0
-    val b4 = 125.0/ 192.0
-    val b5 = -2187.0/6784.0
-    val b6 = 11.0/84.0
-    val b7 = 0.0
+    val b1 = 35./384.
+    val b2 = 0.
+    val b3 = 500./1113.
+    val b4 = 125./ 192.
+    val b5 = -2187./6784.
+    val b6 = 11./84.
+    val b7 = 0.
  
-    val b1p = 5179.0/57600.0
-    val b2p = 0.0
-    val b3p = 7571.0/16695.0
-    val b4p = 393.0/640.0
-    val b5p = -92097.0/339200.0
-    val b6p = 187.0/2100.0
-    val b7p = 1.0/40.0
+    val b1p = 5179./57600.
+    val b2p = 0.
+    val b3p = 7571./16695.
+    val b4p = 393./640.
+    val b5p = -92097./339200.
+    val b6p = 187./2100.
+    val b7p = 1./40.
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute y(t) governed by a differential equation using numerical integration
@@ -73,9 +73,9 @@ object DormandPrince
      *  @param step  the middle step size
      */
     def integrate (f: Derivative, y0: Double, t: Double,
-                   t0: Double = 0.0, step: Double = defaultStepSize): Double =
+                   t0: Double = 0., step: Double = defaultStepSize): Double =
     {
-        integrate2 (f, y0, t, .5*step, 2.0*step, t0)
+        integrate2 (f, y0, t, .5*step, 2.*step, t0)
     } // integrate
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -93,20 +93,20 @@ object DormandPrince
      *  @param maxSteps  the maximum number of steps
      */
     def integrate2 (f: Derivative, y0: Double, t: Double, hmin: Double, hmax: Double,
-                   t0: Double = 0.0, tol: Double = 1E-5, maxSteps: Int = 1000): Double =
+                   t0: Double = 0., tol: Double = 1E-5, maxSteps: Int = 1000): Double =
     {
         var ti    = t0
         var y     = y0
         var h     = hmax
-        var delta = 0.0
+        var delta = 0.
 
-        var k1    = 0.0
-        var k2    = 0.0
-        var k3    = 0.0
-        var k4    = 0.0
-        var k5    = 0.0
-        var k6    = 0.0
-        var k7    = 0.0
+        var k1    = 0.
+        var k2    = 0.
+        var k3    = 0.
+        var k4    = 0.
+        var k5    = 0.
+        var k6    = 0.
+        var k7    = 0.
  
         for (i <- 1 to maxSteps) {
             k1 = f (ti,          y)
@@ -127,7 +127,7 @@ object DormandPrince
             } // if
  
             if (delta <= .1)       h *= .1
-            else if (delta >= 4.0 ) h *= 4.0
+            else if (delta >= 4. ) h *= 4.
             else                   h *= delta
  
             if (h > hmax) h = hmax
@@ -152,17 +152,17 @@ object DormandPrince
      *  @param step  the step size
      */
     def integrateVV (f: Array [DerivativeV], y0: VectorD, t: Double,
-                     t0: Double = 0.0, step: Double = defaultStepSize): VectorD =
+                     t0: Double = 0., step: Double = defaultStepSize): VectorD =
     {
         val maxSteps = 1000
         val hmin     = .2 * step
-        val hmax     = 2.0 * step
+        val hmax     = 2. * step
         val tol      = 1E-5
 
         var ti    = t0
         var y     = y0
         var h     = hmax
-        var delta = 0.0
+        var delta = 0.
 
         val k1 = new VectorD (y.dim)
         val k2 = new VectorD (y.dim)
@@ -191,7 +191,7 @@ object DormandPrince
             } // if
 
             if (delta <= .1)       h *= .1
-            else if (delta >= 4.0 ) h *= 4.0
+            else if (delta >= 4. ) h *= 4.
             else                   h *= delta
 
             if (h > hmax) h = hmax
@@ -223,7 +223,7 @@ object DormandPrinceTest extends App
     val hmax = 1.0
 
     //def integrate (f: Derivative, y0: Double, t: Double, hmin: Double, hmax: Double,
-    //               t0: Double = 0.0, tol: Double = 1E-5, maxSteps: Int = 1000): Double =
+    //               t0: Double = 0., tol: Double = 1E-5, maxSteps: Int = 1000): Double =
     println ("\n==> at t = " + t + " y = " + integrate2 (derv1, y0, t, hmin, hmax))
 
     // @see http://www.mathworks.com/help/techdoc/ref/ode23.html (Example 1)
@@ -234,9 +234,9 @@ object DormandPrinceTest extends App
     val odes = Array [DerivativeV] (dx_dt, dy_dt, dz_dt)
 
     var ti  = .2
-    var p   = new VectorD (0.0, 1.0, 1.0)
+    var p   = new VectorD (0., 1., 1.)
     val p_r = new MatrixD (61, 3); for (k <- 0 until p.dim) p_r(0, k) = p(k)
-    var tt  = new VectorD (61); tt(0) = 0.0
+    var tt  = new VectorD (61); tt(0) = 0.
     for (i <- 1 to 60) {
         tt(i) = ti * i
         p = integrateVV (odes, p, ti)

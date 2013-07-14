@@ -130,15 +130,15 @@ object Quantile
 
         val chi  = ChiSquare (df)  // ChiSquare distribution
         val step = 0.0001
-        var sum  = 0.0
-        var xx   = 0.0
-        var y1   = 0.0
-        var y2   = chi.pf (0.0)     // pdf for ChiSquare distribution
-        while (xx <= x && sum < 1.0) {
+        var sum  = 0.
+        var xx   = 0.
+        var y1   = 0.
+        var y2   = chi.pf (0.)     // pdf for ChiSquare distribution
+        while (xx <= x && sum < 1.) {
             y1  = y2
             xx  += step
             y2  = chi.pf (xx)
-            sum += step * (y1 + y2) / 2.0
+            sum += step * (y1 + y2) / 2.
         } // while
         sum
     } // chiSquareCDF
@@ -154,13 +154,13 @@ object Quantile
         if (p < 0 || p > 1)      flaw ("chiSquareInv", "parameter p must be in the range [0, 1]")
         if (df <= 0 || df >= 50) flaw ("chiSquareInv", "parameter df must be in the set {1, 2, ..., 49}")
 
-        var x1   = 0.0            // lower limit
-        var x2   = 8.0 * df       // upper limit
-        var x    = 0.0            // x coordinate
-        var y    = 0.0            // y coordinate
+        var x1   = 0.            // lower limit
+        var x2   = 8. * df       // upper limit
+        var x    = 0.            // x coordinate
+        var y    = 0.            // y coordinate
         var cont = true          // continue searching
         while (cont) {
-            x = (x1 + x2) / 2.0
+            x = (x1 + x2) / 2.
             y = chiSquareCDF (x, df)
             // println ("x = " + x + " y = " + y + " p = " + p)
             if (y + .0005 < p)      x1 = x
@@ -179,7 +179,7 @@ object Quantile
      */
     def fisherCDF (p: Double, df1: Int, df2: Int): Double =
     {
-        rBetaF (df1 * p / ((df1 * p) + df2), df1 / 2.0, df2 / 2.0)
+        rBetaF (df1 * p / ((df1 * p) + df2), df1 / 2., df2 / 2.)
     } // fisherCDF
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -205,13 +205,13 @@ object Quantile
         if (p < 0 || p > 1)       flaw ("fisherInv", "parameter p must be in the range [0, 1]")
         if (df1 <= 0 || df2 <= 0) flaw ("fisherInv", "parameters df1 and df2 must be positive")
 
-        var x1   = 0.0            // lower limit
-        var x2   = 1.0E6          // upper limit
-        var x    = 0.0            // x coordinate
-        var y    = 0.0            // y coordinate
+        var x1   = 0.            // lower limit
+        var x2   = 1.E6          // upper limit
+        var x    = 0.            // x coordinate
+        var y    = 0.            // y coordinate
         var cont = true          // continue searching
         while (cont) {
-            x = (x1 + x2) / 2.0
+            x = (x1 + x2) / 2.
             y = fisherCDF (x, df1, df2)
             // println ("x = " + x + " y = " + y + " p = " + p)
             if (y + .0005 < p)      x1 = x

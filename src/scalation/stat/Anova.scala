@@ -26,7 +26,7 @@ class Anova (x: MatrixD)
     private val n   = x.dim2                    // n columns (replicas)
     private val md  = m.toDouble                // m as a Double
     private val nd  = n.toDouble                // n as a Double
-            val dfg = md - 1.0                   // degrees of freedom, group
+            val dfg = md - 1.                   // degrees of freedom, group
             val dfe = md * nd - md              // degrees of freedom, error
             val mui = mu_i                      // vector of group means
             val gmu = g_mu                      // grand mean
@@ -56,7 +56,7 @@ class Anova (x: MatrixD)
      */
     def sse = 
     {
-        var sum = 0.0
+        var sum = 0.
         for (i <- 0 until m) sum += (x(i) - mui(i)).sq.sum
         sum
     } // sse

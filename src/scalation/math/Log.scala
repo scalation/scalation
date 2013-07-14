@@ -15,8 +15,8 @@ import math.log                             // natural log
  */
 object Log
 {
-    val log_of_2  = log (2.0)                // natural log of 2
-    val log_of_10 = log (10.0)               // natural log of 10
+    val log_of_2  = log (2.)                // natural log of 2
+    val log_of_10 = log (10.)               // natural log of 10
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the log of x base 2
@@ -47,12 +47,12 @@ object LogTest extends App
 {
     import Log._
 
-    println ("log2 (2)    = " + log2 (2.0))
-    println ("log2 (4)    = " + log2 (4.0))
-    println ("log10 (10)  = " + log10 (10.0))
-    println ("log10 (100) = " + log10 (100.0))
-    println ("logb (4, 4)  = " + logb (4.0, 4.0))
-    println ("logb (4, 16) = " + logb (4.0, 16.0))
+    println ("log2 (2)    = " + log2 (2.))
+    println ("log2 (4)    = " + log2 (4.))
+    println ("log10 (10)  = " + log10 (10.))
+    println ("log10 (100) = " + log10 (100.))
+    println ("logb (4, 4)  = " + logb (4., 4.))
+    println ("logb (4, 16) = " + logb (4., 16.))
 
 } // LogTest object
 

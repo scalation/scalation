@@ -66,8 +66,8 @@ class SVDecomp (a: MatrixD)
  */
 object SVDecompTest extends App
 {
-    val a = new MatrixD ((2, 3), 3.0, 1.0, 1.0,            // 2-by-3 matrix
-                                -1.0, 3.0, 1.0)
+    val a = new MatrixD ((2, 3), 3., 1., 1.,            // 2-by-3 matrix
+                                -1., 3., 1.)
     val svd = new SVDecomp (a)
     val res = svd.decompose ()
     println ("a = " + a)

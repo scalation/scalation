@@ -236,7 +236,7 @@ val ss = 100.00                            // swing speed in miles/hour
 val sf =   1.49                            // smash factor
 val s  = ss * sf * 1609.344 / 3600         // initial ball speed in m/sec
 val a  = aa * Pi / 180.                    // launch angle in radians
-val y0 = new VectorD (0.0, 0.0)              // initial position (y_0, y_1)
+val y0 = new VectorD (0., 0.)              // initial position (y_0, y_1)
 val v0 = new VectorD (s*cos(a), s*sin(a))  // initial velocity at t0
 
 // define the system of Ordinary Differential Equations (ODEs)
@@ -250,7 +250,7 @@ var y  = new VectorD (2)                        // current ball position
 
 breakable { for (i <- 1 to n) {
    y = DormandPrince.integrateV (odes, y0, t)  // compute new position
-   if (y(1) < 0.0) break                        // quit after hitting ground
+   if (y(1) < 0.) break                        // quit after hitting ground
    println ("> at t = " + "%4.1f".format (t) + " y = " + y)
    t += dt
 }} // for

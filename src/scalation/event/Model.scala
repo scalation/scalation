@@ -74,7 +74,7 @@ class Model (name: String, animation: Boolean = true)
      *  Requires at least one to already be scheduled (see next method).
      *  @param startTime   the time at which the simulation is to begin
      */
-    def simulate (startTime: Double = 0.0): ListBuffer [Statistic] =
+    def simulate (startTime: Double = 0.): ListBuffer [Statistic] =
     {
         _clock = startTime
         trace (this, "starts", this, _clock)
@@ -219,9 +219,9 @@ object ModelTest extends App
         //:: define the state variables for the simulation
 
         var busy     = false
-        var nCalls   = 0.0
-        var nDrops   = 0.0
-        var nHangups = 0.0
+        var nCalls   = 0.
+        var nDrops   = 0.
+        var nHangups = 0.
 
         //:: define the nodes in the event graph (event prototypes)
 
@@ -242,7 +242,7 @@ object ModelTest extends App
          *  @param call  the entity that arrives, in this case a phone call
          */
         case class Arrival (call: Entity)
-             extends Event (protoArrival, call, aLinks, this, Array (150.0, 200.0, 50.0, 50.0))
+             extends Event (protoArrival, call, aLinks, this, Array (150., 200., 50., 50.))
         {
             override def occur ()
             {
@@ -259,7 +259,7 @@ object ModelTest extends App
          *  @param call  the entity that departs, in this case a phone call
          */
         case class Departure (call: Entity)
-             extends Event (protoDeparture, call, null, this, Array (450.0, 200.0, 50.0, 50.0))
+             extends Event (protoDeparture, call, null, this, Array (450., 200., 50., 50.))
         {
             override def occur ()
             {
@@ -271,7 +271,7 @@ object ModelTest extends App
 
         //:: start the simulation, passing the first priming event and the start time
 
-        simulate (Arrival (null), 0.0)
+        simulate (Arrival (null), 0.)
         Thread.sleep (2000)
         report (Array (("nCalls", nCalls), ("nDrops", nDrops), ("nHangups", nHangups)))
         report ("Arrival", aLinks)

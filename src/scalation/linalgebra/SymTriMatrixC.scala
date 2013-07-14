@@ -347,7 +347,7 @@ class SymTriMatrixC (val d1: Int)
     /** Compute the (right) nullspace of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.0  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace: VectorC =
@@ -360,7 +360,7 @@ class SymTriMatrixC (val d1: Int)
     /** Compute the (right) nullspace in-place of this m by n matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
      *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.0  The left nullspace of matrix a is
+     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace_ip: VectorC =
@@ -499,11 +499,11 @@ class SymTriMatrixC (val d1: Int)
  */
 object SymTriMatrixCTest extends App
 {
-    val a = new SymTriMatrixC (new VectorC (1.0, 2.0, 3.0),
-                               new VectorC (4.0, 5.0))
+    val a = new SymTriMatrixC (new VectorC (1., 2., 3.),
+                               new VectorC (4., 5.))
 
-    val b = new SymTriMatrixC (new VectorC (2.0, 3.0, 4.0),
-                               new VectorC (5.0, 6.0))
+    val b = new SymTriMatrixC (new VectorC (2., 3., 4.),
+                               new VectorC (5., 6.))
 
     println ("a     = " + a)
     println ("b     = " + b)

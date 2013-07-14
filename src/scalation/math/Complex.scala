@@ -18,7 +18,7 @@ import DoubleWithExp._
  *  @param re  the real part
  *  @param im  the imaginary part
  */
-case class Complex (val re: Double, val im: Double = 0.0)
+case class Complex (val re: Double, val im: Double = 0.)
      extends Fractional [Complex] with Ordered [Complex]
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -149,25 +149,25 @@ case class Complex (val re: Double, val im: Double = 0.0)
     /** Create a complex number from an Int.
      *  @param n  the integer used to create the complex number.
      */
-    def fromDouble (x: Double) = Complex (x, 0.0)
+    def fromDouble (x: Double) = Complex (x, 0.)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a complex number from an Int.
      *  @param n  the integer used to create the complex number.
      */
-    def fromFloat (x: Float) = Complex (x, 0.0)
+    def fromFloat (x: Float) = Complex (x, 0.)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a complex number from an Int.
      *  @param n  the integer used to create the complex number.
      */
-    def fromInt (n: Int) = Complex (n, 0.0)
+    def fromInt (n: Int) = Complex (n, 0.)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a complex number from an Int.
      *  @param n  the integer used to create the complex number.
      */
-    def fromLong (n: Long) = Complex (n, 0.0)
+    def fromLong (n: Long) = Complex (n, 0.)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Override equals to determine whether vector this equals vector b.
@@ -198,11 +198,11 @@ case class Complex (val re: Double, val im: Double = 0.0)
  */
 object Complex
 {
-    val _0  = Complex (0.0, 0.0)     // zero (0)
-    val _1  = Complex (1.0, 0.0)     // one (1)
-    val _i  = Complex (0.0, 1.0)     // imaginary one (i)
-    val _1n = Complex (-1.0, 0.0)    // negative one (-1)
-    val _in = Complex (0.0, -1.0)    // negative imaginary one (-i)
+    val _0  = Complex (0., 0.)     // zero (0)
+    val _1  = Complex (1., 0.)     // one (1)
+    val _i  = Complex (0., 1.)     // imaginary one (i)
+    val _1n = Complex (-1., 0.)    // negative one (-1)
+    val _in = Complex (0., -1.)    // negative imaginary one (-i)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute an arthmetic results (+, -, *, /) where the first argument is
@@ -236,9 +236,9 @@ object Complex
  */
 object ComplexTest extends App
 {
-    val c = Complex (2.0, 3.0)
-    val d = Complex (4.0, 5.0)
-    val e = Complex (5.0)
+    val c = Complex (2., 3.)
+    val d = Complex (4., 5.)
+    val e = Complex (5.)
 
     println ("c      = " + c)
     println ("d      = " + d)

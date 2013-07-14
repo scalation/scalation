@@ -52,7 +52,7 @@ trait Integrator
 
     /** Estimate of the error in calculating y
      */
-    protected var error = 0.0
+    protected var error = 0.
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Use numerical integration to compute the trajectory of an unknown, time-
@@ -68,7 +68,7 @@ trait Integrator
      *  @param step  the step size
      */
     def integrate (f: Derivative, y0: Double, t: Double,
-                   t0: Double = 0.0, step: Double = defaultStepSize): Double
+                   t0: Double = 0., step: Double = defaultStepSize): Double
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Apply the integrate method to each derivative to compute the trajectory of
@@ -83,7 +83,7 @@ trait Integrator
      *  @param step  the step size
      */
     def integrateV (f: Array [Derivative], y0: VectorD, t: Double,
-                    t0: Double = 0.0, step: Double = defaultStepSize): VectorD =
+                    t0: Double = 0., step: Double = defaultStepSize): VectorD =
     {
         val n = y0.dim
         if (n != f.length) {
@@ -109,7 +109,7 @@ trait Integrator
      *  @param step  the step size
      */
     def integrateVV (f: Array [DerivativeV], y0: VectorD, t: Double,
-                     t0: Double = 0.0, step: Double = defaultStepSize): VectorD
+                     t0: Double = 0., step: Double = defaultStepSize): VectorD
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the error estimate.

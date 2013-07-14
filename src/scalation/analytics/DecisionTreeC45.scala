@@ -108,22 +108,22 @@ class DecisionTreeC45 (val x: MatrixI, val y: Array [Int], featr: Array [String]
                    Tuple2 [Double, VectorD] =
     {
         val prob  = new VectorD (k)        // probability vector for a given feature and value
-        var count = 0.0
+        var count = 0.
         if (cont) {                        // feature with continuous values
             if (value == 0) {
                 for (i <- 0 until m if fCol(i) <= thres) {    // below threshold
-                    count      += 1.0
+                    count      += 1.
                     prob(y(i)) += 1
                 } // for
              } else {
                 for (i <- 0 until m if fCol(i) > thres) {      // above threshold
-                    count      += 1.0
+                    count      += 1.
                     prob(y(i)) += 1
                 } // for
             } // if
         } else {                           // feature with discrete values
             for (i <- 0 until m if fCol(i) == value) {
-                count      += 1.0
+                count      += 1.
                 prob(y(i)) += 1
             } // for
         } // if
@@ -138,8 +138,8 @@ class DecisionTreeC45 (val x: MatrixI, val y: Array [Int], featr: Array [String]
      */
     def entropy (prob: VectorD): Double =
     {
-        var sum = 0.0
-        for (p <- prob) if (p > 0.0) sum -= p * log2 (p)
+        var sum = 0.
+        for (p <- prob) if (p > 0.) sum -= p * log2 (p)
         sum             // return entropy, a number in the interval [0, 1]
     } // entropy
 
@@ -153,7 +153,7 @@ class DecisionTreeC45 (val x: MatrixI, val y: Array [Int], featr: Array [String]
     {
         val fCol = x.col(f)            // extract column f from data matrix x
         val vals = vc(f)               // the number of distinct values for feature f
-        var sum  = 0.0
+        var sum  = 0.
         for (i <- 0 until vals) {
             val (coun_fi, prob_fi) = frequency (fCol, i, isCont(f), threshold(f))
             val entr_fi = entropy (prob_fi)           // entropy for feature f value i
@@ -171,10 +171,10 @@ class DecisionTreeC45 (val x: MatrixI, val y: Array [Int], featr: Array [String]
      */
     def calThreshold (f: Int)
     {
-        var thres    =  0.0                          // start with a threshold of 0
-        var tmpThres =  0.0                          // try other thresholds
-        var maxGain  = -1.0                          // maximum gain
-        var tmpGain  =  0.0                          // gain with current threshold
+        var thres    =  0.                          // start with a threshold of 0
+        var tmpThres =  0.                          // try other thresholds
+        var maxGain  = -1.                          // maximum gain
+        var tmpGain  =  0.                          // gain with current threshold
         var fCol     = x.col(f)                     // feature column
         var values   = new MutableList [Double] ()  // values for feature
         for (i <- 0 until m if ! values.contains (fCol(i))) values += fCol(i)
@@ -186,7 +186,7 @@ class DecisionTreeC45 (val x: MatrixI, val y: Array [Int], featr: Array [String]
         } // if
 
         for (i <- 0 until values.length - 1) {
-            tmpThres     = (values(i) + values(i+1)) / 2.0
+            tmpThres     = (values(i) + values(i+1)) / 2.
             threshold(f) = tmpThres                 // tmp change for gain calculation
             tmpGain      = gain (f)                 // compute gain with new threshold
             if (DEBUG) println ("for threshold " + tmpThres + " the gain is " + tmpGain)

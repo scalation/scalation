@@ -40,7 +40,7 @@ class NonLinRegression (x: MatrixD, y: VectorD,
     private val DEBUG      = false                // debug flag
     private val n          = x.dim1               // number of data points (rows in matrix x)
     private var b: VectorD = null                 // parameter vector (b0, b1, ... bp)
-    private var rSquared   = -1.0                  // coefficient of determination (quality of fit)
+    private var rSquared   = -1.                  // coefficient of determination (quality of fit)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Function to compute the Sum of Squares Error (SSE) for given values for
@@ -69,7 +69,7 @@ class NonLinRegression (x: MatrixD, y: VectorD,
         val bfgs = new QuasiNewton (sseF)          // minimize sse using NLP
         b        = bfgs.solve (b_init)             // estimate for b from optimizer
         val sse  = sseF (b)                        // residual/error sum of squares
-        val sst  = (y dot y) - y.sum~^2.0 / n       // total sum of squares
+        val sst  = (y dot y) - y.sum~^2. / n       // total sum of squares
         rSquared = (sst - sse) / sst               // coefficient of determination
         if (DEBUG) println ("sse = " + sse)
     } // train
@@ -81,7 +81,7 @@ class NonLinRegression (x: MatrixD, y: VectorD,
 
    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = f(z, b),
-     *  i.e., (b0, b1) dot (1.0, z1).
+     *  i.e., (b0, b1) dot (1., z1).
      *  @param z  the new vector to predict
      */
     def predict (z: VectorD): Double = f(z, b)
@@ -111,8 +111,8 @@ class NonLinRegression (x: MatrixD, y: VectorD,
 object NonLinRegressionTest extends App
 {
     // 5 data points: constant term, x1 coordinate, x2 coordinate
-    val x = new MatrixD ((15, 1), 2.0, 5.0, 7.0, 10.0, 14.0, 19.0, 26.0, 31.0, 34.0, 38.0, 45.0, 52.0, 53.0, 60.0, 65.0)
-    val y = new VectorD (54.0, 50.0, 45.0, 37.0, 35.0, 25.0, 20.0, 16.0, 18.0, 13.0, 8.0, 11.0, 8.0, 4.0, 6.0)
+    val x = new MatrixD ((15, 1), 2., 5., 7., 10., 14., 19., 26., 31., 34., 38., 45., 52., 53., 60., 65.)
+    val y = new VectorD (54., 50., 45., 37., 35., 25., 20., 16., 18., 13., 8., 11., 8., 4., 6.)
 
     println ("x = " + x)
     println ("y = " + y)
@@ -124,7 +124,7 @@ object NonLinRegressionTest extends App
     rg.train ()
     println ("fit = " + rg.fit)
 
-    val z  = new VectorD (1); z(0) = 50.0         // predict y for one point
+    val z  = new VectorD (1); z(0) = 50.         // predict y for one point
     val yp = rg.predict (z)
     println ("predict (" + z + ") = " + yp)
 

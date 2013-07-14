@@ -38,10 +38,10 @@ class BankModel (name: String, nArrivals: Int, iArrivalRV: Variate,
                  nUnits: Int, serviceRV: Variate, moveRV: Variate)
       extends Model (name)
 {
-    val entry     = new Source ("entry", this, Customer, nArrivals, iArrivalRV, (120.0, 185.0))
-    val tellerQ   = new WaitQueue ("tellerQ", (250.0, 190.0))
-    val teller    = new Resource ("teller", tellerQ, nUnits, serviceRV, (320.0, 185.0))
-    val door      = new Sink ("door", (460.0, 190.0))
+    val entry     = new Source ("entry", this, Customer, nArrivals, iArrivalRV, (120., 185.))
+    val tellerQ   = new WaitQueue ("tellerQ", (250., 190.))
+    val teller    = new Resource ("teller", tellerQ, nUnits, serviceRV, (320., 185.))
+    val door      = new Sink ("door", (460., 190.))
     val toTellerQ = new Transport ("entry2tellerQ", moveRV, entry, tellerQ)
     val toDoor    = new Transport ("teller2door", moveRV, teller, door)
 

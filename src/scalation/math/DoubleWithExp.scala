@@ -41,7 +41,7 @@ object DoubleWithExp
 object DoubleWithExpTest extends App
 {
     import DoubleWithExp._
-    println (2.0 ~^ 3.0)
+    println (2. ~^ 3.)
 
 } // DoubleWithExpTest object
 

@@ -28,11 +28,11 @@ class Statistic (val name: String = "stat", unbiased: Boolean = false)
 
     /** Sum of the sample values
      */
-    protected var sum = 0.0
+    protected var sum = 0.
 
     /** Sum of the sample values squared
      */
-    protected var sumSq = 0.0
+    protected var sumSq = 0.
 
     /** the minimum sample value
      */
@@ -40,7 +40,7 @@ class Statistic (val name: String = "stat", unbiased: Boolean = false)
 
     /** the maximum sample value
      */
-    protected var maxX = 0.0
+    protected var maxX = 0.
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Tally the next value and update accumulators.
@@ -63,7 +63,7 @@ class Statistic (val name: String = "stat", unbiased: Boolean = false)
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the minimum value in sample.
      */
-    def min: Double = if (n == 0) 0.0 else minX
+    def min: Double = if (n == 0) 0. else minX
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the maximum value in sample.
@@ -73,7 +73,7 @@ class Statistic (val name: String = "stat", unbiased: Boolean = false)
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute/estimate the sample mean.
      */
-    def mean: Double = if (n == 0) 0.0 else sum / n.toDouble
+    def mean: Double = if (n == 0) 0. else sum / n.toDouble
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute/estimate the sample variance.  The denominator is one less for
@@ -82,8 +82,8 @@ class Statistic (val name: String = "stat", unbiased: Boolean = false)
      */
     def variance: Double =
     {
-        if (n == 0) 0.0
-        else sumSq / (if (unbiased) n - 1.0 else n).toDouble - mean * mean
+        if (n == 0) 0.
+        else sumSq / (if (unbiased) n - 1. else n).toDouble - mean * mean
     } // variance
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -108,8 +108,8 @@ class Statistic (val name: String = "stat", unbiased: Boolean = false)
     def interval (p: Double = .95): Double =
     {
         val df = n - 1              // degrees of freedom
-        if (df < 1) return 0.0       // flaw ("interval", "must have at least 2 observations")
-        val pp = 1 - (1 - p) / 2.0   // e.g., .95 --> .975 (two tails)
+        if (df < 1) return 0.       // flaw ("interval", "must have at least 2 observations")
+        val pp = 1 - (1 - p) / 2.   // e.g., .95 --> .975 (two tails)
         val t = Quantile.studentTInv (pp, df)
         t * stddev / sqrt (n.toDouble)
     } // interval
@@ -140,7 +140,7 @@ class Statistic (val name: String = "stat", unbiased: Boolean = false)
  *  @param name      the name for this statistic (e.g., NumberInQueue or tellerQ)
  */
 class TimeStatistic (override val name: String = "timeStat",
-                              var lastTime: Double = 0.0)
+                              var lastTime: Double = 0.)
       extends Statistic (name)
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -192,7 +192,7 @@ object StatisticTest extends App
 
     println ("\nTest time persistent statistics")
     val stat2 = new TimeStatistic ()
-    for (i <- 1 to 1000) stat2.accumulate (rv.gen, 2.0 * i)
+    for (i <- 1 to 1000) stat2.accumulate (rv.gen, 2. * i)
     println (stat2.labels)
     println (stat2)
 

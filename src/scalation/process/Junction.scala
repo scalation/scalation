@@ -47,7 +47,7 @@ class Junction (name: String, from: Transport, to: Transport)
         val fAt = from.at
         val tAt = to.at
         director.animate (actor, MoveToken, null, null,
-                 Array ((fAt(0) + tAt(0)) / 2.0 + DIAM, (fAt(1) + tAt(1)) / 2.0 + DIAM))
+                 Array ((fAt(0) + tAt(0)) / 2. + DIAM, (fAt(1) + tAt(1)) / 2. + DIAM))
         actor.schedule (duration)
         actor.yieldToDirector ()
     } // move

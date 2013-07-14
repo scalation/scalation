@@ -71,7 +71,7 @@ class StatVector (dim: Int, private var unbiased: Boolean = false)
      *  unbiased (n-1) vs. maximum likelihood (n) estimators.  Also use n for
      *  population statistics.
      */
-    private def den: Double = if (unbiased) n - 1.0 else n
+    private def den: Double = if (unbiased) n - 1. else n
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the number of samples.
@@ -109,7 +109,7 @@ class StatVector (dim: Int, private var unbiased: Boolean = false)
     {
         val mu  = mean
         val num = dim - k
-        var sum = 0.0
+        var sum = 0.
         for (i <- 0 until num) sum += (v(i) - mu) * (v(i+k) - mu)
         sum / num
     } // acorr
@@ -150,7 +150,7 @@ class StatVector (dim: Int, private var unbiased: Boolean = false)
     def skew: Double =
     {
         val s = (this - mean).sum~^3 / (n * stddev~^3)
-        if (unbiased) s * sqrt (n * (n-1.0)) / (n-2.0) else s
+        if (unbiased) s * sqrt (n * (n-1.)) / (n-2.) else s
     } // skew
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -161,7 +161,7 @@ class StatVector (dim: Int, private var unbiased: Boolean = false)
     {
         val df = dim - 1              // degrees of freedom
         if (df < 1) flaw ("interval", "must have at least 2 observations")
-        val pp = 1 - (1 - p) / 2.0     // e.g., .95 --> .975 (two tails)
+        val pp = 1 - (1 - p) / 2.     // e.g., .95 --> .975 (two tails)
         val t  = studentTInv (pp, df)
         t * stddev / sqrt (dim.toDouble)
     } // interval
@@ -174,8 +174,8 @@ class StatVector (dim: Int, private var unbiased: Boolean = false)
  */
 object StatVectorTest extends App
 {
-    val x = new StatVector (1.0, 2.0, 3.0, 4.0, 5.0, 6.0)
-    val y = new StatVector (2.0, 3.0, 4.0, 5.0, 6.0, 7.0)
+    val x = new StatVector (1., 2., 3., 4., 5., 6.)
+    val y = new StatVector (2., 3., 4., 5., 6., 7.)
 
     println ("x           = " + x)
     println ("y           = " + y)

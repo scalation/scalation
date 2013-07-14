@@ -27,7 +27,7 @@ import scalation.util.Monitor.trace
  *  @param to        the ending component
  *  @param bend      the bend or curvature of the transport (0 => line)
  */
-class Transport (name: String, tripTime: Variate, from: Component, to: Component, bend: Double = 0.0)
+class Transport (name: String, tripTime: Variate, from: Component, to: Component, bend: Double = 0.)
       extends Component
 {
     initComponent (name, Array ())
@@ -44,12 +44,12 @@ class Transport (name: String, tripTime: Variate, from: Component, to: Component
         val w1 = from.at(2)
         val h1 = from.at(3)
         var x1 = from.at(0)
-        val y1 = from.at(1) + h1 / 2.0
+        val y1 = from.at(1) + h1 / 2.
         
         val w2 = to.at(2)
         val h2 = to.at(3)
         var x2 = to.at(0)
-        val y2 = to.at(1) + h2 / 2.0
+        val y2 = to.at(1) + h2 / 2.
 
         if (x1 < x2) x1 += w1 else x2 += w2
 
@@ -99,7 +99,7 @@ class Transport (name: String, tripTime: Variate, from: Component, to: Component
         val fAt = from.at
         val tAt = to.at
         director.animate (actor, MoveToken, null, null,
-                 Array ((fAt(0) + tAt(0)) / 2.0 + DIAM, (fAt(1) + tAt(1)) / 2.0 + DIAM))
+                 Array ((fAt(0) + tAt(0)) / 2. + DIAM, (fAt(1) + tAt(1)) / 2. + DIAM))
         actor.schedule (duration)
         actor.yieldToDirector ()
     } // jump

@@ -39,7 +39,7 @@ class ConjGradient (f: FunctionV2S, g: FunctionV2S = null,
       extends Minimizer with Error
 {
     private val DEBUG    = true                  // the debug flag
-    private val WEIGHT   = 1000.0                 // weight on penalty for constraint violation
+    private val WEIGHT   = 1000.                 // weight on penalty for constraint violation
 
     private var df: Array [FunctionV2S] = null   // array of partials
 
@@ -51,7 +51,7 @@ class ConjGradient (f: FunctionV2S, g: FunctionV2S = null,
      */
     def beta (gr1: VectorD, gr2: VectorD): Double =
     {
-        max (0.0, (gr2 dot (gr2 - gr1)) / (gr1.normSq + EPSILON))    // PR-CG (Polak-Ribiere)
+        max (0., (gr2 dot (gr2 - gr1)) / (gr1.normSq + EPSILON))    // PR-CG (Polak-Ribiere)
     } // beta
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -77,7 +77,7 @@ class ConjGradient (f: FunctionV2S, g: FunctionV2S = null,
         if (g == null) {                  // unconstrained
             f_x
         } else {                          // constrained, g(x) <= 0
-            val penalty = if (ineq) max (g(x), 0.0) else abs (g(x))
+            val penalty = if (ineq) max (g(x), 0.) else abs (g(x))
             f_x + abs (f_x) * WEIGHT * penalty * penalty
         } // if
     } // fg
@@ -110,10 +110,10 @@ class ConjGradient (f: FunctionV2S, g: FunctionV2S = null,
         var x    = x0                                  // current point
         var f_x  = fg(x)                               // objective function at current point
         var y:   VectorD = null                        // next point
-        var f_y  = 0.0                                  // objective function at next point
+        var f_y  = 0.                                  // objective function at next point
         var dir  = -gradient (fg, x)                   // initial direction is -gradient
         var dir0: VectorD = null                       // keep the previous direction
-        var dist = 1.0                                  // distance between current and next point
+        var dist = 1.                                  // distance between current and next point
         var down = true                                // moving down flag
 
         for (k <- 1 to MAX_ITER if down && dist > toler && dir.normSq > toler) {
@@ -144,13 +144,13 @@ object ConjGradientTest extends App
     val x0 = new VectorD (2)
 
     println ("\nMinimize: (x_0 - 3)^2 + (x_1 - 4)^2 + 1")
-    def f (x: VectorD): Double = (x(0) - 3.0) * (x(0) - 3.0) + (x(1) - 4.0) * (x(1) - 4.0) + 1.0
+    def f (x: VectorD): Double = (x(0) - 3.) * (x(0) - 3.) + (x(1) - 4.) * (x(1) - 4.) + 1.
     var solver = new ConjGradient (f)
     var x = solver.solve (x0)
     println ("optimal solution x = " + x + " with an objective value f(x) = " + f(x))
 
     println ("\nMinimize: x_0^4 + (x_0 - 3)^2 + (x_1 - 4)^2 + 1")
-    def g (x: VectorD): Double = pow (x(0), 4.0) + (x(0) - 3.0) * (x(0) - 3.0) + (x(1) - 4.0) * (x(1) - 4.0) + 1.0
+    def g (x: VectorD): Double = pow (x(0), 4.) + (x(0) - 3.) * (x(0) - 3.) + (x(1) - 4.) * (x(1) - 4.) + 1.
     solver = new ConjGradient (g)
     x = solver.solve (x0)
     println ("optimal solution x = " + x + " with an objective value g(x) = " + g(x))

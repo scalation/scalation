@@ -42,7 +42,7 @@ class Source (name: String, director: Model, makeEntity: () => SimActor, units: 
     def this (name: String, director: Model, makeEntity: () => SimActor, units: Int,
               iArrivalTime: Variate, xy: Tuple2 [Double, Double])
     {
-        this (name, director, makeEntity, units, iArrivalTime, Array (xy._1, xy._2, 30.0, 30.0))
+        this (name, director, makeEntity, units, iArrivalTime, Array (xy._1, xy._2, 30., 30.))
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -63,7 +63,7 @@ class Source (name: String, director: Model, makeEntity: () => SimActor, units: 
             val actor = makeEntity ()
             trace (this, "generates", actor, director.clock)
             director.animate (actor, CreateToken, randomColor (actor.id), Ellipse (),
-                     Array (at(0) + at(2) + RAD / 2.0, at(1) + at(3) / 2.0 - RAD))
+                     Array (at(0) + at(2) + RAD / 2., at(1) + at(3) / 2. - RAD))
             actor.schedule (0.0)
             if (i < units) {
                 val duration = iArrivalTime.gen

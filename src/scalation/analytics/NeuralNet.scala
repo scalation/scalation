@@ -48,7 +48,7 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int)
     /** Return the value of the sigmoid function at t.
      *  @param t  the sigmoid function argument
      */
-    def sigmoid (t: Double): Double = 1.0 / (1.0 + exp (-t))
+    def sigmoid (t: Double): Double = 1. / (1. + exp (-t))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector of values of the sigmoid function applied to vector t.
@@ -56,7 +56,7 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int)
      */
     def sigmoid (t: VectorD): VectorD =
     {
-        for (i <- 0 until t.dim) t(i) = 1.0 / (1.0 + exp (-t(i)))
+        for (i <- 0 until t.dim) t(i) = 1. / (1. + exp (-t(i)))
         t
     } // sigmoid
 
@@ -109,9 +109,9 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int)
      */
     def backProp ()
     {
-        val eta = 1.0                                       // the learning rate
-        val _1h = new VectorD (h); _1h.set (1.0)            // one vector for hidden layer
-        val _1o = new VectorD (p); _1o.set (1.0)            // one vector for output layer
+        val eta = 1.                                       // the learning rate
+        val _1h = new VectorD (h); _1h.set (1.)            // one vector for hidden layer
+        val _1o = new VectorD (p); _1o.set (1.)            // one vector for output layer
         val y_h = new VectorD (h)                          // predicted hidden layer value
         val y_o = new VectorD (p)                          // predicted output layer value
  
@@ -202,11 +202,11 @@ object NeuralNetTest extends App
                                   0.5, 0.5)
     val v  = new MatrixD ((2, 2), 0.5, 0.5,     // weight matrix v (hidden to output layer)
                                   0.0, 0.0)
-    val wb = new VectorD (0.0, 0.0)              // bias vector wb (input to hidden layer)
-    val vb = new VectorD (0.0, 0.0)              // bias vector vb (hidden to output layer)
+    val wb = new VectorD (0., 0.)              // bias vector wb (input to hidden layer)
+    val vb = new VectorD (0., 0.)              // bias vector vb (hidden to output layer)
     ann.setWeights (w, v, wb, vb)              // set intial weights and biases
 
-    val z_i = new VectorD (1.0, 1.0)             // predict output z_o from input z_i
+    val z_i = new VectorD (1., 1.)             // predict output z_o from input z_i
     println ("input vector:  z_i = " + z_i)
     println ("output vector: z_o = " + ann.predictAll (z_i))
 
@@ -228,8 +228,8 @@ object NeuralNetTest2 extends App
                                   0.8, 0.6)
     val v  = new MatrixD ((2, 1), 0.3, 0.9)    // weight matrix v (hidden to output layer)
 
-    val wb = new VectorD (0.0, 0.0)              // bias vector wb (input to hidden layer)
-    val vb = new VectorD (0.0, 0.0)              // bias vector vb (hidden to output layer)
+    val wb = new VectorD (0., 0.)              // bias vector wb (input to hidden layer)
+    val vb = new VectorD (0., 0.)              // bias vector vb (hidden to output layer)
     ann.setWeights (w, v, wb, vb)              // set intial weights and biases
 
     println ("input vector:  x(0) = " + x(0))

@@ -36,7 +36,7 @@ class Animator (graph: Dgraph) extends Transform with Error
 
     /** Time dilation factor for speeding up/slowing down animations
      */
-    private var _timeDilationFactor = 1.0
+    private var _timeDilationFactor = 1.
 
     /** Number of lost entities/tokens.
      */
@@ -497,11 +497,11 @@ class Animator (graph: Dgraph) extends Transform with Error
         for (token <- tokens) {                              // look through all the tokens in the list
             if (token.color == color) {                      // find the one with the matching color
                 val size = token.shape.getWidth () + change  // determine new width
-                if (size < 0.0) {                             // not enough there to make change
+                if (size < 0.) {                             // not enough there to make change
                     flaw ("scaleGivenToken", "cannot have a negative fluid level for token of color " + color)
-                } else if (size <= 0.0) {                     // no fluid, implies should have no token
+                } else if (size <= 0.) {                     // no fluid, implies should have no token
                     // destroyToken (token_eid)              // FIX: need to get the token's eid to destroy it
-                    scale (token.shape, Array (0.0, 0.0))
+                    scale (token.shape, Array (0., 0.))
                 } else {                                     // rescale the token
                     scale (token.shape, Array (size, size))
                 } // if
@@ -509,9 +509,9 @@ class Animator (graph: Dgraph) extends Transform with Error
             } // if
         } // for
 
-        if (change < 0.0) {
+        if (change < 0.) {
             flaw ("scaleTokens2At", "cannot remove fluid, since could not find color " + color)
-        } else if (change > 0.0) {
+        } else if (change > 0.) {
             // No color match, so create a new token/fluid of that color
             val eid = EidCounter.next ()
             createToken (eid, Ellipse (), "t" + eid, false, color, node_eid, Array (change, change))

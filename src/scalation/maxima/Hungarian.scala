@@ -179,12 +179,12 @@ class Hungarian (cost: MatrixD)
      */
     private def solve (): Double =
     {
-        if (m > n) { println ("Hungarian: error - m = " + m + " > n = " + n); return -1.0 }
+        if (m > n) { println ("Hungarian: error - m = " + m + " > n = " + n); return -1. }
         initLabels ()   // initial the cost labels for x-nodes
         augment ()      // recursive method the find augmenting paths
 
         println ("------------------------------------")
-        var total = 0.0                  // cost/weight of the optimal matching
+        var total = 0.                  // cost/weight of the optimal matching
         for (x <- r_m) {                // form answer -
             total += cost(x, xy(x))     // using values from x-side
             println ("cost (" + x + ", " + xy(x) + ") = " + cost(x, xy(x)))

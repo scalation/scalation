@@ -89,7 +89,7 @@ case class NormalVec (mu: VectorD, cov: MatrixD, stream: Int = 0)
         val n    = z.dim.toDouble                       // n-dimensional vectors
         val z_mu = z - mu                               // subtract mean
         val zz   = z_mu dot cov.inverse * z_mu
-        exp (-.5 * zz) / sqrt ((2.0 * Pi)~^n * abs (cov.det))
+        exp (-.5 * zz) / sqrt ((2. * Pi)~^n * abs (cov.det))
     } // pf
 
     def gen: VectorD =
@@ -117,7 +117,7 @@ case class PermutedVecD (x: VectorD, stream: Int = 0)
 
     def mean: VectorD =  { val mv = new VectorD (x.dim); mv.set (mu); mv }
 
-    def pf (z: VectorD): Double = 1.0 / fac (x.dim)
+    def pf (z: VectorD): Double = 1. / fac (x.dim)
 
     def gen: VectorD = 
     {
@@ -150,7 +150,7 @@ case class PermutedVecI (x: VectorI, stream: Int = 0)
 
     def mean: VectorD =  { val mv = new VectorD (x.dim); mv.set (mu); mv }
 
-    def pf (z: VectorD): Double = 1.0 / fac (x.dim)
+    def pf (z: VectorD): Double = 1. / fac (x.dim)
 
     def gen: VectorD = throw new NoSuchMethodException ("'gen' not implemented, use 'igen' instead")
 
@@ -174,9 +174,9 @@ case class PermutedVecI (x: VectorI, stream: Int = 0)
 object VariateVecTest extends App
 {
      println ("Test: NormalVec random vector generation ---------------------")
-     val mu = new VectorD (5.0, 5.0)
-     val cov = new MatrixD ((2, 2), 2.0, 1.0,
-                                    1.0, 2.0)
+     val mu = new VectorD (5., 5.)
+     val cov = new MatrixD ((2, 2), 2., 1.,
+                                    1., 2.)
      val nv = NormalVec (mu, cov)
      println ("mean = " + nv.mean)
      for (k <- 0 until 30) println (nv.gen)

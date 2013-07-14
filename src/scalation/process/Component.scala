@@ -18,11 +18,11 @@ trait Component extends Identity
 {
     /** Radius of a token (for animating entities)
      */
-    val RAD = 5.0
+    val RAD = 5.
 
     /** Diameter of a token (for animating entities)
      */
-    val DIAM = 2.0 * RAD
+    val DIAM = 2. * RAD
 
     /** Director of the play/simulation model (to which this component belongs)
      */

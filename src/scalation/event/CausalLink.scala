@@ -52,7 +52,7 @@ case class CausalLink (_name: String, director: Model, condition: () => Boolean,
     def display (from: Event, to: Event)
     {
         if (from.id == to.id) {
-            director.animate (this, CreateEdge, green, new QCurve (), from, to, Array (16.0 * bend))
+            director.animate (this, CreateEdge, green, new QCurve (), from, to, Array (16. * bend))
         } else {
             director.animate (this, CreateEdge, green, new QCurve (), from, to, Array (bend))
         } // if

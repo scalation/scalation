@@ -196,13 +196,13 @@ object Combinatorics extends Error
     def gammaF (a: Double): Double =
     {
         if (a <= 0) flaw ("gammaF", "only handle positive cases")
-        var prod = 1.0
+        var prod = 1.
         val ia   = floor (a).toInt
         val frac = a - floor (a)
         if (frac < EPSILON) {
             prod = fac (ia - 1)
         } else if (approx (frac, .5)) {
-            for (i <- 2 to ia) prod *= 2.0 * i - 1.0
+            for (i <- 2 to ia) prod *= 2. * i - 1.
             prod *= SQRT_PI / 2~^ia
         } else {
             flaw ("gammaF", "only handle positive integer and halves cases")
@@ -216,7 +216,7 @@ object Combinatorics extends Error
      *  @param k  the number of factors in the product
      *  @param x  the base number to start the product
      */
-    def rfac (k: Int, x: Double = 1.0): Double =
+    def rfac (k: Int, x: Double = 1.): Double =
     {
         gammaF (x + k) / gammaF (x)
     } // rfac
@@ -231,10 +231,10 @@ object Combinatorics extends Error
      */
     def hyp2f1 (z: Double, a: Double, b: Double, c: Double): Double =
     {
-        if (b == c) return (1.0-z)~^(-a)    // special cases
+        if (b == c) return (1.-z)~^(-a)    // special cases
 
 	val MAX_ITER = 15
-        var sum      = 0.0
+        var sum      = 0.
         for (k <- 0 until MAX_ITER) {
             sum += ((rfac (k, a) * rfac (k, b)) / rfac (k, c)) * (z~^k / rfac (k))
         } // for
@@ -263,7 +263,7 @@ object Combinatorics extends Error
      */
     def iBetaF (z: Double, a: Double, b: Double): Double =
     {
-        (z~^a / a) * hyp2f1 (z, a, 1.0-b, a+1.0)
+        (z~^a / a) * hyp2f1 (z, a, 1.-b, a+1.)
     } // iBetaF
     
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -306,7 +306,7 @@ object CombinatoricsTest extends App
     
     println ("\nCheck Pascal's Tetrahedron")
     for (n <- 0 until pascalTet.length) {
-        var sum = 0.0
+        var sum = 0.
         for (k <- 0 to n; l <- 0 to k) sum += pascalTet(n)(k)(l)
         println ("sum for layer " + n + " = " + sum + " =? " + 3~^n)
     } // for

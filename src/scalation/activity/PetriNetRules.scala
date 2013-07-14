@@ -131,7 +131,7 @@ object PetriNetRulesTest extends App with PetriNetRules
 {
     //:: Set the initial time.
 
-    val t0 = 1.0
+    val t0 = 1.
 
     //:: Set sample values for tokens.
 
@@ -185,7 +185,7 @@ object PetriNetRulesTest extends App with PetriNetRules
     println ("\n *** Test fluid flows: differential flow model integral derv\n")
 
     def derv1 (t: Double, y: Double) = y
-    def derv2 (t: Double, y: Double) = 2.0 * y
+    def derv2 (t: Double, y: Double) = 2. * y
     val dervs = Array [Derivative] (derv1, derv2)
     println ("Fluid flow:  place to transition: " + fluidFlow (f, dervs, t0, d))
 
