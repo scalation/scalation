@@ -9,7 +9,7 @@
 package scalation.plot
 
 import math.{ceil, floor, min, round}
-import swing.{MainFrame, Panel, SimpleGUIApplication}
+import swing.{MainFrame, Panel}
 
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.random.{Normal, Uniform}

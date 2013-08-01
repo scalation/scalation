@@ -8,12 +8,21 @@
 
 package scalation.linalgebra
 
-import math.abs
-
 import scala.collection.mutable.LinkedEntry
 
 import scalation.math.Complex
+import scalation.math.Complex.{abs, _0}
 import scalation.util.{Error, SortedLinkedHashMap}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Companion object for the SparseMatrixC class.
+ */
+object SparseMatrixC
+{
+    type RowMap = SortedLinkedHashMap [Int, Complex]
+
+} // SparseMatrixC object
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The SparseMatrixC class stores and operates on Matrices of Complex numbers.  Rather
@@ -29,14 +38,21 @@ class SparseMatrixC (val d1: Int,
                      val d2: Int)
       extends Matric with Error with Serializable
 {
+    /** Dimension 1
+     */
     lazy val dim1 = d1
+
+    /** Dimension 2
+     */
     lazy val dim2 = d2
+
+    import SparseMatrixC.RowMap
     
     /** Store the matrix as an array of sorted-linked-maps {(j, v)}
      *  where j is the second index and v is value to store
      */
-    var v = new Array [SortedLinkedHashMap [Int, Complex]] (d1)
-    for (i <- 0 until d1) v(i) = new SortedLinkedHashMap [Int, Complex] ()
+    private val v = new Array [RowMap] (d1)
+    for (i <- 0 until d1) v(i) = new RowMap ()
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a dim1 by dim2 sparse matrix from an array of sorted-linked-maps.
@@ -44,11 +60,11 @@ class SparseMatrixC (val d1: Int,
      *  @param dim2  the column dimension
      *  @param u     the array of sorted-linked-maps
      */
-    def this (dim1: Int, dim2: Int, u: Array [SortedLinkedHashMap [Int, Complex]])
+    def this (dim1: Int, dim2: Int, u: Array [SparseMatrixC.RowMap])
     {
-        this (dim1, dim2)         // invoke primary constructor
+        this (dim1, dim2)
         if (u.length != dim1) flaw ("contructor", "dimension is not matched!")
-        v = u
+        for (i <- 0 until dim1) v(i) = u(i)
     } // constructor
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -66,7 +82,7 @@ class SparseMatrixC (val d1: Int,
     def this (dim1: Int, dim2: Int, x: Complex)
     {
         this (dim1, dim2)                      // invoke primary constructor
-        if (x != Complex._0) for (i <- range1; j <- range2.reverse) v(i)(j) = x
+        if (x != _0) for (i <- range1; j <- range2.reverse) v(i)(j) = x
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -78,7 +94,7 @@ class SparseMatrixC (val d1: Int,
     def this (dim1: Int, x: Complex)
     {
         this (dim1, dim1)                      // invoke primary constructor
-        if (x != Complex._0) for (i <- range1) v(i)(i) = x
+        if (x != _0) for (i <- range1) v(i)(i) = x
     } // constructor
 
    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -104,7 +120,6 @@ class SparseMatrixC (val d1: Int,
         for (i <- range1; j <- range2) v(i)(j) = if (j == 0 && j == 0) Complex (u00)
                                                else Complex (u(i * dim2 + j - 1))
     } // constructor
-
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a sparse matrix and assign values from matrix u.
@@ -149,7 +164,7 @@ class SparseMatrixC (val d1: Int,
      *  @param i  the row index
      *  @param j  the column index
      */
-    def apply (i: Int, j: Int): Complex = if (v(i) contains j) v(i)(j) else Complex._0
+    def apply (i: Int, j: Int): Complex = if (v(i) contains j) v(i)(j) else _0
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get this sparse matrix's vector at the i-th index position (i-th row).
@@ -171,11 +186,35 @@ class SparseMatrixC (val d1: Int,
         val a = Array.ofDim [Complex] (dim2)
         for (j <- 0 until dim2) {
             try a(j) = v(i)(j)
-            catch { case nsee: NoSuchElementException => a(j) = Complex._0 }
+            catch { case nsee: NoSuchElementException => a(j) = _0 }
         } // for
         new VectorC (a)
     } // apply
      */
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise on range ir and column-wise on range jr.
+     *  Ex: b = a(2..4, 3..5)
+     *  @param ir  the row range
+     *  @param jr  the column range
+     */
+    def apply (ir: Range, jr: Range): SparseMatrixC = slice (ir.start, ir.end, jr.start, jr.end)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise on range ir and column-wise at index j.
+     *  Ex: u = a(2..4, 3)
+     *  @param ir  the row range
+     *  @param j   the column index
+     */
+    def apply (ir: Range, j: Int): VectorC = col(j)(ir)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise at index i and column-wise on range jr.
+     *  Ex: u = a(2, 3..5)
+     *  @param i   the row index
+     *  @param jr  the column range
+     */
+    def apply (i: Int, jr: Range): VectorC = this(i)(jr)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set this sparse matrix's element at the i,j-th index position to the scalar x.
@@ -184,7 +223,7 @@ class SparseMatrixC (val d1: Int,
      *  @param j  the column index
      *  @param x  the scalar value to assign
      */
-    def update (i: Int, j: Int, x: Complex) { if (x != Complex._0) v(i)(j) = x else v(i) -= j }
+    def update (i: Int, j: Int, x: Complex) { if (x != _0) v(i)(j) = x else v(i) -= j }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set this sparse matrix's row at the i-th index position to the vector u.
@@ -195,7 +234,7 @@ class SparseMatrixC (val d1: Int,
     {
         for (j <- 0 until u.dim) {
             val x = u(j)
-            if (x != Complex._0) v(i)(j) = x else v(i) -= j
+            if (x != _0) v(i)(j) = x else v(i) -= j
         } // for
     } // update
 
@@ -204,15 +243,66 @@ class SparseMatrixC (val d1: Int,
      *  @param i  the row index
      *  @param u  the sorted-linked-map of non-zreo values to assign
      */
-    def update (i: Int, u: SortedLinkedHashMap [Int, Complex]) { v(i) = u }
+    def update (i: Int, u: RowMap) { v(i) = u }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set this sparse matrix's row at the i-th index position to the vector u.
-     *  @param i  the row index
-     *  @param j  the starting column index
-     *  @param u  the vector value to assign
+    /** Set a slice this matrix row-wise on range ir and column-wise on range jr.
+     *  Ex: a(2..4, 3..5) = b
+     *  @param ir  the row range
+     *  @param jr  the column range
+     *  @param b   the matrix to assign
      */
-    def set (i: Int, j: Int, u: VectorC) { for (k <- 0 until u.dim) this(i, j+k) = u(k) }
+    def update (ir: Range, jr: Range, b: SparseMatrixC)
+    {
+        for (i <- ir; j <- jr) this(i, j) = b(i-ir.start, j-jr.start)
+    } // update
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set a slice this matrix row-wise on range ir and column-wise at index j.
+     *  Ex: a(2..4, 3) = u
+     *  @param ir  the row range
+     *  @param j   the column index
+     *  @param u   the vector to assign
+     */
+    def update (ir: Range, j: Int, u: VectorC) { col(j)(ir) = u }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set a slice this matrix row-wise at index i and column-wise on range jr.
+     *  Ex: a(2, 3..5) = u
+     *  @param i   the row index
+     *  @param jr  the column range
+     *  @param u   the vector to assign
+     */
+    def update (i: Int, jr: Range, u: VectorC) { this(i)(jr) = u }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set all the elements in this matrix to the scalar x.
+     *  @param x  the scalar value to assign
+     */
+    def set (x: Complex)
+    {
+        throw new NoSuchMethodException ("use a dense matrix instead")
+    } // set
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set all the values in this matrix as copies of the values in 2D array u.
+     *  @param u  the 2D array of values to assign
+     */
+    def set (u: Array [Array [Complex]])
+    {
+        for (i <- range1; j <- range2) this(i, j) = u(i)(j)
+    } // set
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set this matrix's ith row starting at column j to the vector u.
+     *  @param i  the row index
+     *  @param u  the vector value to assign
+     *  @param j  the starting column index
+     */
+    def set (i: Int, u: VectorC, j: Int = 0)
+    {
+        for (k <- 0 until u.dim) this(i, k+j) = u(k)
+    } // set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice this sparse matrix row-wise from to end.
@@ -257,48 +347,44 @@ class SparseMatrixC (val d1: Int,
     } // sliceExclude
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get row 'r' from the matrix, returning it as a vector.
-     *  @param r     the row to extract from the matrix
-     *  @param from  the position to start extracting from
+    /** Select rows from this matrix according to the given index/basis.
+     *  @param rowIndex  the row index positions (e.g., (0, 2, 5))
      */
-    def row (r: Int, from: Int = 0): VectorC =
+    def selectRows (rowIndex: Array [Int]): SparseMatrixC =
     {
-        val u = new VectorC (dim2 - from)
-        for (j <- from until dim2 if v(r) contains j) u(j-from) = this(r, j)
-        u
-    } // row
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Select rows from this sparse matrix according a basis.
-     *  @param basis  the row index positions (e.g., (0, 2, 5))
-     */
-    def selectRows (basis: Array [Int]): SparseMatrixC =
-    {
-        val c = new SparseMatrixC (basis.length)
-        for (i <- c.range1) c.setRow (i, col(basis(i)))
+        val c = new SparseMatrixC (rowIndex.length, dim2)
+        for (i <- c.range1) c(i) = this(rowIndex(i))
         c
     } // selectRows
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get column 'c' from the matrix, returning it as a vector.
-     *  @param c     the column to extract from the matrix
+    /** Get column 'col' from the matrix, returning it as a vector.
+     *  @param col   the column to extract from the matrix
      *  @param from  the position to start extracting from
      */
-    def col (c: Int, from: Int = 0): VectorC =
+    def col (col: Int, from: Int = 0): VectorC =
     {
         val u = new VectorC (dim1 - from)
-        for (i <- from until dim1) u(i-from) = this(i, c)
+        for (i <- from until dim1) u(i-from) = this(i, col)
         u
     } // col
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Select columns from this sparse matrix according a basis.
-     *  @param basis  the column index positions (e.g., (0, 2, 5))
+    /** Set column 'col' of the matrix to a vector.
+     *  @param col  the column to set
+     *  @param u    the vector to assign to the column
      */
-    def selectCols (basis: Array [Int]): SparseMatrixC =
+    def setCol (col: Int, u: VectorC) { for (i <- range1) this(i, col) = u(i) }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Select columns from this matrix according to the given index/basis.
+     *  Ex: Can be used to divide a matrix into a basis and a non-basis.
+     *  @param colIndex  the column index positions (e.g., (0, 2, 5))
+     */
+    def selectCols (colIndex: Array [Int]): SparseMatrixC =
     {
-        val c = new SparseMatrixC (basis.length)
-        for (j <- c.range1) c.setCol (j, col(basis(j)))
+        val c = new SparseMatrixC (dim1, colIndex.length)
+        for (j <- c.range2) c.setCol (j, col(colIndex(j)))
         c
     } // selectCols
 
@@ -313,14 +399,14 @@ class SparseMatrixC (val d1: Int,
     } // t
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate this sparse matrix and vector b.
-     *  @param b  the vector to be concatenated as the new last row in matrix
+    /** Concatenate this sparse matrix and vector u.
+     *  @param u  the vector to be concatenated as the new last row in matrix
      */
-    def ++ (b: VectorC): SparseMatrixC =
+    def ++ (u: VectorC): SparseMatrixC =
     {
-        if (b.dim != dim2) flaw ("++", "vector does not match row dimension")
+        if (u.dim != dim2) flaw ("++", "vector does not match row dimension")
         val c = new SparseMatrixC (dim1 + 1, dim2)
-        for (i <- c.range1) c(i) = if (i < dim1) this(i) else b
+        for (i <- c.range1) c(i) = if (i < dim1) this(i) else u
         c
     } // ++
 
@@ -339,9 +425,10 @@ class SparseMatrixC (val d1: Int,
     /** Add in-place this sparse matrix and sparse matrix b.
      *  @param b  the matrix to add (requires sameCrossDimensions)
      */
-    def += (b: SparseMatrixC)
+    def += (b: SparseMatrixC): SparseMatrixC =
     {
         for (i <- range1; e <- b.v(i)) this(i, e._1) = this(i, e._1) + e._2
+        this
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -359,30 +446,32 @@ class SparseMatrixC (val d1: Int,
     /** Add in-place this sparse matrix and matrix b.
      *  @param b  the matrix to add (requires sameCrossDimensions)
      */
-    def += (b: MatrixC)
+    def += (b: MatrixC): SparseMatrixC =
     {
         for (i <- range1; j <- range2) this(i, j) = this(i, j) + b(i, j)
+        this
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add this sparse matrix and scalar s. Note: every element will be likely 
+    /** Add this sparse matrix and scalar x. Note: every element will be likely 
      *  filled, hence the return type is a dense matrix.
-     *  @param s  the scalar to add
+     *  @param x  the scalar to add
      */
-    def + (s: Complex): MatrixC =
+    def + (x: Complex): MatrixC =
     {
         val c = new MatrixC (dim1, dim2)
-        for (i <- range1; j <- range2) c(i, j) = this(i, j) + s
+        for (i <- range1; j <- range2) c(i, j) = this(i, j) + x
         c
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add in-place this sparse matrix and scalar s.
-     *  @param s  the scalar to add
+    /** Add in-place this sparse matrix and scalar x.
+     *  @param x  the scalar to add
      */
-    def += (s: Complex)
+    def += (x: Complex): SparseMatrixC =
     {
-        for (i <- range1; j <- range2) this(i, j) = this(i, j) + s
+        for (i <- range1; j <- range2) this(i, j) = this(i, j) + x
+        this
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -400,9 +489,10 @@ class SparseMatrixC (val d1: Int,
     /** From this sparse matrix substract in-place sparse matrix b.
      *  @param b  the sparse matrix to subtract (requires sameCrossDimensions)
      */
-    def -= (b: SparseMatrixC)
+    def -= (b: SparseMatrixC): SparseMatrixC =
     {
         for (i <- range1; e <- b.v(i)) this(i, e._1) = this(i, e._1) - e._2
+        this
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -420,30 +510,32 @@ class SparseMatrixC (val d1: Int,
     /** From this sparse matrix substract in-place matrix b.
      *  @param b  the matrix to subtract (requires sameCrossDimensions)
      */
-    def -= (b: MatrixC)
+    def -= (b: MatrixC): SparseMatrixC =
     {
         for (i <- range1; j <- range2) this(i, j) = this(i, j) - b(i, j)
+        this
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this sparse matrix subtract scalar s. Note: every element will be likely 
+    /** From this sparse matrix subtract scalar x. Note: every element will be likely 
      *  filled, hence the return type is a dense matrix.
-     *  @param s  the scalar to subtract
+     *  @param x  the scalar to subtract
      */
-    def - (s: Complex): MatrixC =
+    def - (x: Complex): MatrixC =
     {
         val c = new MatrixC (dim1, dim2)
-        for (i <- range1; j <- range2) c(i, j) = this(i, j) - s
+        for (i <- range1; j <- range2) c(i, j) = this(i, j) - x
         c
     } // -
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this sparse matrix subtract in-place scalar s.
-     *  @param s  the scalar to subtract
+    /** From this sparse matrix subtract in-place scalar x.
+     *  @param x  the scalar to subtract
      */
-    def -= (s: Complex)
+    def -= (x: Complex): SparseMatrixC =
     {
-        for (i <- range1; j <- range2) this(i, j) = this(i, j) - s
+        for (i <- range1; j <- range2) this(i, j) = this(i, j) - x
+        this
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -465,7 +557,7 @@ class SparseMatrixC (val d1: Int,
                 var cont = false
                 var itaNext = false               // more elements in row of this matrix?
                 var itbNext = false               // more elements in row of bt matrix?
-                var sum = Complex._0
+                var sum = _0
                 if (ea != null && eb != null) cont = true
                 while (cont) {
                     if (itaNext) ea = ea.later
@@ -481,7 +573,7 @@ class SparseMatrixC (val d1: Int,
                     if (itaNext && ea.later == null) cont = false
                     if (itbNext && eb.later == null) cont = false
                 } // while
-                if (sum != Complex._0) c(i, j) = sum         // assign if non-zero
+                if (sum != _0) c(i, j) = sum         // assign if non-zero
             } // for
         } // for
         c
@@ -493,14 +585,14 @@ class SparseMatrixC (val d1: Int,
      *  the b matrix.
      *  @param b  the matrix to multiply by (requires sameCrossDimensions)
      */
-    def *= (b: SparseMatrixC)
+    def *= (b: SparseMatrixC): SparseMatrixC =
     {
         val c = if (b == this) new SparseMatrixC (this) else b
         val bt = b.t                            // transpose the b matrix (for row access)
         for (i <- c.range1) {
             var ea: LinkedEntry[Int, Complex] = null
             var eb: LinkedEntry[Int, Complex] = null
-            val temp = new SortedLinkedHashMap[Int, Complex]()  
+            val temp = new RowMap ()  
             for (e <- v(i)) temp(e._1) = e._2   // copy a new SortedLinkedHashMap
             for (j <- c.range2) {
                 ea = temp.getFirstEntry()
@@ -508,7 +600,7 @@ class SparseMatrixC (val d1: Int,
                 var cont = false
                 var itaNext = false               // more elements in row of this matrix?
                 var itbNext = false               // more elements in row of bt matrix?
-                var sum = Complex._0
+                var sum = _0
                 if (ea != null && eb != null) cont = true
                 while (cont) {
                     if (itaNext) ea = ea.later
@@ -527,6 +619,7 @@ class SparseMatrixC (val d1: Int,
                 this(i, j) = sum         // assign if non-zero
             } // for
         } // for
+        this
     } // *=
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -537,7 +630,7 @@ class SparseMatrixC (val d1: Int,
     {
         val c = new SparseMatrixC (dim1, b.dim2)
         for (i <- c.range1; j <- c.range2) {
-            var sum = Complex._0
+            var sum = _0
             for (e <- v(i)) sum += e._2 * b(e._1, j)
             c(i, j) = sum
         } // for
@@ -548,18 +641,19 @@ class SparseMatrixC (val d1: Int,
     /** Multiply in-place this sparse matrix by matrix b.
      *  @param b  the matrix to multiply by (requires sameCrossDimensions)
      */
-    def *= (b: MatrixC)
+    def *= (b: MatrixC): SparseMatrixC =
     {
         val c = if (b == this) new SparseMatrixC (this) else b
         for (i <- range1) {
-            val temp = new SortedLinkedHashMap [Int, Complex]()   // save so not overwritten
+            val temp = new RowMap ()   // save so not overwritten
             for (e <- v(i)) temp(e._1) = e._2
             for (j <- range1) {
-                var sum = Complex._0
+                var sum = _0
                 for (e <- temp) sum += e._2 * b(e._1, j)
                 this(i, j) = sum
             } // for
         } // for
+        this
     } // *=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -607,78 +701,81 @@ class SparseMatrixC (val d1: Int,
     } // strassenMult
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this sparse matrix by vector b.
-     *  @param b  the vector to multiply by
+    /** Multiply this sparse matrix by vector u.
+     *  @param u  the vector to multiply by
      */
-    def * (b: VectorC): VectorC =
+    def * (u: VectorC): VectorC =
     {
         val c = new VectorC (dim1)
         for (i <- range1) {
-            var sum = Complex._0
-            for (e <- v(i)) sum += e._2 * b(e._1)
+            var sum = _0
+            for (e <- v(i)) sum += e._2 * u(e._1)
             c(i) = sum
         } // for
         c
     } // *
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this sparse matrix by scalar s.
-     *  @param s  the scalar to multiply by
+    /** Multiply this sparse matrix by scalar x.
+     *  @param x  the scalar to multiply by
      */
-    def * (s: Complex): SparseMatrixC =
+    def * (x: Complex): SparseMatrixC =
     {
         val c = new SparseMatrixC (dim1, dim2)
-        for (i <- range1; e <- v(i)) c(i, e._1) = s * e._2
+        for (i <- range1; e <- v(i)) c(i, e._1) = x * e._2
         c
     } // *
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this sparse matrix by scalar s.
-     *  @param s  the scalar to multiply by
+    /** Multiply in-place this sparse matrix by scalar x.
+     *  @param x  the scalar to multiply by
      */
-    def *= (s: Complex)
+    def *= (x: Complex): SparseMatrixC =
     {
-        for (i <- range1; e <- v(i)) this(i, e._1) = s * e._2
+        for (i <- range1; e <- v(i)) this(i, e._1) = x * e._2
+        this
     } // *=
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this sparse matrix by vector b to produce another matrix (a_ij * b_j)
-     *  @param b  the vector to multiply by
+    /** Multiply this sparse matrix by vector u to produce another matrix (a_ij * b_j)
+     *  @param u  the vector to multiply by
      */
-    def ** (b: VectorC): SparseMatrixC =
+    def ** (u: VectorC): SparseMatrixC =
     {
         val c = new SparseMatrixC (dim1, dim2)
-        for (i <- c.range1; e <- v(i)) c(i, e._1) = e._2 * b(e._1)
+        for (i <- c.range1; e <- v(i)) c(i, e._1) = e._2 * u(e._1)
         c
     } // **
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this sparse matrix by vector b to produce another matrix (a_ij * b_j)
-     *  @param b  the vector to multiply by
+    /** Multiply in-place this sparse matrix by vector u to produce another matrix (a_ij * b_j)
+     *  @param u  the vector to multiply by
      */
-    def **= (b: VectorC)
+    def **= (u: VectorC): SparseMatrixC =
     {
-        for (i <- range1; e <- v(i)) this(i, e._1) = e._2 * b(e._1)
+        for (i <- range1; e <- v(i)) this(i, e._1) = e._2 * u(e._1)
+        this
     } // **=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide this sparse matrix by scalar s.
-     *  @param s  the scalar to divide by
+    /** Divide this sparse matrix by scalar x.
+     *  @param x  the scalar to divide by
      */
-    def / (s: Complex): SparseMatrixC =
+    def / (x: Complex): SparseMatrixC =
     {
         val c = new SparseMatrixC (dim1, dim2)
-        for (i <- range1; e <- v(i)) c(i, e._1) = e._2 / s
+        for (i <- range1; e <- v(i)) c(i, e._1) = e._2 / x
         c
     } // /
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide in-place this sparse matrix by scalar s.
-     *  @param s  the scalar to divide by
+    /** Divide in-place this sparse matrix by scalar x.
+     *  @param x  the scalar to divide by
      */
-    def /= (s: Complex)
+    def /= (x: Complex): SparseMatrixC =
     {
-        for (i <- range1; e <- v(i)) this(i, e._1) = e._2 / s
+        for (i <- range1; e <- v(i)) this(i, e._1) = e._2 / x
+        this
     } // /=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -713,9 +810,9 @@ class SparseMatrixC (val d1: Int,
     /** Find the maximum element in SortedLinkHashMap.
      *  @param u  the SortedLinkHashMap for the search
      */
-    private def getMaxVal (u: SortedLinkedHashMap [Int, Complex]): Complex =
+    private def getMaxVal (u: RowMap): Complex =
     {
-        var x = if (u contains 0) u(0) else Complex._0
+        var x = if (u contains 0) u(0) else _0
         for (e <- u) if (e._2 > x) x = e._2
         x
     } // getMaxVal
@@ -738,9 +835,9 @@ class SparseMatrixC (val d1: Int,
     /** Find the minimum element in SortedLinkHashMap.
      *  @param u  the SortedLinkHashMap for the search
      */
-    private def getMinVal (u: SortedLinkedHashMap [Int, Complex]): Complex =
+    private def getMinVal (u: RowMap): Complex =
     {
-        var x = if (u contains 0) u(0) else Complex._0 
+        var x = if (u contains 0) u(0) else _0 
         for (e <- u) if (e._2 < x) x = e._2
         x
     } // getMinVal
@@ -756,13 +853,13 @@ class SparseMatrixC (val d1: Int,
         val u = new SparseMatrixC (this)         // upper triangular matrix (a copy of this)
         for (i <- u.range1) {
             var pivot = u(i, i)
-            if (pivot == Complex._0) {
+            if (pivot == _0) {
                 val k = partialPivoting (u, i)   // find the maxiumum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u(i, i)                  // reset the pivot
             } // if
             l(i, i) = Complex._1
-            for (j <- i + 1 until u.dim2) l(i, j) = Complex._0
+            for (j <- i + 1 until u.dim2) l(i, j) = _0
             for (k <- i + 1 until u.dim1) {
                 val mul = u(k, i) / pivot
                 l(k, i) = mul
@@ -783,13 +880,13 @@ class SparseMatrixC (val d1: Int,
         val u = this                             // upper triangular matrix (this)
         for (i <- u.range1) {
             var pivot = u(i, i)
-            if (pivot == Complex._0) {
+            if (pivot == _0) {
                 val k = partialPivoting (u, i)   // find the maxiumum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u(i, i)                  // reset the pivot
             } // if
             l(i, i) = Complex._1
-            for (j <- i + 1 until u.dim2) l(i, j) = Complex._0
+            for (j <- i + 1 until u.dim2) l(i, j) = _0
             for (k <- i + 1 until u.dim1) {
                 val mul = u(k, i) / pivot
                 l(k, i) = mul
@@ -841,13 +938,13 @@ class SparseMatrixC (val d1: Int,
     {
         val y = new VectorC (l.dim2)       
         for (k <- 0 until y.dim) {                   // solve for y in l*y = b
-            var sum = Complex._0
+            var sum = _0
             for (j <- 0 until k) sum = sum + l(k, j) * y(j)
             y(k) = b(k) - sum
         } // for
         val x = new VectorC (u.dim2)
         for (k <- x.dim - 1 to 0 by -1) {            // solve for x in u*x = y
-            var sum = Complex._0
+            var sum = _0
             for (j <- k + 1 until u.dim2) sum = sum + u(k, j) * x(j)
             x(k) = (y(k) - sum) / u(k, k)
         } // for
@@ -880,7 +977,7 @@ class SparseMatrixC (val d1: Int,
         for (i <- 0 until m; j <- 0 until n) {
             c(i, j) = if (i <  dim1 && j <  dim2) this(i, j)
                  else if (i >= dim1 && j >= dim2) b(i-dim1, j-dim2)
-                    else                          Complex._0
+                    else                          _0
         } // for
         c
     } // diag
@@ -897,21 +994,40 @@ class SparseMatrixC (val d1: Int,
         val n  = dim1 + p + q
         val c  = new SparseMatrixC (n, n)
         for (i <- 0 until n; j <- 0 until n) {
-            c(i, j) = if (i < p || i > p + dim1) if (i == j) Complex._1 else Complex._0
+            c(i, j) = if (i < p || i > p + dim1) if (i == j) Complex._1 else _0
                     else                         this(i-p, j-p)
         } // for
         c
     } // diag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the main diagonal of this sparse matrix.  Assumes dim2 >= dim1.
+    /** Get the kth diagonal of this sparse matrix.  Assumes dim2 >= dim1.
+     *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
-    def getDiag (): VectorC =
+    def getDiag (k: Int = 0): VectorC =
     {
-        val c = new VectorC (dim1)
-        for (i <- range1) c(i) = this(i, i)
+        val mm = dim1 - math.abs (k)
+        val c = new VectorC (mm)
+        for (i <- 0 until mm) c(i) = this(i, i+k)
         c
     } // getDiag
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the kth diagonal of this matrix to the vector u.  Assumes dim2 >= dim1.
+     *  @param u  the vector to set the diagonal to
+     *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
+     */
+    def setDiag (u: VectorC, k: Int = 0)
+    {
+        val mm = dim1 - math.abs (k)
+        for (i <- 0 until mm) this(i, i+k) = u(i)
+    } // setDiag
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the main diagonal of this matrix to the scalar x.  Assumes dim2 >= dim1.
+     *  @param x  the scalar to set the diagonal to
+     */
+    def setDiag (x: Complex) { for (i <- range1) this(i, i) = x }
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Invert this sparse matrix (requires a squareMatrix) and use partial pivoting.
@@ -922,7 +1038,7 @@ class SparseMatrixC (val d1: Int,
         val c = new SparseMatrixC (dim1, Complex._1)  // let c represent the augmentation
         for (i <- b.range1) {
             var pivot = b(i, i)
-            if (pivot == Complex._0) {
+            if (pivot == _0) {
                 val k = partialPivoting (b, i)     // find the maxiumum element below pivot
                 swap (b, i, k, i)                  // in b, swap rows i and k from column i
                 swap (c, i, k, 0)                  // in c, swap rows i and k from column 0
@@ -934,12 +1050,12 @@ class SparseMatrixC (val d1: Int,
             } // for
             for (k <- 0 until dim1 if k != i) {
                 val mul = b(k, i)
-                if (mul != Complex._0) {
+                if (mul != _0) {
                     for (j <- b.range2) {
                         val bval = b(i, j)
                         val cval = c(i, j)
-                        if (bval != Complex._0) b(k, j) -= mul * bval
-                        if (cval != Complex._0) c(k, j) -= mul * cval
+                        if (bval != _0) b(k, j) -= mul * bval
+                        if (cval != _0) c(k, j) -= mul * cval
                     } // for
                 } // if
             } // for
@@ -957,7 +1073,7 @@ class SparseMatrixC (val d1: Int,
         val c = new SparseMatrixC (dim1, Complex._1)   // let c represent the augmentation
         for (i <- b.range1) {
             var pivot = b(i, i)
-            if (pivot == Complex._0) {
+            if (pivot == _0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 swap (c, i, k, 0)               // in c, swap rows i and k from column 0
@@ -969,7 +1085,7 @@ class SparseMatrixC (val d1: Int,
             } // for
             for (k <- 0 until dim1 if k != i) {
                 val mul = b(k, i)
-                if (mul != Complex._0) {
+                if (mul != _0) {
                     for (j <- b.range2) {
                         b(k, j) = b(k, j) - mul * b(i, j)
                         c(k, j) = c(k, j) - mul * c(i, j)
@@ -990,7 +1106,7 @@ class SparseMatrixC (val d1: Int,
         val b = new SparseMatrixC (this)        // copy this matrix into b
         for (i <- b.range1) {
             var pivot = b(i, i)
-            if (pivot == Complex._0) {
+            if (pivot == _0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b(i, i)                 // reset the pivot
@@ -1016,7 +1132,7 @@ class SparseMatrixC (val d1: Int,
         val b = this                            // use this matrix for b
         for (i <- b.range1) {
             var pivot = b(i, i)
-            if (pivot == Complex._0) {
+            if (pivot == _0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b(i, i)                 // reset the pivot
@@ -1024,12 +1140,26 @@ class SparseMatrixC (val d1: Int,
             for (j <- b.range2) b(i, j) = b(i, j) / pivot
             for (k <- 0 until dim1 if k != i) {
                 val mul = b(k, i)
-                if (mul != Complex._0) {
+                if (mul != _0) {
                     for (j <- b.range2) b(k, j) = b(k, j) - mul * b(i, j)
                 } // if
             } // for
         } // for
     } // reduce_ip
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Clean values in matrix at or below the threshold by setting them to zero.
+     *  Iterative algorithms give approximate values and if very close to zero,
+     *  may throw off other calculations, e.g., in computing eigenvectors.
+     *  @param thres     the cutoff threshold (a small value)
+     *  @param relative  whether to use relative or absolute cutoff
+     */
+    def clean (thres: Double, relative: Boolean = true): SparseMatrixC =
+    {
+        val s = if (relative) mag else Complex._1             // use matrix magnitude or 1
+        for (i <- range1; j <- range2) if (abs (this(i, j)) <= s * thres) this(i, j) = _0
+        this
+    } // clean
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the (right) nullspace of this m by n matrix (requires n = m + 1)
@@ -1071,7 +1201,7 @@ class SparseMatrixC (val d1: Int,
     def trace: Complex =
     {
         if ( ! isSquare) flaw ("trace", "trace only works on square matrices")
-        var sum = Complex._0
+        var sum = _0
         for (i <- range1) sum += this(i, i)
         sum
     } // trace
@@ -1081,7 +1211,7 @@ class SparseMatrixC (val d1: Int,
      */
     def sum: Complex =
     {
-        var sum = Complex._0
+        var sum = _0
         for (i <- range1; j <- range2) sum += this(i, j)
         sum
     } // sum
@@ -1091,10 +1221,33 @@ class SparseMatrixC (val d1: Int,
      */
     def sumLower: Complex =
     {
-        var sum = Complex._0
+        var sum = _0
         for (i <- range1; j <- 0 until i) sum += this(i, j)
         sum
     } // sumLower
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the abs sum of this matrix, i.e., the sum of the absolute value
+     *  of its elements.  This is useful for comparing matrices (a - b).sumAbs
+     */
+    def sumAbs: Complex =
+    {
+        var sum = _0
+        for (i <- range1; j <- range2) sum += abs (this(i, j))
+        sum
+    } // sumAbs
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the 1-norm of this matrix, i.e., the maximum 1-norm of the
+     *  column vectors.  This is useful for comparing matrices (a - b).norm1
+     */
+    def norm1: Complex =
+    {
+        val c = new VectorC (dim2)
+        for (j <- range2) c(j) = col(j).norm1
+        c.max ()
+    } // norm1
+
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the determinant of this sparse matrix.
@@ -1102,7 +1255,7 @@ class SparseMatrixC (val d1: Int,
     def det: Complex =
     {
         if ( ! isSquare) flaw ("det", "determinant only works on square matrices")
-        var sum = Complex._0
+        var sum = _0
         for (j <- range2) {
             val b = sliceExclude (0, j)   // the submatrix that excludes row 0 and column j
             sum += (if (j % 2 == 0) this(0, j) * (if (b.dim1 == 1) b(0, 0) else b.det)
@@ -1122,7 +1275,7 @@ class SparseMatrixC (val d1: Int,
      */
     def isNonnegative: Boolean =
     {
-        for (i <- range1; e <- v(i) if e._2 < Complex._0) return false
+        for (i <- range1; e <- v(i) if e._2 < _0) return false
         true
     } // isNonegative
     
@@ -1177,7 +1330,7 @@ object SparseMatrixCTest extends App
 
     val z  = new SparseMatrixC ((2, 2), 1., 2.,
                                         3., 2.)
-    val b  = new VectorC (8., 7.)
+    val b  = VectorC (8., 7.)
     val lu = z.lud
 
     println ("z         = " + z)

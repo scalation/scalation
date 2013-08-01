@@ -72,7 +72,7 @@ object CholeskyTest extends App
                                  0.4,  1.04, -0.12, 0.28,
                                  0.8, -0.12,  9.2,  1.4,
                                 -0.2,  0.28,  1.4,  4.35)
-    val b = new VectorD (-0.2, -0.32, 13.52, 14.17)
+    val b = VectorD (-0.2, -0.32, 13.52, 14.17)
 
     val c = new Cholesky (a)
     println ("a = " + a)

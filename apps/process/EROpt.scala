@@ -28,7 +28,7 @@ import scalation.util.Monitor
 object EROpt extends App
 {
     val nStop   = 100                             // simulation stopping rule (100 patients)
-    val cost    = new VectorD (240., 480., 10.)   // cost coefficient vector
+    val cost    = VectorD (240., 480., 10.)       // cost coefficient vector
     val PENALTY = 1.E8                            // penalty for infeasibility (e.g., -1 tellers)
     var bm: ERModelOpt = null                     // instance of an ER model
 
@@ -47,9 +47,9 @@ object EROpt extends App
         if (doctors < 1) return PENALTY * (1 - doctors)   // return based on penalty
         bm = new ERModelOpt ("bank", nStop, Uniform (2000, 4000), nurses, doctors,
                              Uniform (7000, 9000), Uniform (5000, 7000), Uniform (900, 1100))
-      val results  = bm.simulate ()
+        val results  = bm.simulate ()
         val waitTime = results(2).mean + results(5).mean
-        val response = new VectorD (nurses, doctors, waitTime)
+        val response = VectorD (nurses, doctors, waitTime)
         val total = cost dot response                                 // compute overall cost
         println ("---------------------------------------------------------------")
         println ("simulated an ER with " + nurses + " nurses, " + doctors +  " doctors, cost = " + total)

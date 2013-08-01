@@ -27,7 +27,7 @@ import scalation.util.Monitor
 object BankOpt extends App
 {
     val nStop   = 100                       // simulation stopping rule (100 customers)
-    val cost    = new VectorD (160., 10.)   // the cost coefficient vector
+    val cost    = VectorD (160., 10.)       // the cost coefficient vector
     val PENALTY = 1.E8                      // penalty for infeasibility (e.g., -1 tellers)
     var bm: BankModelOpt = null             // instance of a bank model
 
@@ -48,7 +48,7 @@ object BankOpt extends App
         bm = new BankModelOpt ("bank", nStop, Uniform (1000, 3000), tellers,
                                Uniform (9000, 11000), Uniform (900, 1100))
         val waitTime = bm.simulate ()(2).mean
-        val response = new VectorD (tellers, waitTime)
+        val response = VectorD (tellers, waitTime)
         cost dot response                                 // return overall cost
     } // f
 

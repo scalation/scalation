@@ -11,6 +11,7 @@ package scalation.random
 import math.{abs, exp, Pi, round, sqrt}
 
 import scalation.linalgebra.{Cholesky, MatrixD, VectorD}
+import scalation.linalgebra_gen.VectorN
 import scalation.linalgebra_gen.Vectors.VectorI
 import scalation.math.Combinatorics.fac
 import scalation.math.DoubleWithExp._
@@ -174,7 +175,7 @@ case class PermutedVecI (x: VectorI, stream: Int = 0)
 object VariateVecTest extends App
 {
      println ("Test: NormalVec random vector generation ---------------------")
-     val mu = new VectorD (5., 5.)
+     val mu  = VectorD (5., 5.)
      val cov = new MatrixD ((2, 2), 2., 1.,
                                     1., 2.)
      val nv = NormalVec (mu, cov)
@@ -182,7 +183,7 @@ object VariateVecTest extends App
      for (k <- 0 until 30) println (nv.gen)
 
      println ("Test: PermutedVecI random vector generation ---------------------")
-     val x  = new VectorI (1, 2, 3, 4, 5, 6, 7, 8, 9)
+     val x  = VectorN (1, 2, 3, 4, 5, 6, 7, 8, 9)
      val rp = PermutedVecI (x)                      // random permutation generator
      println ("mean = " + rp.mean)
      for (k <- 0 until 30) println (rp.igen)

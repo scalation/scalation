@@ -9,6 +9,8 @@
 
 package scalation.math
 
+// import language.implicitConversions
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class defines an expontiation operator '~^' for Ints.
  *  @param x  the base

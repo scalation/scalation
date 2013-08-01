@@ -8,11 +8,10 @@
 
 package scalation.linalgebra
 
-import math.{ceil, max, sqrt}
+import math.sqrt
 import util.Sorting.quickSort
 
 import scalation.math.DoubleWithExp._
-import scalation.math.Primes.prime
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -44,19 +43,6 @@ class VectorD (val dim: Int,
      *  @param u  the array of values
      */
     def this (u: Array [Double]) { this (u.length, u) }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a vector from two or more values (repeated values Double*).
-     *  @param u0  the first value
-     *  @param u1  the second value
-     *  @param u   the rest of the values (zero or more additional values)
-     */
-    def this (u0: Double, u1: Double, u: Double*)
-    {
-        this (u.length + 2)                        // invoke primary constructor
-        v(0) = u0; v(1) = u1
-        for (i <- 2 until dim) v(i) = u(i - 2)
-    } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a vector and assign values from vector u.
@@ -273,7 +259,7 @@ class VectorD (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the negative of this vector (unary minus).
      */
-    def unary_-(): VectorD =
+    def unary_- (): VectorD =
     {
         val c = new VectorD (dim)
         for (i <- range) c.v(i) = -v(i)
@@ -303,6 +289,17 @@ class VectorD (val dim: Int,
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** From this vector subtract scalar s._1 only at position s._2.
+     *  @param s  the (scalar, position) to subtract
+     */
+    def - (s: Tuple2 [Double, Int]): VectorD =
+    {
+        val c = new VectorD (dim)
+        for (i <- range) c.v(i) = if (i == s._2) v(i) - s._1 else v(i)
+        c
+    } // -
+ 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From this vector subtract in-place vector b.
      *  @param b  the vector to add
      */
@@ -313,17 +310,6 @@ class VectorD (val dim: Int,
      *  @param s  the scalar to add
      */
     def -= (s: Double): VectorD = { for (i <- range) v(i) -= s; this }
- 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this vector subtract scalar s._1 only at position s._2.
-     *  @param s  the (scalar, position) to subtract
-     */
-    def - (s: Tuple2 [Double, Int]): VectorD =
-    {
-        val c = new VectorD (dim)
-        for (i <- range) c.v(i) = if (i == s._2) v(i) - s._1 else v(i)
-        c
-    } // -
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply this vector by vector b.
@@ -435,7 +421,7 @@ class VectorD (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of this vector.
      */
-    def sum: Double = v.foldLeft (0.) (_ + _)
+    def sum: Double = v.sum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of this vector skipping the i-th element.
@@ -468,17 +454,17 @@ class VectorD (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize this vector so that it sums to one (like a probability vector).
      */
-    def normalize: VectorD = this * (1./sum)
+    def normalize: VectorD = this * (1. / sum)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize this vector so its length is one (unit vector).
      */
-    def normalizeU: VectorD = this * (1./norm)
+    def normalizeU: VectorD = this * (1. / norm)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize this vector to have a maximum of one.
      */
-    def normalize1: VectorD = this * (1./max ())
+    def normalize1: VectorD = this * (1. / max ())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the dot product (or inner product) of this vector with vector b.
@@ -502,13 +488,23 @@ class VectorD (val dim: Int,
     def norm: Double = sqrt (normSq)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the Manhattan norm (1-norm) of this vector.
+     */
+    def norm1: Double =
+    {
+        var sum = 0.
+        for (i <- range) sum += math.abs (v(i))
+        sum
+    } // norm1
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the maximum element in this vector.
      *  @param e  the ending index (exclusive) for the search
      */
     def max (e: Int = dim): Double =
     {
         var x = v(0)
-        for (i <- 0 until e if v(i) > x) x = v(i)
+        for (i <- 1 until e if v(i) > x) x = v(i)
         x
     } // max
 
@@ -530,7 +526,7 @@ class VectorD (val dim: Int,
     def min (e: Int = dim): Double =
     {
         var x = v(0)
-        for (i <- 0 until e if v(i) < x) x = v(i)
+        for (i <- 1 until e if v(i) < x) x = v(i)
         x
     } // max
 
@@ -557,7 +553,7 @@ class VectorD (val dim: Int,
     def argmax (e: Int = dim): Int =
     {
         var j = 0
-        for (i <- 0 until e if v(i) > v(j)) j = i
+        for (i <- 1 until e if v(i) > v(j)) j = i
         j
     } // argmax
 
@@ -568,7 +564,7 @@ class VectorD (val dim: Int,
     def argmin (e: Int = dim): Int =
     {
         var j = 0
-        for (i <- 0 until e if v(i) < v(j)) j = i
+        for (i <- 1 until e if v(i) < v(j)) j = i
         j
     } // argmin
 
@@ -723,6 +719,39 @@ class VectorD (val dim: Int,
     } // toString
   
 } // VectorD class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Companion object for VectorD class.
+ */
+object VectorD
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a VectorD from one or more values (repeated values Double*).
+     *  @param x   the first double
+     *  @param xs  the rest of the doubles
+     */
+    def apply (x: Double, xs: Double*): VectorD =
+    {
+        val c = new VectorD (1 + xs.length)
+        c(0)  = x
+        for (i <- 1 until c.dim) c.v(i) = xs(i-1)
+        c
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return a VectorD containing a sequence of increasing integers in a range.
+     *  @param start  the start value of the vector, inclusive
+     *  @param end    the end value of the vector, exclusive (i.e., the first value not returned)
+     */
+    def range (start: Int, end: Int): VectorD =
+    {
+        val c = new VectorD (end - start)
+        for (i <- c.range) c.v(i) = (start + i).toDouble
+        c
+    } // range
+
+} // VectorD object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

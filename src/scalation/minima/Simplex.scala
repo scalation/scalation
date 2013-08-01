@@ -19,7 +19,6 @@ import util.control.Breaks.{breakable, break}
 
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.random.Randi
-import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class solves Linear Programming (LP) problems using a tableau based
@@ -48,11 +47,13 @@ import scalation.util.Error
  *  @param x_B  the indices of the initial basis (if not available use Simple2P)
  */
 class Simplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int])
-      extends Error
+      extends MinimizerLP
 {
+    private val DANTIZ   = true                // use Dantiz's pivot rule, else Bland's
     private val DEBUG    = false               // DEBUG mode => show all pivot steps
     private val CHECK    = true                // CHECK mode => check feasibility for each pivot
-    private val EPSILON  = 1E-9                // number close to zero
+    private val _0       = 0.                  // zero, for Floating Point Error (FPE) try setting to EPSILON
+
     private val M        = a.dim1              // the number of constraints
     private val N        = a.dim2              // the number of decision variables
     private val MpN      = M + N               // the number of variables (decision/slack/surplus)
@@ -69,14 +70,14 @@ class Simplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int])
 
     private val t = new MatrixD (MM, NN)             // the MM-by-NN simplex tableau
     for (i <- 0 until M) {
-         flip = if (b(i) < 0.) -1. else 1.
+         flip = if (b(i) < _0) -1. else 1.
          t.set (i, a(i))                             // col x: constraint matrix a
          t(i, N+i) = flip                            // col y: slack/surplus variable matrix s
          t(i, JJ)  = b(i) * flip                     // col b: limit/RHS vector b
     } // for
     t(M)(0 until N) = -c                             // set cost row (M) in the tableau to given cost
 
-    private val checker = new CheckLP (a, b, c)      // checker determines if the LP solution is correct
+    val checker = new CheckLP (a, b, c)              // checker determines if the LP solution is correct
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** In case there are no surplus variables (only slacks), the slack variables
@@ -94,10 +95,13 @@ class Simplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int])
     /** Find the best variable x_l to enter the basis.  Determine the index of
      *  entering variable corresponding to COLUMN l (e.g., using Dantiz's Rule
      *  or Bland's Rule).  Return -1 to indicate no such column.
-     *  t(M).firstPos (JJ)        // use Bland's rule (lowest index, +ve)
-     *  t(M).argmaxPos (JJ)       // use Dantiz's rule (max index, +ve, cycling possible)
+     *  t(M).argmaxPos (JJ)       // use Dantiz's rule (index of max +ve, cycling possible)
+     *  t(M).firstPos (JJ)        // use Bland's rule  (index of first +ve, FPE possible)
      */
-    def entering () = t(M).firstPos (JJ)
+    def entering (): Int =
+    {
+        if (DANTIZ) t(M).argmaxPos (JJ) else t(M).firstPos (JJ)
+    } // entering
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the best variable x_k to leave the basis given that x_l is entering.
@@ -109,8 +113,7 @@ class Simplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int])
     {
         val b_ = t.col (JJ)                                      // updated b column (RHS)
         var k  = -1
-//      for (i <- 0 until M if t(i, l) > 0.) {                   // find the pivot row
-        for (i <- 0 until M if t(i, l) > EPSILON) {              // find the pivot row
+        for (i <- 0 until M if t(i, l) > _0) {                   // find the pivot row
             if (k == -1) k = i
             else if (b_(i) / t(i, l) <= b_(k) / t(k, l)) k = i   // lower ratio => reset k
         } // for
@@ -126,43 +129,32 @@ class Simplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int])
      */
     def pivot (k: Int, l: Int)
     {
-        if (DEBUG) println ("pivot: (k, l) = (" + k + ", " + l + ")") 
-        t(k) /= t(k, l)                                     // make pivot 1
-        for (i <- 0 to M if i != k) t(i) -= t(k) * t(i, l)  // zero rest of column l
-        x_B(k) = l                                          // update basis (l replaces k)
-        if (DEBUG) println (this)
+        println ("pivot: entering = " + l + " leaving = " + k)
+        t(k) /= t(k, l)                                      // make pivot 1
+        for (i <- 0 to M if i != k) t(i) -= t(k) * t(i, l)   // zero rest of column l
+        x_B(k) = l                                           // update basis (l replaces k)
     } // pivot
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Run the simplex algorithm starting from an initial BFS and iteratively
+    /** Run the Simplex Algorithm starting from an initial BFS and iteratively
      *  find a non-basic variable to replace a variable in the current basis
-     *  so long as the objective function improves.
+     *  so long as the objective function improves.  Return the optimal vector x.
      */
-    def solve ()
+    def solve (): VectorD =
     {
-        var k = -1                                   // the leaving variable (row)
-        var l = -1                                   // the entering variable (column)
-        println ("solve: Initial Tableau ---------------------------------------")
-        println (this)
+        if (DEBUG) showTableau (0)                   // for iter = 0
+        var k    = -1                                // the leaving variable (row)
+        var l    = -1                                // the entering variable (column)
 
-        var iter = 0
         breakable { for (it <- 1 to MAX_ITER) {
-            iter = it
             l = entering (); if (l == -1) break      // -1 => optimal solution found
             k = leaving (l); if (k == -1) break      // -1 => solution is unbounded
             pivot (k, l)                             // pivot: k leaves and l enters
             if (CHECK && infeasible) break           // quit if infeasible
+            if (DEBUG) showTableau (it)
         }} // for
-
-        println ("solve: Final Tableau -----------------------------------------")
-        if (DEBUG) println (this)
-        println ("solve: after " + iter + " iterations, with limit of " + MAX_ITER)
-
-        val (x, y, f) = (primal, dual, objective)
-        println ("solve: solution x = " + x + ", f = " + f)
-
-        val correct = checker.isCorrect (x, y, f)
-        if (! correct) flaw ("solve", "the Simplex solution is NOT correct")
+        
+        primal                                       // return the optimal vector x
     } // solve
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -196,7 +188,18 @@ class Simplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int])
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the value of the objective function f(x) = c x.
      */
-    def objective: Double = t(M, JJ)           // bottom, right cell in tableau
+    def objF (x: VectorD): Double = t(M, JJ)    // bottom, right cell in tableau
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Show the current tableau.
+     *  @param iter  the number of iterations do far
+     */
+    def showTableau (iter: Int)
+    {
+        println ("showTableau: --------------------------------------------------------")
+        println (this)
+        println ("showTableau: after " + iter + " iterations, with limit of " + MAX_ITER)
+     } // showTableau
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert the current tableau and basis to a string suitable for display.
@@ -228,39 +231,50 @@ object SimplexTest extends App
      *  @param c    the cost vector
      *  @param x_B  the indices of the intial basis
      */
-    def test (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int])
+    def test (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int] = null)
     {
-//      val lp = new Simplex (a, b, c, x_B)       // test with user specified basis
-        val lp = new Simplex (a, b, c)            // test with default basis
-        lp.solve ()
-        val x = lp.primal         // the primal solution vector x
-        val y = lp.dual           // the dual solution vector y
-        val f = lp.objective      // the minimum value of the objective function
+//      val lp = new Simplex (a, b, c, x_B)    // test with user specified basis
+        val lp = new Simplex (a, b, c)         // test with default basis
+        val x  = lp.solve ()                   // the primal solution vector x
+        val y  = lp.dual                       // the dual solution vector y
+        val f  = lp.objF (x)                   // the minimum value of the objective function
 
-        println ("primal    x = " + x)
-        println ("dual      y = " + y)
-        println ("objective f = " + f)
+        println ("primal x = " + x)
+        println ("dual   y = " + y)
+        println ("objF   f = " + f)
+        println ("optimal? = " + lp.check (x, y, f))
     } // test
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Test case 1:
-     *  Solution x = (1/3, 0, 13/3), x_B = (0, 2, 4), f = -17
-     *  @see Linear Programming and Network Flows, Example 3.9
+    /** Test case 1:  Initialize matrix 'a', vectors 'b' and 'c', and optionally
+     *  the basis 'x_B'.  For Simplex, matrix 'a' and vector 'c' are not augmented.
+     *-------------------------------------------------------------------------
+     *  Minimize    z = -1x_0 - 2x_1 + 1x_2 - 1x_3 - 4x_4 + 2x_5
+     *  Subject to       1x_0 + 1x_1 + 1x_2 + 1y_3 + 1y_4 + 1x_5 <= 6
+     *                   2x_0 - 1x_1 - 2x_2 + 1y_3 + 0y_4 + 0x_5 <= 4
+     *                   0x_0 + 0x_1 + 1x_2 + 1y_3 + 2y_4 + 1x_5 <= 4
+     *  where z is the objective variable and x is the decision vector.
+     *-------------------------------------------------------------------------
+     *  Solution:  primal  x_1 =  4, x_7 = 8, x_4 =  2
+     *             dual    y_1 = -2, y_2 = 0, y_3 = -1
+     *             objF    f = -16
+     *  i.e., x = (4, 8, 2), x_B = (1, 7, 4), y = (-2, 0, -1), f = -16
+     *  @see Linear Programming and Network Flows, Example 5.1
      */
     def test1 ()
     {
-        val a = new MatrixD ((3, 3), 1., 1.,  2.,       // constraint matrix
-                                     1., 1., -1.,
-                                    -1., 1.,  1.)
-        val c   = new VectorD       (1., 1., -4.)       // cost vector
-        val b   = new VectorD (9., 2., 4.)              // constant vector
-        val x_B = Array (3, 4, 5)                       // starting basis
-        test (a, b, c, x_B)
+        val a = new MatrixD ((3, 6), 1.,  1.,  1.,  1.,  1.,  1.,       // constraint matrix
+                                     2., -1., -2.,  1.,  0.,  0.,
+                                     0.,  0.,  1.,  1.,  2.,  1.)
+        val c   = VectorD          (-1., -2.,  1., -1., -4.,  2.)       // cost vector
+        val b   = VectorD (6., 4., 4.)                                  // constant vector
+        val x_B = Array (6, 7, 8)                                       // starting basis
+        test (a, b, c)                                                  // x_B is optional
     } // test1
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test case 2:
-     *  Solution x = (2/3, 10/3, 0), x_B = (0, 1, 5), f = -22/3
+     *  Solution:  x = (2/3, 10/3, 0), x_B = (0, 1, 5), f = -22/3
      *  @see Linear Programming and Network Flows, Example 5.2
      */
     def test2 ()
@@ -268,19 +282,35 @@ object SimplexTest extends App
         val a = new MatrixD ((3, 3), 1., 1.,  1.,       // constraint matrix
                                     -1., 2., -2.,
                                      2., 1.,  0)
-        val c = new VectorD        (-1., -2., 1.)       // cost vector
-        val b = new VectorD (4., 6., 5.)                // constant vector
+        val c   = VectorD          (-1., -2., 1.)       // cost vector
+        val b   = VectorD (4., 6., 5.)                  // constant vector
         val x_B = Array (3, 4, 5)                       // starting basis
         test (a, b, c, x_B)
     } // test2
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Test case 3: randomly generated
+    /** Test case 3:
+     *  Solution:  x = (1/3, 0, 13/3), x_B = (0, 2, 4), f = -17
+     *  @see Linear Programming and Network Flows, Example 3.9
      */
     def test3 ()
     {
+        val a = new MatrixD ((3, 3), 1., 1.,  2.,       // constraint matrix
+                                     1., 1., -1.,
+                                    -1., 1.,  1.)
+        val c   = VectorD           (1., 1., -4.)       // cost vector
+        val b   = VectorD (9., 2., 4.)                  // constant vector
+        val x_B = Array (3, 4, 5)                       // starting basis
+        test (a, b, c, x_B)
+    } // test3
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Test case 4:  randomly generated LP problem.
+     */
+    def test4 ()
+    {
         val rn = Randi (0, 8)
-        val (m, n) = (1000, 1000)
+        val (m, n) = (100, 100)
         val a = new MatrixD (m, n)
         val b = new VectorD (m)
         val c = new VectorD (n)
@@ -288,7 +318,7 @@ object SimplexTest extends App
         for (i <- 0 until m) b(i) = 100. * (rn.igen + 1)
         for (j <- 0 until n) c(j) = -10. * (rn.igen + 1)
         test (a, b, c, null)
-    } // test3
+    } // test4
 
     println ("\ntest1 ========================================================")
     test1 ()
@@ -296,6 +326,8 @@ object SimplexTest extends App
     test2 ()
     println ("\ntest3 ========================================================")
     test3 ()
+    println ("\ntest4 ========================================================")
+    test4 ()
 
 } // SimplexTest object
 

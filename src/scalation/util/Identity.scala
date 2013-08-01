@@ -65,12 +65,12 @@ object Counter
 {
     /** Used for counter
      */
-    private val i = Count () 
+    private var i = 0
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the next value from the counter.
      */
-    def next () = i++
+    def next () = { i += 1; i }
 
 } // Counter object
 

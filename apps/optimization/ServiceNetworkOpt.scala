@@ -11,15 +11,15 @@
 package optimization
 
 import scalation.linalgebra.{MatrixD, VectorD}
-import scalation.minima.Simplex2P
+import scalation.minima.Simplex
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** Optimize the service network by solving the following Linear Programming
+/** Optimize the service network by solving the following Linear Programming (LP)
  *  Problem.
  */
 object ServiceNetworkOpt extends App
 {
-    // Linear Program:  min c*x s.t. a*x <= b, x >= 0
+    // Linear Program:  min c x  s.t.  a x <= b, x >= 0
     //
     //  x = [x_i y_i z_i]           x1,  x2,  x3,  x4,  x5,  x6,  y1,  y2,  y3,  y4,  y5,  z1,  z2
     val a = new MatrixD ((16, 13), -1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  0.,   // row 1
@@ -38,21 +38,22 @@ object ServiceNetworkOpt extends App
                                     0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  0.,  0.,  0.,  0.,   // row 14
                                     0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  0.,  0.,  0.,   // row 15
                                     0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  0.,  0.)   // row 16
+     val c = VectorD              (11., 12., 13., 14., 15., 16.,-81.,-82.,-83.,-84.,-85.,  1.,  2.)
 
-     val b = new VectorD (0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 5., 6., 4., 3., 4.)
+     val b = VectorD (0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 5., 6., 4., 3., 4.)
 
-     val c = new VectorD (11., 12., 13., 14., 15., 16., -81., -82., -83., -84., -85., 1., 2.)
 
-     val lp = new Simplex2P (a, b, c)
+     val lp = new Simplex (a, b, c)        // solve the above LP using the Simplex Algorithm
     
-     lp.solve2P ()                         // find a minima
+     val x = lp.solve ()                   // find a minima for decision vector
+     val f = lp.objF (x)                   // find a minima for objective function
 
-     println ("opt = " + lp.primal)        // optimal values for variables x, y, z
-     println ("obj = " + lp.objective)     // optimal value for objective function (- profit)
+     println ("x = " + x)                  // optimal values for variables x = [x_i, y_i, z_i]
+     println ("f = " + f)                  // optimal value for objective function (- profit)
 
 /** Solution:
-    opt = VectorD (6.0	12.0	18.0	6.0	9.0	12.0	5.0	6.0	4.0	3.0	3.0	6.0	3.0)
-    obj = -868.9999999999999
+    x = VectorD (6.0	12.0	18.0	6.0	9.0	12.0	5.0	6.0	4.0	3.0	3.0	6.0	3.0)
+    f = -868.9999999999999
 */
 
 } // ServiceNetworkOpt

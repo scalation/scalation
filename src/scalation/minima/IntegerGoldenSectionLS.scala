@@ -128,8 +128,8 @@ object IntegerGoldenSectionLSTest extends App
  *
 object IntegerGoldenSectionLSTest2 extends App
 {
-    val zo   = new VectorD (0., 0.)                       // zero vector, the origin
-    val dir  = new VectorD (1., 1.)                       // direction to search in
+    val zo   = VectorD (0., 0.)                       // zero vector, the origin
+    val dir  = VectorD (1., 1.)                       // direction to search in
     val ymax = 5.
     var y    = 0.
     var x    = zo

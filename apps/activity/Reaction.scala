@@ -31,9 +31,9 @@ object Reaction extends App
 
     //:: Define the places along with their initial markings by color.
 
-    val place = Array [PlaceD] (new PlaceD (100, 250, new VectorD (20.,  0.)),
-                                new PlaceD (200, 350, new VectorD ( 0., 10.)),
-                                new PlaceD (500, 250, new VectorD ( 0.,  0.)))
+    val place = Array [PlaceD] (new PlaceD (100, 250, VectorD (20.,  0.)),
+                                new PlaceD (200, 350, VectorD ( 0., 10.)),
+                                new PlaceD (500, 250, VectorD ( 0.,  0.)))
 
     //:: Define the transitions.
 
@@ -52,10 +52,10 @@ object Reaction extends App
     //:: Also, establish a back link to the containing Petri net.
 
     transt(0).connect (pnet,
-        Array [ArcD] (new ArcD (place(0), transt(0), true,  new VectorD (0., 0.), null, Array [Derivative] (derv1, derv2)),
-                      new ArcD (place(1), transt(0), true,  new VectorD (0., 10.))),
-        Array [ArcD] (new ArcD (place(1), transt(0), false, new VectorD (0., 10.)),
-                      new ArcD (place(2), transt(0), false, new VectorD (10., 0.))))
+        Array [ArcD] (new ArcD (place(0), transt(0), true,  VectorD (0., 0.), null, Array [Derivative] (derv1, derv2)),
+                      new ArcD (place(1), transt(0), true,  VectorD (0., 10.))),
+        Array [ArcD] (new ArcD (place(1), transt(0), false, VectorD (0., 10.)),
+                      new ArcD (place(2), transt(0), false, VectorD (10., 0.))))
 
     println (pnet)
     pnet.simulate (2, 20)

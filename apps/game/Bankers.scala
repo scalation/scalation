@@ -11,11 +11,12 @@
 package game
 
 import scalation.linalgebra_gen.Matrices.MatrixI
+import scalation.linalgebra_gen.VectorN
 import scalation.linalgebra_gen.Vectors.VectorI
 
 object Bankers extends App
 { 
-    var avail = new VectorI (5, 5)           // units of each resource
+    var avail = VectorN (5, 5)               // units of each resource
     val max   = new MatrixI ((4, 2), 3, 2,   // maximum needs of processes
                                      2, 3,
                                      3, 2,
@@ -42,7 +43,7 @@ object Bankers extends App
 
     def safe (p: Int, q: VectorI): Boolean =
     {
-        val done = new VectorI (4)     // initially not done, all zero
+        val done = VectorN (4)         // initially not done, all zero
         var work = avail               // keep track of reclaimed resources
         var cont = true
         while (cont) {
@@ -58,10 +59,10 @@ object Bankers extends App
         done.sum == done.dim
     } // safe
 
-    request (0, new VectorI (2, 2))
-    request (1, new VectorI (2, 2))
-    request (2, new VectorI (1, 0))
-    request (3, new VectorI (0, 1))
+    request (0, VectorN (2, 2))
+    request (1, VectorN (2, 2))
+    request (2, VectorN (1, 0))
+    request (3, VectorN (0, 1))
 
 } // Bankers object
 

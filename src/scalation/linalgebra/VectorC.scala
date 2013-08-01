@@ -8,12 +8,11 @@
 
 package scalation.linalgebra
 
-import math.ceil
+import util.Sorting.quickSort
 
 import scalation.math.Complex
 import scalation.math.Complex._
 import scalation.math.DoubleWithExp._
-import scalation.math.Primes.prime
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -41,32 +40,6 @@ class VectorC (val dim: Int,
      *  @param u  the array of values
      */
     def this (u: Array [Complex]) { this (u.length, u) }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a vector from two or more values (repeated values Complex*).
-     *  @param u0  the first value
-     *  @param u1  the second value
-     *  @param u   the rest of the values (zero or more additional values)
-     */
-    def this (u0: Complex, u1: Complex, u: Complex*)
-    {
-        this (u.length + 2)                        // invoke primary constructor
-        v(0) = u0; v(1) = u1
-        for (i <- 2 until dim) v(i) = u(i - 2)
-    } // constructor
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a vector from two or more real values (repeated values Double*).
-     *  @param u0  the first value
-     *  @param u1  the second value
-     *  @param u   the rest of the values (zero or more additional values)
-     */
-    def this (u0: Double, u1: Double, u: Double*)
-    {
-        this (u.length + 2)                        // invoke primary constructor
-        v(0) = Complex (u0); v(1) = Complex (u1)
-        for (i <- 2 until dim) v(i) = Complex (u(i - 2))
-    } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a vector and assign values from vector u.
@@ -203,13 +176,13 @@ class VectorC (val dim: Int,
     def slice (from: Int, till: Int): VectorC = new VectorC (till - from, v.slice (from, till))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Select a subset of elements of this vector corresponding to a basis.
-     *  @param basis  the set of index positions (e.g., 0, 2, 5)
+    /** Select a subset of elements of this vector corresponding to a index/basis.
+     *  @param index  the set of index positions (e.g., 0, 2, 5)
      */
-    def select (basis: Array [Int]): VectorC =
+    def select (index: Array [Int]): VectorC =
     {
-        val c = new VectorC (basis.length)
-        for (i <- c.range) c.v(i) = v(basis(i))
+        val c = new VectorC (index.length)
+        for (i <- c.range) c.v(i) = v(index(i))
         c
     } // select
 
@@ -232,6 +205,17 @@ class VectorC (val dim: Int,
     {
         val c = new VectorC (dim + 1)
         for (i <- c.range) c.v(i) = if (i < dim) v(i) else b
+        c
+    } // ++
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate this vector and scalar b.
+     *  @param b  the scalar to be concatenated
+     */
+    def ++ (b: Double): VectorC =
+    {
+        val c = new VectorC (dim + 1)
+        for (i <- c.range) c.v(i) = if (i < dim) v(i) else Complex (b)
         c
     } // ++
 
@@ -546,7 +530,17 @@ class VectorC (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize this vector so that it sums to one (like a probability vector).
      */
-    def normalize: VectorC = this * (_1/sum)
+    def normalize: VectorC = this * (_1 / sum)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Normalize this vector so its length is one (unit vector).
+     */
+    def normalizeU: VectorC = this * (_1 / norm)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Normalize this vector to have a maximum of one.
+     */
+    def normalize1: VectorC = this * (_1 / max ())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the dot product (or inner product) of this vector with vector b.
@@ -560,19 +554,6 @@ class VectorC (val dim: Int,
     } // dot
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the outer product of this vector with vector b.
-     *  Should not be dependent on MatrixD.
-     *  @param b  the other vector
-     *
-    def outer (b: VectorC): MatrixC =
-    {
-        val c = new MatrixD (dim, b.dim)
-        for (i <- range; j <- b.range) c(i, j) = v(i) * b.v(j)
-        c
-    } // outer
-     */
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Euclidean norm (2-norm) squared of this vector.
      */
     def normSq: Complex = this dot this
@@ -583,13 +564,23 @@ class VectorC (val dim: Int,
     def norm: Complex = sqrt (normSq)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the Manhattan norm (1-norm) of this vector.
+     */
+    def norm1: Complex = 
+    {
+        var sum = _0
+        for (i <- range) sum += v(i).abs
+        sum
+    } // norm1
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the maximum element in this vector.
      *  @param e  the ending index (exclusive) for the search
      */
     def max (e: Int = dim): Complex = 
     {
         var x = v(0)
-        for (i <- 0 until e if v(i) > x) x = v(i)
+        for (i <- 1 until e if v(i) > x) x = v(i)
         x
     } // max
 
@@ -611,7 +602,7 @@ class VectorC (val dim: Int,
     def min (e: Int = dim): Complex = 
     {
         var x = v(0)
-        for (i <- 0 until e if v(i) < x) x = v(i)
+        for (i <- 1 until e if v(i) < x) x = v(i)
         x
     } // max
 
@@ -627,13 +618,18 @@ class VectorC (val dim: Int,
     } // min
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the element with the greatest magnitude in this vector.
+     */
+    def mag: Complex = Complex.abs (max ()) max Complex.abs (min ())
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the argument maximum of this vector (index of maximum element).
      *  @param e  the ending index (exclusive) for the search
      */
     def argmax (e: Int = dim): Int =
     {
         var j = 0
-        for (i <- 0 until e if v(i) > v(j)) j = i
+        for (i <- 1 until e if v(i) > v(j)) j = i
         j
     } // argmax
 
@@ -644,7 +640,7 @@ class VectorC (val dim: Int,
     def argmin (e: Int = dim): Int =
     {
         var j = 0
-        for (i <- 0 until e if v(i) < v(j)) j = i
+        for (i <- 1 until e if v(i) < v(j)) j = i
         j
     } // argmin
 
@@ -715,6 +711,11 @@ class VectorC (val dim: Int,
      *  @param x  the element to be checked
      */
     def contains (x: Complex): Boolean = v contains x
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Sort this vector in-place in non-decreasing order.
+     */
+    def sort () { quickSort (v)(Complex.ord) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check whether the other vector is at least as long as this vector.
@@ -791,12 +792,60 @@ class VectorC (val dim: Int,
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Companion object for VectorC class.
+ */
+object VectorC
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a VectorC from one or more values (repeated values Complex*).
+     *  @param x   the first complex number
+     *  @param xs  the rest of the complex numbers.
+     */
+    def apply (x: Complex, xs: Complex*): VectorC =
+    {
+        val c = new VectorC (1 + xs.length)
+        c(0) = x
+        for (i <- 1 until c.dim) c.v(i) = xs(i-1)
+        c
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a VectorC from one or more values (repeated values Double*).
+     *  @param x   the first double
+     *  @param xs  the rest of the doubles
+     */
+    def apply (x: Double, xs: Double*): VectorC =
+    {
+        val c = new VectorC (1 + xs.length)
+        c(0)  = Complex (x)
+        for (i <- 1 until c.dim) c.v(i) = Complex (xs(i-1))
+        c
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return a VectorC containing a sequence of increasing integers in a range.
+     *  @param start  the start value of the vector, inclusive
+     *  @param end    the end value of the vector, exclusive (i.e., the first value not returned)
+     */
+    def range (start: Int, end: Int): VectorC =
+    {
+        val c = new VectorC (end - start)
+        for (i <- c.range) c.v(i) = Complex (start + i)
+        c
+    } // range
+
+} // VectorC object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This object tests the operations provided by VectorC.
  */
 object VectorCTest extends App
 {
-    var x: VectorC = null
-    var y: VectorC = null
+    var x:  VectorC = null
+    var y:  VectorC = null
+    val z = VectorC (_0, _1)
+    println ("z = " + z)
     val c = Complex (4.)
 
     for (l <- 1 to 4) {

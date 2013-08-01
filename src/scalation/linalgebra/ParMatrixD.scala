@@ -30,7 +30,12 @@ class ParMatrixD (val d1: Int,
     // foreach, mag, rank, sameDimensions, leDimensions, sameCrossDimensions,
     // isSquare, isSymmetric
 
+    /** Dimension 1
+     */
     lazy val dim1 = d1
+
+    /** Dimension 2
+     */
     lazy val dim2 = d2
 
 //  val processors  = Runtime.getRuntime ().availableProcessors ()
@@ -258,43 +263,44 @@ class ParMatrixD (val d1: Int,
     } // sliceExclude
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Select rows from this matrix according a basis. 
-     *  @param basis  the row index positions (e.g., (0, 2, 5))
+    /** Select rows from this matrix according to the given index/basis.
+     *  @param rowIndex  the row index positions (e.g., (0, 2, 5))
      */
-    def selectRows (basis: Array [Int]): ParMatrixD =
+    def selectRows (rowIndex: Array [Int]): ParMatrixD =
     {
-        val c = new ParMatrixD (basis.length)
-        for (i <- c.range1) c(i) = col(basis(i))
+        val c = new ParMatrixD (rowIndex.length, dim2)
+        for (i <- c.range1) c(i) = this(rowIndex(i))
         c
     } // selectRows
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get column 'c' from the matrix, returning it as a vector.
-     *  @param c     the column to extract from the matrix
+    /** Get column 'col' from the matrix, returning it as a vector.
+     *  @param col   the column to extract from the matrix
      *  @param from  the position to start extracting from
      */
-    def col (c: Int, from: Int = 0): VectorD =
+    def col (col: Int, from: Int = 0): VectorD =
     {
         val u = new VectorD (dim1 - from)
-        for (i <- from until dim1) u(i-from) = v(i)(c)
+        for (i <- from until dim1) u(i-from) = v(i)(col)
         u
     } // col
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set column 'c' of the matrix to a vector.
-     *  @param c  the column to set
-     *  @param u  the vector to assign to the column
+    /** Set column 'col' of the matrix to a vector.
+     *  @param col  the column to set
+     *  @param u    the vector to assign to the column
      */
-    def setCol (c: Int, u: VectorD) { for (i <- range1) v(i)(c) = u(i) }
+    def setCol (col: Int, u: VectorD) { for (i <- range1) v(i)(col) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Select columns from this matrix according a basis. 
-     *  @param basis  the column index positions (e.g., (0, 2, 5))
+    /** Select columns from this matrix according to the given index/basis.
+     *  Ex: Can be used to divide a matrix into a basis and a non-basis.
+     *  @param colIndex  the column index positions (e.g., (0, 2, 5))
      */
-    def selectCols (basis: Array [Int]): ParMatrixD =
+    def selectCols (colIndex: Array [Int]): ParMatrixD =
     {
-        val c = new ParMatrixD (basis.length)
-        for (j <- c.range1) c.setCol (j, col(basis(j)))
+        val c = new ParMatrixD (dim1, colIndex.length)
+        for (j <- c.range2) c.setCol (j, col(colIndex(j)))
         c
     } // selectCols
 
@@ -356,24 +362,26 @@ class ParMatrixD (val d1: Int,
     /** Add in-place this matrix and matrix b.
      *  @param b  the matrix to add (requires leDimensions)
      */
-    def += (b: ParMatrixD)
+    def += (b: ParMatrixD): ParMatrixD =
     {
         for (i <- (0 until dim1 by granularity).par) {
             var end = i + granularity; if (i + granularity >= dim1) end = dim1 
             for (ii <- i until end; j <- range2) v(ii)(j) = v(ii)(j) + b.v(ii)(j)
         } // for
+        this
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place this matrix and scalar x.
      *  @param x  the scalar to add
      */
-    def += (x: Double)
+    def += (x: Double): ParMatrixD =
     {
         for (i <- (0 until dim1 by granularity).par) {
             var end = i + granularity; if (i + granularity >= dim1) end = dim1 
             for (ii <- i until end; j <- range2) v(ii)(j) = v(ii)(j) + x
         } // for
+        this
     } // +=
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -408,24 +416,26 @@ class ParMatrixD (val d1: Int,
     /** From this matrix subtract in-place matrix b.
      *  @param b  the matrix to subtract (requires leDimensions)
      */
-    def -= (b: ParMatrixD)
+    def -= (b: ParMatrixD): ParMatrixD =
     {
         for (i <- (0 until dim1 by granularity).par) {
             var end = i + granularity; if (i + granularity >= dim1) end = dim1 
             for (ii <- i until end; j <- range2) v(ii)(j) = v(ii)(j) - b.v(ii)(j)
         } // for
+        this
     } // -=
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From this matrix subtract in-place scalar x.
      *  @param x  the scalar to subtract
      */
-    def -= (x: Double)
+    def -= (x: Double): ParMatrixD =
     {
         for (i <- (0 until dim1 by granularity).par) {
             var end = i + granularity; if (i + granularity >= dim1) end = dim1 
             for (ii <- i until end; j <- range2) v(ii)(j) = v(ii)(j) - x
         } // for
+        this
     } // -=
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -482,7 +492,7 @@ class ParMatrixD (val d1: Int,
      *  efficiency.  Use 'times_ip' method to skip the transpose step.
      *  @param b  the matrix to multiply by (requires square and sameCrossDimensions)
      */
-    def *= (b: ParMatrixD)
+    def *= (b: ParMatrixD): ParMatrixD =
     {
         if (! b.isSquare)   flaw ("*=", "matrix b must be square")
         if (dim2 != b.dim1) flaw ("*=", "matrix *= matrix - incompatible cross dimensions")
@@ -497,18 +507,20 @@ class ParMatrixD (val d1: Int,
                 v(i)(j) = sum
             } // for
         } // for
+        this
     } // *=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place this matrix by scalar x.
      *  @param x  the scalar to multiply by
      */
-    def *= (x: Double)
+    def *= (x: Double): ParMatrixD =
     {
         for (i <- (0 until dim1 by granularity).par) {
             var end = i + granularity; if (i + granularity >= dim1) end = dim1
             for (ii <- i until end; j <- range2) v(ii)(j) = v(ii)(j) * x
         } // for
+        this
     } // *=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -612,12 +624,13 @@ class ParMatrixD (val d1: Int,
     /** Multiply in-place this matrix by vector u to produce another matrix (a_ij * u_j)
      *  @param u  the vector to multiply by
      */
-    def **= (u: VectorD)
+    def **= (u: VectorD): ParMatrixD =
     {
         for (i <- (0 until dim1 by granularity).par) {
             var end = i + granularity; if (i + granularity >= dim1) end = dim1 
             for (ii <- i until end; j <- range2) v(ii)(j) = v(ii)(j) * u(j)
         } // for
+        this
     } // **=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -638,12 +651,13 @@ class ParMatrixD (val d1: Int,
     /** Divide in-place this matrix by scalar x.
      *  @param x  the scalar to divide by
      */
-    def /= (x: Double)
+    def /= (x: Double): ParMatrixD =
     {
         for (i <- (0 until dim1 by granularity).par) {
             var end = i + granularity; if (i + granularity >= dim1) end = dim1 
             for (ii <- i until end; j <- range2) v(ii)(j) = v(ii)(j) / x
         } // for
+        this
     } // /=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1127,6 +1141,28 @@ class ParMatrixD (val d1: Int,
     } // sumLower
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the abs sum of this matrix, i.e., the sum of the absolute value
+     *  of its elements.  This is useful for comparing matrices (a - b).sumAbs
+     */
+    def sumAbs: Double =
+    {
+        var sum = 0.
+        for (i <- range1; j <- range2) sum += abs (v(i)(j))
+        sum
+    } // sumAbs
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the 1-norm of this matrix, i.e., the maximum 1-norm of the
+     *  column vectors.  This is useful for comparing matrices (a - b).norm1
+     */
+    def norm1: Double =
+    {
+        val c = new VectorD (dim2)
+        for (j <- range2) c(j) = col(j).norm1
+        c.max ()
+    } // norm1
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the determinant of this matrix.  The value of the determinant
      *  indicates, among other things, whether there is a unique solution to a
      *  system of linear equations (a nonzero determinant).
@@ -1317,7 +1353,7 @@ object ParMatrixDTest extends App
 
     val z   = new ParMatrixD ((2, 2), 1., 2.,
                                       3., 2.)
-    val b   = new VectorD (8., 7.)
+    val b   = VectorD (8., 7.)
     val lu  = z.lud
     val lu2 = z.lud_npp
 

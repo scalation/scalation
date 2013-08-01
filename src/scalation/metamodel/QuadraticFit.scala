@@ -130,14 +130,14 @@ object QuadraticFitTest extends App
 {
     def f(x: VectorD): Double = (x(0) - 10.)~^2. + (x(1) - 20.)~^2. + 1.
 
-    val x0 = new VectorD (5., 10.)                   // center of the grid
+    val x0 = VectorD (5., 10.)                       // center of the grid
     val qf = new QuadraticFit (f)                    // construct a quadratic fit object
     qf.formGrid (x0, 0)                              // form a grid around point x0
     val result = qf.response ()                      // compute the response surface for the grid
     println (result)        
     qf.fit (result)                                  // use multiple regression to fit surface
 
-    val x1 = new VectorD (6., 9.)                    // test the fit for point x1
+    val x1 = VectorD (6., 9.)                        // test the fit for point x1
     val yp = qf.qFormsEval (x1)                      // evaluate using regression equation
     println ("y  = " + f(x1))                        // actual y value at x1
     println ("yp = " + yp)                           // predicted y value at x1

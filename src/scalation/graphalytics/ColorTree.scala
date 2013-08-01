@@ -16,7 +16,6 @@ import scalation.math.DoubleWithExp._
 import scalation.random.Randi
 import scalation.scala2d.Colors._
 import scalation.scala2d.{Ellipse, QCurve, R2}
-import scalation.util.Count
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class is for a node in the color tree.
@@ -59,11 +58,11 @@ class ColorTree (minOut: Int = 0, maxOut: Int = 2)
     private val TOP    = 100.                          // y coordinate for root
     private val DIA    = 15.                           // diameter for circles
     private val rng    = new Randi (minOut, maxOut)    // random generator for # children
-    private val nCount = Count ()                      // node counter for id auto-increment
     private val ani    = new DgAnimator ("ColorTree")  // tree animator
     private val cq     = ani.getCommandQueue           // tree animator command queue
             val root   = new TreeNode (0)              // the root node of the tree
     private val nodes  = ListBuffer [TreeNode] ()      // list of all nodes
+    private var nCount = 0                             // node counter for id auto-increment
 
     root.loc.x = MID
     root.loc.y = TOP
@@ -82,11 +81,12 @@ class ColorTree (minOut: Int = 0, maxOut: Int = 2)
      */
     def add (p: TreeNode): TreeNode =
     {
-        val n    = new TreeNode (nCount++)     // add node n
-        nodes += n                         // add node n to nodes list
-        n.parent = p                       // comment out, if parent references not needed
-        if (p != null) p.child += n        // add n as child of p
-        n                                  // return node n
+        nCount  += 1
+        val n    = new TreeNode (nCount)     // add node n
+        nodes   += n                         // add node n to nodes list
+        n.parent = p                         // comment out, if parent references not needed
+        if (p != null) p.child += n          // add n as child of p
+        n                                    // return node n
     } // add
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

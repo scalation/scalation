@@ -9,7 +9,7 @@
 package scalation.plot
 
 import math.{ceil, floor, min, pow, round}
-import swing.{MainFrame, Panel, SimpleGUIApplication}
+import swing.{MainFrame, Panel}
 
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.scala2d.{Ellipse, Line}

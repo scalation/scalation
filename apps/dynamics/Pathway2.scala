@@ -36,9 +36,9 @@ object Pathway2 extends App
     val vm2 = .0018
     val vm3 = .000012
 
-    // concentrations    A   B   C
-    //                   0   1   2
-    var c = new VectorD (1., 0., 0.)
+    // concentrations  A   B   C
+    //                 0   1   2
+    var c = VectorD   (1., 0., 0.)
 
     // define the system of Ordinary Differential Equations (ODEs)
 

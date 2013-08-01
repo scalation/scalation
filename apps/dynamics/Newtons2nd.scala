@@ -36,8 +36,8 @@ object Newtons2nd extends App
     val sf =   1.49                                // smash factor
     val s  = ss * sf * 1609.344 / 3600             // initial ball speed in meters/second
     val a  = aa * Pi / 180.                        // launch angle in radians
-    val p0 = new VectorD (0., 0.)                  // initial position (x, y) at time t0 = 0
-    val v0 = new VectorD (s * cos(a), s * sin(a))  // initial velocity (v_x, v_y) at t0
+    val p0 = VectorD (0., 0.)                      // initial position (x, y) at time t0 = 0
+    val v0 = VectorD (s * cos(a), s * sin(a))      // initial velocity (v_x, v_y) at t0
 
     println ("ball speed    s  = " + s)
     println ("launch angle  a  = " + a)
@@ -48,7 +48,7 @@ object Newtons2nd extends App
     def dy_dt (t: Double, y: Double) = v0(1) - g * t      // ODE 2
     val odes: Array [Derivative] = Array (dx_dt, dy_dt)
 
-    def exactSolution (t: Double) = new VectorD (v0(0) * t, v0(1) * t - .5 * g * t * t)
+    def exactSolution (t: Double) = VectorD (v0(0) * t, v0(1) * t - .5 * g * t * t)
 
     val p_r = new MatrixD (n, 2, null); p_r(0) = p0
     val p_d = new MatrixD (n, 2, null); p_d(0) = p0

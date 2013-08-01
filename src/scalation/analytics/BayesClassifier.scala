@@ -159,7 +159,7 @@ object BayesClassifierTest extends App
                                  5.50,   150.,    8.,
                                  5.42,   130.,    7.,
                                  5.75,   150.,    9.)
-    val y = Array (0, 0, 0, 0, 1, 1, 1, 1)          // classification vector: 0(M), 1(F))
+    val y = Array (0, 0, 0, 0, 1, 1, 1, 1)                // classification vector: 0(M), 1(F))
     println ("x = " + x)
     println ("y = " + y)
     println ("---------------------------------------------------------------")
@@ -172,7 +172,7 @@ object BayesClassifierTest extends App
     cl.train ()
 
     // test sample ------------------------------------------------------------
-    val z = new VectorD (6., 130, 8.)                     // new data vector to classify
+    val z = VectorD (6., 130, 8.)                         // new data vector to classify
     println ("--- classify " + z + " = " + cl.classify (z) + "\n")
 
 } // BayesClassifierTest object

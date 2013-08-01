@@ -148,8 +148,8 @@ object HierClusteringTest extends App
                                  4., 5.,
                                  9., 8.,
                                  8., 9.)
-    val y = new VectorD (10., 10.)
-    val z = new VectorD ( 2.,  4.)
+    val y = VectorD (10., 10.)
+    val z = VectorD ( 2.,  4.)
     println ("v = " + v)
     println ("y = " + y)
     println ("z = " + z)

@@ -9,7 +9,7 @@
 package scalation.plot
 
 import math.{ceil, floor, min, pow, round}
-import swing.{MainFrame, Panel, SimpleGUIApplication}
+import swing.{MainFrame, Panel}
 
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.scala2d.{Ellipse, Line}
@@ -150,8 +150,8 @@ class Plot (x: VectorD, y: VectorD, z: VectorD = null, _title: String = "Plot y 
 object PlotTest extends App
 {
 /*
-    val x = new VectorD (0., 1., 2., 3.,  4.,  5.,  6., 7., 8., 9., 10.)
-    val y = new VectorD (0., 1., 4., 9., 16., 25., 16., 9., 4., 1.,  0.)
+    val x = VectorD (0., 1., 2., 3.,  4.,  5.,  6., 7., 8., 9., 10.)
+    val y = VectorD (0., 1., 4., 9., 16., 25., 16., 9., 4., 1.,  0.)
 */
     val x = new VectorD (100)
     val y = new VectorD (100)

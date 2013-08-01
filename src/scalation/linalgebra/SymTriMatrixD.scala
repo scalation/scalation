@@ -26,7 +26,12 @@ class SymTriMatrixD (val d1: Int)
     // foreach, mag, rank, sameDimensions, leDimensions, sameCrossDimensions,
     // isSquare, isSymmetric
 
+    /** Dimension 1
+     */
     lazy val dim1 = d1
+
+    /** Dimension 2
+     */
     lazy val dim2 = d1
 
     /** Size of the sub-diagonal
@@ -104,8 +109,23 @@ class SymTriMatrixD (val d1: Int)
         if      (i == j)     _dg(i)       // on diagonal
         else if (i == j + 1) _sd(j)       // on sub-diagonal (below diagonal)
         else if (i + 1 == j) _sd(i)       // on sup-diagonal (above diagonal)
-        else throw new Exception ("apply: element not on tridiagonal")
+        else throw new Exception ("SymTriMatrixD.apply: element not on tridiagonal")
     } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get this matrix's element at the i,j-th index position, returning 0. if
+     *  off tridiagonal.
+     *  @param i  the row index
+     *  @param j  the column index
+     */
+    def at (i: Int, j: Int): Double =
+    {
+        if (i < 0 || j < 0 || i >= d1 || j >= d1) .0
+        else if (i == j)     _dg(i)       // on diagonal
+        else if (i == j + 1) _sd(j)       // on sub-diagonal (below diagonal)
+        else if (i + 1 == j) _sd(i)       // on sup-diagonal (above diagonal)
+        else 0.
+    } // at
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get this matrix's vector at the i-th index position (i-th row).
@@ -209,7 +229,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def update (i: Int, jr: Range, u: VectorD) { this(i)(jr) = u }
 
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set all the elements in this matrix to the scalar x.
      *  @param x  the scalar value to assign
      */
@@ -221,7 +241,7 @@ class SymTriMatrixD (val d1: Int)
         } // for
     } // set
 
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set all the values in this matrix as copies of the values in 2D array u.
      *  @param u  the 2D array of values to assign
      */
@@ -278,43 +298,44 @@ class SymTriMatrixD (val d1: Int)
         throw new NoSuchMethodException ("SymTriMatrixD does not support sliceExclude")
     } // sliceExclude
 
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Select rows from this matrix according a basis.
-     *  @param basis  the row index positions (e.g., (0, 2, 5))
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Select rows from this matrix according to the given index/basis.
+     *  @param rowIndex  the row index positions (e.g., (0, 2, 5))
      */
-    def selectRows (basis: Array [Int]): SymTriMatrixD =
+    def selectRows (rowIndex: Array [Int]): SymTriMatrixD =
     {
         throw new NoSuchMethodException ("SymTriMatrixD does not support selectRows")
     } // selectRows
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get column 'c' from the matrix, returning it as a vector.
-     *  @param c     the column to extract from the matrix
+    /** Get column 'col' from the matrix, returning it as a vector.
+     *  @param col   the column to extract from the matrix
      *  @param from  the position to start extracting from
      */
-    def col (c: Int, from: Int = 0): VectorD =
+    def col (col: Int, from: Int = 0): VectorD =
     {
-        val u = new VectorD (dim1 - from)
-        for (i <- (from max c-1) until (dim1 min c+2)) u(i-from) = this(i, c)
+        val u = new VectorD (d1 - from)
+        for (i <- (from max col-1) until (d1 min col+2)) u(i-from) = this(i, col)
         u
     } // col
 
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set column 'c' of the matrix to a vector.
-     *  @param c  the column to set
-     *  @param u  the vector to assign to the column
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set column 'col' of the matrix to a vector.
+     *  @param col  the column to set
+     *  @param u    the vector to assign to the column
      */
-    def setCol (c: Int, u: VectorD)
+    def setCol (col: Int, u: VectorD)
     {
-        _dg(c) = u(c)
-        if (c > 0) _sd(c-1) = u(c-1)
+        _dg(col) = u(col)
+        if (col > 0) _sd(col-1) = u(col-1)
     } // setCol
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Select columns from this matrix according a basis.
-     *  @param basis  the column index positions (e.g., (0, 2, 5))
+    /** Select columns from this matrix according to the given index/basis.
+     *  Ex: Can be used to divide a matrix into a basis and a non-basis.
+     *  @param colIndex  the column index positions (e.g., (0, 2, 5))
      */
-    def selectCols (basis: Array [Int]): SymTriMatrixD =
+    def selectCols (colIndex: Array [Int]): SymTriMatrixD =
     {
         throw new NoSuchMethodException ("SymTriMatrixD does not support selectCol")
     } // selectCols
@@ -325,11 +346,11 @@ class SymTriMatrixD (val d1: Int)
      */
     def t: SymTriMatrixD = this
 
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate this matrix and vector u.
      *  @param u  the vector to be concatenated as the new last row in matrix
      */
-    def ++ (u: VectorD): Matrix =
+    def ++ (u: VectorD): SymTriMatrixD =
     {
         throw new NoSuchMethodException ("SymTriMatrixD does not support ++")
     } // ++
@@ -338,7 +359,7 @@ class SymTriMatrixD (val d1: Int)
     /** Add this matrix and matrix b.
      *  @param b  the matrix to add (requires leDimensions)
      */
-    def + (b: Matrix): Matrix = 
+    def + (b: Matrix): SymTriMatrixD = 
     {
         val trid = b.asInstanceOf [SymTriMatrixD]
 	if (d1 == trid.d1) {
@@ -353,13 +374,16 @@ class SymTriMatrixD (val d1: Int)
     /** Add this matrix and scalar x.
      *  @param x  the scalar to add
      */
-    def + (x: Double): Matrix = new SymTriMatrixD (_dg + x, _sd + x)
+    def + (x: Double): SymTriMatrixD =
+    {
+        new SymTriMatrixD (_dg + x, _sd + x)
+    } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place this matrix and matrix b.
      *  @param b  the matrix to add (requires leDimensions)
      */
-    def += (b: Matrix)
+    def += (b: Matrix): SymTriMatrixD =
     {
         val trid = b.asInstanceOf [SymTriMatrixD]
         if (d1 == trid.d1) {
@@ -368,19 +392,23 @@ class SymTriMatrixD (val d1: Int)
         } else {
             flaw ("+=", "matrix b has the wrong dimensions")
         } // if
+        this
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place this matrix and scalar x.
      * @param x  the scalar to add
      */
-    def += (x: Double) = { _dg += x; _sd += x }
+    def += (x: Double): SymTriMatrixD =
+    {
+        _dg += x; _sd += x; this
+    } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From this matrix subtract matrix b.
      *  @param b  the matrix to subtract (requires leDimensions)
      */
-    def - (b: Matrix): Matrix = 
+    def - (b: Matrix): SymTriMatrixD = 
     {
         val trid = b.asInstanceOf [SymTriMatrixD]
         if (d1 == trid.d1) {
@@ -395,13 +423,16 @@ class SymTriMatrixD (val d1: Int)
     /** From this matrix subtract scalar x.
      *  @param x  the scalar to subtract
      */
-    def - (x: Double): Matrix = new SymTriMatrixD (_dg - x, _sd - x)
+    def - (x: Double): SymTriMatrixD =
+    {
+        new SymTriMatrixD (_dg - x, _sd - x)
+    } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From this matrix subtract in-place matrix b.
      *  @param b  the matrix to subtract (requires leDimensions)
      */
-    def -= (b: Matrix)
+    def -= (b: Matrix): SymTriMatrixD =
     {
         val trid = b.asInstanceOf [SymTriMatrixD]
         if (d1 == trid.d1) {
@@ -410,21 +441,43 @@ class SymTriMatrixD (val d1: Int)
         } else {
             flaw ("-=", "matrix b has the wrong dimensions")
         } // if
+        this
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From this matrix subtract in-place scalar x.
      *  @param x  the scalar to subtract
      */
-    def -= (x: Double) = { _dg -= x; _sd -= x }
+    def -= (x: Double): SymTriMatrixD =
+    {
+        _dg -= x; _sd -= x; this
+    } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply this matrix by matrix b.
      *  @param b  the matrix to multiply by
      */
-    def * (b: Matrix): Matrix = 
+    def * (b: Matrix): SymTriMatrixD = 
     {
-        throw new NoSuchMethodException ("matrix multiplication not yet implemented")
+        throw new NoSuchMethodException ("SymTriMatrixD does not support * with general matrices")
+    } // *
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply this matrix by matrix b.  Requires b to have type SymTriMatrixD,
+     *  but returns a more general type of matrix.
+     *  @param b  the matrix to multiply by
+     */
+    def * (b: SymTriMatrixD): MatrixD = 
+    {
+        val c = new MatrixD (d1)
+        for (i <- 0 until d1; j <- (i-2 max 0) to (i+2 min d1_1)) {
+            var sum = 0.
+            val k1 = ((i min j) - 1) max 0
+            val k2 = ((i max j) + 1) min d1_1
+            for (k <- k1 to k2) sum += at(i, k) * b.at(k, j)
+            c(i, j) = sum
+        } // for
+        c
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -434,11 +487,9 @@ class SymTriMatrixD (val d1: Int)
     def * (u: VectorD): VectorD = 
     {
         val c = new VectorD (d1)
-        c(0)  = u(0) * _dg(0) + _sd(0) * u(1)
+        c(0)  = _dg(0) * u(0) + _sd(0) * u(1)
         for (i <- 1 until d1_1) {
-            c(i) = _sd(i-1) * u(i-1)
-            c(i) = c(i) + _dg(i) * u(i)
-            c(i) = c(i) + _sd(i+1) * u(i+1)
+            c(i) = _sd(i-1) * u(i-1) + _dg(i) * u(i) + _sd(i) * u(i+1)
         } // for
         c(d1-1) = _sd(d1-2) * u(d1-2) + _dg(d1-1) * u(d1-1)
         c
@@ -448,58 +499,70 @@ class SymTriMatrixD (val d1: Int)
     /** Multiply this matrix by scalar x.
      *  @param x  the scalar to multiply by
      */
-    def * (x: Double): Matrix = new SymTriMatrixD (_dg * x, _sd * x)
+    def * (x: Double): SymTriMatrixD =
+    {
+        new SymTriMatrixD (_dg * x, _sd * x)
+    } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place this matrix by matrix b
      *  @param b  the matrix to multiply by
      */
-    def *= (b: Matrix)
+    def *= (b: Matrix): SymTriMatrixD =
     {
-        throw new NoSuchMethodException ("inplace matrix multiplication not yet implemented")
+        throw new NoSuchMethodException ("inplace matrix multiplication not implemented")
     } // *=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place this matrix by scalar x.
      *  @param x  the scalar to multiply by
      */
-    def *= (x: Double) = { _dg *= x; _sd *= x }
+    def *= (x: Double): SymTriMatrixD =
+    {
+        _dg *= x; _sd *= x; this
+    } // *=
 
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply this matrix by vector u to produce another matrix (a_ij * u_j)
      *  @param u  the vector to multiply by
      */
-    def ** (u: VectorD): Matrix = 
+    def ** (u: VectorD): SymTriMatrixD = 
     {
-        throw new NoSuchMethodException ("matrix * vector -> matrix not implemented yet")
+        throw new NoSuchMethodException ("matrix * vector -> matrix not implemented")
     } // **
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place this matrix by vector u to produce another matrix (a_ij * u_j)
      *  @param u  the vector to multiply by
      */
-    def **= (u: VectorD)
+    def **= (u: VectorD): SymTriMatrixD =
     {
-        throw new NoSuchMethodException ("inplace matrix * vector -> matrix not implemented yet")
+        throw new NoSuchMethodException ("inplace matrix * vector -> matrix not implemented")
     } // **=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide this matrix by scalar x.
      *  @param x  the scalar to divide by
      */
-    def / (x: Double): Matrix = new SymTriMatrixD (_dg / x, _sd / x)
+    def / (x: Double): SymTriMatrixD =
+    {
+        new SymTriMatrixD (_dg / x, _sd / x)
+    } // /
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place this matrix by scalar x.
      *  @param x  the scalar to divide by
      */
-    def /= (x: Double) = { _dg /= x; _sd /= x }
+    def /= (x: Double): SymTriMatrixD =
+    {
+        _dg /= x; _sd /= x; this
+    } // /=
 
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Raise this matrix to the pth power (for some integer p >= 2).
      *  @param p  the power to raise this matrix to
      */
-    def ~^ (p: Int): MatrixD =
+    def ~^ (p: Int): SymTriMatrixD =
     {
         throw new NoSuchMethodException ("matrix power function (~^) not implemented")
     } // ~^
@@ -552,19 +615,13 @@ class SymTriMatrixD (val d1: Int)
      *  @param thres     the cutoff threshold (a small value)
      *  @param relative  whether to use relative or absolute cutoff
      */
-    def clean (thres: Double, relative: Boolean = true): Matrix =
+    def clean (thres: Double, relative: Boolean = true): SymTriMatrixD =
     {
         val s = if (relative) mag else 1.             // use matrix magnitude or 1
         for (i <- range_d) if (abs (_dg(i)) <= thres * s) _dg(i) = 0. 
         for (i <- range_s) if (abs (_sd(i)) <= thres * s) _sd(i) = 0.
         this
     } // clean
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check whether this matrix is rectangular (all rows have the same number
-     *  of columns).
-     */
-    def isRectangular: Boolean = true
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the determinant of this matrix.
@@ -595,14 +652,6 @@ class SymTriMatrixD (val d1: Int)
         for (i <- d1 - 2 to 0 by -1) x(i) = d(i) - c(i) * x(i+1)
         x
     } // solve
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert this symmetric tridiagonal matrix to a string.
-     */
-    override def toString: String = 
-    {
-        "\nSymTriMatrixD (\t" + _dg + ", \n\t\t\t" + _sd + ")"
-    } // toString
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Helper method for computing the determinant of this matrix.
@@ -660,9 +709,40 @@ class SymTriMatrixD (val d1: Int)
     def sumLower: Double = _sd.sum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the abs sum of this matrix, i.e., the sum of the absolute value
+     *  of its elements.  This is useful for comparing matrices (a - b).sumAbs
+     */
+    def sumAbs: Double = _dg.norm1 + _sd.norm1 + _sd.norm1
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the 1-norm of this matrix, i.e., the maximum 1-norm of the
+     *  column vectors.  This is useful for comparing matrices (a - b).norm1
+     */
+    def norm1: Double =
+    {
+        val c = new VectorD (dim2)
+        for (j <- range2) c(j) = col(j).norm1
+        c.max ()
+    } // norm1
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Check whether this matrix is rectangular (all rows have the same number
+     *  of columns).
+     */
+    def isRectangular: Boolean = true
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check whether this matrix is nonnegative (has no negative elements).
      */
     def isNonnegative: Boolean = _dg.isNonnegative && _sd.isNonnegative
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert this symmetric tridiagonal matrix to a string.
+     */
+    override def toString: String = 
+    {
+        "\nSymTriMatrixD (\t" + _dg + ", \n\t\t" + _sd + ")"
+    } // toString
 
     //--------------------------------------------------------------------------
     // The following methods are not useful for Symmetric Tridiagonal matrices:
@@ -688,27 +768,32 @@ class SymTriMatrixD (val d1: Int)
         throw new NoSuchMethodException ("solve lu not implemented")
     } // solve
 
-    def diag (b: Matrix): Matrix = 
+    def diag (b: Matrix): SymTriMatrixD = 
     {
         throw new NoSuchMethodException ("diag not implemented")
     } // diag
 
-    def diag (p: Int, q: Int): Matrix = 
+    def diag (p: Int, q: Int): SymTriMatrixD = 
     {
         throw new NoSuchMethodException ("diag not implemented")
     } // diag
 
-    def inverse: Matrix = 
+    def inverse_npp: SymTriMatrixD = 
+    {
+        throw new NoSuchMethodException ("inverse: not implemented")
+    } // inverse_npp
+
+    def inverse: SymTriMatrixD = 
     {
         throw new NoSuchMethodException ("inverse: not implemented")
     } // inverse
 
-    def inverse_ip: Matrix = 
+    def inverse_ip: SymTriMatrixD = 
     {
         throw new NoSuchMethodException ("inverse_ip not implemented")
     } // inverse_ip
 
-    def reduce: Matrix = 
+    def reduce: SymTriMatrixD = 
     {
         throw new NoSuchMethodException ("reduce not implemented")
     } // reduce
@@ -726,16 +811,30 @@ class SymTriMatrixD (val d1: Int)
  */
 object SymTriMatrixDTest extends App
 {
-    val a = new SymTriMatrixD (new VectorD (1., 2., 3.),
-                               new VectorD (4., 5.))
+    val a = new SymTriMatrixD (VectorD (1., 2., 3.),
+                               VectorD (4., 5.))
 
-    val b = new SymTriMatrixD (new VectorD (2., 3., 4.),
-                               new VectorD (5., 6.))
+    val b = new SymTriMatrixD (VectorD (2., 3., 4.),
+                               VectorD (5., 6.))
+
+    val u = VectorD (5., 3., 6.)
+
+    val c = new MatrixD ((3, 3), 1., 4., 0.,
+                                 4., 2., 5.,
+                                 0., 5., 3.)
+
+    val d = new MatrixD ((3, 3), 2., 5., 0.,
+                                 5., 3., 6.,
+                                 0., 6., 4.)
 
     println ("a     = " + a)
     println ("b     = " + b)
     println ("a.det = " + a.det)	
     println ("a + b = " + (a + b))	
+    println ("a - b = " + (a - b))	
+    println ("a * b = " + (a * b))	
+    println ("a * u = " + (a * u))	
+    println ("c * d = " + (c * d))	
 
 } // SymTriMatrixDTest object
 

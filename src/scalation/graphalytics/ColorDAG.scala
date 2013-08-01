@@ -13,10 +13,10 @@ import math.round
 
 import scalation.animation.{AnimateCommand, DgAnimator}
 import scalation.animation.CommandType._
-import scalation.linalgebra_gen.Vectors.VectorI
 import scalation.random.Randi
 import scalation.scala2d.Colors._
 import scalation.scala2d.{Ellipse, QCurve, Rectangle}
+import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class provides a data structure Directed Acyclic Graphs (DAGs) with colored nodes.
@@ -34,20 +34,21 @@ import scalation.scala2d.{Ellipse, QCurve, Rectangle}
  */
 class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
                 minColors: Int, maxColors: Int, colorDepth: Int, seed: Int = 0)
+      extends Error
 {
-    val stages = dimensions.length                         // the number of stages in the DAG (k stages)
-    val nodes  = Array.ofDim [Array [DagNode]] (stages)    // a ragged array of DagNode arrays to hold the nodes in the DAG
-    val edges  = ListBuffer [Edge]()                       // a list to hold the edges of the DAG
+    val stages = dimensions.length                        // the number of stages in the DAG (k stages)
+    val nodes  = Array.ofDim [Array [DagNode]] (stages)   // a ragged array of DagNode arrays to hold the nodes in the DAG
+    val edges  = ListBuffer [Edge] ()                     // a list to hold the edges of the DAG
 
-    val colors = new ColorTree (minColors, maxColors)      // get a new ColorTree object with the specified limits on child nodes
-    colors.genTree (colorDepth)                            // generate the ColorTree with the specified maximum depth
-    val nColors = colors.size                              // get the number of colors in the ColorTree
+    val colors = new ColorTree (minColors, maxColors)     // get a new ColorTree object with specified limits on child nodes
+    colors.genTree (colorDepth)                           // generate the ColorTree with the specified maximum depth
+    val nColors = colors.size                             // get the number of colors in the ColorTree
  
-    val randIn  = new Randi (1, maxIn, seed)               // random number generator for the number of incoming edges for a node
-    val randOut = new Randi (1, maxOut, seed)              // random number generator for the number of outgoing edges for a node
-    val randCol = new Randi (0, nColors-1, seed)           // random number generator for assigning colors to nodes and edges
+    val randIn  = new Randi (1, maxIn, seed)              // random number generator for number of incoming edges for a node
+    val randOut = new Randi (1, maxOut, seed)             // random number generator for number of outgoing edges for a node
+    val randCol = new Randi (0, nColors-1, seed)          // random number generator for assigning colors to nodes and edges
 
-    for (i <- 0 until stages) nodes(i) = Array.ofDim [DagNode] (dimensions(i))     // allocate an array for each stage of the DAG
+    for (i <- 0 until stages) nodes(i) = Array.ofDim [DagNode] (dimensions(i))    // allocate an array for each stage of DAG
 
     println ("ColorDAG (dimensions = " + dimensions.deep +
                       " maxIn = " + maxIn +
@@ -70,8 +71,8 @@ class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
         val outColors = Array.ofDim [TreeNode] (outDegree)     // array to hold the node's output colors
         val in        = ListBuffer [DagNode] ()                // list to hold all the nodes providing inputs to this node
         val out       = ListBuffer [DagNode] ()                // list to hold all the nodes this node provides outputs for
-        var used      = false                                  // flag to mark that a node is definitlely included in the DAG
-        var unused    = false                                  // flag to mark that a node is ruled out of inclusion in the DAG
+        var used      = false                                  // flag to mark that a node is definitlely included in DAG
+        var unused    = false                                  // flag to mark that a node is ruled out of inclusion in DAG
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         /** This method determines whether or not the node is a source node.
@@ -113,10 +114,24 @@ class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
                                  if (i == stages-1) 0 else if (i == 0) 1 else randOut.igen)
             numNodes += 1
             nodes(i)(j) = n 
-            for (k <- 0 until n.inDegree)  n.inColors(k)  = colors(randCol.igen)
-            for (k <- 0 until n.outDegree) n.outColors(k) = colors(randCol.igen)
+            for (k <- 0 until n.inDegree)  n.inColors(k)  = genUniqueColor (n.inColors)
+            for (k <- 0 until n.outDegree) n.outColors(k) = genUniqueColor (n.outColors)
         } // for	
     } // genNodes
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Generate and return a unique color for either a node's inputs or outputs.
+     *  @param ioColors  the array of existing colors
+     */
+    def genUniqueColor (ioColors: Array [TreeNode]): TreeNode =
+    {
+        for (i <- 0 until 2*ioColors.length) {
+            val colr = colors(randCol.igen)
+            if (! (ioColors contains colr)) return colr
+        } // for
+        flaw ("genUniqueColor", "unable to generate a unique color")
+        null
+    } // genUniqueColor
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** For each node in the DAG, check that (1) all of its "inputs" are color/type compatible
@@ -190,7 +205,7 @@ class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
         for (e <- edges) {
             val from = e.fromNode
             val to   = e.toNode
-            if (! from.out.contains (to) && ! to.in.contains (from)) {
+            if (! (from.out contains to) && ! (to.in contains from)) {
                 from.out += to
                 to.in    += from
             } // if
@@ -279,7 +294,7 @@ class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
         val cq    = dga.getCommandQueue
 
         for (i <- 0 until stages) {                               // display nodes
-            var nodeCount = dimensions(i)                         // the number of nodes being animated for the current stage
+            var nodeCount = dimensions(i)                         // the number of nodes being animated for current stage
             var height = round (800 / (nodeCount+1))              // the height for each level in the current stage
             var count = 0
             for (n <- nodes(i)) {
@@ -304,7 +319,8 @@ class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
         var eCount = 0
         for (e <- edges) {                                        // display edges
             eCount += 1
-            cq += AnimateCommand (CreateEdge, eCount, QCurve (), "", true, e.color, null, 2000, e.fromNode.id, e.toNode.id)
+            cq += AnimateCommand (CreateEdge, eCount, QCurve (), "", true, e.color,
+                                  null, 2000, e.fromNode.id, e.toNode.id)
         } // for
         dga.animate (0, 100000)
     } // animateDAG

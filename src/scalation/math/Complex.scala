@@ -8,7 +8,7 @@
 
 package scalation.math
 
-import scala.math.{max, min}
+import math.{acos, cos, max, min, sin, signum}
 
 import DoubleWithExp._
 
@@ -28,48 +28,83 @@ case class Complex (val re: Double, val im: Double = 0.)
     def negate (c: Complex) = -c
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add two complex numbers or complex plus double.
-     *  @param c  add c to this
+    /** Add two complex numbers.
+     *  @param c  add complex c to this
      */
     def + (c: Complex) = Complex (re + c.re, im + c.im)
     def plus (c: Complex, d: Complex) = c + d
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add a complex number plus double.
+     *  @param r  add r to this
+     */
     def + (r: Double) = Complex (re + r, im)
     def plus (c: Complex, r: Double) = c + r
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Subtract two complex numbers or complex minus double.
+    /** Subtract two complex numbers.
      *  @param c  subtract c from this
      */
     def - (c: Complex) = Complex (re - c.re, im - c.im)
     def minus (c: Complex, d: Complex) = c - d
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Subtract: a complex number minus double.
+     *  @param r  subtract r from this
+     */
     def - (r: Double) = Complex (re - r, im)
     def minus (c: Complex, r: Double) = c - r
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply two complex numbers or complex times double.
+    /** Multiply two complex numbers.
      *  @param c  multiply this times c
      */
     def * (c: Complex) = Complex (re * c.re - im * c.im, re * c.im + im * c.re)
     def times (c: Complex, d: Complex) = c * d
-    def * (r: Double) = Complex (re * r, im * r)
-    def times (c: Complex, d: Double) = c * d
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide two complex numbers or complex div double.
+    /** Multiply a complex numbers times double.
+     *  @param r  multiply this times r
+     */
+    def * (r: Double) = Complex (re * r, im * r)
+    def times (c: Complex, r: Double) = c * r
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide two complex numbers.
      *  @param c  divide this by c
      */
     def / (c: Complex) = Complex ((re * c.re + im * c.im) / (c.re * c.re + c.im * c.im),
                                   (im * c.re - re * c.im) / (c.re * c.re + c.im * c.im))
     def div (c: Complex, d: Complex) = c / d
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide a complex numbers div double.
+     *  @param r  divide this by r
+     */
     def / (r: Double) = Complex ((re * r) / (r * r), (im * r) / (r * r))
     def div (c: Complex, r: Double) = c / r
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Raise a complex to the d-th power.
-     *  @param d  the power/exponent
+    /** Raise a complex to the r-th power (a double) using polar coordinates.
+     *  @param r  the power/exponent
      */
-    def ~^ (r: Double) = Complex (re ~^ r, im ~^ r)
+    def ~^ (r: Double) = { val (rad, ang) = polar; Complex.create (rad ~^ r, ang * r) }
     def pow (c: Complex, r: Double) = c ~^ r
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the radius of the complex number as a vector in the re-im plane.
+     */
+    def radius: Double = math.sqrt (re ~^ 2. + im ~^ 2.)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the angle of the complex number as a vector in the re-im plane.
+     */
+    def angle: Double = acos (re / radius)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the complex number in polar coordinates (radius, angle).
+     */
+    def polar: Tuple2 [Double, Double] = { val rad = radius; (rad, acos (re / rad)) }
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the complex conjugate: if z = (a + bi) then z.bar = (a - bi).
@@ -96,7 +131,7 @@ case class Complex (val re: Double, val im: Double = 0.)
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether this complex number is real (no imaginary part).
      */
-    def isRe = im == 0
+    def isRe = im == 0.
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compare two complex numbers (negative for <, zero for ==, positive for >).
@@ -146,32 +181,32 @@ case class Complex (val re: Double, val im: Double = 0.)
     def toLong = re.toLong
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a complex number from an Int.
-     *  @param n  the integer used to create the complex number.
+    /** Create a complex number from a Double.
+     *  @param x  the double used to create the complex number
      */
-    def fromDouble (x: Double) = Complex (x, 0.)
+    def fromDouble (x: Double) = Complex (x)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a complex number from a Float.
+     *  @param x  the float used to create the complex number
+     */
+    def fromFloat (x: Float) = Complex (x)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a complex number from an Int.
-     *  @param n  the integer used to create the complex number.
+     *  @param n  the integer used to create the complex number
      */
-    def fromFloat (x: Float) = Complex (x, 0.)
+    def fromInt (n: Int) = Complex (n)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a complex number from an Int.
-     *  @param n  the integer used to create the complex number.
+    /** Create a complex number from a Long.
+     *  @param n  the long used to create the complex number
      */
-    def fromInt (n: Int) = Complex (n, 0.)
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a complex number from an Int.
-     *  @param n  the integer used to create the complex number.
-     */
-    def fromLong (n: Long) = Complex (n, 0.)
+    def fromLong (n: Long) = Complex (n)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Override equals to determine whether vector this equals vector b.
-     *  @param b  the vector to compare with this
+    /** Override equals to determine whether this complex number equals complex c.
+     *  @param c  the complex number to compare with this
      */
     override def equals (c: Any): Boolean =
     {
@@ -198,11 +233,34 @@ case class Complex (val re: Double, val im: Double = 0.)
  */
 object Complex
 {
-    val _0  = Complex (0., 0.)     // zero (0)
-    val _1  = Complex (1., 0.)     // one (1)
-    val _i  = Complex (0., 1.)     // imaginary one (i)
-    val _1n = Complex (-1., 0.)    // negative one (-1)
-    val _in = Complex (0., -1.)    // negative imaginary one (-i)
+    /** Zero (0) as a Complex number
+     */
+    val _0  = Complex (0.)
+
+    /** One (1) as a Complex number
+     */
+    val _1  = Complex (1.)
+
+    /** Imaginary one (i) as a Complex number
+     */
+    val _i  = Complex (0., 1.)
+
+    /** Negative one (-1) as a Complex number
+     */
+    val _1n = Complex (-1.)
+
+    /** Negative imaginary one (-i) as a Complex number
+     */
+    val _in = Complex (0., -1.)
+
+    private val rr2 = 1. / math.sqrt (2.)   // reciprocal root of 2.
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a complex number from the given polar coordinates.
+     *  @param rad  the radius (the length of the vector in the re-im plane)
+     *  @param ang  the angle (the angle of the vector above the re-axis)
+     */
+    def create (rad: Double, ang: Double): Complex = Complex (rad * cos (ang), rad * sin (ang))
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute an arthmetic results (+, -, *, /) where the first argument is
@@ -220,15 +278,28 @@ object Complex
     /** Return the absolute value of that complex number.
      *  @param c  that complex number
      */
-    def abs (c: Complex) = c.abs
+    def abs (c: Complex): Complex = c.abs
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the square root of that complex number.
+     *  @see www.mathpropress.com/stan/bibliography/complexSquareRoot.pdf
      *  @param c  that complex number
      */
-    def sqrt (c: Complex) = Complex (math.sqrt (c.re), math.sqrt (c.re))
+    def sqrt (c: Complex): Complex =
+    { 
+        val (a, b) = (c.re, c.im)
+        val rad    = c.radius
+        Complex (rr2 * math.sqrt (rad + a),
+                 rr2 * math.sqrt (rad - a) * signum (b))
+    } // sqrt
 
-} // Complex companion object
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Ordering for complex numbers.
+     */
+    val ord = new Ordering [Complex]
+            { def compare (x: Complex, y: Complex) = x compare y }
+
+} // Complex object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -236,23 +307,44 @@ object Complex
  */
 object ComplexTest extends App
 {
+    import util.Sorting.quickSort
+    import Complex._
+
     val c = Complex (2., 3.)
     val d = Complex (4., 5.)
     val e = Complex (5.)
+    val r = sqrt (c)
 
-    println ("c      = " + c)
-    println ("d      = " + d)
-    println ("e      = " + e)
-    println ("-c     = " + -c)
-    println ("c + d  = " + (c + d))
-    println ("c - d  = " + (c - d))
-    println ("c * d  = " + (c * d))
-    println ("c / d  = " + (c / d))
-    println ("c.bar  = " + c.bar)
-    println ("c.abs  = " + c.abs)
-    println ("d.isRe = " + d.isRe)
-    println ("e.isRe = " + e.isRe)
-    println ("c < d  = " + (c < d))
+    println ("c       = " + c)
+    println ("d       = " + d)
+    println ("e       = " + e)
+    println ("-c      = " + -c)
+    println ("c + d   = " + (c + d))
+    println ("c - d   = " + (c - d))
+    println ("c * d   = " + (c * d))
+    println ("c / d   = " + (c / d))
+    println ("c ~^ 2. = " + (c ~^ 2.))
+    println ("c * c   = " + (c * c))
+    println ("c.bar   = " + c.bar)
+    println ("c.abs   = " + c.abs)
+    println ("c max d = " + (c max d))
+    println ("c min d = " + (c min d))
+    println ("d.isRe  = " + d.isRe)
+    println ("e.isRe  = " + e.isRe)
+    println ("sqrt(c) = " + r)
+    println ("r * r   = " + (r * r))
+    println ("c < d   = " + (c < d))
+    println ("d < c   = " + (d < c))
 
-} // ComplexTest
+    def sort (arr: Array [Complex])
+    {
+        quickSort (arr)(Complex.ord)
+    } // sort
+
+    val arr = Array (e, d, c)
+    println ("arr = " + arr.deep)
+    sort (arr)
+    println ("arr = " + arr.deep)
+
+} // ComplexTest object
 

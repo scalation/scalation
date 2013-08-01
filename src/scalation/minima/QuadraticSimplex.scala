@@ -250,10 +250,10 @@ object QuadraticSimplexTest extends App
     {
         val a = new MatrixD ((2, 2),  2., 1.,
                                      -1., 1.)
-        val b = new VectorD (2., 4.)
+        val b = VectorD (2., 4.)
         val q = new MatrixD ((2, 2),  2., -2,
                                      -2.,  2)
-        val c = new VectorD (-4., -6.)
+        val c = VectorD (-4., -6.)
         test (a, b, q, c)
     } // test1
 
@@ -270,10 +270,10 @@ object QuadraticSimplexTest extends App
         val a = new MatrixD ((3, 2), -1., -3.,
                                       2.,  5,
                                       3.,  4.)
-        val b = new VectorD (-15.,  100., 80.)
+        val b = VectorD (-15.,  100., 80.)
         val q = new MatrixD ((2, 2),  1.,  0.,
                                       0.,  0.)
-        val c = new VectorD (3., 4)
+        val c = VectorD (3., 4)
         test (a, b, q, c)
     } // test2
 

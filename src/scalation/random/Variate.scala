@@ -384,13 +384,13 @@ case class Dice (cdf: Array [Double] = Array (.1, .3, .5, .7, .9, 1.), stream: I
  *  @param cumulative  whether dist is cumulative (cdf) or not (pmf)
  *  @param stream      the random number stream
  */
-case class Discrete (dist: VectorD = new VectorD (.2, .2, .2, .2, .2), x: VectorD = null,
+case class Discrete (dist: VectorD = VectorD (.2, .2, .2, .2, .2), x: VectorD = null,
                      cumulative: Boolean = false, stream: Int = 0)
      extends Variate (stream)
 {
-    private val cdf = if (cumulative) dist.apply () else dist.cumulate.apply ()
+    private val cdf = if (cumulative) dist() else dist.cumulate()
     private val n   = dist.dim
-    private val xx  = if (x == null || x.dim == 0) dist.ramp ().apply () else x.apply ()
+    private val xx  = if (x == null || x.dim == 0) dist.ramp ()() else x()
 
     if (xx.length != dist.dim) flaw ("Discrete", "dist and xx must have the same length")
     _discrete = true

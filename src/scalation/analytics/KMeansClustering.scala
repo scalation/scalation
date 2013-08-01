@@ -166,7 +166,7 @@ object KMeansClusteringTest extends App
                                  4., 5.,
                                  9., 8.,
                                  8., 9.)
-    val y = new VectorD (10., 10.)
+    val y = VectorD (10., 10.)
     println ("v = " + v)
     println ("y = " + y)
     println ("----------------------------------------------------")

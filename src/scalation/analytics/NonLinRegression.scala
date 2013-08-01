@@ -112,19 +112,19 @@ object NonLinRegressionTest extends App
 {
     // 5 data points: constant term, x1 coordinate, x2 coordinate
     val x = new MatrixD ((15, 1), 2., 5., 7., 10., 14., 19., 26., 31., 34., 38., 45., 52., 53., 60., 65.)
-    val y = new VectorD (54., 50., 45., 37., 35., 25., 20., 16., 18., 13., 8., 11., 8., 4., 6.)
+    val y = VectorD (54., 50., 45., 37., 35., 25., 20., 16., 18., 13., 8., 11., 8., 4., 6.)
 
     println ("x = " + x)
     println ("y = " + y)
 
-    def f (x: VectorD, b: VectorD): Double = b(0) * exp (b(1) * x(0))    // non-linear regression function
-    val b_init = new VectorD (4.04, .038)                                // initial guess for parameter vector b
+    def f (x: VectorD, b: VectorD): Double = b(0) * exp (b(1) * x(0))   // non-linear regression function
+    val b_init = VectorD (4.04, .038)                                   // initial guess for parameter vector b
 
     val rg = new NonLinRegression (x, y, f, b_init)
     rg.train ()
     println ("fit = " + rg.fit)
 
-    val z  = new VectorD (1); z(0) = 50.         // predict y for one point
+    val z  = VectorD (1); z(0) = 50.              // predict y for one point
     val yp = rg.predict (z)
     println ("predict (" + z + ") = " + yp)
 

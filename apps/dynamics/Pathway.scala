@@ -30,9 +30,9 @@ object Pathway extends App
     val kf = (1.0,  1.0,  0.5)     // forward reaction rates
     val kb = (0.02, 0.02, 0.01)    // backward reaction rates
 
-    // concentrations    H2, O2, O,   H,  OH, H2O
-    //                   0   1   2    3   4   5
-    var c = new VectorD (6., 6., 0., .01, 0., 1.)
+    // concentrations  H2, O2, O,   H,  OH, H2O
+    //                 0   1   2    3   4   5
+    var c = VectorD   (6., 6., 0., .01, 0., 1.)
 
     // define the system of Ordinary Differential Equations (ODEs)
 

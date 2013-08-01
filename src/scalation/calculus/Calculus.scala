@@ -201,10 +201,10 @@ object CalculusTest extends App
     def df_dx1 (x: VectorD): Double = 2. * x(1) - 8.
     val df = Array [FunctionV2S] (df_dx0, df_dx1)
 
-    var x = new VectorD (0., 0.)
+    var x = VectorD (0., 0.)
     println ("gradient  f(" + x + ") = " + gradient (f, x))
     println ("gradientD f(" + x + ") = " + gradientD (df, x))
-    x = new VectorD (1., 1.)
+    x = VectorD (1., 1.)
     println ("gradient  f(" + x + ") = " + gradient (f, x))
     println ("gradientD f(" + x + ") = " + gradientD (df, x))
 

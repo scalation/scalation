@@ -128,9 +128,10 @@ class IntegerLP (a: MatrixD, b: VectorD, c: VectorD, excl: Set [Int] = Set ())
     {
         val MAX_DEPTH = 4 * N                         // limit on depth of recursion  FIX ??
         val lp = new Simplex2P (cons._1, cons._2, c)  // set up a new LP problem
-        if (! lp.solve2P ()) return                   // solve the new LP problem, return if no solution
-        val x = lp.primal                             // optimal solution vector for this LP
-        val f = lp.objective                          // optimum objective function value for this LP
+        val x  = lp.solve ()                          // optimal primal solution vector for this LP
+        val y  = lp.dual                              // optimal dual solution vector for this LP
+        val f  = lp.objF (x)                          // optimal objective function value for this LP
+        if (! lp.check (x, y, f)) return              // check the new LP, return if no solution
         
         val j = fractionalVar (x)                     // find j such that x_j is not an integer
         var bound = 0.
@@ -182,8 +183,8 @@ object IntegerLPTest extends App
 {
     val a = new MatrixD ((2, 2), 3., 1.,
                                  1., 2.)
-    val c = new VectorD         (3., 4.) 
-    val b = new VectorD (-4., -4.)
+    val c = VectorD             (3., 4.) 
+    val b = VectorD (-4., -4.)
 
     val ilp = new IntegerLP (a, b, c)
     ilp.solve (0, (a, b))

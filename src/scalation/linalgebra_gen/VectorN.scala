@@ -9,7 +9,8 @@
 package scalation.linalgebra_gen
 
 import Numeric._
-import math.{ceil, sqrt}
+import math.{BigDecimal, ceil, sqrt}
+import util.Sorting.quickSort
 
 import scalation.linalgebra.VectorD
 import scalation.math.Primes.prime
@@ -17,23 +18,27 @@ import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** Convenience definitions for commonly used types of vectors.  For efficiency,
- *  non-generic versions of VectorD and VectorC are provided in the linalgebra
- *  package.
+ *  non-generic versions of VectorD, VectorC and VectorR are provided in the
+ *  linalgebra package.
  */
 object Vectors
 {
     type VectorI = VectorN [Int]              // Vector of Integers
     type VectorL = VectorN [Long]             // Vector of Long Integers
     type VectorF = VectorN [Float]            // Vector of Floating Point Numbers
+    type VectorB = VectorN [BigDecimal]       // Vector of Arbitrary-precision Decimal Numbers
 //  type VectorD = VectorN [Double]           // Vector of Double Precision Float
 //  type VectorC = VectorN [Complex]          // Vector of Complex Numbers
+//  type VectorR = VectorN [Rational]         // Vector of Rational Numbers
 
 } // Vectors object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The VectorN class stores and operates on Numeric Vectors of various sizes
- *  and types.  The element type may be any subtype of Numeric.
+ *  and types.  The element type may be any subtype of Numeric.  Some methods
+ *  only work for Fractional types.  When/if Scala adds 'sqrt' and 'pow' to
+ *  Fractional types the following methods will be implemented: ~^, ~^=, normalizeU.
  *  @param dim  the dimension/size of the vector
  *  @param v    the 1D array used to store vector elements
  */
@@ -60,24 +65,23 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
     private val nu = implicitly [Numeric [T]]
     import nu._
 
+    /** Numeric zero (0)
+     */
+    val _0 = nu.zero
+
+    /** Numeric one (1)
+     */
+    val _1 = nu.one
+
+    /** Numeric minus one (-1)
+     */
+    val _1n = -_1
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a vector from an array of values.
      *  @param u  the array of values
      */
     def this (u: Array [T]) { this (u.length, u) }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a vector from two or more values (repeated values T*).
-     *  @param u0  the first value
-     *  @param u1  the second value
-     *  @param u   the rest of the values (zero or more additional values)
-     */
-    def this (u0: T, u1: T, u: T*)
-    {
-        this (u.length + 2)                        // invoke primary constructor
-        v(0) = u0; v(1) = u1
-        for (i <- 2 until dim) v(i) = u(i - 2)
-    } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a vector and assign values from vector u.
@@ -88,13 +92,6 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
         this (u.dim)                               // invoke primary constructor
         for (i <- range) v(i) = u(i)
     } // constructor
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Indicator function, returning 1 if i == j, 0 otherwise.
-     *  @param i  the first integer value (e.g., index)
-     *  @param j  the second integer value (e.g., index)
-     */
-    def ind (i: Int, j: Int): Int = if (i == j) 1 else 0
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Expand the size (dim) of this vector by 'more' elements.
@@ -114,7 +111,7 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
     def oneAt (j: Int, size: Int = dim): VectorN [T] =
     {
         val c = new VectorN [T] (size)
-        for (i <- 0 until size) c.v(i) = if (i == j) one else zero
+        for (i <- 0 until size) c.v(i) = if (i == j) _1 else _0
         c
     } // oneAt
 
@@ -126,7 +123,7 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
     def _oneAt (j: Int, size: Int = dim): VectorN [T] =
     {
         val c = new VectorN [T] (size)
-        for (i <- 0 until size) c.v(i) = if (i == j) -one else zero
+        for (i <- 0 until size) c.v(i) = if (i == j) _1n else _0
         c
     } // _oneAt
 
@@ -231,13 +228,13 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
     def slice (from: Int, till: Int): VectorN [T] = new VectorN [T] (till - from, v.slice (from, till))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Select a subset of elements of this vector corresponding to a basis.
-     *  @param basis  the set of index positions (e.g., 0, 2, 5)
+    /** Select a subset of elements of this vector corresponding to a index/basis.
+     *  @param index  the set of index positions (e.g., 0, 2, 5)
      */
-    def select (basis: VectorI): VectorN [T] =
+    def select (index: Array [Int]): VectorN [T] =
     {
-        val c = new VectorN [T] (basis.dim)
-        for (i <- c.range) c.v(i) = v(basis(i))
+        val c = new VectorN [T] (index.length)
+        for (i <- c.range) c.v(i) = v(index(i))
         c
     } // select
 
@@ -295,6 +292,18 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
         for (i <- range) c.v(i) = if (i == s._2) v(i) + s._1 else v(i)
         c
     } // +
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add in-place this vector and vector b.
+     *  @param b  the vector to add
+     */
+    def += (b: VectorN [T]): VectorN [T] = { for (i <- range) v(i) += b.v(i); this }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add in-place this vector and scalar s.
+     *  @param s  the scalar to add
+     */
+    def += (s: T): VectorN [T] = { for (i <- range) v(i) += s; this }
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the negative of this vector (unary minus).
@@ -338,6 +347,18 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
         for (i <- range) c.v(i) = if (i == s._2) v(i) - s._1 else v(i)
         c
     } // -
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** From this vector subtract in-place vector b.
+     *  @param b  the vector to add
+     */
+    def -= (b: VectorN [T]): VectorN [T] = { for (i <- range) v(i) -= b.v(i); this }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** From this vector subtract in-place scalar s.
+     *  @param s  the scalar to add
+     */
+    def -= (s: T): VectorN [T] = { for (i <- range) v(i) -= s; this }
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply this vector by scalar s.
@@ -365,12 +386,19 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
     /** Multiply this 'row' vector by matrix m.
      *  @param m  the matrix to multiply by
      */
-    def * (m: MatrixN [T]): VectorN [T] = m.t * this
+    def * (m: Matrix [T]): VectorN [T] = m.t * this
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Square each element of this vector.
+    /** Multiply in-place this vector and vector b.
+     *  @param b  the vector to add
      */
-    def sq: VectorN [T] = this * this
+    def *= (b: VectorN [T]): VectorN [T] = { for (i <- range) v(i) *= b.v(i); this }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply in-place this vector and scalar s.
+     *  @param s  the scalar to add
+     */
+    def *= (s: T): VectorN [T] = { for (i <- range) v(i) *= s; this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide this vector by vector b (element-by-element).
@@ -397,7 +425,59 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
     } // /
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the vector is absolute values.
+    /** Divide in-place this vector and vector b.
+     *  @param b  the vector to add
+     */
+    def /= (b: VectorN [T]) (implicit fr: Fractional [T]): VectorN [T] =
+    {
+        import fr._
+        for (i <- range) v(i) /= b.v(i)
+        this
+    } // /=
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide in-place this vector and scalar s.
+     *  @param s  the scalar to add
+     */
+    def /= (s: T) (implicit fr: Fractional [T]): VectorN [T] =
+    {
+        import fr._
+        for (i <- range) v(i) /= s
+        this
+    } // /=
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the vector containing each element of this vector raised to the
+     *  s-th power.
+     *  @param s  the scalar exponent
+     *
+    def ~^ (s: T) (implicit fr: Fractional [T]): VectorN [T] =
+    {
+        import fr._
+        val c = new VectorN [T] (dim)
+        for (i <- range) c.v(i) = math.pow (v(i), s)
+        c
+    } // ~^
+     */
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Raise each element of this vector to the s-th power.
+     *  @param s  the scalar exponent
+     *
+    def ~^= (s: T) (implicit fr: Fractional [T])
+    {
+        import fr._
+        for (i <- range) v(i) = math.pow (v(i), s) 
+    } // ~^
+     */
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Square each element of this vector.
+     */
+    def sq: VectorN [T] = this * this
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the vector that is the element-wise absolute value of this vector.
      */
     def abs: VectorN [T] =
     {
@@ -409,7 +489,7 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of this vector.
      */
-    def sum: T = v.foldLeft (zero) (_ + _)
+    def sum: T = v.sum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of this vector skipping the i-th element.
@@ -422,8 +502,8 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
      */
     def sum_pos: T =
     {
-        var sum = zero
-        for (i <- range if v(i) > zero) sum += v(i)
+        var sum = _0
+        for (i <- range if v(i) > _0) sum += v(i)
         sum
     } // sum_pos
 
@@ -433,7 +513,7 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
      */
     def cumulate: VectorN [T] =
     {
-        var sum = zero
+        var sum = _0
         val c = new VectorN [T] (dim)
         for (i <- range) { sum += v(i); c.v(i) = sum }
         c
@@ -449,12 +529,31 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
     } // normalize
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Normalize this vector so its length is one (unit vector).
+     *
+    def normalizeU (implicit fr: Fractional [T]): VectorN [T] =
+    {
+        import fr._
+        this * (one / norm)
+    } // normalizeU
+     */
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Normalize this vector to have a maximum of one.
+     */
+    def normalize1 (implicit fr: Fractional [T]): VectorN [T] =
+    {
+        import fr._
+        this * (one / this.max ())
+    } // normalize1
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the dot product (or inner product) of this vector with vector b.
      *  @param b  the other vector
      */
     def dot (b: VectorN [T]): T =
     {
-        var s = zero
+        var s = _0
         for (i <- range) s += v(i) * b.v(i)
         s
     } // dot
@@ -468,6 +567,16 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
     /** Compute the Euclidean norm (2-norm) of this vector (requires Fractional type).
      */
     def norm (implicit fr: Fractional [T]): Double = sqrt (normSq.asInstanceOf [Double])
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the Manhattan norm (1-norm) of this vector.
+     */
+    def norm1: T =
+    {
+        var sum = _0
+        for (i <- range) sum += nu.abs (v(i))
+        sum
+    } // norm1
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the maximum element in this vector.
@@ -504,13 +613,18 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
     } // min
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the element with the greatest magnitude in this vector.
+     */
+    def mag: T = nu.abs (max ()) max nu.abs (min ())
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the argument maximum of this vector (index of maximum element).
      *  @param e  the ending index (exclusive) for the search
      */
     def argmax (e: Int = dim): Int =
     {
         var j = 0
-        for (i <- 0 until e if v(i) > v(j)) j = i
+        for (i <- 1 until e if v(i) > v(j)) j = i
         j
     } // argmax
 
@@ -521,7 +635,7 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
     def argmin (e: Int = dim): Int =
     {
         var j = 0
-        for (i <- 0 until e if v(i) < v(j)) j = i
+        for (i <- 1 until e if v(i) < v(j)) j = i
         j
     } // argmin
 
@@ -531,7 +645,7 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
      */
     def argminNeg (e: Int = dim): Int =
     {
-        val j = argmin (e); if (v(j) < zero) j else -1
+        val j = argmin (e); if (v(j) < _0) j else -1
     } // argmaxNeg
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -540,7 +654,7 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
      */
     def argmaxPos (e: Int = dim): Int =
     {
-        val j = argmax (e); if (v(j) > zero) j else -1
+        val j = argmax (e); if (v(j) > _0) j else -1
     } // argmaxPos
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -549,7 +663,7 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
      */
     def firstNeg (e: Int = dim): Int =
     {
-        for (i <- 0 until e if v(i) < zero) return i; -1
+        for (i <- 0 until e if v(i) < _0) return i; -1
     } // firstNeg
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -558,7 +672,7 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
      */
     def firstPos (e: Int = dim): Int =
     {
-        for (i <- 0 until e if v(i) > zero) return i; -1
+        for (i <- 0 until e if v(i) > _0) return i; -1
     } // firstPos
 
    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -567,7 +681,7 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
     def countNeg: Int =
     {
         var count = 0
-        for (i <- 0 until dim if v(i) < zero) count += 1
+        for (i <- 0 until dim if v(i) < _0) count += 1
         count
     } // countNeg
 
@@ -577,7 +691,7 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
     def countPos: Int =
     {
         var count = 0
-        for (i <- 0 until dim if v(i) > zero) count += 1
+        for (i <- 0 until dim if v(i) > _0) count += 1
         count
     } // countPos
 
@@ -593,6 +707,11 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
      */
     def contains (x: T): Boolean = v.contains (x)
 
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Sort this vector in-place in non-decreasing order.
+     */
+    def sort () { quickSort (v) }
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check whether the other vector is at least as long as this vector.
      *  @param b  the other vector
@@ -604,7 +723,7 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
      */
     def isNonnegative: Boolean =
     {
-        for (i <- range if v(i) < zero) return false
+        for (i <- range if v(i) < _0) return false
         true
     } // isNonnegative
 
@@ -671,11 +790,32 @@ class VectorN [T <% Ordered [T]: ClassManifest: Numeric] (val dim: Int,
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Companion object for VectorD class.
+ */
+object VectorN
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a VectorN [T] from one or more values (repeated values T*).
+     *  @param u0  the first value
+     *  @param u   the rest of the values (zero or more additional values)
+     */
+    def apply [T <% Ordered [T]: ClassManifest: Numeric] (x: T, xs: T*): VectorN [T] =
+    {
+        val c = new VectorN [T] (1 + xs.length)
+        c(0)  = x
+        for (i <- 1 until c.dim) c.v(i) = xs(i-1)
+        c
+    } // apply
+
+} // VectorN object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The VectorNTest object tests the operations provided by VectorN.
  */
 object VectorNTest extends App
 {
-    import Vectors.VectorI
+    import Vectors._
 
     var a: VectorI = null
     var b: VectorI = null
@@ -722,7 +862,7 @@ object VectorNTest extends App
         println ("x < y    = " + (x < y))
     } // for
 
-    c = new VectorI (4, 2, 3, 1)
+    c = VectorN (4, 2, 3, 1)
     println ("c          = " + c) 
     println ("c.cumulate = " + c.cumulate)
     println ("c.ramp     = " + c.ramp ())

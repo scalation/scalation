@@ -22,5 +22,5 @@ trait LineSearch
      */
     def search (step: Double): Double
 
-} // LineSearch
+} // LineSearch trait
 

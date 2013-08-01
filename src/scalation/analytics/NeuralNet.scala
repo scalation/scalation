@@ -198,15 +198,15 @@ object NeuralNetTest extends App
     val y   = new MatrixD (1, 2)               // training data - output vectors (not used)
     val ann = new NeuralNet (x, y, 2)          // create a Neural Net
 
-    val w  = new MatrixD ((2, 2), 0.5, 0.0,     // weight matrix w (input to hidden layer)
+    val w  = new MatrixD ((2, 2), 0.5, 0.0,    // weight matrix w (input to hidden layer)
                                   0.5, 0.5)
-    val v  = new MatrixD ((2, 2), 0.5, 0.5,     // weight matrix v (hidden to output layer)
+    val v  = new MatrixD ((2, 2), 0.5, 0.5,    // weight matrix v (hidden to output layer)
                                   0.0, 0.0)
-    val wb = new VectorD (0., 0.)              // bias vector wb (input to hidden layer)
-    val vb = new VectorD (0., 0.)              // bias vector vb (hidden to output layer)
+    val wb = VectorD (0., 0.)                  // bias vector wb (input to hidden layer)
+    val vb = VectorD (0., 0.)                  // bias vector vb (hidden to output layer)
     ann.setWeights (w, v, wb, vb)              // set intial weights and biases
 
-    val z_i = new VectorD (1., 1.)             // predict output z_o from input z_i
+    val z_i = VectorD (1., 1.)                 // predict output z_o from input z_i
     println ("input vector:  z_i = " + z_i)
     println ("output vector: z_o = " + ann.predictAll (z_i))
 
@@ -228,8 +228,8 @@ object NeuralNetTest2 extends App
                                   0.8, 0.6)
     val v  = new MatrixD ((2, 1), 0.3, 0.9)    // weight matrix v (hidden to output layer)
 
-    val wb = new VectorD (0., 0.)              // bias vector wb (input to hidden layer)
-    val vb = new VectorD (0., 0.)              // bias vector vb (hidden to output layer)
+    val wb = VectorD (0., 0.)                  // bias vector wb (input to hidden layer)
+    val vb = VectorD (0., 0.)                  // bias vector vb (hidden to output layer)
     ann.setWeights (w, v, wb, vb)              // set intial weights and biases
 
     println ("input vector:  x(0) = " + x(0))
