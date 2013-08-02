@@ -78,12 +78,12 @@ class ARMA (y: VectorD, t: VectorD)
         val psi = new MatrixD (m+1, m+1)
         val r   = new VectorD (m+1); r(0) = c(0)
         for (t <- 1 to m) {
-            var sum = 0.
+            var sum = 0.0
             for (j <- 1 until t) sum += psi(t-1, j) * c(t-j)
             val a = (c(t) - sum) / r(t-1)
             psi(t, t) = a
             for (j <- 1 until t) psi(t, j) = psi(t-1, j) - a * psi(t-1, t-j)
-            r(t) = r(t-1) * (1. - a * a)
+            r(t) = r(t-1) * (1.0 - a * a)
         } // for
         println ("psi = " + psi)
         pacf = psi.getDiag ().slice (1, m+1)    // PACF is the diagonal of the psi matrix
@@ -101,7 +101,7 @@ class ARMA (y: VectorD, t: VectorD)
         val p = phi.dim                    // order p for AR(p) model
         val f = new VectorD (n)            // forecasts for x
         for (t <- p until n) {             // start at t = p (enough data)
-            var sum = 0.
+            var sum = 0.0
             for (j <- 0 until p) sum += phi(j) * x(t-1-j)
             f(t) = sum
         } // for
@@ -119,7 +119,7 @@ class ARMA (y: VectorD, t: VectorD)
         if (q != 1) flaw ("est_ma", "estimation for q > 1 not yet implemented")
 
         val theta = new VectorD (q)          // MA(q) cofficients: theta_0, ..., theta_q-1
-        theta(0) = 0.      // FIX: need to estimate theta(0)
+        theta(0) = 0.0      // FIX: need to estimate theta(0)
         theta           
     } // est_ma
 
@@ -137,7 +137,7 @@ class ARMA (y: VectorD, t: VectorD)
         val k = n-q
         val f = new VectorD (k)            // forecasts for x
         for (t <- 0 until k) {
-            var sum = 0.
+            var sum = 0.0
             for (j <- 1 until min (k, t)) sum += theta(0)~^j * x(t-j)
             f(t) = sum
         } // for
@@ -158,7 +158,7 @@ class ARMA (y: VectorD, t: VectorD)
      */
     def predict (y: VectorD): Double = 
     {
-        0.    // FIX: not yet implemented
+        0.0    // FIX: not yet implemented
     } // predict
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -214,7 +214,7 @@ object ARMATest extends App
     val r = Random ()
     val t = genTimes (n)
     val y = new VectorD (n)
-    for (i <- 0 until n) y(i) = t(i) + 10. * r.gen
+    for (i <- 0 until n) y(i) = t(i) + 10.0 * r.gen
 
     val ts = new ARMA (y, t)   // time series data: y vs. t
 

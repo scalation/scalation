@@ -87,7 +87,7 @@ class SparseMatrixC (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a dim1 by dim1 square sparse matrix with x assigned on the diagonal
-     *  and 0 assigned off the diagonal.  To obtain an identity matrix, let x = 1.
+     *  and 0 assigned off the diagonal.  To obtain an identity matrix, let x = 1.0
      *  @param dim1  the row and column dimension
      *  @param x     the scalar value to assign on the diagonal
      */
@@ -1318,19 +1318,19 @@ object SparseMatrixCTest extends App
         println ("\n\tTest SparseMatrixC on real matrices of dim " + l)
         val x = new SparseMatrixC (l, l)
         val y = new SparseMatrixC (l, l)
-        x.set (2.)
-        y.set (3.)
+        x.set (2.0)
+        y.set (3.0)
         println ("x + y  = " + (x + y))
         println ("x - y  = " + (x - y))
         println ("x * y  = " + (x * y))
-        println ("x * 4. = " + (x * Complex (4.)))
+        println ("x * 4. = " + (x * Complex (4.0)))
     } // for
 
     println ("\n\tTest SparseMatrixC on additional operations")
 
-    val z  = new SparseMatrixC ((2, 2), 1., 2.,
-                                        3., 2.)
-    val b  = VectorC (8., 7.)
+    val z  = new SparseMatrixC ((2, 2), 1.0, 2.0,
+                                        3.0, 2.0)
+    val b  = VectorC (8.0, 7.0)
     val lu = z.lud
 
     println ("z         = " + z)
@@ -1342,11 +1342,11 @@ object SparseMatrixCTest extends App
     println ("z.det     = " + z.det)
     println ("z         = " + z)
 
-    val w = new SparseMatrixC ((2, 3), 2., 3., 5.,
-                                      -4., 2., 3.)
-    val v = new MatrixC ((3, 2), 2., -4.,
-                                 3.,  2.,
-                                 5.,  3.)
+    val w = new SparseMatrixC ((2, 3), 2.0, 3.0, 5.0,
+                                      -4.0, 2.0, 3.0)
+    val v = new MatrixC ((3, 2), 2.0, -4.0,
+                                 3.0,  2.0,
+                                 5.0,  3.0)
     
     println ("w         = " + w)
     println ("v         = " + v)

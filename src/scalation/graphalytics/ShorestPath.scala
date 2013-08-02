@@ -44,9 +44,9 @@ object ShortestPathTest extends App
 {
     // dense matrix representation for the graph, where d_ij = distance from i to j
 
-    val d = new MatrixD ((3, 3),   0.,   2., 100.,
-                                 100.,   0.,   3.,
-                                   4., 100.,   0.)
+    val d = new MatrixD ((3, 3),   0.0,   2.0, 100.0,
+                                 100.0,   0.0,   3.0,
+                                   4.0, 100.0,   0.0)
     println (d)
     val sp = new ShortestPath (d)
     sp.spath
@@ -54,9 +54,9 @@ object ShortestPathTest extends App
 
     // sparse matrix representation for the graph, where d_ij = distance from i to j
 
-    val d2 = new SparseMatrixD (3, 3, Array (new RowMap (List ((1, 2.),   (2, 100.))),
-                                             new RowMap (List ((0, 100.), (2, 3.))),
-                                             new RowMap (List ((0, 4.),   (1, 100.)))))
+    val d2 = new SparseMatrixD (3, 3, Array (new RowMap (List ((1, 2.0),   (2, 100.0))),
+                                             new RowMap (List ((0, 100.0), (2, 3.0))),
+                                             new RowMap (List ((0, 4.0),   (1, 100.0)))))
     println (d2)
     val sp2 = new ShortestPath (d2)
     sp2.spath

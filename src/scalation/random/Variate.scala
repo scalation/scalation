@@ -57,7 +57,7 @@ abstract class Variate (stream: Int = 0)
     /** Return the entire probability mass function (pmf) for finite discrete RV's.
      *  @param k  number of objects of the first type
      */
-    def pmf (k: Int = 0): Array [Double] = Array (0.)
+    def pmf (k: Int = 0): Array [Double] = Array (0.0)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine the next random number for the particular distribution.
@@ -88,15 +88,15 @@ case class Bernoulli (p: Double = .5, stream: Int = 0)
 {
     if (p < 0 || p > 1) flaw ("constructor", "parameter p must be in [0, 1]")
     _discrete = true
-    private val q = 1. - p     // probability of failure
+    private val q = 1.0 - p     // probability of failure
 
     def mean: Double = p
 
-    def pf (z: Double): Double = if (approx (z, 0.)) q else if (approx (z, 1.)) p else 0.
+    def pf (z: Double): Double = if (approx (z, 0.0)) q else if (approx (z, 1.0)) p else 0.0
 
     override def pmf (k: Int): Array [Double] = Array (q, p)
 
-    def gen: Double = if (r.gen < p) 1. else 0.
+    def gen: Double = if (r.gen < p) 1.0 else 0.0
 
 } // Bernoulli class
 
@@ -120,7 +120,7 @@ case class Beta (alpha: Double = 2, beta: Double = 3, stream: Int = 0)
 
     def pf (z: Double): Double =
     {
-        if (0. < z && z < 1.) pow (z, alpha-1.) * pow (1.-z, beta-1.) / betaF (alpha, beta)
+        if (0.0 < z && z < 1.0) pow (z, alpha-1.0) * pow (1.0-z, beta-1.0) / betaF (alpha, beta)
         else                  0
     } // pf
 
@@ -144,10 +144,10 @@ case class Beta (alpha: Double = 2, beta: Double = 3, stream: Int = 0)
 case class Binomial (p: Double = .5, n: Int = 10, stream: Int = 0)
      extends Variate (stream)
 {
-    if (p < 0. || p > 1.) flaw ("constructor", "parameter p must be in [0, 1]")
+    if (p < 0.0 || p > 1.0) flaw ("constructor", "parameter p must be in [0, 1]")
     if (n <= 0)           flaw ("constructor", "parameter n must be positive")
     _discrete = true
-    private val q    = 1. - p                   // probability of failure
+    private val q    = 1.0 - p                   // probability of failure
     private val p_q  = p / q                    // the ratio p divided by q
     private val coin = Bernoulli (p, stream)    // coin with prob of success of p
 
@@ -159,7 +159,7 @@ case class Binomial (p: Double = .5, n: Int = 10, stream: Int = 0)
         if (z == k && 0 <= k && k <= n)
             choose (n, k) * pow (p, k) * pow (q, n-k)
         else 
-            0.
+            0.0
     } // pf
 
     def pf (k: Int): Double =    // ex: for n = 10, (k, l) = (4, 6)
@@ -167,7 +167,7 @@ case class Binomial (p: Double = .5, n: Int = 10, stream: Int = 0)
         if (0 <= k && k <= n)
             choose (n, k) * pow (p, k) * pow (q, n-k)
         else 
-            0.
+            0.0
     } // pf
 
     override def pmf (k: Int): Array [Double] =
@@ -180,7 +180,7 @@ case class Binomial (p: Double = .5, n: Int = 10, stream: Int = 0)
 
     def gen: Double =
     {
-        var sum = 0.
+        var sum = 0.0
         for (i <- 0 until n) sum += coin.gen
         sum
     } // gen
@@ -198,21 +198,21 @@ case class Binomial (p: Double = .5, n: Int = 10, stream: Int = 0)
  *  @param n       the number of independent trials
  *  @param stream  the random number stream
  */
-case class Trinomial (p: Double = 1./3., q: Double = 1./3., n: Int = 10, stream: Int = 0)
+case class Trinomial (p: Double = 1.0/3.0, q: Double = 1.0/3.0, n: Int = 10, stream: Int = 0)
      extends Variate (stream)
 {
-    if (p < 0.)   flaw ("constructor", "parameter p must be non-negative")
-    if (q < 0.)   flaw ("constructor", "parameter q must be non-negative")
-    if (p+q > 1.) flaw ("constructor", "p+q must not exceed one")
+    if (p < 0.0)   flaw ("constructor", "parameter p must be non-negative")
+    if (q < 0.0)   flaw ("constructor", "parameter q must be non-negative")
+    if (p+q > 1.0) flaw ("constructor", "p+q must not exceed one")
     if (n <= 0)   flaw ("constructor", "parameter n must be positive")
     _discrete = true
 
-    private val qq   = 1. - p - q             // the probability of low (0)
+    private val qq   = 1.0 - p - q             // the probability of low (0)
     private val p_qq = p / qq                 // the ratio of high to low
     private val q_qq = q / qq                 // the ratio of medium to low
-    private val dice = Dice (Array (qq, qq+q, 1.), stream)
+    private val dice = Dice (Array (qq, qq+q, 1.0), stream)
 
-    def mean: Double = (q + 2.*p) * n
+    def mean: Double = (q + 2.0*p) * n
 
     def pf (z: Double): Double =
     {
@@ -221,7 +221,7 @@ case class Trinomial (p: Double = 1./3., q: Double = 1./3., n: Int = 10, stream:
         if (z == k && 0 <= k && k+l <= n)
             choose (n, k, l) * pow (p, k) * pow (q, l) * pow (qq, n-(k+l))
         else
-            0.
+            0.0
     } // pf
 
     def pf (y: Double, z: Double): Double =
@@ -231,7 +231,7 @@ case class Trinomial (p: Double = 1./3., q: Double = 1./3., n: Int = 10, stream:
         if (y == k && z == l && 0 <= k && 0 <= l && k+l <= n)
             choose (n, k, l) * pow (p, k) * pow (q, l) * pow (qq, n-(k+l))
         else
-            0.
+            0.0
     } // pf
 
     def pf (k: Int, l: Int): Double =   // ex: n = 10, (k, l, m) = (2, 3, 5)
@@ -239,7 +239,7 @@ case class Trinomial (p: Double = 1./3., q: Double = 1./3., n: Int = 10, stream:
         if (0 <= k && 0 <= l && k+l <= n)
             choose (n, k, l) * pow (p, k) * pow (q, l) * pow (qq, n-(k+l))
         else
-            0.
+            0.0
     } // pf
 
     override def pmf (k: Int): Array [Double] =
@@ -262,7 +262,7 @@ case class Trinomial (p: Double = 1./3., q: Double = 1./3., n: Int = 10, stream:
 
     def gen: Double =
     {
-        var sum = 0.
+        var sum = 0.0
         for (i <- 0 until n) sum += dice.gen      // add 0, 1 or 2
         sum
     } // gen
@@ -277,10 +277,10 @@ case class Trinomial (p: Double = 1./3., q: Double = 1./3., n: Int = 10, stream:
  *  @param beta    the scale parameter 
  *  @param stream  the random number stream
  */
-case class Cauchy (alpha: Double = 2.5, beta: Double = 1., stream: Int = 0)
+case class Cauchy (alpha: Double = 2.5, beta: Double = 1.0, stream: Int = 0)
      extends Variate (stream)
 {
-    if (beta <= 0.) flaw ("constructor", "parameter beta must be positive")
+    if (beta <= 0.0) flaw ("constructor", "parameter beta must be positive")
 
     def mean: Double = alpha    // but, technically does not exist
 
@@ -305,15 +305,15 @@ case class ChiSquare (df: Int = 2, stream: Int = 0)
 {
     if (df <= 0) flaw ("constructor", "parameter df must be positive")
 
-    private val gamma  = Gamma (df/2, 2., stream)
-    private val normal = Normal (0., 1., stream)
-    private val k      = df/2.
+    private val gamma  = Gamma (df/2, 2.0, stream)
+    private val normal = Normal (0.0, 1.0, stream)
+    private val k      = df/2.0
 
     def mean: Double = df
 
-    def pf (z: Double): Double = pow (.5, k) * pow (z, k-1) * exp (-z/2.) / gammaF (k)
+    def pf (z: Double): Double = pow (.5, k) * pow (z, k-1) * exp (-z/2.0) / gammaF (k)
 
-    def gen: Double = gamma.gen + (if (df % 2 == 0) 0. else pow (normal.gen, 2))
+    def gen: Double = gamma.gen + (if (df % 2 == 0) 0.0 else pow (normal.gen, 2))
 
 } // ChiSquare class
 
@@ -331,7 +331,7 @@ case class Deterministic (x: Double = 1, stream: Int = 0)
 
     def mean: Double = x
 
-    def pf (z: Double): Double = if (approx (z, x)) 1. else 0.
+    def pf (z: Double): Double = if (approx (z, x)) 1.0 else 0.0
 
     def gen: Double = x
 
@@ -345,7 +345,7 @@ case class Deterministic (x: Double = 1, stream: Int = 0)
  *  @param cdf     the distribution function (cdf)
  *  @param stream  the random number stream
  */
-case class Dice (cdf: Array [Double] = Array (.1, .3, .5, .7, .9, 1.), stream: Int = 0)
+case class Dice (cdf: Array [Double] = Array (.1, .3, .5, .7, .9, 1.0), stream: Int = 0)
      extends Variate (stream)
 {
     _discrete = true
@@ -353,7 +353,7 @@ case class Dice (cdf: Array [Double] = Array (.1, .3, .5, .7, .9, 1.), stream: I
 
     def mean: Double =
     {
-       var sum = 0.
+       var sum = 0.0
        for (i <- 1 until n) sum += i * (cdf(i) - cdf(i))
        sum
     } // mean
@@ -361,14 +361,14 @@ case class Dice (cdf: Array [Double] = Array (.1, .3, .5, .7, .9, 1.), stream: I
     def pf (z: Double): Double =
     {
         val j = floor (z).toInt
-        if (j == z) if (j == 0) cdf(0) else cdf(j) - cdf(j-1) else 0.
+        if (j == z) if (j == 0) cdf(0) else cdf(j) - cdf(j-1) else 0.0
     } // pf
 
     def gen: Double =
     {
         val ran = r.gen
         for (i <- 0 until n if ran <= cdf(i)) return i.toDouble
-        n.toDouble - 1.
+        n.toDouble - 1.0
     } // gen
 
 } // Dice class
@@ -426,12 +426,12 @@ case class Discrete (dist: VectorD = VectorD (.2, .2, .2, .2, .2), x: VectorD = 
  *  @param k       the number of stages (or Exponential samples)
  *  @param stream  the random number stream
  */
-case class Erlang (mu: Double = 1., k: Int = 2, stream: Int = 0)
+case class Erlang (mu: Double = 1.0, k: Int = 2, stream: Int = 0)
      extends Variate (stream)
 {
-    if (mu <= 0. || k <= 0) flaw ("constructor", "parameters mu and k must be positive")
+    if (mu <= 0.0 || k <= 0) flaw ("constructor", "parameters mu and k must be positive")
 
-    private val l = 1. / mu   // lambda
+    private val l = 1.0 / mu   // lambda
 
     def mean: Double = mu * k
 
@@ -439,7 +439,7 @@ case class Erlang (mu: Double = 1., k: Int = 2, stream: Int = 0)
 
     def gen: Double =
     {
-        var prod = 1.
+        var prod = 1.0
         for (i <- 0 until k) prod *= r.gen
         -mu * log (prod)
     } // gen
@@ -453,16 +453,16 @@ case class Erlang (mu: Double = 1., k: Int = 2, stream: Int = 0)
  *  @param mu      the mean
  *  @param stream  the random number stream
  */
-case class Exponential (mu: Double = 1., stream: Int = 0)
+case class Exponential (mu: Double = 1.0, stream: Int = 0)
      extends Variate (stream)
 {
-    if (mu <= 0.) flaw ("constructor", "parameter mu must be positive")
+    if (mu <= 0.0) flaw ("constructor", "parameter mu must be positive")
 
-    private val l = 1. / mu   // lambda
+    private val l = 1.0 / mu   // lambda
 
     def mean: Double = mu
 
-    def pf (z: Double): Double = if (z >= 0) l * exp (-l*z) else 0.
+    def pf (z: Double): Double = if (z >= 0) l * exp (-l*z) else 0.0
 
     def gen: Double = -mu * log (r.gen)
 
@@ -489,8 +489,8 @@ case class Fisher (df1: Int = 6, df2: Int = 4, stream: Int = 0)
 
     def pf (z: Double): Double =
     {
-        if (z >= 0.) sqrt (pow (df1*z, df1) * pow (df2, df2) / pow (df1*z + df2, df1+df2)) /
-                          (z * betaF (df1/2., df2/2.))
+        if (z >= 0.0) sqrt (pow (df1*z, df1) * pow (df2, df2) / pow (df1*z + df2, df1+df2)) /
+                          (z * betaF (df1/2.0, df2/2.0))
         else         0
     } // pf
 
@@ -512,7 +512,7 @@ case class Fisher (df1: Int = 6, df2: Int = 4, stream: Int = 0)
  *  @param beta    the scale parameter
  *  @param stream  the random number stream
  */
-case class Gamma (alpha: Double = 1., beta: Double = 1., stream: Int = 0)
+case class Gamma (alpha: Double = 1.0, beta: Double = 1.0, stream: Int = 0)
      extends Variate (stream)
 {
     if (alpha <= 0 || beta <= 0) flaw ("constructor", "parameters alpha and beta must be positive")
@@ -526,27 +526,27 @@ case class Gamma (alpha: Double = 1., beta: Double = 1., stream: Int = 0)
     
     def pf (z: Double): Double =
     {
-        if (z > 0.) pow (beta, -alpha) * pow (z,  alpha-1) * exp (-z/beta) / gammaF (alpha)
+        if (z > 0.0) pow (beta, -alpha) * pow (z,  alpha-1) * exp (-z/beta) / gammaF (alpha)
         else        0
     } // pf
 
     def gen: Double =
     {
-        var x = 0.
-        var y = 0.
-        if (alpha < 1.) {                                 // 0 < alpha < 1
+        var x = 0.0
+        var y = 0.0
+        if (alpha < 1.0) {                                 // 0 < alpha < 1
             do {
-                x = pow (r.gen, 1. / alpha)
-                y = pow (r.gen, 1. / (1.-alpha))
+                x = pow (r.gen, 1.0 / alpha)
+                y = pow (r.gen, 1.0 / (1.0-alpha))
             } while (x + y > 1)
             return (x / (x + y)) * (-log (r.gen)) * beta
-        } else if (alpha < 5.) {                          // 1 <= alpha < 5
+        } else if (alpha < 5.0) {                          // 1 <= alpha < 5
             do {
                 x = alpha / a
-                var prod = 1.
+                var prod = 1.0
                 for (i <- 0 until a) prod *= r.gen
                 x *= -log (prod)
-            } while (r.gen > pow (x / alpha, b) * exp (-b * x / (alpha-1.)))
+            } while (r.gen > pow (x / alpha, b) * exp (-b * x / (alpha-1.0)))
             return x * beta
         } else {                                          // alpha >= 5
             if (r.gen >= b) erl1.gen else erl2.gen
@@ -568,7 +568,7 @@ case class Geometric (p: Double = .5, stream: Int = 0)
     if (p < 0 || p > 1) flaw ("constructor", "parameter p must be in [0, 1]")
     _discrete = true
 
-    private val q      = 1. - p
+    private val q      = 1.0 - p
     private val log_q  = log (q)
     private val q_by_p = q / p
 
@@ -577,7 +577,7 @@ case class Geometric (p: Double = .5, stream: Int = 0)
     def pf (z: Double): Double = 
     {
         val k = floor (z).toInt
-        if (z == k && k >= 0) p * pow (q, k) else 0.
+        if (z == k && k >= 0) p * pow (q, k) else 0.0
     } // pf
 
     def gen: Double = floor (log (r.gen) / log_q).toInt
@@ -597,16 +597,16 @@ case class Geometric (p: Double = .5, stream: Int = 0)
 case class HyperExponential (p: Double = .5, mu1: Double = 1, mu2: Double = 2, stream: Int = 0)
      extends Variate (stream)
 {
-    if (p < 0. || p > 1.)       flaw ("constructor", "parameter p must be in [0, 1]")
-    if (mu1 <= 0. || mu2 <= 0.) flaw ("constructor", "parameters mu1 and mu2 must be positive")
+    if (p < 0.0 || p > 1.0)       flaw ("constructor", "parameter p must be in [0, 1]")
+    if (mu1 <= 0.0 || mu2 <= 0.0) flaw ("constructor", "parameters mu1 and mu2 must be positive")
 
-    private val q  = 1. - p
-    private val l1 = 1. / mu1   // lambda 1
-    private val l2 = 1. / mu2   // lambda 2
+    private val q  = 1.0 - p
+    private val l1 = 1.0 / mu1   // lambda 1
+    private val l2 = 1.0 / mu2   // lambda 2
 
     def mean: Double = p * mu1 + q * mu2
 
-    def pf (z: Double): Double = if (z >= 0.) p * l1 * exp (-l1*z) + q * l2 * exp (-l2*z) else 0.
+    def pf (z: Double): Double = if (z >= 0.0) p * l1 * exp (-l1*z) + q * l2 * exp (-l2*z) else 0.0
 
     def gen: Double = log (r.gen) * (if (r.gen < p) -mu1 else -mu2)
 
@@ -621,19 +621,19 @@ case class HyperExponential (p: Double = .5, mu1: Double = 1, mu2: Double = 2, s
  *  @param sigma   the standard deviation
  *  @param stream  the random number stream
  */
-case class _HyperExponential (mu: Double = 1., sigma: Double = 2, stream: Int = 0)
+case class _HyperExponential (mu: Double = 1.0, sigma: Double = 2, stream: Int = 0)
      extends Variate (stream)
 {
-    if (mu <= 0. || sigma <= 0.) flaw ("constructor", "parameters mu and sigma must be positive")
+    if (mu <= 0.0 || sigma <= 0.0) flaw ("constructor", "parameters mu and sigma must be positive")
 
     private val cv2 = pow (sigma / mu, 2)
-    private val p   = .5 * (1. - sqrt ((cv2-1.) / (cv2+1.)))
+    private val p   = .5 * (1.0 - sqrt ((cv2-1.0) / (cv2+1.0)))
 
-    private val l = 2. * p / mu   // adjusted lambda
+    private val l = 2.0 * p / mu   // adjusted lambda
 
     def mean: Double = mu
 
-    def pf (z: Double): Double = if (z >= 0.) l * exp (-l*z) else 0.
+    def pf (z: Double): Double = if (z >= 0.0) l * exp (-l*z) else 0.0
 
     def gen: Double =
     {
@@ -655,7 +655,7 @@ case class _HyperExponential (mu: Double = 1., sigma: Double = 2, stream: Int = 
 case class HyperGeometric (p: Double = .5, n: Int = 5, pop: Int = 10, stream: Int = 0)
      extends Variate (stream)
 {
-    if (p < 0. || p > 1.)   flaw ("constructor", "parameter p must be in [0, 1]")
+    if (p < 0.0 || p > 1.0)   flaw ("constructor", "parameter p must be in [0, 1]")
     if (n <= 0 || pop <= 0) flaw ("constructor", "parameters n and pop must be positive")
     _discrete = true
 
@@ -669,7 +669,7 @@ case class HyperGeometric (p: Double = .5, n: Int = 5, pop: Int = 10, stream: In
         if (k == z && 0 <= k && k <= reds && k <= n)
             choose (reds, k) * choose (pop-reds, n-k) / choose (pop, n).toDouble
         else
-            0.
+            0.0
     } // pf
 
     def gen: Double =
@@ -694,20 +694,20 @@ case class HyperGeometric (p: Double = .5, n: Int = 5, pop: Int = 10, stream: In
  *  @param sigma2  the variance (sigma squared) for underlying Normal
  *  @param stream  the random number stream
  */
-case class LogNormal (mu: Double = 0., sigma2: Double = 1., stream: Int = 0)
+case class LogNormal (mu: Double = 0.0, sigma2: Double = 1.0, stream: Int = 0)
      extends Variate (stream)
 {
-    if (sigma2 <= 0.) flaw ("constructor", "parameter sigma2 must be positive")
+    if (sigma2 <= 0.0) flaw ("constructor", "parameter sigma2 must be positive")
 
-    private val _2sigma2 = 2. * sigma2
+    private val _2sigma2 = 2.0 * sigma2
     private val normal   = Normal (mu, sigma2, stream)   // associated Normal distribution
 
-    def mean: Double = exp (mu + sigma2/2.)
+    def mean: Double = exp (mu + sigma2/2.0)
 
     def pf (z: Double): Double =
     {
         val denom = z * sqrt (Pi * _2sigma2)
-        if (z > 0.) exp (-pow (log (z) - mu, 2) / _2sigma2) / denom else 0.
+        if (z > 0.0) exp (-pow (log (z) - mu, 2) / _2sigma2) / denom else 0.0
     } // pf
 
     def gen: Double = exp (normal.gen)
@@ -729,16 +729,16 @@ case class Multinomial (p: Array [Double] = Array (.4, .3, .3), n: Int = 5, stre
     if (n <= 0) flaw ("constructor", "parameter n must be positive")
     _discrete = true
 
-    def mean: Double = 0.   // FIX
+    def mean: Double = 0.0   // FIX
 
     def pf (z: Double): Double =
     {
-        0.   // FIX
+        0.0   // FIX
     } // pf
 
     def gen: Double =
     {
-        0.   // FIX
+        0.0   // FIX
     } // gen
 
 } // Multinomial
@@ -754,11 +754,11 @@ case class Multinomial (p: Array [Double] = Array (.4, .3, .3), n: Int = 5, stre
 case class NegativeBinomial (p: Double = .5, s: Int = 2, stream: Int = 0)
      extends Variate (stream)
 {
-    if (p < 0. || p > 1.) flaw ("constructor", "parameter p must be in [0, 1]")
+    if (p < 0.0 || p > 1.0) flaw ("constructor", "parameter p must be in [0, 1]")
     if (s <= 0)           flaw ("constructor", "parameter s must be positive")
     _discrete = true
 
-    private val q    = 1. - p
+    private val q    = 1.0 - p
     private val geom = Geometric (p, stream)
 
     def mean: Double = s * q / p
@@ -766,7 +766,7 @@ case class NegativeBinomial (p: Double = .5, s: Int = 2, stream: Int = 0)
     def pf (z: Double): Double =
     {
         val k = floor (z).toInt
-        if (k == z && k >= 0) choose (s+k-1, k) * pow (p, s) * pow (q, k) else 0.
+        if (k == z && k >= 0) choose (s+k-1, k) * pow (p, s) * pow (q, k) else 0.0
     } // pf
 
     def gen: Double = 
@@ -786,32 +786,32 @@ case class NegativeBinomial (p: Double = .5, s: Int = 2, stream: Int = 0)
  *  @param sigma2  the variance (sigma squared)
  *  @param stream  the random number stream
  */
-case class Normal (mu: Double = 0., sigma2: Double = 1., stream: Int = 0)
+case class Normal (mu: Double = 0.0, sigma2: Double = 1.0, stream: Int = 0)
      extends Variate (stream)
 {
-    if (sigma2 < 0.) flaw ("constructor", "parameter sigma2 must be nonnegative")
+    if (sigma2 < 0.0) flaw ("constructor", "parameter sigma2 must be nonnegative")
 
     private val sigma    = sqrt (sigma2)
-    private val _2sigma2 = 2. * sigma2
+    private val _2sigma2 = 2.0 * sigma2
     private var computed = true       // toggle, since values gen in pairs
-    private var save     = 0.         // save second in pair
+    private var save     = 0.0         // save second in pair
 
     def mean: Double = mu
 
-    def pf (z: Double): Double = (1. / sqrt (Pi*_2sigma2)) * exp (-pow (z-mu, 2) / _2sigma2)
+    def pf (z: Double): Double = (1.0 / sqrt (Pi*_2sigma2)) * exp (-pow (z-mu, 2) / _2sigma2)
 
     def gen: Double =             // use acceptance-rejection method
     {
-        var (a, b, w, t) = (0., 0., 0., 0.)
+        var (a, b, w, t) = (0.0, 0.0, 0.0, 0.0)
 
         computed = ! computed;
         if (computed) return save * sigma2 + mu
         do {
-            a = 2. * r.gen - 1.
-            b = 2. * r.gen - 1.
+            a = 2.0 * r.gen - 1.0
+            b = 2.0 * r.gen - 1.0
             w = a*a + b*b
-        } while (w > 1.)
-        t    = sqrt (-2. * log (w) / w)
+        } while (w > 1.0)
+        t    = sqrt (-2.0 * log (w) / w)
         save = b * t
         (a * t) * sigma + mu
     } // gen
@@ -827,10 +827,10 @@ case class Normal (mu: Double = 0., sigma2: Double = 1., stream: Int = 0)
  *  @param mu      the mean
  *  @param stream  the random number stream
  */
-case class Poisson (mu: Double = 2., stream: Int = 0)
+case class Poisson (mu: Double = 2.0, stream: Int = 0)
      extends Variate (stream)
 {
-    if (mu <= 0.) flaw ("constructor", "parameter mu must be positive")
+    if (mu <= 0.0) flaw ("constructor", "parameter mu must be positive")
     _discrete = true
 
     private val cutoff = exp (-mu)
@@ -840,13 +840,13 @@ case class Poisson (mu: Double = 2., stream: Int = 0)
     def pf (z: Double): Double =
     {
         val k = floor (z).toInt
-        if (k == z && k >= 0) exp (-mu) * pow (mu, k) / fac (k) else 0.
+        if (k == z && k >= 0) exp (-mu) * pow (mu, k) / fac (k) else 0.0
     } // pf
 
     def gen: Double = 
     {
         var n = -1
-        var prod = 1.
+        var prod = 1.0
         do { prod *= r.gen; n += 1 } while (prod >= cutoff)
         n
     } // gen
@@ -869,12 +869,12 @@ case class Randi (a: Int = 0, b: Int = 5, stream: Int = 0)
 
     private val width = b + 1 - a
 
-    def mean: Double = (a + b) / 2.
+    def mean: Double = (a + b) / 2.0
 
     def pf (z: Double): Double =
     {
         val k = floor (z).toInt
-        if (k == z && a <= k && k <= b) 1. / width.toDouble else 0.
+        if (k == z && a <= k && k <= b) 1.0 / width.toDouble else 0.0
     } // pf
 
     def gen: Double = floor (a + width * r.gen).toInt
@@ -896,12 +896,12 @@ case class Randi0 (b: Int = 5, stream: Int = 0)
 
     private val width = b + 1
 
-    def mean: Double = b / 2.
+    def mean: Double = b / 2.0
 
     def pf (z: Double): Double =
     {
         val k = floor (z).toInt
-        if (k == z && k <= b) 1. / width.toDouble else 0.
+        if (k == z && k <= b) 1.0 / width.toDouble else 0.0
     } // pf
 
     def gen: Double = floor (width * r.gen).toInt
@@ -921,15 +921,15 @@ case class StudentT (df: Int = 4, stream: Int = 0)
 {
     if (df <= 0) flaw ("constructor", "parameter df must be positive")
 
-    private val _df    = (df + 1) / 2.
-    private val normal = Normal (0., 1., stream)
+    private val _df    = (df + 1) / 2.0
+    private val normal = Normal (0.0, 1.0, stream)
     private val chi    = ChiSquare (df, stream)
 
-    def mean: Double = 0.
+    def mean: Double = 0.0
 
     def pf (z: Double): Double =
     {
-        gammaF (_df) * pow (1 + (z*z)/df, -_df) / (sqrt (df*Pi) * gammaF (df/2.))
+        gammaF (_df) * pow (1 + (z*z)/df, -_df) / (sqrt (df*Pi) * gammaF (df/2.0))
     } // pf
 
     def gen: Double = normal.gen / sqrt (chi.gen / df) 
@@ -981,16 +981,16 @@ case class Triangular (a: Double = 0, b: Double = 5, c: Double = Double.MaxValue
  *  @param b       the upper bound
  *  @param stream  the random number stream
  */
-case class Uniform (a: Double = 0., b: Double = 5., stream: Int = 0)
+case class Uniform (a: Double = 0.0, b: Double = 5.0, stream: Int = 0)
      extends Variate (stream)
 {
     if (a > b) flaw ("constructor", "parameter a must not be greater than b")
 
     private val width = b - a
 
-    def mean: Double = (a + b) / 2.
+    def mean: Double = (a + b) / 2.0
 
-    def pf (z: Double): Double = if (a <= z && z <= b) 1. / width else 0.
+    def pf (z: Double): Double = if (a <= z && z <= b) 1.0 / width else 0.0
 
     def gen: Double = a + width * r.gen
 
@@ -1004,19 +1004,19 @@ case class Uniform (a: Double = 0., b: Double = 5., stream: Int = 0)
  *  @param beta    the scale parameter
  *  @param stream  the random number stream
  */
-case class Weibull (alpha: Double = 2., beta: Double = 2., stream: Int = 0)
+case class Weibull (alpha: Double = 2.0, beta: Double = 2.0, stream: Int = 0)
      extends Variate (stream)
 {
-    if (alpha <= 0. || beta <= 0.) flaw ("constructor", "parameters alpha and beta must be positive")
+    if (alpha <= 0.0 || beta <= 0.0) flaw ("constructor", "parameters alpha and beta must be positive")
 
-    private val shape_recip = 1. / alpha
+    private val shape_recip = 1.0 / alpha
 
     def mean: Double = beta * shape_recip * gammaF (shape_recip)
 
     def pf (z: Double): Double =
     {
-        if (z > 0.) alpha * pow (beta, -alpha) * pow (z, alpha-1.) * exp (-pow (z/beta, alpha))
-        else        0.
+        if (z > 0.0) alpha * pow (beta, -alpha) * pow (z, alpha-1.0) * exp (-pow (z/beta, alpha))
+        else        0.0
     } // pf
 
     def gen: Double = 
@@ -1066,21 +1066,21 @@ object VariateTest extends App
 
         val rep    = 50000          // replications
         var j      = 0              // interval number
-        var x      = 0.             // x coordinate
-        var o      = 0.             // observed value: height of histogram
-        var e      = 0.             // expected value: pf (x)
-        var chi2   = 0.             // ChiSquare statistic
+        var x      = 0.0             // x coordinate
+        var o      = 0.0             // observed value: height of histogram
+        var e      = 0.0             // expected value: pf (x)
+        var chi2   = 0.0             // ChiSquare statistic
         var n      = 0              // number of nonzero intervals
         val offset = if (rv.isInstanceOf [StudentT] || rv.isInstanceOf [Normal]) 25 else 0
         val sum    = new Array [Int] (51)
 
         for (i <- 1 to rep) {
-            j = floor (rv.gen * 10.).toInt + offset
+            j = floor (rv.gen * 10.0).toInt + offset
             if (0 <= j && j <= 50) sum (j) += 1
         } // for
 
         for (i <- 0 until sum.length) {
-            x = (i - offset) / 10.
+            x = (i - offset) / 10.0
             o = sum(i)
             e = round (if (rv.discrete) 50000 * rv.pf (x) else 5000 * rv.pf (x + .05) )
             if (e >= 5) {
@@ -1150,7 +1150,7 @@ object VariateTest extends App
     distrTest (Uniform ())
     distrTest (Weibull ())
 
-    val trinom = Trinomial (1./3., 1./3., 9)
+    val trinom = Trinomial (1.0/3.0, 1.0/3.0, 9)
     println ("trinom = " + trinom.pmf(0).deep)
 
 } // VariateTest object

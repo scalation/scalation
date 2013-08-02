@@ -380,12 +380,12 @@ object Rational
      */
     def from_Double (y: Double, md: Long = maxDen): Tuple2 [Long, Long] =
     {
-        val epsilon = 1. / md
+        val epsilon = 1.0 / md
         var d = y
         val n = floor (d)
         d -= n
         if (d < epsilon) return (n.toLong, 1l)
-        else if ((1. - epsilon) < d) return (n.toLong + 1l, 1l)
+        else if ((1.0 - epsilon) < d) return (n.toLong + 1l, 1l)
         var low_n = 0l
         var low_d = 1l
         var upp_n = 1l
@@ -509,7 +509,7 @@ object RationalTest extends App
     println ("fromDouble (.125))  = " + fromDouble (.125))
     println ("fromDouble (.0625)) = " + fromDouble (.0625))
     println ("fromDouble (-.125)) = " + fromDouble (-.125))
-    println ("fromDouble (1./3.)) = " + fromDouble (1./3.))
+    println ("fromDouble (1./3.)) = " + fromDouble (1.0/3.0))
     println ("fromDouble (.334))  = " + fromDouble (.334))
     println ("fromDouble (.2))    = " + fromDouble (.2))
     println ("fromDouble (0.0))   = " + fromDouble (0.0))

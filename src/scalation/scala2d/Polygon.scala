@@ -133,7 +133,7 @@ case class Quad (vertex: Array [R2])
      *  @param side2    the heigth of the parallelogram (change in y)
      *  @param shift    the x-shift between top and bottom sides 
      */
-    def this (topLeft: R2, side1: Double, side2: Double, shift: Double = 0.)
+    def this (topLeft: R2, side1: Double, side2: Double, shift: Double = 0.0)
     {
         this (Array [R2] (topLeft,
                           R2 (topLeft.x + side1, topLeft.y),
@@ -177,9 +177,9 @@ case class Pentagon (vertex: Array [R2])
     def this (topLeft: R2, side: Double)
     {
         this (Array [R2] (R2 (topLeft.x + cos72 * side, topLeft.y),
-                          R2 (topLeft.x + (1. + cos72) * side, topLeft.y),
-                          R2 (topLeft.x + (1. + 2. * cos72) * side, topLeft.y + sin72 * side),
-                          R2 (topLeft.x + (.5 + cos72) * side, topLeft.y + (1. + 2. * cos72) * side),
+                          R2 (topLeft.x + (1.0 + cos72) * side, topLeft.y),
+                          R2 (topLeft.x + (1.0 + 2.0 * cos72) * side, topLeft.y + sin72 * side),
+                          R2 (topLeft.x + (.5 + cos72) * side, topLeft.y + (1.0 + 2.0 * cos72) * side),
                           R2 (topLeft.x, topLeft.y + sin72 * side)))
     } // constructor
 
@@ -220,9 +220,9 @@ case class Hexagon (vertex: Array [R2])
     {
         this (Array [R2] (topLeft,
                           R2 (topLeft.x + side, topLeft.y),
-                          R2 (topLeft.x + (1. + cos60) * side, topLeft.y + sin60 * side),
-                          R2 (topLeft.x + side, topLeft.y + 2. * sin60 * side),
-                          R2 (topLeft.x, topLeft.y + 2. * sin60 * side),
+                          R2 (topLeft.x + (1.0 + cos60) * side, topLeft.y + sin60 * side),
+                          R2 (topLeft.x + side, topLeft.y + 2.0 * sin60 * side),
+                          R2 (topLeft.x, topLeft.y + 2.0 * sin60 * side),
                           R2 (topLeft.x - cos60 * side, topLeft.y + sin60 * side)))
     } // constructor
 
@@ -262,12 +262,12 @@ case class Octagon (vertex: Array [R2])
     def this (topLeft: R2, side: Double)
     {
         this (Array [R2] (R2 (topLeft.x + cos45 * side, topLeft.y),
-                          R2 (topLeft.x + (1. + cos45) * side, topLeft.y),
-                          R2 (topLeft.x + (1. + 2. * cos45) * side, topLeft.y + cos45 * side),
-                          R2 (topLeft.x + (1. + 2. * cos45) * side, topLeft.y + (1. + cos45) * side),
-                          R2 (topLeft.x + (1. + cos45) * side, topLeft.y + (1. + 2. * cos45) * side),
-                          R2 (topLeft.x + cos45 * side, topLeft.y + (1. + 2. * cos45) * side),
-                          R2 (topLeft.x, topLeft.y + (1. + cos45) * side),
+                          R2 (topLeft.x + (1.0 + cos45) * side, topLeft.y),
+                          R2 (topLeft.x + (1.0 + 2.0 * cos45) * side, topLeft.y + cos45 * side),
+                          R2 (topLeft.x + (1.0 + 2.0 * cos45) * side, topLeft.y + (1.0 + cos45) * side),
+                          R2 (topLeft.x + (1.0 + cos45) * side, topLeft.y + (1.0 + 2.0 * cos45) * side),
+                          R2 (topLeft.x + cos45 * side, topLeft.y + (1.0 + 2.0 * cos45) * side),
+                          R2 (topLeft.x, topLeft.y + (1.0 + cos45) * side),
                           R2 (topLeft.x, topLeft.y + cos45 * side)))
     } // constructor
 
@@ -288,11 +288,11 @@ case class Octagon (vertex: Array [R2])
  */
 object Constants
 {
-    val cos45 = cos (Pi / 4.)   // same value for sin45
-    val cos60 = cos (Pi / 3.)
-    val sin60 = sin (Pi / 3.)
-    val cos72 = cos (2. * Pi / 5.)
-    val sin72 = sin (2. * Pi / 5.)
+    val cos45 = cos (Pi / 4.0)   // same value for sin45
+    val cos60 = cos (Pi / 3.0)
+    val sin60 = sin (Pi / 3.0)
+    val cos72 = cos (2.0 * Pi / 5.0)
+    val sin72 = sin (2.0 * Pi / 5.0)
 
 } // Constants object
 

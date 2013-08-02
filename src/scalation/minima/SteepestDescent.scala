@@ -34,7 +34,7 @@ class SteepestDescent (f: FunctionV2S, exactLS: Boolean = true)
       extends Minimizer with Error
 {
     private val DEBUG    = true                 // debug flag
-    private val WEIGHT   = 1000.                // weight on penalty for constraint violation
+    private val WEIGHT   = 1000.0                // weight on penalty for constraint violation
     private var given    = false                // default: functions for partials are not given
 
     private var df: Array [FunctionV2S] = null  // array of partials
@@ -74,10 +74,10 @@ class SteepestDescent (f: FunctionV2S, exactLS: Boolean = true)
         var x    = x0                                  // current point
         var f_x  = f(x)                                // objective function at current point
         var y: VectorD = null                          // next point
-        var f_y  = 0.                                  // objective function at next point
+        var f_y  = 0.0                                  // objective function at next point
         var dir  = if (given) -gradientD (df, x)       // initial direction is -gradient: use partials
                    else -gradient (f, x)               //                                 estimate gradient
-        var dist = 1.                                  // distance between current and next point
+        var dist = 1.0                                  // distance between current and next point
         var down = true                                // moving down flag
 
         for (k <- 1 to MAX_ITER if down && dist > toler && dir.normSq > toler) {
@@ -104,28 +104,28 @@ class SteepestDescent (f: FunctionV2S, exactLS: Boolean = true)
  */
 object SteepestDescentTest extends App
 {
-    var x0 = VectorD (0., 0.)                       // starting point
+    var x0 = VectorD (0.0, 0.0)                       // starting point
     var x: VectorD = null                           // optimal solution
 
     println ("\nProblem 1: (x_0 - 2)^2 + (x_1 - 3)^2 + 1") 
-    def f (x: VectorD): Double = (x(0) - 2.) * (x(0) - 2.) + (x(1) - 3.) * (x(1) - 3.) + 1
+    def f (x: VectorD): Double = (x(0) - 2.0) * (x(0) - 2.0) + (x(1) - 3.0) * (x(1) - 3.0) + 1
     val solver = new SteepestDescent (f)
     x = solver.solve (x0)
     println ("optimal solution = " + x + ", objective value = " + f(x))
 
     println ("\nProblem 2 (with partials): (x_0 - 2)^2 + (x_1 - 3)^2 + 1") 
-    x0 = VectorD (0., 0.)
-    def df_dx0 (x: VectorD): Double = 2. * x(0) - 4.
-    def df_dx1 (x: VectorD): Double = 2. * x(1) - 6.
+    x0 = VectorD (0.0, 0.0)
+    def df_dx0 (x: VectorD): Double = 2.0 * x(0) - 4.0
+    def df_dx1 (x: VectorD): Double = 2.0 * x(1) - 6.0
     solver.setDerivatives (Array [FunctionV2S] (df_dx0, df_dx1))
     x = solver.solve (x0)
     println ("optimal solution = " + x + ", objective value = " + f(x))
 
     println ("\nProblem 3: x_0/4 + 5x_0^2 + x_0^4 - 9x_0^2 x_1 + 3x_1^2 + 2x_1^4")
     // @see http://math.fullerton.edu/mathews/n2003/gradientsearch/GradientSearchMod/Links/GradientSearchMod_lnk_5.html
-    x0 = VectorD (0., 0.)
-    def f3 (x: VectorD): Double = x(0)/4. + 5.*x(0)*x(0) + pow(x(0),4) -
-                                  9.*x(0)*x(0)*x(1) + 3.*x(1)*x(1) + 2.*pow(x(1),4)
+    x0 = VectorD (0.0, 0.0)
+    def f3 (x: VectorD): Double = x(0)/4.0 + 5.0*x(0)*x(0) + pow(x(0),4) -
+                                  9.0*x(0)*x(0)*x(1) + 3.0*x(1)*x(1) + 2.0*pow(x(1),4)
     val solver3 = new SteepestDescent (f3)
     x = solver3.solve (x0)
     println ("optimal solution = " + x + ", objective value = " + f3(x))

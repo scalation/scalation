@@ -90,12 +90,12 @@ class PlotM (x: VectorD, y: MatrixD, var label: Array [String] = null,
             super.paintComponent (g2d)
             var x_pos = 0
             var y_pos = 0
-            var step  = 0.
+            var step  = 0.0
 
             //:: Draw the axes
 
             g2d.setPaint (black)
-            g2d.setStroke (new BasicStroke (2.f))
+            g2d.setStroke (new BasicStroke (2.0f))
             axis.setLine (baseX - 1, baseY + 1, baseX + 10 + frameW - 2 * offset, baseY + 1)
             g2d.draw (axis)
             axis.setLine (baseX - 1, offset - 10, baseX - 1, baseY + 1)
@@ -176,8 +176,8 @@ object PlotMTest extends App
     val x = new VectorD (200)
     val y = new MatrixD (5, 200)
     for (i <- 0 until 200) {
-        x(i)    = (i - 100) / 10.
-        y(0, i) = 10. * x(i)
+        x(i)    = (i - 100) / 10.0
+        y(0, i) = 10.0 * x(i)
         y(1, i) = pow (x(i), 2)
         y(2, i) = .1 * pow (x(i), 3)
         y(3, i) = .01 * pow (x(i), 4)

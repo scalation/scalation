@@ -63,7 +63,7 @@ class SVD (a: MatrixD)
             } // if
         } // for
 
-        for (i <- 0 until m; j <- 0 until n if j != i && j != i+1) a(i, j) = 0.   // clean matrix off diagonals
+        for (i <- 0 until m; j <- 0 until n if j != i && j != i+1) a(i, j) = 0.0   // clean matrix off diagonals
 
         (u, a, v)                           // return (u, b as a, v)
     } // bidiagonalization
@@ -83,7 +83,7 @@ class SVD (a: MatrixD)
         var c  = new VectorD (n-1)                   // above main diagonal (beta)
         var d  = new VectorD (n)                     // main diagonal (alpha)
         var ut = new MatrixD (n, m)                  // transpose of u 
-        var vt = new MatrixD (n, m); vt(0, 0) = 1.   // transpose of v
+        var vt = new MatrixD (n, m); vt(0, 0) = 1.0   // transpose of v
         val at = a.t                                 // transpose of matrix a
 
         for (k <- 0 until n) {
@@ -110,14 +110,14 @@ class SVD (a: MatrixD)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This object is used to test the SVD class.
- *  bidiagonalization answer = [ (21.8, -.613), (12.8, 2.24, 0.) ]
+ *  bidiagonalization answer = [ (21.8, -.613), (12.8, 2.24, 0.0) ]
  */
 object SVDTest extends App
 {
-    val a = new MatrixD ((4, 3), 1.,  2.,  3.,
-                                 4.,  5.,  6.,
-                                 7.,  8.,  9.,
-                                10., 11., 12.)
+    val a = new MatrixD ((4, 3), 1.0,  2.0,  3.0,
+                                 4.0,  5.0,  6.0,
+                                 7.0,  8.0,  9.0,
+                                10.0, 11.0, 12.0)
     println ("a = " + a)
     val svd = new SVD (a)
     val (u, b, v) = svd.bidiagonalization ()

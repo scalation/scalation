@@ -22,7 +22,7 @@ class DualIso (g: Graph, q: Graph)
       extends PatternMatcher (g, q)
 {
     private val duals        = new DualSim2 (g, q)     // object for Dual Simulation algorithm
-    private var t0           = 0.                      // start time for timer
+    private var t0           = 0.0                      // start time for timer
     private var matches      = Set [Array [ISet]] ()   // initialize matches to empty
     private var noBijections = true                    // no results yet
 

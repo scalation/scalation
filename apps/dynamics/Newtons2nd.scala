@@ -28,15 +28,15 @@ import scalation.plot.Plot
 object Newtons2nd extends App
 {
     val n  = 100                                   // maximum number of time points
-    val tm =   5.                                  // simulate for a maximum of tm seconds
+    val tm =   5.0                                  // simulate for a maximum of tm seconds
     val g  =   9.80665                             // gravitational force in meters/second^2
     val m  =  45.93                                // mass of a golf ball in grams
     val aa =  15.00                                // launch angle in degrees
     val ss = 100.00                                // swing speed in miles/hour
     val sf =   1.49                                // smash factor
     val s  = ss * sf * 1609.344 / 3600             // initial ball speed in meters/second
-    val a  = aa * Pi / 180.                        // launch angle in radians
-    val p0 = VectorD (0., 0.)                      // initial position (x, y) at time t0 = 0
+    val a  = aa * Pi / 180.0                        // launch angle in radians
+    val p0 = VectorD (0.0, 0.0)                      // initial position (x, y) at time t0 = 0
     val v0 = VectorD (s * cos(a), s * sin(a))      // initial velocity (v_x, v_y) at t0
 
     println ("ball speed    s  = " + s)
@@ -53,14 +53,14 @@ object Newtons2nd extends App
     val p_r = new MatrixD (n, 2, null); p_r(0) = p0
     val p_d = new MatrixD (n, 2, null); p_d(0) = p0
     val p_e = new MatrixD (n, 2, null); p_e(0) = p0
-    val tt  = new VectorD (n, null);    tt(0)  = 0.
+    val tt  = new VectorD (n, null);    tt(0)  = 0.0
 
     val dt = tm / n                                       // time step
     var t  = dt                                           // next time point to examine
 
     breakable { for (i <- 1 to n) {
         p_e(i) = exactSolution (t)                        // compute new position using EX
-        if (p_e(i, 1) < 0.) { p_e(i, 1) = 0; break }      // quit after hitting the ground
+        if (p_e(i, 1) < 0.0) { p_e(i, 1) = 0; break }      // quit after hitting the ground
 
         p_r(i) = RungeKutta.integrateV (odes, p0, t)      // compute new position using RK
         p_d(i) = DormandPrince.integrateV (odes, p0, t)   // compute new position using DP

@@ -44,7 +44,7 @@ class QRDecomp (a: MatrixD)
             val _norm = q.col(j).norm         // norm of the jth column
             r(j, j) = _norm
 
-            if (_norm != 0.) {
+            if (_norm != 0.0) {
                 for (i <- 0 until m) q(i, j) /= _norm
                 for (k <- j + 1 until n) {
                     r(j, k) = q.col(j) dot q.col(k)
@@ -108,7 +108,7 @@ class QRDecomp (a: MatrixD)
      */
     def nullspaceV: VectorD =
     {
-        val x = new VectorD (n); x(n-1) = 1.         // vector to solve for
+        val x = new VectorD (n); x(n-1) = 1.0         // vector to solve for
         val b = new VectorD (n)                      // new rhs as -r_i,n-1          
         for (i <- 0 until n) b(i) = -r(i, n-1)
         val rr = r.slice (0, n, 0, n-1)              // drop last column
@@ -143,25 +143,25 @@ object QRDecompTest extends App
          println ("a*ns = " + (a*ns))      // check that a*ns = 0
      } // test
 
-     val a1 = new MatrixD ((4, 3), 9.,  0., 26.,
-                                  12.,  0., -7.,
-                                   0.,  4.,  4.,
-                                   0., -3., -3.)
+     val a1 = new MatrixD ((4, 3), 9.0,  0.0, 26.0,
+                                  12.0,  0.0, -7.0,
+                                   0.0,  4.0,  4.0,
+                                   0.0, -3.0, -3.0)
 
-     val a2 = new MatrixD ((2, 2), 2.,  1.,
-                                  -4., -2.)
+     val a2 = new MatrixD ((2, 2), 2.0,  1.0,
+                                  -4.0, -2.0)
 
-     val a3 = new MatrixD ((3, 3), 2.,  1.,  1.,
-                                  -5., -2., -2.,
-                                  -5., -2., -2.)
+     val a3 = new MatrixD ((3, 3), 2.0,  1.0,  1.0,
+                                  -5.0, -2.0, -2.0,
+                                  -5.0, -2.0, -2.0)
 
-     val a4 = new MatrixD ((2, 4), -1., 1., 2.,  4.,
-                                    2., 0., 1., -7.)
+     val a4 = new MatrixD ((2, 4), -1.0, 1.0, 2.0,  4.0,
+                                    2.0, 0.0, 1.0, -7.0)
 
-     val a5 = new MatrixD ((4, 4), -1., 1., 2.,  4.,
-                                    2., 0., 1., -7.,
-                                    2., 0., 1., -7.,
-                                    2., 0., 1., -7.)
+     val a5 = new MatrixD ((4, 4), -1.0, 1.0, 2.0,  4.0,
+                                    2.0, 0.0, 1.0, -7.0,
+                                    2.0, 0.0, 1.0, -7.0,
+                                    2.0, 0.0, 1.0, -7.0)
 
      test (a1)
      test (a2)

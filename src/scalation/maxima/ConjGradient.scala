@@ -38,7 +38,7 @@ class ConjGradient (f: FunctionV2S, g: FunctionV2S = null, ineq: Boolean = true)
     private val DEBUG    = true              // the debug flag
     private val EPSILON  = 1E-9              // number close to zero
     private val MAX_ITER = 500               // maximum number of iterations
-    private val WEIGHT   = 1000.             // weight on penalty for constraint violation
+    private val WEIGHT   = 1000.0             // weight on penalty for constraint violation
 
     private var df: Array [FunctionV2S] = null   // array of partials
     private var pr_cg = true                 // use PR-CG (true) or Steepest-Descent (false)
@@ -58,7 +58,7 @@ class ConjGradient (f: FunctionV2S, g: FunctionV2S = null, ineq: Boolean = true)
      */
     def beta (gr1: VectorD, gr2: VectorD): Double =
     {
-       max (0., (gr2 dot (gr2 - gr1)) / (gr1.normSq + EPSILON))    // PR-CG (Polak-Ribiere)
+       max (0.0, (gr2 dot (gr2 - gr1)) / (gr1.normSq + EPSILON))    // PR-CG (Polak-Ribiere)
     } // beta
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -82,8 +82,8 @@ class ConjGradient (f: FunctionV2S, g: FunctionV2S = null, ineq: Boolean = true)
         if (g == null) {                  // unconstrained
             f(x)
         } else {                          // constrained, g(x) <= 0
-            val penalty = if (ineq) max (g(x), 0.) else abs (g(x))
-            f(x) * (1. - WEIGHT * penalty * penalty)
+            val penalty = if (ineq) max (g(x), 0.0) else abs (g(x))
+            f(x) * (1.0 - WEIGHT * penalty * penalty)
         } // if
     } // fg
 
@@ -141,13 +141,13 @@ object ConjGradientTest extends App
     val x0 = new VectorD (2)
 
     println ("\nMaximize: 10 - (x_0 - 3)^2 - (x_1 - 4)^2 + 1")
-    def f (x: VectorD): Double = 10. - (x(0) - 3.) * (x(0) - 3.) - (x(1) - 4.) * (x(1) - 4.)
+    def f (x: VectorD): Double = 10.0 - (x(0) - 3.0) * (x(0) - 3.0) - (x(1) - 4.0) * (x(1) - 4.0)
     var solver = new ConjGradient (f)
     var x = solver.solve (x0)
     println ("optimal solution x = " + x + " with an objective value f(x) = " + f(x))
 
     println ("\nMaximize: 10 - x_0^4 + (x_0 - 3)^2 + (x_1 - 4)^2")
-    def g (x: VectorD): Double = 10. - pow (x(0), 4.) + (x(0) - 3.) * (x(0) - 3.) + (x(1) - 4.) * (x(1) - 4.)
+    def g (x: VectorD): Double = 10.0 - pow (x(0), 4.0) + (x(0) - 3.0) * (x(0) - 3.0) + (x(1) - 4.0) * (x(1) - 4.0)
     solver = new ConjGradient (g)
     x = solver.solve (x0)
     println ("optimal solution x = " + x + " with an objective value g(x) = " + g(x))

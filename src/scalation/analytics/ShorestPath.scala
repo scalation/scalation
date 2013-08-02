@@ -38,9 +38,9 @@ class ShortestPath (c: MatrixD)
  */
 object ShortestPathTest extends App
 {
-    val d = new MatrixD ((3, 3),   0.,   2., 100.,
-                                 100.,   0.,   3.,
-                                   4., 100.,   0.)
+    val d = new MatrixD ((3, 3),   0.0,   2.0, 100.0,
+                                 100.0,   0.0,   3.0,
+                                   4.0, 100.0,   0.0)
     println (d)
     val sp = new ShortestPath (d)
     sp.spath

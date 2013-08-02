@@ -35,9 +35,9 @@ class BankModel (name: String, nArrivals: Int, arrivalRV: Variate, serviceRV: Va
 {
     //:: define the state variables for the simulation
 
-    var nArr = 0.    // number of customers that have arrived
-    var nIn  = 0.    // number of customers in the bank
-    var nOut = 0.    // number of customers that have finished and left the bank
+    var nArr = 0.0    // number of customers that have arrived
+    var nIn  = 0.0    // number of customers in the bank
+    var nOut = 0.0    // number of customers that have finished and left the bank
 
     //:: define the nodes in the event graph (event prototypes)
 
@@ -61,7 +61,7 @@ class BankModel (name: String, nArrivals: Int, arrivalRV: Variate, serviceRV: Va
      * @param customer  the entity that arrives, in this case a customer
      */
     case class Arrival (customer: Entity)
-         extends Event (protoArrival, customer, aLinks, this, Array (150., 200., 50., 50.))
+         extends Event (protoArrival, customer, aLinks, this, Array (150.0, 200.0, 50.0, 50.0))
     {
         override def occur ()
         {
@@ -77,7 +77,7 @@ class BankModel (name: String, nArrivals: Int, arrivalRV: Variate, serviceRV: Va
      * @param customer  the entity that departs, in this case a customer
      */
     case class Departure (customer: Entity)
-         extends Event (protoDeparture, customer, dLinks, this,  Array (450., 200., 50., 50.))
+         extends Event (protoDeparture, customer, dLinks, this,  Array (450.0, 200.0, 50.0, 50.0))
     {
         override def occur ()
         {
@@ -90,7 +90,7 @@ class BankModel (name: String, nArrivals: Int, arrivalRV: Variate, serviceRV: Va
 
     //:: start the simulation, passing the the first priming event and start time
 
-    simulate (Arrival (null), 0.)
+    simulate (Arrival (null), 0.0)
     Thread.sleep (2000)
     report (Array (("nArr", nArr), ("nIn", nIn), ("nOut", nOut)))
     report ("Arrival", aLinks)

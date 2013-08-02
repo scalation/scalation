@@ -29,7 +29,7 @@ import scalation.linalgebra.VectorD
 trait Minimizer
 {
     protected val EPSILON  = 1E-8          // number close to zero
-    protected val STEP     = 1.            // default initial step size
+    protected val STEP     = 1.0            // default initial step size
     protected val MAX_ITER = 500           // maximum number of major steps/iterations 
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -38,7 +38,7 @@ trait Minimizer
      *  unconstrained  optimization.
      *  @param x  the coordinate values of the current point
      */
-    def fg (x: VectorD): Double = 0.
+    def fg (x: VectorD): Double = 0.0
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform an exact (e.g., GoldenSectionLS) or inexact (e.g., WolfeLS) line search.

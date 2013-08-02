@@ -26,7 +26,7 @@ abstract class PatternMatcher (g: Graph, q: Graph)
     protected val EMPTY      = Array [ISet] ()    // empty result (no match)
     protected val CHECK      = 1024               // check progress after this many matches
     protected val LIMIT      = 1E7                // quit after too many matches
-    protected val ns_per_ms  = 1.E-6              // nanoseconds per millisecond
+    protected val ns_per_ms  = 1.0E-6              // nanoseconds per millisecond
     protected val SELF_LOOPS = false              // whether the directed graph has self-loops
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

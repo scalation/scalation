@@ -1237,19 +1237,19 @@ object MatrixCTest extends App
         println ("\n\tTest MatrixC on real matrices of dim " + l)
         val x = new MatrixC (l, l)
         val y = new MatrixC (l, l)
-        x.set (2.)
-        y.set (3.)
+        x.set (2.0)
+        y.set (3.0)
         println ("x + y  = " + (x + y))
         println ("x - y  = " + (x - y))
         println ("x * y  = " + (x * y))
-        println ("x * 4. = " + (x * Complex (4.)))
+        println ("x * 4. = " + (x * Complex (4.0)))
     } // for
 
     println ("\n\tTest MatrixC on additional operations")
 
-    val z = new MatrixC ((2, 2), 1., 2.,
-                                 3., 2.)
-    val b = VectorC (8., 7.)
+    val z = new MatrixC ((2, 2), 1.0, 2.0,
+                                 3.0, 2.0)
+    val b = VectorC (8.0, 7.0)
     val lu  = z.lud
     val lu2 = z.lud_npp
 
@@ -1265,11 +1265,11 @@ object MatrixCTest extends App
     z *= z                             // in-place matrix multiplication
     println ("z squared = " + z)
 
-    val w = new MatrixC ((2, 3), 2., 3., 5.,
-                                -4., 2., 3.)
-    val v = new MatrixC ((3, 2), 2., -4.,
-                                 3.,  2.,
-                                 5.,  3.)
+    val w = new MatrixC ((2, 3), 2.0, 3.0, 5.0,
+                                -4.0, 2.0, 3.0)
+    val v = new MatrixC ((3, 2), 2.0, -4.0,
+                                 3.0,  2.0,
+                                 5.0,  3.0)
 
     println ("w         = " + w)
     println ("v         = " + v)

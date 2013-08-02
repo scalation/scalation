@@ -64,7 +64,7 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
     private var nn       = MpN + R + 1         // # columns in tableau
     private var jj       = nn - 1              // the last column (b)
     private val MAX_ITER = 200 * N             // maximum number of iterations
-    private var flip     = 1.                  // 1(slack) or -1(surplus) depending on b_i
+    private var flip     = 1.0                  // 1(slack) or -1(surplus) depending on b_i
 
     if (b.dim != M) flaw ("constructor", "b.dim = " + b.dim + " != " + M)
     if (c.dim != N) flaw ("constructor", "c.dim = " + c.dim + " != " + N)
@@ -72,10 +72,10 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
     private val t  = new MatrixD (MM, nn)                // the MM-by-nn simplex tableau
     private var jr = -1                                  // index counter for artificial variables
     for (i <- 0 until M) {
-         flip = if (b(i) < 0.) -1. else 1.
+         flip = if (b(i) < 0.0) -1.0 else 1.0
          t.set (i, a(i))                                 // col x: constraint matrix a
          t(i, N + i) = flip                              // col y: slack/surplus variable matrix s
-         if (flip < 0) { jr += 1; t(i, MpN + jr) = 1. }  // col r: artificial variable matrix r
+         if (flip < 0) { jr += 1; t(i, MpN + jr) = 1.0 }  // col r: artificial variable matrix r
          t(i, jj) = b(i) * flip                          // col b: limit/RHS vector b
     } // for
 
@@ -104,7 +104,7 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
     {
         jr = -1
         for (i <- 0 until M) {
-            if (b(i) >= 0.) {
+            if (b(i) >= 0.0) {
                 x_B(i) = N + i        // put slack variable in basis
             } else {
                 jr += 1
@@ -124,7 +124,7 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
     {
         val b_ = t.col (jj)                                      // updated b column (RHS)
         var k  = -1
-        for (i <- 0 until M if t(i, l) > 0.) {                   // find the pivot row
+        for (i <- 0 until M if t(i, l) > 0.0) {                   // find the pivot row
             if (k == -1) k = i
             else if (b_(i) / t(i, l) <= b_(k) / t(k, l)) k = i   // lower ratio => reset k
         } // for
@@ -196,7 +196,7 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
         var f = Double.NegativeInfinity   // worst possible value for maximization
 
         if (R > 0) {
-            t(M)(MpN until jj) = -1.      // set cost row (M) in the tableau to remove artificials
+            t(M)(MpN until jj) = -1.0      // set cost row (M) in the tableau to remove artificials
         } else {
             t(M)(0 until N) = -c          // set cost row (M) in the tableau to given cost vector
         } // if
@@ -294,13 +294,13 @@ object Simplex2PTest extends App
      */
     def test1 ()
     {
-        val a = new MatrixD ((5, 3), -1.,  1.,  0.,
-                                      1.,  4.,  0.,
-                                      2.,  1.,  0.,
-                                      3., -4.,  0.,
-                                      0.,  0.,  1.)
-        val c = VectorD              (1.,  1.,  1.)
-        val b = VectorD (5., 45., 27., 24., 4.)
+        val a = new MatrixD ((5, 3), -1.0,  1.0,  0.0,
+                                      1.0,  4.0,  0.0,
+                                      2.0,  1.0,  0.0,
+                                      3.0, -4.0,  0.0,
+                                      0.0,  0.0,  1.0)
+        val c = VectorD              (1.0,  1.0,  1.0)
+        val b = VectorD (5.0, 45.0, 27.0, 24.0, 4.0)
         test (a, b, c)
     } // test1
 
@@ -312,11 +312,11 @@ object Simplex2PTest extends App
      */
     def test2 ()
     {
-        val a = new MatrixD ((3, 2),  5., 15.,
-                                      4.,  4.,
-                                     35., 20.)
-        val c = VectorD            ( 13., 23.)
-        val b = VectorD (480., 160., 1190.)
+        val a = new MatrixD ((3, 2),  5.0, 15.0,
+                                      4.0,  4.0,
+                                     35.0, 20.0)
+        val c = VectorD            ( 13.0, 23.0)
+        val b = VectorD (480.0, 160.0, 1190.0)
         test (a, b, c)
     } // test2
 
@@ -329,11 +329,11 @@ object Simplex2PTest extends App
      */
     def test3 ()
     {
-        val a = new MatrixD ((3, 4), .5,  -5.5, -2.5,   9.,
-                                     .5,  -1.5, -0.5,   1.,
-                                    1.0,   0.0,  0.0,   0.)
-        val c = VectorD           (10.0, -57.0, -9.0, -24.)
-        val b = VectorD (0., 0., 1.)
+        val a = new MatrixD ((3, 4), .5,  -5.5, -2.5,   9.0,
+                                     .5,  -1.5, -0.5,   1.0,
+                                    1.0,   0.0,  0.0,   0.0)
+        val c = VectorD           (10.0, -57.0, -9.0, -24.0)
+        val b = VectorD (0.0, 0.0, 1.0)
         test (a, b, c)
     } // test3
 
@@ -346,10 +346,10 @@ object Simplex2PTest extends App
      */
     def test4 ()
     {
-        val a = new MatrixD ((2, 4), -2., -9.,  1.,   9.,
-                                      1.,  1., -1.,  -2.)
-        val c = VectorD              (2.,  3., -1., -12.)
-        val b = VectorD (3., 2.)
+        val a = new MatrixD ((2, 4), -2.0, -9.0,  1.0,   9.0,
+                                      1.0,  1.0, -1.0,  -2.0)
+        val c = VectorD              (2.0,  3.0, -1.0, -12.0)
+        val b = VectorD (3.0, 2.0)
         test (a, b, c)
     } // test4
 
@@ -362,10 +362,10 @@ object Simplex2PTest extends App
      */
     def test5 ()
     {
-        val a = new MatrixD ((2, 2),  2., 3.,
-                                      2., 0.)
-        val c = VectorD              (1., 2.)
-        val b = VectorD (16., -8.)
+        val a = new MatrixD ((2, 2),  2.0, 3.0,
+                                      2.0, 0.0)
+        val c = VectorD              (1.0, 2.0)
+        val b = VectorD (16.0, -8.0)
         test (a, b, c)
     } // test5 ()
 
@@ -378,12 +378,12 @@ object Simplex2PTest extends App
      */
     def test6 ()
     {
-        val a = new MatrixD ((4, 2),  1., 1.,
-                                      5., 9.,
-                                      1., 0.,
-                                      0., 1.)
-        val c = VectorD              (5., 8.)
-        val b = VectorD (6., 45., 1., -5)
+        val a = new MatrixD ((4, 2),  1.0, 1.0,
+                                      5.0, 9.0,
+                                      1.0, 0.0,
+                                      0.0, 1.0)
+        val c = VectorD              (5.0, 8.0)
+        val b = VectorD (6.0, 45.0, 1.0, -5)
         test (a, b, c)
     } // test6 ()
 

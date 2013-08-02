@@ -53,7 +53,7 @@ class CheckLP (a: MatrixD, b: VectorD, c: VectorD)
         if (x.dim != N) flaw ("constructor", "x.dim = " + x.dim + " != " + N)
 
         // non-negativity constraints: check that x >= 0
-        for (j <- 0 until N if x(j) < 0.) {
+        for (j <- 0 until N if x(j) < 0.0) {
             flaw ("isPrimalFeasible", "x(" + j + ") = " + x(j) + " is negative")
             return false
         } // for
@@ -81,7 +81,7 @@ class CheckLP (a: MatrixD, b: VectorD, c: VectorD)
         if (y.dim != M) flaw ("constructor", "y.dim = " + y.dim + " != " + M)
 
         // non-positivity constraints: check that y <= 0
-        for (i <- 0 until M if y(i) > 0.) {
+        for (i <- 0 until M if y(i) > 0.0) {
             flaw ("isDualFeasible", "y(" + i + ") = " + y(i) + " is positive")
             return false
         } // for

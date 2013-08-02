@@ -332,7 +332,7 @@ trait Matrix
         val max   = if (dim1 < dim2) dim1 else dim2      // rank <= min (m, n)
         val u     = lud._2                               // upper triangular matrix
         var count = 0
-        for (i <- 0 until max if this(i, i) != 0.) count += 1
+        for (i <- 0 until max if this(i, i) != 0.0) count += 1
         count
     } // rank
 
