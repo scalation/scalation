@@ -40,7 +40,7 @@ class SSShortestPath (c: Matrix, s: Int)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine the shortest path from vertex s to each vertex j.
      */
-    def spath ()
+    def spath() =
     {
         var go = true                                      // set the go flag to true
         while (go && q.nonEmpty) {
@@ -70,9 +70,9 @@ object SSShortestPathTest extends App
 {
     // dense matrix representation for the graph, where d_ij = distance from i to j
 
-    val d = new MatrixD ((3, 3),   0.,   2., 100.,
-                                 100.,   0.,   3.,
-                                   4., 100.,   0.)
+    val d = new MatrixD ((3, 3),   0.0,   2.0, 100.0,
+                                 100.0,   0.0,   3.0,
+                                   4.0, 100.0,   0.0)
     println (d)
     val sp = new SSShortestPath (d, 0)
     sp.spath
@@ -80,9 +80,9 @@ object SSShortestPathTest extends App
 
     // sparse matrix representation for the graph, where d_ij = distance from i to j
 
-    val d2 = new SparseMatrixD (3, 3, Array (new RowMap ((1, 2.),   (2, 100.)),
-                                             new RowMap ((0, 100.), (2, 3.)),
-                                             new RowMap ((0, 4.),   (1, 100.)) ))
+    val d2 = new SparseMatrixD (3, 3, Array (new RowMap ((1, 2.0),   (2, 100.0)),
+                                             new RowMap ((0, 100.0), (2, 3.0)),
+                                             new RowMap ((0, 4.0),   (1, 100.0)) ))
     println (d2)
     val sp2 = new SSShortestPath (d2, 0)
     sp2.spath

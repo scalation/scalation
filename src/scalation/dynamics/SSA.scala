@@ -23,7 +23,7 @@ import scalation.util.Error
  *  @param x   the matrix giving species population per volume
  *  @param t0  the start time for the simulation
  */
-class SSA (c: MatrixI, r: MatrixI, z: MatrixI, x: MatrixD, t0: Double = 0.)
+class SSA (c: MatrixI, r: MatrixI, z: MatrixI, x: MatrixD, t0: Double = 0.0)
       extends Error
 {
     val L = c.dim1      // the number of sub-volumes
@@ -35,7 +35,7 @@ class SSA (c: MatrixI, r: MatrixI, z: MatrixI, x: MatrixD, t0: Double = 0.)
     if (z.dim1 != R)                flaw ("constructor", "wrong dimensions for x matrix")
     if (x.dim1 != L || x.dim2 != S) flaw ("constructor", "wrong dimensions for x matrix")
 
-    val cut = (.003, 3., 100.)                                 // cut-off values
+    val cut = (.003, 3.0, 100.0)                                 // cut-off values
     val e   = for (l <- 0 until L) yield r(l).sum + c(l).sum   // reaction + diffusion events
     var t   = t0                                               // the simulation clock (current time)
 
@@ -85,9 +85,9 @@ object SSATest extends App
                                   0,  1, -1, -1)     // reaction 4: S2 + S3 -> S1
 
     // initial population for each species (L by S)
-    val x = new MatrixD ((3, 4), 50., 50., 0., 0.,   // initial pop. in sub-vol. 0
-                                  0.,  0., 0., 0.,   // initial pop. in sub-vol. 1
-                                  0.,  0., 0., 0.)   // initial pop. in sub-vol. 1
+    val x = new MatrixD ((3, 4), 50.0, 50.0, 0.0, 0.0,   // initial pop. in sub-vol. 0
+                                  0.0,  0.0, 0.0, 0.0,   // initial pop. in sub-vol. 1
+                                  0.0,  0.0, 0.0, 0.0)   // initial pop. in sub-vol. 1
 
     val pathway = new SSA (c, r, z, x)
     println ("pathway = " + pathway)

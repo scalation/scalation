@@ -720,7 +720,7 @@ class VectorR (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether the predicate pred holds for some element in this vector.
-     *  @param pred  the predicate to test (e.g., "_ == 5.")
+     *  @param pred  the predicate to test (e.g., "_ == 5.0")
      */
     def exists (pred: (Rational) => Boolean): Boolean = v.exists (pred)
 

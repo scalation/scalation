@@ -501,7 +501,7 @@ class MatrixN [T: ClassManifest: Numeric] (val d1: Int,
     {
         val c = new VectorD (dim1)
         for (i <- range1) {
-            var sum = 0.
+            var sum = 0.0
             for (k <- range2) sum += v(i)(k).asInstanceOf [Double] * u(k)
             c(i) = sum
         } // for
@@ -650,7 +650,7 @@ class MatrixN [T: ClassManifest: Numeric] (val d1: Int,
 
         for (i <- u.range1) {
             val pivot = u(i, i)
-            if (pivot == 0.) flaw ("lud_npp", "use lud since you have a zero pivot")
+            if (pivot == 0.0) flaw ("lud_npp", "use lud since you have a zero pivot")
             l(i, i) = _1
             for (j <- i + 1 until u.dim2) l(i, j) = _0
             for (k <- i + 1 until u.dim1) {
@@ -675,7 +675,7 @@ class MatrixN [T: ClassManifest: Numeric] (val d1: Int,
 
         for (i <- u.range1) {
             var pivot = u(i, i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (u, i)   // find the maxiumum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u(i, i)                  // reset the pivot
@@ -704,7 +704,7 @@ class MatrixN [T: ClassManifest: Numeric] (val d1: Int,
 
         for (i <- u.range1) {
             var pivot = u(i, i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (u, i)   // find the maxiumum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u(i, i)                  // reset the pivot
@@ -874,7 +874,7 @@ class MatrixN [T: ClassManifest: Numeric] (val d1: Int,
 
         for (i <- b.range1) {
             val pivot = b.v(i)(i)
-            if (pivot == 0.) flaw ("inverse_npp", "use inverse since you have a zero pivot")
+            if (pivot == 0.0) flaw ("inverse_npp", "use inverse since you have a zero pivot")
             for (j <- b.range2) {
                 b.v(i)(j) /= pivot
                 c.v(i)(j) /= pivot
@@ -901,7 +901,7 @@ class MatrixN [T: ClassManifest: Numeric] (val d1: Int,
 
         for (i <- b.range1) {
             var pivot = b.v(i)(i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 swap (c, i, k, 0)               // in c, swap rows i and k from column 0
@@ -933,7 +933,7 @@ class MatrixN [T: ClassManifest: Numeric] (val d1: Int,
 
         for (i <- b.range1) {
             var pivot = b.v(i)(i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 swap (c, i, k, 0)               // in c, swap rows i and k from column 0
@@ -966,7 +966,7 @@ class MatrixN [T: ClassManifest: Numeric] (val d1: Int,
 
         for (i <- b.range1) {
             var pivot = b.v(i)(i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b.v(i)(i)               // reset the pivot
@@ -994,7 +994,7 @@ class MatrixN [T: ClassManifest: Numeric] (val d1: Int,
 
         for (i <- b.range1) {
             var pivot = b.v(i)(i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b.v(i)(i)               // reset the pivot
@@ -1203,19 +1203,19 @@ object MatrixNTest extends App
         println ("\n\tTest MatrixN on real matrices of dim " + l)
         val x = new MatrixN [Double] (l, l)
         val y = new MatrixN [Double] (l, l)
-        x.set (2.)
-        y.set (3.)
+        x.set (2.0)
+        y.set (3.0)
         println ("x + y  = " + (x + y))
         println ("x - y  = " + (x - y))
         println ("x * y  = " + (x * y))
-        println ("x * 4. = " + (x * 4.))
+        println ("x * 4. = " + (x * 4.0))
     } // for
 
     println ("\n\tTest MatrixN on additional operations")
 
     val z = new MatrixN [Double] (2, 2)
-    z.set (Array (Array (1., 2.), Array (3., 2.)))
-    val b   = VectorN (8., 7.)
+    z.set (Array (Array (1.0, 2.0), Array (3.0, 2.0)))
+    val b   = VectorN (8.0, 7.0)
     val lu  = z.lud
     val lu2 = z.lud_npp
 
@@ -1232,9 +1232,9 @@ object MatrixNTest extends App
     println ("z squared = " + z)
 
     val w = new MatrixN [Double] (2, 3)
-    w.set (Array (Array (2., 3., 5.), Array (-4., 2., 3.)))
+    w.set (Array (Array (2.0, 3.0, 5.0), Array (-4.0, 2.0, 3.0)))
     val v = new MatrixN [Double] (3, 2)
-    v.set (Array (Array (2., -4.), Array (3., 2.), Array (5., 3.)))
+    v.set (Array (Array (2.0, -4.0), Array (3.0, 2.0), Array (5.0, 3.0)))
 
     println ("w         = " + w)
     println ("v         = " + v)

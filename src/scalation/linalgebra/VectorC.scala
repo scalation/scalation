@@ -86,7 +86,7 @@ class VectorC (val dim: Int,
     } // _oneAt
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a ramp-up vector of increasing values: 0, 1, 2, ..., size - 1.
+    /** Create a ramp-up vector of increasing values: 0, 1, 2, ..., size - 1.0
      *  @param size  the size of the vector (upper bound = size - 1)
      */
     def ramp (size: Int = dim): VectorC =
@@ -702,7 +702,7 @@ class VectorC (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether the predicate pred holds for some element in this vector.
-     *  @param pred  the predicate to test (e.g., "_ == 5.")
+     *  @param pred  the predicate to test (e.g., "_ == 5.0")
      */
     def exists (pred: (Complex) => Boolean): Boolean = v.exists (pred)
 
@@ -846,7 +846,7 @@ object VectorCTest extends App
     var y:  VectorC = null
     val z = VectorC (_0, _1)
     println ("z = " + z)
-    val c = Complex (4.)
+    val c = Complex (4.0)
 
     for (l <- 1 to 4) {
         println ("\n\tTest VectorC on complex vectors of dim " + l)

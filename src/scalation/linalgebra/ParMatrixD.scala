@@ -448,7 +448,7 @@ class ParMatrixD (val d1: Int,
         val c = new ParMatrixD (dim1, b.dim2)
         val t = b.t                         // transpose the b matrix
         for (i <- range1.par; j <- c.range2.par) {
-            var sum = 0.
+            var sum = 0.0
             for (k <- range2) sum += v(i)(k) * t.v(j)(k)
             c.v(i)(j) = sum
         } // for
@@ -465,7 +465,7 @@ class ParMatrixD (val d1: Int,
         for (i <- (0 until dim1 by granularity).par) {
             var end = i + granularity; if (i + granularity >= dim1) end = dim1
             for (ii <- i until end) {
-                var sum = 0.
+                var sum = 0.0
                 for (k <- range2) sum += v(ii)(k) * u(k)
                 c(ii) = sum
             } // for
@@ -502,7 +502,7 @@ class ParMatrixD (val d1: Int,
             val row_i = new VectorD (dim2)            // save ith row so not overwritten
             for (j <- range2) row_i(j) = v(i)(j)      // copy values from ith row of this matrix
             for (j <- range2) {
-                var sum = 0.
+                var sum = 0.0
                 for (k <- range2) sum += row_i(k) * t.v(j)(k)
                 v(i)(j) = sum
             } // for
@@ -531,7 +531,7 @@ class ParMatrixD (val d1: Int,
     {
         val c = new ParMatrixD (dim1, b.dim2)
         for (i <- range1.par; j <- c.range2.par) {
-            var sum = 0.
+            var sum = 0.0
             for (k <- range2) sum += v(i)(k) * b.v(k)(j)
             c.v(i)(j) = sum
         } // for
@@ -553,7 +553,7 @@ class ParMatrixD (val d1: Int,
             val row_i = new VectorD (dim2)            // save ith row so not overwritten
             for (j <- range2) row_i(j) = v(i)(j)      // copy values from ith row of this matrix
             for (j <- range2) {
-                var sum = 0.
+                var sum = 0.0
                 for (k <- range2) sum += row_i(k) * bb.v(k)(j)
                 v(i)(j) = sum
             } // for
@@ -672,7 +672,7 @@ class ParMatrixD (val d1: Int,
 
         val c = new ParMatrixD (dim1, dim1)
         for (i <- range1.par; j <- range1) {
-            var sum = 0.
+            var sum = 0.0
             for (k <- range1) sum += v(i)(k) * v(k)(j)
             c.v(i)(j) = sum
         } // for
@@ -713,9 +713,9 @@ class ParMatrixD (val d1: Int,
 
         for (i <- u.range1) {
             val pivot = u(i, i)
-            if (pivot == 0.) flaw ("lud_npp", "use lud since you have a zero pivot")
-            l(i, i) = 1.
-            for (j <- i + 1 until u.dim2) l(i, j) = 0.
+            if (pivot == 0.0) flaw ("lud_npp", "use lud since you have a zero pivot")
+            l(i, i) = 1.0
+            for (j <- i + 1 until u.dim2) l(i, j) = 0.0
             for (k <- i + 1 until u.dim1) {
                 val mul = u(k, i) / pivot
                 l(k, i) = mul
@@ -737,13 +737,13 @@ class ParMatrixD (val d1: Int,
 
         for (i <- u.range1) {
             var pivot = u(i, i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (u, i)   // find the maxiumum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u(i, i)                  // reset the pivot
             } // if
-            l(i, i) = 1.
-            for (j <- i + 1 until u.dim2) l(i, j) = 0.
+            l(i, i) = 1.0
+            for (j <- i + 1 until u.dim2) l(i, j) = 0.0
             for (k <- ((i + 1) until dim1 by granularity).par){
                 var end = k + granularity; if (k + granularity >= dim1) end = dim1 
                 for (kk <- k until end) {
@@ -768,13 +768,13 @@ class ParMatrixD (val d1: Int,
 
         for (i <- u.range1) {
             var pivot = u(i, i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (u, i)   // find the maxiumum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u(i, i)                  // reset the pivot
             } // if
-            l(i, i) = 1.
-            for (j <- i + 1 until u.dim2) l(i, j) = 0.
+            l(i, i) = 1.0
+            for (j <- i + 1 until u.dim2) l(i, j) = 0.0
             for (k <- i + 1 until u.dim1) {
                 val mul = u(k, i) / pivot
                 l(k, i) = mul
@@ -870,7 +870,7 @@ class ParMatrixD (val d1: Int,
         for (i <- 0 until m; j <- 0 until n) {
             c.v(i)(j) = if (i <  dim1 && j <  dim2) v(i)(j)
                    else if (i >= dim1 && j >= dim2) b.v(i-dim1)(j-dim2)
-                      else                          0.
+                      else                          0.0
         } // for
         c
     } // diag
@@ -889,7 +889,7 @@ class ParMatrixD (val d1: Int,
         val c = new ParMatrixD (n, n)
 
         for (i <- 0 until n; j <- 0 until n) {
-            c.v(i)(j) = if (i < p || i > p + dim1) if (i == j) 1. else 0.
+            c.v(i)(j) = if (i < p || i > p + dim1) if (i == j) 1.0 else 0.0
                         else                       v(i-p)(j-p)
         } // for
         c
@@ -930,11 +930,11 @@ class ParMatrixD (val d1: Int,
     def inverse_npp: ParMatrixD =
     {
         val b = new ParMatrixD (this)              // copy this matrix into b
-        val c = new ParMatrixD (dim1, 1., 0.)   // let c represent the augmentation
+        val c = new ParMatrixD (dim1, 1.0, 0.0)   // let c represent the augmentation
 
         for (i <- b.range1) {
             val pivot = b.v(i)(i)
-            if (pivot == 0.) flaw ("inverse_npp", "use inverse since you have a zero pivot")
+            if (pivot == 0.0) flaw ("inverse_npp", "use inverse since you have a zero pivot")
             for (j <- b.range2) {
                 b.v(i)(j) /= pivot
                 c.v(i)(j) /= pivot
@@ -956,11 +956,11 @@ class ParMatrixD (val d1: Int,
     def inverse: ParMatrixD =
     {
         val b = new ParMatrixD (this)              // copy this matrix into b
-        val c = new ParMatrixD (dim1, 1., 0.)      // let c represent the augmentation
+        val c = new ParMatrixD (dim1, 1.0, 0.0)      // let c represent the augmentation
 
         for (i <- b.range1) {
             var pivot = b.v(i)(i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 swap (c, i, k, 0)               // in c, swap rows i and k from column 0
@@ -989,11 +989,11 @@ class ParMatrixD (val d1: Int,
     def inverse_ip: ParMatrixD =
     {
         val b = this                                // use this matrix for b
-        val c = new ParMatrixD (dim1, 1., 0.)   // let c represent the augmentation
+        val c = new ParMatrixD (dim1, 1.0, 0.0)   // let c represent the augmentation
 
         for (i <- b.range1) {
             var pivot = b.v(i)(i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 swap (c, i, k, 0)               // in c, swap rows i and k from column 0
@@ -1025,7 +1025,7 @@ class ParMatrixD (val d1: Int,
         val b = new ParMatrixD (this)    // copy this matrix into b
         for (i <- b.range1) {
             var pivot = b.v(i)(i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b.v(i)(i)               // reset the pivot
@@ -1050,7 +1050,7 @@ class ParMatrixD (val d1: Int,
         val b = this         // use this matrix for b
         for (i <- b.range1) {
             var pivot = b.v(i)(i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b.v(i)(i)               // reset the pivot
@@ -1072,8 +1072,8 @@ class ParMatrixD (val d1: Int,
      */
     def clean (thres: Double, relative: Boolean = true): ParMatrixD =
     {
-        val s = if (relative) mag else 1.             // use matrix magnitude or 1
-        for (i <- range1; j <- range2) if (abs (v(i)(j)) <= thres * s) v(i)(j) = 0.
+        val s = if (relative) mag else 1.0             // use matrix magnitude or 1
+        for (i <- range1; j <- range2) if (abs (v(i)(j)) <= thres * s) v(i)(j) = 0.0
         this
     } // clean
 
@@ -1088,7 +1088,7 @@ class ParMatrixD (val d1: Int,
     {
         if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
 
-        reduce.col(dim2 - 1) * -1. ++ 1.
+        reduce.col(dim2 - 1) * -1.0 ++ 1.0
     } // nullspace
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1103,7 +1103,7 @@ class ParMatrixD (val d1: Int,
         if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
 
         reduce_ip
-        col(dim2 - 1) * -1. ++ 1.
+        col(dim2 - 1) * -1.0 ++ 1.0
     } // nullspace_ip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1115,7 +1115,7 @@ class ParMatrixD (val d1: Int,
     {
         if ( ! isSquare) flaw ("trace", "trace only works on square matrices")
 
-        var sum = 0.
+        var sum = 0.0
         for (i <- range1) sum += v(i)(i)
         sum
     } // trace
@@ -1125,7 +1125,7 @@ class ParMatrixD (val d1: Int,
      */
     def sum: Double =
     {
-        var sum = 0.
+        var sum = 0.0
         for (i <- range1; j <- range2) sum += v(i)(j)
         sum
     } // sum
@@ -1135,7 +1135,7 @@ class ParMatrixD (val d1: Int,
      */
     def sumLower: Double =
     {
-        var sum = 0.
+        var sum = 0.0
         for (i <- range1; j <- 0 until i) sum += v(i)(j)
         sum
     } // sumLower
@@ -1146,7 +1146,7 @@ class ParMatrixD (val d1: Int,
      */
     def sumAbs: Double =
     {
-        var sum = 0.
+        var sum = 0.0
         for (i <- range1; j <- range2) sum += abs (v(i)(j))
         sum
     } // sumAbs
@@ -1171,7 +1171,7 @@ class ParMatrixD (val d1: Int,
     {
         if ( ! isSquare) flaw ("det", "determinant only works on square matrices")
 
-        var sum = 0.
+        var sum = 0.0
         var b: ParMatrixD = null
         for (j <- range2) {
             b = sliceExclude (0, j)   // the submatrix that excludes row 0 and column j
@@ -1196,7 +1196,7 @@ class ParMatrixD (val d1: Int,
      */
     def isNonnegative: Boolean =
     {
-        for (i <- range1; j <- range2 if v(i)(j) < 0.) return false
+        for (i <- range1; j <- range2 if v(i)(j) < 0.0) return false
         true
     } // isNonegative
 
@@ -1341,19 +1341,19 @@ object ParMatrixDTest extends App
         println ("\n\tTest ParMatrixD on real matrices of dim " + l)
         val x = new ParMatrixD (l, l)
         val y = new ParMatrixD (l, l)
-        x.set (2.)
-        y.set (3.)
+        x.set (2.0)
+        y.set (3.0)
         println ("x + y  = " + (x + y))
         println ("x - y  = " + (x - y))
         println ("x * y  = " + (x * y))
-        println ("x * 4. = " + (x * 4.))
+        println ("x * 4. = " + (x * 4.0))
     } // for
 
     println ("\n\tTest ParMatrixD on additional operations")
 
-    val z   = new ParMatrixD ((2, 2), 1., 2.,
-                                      3., 2.)
-    val b   = VectorD (8., 7.)
+    val z   = new ParMatrixD ((2, 2), 1.0, 2.0,
+                                      3.0, 2.0)
+    val b   = VectorD (8.0, 7.0)
     val lu  = z.lud
     val lu2 = z.lud_npp
 
@@ -1369,11 +1369,11 @@ object ParMatrixDTest extends App
     z *= z                             // in-place matrix multiplication
     println ("z squared = " + z)
 
-    val w = new ParMatrixD ((2, 3), 2., 3., 5., 
-                                   -4., 2., 3.)
-    val v = new ParMatrixD ((3, 2), 2., -4., 
-                                    3.,  2., 
-                                    5.,  3.)
+    val w = new ParMatrixD ((2, 3), 2.0, 3.0, 5.0,
+                                   -4.0, 2.0, 3.0)
+    val v = new ParMatrixD ((3, 2), 2.0, -4.0,
+                                    3.0,  2.0,
+                                    5.0,  3.0)
 
     println ("w         = " + w)
     println ("v         = " + v)

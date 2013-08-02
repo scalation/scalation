@@ -107,7 +107,7 @@ object Calculus
         val c = new VectorD (x.dim)
         for (i <- 0 until x.dim) {
             c(i) = if (i < n) (f(x + (h, i)) - f(x - (h, i))) / h2   // derivative
-                   else       (f(x + (1, i)) - f(x - (1, i))) / 2.   // difference
+                   else       (f(x + (1, i)) - f(x - (1, i))) / 2.0   // difference
         } // for
         c
     } // slope
@@ -136,7 +136,7 @@ object Calculus
      *  @param f  the function whose second derivative is sought
      *  @param x  the point (scalar) at which to estimate the derivative
      */
-    def derivative2 (f: FunctionS2S, x: Double): Double = (f(x + h) - 2.*f(x) + f(x - h)) / hh
+    def derivative2 (f: FunctionS2S, x: Double): Double = (f(x + h) - 2.0*f(x) + f(x - h)) / hh
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Estimate the (i,j)th second partial derivative of the vector-to-scalar
@@ -150,8 +150,8 @@ object Calculus
      */
     def partial2 (f: FunctionV2S, x: VectorD, i: Int, j: Int): Double = 
     {
-        if (i == j) (f(x + (h, i)) - 2.*f(x) + f(x - (h, i))) / hh        // pure partial
-        else 0. // FIX: (f(x + (h, i, j)) - 2.*f(x) + f(x - (h, i, j))) / hh   // cross partial
+        if (i == j) (f(x + (h, i)) - 2.0*f(x) + f(x - (h, i))) / hh        // pure partial
+        else 0.0 // FIX: (f(x + (h, i, j)) - 2.0*f(x) + f(x - (h, i, j))) / hh   // cross partial
     } // partial2
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -174,8 +174,8 @@ object Calculus
      */
     def laplacian (f: FunctionV2S, x: VectorD): Double =
     {
-        var sum = 0.
-        for (i <- 0 until x.dim) sum += (f(x + (h, i)) - 2.*f(x) + f(x - (h, i))) / hh
+        var sum = 0.0
+        for (i <- 0 until x.dim) sum += (f(x + (h, i)) - 2.0*f(x) + f(x - (h, i))) / hh
         sum
     } // laplacian
 
@@ -189,22 +189,22 @@ object CalculusTest extends App
 {
     import Calculus._
 
-    def g (y: Double): Double = 2. * (y - 3.) * (y - 3.)
+    def g (y: Double): Double = 2.0 * (y - 3.0) * (y - 3.0)
 
-    var y = 0.
+    var y = 0.0
     println ("derivative  g(" + y + ") = " + derivative (g, y))
-    y = 1.
+    y = 1.0
     println ("derivative  g(" + y + ") = " + derivative (g, y))
 
-    def f (x: VectorD): Double = 2. * (x(0) - 3.) * (x(0) - 3.) + (x(1) - 4.) * (x(1) - 4.)
-    def df_dx0 (x: VectorD): Double = 4. * x(0) - 12.
-    def df_dx1 (x: VectorD): Double = 2. * x(1) - 8.
+    def f (x: VectorD): Double = 2.0 * (x(0) - 3.0) * (x(0) - 3.0) + (x(1) - 4.0) * (x(1) - 4.0)
+    def df_dx0 (x: VectorD): Double = 4.0 * x(0) - 12.0
+    def df_dx1 (x: VectorD): Double = 2.0 * x(1) - 8.0
     val df = Array [FunctionV2S] (df_dx0, df_dx1)
 
-    var x = VectorD (0., 0.)
+    var x = VectorD (0.0, 0.0)
     println ("gradient  f(" + x + ") = " + gradient (f, x))
     println ("gradientD f(" + x + ") = " + gradientD (df, x))
-    x = VectorD (1., 1.)
+    x = VectorD (1.0, 1.0)
     println ("gradient  f(" + x + ") = " + gradient (f, x))
     println ("gradientD f(" + x + ") = " + gradientD (df, x))
 
@@ -230,7 +230,7 @@ object CalculusTest2 extends App
 
     def d (x: Double): Double = cos (x)      // its derivative
 
-    var x = Array (0., .1, .2, .3, .4, .5, .6, .7, .8, .9)
+    var x = Array (0.0, .1, .2, .3, .4, .5, .6, .7, .8, .9)
     for (i <- 0 until x.length) {
         var hh = 1E-4
         println (" x \t\t h \t\t deriv \t\t 1-sided \t\t error \t\t 2-sided \t\t error")
@@ -238,7 +238,7 @@ object CalculusTest2 extends App
             resetH (hh)
             val (d0, d1, d2) = (d(x(i)), derivative1 (f, x(i)), derivative (f, x(i)))
             println (x(i) + "\t" + hh + "\t" + d0 + "\t" + d1 + "\t" + abs (d1-d0) + "\t" + d2 + "\t" + abs (d2-d0))
-            hh /= 10.
+            hh /= 10.0
         } // for
         println ()
     } // for

@@ -75,7 +75,7 @@ case class Random (stream: Int = 0)
 
     /** The reciprocal of the modulus
      */
-    private val one_by_m: Double = 1. / m.asInstanceOf [Double]
+    private val one_by_m: Double = 1.0 / m.asInstanceOf [Double]
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the mean for the random number generator's gen method.

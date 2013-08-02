@@ -64,12 +64,12 @@ class Plot (x: VectorD, y: VectorD, z: VectorD = null, _title: String = "Plot y 
             super.paintComponent (g2d)
             var x_pos = 0
             var y_pos = 0
-            var step  = 0.
+            var step  = 0.0
 
             //:: Draw the axes
 
             g2d.setPaint (black)
-            g2d.setStroke (new BasicStroke (2.f))
+            g2d.setStroke (new BasicStroke (2.0f))
             axis.setLine (baseX - 1, baseY + 1, baseX + 10 + frameW - 2 * offset, baseY + 1)
             g2d.draw (axis)
             axis.setLine (baseX - 1, offset - 10, baseX - 1, baseY + 1)
@@ -150,12 +150,12 @@ class Plot (x: VectorD, y: VectorD, z: VectorD = null, _title: String = "Plot y 
 object PlotTest extends App
 {
 /*
-    val x = VectorD (0., 1., 2., 3.,  4.,  5.,  6., 7., 8., 9., 10.)
-    val y = VectorD (0., 1., 4., 9., 16., 25., 16., 9., 4., 1.,  0.)
+    val x = VectorD (0.0, 1.0, 2.0, 3.0,  4.0,  5.0,  6.0, 7.0, 8.0, 9.0, 10.0)
+    val y = VectorD (0.0, 1.0, 4.0, 9.0, 16.0, 25.0, 16.0, 9.0, 4.0, 1.0,  0.0)
 */
     val x = new VectorD (100)
     val y = new VectorD (100)
-    for (i <- 0 until 100) { x(i) = i / 10.; y(i) = pow (x(i) - 5, 2) }
+    for (i <- 0 until 100) { x(i) = i / 10.0; y(i) = pow (x(i) - 5, 2) }
     val plot = new Plot (x, y)
     println ("plot = " + plot)
 

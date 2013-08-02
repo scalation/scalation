@@ -36,11 +36,11 @@ class LogitRegression (x: MatrixD, y: VectorI)
     private val DEBUG      = false                   // debug flag
     private val k          = x.dim2 - 1              // number of variables 
     private val n          = x.dim1.toDouble         // number of data points (rows)
-    private val r_df       = (n-1.) / (n-k-1.)       // ratio of degrees of freedom
+    private val r_df       = (n-1.0) / (n-k-1.0)       // ratio of degrees of freedom
     private var b: VectorD = null                    // parameter vector (b0, b1, ... bk)
-    private var rSquared   = -1.                     // coefficient of determination (quality of fit)
-    private var rBarSq     = -1.                     // Adjusted R-squared
-    private var fStat      = -1.                     // F statistic (quality of fit)
+    private var rSquared   = -1.0                     // coefficient of determination (quality of fit)
+    private var rBarSq     = -1.0                     // Adjusted R-squared
+    private var fStat      = -1.0                     // F statistic (quality of fit)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the log of the odds of an event ocurring (e.g., success, 1).
@@ -52,7 +52,7 @@ class LogitRegression (x: MatrixD, y: VectorI)
     /** Compute the inverse of the logit function.
      *  @param a  the logit value
      */
-    def logitInv (a: Double): Double = 1. / (1. + exp (-a))
+    def logitInv (a: Double): Double = 1.0 / (1.0 + exp (-a))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** For a given parameter vector b, compute -2 * Log-Likelihood (-2LL).
@@ -62,12 +62,12 @@ class LogitRegression (x: MatrixD, y: VectorI)
      */
     def ll (b: VectorD): Double =
     {
-        var sum = 0.
+        var sum = 0.0
         for (i <- 0 until x.dim1) {
             val bx = b dot x(i)
-            sum += y(i) * bx - log (1. + exp (bx))
+            sum += y(i) * bx - log (1.0 + exp (bx))
         } // for
-        -2. * sum                               // set up for minimization
+        -2.0 * sum                               // set up for minimization
     } // ll
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -94,11 +94,11 @@ class LogitRegression (x: MatrixD, y: VectorI)
         b        = x_pinv * y                        // parameter vector (b0, b1, ... bk)
         val e    = y - x * b                         // residual/error vector
         val sse  = e dot e                           // residual/error sum of squares
-        val sst  = (y dot y) - y.sum~^2. / n         // total sum of squares
+        val sst  = (y dot y) - y.sum~^2.0 / n         // total sum of squares
         val ssr  = sst - sse                         // regression sum of squares
         rSquared = ssr / sst                         // coefficient of determination (R-squared)
-        rBarSq   = 1. - (1.-rSquared) * r_df         // R-bar-squared (adjusted R-squared)
-        fStat    = ssr * (n-k-1.)  / (sse * k)       // F statistic (msr / mse)
+        rBarSq   = 1.0 - (1.0-rSquared) * r_df         // R-bar-squared (adjusted R-squared)
+        fStat    = ssr * (n-k-1.0)  / (sse * k)       // F statistic (msr / mse)
     } // train
      */
 
@@ -113,11 +113,11 @@ class LogitRegression (x: MatrixD, y: VectorI)
         b        = x_pinv * yy                       // parameter vector (b0, b1, ... bk)
         val e    = yy - x * b                        // residual/error vector
         val sse  = e dot e                           // residual/error sum of squares
-        val sst  = (yy dot yy) - yy.sum~^2. / n      // total sum of squares
+        val sst  = (yy dot yy) - yy.sum~^2.0 / n      // total sum of squares
         val ssr  = sst - sse                         // regression sum of squares
         rSquared = ssr / sst                         // coefficient of determination
-        rBarSq   = 1. - (1.-rSquared) * r_df         // R-bar-squared (adjusted R-squared)
-        fStat    = ssr * (n-k-1.)  / (sse * k)       // F statistic (msr / mse)
+        rBarSq   = 1.0 - (1.0-rSquared) * r_df         // R-bar-squared (adjusted R-squared)
+        fStat    = ssr * (n-k-1.0)  / (sse * k)       // F statistic (msr / mse)
     } // train
      */
 
@@ -128,7 +128,7 @@ class LogitRegression (x: MatrixD, y: VectorI)
 
    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
-     *  i.e., (b0, b1) dot (1., z1).
+     *  i.e., (b0, b1) dot (1.0, z1).
      *  @param z  the new vector to predict
      */
     def predict (z: VectorD): Double = b dot z
@@ -149,8 +149,8 @@ class LogitRegression (x: MatrixD, y: VectorI)
     {
         var j_max   = -1                     // index of variable to eliminate
         var b_max: VectorD = null            // parameter values for best solution
-        var rSq_max = -1.                    // currently maximizing R squared
-        var fS_max  = -1.                    // could optimize on F statistic
+        var rSq_max = -1.0                    // currently maximizing R squared
+        var fS_max  = -1.0                    // could optimize on F statistic
 
         for (j <- 1 to k) {
             val keep = n.toInt               // i-value large enough to not exclude any rows in slice
@@ -177,7 +177,7 @@ class LogitRegression (x: MatrixD, y: VectorI)
             val x_j  = x.col(j)                                           // x_j is jth column in x
             val rg_j = new LogitRegression (x.sliceExclude (keep, j), x_j)     // regress with x_j removed
             rg_j.train ()
-            vifV(j-1) =  1. / (1. - rg_j.fit._2)                      // store vif for x_1 in vifV(0)
+            vifV(j-1) =  1.0 / (1.0 - rg_j.fit._2)                      // store vif for x_1 in vifV(0)
         } // for
         vifV
     } // vif
@@ -245,7 +245,7 @@ object LogitRegressionTest extends App
     rg.train ()
     println ("fit = " + rg.fit)
 
-    val z  = VectorD (1., 100., 100., 100.)         // predict y for one point
+    val z  = VectorD (1.0, 100.0, 100.0, 100.0)         // predict y for one point
     val yp = rg.predict (z)
     println ("predict (" + z + ") = " + yp)
 

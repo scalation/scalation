@@ -18,7 +18,7 @@ import scalation.util.Error
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class is used to solve parabolic partial differential equations like
  *  the Heat Equation.  Let u(x, t) = temperature of a rod at position 0 <= x <= xm
- *  and time t > 0.  Numerically solve the
+ *  and time t > 0.0  Numerically solve the
  *  Heat Equation:           u_t = k * u_xx
  *  with initial conditions  u(x, 0) = ic(x)
  *      boundary conditions  (u(0, t), u(xm, t)) = bc
@@ -54,12 +54,12 @@ class ParabolicPDE (k: Double, dt: Double, dx: Double, xm: Double,
         u(0, 0) = bc._1; u(nx-1, 0) = bc._2                  // apply boundary conditions
         u(0, 1) = bc._1; u(nx-1, 1) = bc._2                  // apply boundary conditions (to both)
 
-        println ("at t = " + 0. + ": \tu = " + u.col(j1))
+        println ("at t = " + 0.0 + ": \tu = " + u.col(j1))
 
         for (j <- 1 until nt) {                              // iterative over t = j*dt
             for (i <- 1 until nx-1) {                        // iterative over x = i*dx
                                                              // explicit recurrence equation
-                u(i, j2) = u(i, j1) + r * (u(i-1, j1) - 2.*u(i, j1) + u(i+1, j1))
+                u(i, j2) = u(i, j1) + r * (u(i-1, j1) - 2.0*u(i, j1) + u(i+1, j1))
 
             } // for
             println ("at t = " + j*dt + ": \tu = " + u.col(j2))
@@ -74,8 +74,8 @@ class ParabolicPDE (k: Double, dt: Double, dx: Double, xm: Double,
      *  This method uses the implicit Crank-Nicolson technique to solve the PDE,
      *  which provides greater stability and accuracy.
      *  Implicit recurrence equation:
-     *      -r*u(i-1, j2) + 2.*(1.+r)*u(i, j2) - r*u(i+1, j2) =
-     *       r*u(i-1, j1) + 2.*(1.-r)*u(i, j1) + r*u(i+1, j1)
+     *      -r*u(i-1, j2) + 2.0*(1.0+r)*u(i, j2) - r*u(i+1, j2) =
+     *       r*u(i-1, j1) + 2.0*(1.0-r)*u(i, j1) + r*u(i+1, j1)
      *  This equation is solved simultaneously:  solve for u in mat * u = vec
      *  @see people.sc.fsu.edu/~jpeterson/5-CrankNicolson.pdf
      *  @param t  the time the solution is desired
@@ -91,14 +91,14 @@ class ParabolicPDE (k: Double, dt: Double, dx: Double, xm: Double,
         val mat = formMatrix (r, mx)                         // coefficients for next time point
         val vec = new VectorD (mx)                           // to hold values from current time point
 
-        println ("at t = " + 0. + ": \tu = " + u)
+        println ("at t = " + 0.0 + ": \tu = " + u)
 
         for (j <- 1 until nt) {                              // iterative over time t = j*dt
-            vec(0)    = 2.*(1.-r)*u(1) + r*u(2) + 2.*r*bc._1
-            vec(mx-1) = r*u(mx-1) + 2.*(1.-r)*u(mx) + 2.*r*bc._2
+            vec(0)    = 2.0*(1.0-r)*u(1) + r*u(2) + 2.0*r*bc._1
+            vec(mx-1) = r*u(mx-1) + 2.0*(1.0-r)*u(mx) + 2.0*r*bc._2
 
             for (i <- 1 until mx-1) {                        // iterative over position x = i*dx
-                vec(i) = r*u(i) + 2.*(1.-r)*u(i+1) + r*u(i+2)
+                vec(i) = r*u(i) + 2.0*(1.0-r)*u(i+1) + r*u(i+2)
             } // for
 
 //          println ("mat = " + mat + "\nvec = " + vec)
@@ -118,7 +118,7 @@ class ParabolicPDE (k: Double, dt: Double, dx: Double, xm: Double,
         val mat = new MatrixD (mx, mx)
         for (i <- 0 until mx) {
             if (i > 0) mat(i, i-1) = -r                       // sub-digonal
-            mat(i, i) = 2.*(1.+r)                             // diagonal
+            mat(i, i) = 2.0*(1.0+r)                             // diagonal
             if (i < mx-1) mat(i, i+1) = -r                    // super-diagonal
         } // for
         mat
@@ -135,20 +135,20 @@ class ParabolicPDE (k: Double, dt: Double, dx: Double, xm: Double,
 object ParabolicPDETest extends App
 {
     val k  = 0.82                                     // thermal conductivity in cal/s*cm*0C
-    val dt = 2.                                       // delta t in sec
+    val dt = 2.0                                       // delta t in sec
     val dx = 2.5                                      // delta x in cm
-    val xm = 10.                                      // length of rod in cm
+    val xm = 10.0                                      // length of rod in cm
 
-    def ic (x: Double): Double = 0.                   // initial conditions
-    val bc = (100., 50.)                              // boundary conditions
+    def ic (x: Double): Double = 0.0                   // initial conditions
+    val bc = (100.0, 50.0)                              // boundary conditions
 
     val pde = new ParabolicPDE (k, dt, dx, xm, ic, bc)
 
     println (" Explicit Finite Difference ------------------------------------------")
-    println ("solution = " + pde.solve (60.))           // solve for t = 2, 4, ... sec
+    println ("solution = " + pde.solve (60.0))           // solve for t = 2, 4, ... sec
 
     println (" Implicit Crank-Nicholson --------------------------------------------")
-    println ("solution = " + pde.solveCN (60.))         // solve for t = 2, 4, ... sec
+    println ("solution = " + pde.solveCN (60.0))         // solve for t = 2, 4, ... sec
 
 } // ParabolicPDETest
 

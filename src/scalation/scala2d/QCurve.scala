@@ -28,16 +28,16 @@ import scalation.util.Error
  * @param p2        the ending point for the quad curve
  * @param straight  whether the quad curve is straight (i.e., a line)
  */
-case class QCurve (var p1:       R2      = R2 (0., 0.),
-                   var pc:       R2      = R2 (0., 0.),
-                   var p2:       R2      = R2 (0., 0.),
+case class QCurve (var p1:       R2      = R2 (0.0, 0.0),
+                   var pc:       R2      = R2 (0.0, 0.0),
+                   var p2:       R2      = R2 (0.0, 0.0),
                    var straight: Boolean = true)
      extends java.awt.geom.QuadCurve2D.Double (p1.x, p1.y, pc.x, pc.y, p2.x, p2.y)
      with CurvilinearShape with Error
 {
     /** Trajectory parameter t ranges from 0. to 1. (indicates how far along the curve)
      */
-    private var t = 0.
+    private var t = 0.0
 
     /** Number of discrete steps to take along trajectory
      */
@@ -81,8 +81,8 @@ case class QCurve (var p1:       R2      = R2 (0., 0.),
      */
     def getCenterX (): Double =
     {
-        if (pc.x > 0.) (p1.x + 2. * pc.x + p2.x) / 4.
-        else           (p1.x + p2.x) / 2.
+        if (pc.x > 0.0) (p1.x + 2.0 * pc.x + p2.x) / 4.0
+        else           (p1.x + p2.x) / 2.0
     } // getCenterX
 
     /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -90,8 +90,8 @@ case class QCurve (var p1:       R2      = R2 (0., 0.),
      */
     def getCenterY (): Double =
     {
-        if (pc.y > 0.) (p1.y + 2. * pc.y + p2.y) / 4.
-        else           (p1.y + p2.y) / 2.
+        if (pc.y > 0.0) (p1.y + 2.0 * pc.y + p2.y) / 4.0
+        else           (p1.y + p2.y) / 2.0
     } // getCenterY
 
     /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -148,7 +148,7 @@ case class QCurve (var p1:       R2      = R2 (0., 0.),
      */
     def getFirst (width: Double, height: Double): R2 = 
     {
-        R2 (p1.x + width / 2., p1.y + height / 2.)
+        R2 (p1.x + width / 2.0, p1.y + height / 2.0)
     } // getFirst
 
     /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -169,7 +169,7 @@ case class QCurve (var p1:       R2      = R2 (0., 0.),
      */
     def getLast (width: Double, height: Double): R2 = 
     {
-        R2 (p2.x + width / 2., p2.y + height / 2.)
+        R2 (p2.x + width / 2.0, p2.y + height / 2.0)
     } // getLast
 
     /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -187,8 +187,8 @@ case class QCurve (var p1:       R2      = R2 (0., 0.),
      */
     def eval (): R2 =
     {
-       R2 (pow (1.-t, 2) * p1.x + 2. * (1.-t) * t * pc.x + pow (t, 2) * p2.x,
-           pow (1.-t, 2) * p1.y + 2. * (1.-t) * t * pc.y + pow (t, 2) * p2.y)
+       R2 (pow (1.0-t, 2) * p1.x + 2.0 * (1.0-t) * t * pc.x + pow (t, 2) * p2.x,
+           pow (1.0-t, 2) * p1.y + 2.0 * (1.0-t) * t * pc.y + pow (t, 2) * p2.y)
     } // eval
 
     /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -198,12 +198,12 @@ case class QCurve (var p1:       R2      = R2 (0., 0.),
     def next (): R2 =
     {
         var q: R2 = null                        // the next point along the curve
-        if (t > 1.) {
-            t = 0.                              // reset trajectory
+        if (t > 1.0) {
+            t = 0.0                              // reset trajectory
         } else {
             q = eval ()                         // calculate the new point
         } // if
-        t += 1. / steps.asInstanceOf [Double]   // increment trajectory parameter
+        t += 1.0 / steps.asInstanceOf [Double]   // increment trajectory parameter
         // println ("QCurve.next: q = " + q)
         q
     } // next
@@ -219,7 +219,7 @@ case class QCurve (var p1:       R2      = R2 (0., 0.),
     override def next (width: Double, height: Double): R2 =
     {
         val q = next ()
-        if (q != null) R2 (q.x - width / 2., q.y - height / 2.) else null
+        if (q != null) R2 (q.x - width / 2.0, q.y - height / 2.0) else null
     } // next
 
     /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -281,9 +281,9 @@ object QCurveCalc
      * @param p2    the ending point
      * @param bend  the bend or curvature 
      */
-    def computeControlPoint (p1: R2, p2: R2, bend: Double = 0.): R2 =
+    def computeControlPoint (p1: R2, p2: R2, bend: Double = 0.0): R2 =
     {
-        val mid = R2 ((p1.x + p2.x) / 2., (p1.y + p2.y) / 2.)
+        val mid = R2 ((p1.x + p2.x) / 2.0, (p1.y + p2.y) / 2.0)
         if (abs (bend) < EPSILON) {
             mid
         } else {
@@ -292,7 +292,7 @@ object QCurveCalc
             if (m.isInfinity) {		
                 R2 (mid.x + dist, mid.y)
             } else {
-                R2 (mid.x + dist * m / sqrt (1. + pow (m, 2)), mid.y - dist / sqrt (1. + pow (m, 2)))
+                R2 (mid.x + dist * m / sqrt (1.0 + pow (m, 2)), mid.y - dist / sqrt (1.0 + pow (m, 2)))
             } // if
         } // if
     } // computeControlPoint
@@ -308,13 +308,13 @@ object QCurveTest extends App
     private val line2 = new QCurve (R2 (200, 200), R2 (200, 400))
     private val line3 = new QCurve (R2 (200, 200), R2 (400, 400))
 
-    private val curve1 = new QCurve (R2 (200, 200), R2 (400, 200), 1.)
-    private val curve2 = new QCurve (R2 (200, 200), R2 (200, 400), 1.)
-    private val curve3 = new QCurve (R2 (200, 200), R2 (400, 400), 1.)
+    private val curve1 = new QCurve (R2 (200, 200), R2 (400, 200), 1.0)
+    private val curve2 = new QCurve (R2 (200, 200), R2 (200, 400), 1.0)
+    private val curve3 = new QCurve (R2 (200, 200), R2 (400, 400), 1.0)
 
-    private val curve4 = new QCurve (R2 (200, 200), R2 (400, 200), -2.)
-    private val curve5 = new QCurve (R2 (200, 200), R2 (200, 400), -2.)
-    private val curve6 = new QCurve (R2 (200, 200), R2 (400, 400), -2.)
+    private val curve4 = new QCurve (R2 (200, 200), R2 (400, 200), -2.0)
+    private val curve5 = new QCurve (R2 (200, 200), R2 (200, 400), -2.0)
+    private val curve6 = new QCurve (R2 (200, 200), R2 (400, 400), -2.0)
 
     private val canvas = new Panel
     {
@@ -386,7 +386,7 @@ object QCurveTest2 extends App
 
         def act ()
         {
-             val size    = 10.
+             val size    = 10.0
              var loc: R2 = null
              
              for (i <- 0 until curve.length) {

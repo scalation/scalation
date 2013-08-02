@@ -124,7 +124,7 @@ class SymTriMatrixD (val d1: Int)
         else if (i == j)     _dg(i)       // on diagonal
         else if (i == j + 1) _sd(j)       // on sub-diagonal (below diagonal)
         else if (i + 1 == j) _sd(i)       // on sup-diagonal (above diagonal)
-        else 0.
+        else 0.0
     } // at
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -471,7 +471,7 @@ class SymTriMatrixD (val d1: Int)
     {
         val c = new MatrixD (d1)
         for (i <- 0 until d1; j <- (i-2 max 0) to (i+2 min d1_1)) {
-            var sum = 0.
+            var sum = 0.0
             val k1 = ((i min j) - 1) max 0
             val k2 = ((i max j) + 1) min d1_1
             for (k <- k1 to k2) sum += at(i, k) * b.at(k, j)
@@ -617,9 +617,9 @@ class SymTriMatrixD (val d1: Int)
      */
     def clean (thres: Double, relative: Boolean = true): SymTriMatrixD =
     {
-        val s = if (relative) mag else 1.             // use matrix magnitude or 1
-        for (i <- range_d) if (abs (_dg(i)) <= thres * s) _dg(i) = 0. 
-        for (i <- range_s) if (abs (_sd(i)) <= thres * s) _sd(i) = 0.
+        val s = if (relative) mag else 1.0             // use matrix magnitude or 1
+        for (i <- range_d) if (abs (_dg(i)) <= thres * s) _dg(i) = 0.0
+        for (i <- range_s) if (abs (_sd(i)) <= thres * s) _sd(i) = 0.0
         this
     } // clean
 
@@ -644,7 +644,7 @@ class SymTriMatrixD (val d1: Int)
         c(0) = c(0) / b(0)
         d(0) = d(0) / b(0)
         for (i <- 1 until d1) {
-            val id = 1. / (b(i) - c(i-1) * a(i))
+            val id = 1.0 / (b(i) - c(i-1) * a(i))
             c(i)   = c(i) * id
             d(i)   = (d(i) - d(i-1) * a(i)) * id
         } // for
@@ -674,7 +674,7 @@ class SymTriMatrixD (val d1: Int)
     def nullspace: VectorD =
     {
         if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
-        reduce.col(dim2 - 1) * -1. ++ 1.
+        reduce.col(dim2 - 1) * -1.0 ++ 1.0
     } // nullspace
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -688,7 +688,7 @@ class SymTriMatrixD (val d1: Int)
     {
         if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
         reduce_ip
-        col(dim2 - 1) * -1. ++ 1.
+        col(dim2 - 1) * -1.0 ++ 1.0
     } // nullspace_ip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -811,21 +811,21 @@ class SymTriMatrixD (val d1: Int)
  */
 object SymTriMatrixDTest extends App
 {
-    val a = new SymTriMatrixD (VectorD (1., 2., 3.),
-                               VectorD (4., 5.))
+    val a = new SymTriMatrixD (VectorD (1.0, 2.0, 3.0),
+                               VectorD (4.0, 5.0))
 
-    val b = new SymTriMatrixD (VectorD (2., 3., 4.),
-                               VectorD (5., 6.))
+    val b = new SymTriMatrixD (VectorD (2.0, 3.0, 4.0),
+                               VectorD (5.0, 6.0))
 
-    val u = VectorD (5., 3., 6.)
+    val u = VectorD (5.0, 3.0, 6.0)
 
-    val c = new MatrixD ((3, 3), 1., 4., 0.,
-                                 4., 2., 5.,
-                                 0., 5., 3.)
+    val c = new MatrixD ((3, 3), 1.0, 4.0, 0.0,
+                                 4.0, 2.0, 5.0,
+                                 0.0, 5.0, 3.0)
 
-    val d = new MatrixD ((3, 3), 2., 5., 0.,
-                                 5., 3., 6.,
-                                 0., 6., 4.)
+    val d = new MatrixD ((3, 3), 2.0, 5.0, 0.0,
+                                 5.0, 3.0, 6.0,
+                                 0.0, 6.0, 4.0)
 
     println ("a     = " + a)
     println ("b     = " + b)

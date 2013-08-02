@@ -809,21 +809,21 @@ class SymTriMatrixC (val d1: Int)
  */
 object SymTriMatrixCTest extends App
 {
-    val a = new SymTriMatrixC (VectorC (1., 2., 3.),
-                               VectorC (4., 5.))
+    val a = new SymTriMatrixC (VectorC (1.0, 2.0, 3.0),
+                               VectorC (4.0, 5.0))
 
-    val b = new SymTriMatrixC (VectorC (2., 3., 4.),
-                               VectorC (5., 6.))
+    val b = new SymTriMatrixC (VectorC (2.0, 3.0, 4.0),
+                               VectorC (5.0, 6.0))
 
-    val u = VectorC (5., 3., 6.)
+    val u = VectorC (5.0, 3.0, 6.0)
 
-    val c = new MatrixC ((3, 3), 1., 4., 0.,
-                                 4., 2., 5.,
-                                 0., 5., 3.)
+    val c = new MatrixC ((3, 3), 1.0, 4.0, 0.0,
+                                 4.0, 2.0, 5.0,
+                                 0.0, 5.0, 3.0)
 
-    val d = new MatrixC ((3, 3), 2., 5., 0.,
-                                 5., 3., 6.,
-                                 0., 6., 4.)
+    val d = new MatrixC ((3, 3), 2.0, 5.0, 0.0,
+                                 5.0, 3.0, 6.0,
+                                 0.0, 6.0, 4.0)
 
     println ("a     = " + a)
     println ("b     = " + b)

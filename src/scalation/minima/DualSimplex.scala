@@ -65,7 +65,7 @@ class DualSimplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int])
     private val t  = new MatrixD (MM, NN)          // the MM-by-NN simplex tableau
     for (i <- 0 until M) {
          t.set (i, a(i))                           // col x: constraint matrix a
-         t(i, N+i) = 1.                            // col y: slack/surplus variable matrix s
+         t(i, N+i) = 1.0                            // col y: slack/surplus variable matrix s
          t(i, JJ)  = b(i)                          // col b: limit/RHS vector b
     } // for
     t(M)(0 until N) = -c                           // set cost row (M) in the tableau to given cost
@@ -89,7 +89,7 @@ class DualSimplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int])
     {
         val c_ = t(M)                                           // updated c row (cost)
         var l  = -1
-        for (j <- 0 until MpN if t(k, j) < 0.) {                // find the pivot column
+        for (j <- 0 until MpN if t(k, j) < 0.0) {                // find the pivot column
             if (l == -1) l = j
             else if (c_(j) / t(k, j) < c_(l) / t(k, l)) l = j   // lower ratio => reset l
         } // for
@@ -220,10 +220,10 @@ object DualSimplexTest extends App
      */
     def test1 ()
     {
-        val a = new MatrixD ((2, 3), -1., -2., -1.,     // constraint matrix
-                                     -2.,  1., -3.)
-        val c   = VectorD            (2.,  3.,  4.)     // cost vector
-        val b   = VectorD (-3., -4.)                    // constant vector
+        val a = new MatrixD ((2, 3), -1.0, -2.0, -1.0,     // constraint matrix
+                                     -2.0,  1.0, -3.0)
+        val c   = VectorD            (2.0,  3.0,  4.0)     // cost vector
+        val b   = VectorD (-3.0, -4.0)                    // constant vector
         val x_B = Array (3, 4)                          // starting basis
         test (a, b, c, x_B)
     } // test1

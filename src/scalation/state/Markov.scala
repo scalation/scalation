@@ -87,7 +87,7 @@ class Markov (tr: MatrixD) extends Error
      */
     def limit: VectorD =
     {
-        val ident = new MatrixD (tr.dim1, 1., 0.)
+        val ident = new MatrixD (tr.dim1, 1.0, 0.0)
         (tr - ident).t.slice (0, tr.dim1 - 1).nullspace.normalize
     } // limit
 
@@ -104,16 +104,16 @@ class Markov (tr: MatrixD) extends Error
         var i          = i0            // current state = start state
         var absorbed   = false         // whether it has entered an absorbing state
         val tk_id      = tr.dim1       // the identifier for the token
-        val ms_per_sec = 1000.         // 1000 milliseconds per second (animate using seconds)
+        val ms_per_sec = 1000.0         // 1000 milliseconds per second (animate using seconds)
 
         animate ()
-        aniQ += AnimateCommand (CreateToken, tk_id, Ellipse (), "tk" + tk_id, false, black, null, 0., i0)
+        aniQ += AnimateCommand (CreateToken, tk_id, Ellipse (), "tk" + tk_id, false, black, null, 0.0, i0)
 
         println ("simulate: start simulation of Discrete-Time Markov Chain at time " + clock)
         println ("simulate: at time " + clock + " the state is " + i)
 
         while (clock < endTime && ! absorbed) {
-            if (tr(i, i) == 1.) {
+            if (tr(i, i) == 1.0) {
                 absorbed = true
                 println ("simulate: entered absorbing state " + i)
             } else {
@@ -144,7 +144,7 @@ class Markov (tr: MatrixD) extends Error
             //:: Display the nodes for the Markov Chain
 
             for (i <- 0 until n) {
-                val theta = -Pi + 2. * Pi * (i / n.asInstanceOf [Double])
+                val theta = -Pi + 2.0 * Pi * (i / n.asInstanceOf [Double])
                 val shape = Ellipse ()
                 val label = "n" + i
                 val color = lightblue
@@ -152,7 +152,7 @@ class Markov (tr: MatrixD) extends Error
                                    yCenter + radius * sin (theta), size, size)
                 println ("Markov.animate: " + label + "." + i + " " + CreateNode + " " + color +
                          " " + shape + " " + at.deep)
-                aniQ += AnimateCommand (CreateNode, i, shape, label, true, color, at, 0.)
+                aniQ += AnimateCommand (CreateNode, i, shape, label, true, color, at, 0.0)
             } // for
 
             //:: Display the edges for the Markov Chain
@@ -167,10 +167,10 @@ class Markov (tr: MatrixD) extends Error
                             " " + color + " " + shape + " " + i + " " + j)
                    if (i == j) {
                        aniQ += AnimateCommand (CreateEdge, eid, shape, label, true, color,
-                                               Array (16. * bend), 0., i, j)
+                                               Array (16.0 * bend), 0.0, i, j)
                    } else {
                        aniQ += AnimateCommand (CreateEdge, eid, shape, label, true, color,
-                                               Array (bend), 0., i, j)
+                                               Array (bend), 0.0, i, j)
                    } // if
                 } // for
             } // for
@@ -184,7 +184,7 @@ class Markov (tr: MatrixD) extends Error
     def isStochastic: Boolean =
     {
         if ( ! (tr.isSquare && tr.isNonnegative)) return false
-        for (row <- tr) if (abs (row.sum - 1.) > EPSILON) return false
+        for (row <- tr) if (abs (row.sum - 1.0) > EPSILON) return false
         true
     } // isStochastic
 
@@ -207,7 +207,7 @@ object MarkovTest extends App
                                               .0, .2, .8, .0,
                                               .3, .0, .5, .2,
                                               .1, .0, .7, .2))
-    var p = VectorD (1., 0., 0., 0.)
+    var p = VectorD (1.0, 0.0, 0.0, 0.0)
 
     println ("\nDiscrete-Time Markov Chain mc = " + mc + "\n")
     println ("\nDiscrete-Time Markov Chain: transient solution:")

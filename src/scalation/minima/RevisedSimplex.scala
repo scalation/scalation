@@ -104,12 +104,12 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     } // leaving
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check if u <= 0., the solution is unbounded.
+    /** Check if u <= 0.0, the solution is unbounded.
      *  @param u  the vector for leaving
      */
     def unbounded (u: VectorD): Boolean =
     {
-        for (i <- 0 until u.dim if u(i) > 0.) return false
+        for (i <- 0 until u.dim if u(i) > 0.0) return false
         flaw ("unbounded", "the solution is UNBOUNDED")
         true
     } // unbounded
@@ -263,11 +263,11 @@ object RevisedSimplexTest extends App
      */
     def test1 ()
     {
-        val a = new MatrixD ((3, 9), 1.,  1.,  1.,  1.,  1.,  1.,  1., 0., 0.,    // constraint matrix
-                                     2., -1., -2.,  1.,  0.,  0.,  0., 1., 0.,
-                                     0.,  0.,  1.,  1.,  2.,  1.,  0., 0., 1.)
-        val c   = VectorD          (-1., -2.,  1., -1., -4.,  2.,  0., 0., 0.)    // cost vector
-        val b   = VectorD (6., 4., 4.)                                            // constant vector
+        val a = new MatrixD ((3, 9), 1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, 0.0, 0.0,    // constraint matrix
+                                     2.0, -1.0, -2.0,  1.0,  0.0,  0.0,  0.0, 1.0, 0.0,
+                                     0.0,  0.0,  1.0,  1.0,  2.0,  1.0,  0.0, 0.0, 1.0)
+        val c   = VectorD          (-1.0, -2.0,  1.0, -1.0, -4.0,  2.0,  0.0, 0.0, 0.0)    // cost vector
+        val b   = VectorD (6.0, 4.0, 4.0)                                            // constant vector
         val x_B = Array (6, 7, 8)                                                 // starting basis
         test (a, b, c)                                                            // x_B is optional
     } // test1
@@ -279,11 +279,11 @@ object RevisedSimplexTest extends App
      */
     def test2 ()
     {
-        val a = new MatrixD ((3, 6), 1., 1.,  1.,  1., 0., 0.,      // constraint matrix
-                                    -1., 2., -2.,  0., 1., 0.,
-                                     2., 1.,  0.,  0., 0., 1.)
-        val c   = VectorD          (-1., -2., 1.,  0., 0., 0.)      // cost vector
-        val b   = VectorD (4., 6., 5.)                              // constant vector
+        val a = new MatrixD ((3, 6), 1.0, 1.0,  1.0,  1.0, 0.0, 0.0,      // constraint matrix
+                                    -1.0, 2.0, -2.0,  0.0, 1.0, 0.0,
+                                     2.0, 1.0,  0.0,  0.0, 0.0, 1.0)
+        val c   = VectorD          (-1.0, -2.0, 1.0,  0.0, 0.0, 0.0)      // cost vector
+        val b   = VectorD (4.0, 6.0, 5.0)                              // constant vector
         val x_B = Array (3, 4, 5)                                   // starting basis
         test (a, b, c)
     } // test2
@@ -295,11 +295,11 @@ object RevisedSimplexTest extends App
      */
     def test3 ()
     {
-        val a = new MatrixD ((3, 6), 1., 1.,  2.,  1., 0., 0.,      // constraint matrix
-                                     1., 1., -1.,  0., 1., 0.,
-                                    -1., 1.,  1.,  0., 0., 1.)
-        val c   = VectorD           (1., 1., -4.,  0., 0., 0.)      // cost vector
-        val b   = VectorD (9., 2., 4.)                              // constant vector
+        val a = new MatrixD ((3, 6), 1.0, 1.0,  2.0,  1.0, 0.0, 0.0,      // constraint matrix
+                                     1.0, 1.0, -1.0,  0.0, 1.0, 0.0,
+                                    -1.0, 1.0,  1.0,  0.0, 0.0, 1.0)
+        val c   = VectorD           (1.0, 1.0, -4.0,  0.0, 0.0, 0.0)      // cost vector
+        val b   = VectorD (9.0, 2.0, 4.0)                              // constant vector
         val x_B = Array (3, 4, 5)                                   // starting basis
         test (a, b, c, x_B)
     } // test3
@@ -317,10 +317,10 @@ object RevisedSimplexTest extends App
         val c = new VectorD (m+n)
         for (i <- 0 until m) {
             for (j <- 0 until n) a(i, j) = rn.igen
-            for (j <- n until m+n) a(i, j) = if (j-n == i) 1. else 0.
+            for (j <- n until m+n) a(i, j) = if (j-n == i) 1.0 else 0.0
         } // for
-        for (i <- 0 until m) b(i) = 100. * (rn.igen + 1)
-        for (j <- 0 until n) c(j) = -10. * (rn.igen + 1)
+        for (i <- 0 until m) b(i) = 100.0 * (rn.igen + 1)
+        for (j <- 0 until n) c(j) = -10.0 * (rn.igen + 1)
         test (a, b, c)
     } // test4
 

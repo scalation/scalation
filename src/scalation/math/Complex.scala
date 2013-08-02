@@ -18,7 +18,7 @@ import DoubleWithExp._
  *  @param re  the real part
  *  @param im  the imaginary part
  */
-case class Complex (val re: Double, val im: Double = 0.)
+case class Complex (val re: Double, val im: Double = 0.0)
      extends Fractional [Complex] with Ordered [Complex]
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -94,7 +94,7 @@ case class Complex (val re: Double, val im: Double = 0.)
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the radius of the complex number as a vector in the re-im plane.
      */
-    def radius: Double = math.sqrt (re ~^ 2. + im ~^ 2.)
+    def radius: Double = math.sqrt (re ~^ 2.0 + im ~^ 2.0)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the angle of the complex number as a vector in the re-im plane.
@@ -131,7 +131,7 @@ case class Complex (val re: Double, val im: Double = 0.)
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether this complex number is real (no imaginary part).
      */
-    def isRe = im == 0.
+    def isRe = im == 0.0
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compare two complex numbers (negative for <, zero for ==, positive for >).
@@ -235,25 +235,25 @@ object Complex
 {
     /** Zero (0) as a Complex number
      */
-    val _0  = Complex (0.)
+    val _0  = Complex (0.0)
 
     /** One (1) as a Complex number
      */
-    val _1  = Complex (1.)
+    val _1  = Complex (1.0)
 
     /** Imaginary one (i) as a Complex number
      */
-    val _i  = Complex (0., 1.)
+    val _i  = Complex (0.0, 1.0)
 
     /** Negative one (-1) as a Complex number
      */
-    val _1n = Complex (-1.)
+    val _1n = Complex (-1.0)
 
     /** Negative imaginary one (-i) as a Complex number
      */
-    val _in = Complex (0., -1.)
+    val _in = Complex (0.0, -1.0)
 
-    private val rr2 = 1. / math.sqrt (2.)   // reciprocal root of 2.
+    private val rr2 = 1.0 / math.sqrt (2.0)   // reciprocal root of 2.
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a complex number from the given polar coordinates.
@@ -310,9 +310,9 @@ object ComplexTest extends App
     import util.Sorting.quickSort
     import Complex._
 
-    val c = Complex (2., 3.)
-    val d = Complex (4., 5.)
-    val e = Complex (5.)
+    val c = Complex (2.0, 3.0)
+    val d = Complex (4.0, 5.0)
+    val e = Complex (5.0)
     val r = sqrt (c)
 
     println ("c       = " + c)
@@ -323,7 +323,7 @@ object ComplexTest extends App
     println ("c - d   = " + (c - d))
     println ("c * d   = " + (c * d))
     println ("c / d   = " + (c / d))
-    println ("c ~^ 2. = " + (c ~^ 2.))
+    println ("c ~^ 2. = " + (c ~^ 2.0))
     println ("c * c   = " + (c * c))
     println ("c.bar   = " + c.bar)
     println ("c.abs   = " + c.abs)

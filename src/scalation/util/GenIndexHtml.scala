@@ -47,7 +47,7 @@ object GenIndexHtml extends App
             fos.write ("</ul>\n</body>\n<html>")
             fos.close ()
             for (fi <- dirs if fi.isDirectory ()) recCreate (fi)
-        } catch { case _ => }
+        } catch { case _ : Throwable => }
     } // recCreate
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -61,7 +61,7 @@ object GenIndexHtml extends App
         } else {
             val files = f.listFiles ()
             if (files != null) {
-                for (fi <- files) try recDeleteIndex (fi) catch { case _ => }
+                for (fi <- files) try recDeleteIndex (fi) catch { case _ : Throwable => }
             } // if
         } // if
     } // recDeleteIndex

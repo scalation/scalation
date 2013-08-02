@@ -430,7 +430,7 @@ class MatrixD (val d1: Int,
         val c = new MatrixD (dim1, b.dim2)
         val bt = b.t                         // transpose the b matrix
         for (i <- range1; j <- c.range2) {
-            var sum = 0.
+            var sum = 0.0
             for (k <- range2) sum += v(i)(k) * bt.v(j)(k)
             c.v(i)(j) = sum
         } // for
@@ -447,7 +447,7 @@ class MatrixD (val d1: Int,
 
         val c = new VectorD (dim1)
         for (i <- range1) {
-            var sum = 0.
+            var sum = 0.0
             for (k <- range2) sum += v(i)(k) * u(k)
             c(i) = sum
         } // for
@@ -480,7 +480,7 @@ class MatrixD (val d1: Int,
             val row_i = new VectorD (dim2)            // save ith row so not overwritten
             for (j <- range2) row_i(j) = v(i)(j)      // copy values from ith row of this matrix
             for (j <- range2) {
-                var sum = 0.
+                var sum = 0.0
                 for (k <- range2) sum += row_i(k) * bt.v(j)(k)
                 v(i)(j) = sum
             } // for
@@ -508,7 +508,7 @@ class MatrixD (val d1: Int,
 
         val c = new MatrixD (dim1, b.dim2)
         for (i <- range1; j <- c.range2) {
-            var sum = 0.
+            var sum = 0.0
             for (k <- range2) sum += v(i)(k) * b.v(k)(j)
             c.v(i)(j) = sum
         } // for
@@ -531,7 +531,7 @@ class MatrixD (val d1: Int,
             val row_i = new VectorD (dim2)            // save ith row so not overwritten
             for (j <- range2) row_i(j) = v(i)(j)      // copy values from ith row of this matrix
             for (j <- range2) {
-                var sum = 0.
+                var sum = 0.0
                 for (k <- range2) sum += row_i(k) * bb.v(k)(j)
                 v(i)(j) = sum
             } // for
@@ -651,7 +651,7 @@ class MatrixD (val d1: Int,
 
         val c = new MatrixD (dim1, dim1)
         for (i <- range1; j <- range1) {
-            var sum = 0.
+            var sum = 0.0
             for (k <- range1) sum += v(i)(k) * v(k)(j)
             c.v(i)(j) = sum
         } // for
@@ -692,9 +692,9 @@ class MatrixD (val d1: Int,
 
         for (i <- u.range1) {
             val pivot = u.v(i)(i)
-            if (pivot == 0.) flaw ("lud_npp", "use lud since you have a zero pivot")
-            l.v(i)(i) = 1.
-            for (j <- i + 1 until u.dim2) l.v(i)(j) = 0.
+            if (pivot == 0.0) flaw ("lud_npp", "use lud since you have a zero pivot")
+            l.v(i)(i) = 1.0
+            for (j <- i + 1 until u.dim2) l.v(i)(j) = 0.0
             for (k <- i + 1 until u.dim1) {
                 val mul = u.v(k)(i) / pivot
                 l.v(k)(i) = mul
@@ -716,13 +716,13 @@ class MatrixD (val d1: Int,
 
         for (i <- u.range1) {
             var pivot = u.v(i)(i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (u, i)   // find the maxiumum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u.v(i)(i)                // reset the pivot
             } // if
-            l.v(i)(i) = 1.
-            for (j <- i + 1 until u.dim2) l.v(i)(j) = 0.
+            l.v(i)(i) = 1.0
+            for (j <- i + 1 until u.dim2) l.v(i)(j) = 0.0
             for (k <- i + 1 until u.dim1) {
                 val mul = u.v(k)(i) / pivot
                 l.v(k)(i) = mul
@@ -744,13 +744,13 @@ class MatrixD (val d1: Int,
 
         for (i <- u.range1) {
             var pivot = u.v(i)(i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (u, i)   // find the maxiumum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u.v(i)(i)                // reset the pivot
             } // if
-            l.v(i)(i) = 1.
-            for (j <- i + 1 until u.dim2) l.v(i)(j) = 0.
+            l.v(i)(i) = 1.0
+            for (j <- i + 1 until u.dim2) l.v(i)(j) = 0.0
             for (k <- i + 1 until u.dim1) {
                 val mul = u.v(k)(i) / pivot
                 l.v(k)(i) = mul
@@ -849,7 +849,7 @@ class MatrixD (val d1: Int,
         for (i <- 0 until m; j <- 0 until n) {
             c.v(i)(j) = if (i <  dim1 && j <  dim2) v(i)(j)
                    else if (i >= dim1 && j >= dim2) b.v(i-dim1)(j-dim2)
-                      else                          0.
+                      else                          0.0
         } // for
         c
     } // diag
@@ -865,7 +865,7 @@ class MatrixD (val d1: Int,
         val m = dim1 + p                // new number of rows
         val n = dim1 + p                // new number of columns
         val c = new MatrixD (m, n)
-        for (i <- 0 until p) c.v(i)(i) = 1.
+        for (i <- 0 until p) c.v(i)(i) = 1.0
         c(p until m, p until n) = this
         c
     } // diag
@@ -885,7 +885,7 @@ class MatrixD (val d1: Int,
         val c = new MatrixD (n, n)
 
         for (i <- 0 until n; j <- 0 until n) {
-            c.v(i)(j) = if (i < p || i > p + dim1) if (i == j) 1. else 0.
+            c.v(i)(j) = if (i < p || i > p + dim1) if (i == j) 1.0 else 0.0
                         else                       v(i-p)(j-p)
         } // for
         c
@@ -926,11 +926,11 @@ class MatrixD (val d1: Int,
     def inverse_npp: MatrixD =
     {
         val b = new MatrixD (this)              // copy this matrix into b
-        val c = new MatrixD (dim1, 1., 0.)   // let c represent the augmentation
+        val c = new MatrixD (dim1, 1.0, 0.0)   // let c represent the augmentation
 
         for (i <- b.range1) {
             val pivot = b.v(i)(i)
-            if (pivot == 0.) flaw ("inverse_npp", "use inverse since you have a zero pivot")
+            if (pivot == 0.0) flaw ("inverse_npp", "use inverse since you have a zero pivot")
             for (j <- b.range2) {
                 b.v(i)(j) /= pivot
                 c.v(i)(j) /= pivot
@@ -952,11 +952,11 @@ class MatrixD (val d1: Int,
     def inverse: MatrixD =
     {
         val b = new MatrixD (this)              // copy this matrix into b
-        val c = new MatrixD (dim1, 1., 0.)      // let c represent the augmentation
+        val c = new MatrixD (dim1, 1.0, 0.0)      // let c represent the augmentation
 
         for (i <- b.range1) {
             var pivot = b.v(i)(i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 swap (c, i, k, 0)               // in c, swap rows i and k from column 0
@@ -985,11 +985,11 @@ class MatrixD (val d1: Int,
     def inverse_ip: MatrixD =
     {
         var b = this                            // use this matrix for b
-        val c = new MatrixD (dim1, 1., 0.)      // let c represent the augmentation
+        val c = new MatrixD (dim1, 1.0, 0.0)      // let c represent the augmentation
 
         for (i <- b.range1) {
             var pivot = b.v(i)(i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 swap (c, i, k, 0)               // in c, swap rows i and k from column 0
@@ -1022,7 +1022,7 @@ class MatrixD (val d1: Int,
 
         for (i <- b.range1) {
             var pivot = b.v(i)(i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b.v(i)(i)               // reset the pivot
@@ -1048,7 +1048,7 @@ class MatrixD (val d1: Int,
 
         for (i <- b.range1) {
             var pivot = b.v(i)(i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b.v(i)(i)               // reset the pivot
@@ -1070,8 +1070,8 @@ class MatrixD (val d1: Int,
      */
     def clean (thres: Double, relative: Boolean = true): MatrixD =
     {
-        val s = if (relative) mag else 1.             // use matrix magnitude or 1
-        for (i <- range1; j <- range2) if (abs (v(i)(j)) <= thres * s) v(i)(j) = 0.
+        val s = if (relative) mag else 1.0             // use matrix magnitude or 1
+        for (i <- range1; j <- range2) if (abs (v(i)(j)) <= thres * s) v(i)(j) = 0.0
         this
     } // clean
 
@@ -1089,7 +1089,7 @@ class MatrixD (val d1: Int,
     {
         if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
 
-        reduce.col(dim2 - 1) * -1. ++ 1.
+        reduce.col(dim2 - 1) * -1.0 ++ 1.0
     } // nullspace
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1104,7 +1104,7 @@ class MatrixD (val d1: Int,
         if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
 
         reduce_ip
-        col(dim2 - 1) * -1. ++ 1.
+        col(dim2 - 1) * -1.0 ++ 1.0
     } // nullspace_ip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1116,7 +1116,7 @@ class MatrixD (val d1: Int,
     {
         if ( ! isSquare) flaw ("trace", "trace only works on square matrices")
 
-        var sum = 0.
+        var sum = 0.0
         for (i <- range1) sum += v(i)(i)
         sum
     } // trace
@@ -1126,7 +1126,7 @@ class MatrixD (val d1: Int,
      */
     def sum: Double =
     {
-        var sum = 0.
+        var sum = 0.0
         for (i <- range1; j <- range2) sum += v(i)(j)
         sum
     } // sum
@@ -1136,7 +1136,7 @@ class MatrixD (val d1: Int,
      */
     def sumLower: Double =
     {
-        var sum = 0.
+        var sum = 0.0
         for (i <- range1; j <- 0 until i) sum += v(i)(j)
         sum
     } // sumLower
@@ -1147,7 +1147,7 @@ class MatrixD (val d1: Int,
      */
     def sumAbs: Double =
     {
-        var sum = 0.
+        var sum = 0.0
         for (i <- range1; j <- range2) sum += abs (v(i)(j))
         sum
     } // sumAbs
@@ -1172,7 +1172,7 @@ class MatrixD (val d1: Int,
     {
         if ( ! isSquare) flaw ("det", "determinant only works on square matrices")
 
-        var sum = 0.
+        var sum = 0.0
         var b: MatrixD = null
         for (j <- range2) {
             b = sliceExclude (0, j)   // the submatrix that excludes row 0 and column j
@@ -1197,7 +1197,7 @@ class MatrixD (val d1: Int,
      */
     def isNonnegative: Boolean =
     {
-        for (i <- range1; j <- range2 if v(i)(j) < 0.) return false
+        for (i <- range1; j <- range2 if v(i)(j) < 0.0) return false
         true
     } // isNonegative
 
@@ -1227,7 +1227,7 @@ object MatrixD extends Error
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create an n-by-n identity matrix (ones on main diagonal, zeroes elsewhere).
      */
-    def eye (n: Int): MatrixD = new MatrixD (n, 1., 0.)
+    def eye (n: Int): MatrixD = new MatrixD (n, 1.0, 0.0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply vector u by matrix a.  Treat u as a row vector.
@@ -1240,7 +1240,7 @@ object MatrixD extends Error
 
         val c = new VectorD (a.dim2)
         for (j <- a.range2) {
-            var sum = 0.
+            var sum = 0.0
             for (k <- a.range1) sum += u(k) * a.v(k)(j)
             c(j) = sum
         } // for
@@ -1361,22 +1361,22 @@ object MatrixDTest extends App
         println ("\n\tTest MatrixD on real matrices of dim " + l)
         val x = new MatrixD (l, l)
         val y = new MatrixD (l, l)
-        x.set (2.)
-        y.set (3.)
+        x.set (2.0)
+        y.set (3.0)
         println ("x + y  = " + (x + y))
         println ("x - y  = " + (x - y))
         println ("x * y  = " + (x * y))
-        println ("x * 4. = " + (x * 4.))
+        println ("x * 4. = " + (x * 4.0))
     } // for
 
     println ("\n\tTest MatrixD on additional operations")
 
-    val z   = new MatrixD ((2, 2), 1., 2.,
-                                   3., 2.)
-    val t   = new MatrixD ((3, 3), 1., 2., 3.,
-                                   4., 3., 2.,
-                                   1., 3., 1.)
-    val b   = VectorD (8., 7.)
+    val z   = new MatrixD ((2, 2), 1.0, 2.0,
+                                   3.0, 2.0)
+    val t   = new MatrixD ((3, 3), 1.0, 2.0, 3.0,
+                                   4.0, 3.0, 2.0,
+                                   1.0, 3.0, 1.0)
+    val b   = VectorD (8.0, 7.0)
     val lu  = z.lud
     val lu2 = z.lud_npp
 
@@ -1395,11 +1395,11 @@ object MatrixDTest extends App
     z *= z                             // in-place matrix multiplication
     println ("z squared = " + z)
 
-    val w = new MatrixD ((2, 3), 2., 3., 5., 
-                                -4., 2., 3.)
-    val v = new MatrixD ((3, 2), 2., -4., 
-                                 3.,  2.,
-                                 5.,  3.)
+    val w = new MatrixD ((2, 3), 2.0, 3.0, 5.0,
+                                -4.0, 2.0, 3.0)
+    val v = new MatrixD ((3, 2), 2.0, -4.0,
+                                 3.0,  2.0,
+                                 5.0,  3.0)
     println ("w         = " + w)
     println ("v         = " + v)
     println ("w.reduce  = " + w.reduce)
@@ -1412,11 +1412,11 @@ object MatrixDTest extends App
 
     for (row <- z) println ("row = " + row.deep)
 
-    val aa = new MatrixD ((3, 2), 1., 2.,
-                                  3., 4.,
-                                  5., 6.)
-    val bb = new MatrixD ((2, 2), 1., 2.,
-                                  3., 4.)
+    val aa = new MatrixD ((3, 2), 1.0, 2.0,
+                                  3.0, 4.0,
+                                  5.0, 6.0)
+    val bb = new MatrixD ((2, 2), 1.0, 2.0,
+                                  3.0, 4.0)
 
     println ("aa * bb  = " + aa * bb)
     println ("aa       = " + aa)
