@@ -6,7 +6,7 @@ organization := "scalation"
 
 scalaVersion := "2.10.2"
 
-crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.2")
+crossScalaVersions := Seq("2.9.3", "2.10.2")
 
 resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
 
@@ -22,5 +22,5 @@ scalacOptions ++= Seq("-unchecked", "-deprecation", "-Xexperimental")
 
 sourceDirectory in Compile <<= baseDirectory( _ / "." )
 
-unmanagedSourceDirectories in Compile <<= baseDirectory(base => Seq("src", "examples") map (base / _))
+unmanagedSourceDirectories in Compile <<= baseDirectory(base => Seq("src", "apps") map (base / _))
 
