@@ -54,13 +54,13 @@ class PortfolioOpt (r: MatrixD, label: Array [String])
      */
     def opt (): Tuple2 [VectorD, Double] =
     {
-        val x0 = new VectorD (r.dim2); x0.set (1. / r.dim2)   // initil guess, all equal
+        val x0 = new VectorD (r.dim2); x0.set (1.0 / r.dim2)   // initil guess, all equal
 
         // negativity function
         def neg (x: VectorD): Double = 
         { 
-            var sum = 0.
-            for (i <- 0 until x.dim) sum += min (0., x(i))
+            var sum = 0.0
+            for (i <- 0 until x.dim) sum += min (0.0, x(i))
             sum
         } // neg
 
@@ -69,7 +69,7 @@ class PortfolioOpt (r: MatrixD, label: Array [String])
 
         // constraint function
         // require the vector to sum to 1 and each element to be non-negative
-        def g (x: VectorD) = (1. - x.sum)~^2 + neg (x)~^2
+        def g (x: VectorD) = (1.0 - x.sum)~^2 + neg (x)~^2
 
         val solver = new ConjGradient (f, g, true)        // quadratic optimizer
         val x   = solver.solve (x0, .1)                   // optimal x vector

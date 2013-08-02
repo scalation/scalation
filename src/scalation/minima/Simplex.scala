@@ -36,7 +36,7 @@ import scalation.random.Randi
  *  a_i x >= b_i  =>  a_i x + s_i = b_i    // use surplus variable s_i with coeff -1
  *
  *  Creates an MM-by-NN simplex tableau with
- *  -- [0..M-1, 0..N-1]    = a (constraint matrix)
+ *  -- [0.0.M-1, 0..N-1]    = a (constraint matrix)
  *  -- [0..M-1, N..M+N-1]  = s (slack/surplus variable matrix)
  *  -- [0..M-1, NN-1]      = b (limit/RHS vector)
  *  -- [M, 0..NN-2]        = c (cost vector)
@@ -52,7 +52,7 @@ class Simplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int])
     private val DANTIZ   = true                // use Dantiz's pivot rule, else Bland's
     private val DEBUG    = false               // DEBUG mode => show all pivot steps
     private val CHECK    = true                // CHECK mode => check feasibility for each pivot
-    private val _0       = 0.                  // zero, for Floating Point Error (FPE) try setting to EPSILON
+    private val _0       = 0.0                  // zero, for Floating Point Error (FPE) try setting to EPSILON
 
     private val M        = a.dim1              // the number of constraints
     private val N        = a.dim2              // the number of decision variables
@@ -62,7 +62,7 @@ class Simplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int])
     private val NN       = MpN + 1             // # columns in tableau
     private val JJ       = NN - 1              // the last column (b)
     private val MAX_ITER = 200 * N             // maximum number of iterations
-    private var flip     = 1.                  // 1(slack) or -1(surplus) depending on b_i
+    private var flip     = 1.0                  // 1(slack) or -1(surplus) depending on b_i
 
     if (b.dim != M) flaw ("constructor", "b.dim = " + b.dim + " != " + M)
     if (c.dim != N) flaw ("constructor", "c.dim = " + c.dim + " != " + N)
@@ -70,7 +70,7 @@ class Simplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int])
 
     private val t = new MatrixD (MM, NN)             // the MM-by-NN simplex tableau
     for (i <- 0 until M) {
-         flip = if (b(i) < _0) -1. else 1.
+         flip = if (b(i) < _0) -1.0 else 1.0
          t.set (i, a(i))                             // col x: constraint matrix a
          t(i, N+i) = flip                            // col y: slack/surplus variable matrix s
          t(i, JJ)  = b(i) * flip                     // col b: limit/RHS vector b
@@ -263,11 +263,11 @@ object SimplexTest extends App
      */
     def test1 ()
     {
-        val a = new MatrixD ((3, 6), 1.,  1.,  1.,  1.,  1.,  1.,       // constraint matrix
-                                     2., -1., -2.,  1.,  0.,  0.,
-                                     0.,  0.,  1.,  1.,  2.,  1.)
-        val c   = VectorD          (-1., -2.,  1., -1., -4.,  2.)       // cost vector
-        val b   = VectorD (6., 4., 4.)                                  // constant vector
+        val a = new MatrixD ((3, 6), 1.0,  1.0,  1.0,  1.0,  1.0,  1.0,       // constraint matrix
+                                     2.0, -1.0, -2.0,  1.0,  0.0,  0.0,
+                                     0.0,  0.0,  1.0,  1.0,  2.0,  1.0)
+        val c   = VectorD          (-1.0, -2.0,  1.0, -1.0, -4.0,  2.0)       // cost vector
+        val b   = VectorD (6.0, 4.0, 4.0)                                  // constant vector
         val x_B = Array (6, 7, 8)                                       // starting basis
         test (a, b, c)                                                  // x_B is optional
     } // test1
@@ -279,11 +279,11 @@ object SimplexTest extends App
      */
     def test2 ()
     {
-        val a = new MatrixD ((3, 3), 1., 1.,  1.,       // constraint matrix
-                                    -1., 2., -2.,
-                                     2., 1.,  0)
-        val c   = VectorD          (-1., -2., 1.)       // cost vector
-        val b   = VectorD (4., 6., 5.)                  // constant vector
+        val a = new MatrixD ((3, 3), 1.0, 1.0,  1.0,       // constraint matrix
+                                    -1.0, 2.0, -2.0,
+                                     2.0, 1.0,  0)
+        val c   = VectorD          (-1.0, -2.0, 1.0)       // cost vector
+        val b   = VectorD (4.0, 6.0, 5.0)                  // constant vector
         val x_B = Array (3, 4, 5)                       // starting basis
         test (a, b, c, x_B)
     } // test2
@@ -295,11 +295,11 @@ object SimplexTest extends App
      */
     def test3 ()
     {
-        val a = new MatrixD ((3, 3), 1., 1.,  2.,       // constraint matrix
-                                     1., 1., -1.,
-                                    -1., 1.,  1.)
-        val c   = VectorD           (1., 1., -4.)       // cost vector
-        val b   = VectorD (9., 2., 4.)                  // constant vector
+        val a = new MatrixD ((3, 3), 1.0, 1.0,  2.0,       // constraint matrix
+                                     1.0, 1.0, -1.0,
+                                    -1.0, 1.0,  1.0)
+        val c   = VectorD           (1.0, 1.0, -4.0)       // cost vector
+        val b   = VectorD (9.0, 2.0, 4.0)                  // constant vector
         val x_B = Array (3, 4, 5)                       // starting basis
         test (a, b, c, x_B)
     } // test3
@@ -315,8 +315,8 @@ object SimplexTest extends App
         val b = new VectorD (m)
         val c = new VectorD (n)
         for (i <- 0 until m; j <- 0 until n) a(i, j) = rn.igen
-        for (i <- 0 until m) b(i) = 100. * (rn.igen + 1)
-        for (j <- 0 until n) c(j) = -10. * (rn.igen + 1)
+        for (i <- 0 until m) b(i) = 100.0 * (rn.igen + 1)
+        for (j <- 0 until n) c(j) = -10.0 * (rn.igen + 1)
         test (a, b, c, null)
     } // test4
 

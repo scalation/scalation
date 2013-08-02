@@ -23,20 +23,20 @@ import scalation.util.Error
  *  @param p2   the ending point for the line/arrow
  *  @param len  the length of the arrowhead on the line/arrow
  */
-case class Arrow (var p1:  R2  = R2 (0., 0.),
-                  var p2:  R2  = R2 (0., 0.),
+case class Arrow (var p1:  R2  = R2 (0.0, 0.0),
+                  var p2:  R2  = R2 (0.0, 0.0),
                   var len: Int = 10)
      extends java.awt.geom.Path2D.Double with CurvilinearShape
 {
     {
         val deltaX = p2.x - p1.x
         val slope  = (p2.y - p1.y) / deltaX                         // slope of the main line
-        val a1_2 = if (slope == Double.PositiveInfinity) Pi / 2.    // angle of line p1 to p2
-              else if (slope == Double.NegativeInfinity) 3. * Pi / 2.
-              else if (deltaX < 0.) Pi + atan (slope)
+        val a1_2 = if (slope == Double.PositiveInfinity) Pi / 2.0    // angle of line p1 to p2
+              else if (slope == Double.NegativeInfinity) 3.0 * Pi / 2.0
+              else if (deltaX < 0.0) Pi + atan (slope)
                  else atan (slope)
-        val a2_3 = a1_2 - 5. * Pi / 6.                              // angle of line p2 to p3
-        val a3_4 = a1_2 + Pi / 2.                                   // angle of line p3 to p4
+        val a2_3 = a1_2 - 5.0 * Pi / 6.0                              // angle of line p2 to p3
+        val a3_4 = a1_2 + Pi / 2.0                                   // angle of line p3 to p4
         val p3   = R2 (p2.x + len * cos (a2_3), p2.y + len * sin (a2_3))
         val p4   = R2 (p3.x + len * cos (a3_4), p3.y + len * sin (a3_4))
         moveTo (p1.x, p1.y)
@@ -49,12 +49,12 @@ case class Arrow (var p1:  R2  = R2 (0., 0.),
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the x-coordinate of the center of the main line.
      */
-    def getCenterX (): Double = (p1.x + p2.x) / 2.
+    def getCenterX (): Double = (p1.x + p2.x) / 2.0
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the y-coordinate of the center of the main line.
      */
-    def getCenterY (): Double = (p1.y + p2.y) / 2.
+    def getCenterY (): Double = (p1.y + p2.y) / 2.0
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set (or reset) the location for the Arrow as a line.
@@ -66,12 +66,12 @@ case class Arrow (var p1:  R2  = R2 (0., 0.),
         p1 = _p1; p2 = _p2
         val deltaX = p2.x - p1.x
         val slope  = (p2.y - p1.y) / deltaX                         // slope of the main line
-        val a1_2 = if (slope == Double.PositiveInfinity) Pi / 2.    // angle of line p1 to p2
-                   else if (slope == Double.NegativeInfinity) 3. * Pi / 2.
-                   else if (deltaX < 0.) Pi + atan (slope)
+        val a1_2 = if (slope == Double.PositiveInfinity) Pi / 2.0    // angle of line p1 to p2
+                   else if (slope == Double.NegativeInfinity) 3.0 * Pi / 2.0
+                   else if (deltaX < 0.0) Pi + atan (slope)
                    else atan (slope)
-        val a2_3 = a1_2 - 5. * Pi / 6.                              // angle of line p2 to p3
-        val a3_4 = a1_2 + Pi / 2.                                   // angle of line p3 to p4
+        val a2_3 = a1_2 - 5.0 * Pi / 6.0                              // angle of line p2 to p3
+        val a3_4 = a1_2 + Pi / 2.0                                   // angle of line p3 to p4
         val p3   = R2 (p2.x + len * cos (a2_3), p2.y + len * sin (a2_3))
         val p4   = R2 (p3.x + len * cos (a3_4), p3.y + len * sin (a3_4))
         moveTo (p1.x, p1.y)

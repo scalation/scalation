@@ -32,13 +32,13 @@ import scalation.scala2d.Shapes.{BasicStroke, Dimension, Graphics2D}
  *  @param _title  the title of the plot
  */
 class Contour (f: FunctionV2S, lb: VectorD, ub: VectorD, path: ArrayBuffer [VectorD] = null,
-               private var deltaF: Double = -1., private var lbF: Double = 0.,
+               private var deltaF: Double = -1.0, private var lbF: Double = 0.0,
                _title: String = "Contour plot of f(x, y)")
       extends MainFrame
 {
     private val EPSILON   = 1E-9
-    private val _1_3      = 1. / 3.
-    private val _2_3      = 2. / 3.
+    private val _1_3      = 1.0 / 3.0
+    private val _2_3      = 2.0 / 3.0
     private val frameSize = new Dimension (600, 600)
     private val frameW    = (round (frameSize.getWidth ())).asInstanceOf [Int]
     private val frameH    = (round (frameSize.getHeight ())).asInstanceOf [Int]
@@ -76,12 +76,12 @@ class Contour (f: FunctionV2S, lb: VectorD, ub: VectorD, path: ArrayBuffer [Vect
             super.paintComponent (g2d)
             var x_pos = 0
             var y_pos = 0
-            var step  = 0.
+            var step  = 0.0
 
             //:: Draw the axes
 
             g2d.setPaint (black)
-            g2d.setStroke (new BasicStroke (2.f))
+            g2d.setStroke (new BasicStroke (2.0f))
             axis.setLine (baseX - 1, baseY + 1, baseX + 10 + frameW - 2 * offset, baseY + 1)
             g2d.draw (axis)
             axis.setLine (baseX - 1, offset - 10, baseX - 1, baseY + 1)
@@ -107,7 +107,7 @@ class Contour (f: FunctionV2S, lb: VectorD, ub: VectorD, path: ArrayBuffer [Vect
 
             //:: Draw squares for the color-coded values of the points of the function being plotted
 
-            for (x <- lb(0) to ub(0) by deltaX/50.; y <- lb(1) to ub(1) by deltaY/50.) {
+            for (x <- lb(0) to ub(0) by deltaX/50.0; y <- lb(1) to ub(1) by deltaY/50.0) {
                 val vec  = VectorD (x, y)
                 val frac = (f(vec) - lbF) / deltaF         // fractional way from lower to upper bound
 
@@ -148,7 +148,7 @@ class Contour (f: FunctionV2S, lb: VectorD, ub: VectorD, path: ArrayBuffer [Vect
     } // canvas Panel
 
     {
-        if (deltaF < 0.) resetBounds ()
+        if (deltaF < 0.0) resetBounds ()
         title    = _title
         contents = canvas
         visible  = true
@@ -162,7 +162,7 @@ class Contour (f: FunctionV2S, lb: VectorD, ub: VectorD, path: ArrayBuffer [Vect
     {
         var minF = Double.PositiveInfinity
         var maxF = Double.NegativeInfinity
-        for (x <- lb(0) to ub(0) by deltaX/50.; y <- lb(1) to ub(1) by deltaY/50.) {
+        for (x <- lb(0) to ub(0) by deltaX/50.0; y <- lb(1) to ub(1) by deltaY/50.0) {
             val vec   = VectorD (x, y)
             val f_vec = f(vec)
             if (f_vec < minF) minF = f_vec
@@ -196,11 +196,11 @@ class Contour (f: FunctionV2S, lb: VectorD, ub: VectorD, path: ArrayBuffer [Vect
  */
 object ContourTest extends App
 {
-    def f(x: VectorD): Double = (x(0)/2. - 3.) * (x(0)/2. - 3.) + (x(1)/3. - 2.) * (x(1)/3. - 2.)
-    val lb     = VectorD (0., 0.)
-    val ub     = VectorD (10., 10.)
-    val deltaF = 18.
-    val path   = ArrayBuffer (VectorD (0., 0.), VectorD (3., 2.), VectorD (6., 6.)) 
+    def f(x: VectorD): Double = (x(0)/2.0 - 3.0) * (x(0)/2.0 - 3.0) + (x(1)/3.0 - 2.0) * (x(1)/3.0 - 2.0)
+    val lb     = VectorD (0.0, 0.0)
+    val ub     = VectorD (10.0, 10.0)
+    val deltaF = 18.0
+    val path   = ArrayBuffer (VectorD (0.0, 0.0), VectorD (3.0, 2.0), VectorD (6.0, 6.0))
     val plot   = new Contour (f, lb, ub, path)
     println ("plot = " + plot)
 

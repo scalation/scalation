@@ -27,8 +27,8 @@ import scalation.util.Monitor
 object BankOpt extends App
 {
     val nStop   = 100                       // simulation stopping rule (100 customers)
-    val cost    = VectorD (160., 10.)       // the cost coefficient vector
-    val PENALTY = 1.E8                      // penalty for infeasibility (e.g., -1 tellers)
+    val cost    = VectorD (160.0, 10.0)       // the cost coefficient vector
+    val PENALTY = 1.0E8                      // penalty for infeasibility (e.g., -1 tellers)
     var bm: BankModelOpt = null             // instance of a bank model
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -79,10 +79,10 @@ class BankModelOpt (name: String, nArrivals: Int, iArrivalRV: Variate,
 {
     Monitor.traceOff ()
 
-    val entry     = new Source ("entry", this, Customer, nArrivals, iArrivalRV, (120., 185.))
-    val tellerQ   = new WaitQueue ("tellerQ", (250., 190.))
-    val teller    = new Resource ("teller", tellerQ, nUnits, serviceRV, (320., 185.))
-    val door      = new Sink ("door", (460., 185.))
+    val entry     = new Source ("entry", this, Customer, nArrivals, iArrivalRV, (120.0, 185.0))
+    val tellerQ   = new WaitQueue ("tellerQ", (250.0, 190.0))
+    val teller    = new Resource ("teller", tellerQ, nUnits, serviceRV, (320.0, 185.0))
+    val door      = new Sink ("door", (460.0, 185.0))
     val toTellerQ = new Transport ("entry2tellerQ", moveRV, entry, tellerQ)
     val toDoor    = new Transport ("teller2door", moveRV, teller, door)
 

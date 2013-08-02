@@ -19,19 +19,19 @@ import scalation.util.Error
  *  @param p1  the starting point for the line
  *  @param p2  the ending point for the line
  */
-case class Line (var p1:  R2 = R2 (0., 0.),
-                 var p2:  R2 = R2 (0., 0.))
+case class Line (var p1:  R2 = R2 (0.0, 0.0),
+                 var p2:  R2 = R2 (0.0, 0.0))
      extends java.awt.geom.Line2D.Double (p1, p2) with CurvilinearShape
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the x-coordinate of the center of the line.
      */
-    def getCenterX (): Double = (p1.x + p2.x) / 2.
+    def getCenterX (): Double = (p1.x + p2.x) / 2.0
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the y-coordinate of the center of the line.
      */
-    def getCenterY (): Double = (p1.y + p2.y) / 2.
+    def getCenterY (): Double = (p1.y + p2.y) / 2.0
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set (or reset) the frame/location for the Line as a line.

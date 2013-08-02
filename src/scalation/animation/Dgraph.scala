@@ -135,11 +135,11 @@ class Dgraph (name: String = "Dgraph", bipartite: Boolean = false)
             var x2 = to.shape.getCenterX ()
             val y2 = to.shape.getCenterY ()
             if (x1 < x2) {
-                x1 += from.shape.getWidth () / 2.
-                x2 -= to.shape.getWidth () / 2.
+                x1 += from.shape.getWidth () / 2.0
+                x2 -= to.shape.getWidth () / 2.0
             } else {
-                x1 -= from.shape.getWidth () / 2.
-                x2 += to.shape.getWidth () / 2.
+                x1 -= from.shape.getWidth () / 2.0
+                x2 += to.shape.getWidth () / 2.0
             } // if
 
             if (abs (bend) < EPSILON) {
@@ -169,7 +169,7 @@ class Dgraph (name: String = "Dgraph", bipartite: Boolean = false)
          */
         def this (shape: CurvilinearShape, label: String, primary: Boolean, color: Color, from: Node, to: Node)
         {
-            this (shape, label, primary, color, from, to, 0.)
+            this (shape, label, primary, color, from, to, 0.0)
         } // Edge constructor
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -188,7 +188,7 @@ class Dgraph (name: String = "Dgraph", bipartite: Boolean = false)
         def this (shape: CurvilinearShape, label: String, primary: Boolean, color: Color, from: Node, to: Node,
                   x1: Double, y1: Double, x2: Double, y2: Double)
         {
-            this (shape, label, primary, color, from, to, 0.)
+            this (shape, label, primary, color, from, to, 0.0)
             from.addEdge (this)                      // add this edge to outgoing edges of from node
             shape.setLine (R2 (x1, y1), R2 (x2, y2))
         } // Edge constructor
@@ -211,7 +211,7 @@ class Dgraph (name: String = "Dgraph", bipartite: Boolean = false)
         def this (shape: CurvilinearShape, label: String, primary: Boolean, color: Color, from: Node, to: Node,
                   x1: Double, y1: Double, xc: Double, yc: Double, x2: Double, y2: Double)
         {
-            this (shape, label, primary, color, from, to, 0.)
+            this (shape, label, primary, color, from, to, 0.0)
             from.addEdge (this)                      // add this edge to outgoing edges of from node
             shape.setLine (R2 (x1, y1), R2 (xc, yc), R2 (x2, y2))
         } // Edge constructor

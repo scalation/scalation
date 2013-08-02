@@ -62,7 +62,7 @@ class PrincipalComponents (x: MatrixD)
     {
         val cov = new MatrixD (N, N)                           // the covariance matrix
         for (i <- 0 until N; j <- i until N) {
-            cov(i, j) = (x.col(i) dot x.col(j)) / (MR - 1.)
+            cov(i, j) = (x.col(i) dot x.col(j)) / (MR - 1.0)
             if (i != j) cov(j, i) = cov(i, j)
         } // for
         cov

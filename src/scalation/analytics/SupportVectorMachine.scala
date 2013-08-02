@@ -30,7 +30,7 @@ class SupportVectorMachine (x: MatrixD, y: VectorD)
     if (x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
 
     private val w = new VectorD (x.dim2)     // normal vector to the hyperplane
-    private var b = 0.                       // intercept
+    private var b = 0.0                       // intercept
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Lagrangian Dual function, i.e., the objective function, to be
@@ -39,7 +39,7 @@ class SupportVectorMachine (x: MatrixD, y: VectorD)
      */
     def l_D (a: VectorD): Double =
     {
-        var sum = 0.
+        var sum = 0.0
         for (i <- 0 until x.dim1; j <- 0 until x.dim2) {
             sum += a(i) * a(j) * y(i) * y(j) * (x(i) dot x(j))
         } // for
@@ -47,13 +47,13 @@ class SupportVectorMachine (x: MatrixD, y: VectorD)
     } // l_D
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Equality constraint to be satisfied, dot product of a and y == 0.
+    /** Equality constraint to be satisfied, dot product of a and y == 0.0
      *  @param a  the vector of Lagrange multipliers
      */
     def g (a: VectorD): Double = a dot y
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine the normal vector w of the separating hyperplane w dot x + b = 0.
+    /** Determine the normal vector w of the separating hyperplane w dot x + b = 0.0
      *  Use a quadratic programming solver to find the optimal values for the
      *  the Lagrange multipliers a.  Use these to compute w.
      */
@@ -66,17 +66,17 @@ class SupportVectorMachine (x: MatrixD, y: VectorD)
     } // find_w
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine the intercept b of the separating hyperplane w dot x + b = 0.
+    /** Determine the intercept b of the separating hyperplane w dot x + b = 0.0
      *  Use ...
      */
     def find_b ()
     {
-        b = 0.  // FIX: to be implemented
+        b = 0.0  // FIX: to be implemented
     } // find_b
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From the positive and negative cases (vectors), find an optimal separating
-     *  hyperplane w dot x + b = 0.
+     *  hyperplane w dot x + b = 0.0
      */
     def train ()
     {
@@ -104,9 +104,9 @@ class SupportVectorMachine (x: MatrixD, y: VectorD)
  */
 object SupportVectorMachineTest extends App
 {
-    val x = new MatrixD ((2, 2), 1., 1.,
-                                 2., 2.)
-    val y = VectorD (1., -1.)
+    val x = new MatrixD ((2, 2), 1.0, 1.0,
+                                 2.0, 2.0)
+    val y = VectorD (1.0, -1.0)
 
     println ("x = " + x)
     println ("y = " + y)
@@ -115,7 +115,7 @@ object SupportVectorMachineTest extends App
     svm.train ()
     println ("fit = " + svm.fit)
 
-    val z  = VectorD (3., 3.)               // classify y for one point
+    val z  = VectorD (3.0, 3.0)               // classify y for one point
     val yp = svm.classify (z)
     println ("classify (" + z + ") = " + yp)
 

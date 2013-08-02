@@ -25,21 +25,21 @@ import scalation.util.Error
  *  @param p2   the ending point for the curve/arc
  *  @param len  the length of the arrowhead on the curve/arc
  */
-case class QArrow (var p1:  R2  = R2 (0., 0.),
-                   var pc:  R2  = R2 (0., 0.),
-                   var p2:  R2  = R2 (0., 0.),
+case class QArrow (var p1:  R2  = R2 (0.0, 0.0),
+                   var pc:  R2  = R2 (0.0, 0.0),
+                   var p2:  R2  = R2 (0.0, 0.0),
                    len: Int = 10)
      extends java.awt.geom.Path2D.Double with CurvilinearShape
 {
     {
         val deltaX = p2.x - pc.x
         val slope  = (p2.y - pc.y) / deltaX                         // slope of curve at p2
-        val a1_2 = if (slope == Double.PositiveInfinity) Pi / 2.    // angle of line pc to p2
-              else if (slope == Double.NegativeInfinity) 3. * Pi / 2.
-              else if (deltaX < 0.) Pi + atan (slope)
+        val a1_2 = if (slope == Double.PositiveInfinity) Pi / 2.0    // angle of line pc to p2
+              else if (slope == Double.NegativeInfinity) 3.0 * Pi / 2.0
+              else if (deltaX < 0.0) Pi + atan (slope)
                  else atan (slope)
-        val a2_3 = a1_2 - 5. * Pi / 6.                              // angle of line p2 to p3
-        val a3_4 = a1_2 + Pi / 2.                                   // angle of line p3 to p4
+        val a2_3 = a1_2 - 5.0 * Pi / 6.0                              // angle of line p2 to p3
+        val a3_4 = a1_2 + Pi / 2.0                                   // angle of line p3 to p4
         val p3   = R2 (p2.x + len * cos (a2_3), p2.y + len * sin (a2_3))
         val p4   = R2 (p3.x + len * cos (a3_4), p3.y + len * sin (a3_4))
         moveTo (p1.x, p1.y)
@@ -54,7 +54,7 @@ case class QArrow (var p1:  R2  = R2 (0., 0.),
      *  control point.
      *  @param p1    the starting point for the curve/arc
      *  @param p2    the ending point for the curve/arc
-     *  @param bend  the bend or curvature  (1. => line length)
+     *  @param bend  the bend or curvature  (1.0 => line length)
      */
     def this (p1: R2, p2: R2, bend: Double)
     {
@@ -66,8 +66,8 @@ case class QArrow (var p1:  R2  = R2 (0., 0.),
      */
     def getCenterX (): Double =
     {
-        if (pc.x > 0.) (p1.x + 2. * pc.x + p2.x) / 4.
-        else           (p1.x + p2.x) / 2.
+        if (pc.x > 0.0) (p1.x + 2.0 * pc.x + p2.x) / 4.0
+        else           (p1.x + p2.x) / 2.0
     } // getCenterX
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -75,8 +75,8 @@ case class QArrow (var p1:  R2  = R2 (0., 0.),
      */
     def getCenterY (): Double =
     {
-        if (pc.y > 0.) (p1.y + 2. * pc.y + p2.y) / 4.
-        else           (p1.y + p2.y) / 2.
+        if (pc.y > 0.0) (p1.y + 2.0 * pc.y + p2.y) / 4.0
+        else           (p1.y + p2.y) / 2.0
     } // getCenterY
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -87,7 +87,7 @@ case class QArrow (var p1:  R2  = R2 (0., 0.),
     def setLine (_p1: R2, _p2: R2)
     {
         p1 = _p1; p2 = _p2
-        val pc = computeControlPoint (p1, p2, 0.)    // use 0 for the bend
+        val pc = computeControlPoint (p1, p2, 0.0)    // use 0 for the bend
         setLine (p1, pc, p2)
     } // setLine
 
@@ -117,12 +117,12 @@ case class QArrow (var p1:  R2  = R2 (0., 0.),
         p1 = _p1; pc = _pc; p2 = _p2
         val deltaX = p2.x - pc.x
         val slope  = (p2.y - pc.y) / deltaX                         // slope of curve at p2
-        val a1_2 = if (slope == Double.PositiveInfinity) Pi / 2.    // angle of line pc to p2
-              else if (slope == Double.NegativeInfinity) 3. * Pi / 2.
-              else if (deltaX < 0.) Pi + atan (slope)
+        val a1_2 = if (slope == Double.PositiveInfinity) Pi / 2.0    // angle of line pc to p2
+              else if (slope == Double.NegativeInfinity) 3.0 * Pi / 2.0
+              else if (deltaX < 0.0) Pi + atan (slope)
                  else atan (slope)
-        val a2_3 = a1_2 - 5. * Pi / 6.                              // angle of line p2 to p3
-        val a3_4 = a1_2 + Pi / 2.                                   // angle of line p3 to p4
+        val a2_3 = a1_2 - 5.0 * Pi / 6.0                              // angle of line p2 to p3
+        val a3_4 = a1_2 + Pi / 2.0                                   // angle of line p3 to p4
         val p3   = R2 (p2.x + len * cos (a2_3), p2.y + len * sin (a2_3))
         val p4   = R2 (p3.x + len * cos (a3_4), p3.y + len * sin (a3_4))
         moveTo (p1.x, p1.y)

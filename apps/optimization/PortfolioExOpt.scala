@@ -68,12 +68,12 @@ object PortfolioExOpt extends App
     println ("mean = " + mean)
     println ("cova = " + cova)
 
-    val x0 = new VectorD (r.dim2); x0.set (1. / r.dim2)
+    val x0 = new VectorD (r.dim2); x0.set (1.0 / r.dim2)
 //  def f (x: VectorD) = (cova * x) dot x
-//  def g (x: VectorD) = abs((mean dot x) - 1.25) + abs(x.sum - 1.) 
+//  def g (x: VectorD) = abs((mean dot x) - 1.25) + abs(x.sum - 1.0)
 
     def f (x: VectorD) = -(mean dot x) / sqrt((cova * x) dot x) 
-    def g (x: VectorD) = (x.sum - 1.) + (1. - x.sum)
+    def g (x: VectorD) = (x.sum - 1.0) + (1.0 - x.sum)
 
     val solver = new ConjGradient (f, g, false)
     var x = solver.solve (x0)

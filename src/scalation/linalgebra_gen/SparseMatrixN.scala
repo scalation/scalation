@@ -559,7 +559,7 @@ class SparseMatrixN [T: ClassManifest: Numeric] (d1: Int,
                     if (itaNext && ea.later == null) cont = false
                     if (itbNext && eb.later == null) cont = false
                 } // while
-                if (sum != 0.) c(i, j) = sum         // assign if non-zero
+                if (sum != 0.0) c(i, j) = sum         // assign if non-zero
             } // for
         } // for
         c
@@ -810,7 +810,7 @@ class SparseMatrixN [T: ClassManifest: Numeric] (d1: Int,
 
         for (i <- u.range1) {
             var pivot = u(i, i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (u, i)   // find the maxiumum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u(i, i)                  // reset the pivot
@@ -839,7 +839,7 @@ class SparseMatrixN [T: ClassManifest: Numeric] (d1: Int,
 
         for (i <- u.range1) {
             var pivot = u(i, i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (u, i)   // find the maxiumum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u(i, i)                  // reset the pivot
@@ -1014,7 +1014,7 @@ class SparseMatrixN [T: ClassManifest: Numeric] (d1: Int,
 
         for (i <- b.range1) {
             val pivot = b(i, i)
-            if (pivot == 0.) flaw ("inverse_npp", "use inverse since you have a zero pivot")
+            if (pivot == 0.0) flaw ("inverse_npp", "use inverse since you have a zero pivot")
             for (j <- b.range2) {
                 b(i, j) = b(i, j) / pivot
                 c(i, j) = c(i, j) / pivot
@@ -1041,7 +1041,7 @@ class SparseMatrixN [T: ClassManifest: Numeric] (d1: Int,
 
         for (i <- b.range1) {
             var pivot = b(i, i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 swap (c, i, k, 0)               // in c, swap rows i and k from column 0
@@ -1074,7 +1074,7 @@ class SparseMatrixN [T: ClassManifest: Numeric] (d1: Int,
 
         for (i <- b.range1) {
             var pivot = b(i, i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 swap (c, i, k, 0)               // in c, swap rows i and k from column 0
@@ -1107,7 +1107,7 @@ class SparseMatrixN [T: ClassManifest: Numeric] (d1: Int,
 
         for (i <- b.range1) {
             var pivot = b(i, i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b(i, i)                 // reset the pivot
@@ -1137,7 +1137,7 @@ class SparseMatrixN [T: ClassManifest: Numeric] (d1: Int,
 
         for (i <- b.range1) {
             var pivot = b(i, i)
-            if (pivot == 0.) {
+            if (pivot == 0.0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b(i, i)                 // reset the pivot
@@ -1324,8 +1324,8 @@ object SparseMatrixNTest extends App
 {
      import SparseMatrices._
 
-     val y = new SparseMatrixF (3, 3, 7.f, 0.f)
-     val z = new SparseMatrixF (3, 8.f, 0.f)
+     val y = new SparseMatrixF (3, 3, 7.0f, 0.0f)
+     val z = new SparseMatrixF (3, 8.0f, 0.0f)
      val a = y + z
      val b = y - z
      val c = y * z
@@ -1338,19 +1338,19 @@ object SparseMatrixNTest extends App
 
      type RowMap = SortedLinkedHashMap [Int, Float]
 
-     val x = new SparseMatrixF (12, 0.f)
-     x(0)  = new RowMap ((1, 1.f), (5, 1.f), (6, 1.f), (9, 1.f))
-     x(1)  = new RowMap ((0, 1.f), (2, 1.f), (4, 1.f))
-     x(2)  = new RowMap ((1, 1.f), (3, 1.f), (4, 1.f))
-     x(3)  = new RowMap ((2, 1.f), (7, 1.f), (8, 1.f), (10, 1.f))
-     x(4)  = new RowMap ((1, 1.f), (2, 1.f), (6, 1.f), (7, 1.f))
-     x(5)  = new RowMap ((0, 1.f), (9, 1.f))
-     x(6)  = new RowMap ((0, 1.f), (4, 1.f), (9, 1.f))
-     x(7)  = new RowMap ((3, 1.f), (4, 1.f), (8, 1.f), (10, 1.f))
-     x(8)  = new RowMap ((3, 1.f), (7, 1.f), (10, 1.f), (11, 1.f))
-     x(9)  = new RowMap ((0, 1.f), (5, 1.f), (6, 1.f))
-     x(10) = new RowMap ((3, 1.f), (7, 1.f), (8, 1.f), (11, 1.f))
-     x(11) = new RowMap ((8, 1.f))
+     val x = new SparseMatrixF (12, 0.0f)
+     x(0)  = new RowMap ((1, 1.0f), (5, 1.0f), (6, 1.0f), (9, 1.0f))
+     x(1)  = new RowMap ((0, 1.0f), (2, 1.0f), (4, 1.0f))
+     x(2)  = new RowMap ((1, 1.0f), (3, 1.0f), (4, 1.0f))
+     x(3)  = new RowMap ((2, 1.0f), (7, 1.0f), (8, 1.0f), (10, 1.0f))
+     x(4)  = new RowMap ((1, 1.0f), (2, 1.0f), (6, 1.0f), (7, 1.0f))
+     x(5)  = new RowMap ((0, 1.0f), (9, 1.0f))
+     x(6)  = new RowMap ((0, 1.0f), (4, 1.0f), (9, 1.0f))
+     x(7)  = new RowMap ((3, 1.0f), (4, 1.0f), (8, 1.0f), (10, 1.0f))
+     x(8)  = new RowMap ((3, 1.0f), (7, 1.0f), (10, 1.0f), (11, 1.0f))
+     x(9)  = new RowMap ((0, 1.0f), (5, 1.0f), (6, 1.0f))
+     x(10) = new RowMap ((3, 1.0f), (7, 1.0f), (8, 1.0f), (11, 1.0f))
+     x(11) = new RowMap ((8, 1.0f))
 
      println ("x     = " + x); x.showAll
 

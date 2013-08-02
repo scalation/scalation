@@ -42,7 +42,7 @@ class NelderMeadSimplex (f: FunctionV2S, n: Int)
     private val gamma = 2.0                           // gamma (> 1)  parameter for expansion
     private val delta = 0.5                           // delta (0, 1) parameter for shrinkage
 
-    private var (f_h, f_s, f_l) = (0., 0., 0.)        // worst, second worst, best functional values
+    private var (f_h, f_s, f_l) = (0.0, 0.0, 0.0)        // worst, second worst, best functional values
 
     if (n < 2) flaw ("constructor", "requires at least a 2-dimensional problem")
 
@@ -154,7 +154,7 @@ class NelderMeadSimplex (f: FunctionV2S, n: Int)
      *  @param dir   the direction to move in
      *  @param step  the initial step size
      */
-    def lineSearch (x: VectorD, dir: VectorD, step: Double = STEP): Double = 0.
+    def lineSearch (x: VectorD, dir: VectorD, step: Double = STEP): Double = 0.0
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Replace the worst vertex (h=0) in the simplex with the new point.
@@ -250,10 +250,10 @@ class NelderMeadSimplex (f: FunctionV2S, n: Int)
  */
 object NelderMeadSimplexTest extends App
 {
-    var x0 = VectorD (1., 1.)                             // starting point
+    var x0 = VectorD (1.0, 1.0)                             // starting point
 
     println ("\nProblem 1: (x_0 - 2)^2 + (x_1 - 3)^2 + 1") 
-    def f (x: VectorD): Double = (x(0) - 2.) * (x(0) - 2.) + (x(1) - 3.) * (x(1) - 3.) + 1
+    def f (x: VectorD): Double = (x(0) - 2.0) * (x(0) - 2.0) + (x(1) - 3.0) * (x(1) - 3.0) + 1
     val solver = new NelderMeadSimplex (f, 2)
     val x = solver.solve (x0)                             // optimal point
     println ("optimal solution = " + x + " at " + f(x))
