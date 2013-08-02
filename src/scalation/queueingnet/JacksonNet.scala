@@ -125,8 +125,8 @@ object JacksonNetTest extends App
 {
     val p  = new MatrixD ((2, 2), 0., 1.,
                                   0., 0.)
-    val r  = new VectorD (5., 0.)
-    val mu = new VectorD (8., 10.)
+    val r  = VectorD (5., 0.)
+    val mu = VectorD (8., 10.)
 
     val jqn = new JacksonNet (p, r, mu)
     jqn.check

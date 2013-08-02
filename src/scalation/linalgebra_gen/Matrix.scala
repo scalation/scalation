@@ -47,6 +47,30 @@ trait Matrix [T]
     def apply (i: Int): VectorN [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise on range ir and column-wise on range jr.
+     *  Ex: b = a(2..4, 3..5)
+     *  @param ir  the row range
+     *  @param jr  the column range
+     */
+    def apply (ir: Range, jr: Range): Matrix [T]
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise on range ir and column-wise at index j.
+     *  Ex: u = a(2..4, 3)
+     *  @param ir  the row range
+     *  @param j   the column index
+     */
+    def apply (ir: Range, j: Int): VectorN [T]
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise at index i and column-wise on range jr.
+     *  Ex: u = a(2, 3..5)
+     *  @param i   the row index
+     *  @param jr  the column range
+     */
+    def apply (i: Int, jr: Range): VectorN [T]
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set this matrix's element at the i,j-th index position to the scalar x.
      *  @param i  the row index
      *  @param j  the column index
@@ -62,22 +86,42 @@ trait Matrix [T]
     def update (i: Int, u: VectorN [T])
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set a slice this matrix row-wise on range ir and column-wise at index j.
+     *  Ex: a(2..4, 3) = u
+     *  @param ir  the row range
+     *  @param j   the column index
+     *  @param u   the vector to assign
+     */
+    def update (ir: Range, j: Int, u: VectorN [T])
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set a slice this matrix row-wise at index i and column-wise on range jr.
+     *  Ex: a(2, 3..5) = u
+     *  @param i   the row index
+     *  @param jr  the column range
+     *  @param u   the vector to assign
+     */
+    def update (i: Int, jr: Range, u: VectorN [T])
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set all the elements in this matrix to the scalar x.
      *  @param x  the scalar value to assign
      */
-    def set (x: T) { for (i <- range1; j <- range2) this(i, j) = x }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set all the lower triangular elements in this matrix to the scalar x.
-     *  @param x  the scalar value to assign
-     */
-    def setLower (x: T) { for (i <- range1; j <- 0 until i) this(i, j) = x }
+    def set (x: T)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the values in this matrix as copies of the values in 2D array u.
      *  @param u  the 2D array of values to assign
      */
-    def set (u: Array [Array [T]]) { for (i <- range1; j <- range2) this(i, j) = u(i)(j) }
+    def set (u: Array [Array [T]])
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set this matrix's ith row starting a column j to the vector u.
+     *  @param i  the row index
+     *  @param u  the vector value to assign
+     *  @param j  the starting column index
+     */
+    def set (i: Int, u: VectorN [T], j: Int = 0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Iterate over the matrix row by row.
@@ -88,48 +132,6 @@ trait Matrix [T]
         var i = 0
         while (i < dim1) { f (this(i)()); i += 1 }
     } // foreach
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get row '_row' from the matrix, returning it as a vector.
-     *  @param _row  the row to extract from the matrix
-     *  @param from  the position to start extracting from
-     */
-    def row (_row: Int, from: Int = 0): VectorN [T]
-/*
-    {
-        val c = new VectorN [T] (dim2 - from)
-        for (j <- from until dim2) c(j - from) = this(_row, j)
-        c
-    } // row
-*/
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set row 'row' of the matrix to a vector.
-     *  @param row  the column to set
-     *  @param u    the vector to assign to the column
-     */
-    def setRow (row: Int, u: VectorN [T]) { for (j <- range2) this(row, j) = u(j) }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get column '_col' from the matrix, returning it as a vector.
-     *  @param _col  the column to extract from the matrix
-     *  @param from  the position to start extracting from
-     */
-    def col (_col: Int, from: Int = 0): VectorN [T]
-/*
-    {
-        val c = new VectorN [T] (dim1 - from)
-        for (i <- from until dim1) c(i - from) = this(i, _col)
-        c
-    } // col
-*/
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set column 'col' of the matrix to a vector.
-     *  @param col  the column to set
-     *  @param u    the vector to assign to the column
-     */
-    def setCol (col: Int, u: VectorN [T]) { for (i <- range1) this(i, col) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice this matrix row-wise from to end.
@@ -155,10 +157,31 @@ trait Matrix [T]
     def sliceExclude (row: Int, col: Int): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return 1 if the condition is true else 0
-     *  @param cond  the condition to evaluate
+    /** Select rows from this matrix according the given index.
+     *  @param rowIndex  the row index positions (e.g., (0, 2, 5))
      */
-    def oneIf (cond: Boolean): Int = if (cond) 1 else 0
+    def selectRows (rowIndex: Array [Int]): Matrix [T]
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get column 'col' from the matrix, returning it as a vector.
+     *  @param col   the column to extract from the matrix
+     *  @param from  the position to start extracting from
+     */
+    def col (col: Int, from: Int = 0): VectorN [T]
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set column 'col' of the matrix to a vector.
+     *  @param col  the column to set
+     *  @param u    the vector to assign to the column
+     */
+    def setCol (col: Int, u: VectorN [T])
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Select columns from this matrix according the given index.
+     *  Ex:  Can be used to divide a matrix into a basis and a non-basis.
+     *  @param colIndex  the column index positions (e.g., (0, 2, 5))
+     */
+    def selectCols (colIndex: Array [Int]): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Transpose this matrix (rows => columns).
@@ -166,58 +189,100 @@ trait Matrix [T]
     def t: Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add this matrix and scalar s.
-     *  @param s  the scalar to add
+    /** Concatenate this matrix and vector u.
+     *  @param u  the vector to be concatenated as the new last row in matrix
      */
-    def + (s: T): Matrix [T]
+    def ++ (u: VectorN [T]): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add in-place this matrix and scalar s.
-     *  @param s  the scalar to add
+    /** Add this matrix and scalar x.
+     *  @param x  the scalar to add
      */
-    def += (s: T)
+    def + (x: T): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract scalar s.
-     *  @param s  the scalar to subtract
+    /** Add in-place this matrix and scalar x.
+     *  @param x  the scalar to add
      */
-    def - (s: T): Matrix [T]
+    def += (x: T): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract in-place scalar s.
-     *  @param s  the scalar to subtract
+    /** From this matrix subtract scalar x.
+     *  @param x  the scalar to subtract
      */
-    def -= (s: T)
+    def - (x: T): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector b.
-     *  @param b  the vector to multiply by
+    /** From this matrix subtract in-place scalar x.
+     *  @param x  the scalar to subtract
      */
-    def * (b: VectorN [T]): VectorN [T]
+    def -= (x: T): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by scalar s.
-     *  @param s  the scalar to multiply by
+    /** Multiply this matrix by vector u.
+     *  @param u  the vector to multiply by
      */
-    def * (s: T): Matrix [T]
+    def * (u: VectorN [T]): VectorN [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by scalar s.
-     *  @param s  the scalar to multiply by
+    /** Multiply this matrix by scalar x.
+     *  @param x  the scalar to multiply by
      */
-    def *= (s: T)
+    def * (x: T): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector b to produce another matrix (a_ij * b_j)
-     *  @param b  the vector to multiply by
+    /** Multiply in-place this matrix by scalar x.
+     *  @param x  the scalar to multiply by
      */
-    def ** (b: VectorN [T]): Matrix [T]
+    def *= (x: T): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by vector b to produce another matrix (a_ij * b_j)
-     *  @param b  the vector to multiply by
+    /** Multiply this matrix by vector u to produce another matrix (a_ij * u_j)
+     *  @param u  the vector to multiply by
      */
-    def **= (b: VectorN [T])
+    def ** (u: VectorN [T]): Matrix [T]
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply in-place this matrix by vector u to produce another matrix (a_ij * u_j)
+     *  @param u  the vector to multiply by
+     */
+    def **= (u: VectorN [T]): Matrix [T]
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide this matrix by scalar x.
+     *  @param x  the scalar to divide by
+     */
+    def / (x: T) (implicit fr: Fractional [T]): Matrix [T]
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide in-place this matrix by scalar x.
+     *  @param x  the scalar to divide by
+     */
+    def /= (x: T) (implicit fr: Fractional [T]): Matrix [T]
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Raise this matrix to the pth power (for some integer p >= 2).
+     *  Caveat: should be replace by a divide and conquer algorithm.
+     *  @param p  the power to raise this matrix to
+     */
+    def ~^ (p: Int): Matrix [T]
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the maximum element in this matrix.
+     *  @param e  the ending row index (exclusive) for the search
+     */
+    def max (e: Int = dim1): T
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the minimum element in this matrix.
+     *  @param e  the ending row index (exclusive) for the search
+     */
+    def min (e: Int = dim1): T
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the magnitude of this matrix, the element value farthest from zero.
+     */
+    def mag: T
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Decompose this matrix into the product of lower and upper triangular
@@ -260,9 +325,9 @@ trait Matrix [T]
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine the rank of this m by n matrix by taking the upper triangular
      *  matrix from the LU Decomposition and counting the number of non-zero
-     *  diagonal elements.
+     *  diagonal elements.  FIX:  should implement in implementing classes.
      */
-    def rank (implicit fr: Fractional [T]): Double =
+    def rank (implicit fr: Fractional [T]): Int =
     {
         val max   = if (dim1 < dim2) dim1 else dim2   // rank <= min (m, n)
         val u     = lud._2                            // upper triangular matrix
@@ -280,27 +345,35 @@ trait Matrix [T]
     def diag (p: Int, q: Int): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the main diagonal of this matrix.  Assumes dim2 >= dim1.
+    /** Get the kth diagonal of this matrix.  Assumes dim2 >= dim1.
+     *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
-    def getDiag (): VectorN [T]
+    def getDiag (k: Int = 0): VectorN [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the main diagonal of this matrix to the scalar value s.  Assumes dim2 >= dim1.
+    /** Set the kth diagonal of this matrix to the vector u.  Assumes dim2 >= dim1.
+     *  @param u  the vector to set the diagonal to
+     *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
-    def setDiag (s: T) { for (i <- range1) this(i, i) = s }
+    def setDiag (u: VectorN [T], k: Int = 0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Invert this matrix (requires a squareMatrix) and do not use partial pivoting.
+    /** Set the main diagonal of this matrix to the scalar x.  Assumes dim2 >= dim1.
+     */
+    def setDiag (x: T)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Invert this matrix (requires a squareMatrix) not using partial pivoting.
      */
     def inverse_npp (implicit fr: Fractional [T]): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Invert this matrix (requires a squareMatrix) and use partial pivoting.
+    /** Invert this matrix (requires a squareMatrix) using partial pivoting.
      */
     def inverse (implicit fr: Fractional [T]): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Invert in-place this matrix (requires a squareMatrix) and use partial pivoting.
+    /** Invert in-place this matrix (requires a squareMatrix) using partial pivoting.
      */
     def inverse_ip (implicit fr: Fractional [T]): Matrix [T]
 
@@ -315,6 +388,15 @@ trait Matrix [T]
      *  embed an identity matrix.  A constraint on this m by n matrix is that n >= m.
      */ 
     def reduce_ip (implicit fr: Fractional [T])
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Clean values in matrix at or below the threshold by setting them to zero.
+     *  Iterative algorithms give approximate values and if very close to zero,
+     *  may throw off other calculations, e.g., in computing eigenvectors.
+     *  @param thres     the cutoff threshold (a small value)
+     *  @param relative  whether to use relative or absolute cutoff
+     */
+    def clean (thres: T, relative: Boolean = true) (implicit fr: Fractional [T]): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the (right) nullspace of this m by n matrix (requires n = m + 1)
@@ -350,6 +432,18 @@ trait Matrix [T]
     /** Compute the sum of the lower triangular region of this matrix.
      */
     def sumLower: T
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the abs sum of this matrix, i.e., the sum of the absolute value
+     *  of its elements.  This is useful for comparing matrices (a - b).sumAbs
+     */
+    def sumAbs: T
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the 1-norm of this matrix, i.e., the maximum 1-norm of the
+     *  column vectors.  This is useful for comparing matrices (a - b).norm1
+     */
+    def norm1: T
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the determinant of this matrix.

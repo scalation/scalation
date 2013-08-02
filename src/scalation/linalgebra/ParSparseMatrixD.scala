@@ -32,13 +32,18 @@ class ParSparseMatrixD (val d1: Int,
     // foreach, mag, rank, sameDimensions, leDimensions, sameCrossDimensions,
     // isSquare, isSymmetric
 
+    /** Dimension 1
+     */
     lazy val dim1 = d1
+
+    /** Dimension 2
+     */
     lazy val dim2 = d2
     
     /** Store the matrix as an array of sorted-linked-maps {(j, v)}
      *  where j is the second index and v is value to store
      */
-    var v = new Array [SortedLinkedHashMap [Int, Double]] (d1)
+    private val v = new Array [SortedLinkedHashMap [Int, Double]] (d1)
     for (i <- 0 until d1) v(i) = new SortedLinkedHashMap [Int, Double] ()
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -51,7 +56,7 @@ class ParSparseMatrixD (val d1: Int,
     {
         this (dim1, dim2)         // invoke primary constructor
         if (u.length != dim1) flaw ("contructor", "dimension is not matched!")
-        v = u
+        for (i <- 0 until dim1) v(i) = u(i)
     } // constructor
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -295,43 +300,44 @@ class ParSparseMatrixD (val d1: Int,
     } // sliceExclude
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Select rows from this sparse matrix according a basis.
-     *  @param basis  the row index positions (e.g., (0, 2, 5))
+    /** Select rows from this matrix according to the given index/basis.
+     *  @param rowIndex  the row index positions (e.g., (0, 2, 5))
      */
-    def selectRows (basis: Array [Int]): ParSparseMatrixD =
+    def selectRows (rowIndex: Array [Int]): ParSparseMatrixD =
     {
-        val c = new ParSparseMatrixD (basis.length)
-        for (i <- c.range1) c(i) = col(basis(i))
+        val c = new ParSparseMatrixD (rowIndex.length, dim2)
+        for (i <- c.range1) c(i) = this(rowIndex(i))
         c
     } // selectRows
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get column 'c' from the matrix, returning it as a vector.
-     *  @param c     the column to extract from the matrix
+    /** Get column 'col' from the matrix, returning it as a vector.
+     *  @param col   the column to extract from the matrix
      *  @param from  the position to start extracting from
      */
-    def col (c: Int, from: Int = 0): VectorD =
+    def col (col: Int, from: Int = 0): VectorD =
     {
         val u = new VectorD (dim1 - from)
-        for (i <- from until dim1) u(i-from) = this(i, c)
+        for (i <- from until dim1) u(i-from) = this(i, col)
         u
     } // col
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set column 'c' of the matrix to a vector.
-     *  @param c  the column to set
-     *  @param u  the vector to assign to the column
+    /** Set column 'col' of the matrix to a vector.
+     *  @param col  the column to set
+     *  @param u    the vector to assign to the column
      */
-    def setCol (c: Int, u: VectorD) { for (i <- range1) this(i, c) = u(i) }
+    def setCol (col: Int, u: VectorD) { for (i <- range1) this(i, col) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Select columns from this sparse matrix according a basis.
-     *  @param basis  the column index positions (e.g., (0, 2, 5))
+    /** Select columns from this matrix according to the given index/basis.
+     *  Ex: Can be used to divide a matrix into a basis and a non-basis.
+     *  @param colIndex  the column index positions (e.g., (0, 2, 5))
      */
-    def selectCols (basis: Array [Int]): ParSparseMatrixD =
+    def selectCols (colIndex: Array [Int]): ParSparseMatrixD =
     {
-        val c = new ParSparseMatrixD (basis.length)
-        for (j <- c.range1) c.setCol (j, col(basis(j)))
+        val c = new ParSparseMatrixD (dim1, colIndex.length)
+        for (j <- c.range2) c.setCol (j, col(colIndex(j)))
         c
     } // selectCols
 
@@ -396,27 +402,30 @@ class ParSparseMatrixD (val d1: Int,
     /** Add in-place this sparse matrix and sparse matrix b.
      *  @param b  the matrix to add (requires sameCrossDimensions)
      */
-    def += (b: ParSparseMatrixD)
+    def += (b: ParSparseMatrixD): ParSparseMatrixD =
     {
         for (i <- range1.par; e <- b.v(i)) this(i, e._1) = this(i, e._1) + e._2
+        this
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place this sparse matrix and matrix b.
      *  @param b  the matrix to add (requires sameCrossDimensions)
      */
-    def += (b: ParMatrixD)
+    def += (b: ParMatrixD): ParSparseMatrixD =
     {
         for (i <- range1.par; j <- range2) this(i, j) = this(i, j) + b(i, j)
+        this
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place this sparse matrix and scalar x.
      *  @param x  the scalar to add
      */
-    def += (x: Double)
+    def += (x: Double): ParSparseMatrixD =
     {
         for (i <- range1.par; j <- range2) this(i, j) = this(i, j) + x
+        this
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -457,27 +466,30 @@ class ParSparseMatrixD (val d1: Int,
     /** From this sparse matrix substract in-place sparse matrix b.
      *  @param b  the sparse matrix to subtract (requires sameCrossDimensions)
      */
-    def -= (b: ParSparseMatrixD)
+    def -= (b: ParSparseMatrixD): ParSparseMatrixD =
     {
         for (i <- range1.par; e <- b.v(i)) this(i, e._1) = this(i, e._1) - e._2
+        this
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From this sparse matrix substract in-place matrix b.
      *  @param b  the matrix to subtract (requires sameCrossDimensions)
      */
-    def -= (b: ParMatrixD)
+    def -= (b: ParMatrixD): ParSparseMatrixD =
     {
         for (i <- range1.par; j <- range2) this(i, j) = this(i, j) - b(i, j)
+        this
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From this sparse matrix subtract in-place scalar x.
      *  @param x  the scalar to subtract
      */
-    def -= (x: Double)
+    def -= (x: Double): ParSparseMatrixD =
     {
         for (i <- range1.par; j <- range2) this(i, j) = this(i, j) - x
+        this
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -618,7 +630,7 @@ class ParSparseMatrixD (val d1: Int,
      *  the b matrix.
      *  @param b  the matrix to multiply by (requires square and sameCrossDimensions)
      *
-    def *= (b: ParSparseMatrixD)
+    def *= (b: ParSparseMatrixD): ParSparseMatrixD =
     {
         if (! b.isSquare)   flaw ("*=", "matrix b must be square")
         if (dim2 != b.dim1) flaw ("*=", "matrix *= matrix - incompatible cross dimensions")
@@ -654,6 +666,7 @@ class ParSparseMatrixD (val d1: Int,
                 this(i, j) = sum
             } // for
         } // for
+        this
     } // *=
      */
 
@@ -663,7 +676,7 @@ class ParSparseMatrixD (val d1: Int,
      *  the b matrix.
      *  @param b  the matrix to multiply by (requires square and sameCrossDimensions)
      */
-    def *= (b: ParSparseMatrixD)
+    def *= (b: ParSparseMatrixD): ParSparseMatrixD =
     {
         if (! b.isSquare)   flaw ("*=", "matrix b must be square")
         if (dim2 != b.dim1) flaw ("*=", "matrix *= matrix - incompatible cross dimensions")
@@ -699,13 +712,14 @@ class ParSparseMatrixD (val d1: Int,
                 this(i, j) = sum         // assign if non-zero
             } // for
         } // for
+        this
     } // *=
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place this sparse matrix by matrix b.
      *  @param b  the matrix to multiply by (requires sameCrossDimensions)
      */
-    def *= (b: ParMatrixD)
+    def *= (b: ParMatrixD): ParSparseMatrixD =
     {
         if (! b.isSquare)   flaw ("*=", "matrix b must be square")
         if (dim2 != b.dim1) flaw ("*=", "matrix *= matrix - incompatible cross dimensions")
@@ -719,15 +733,17 @@ class ParSparseMatrixD (val d1: Int,
                 this(i, j) = sum
             } // for
         } // for
+        this
     } // *=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place this sparse matrix by scalar x.
      *  @param x  the scalar to multiply by
      */
-    def *= (x: Double)
+    def *= (x: Double): ParSparseMatrixD =
     {
         for (i <- range1.par; e <- v(i)) this(i, e._1) = x * e._2
+        this
     } // *=
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -777,7 +793,7 @@ class ParSparseMatrixD (val d1: Int,
     } // times_s
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this sparse matrix by vector b to produce another matrix (a_ij * u_j)
+    /** Multiply this sparse matrix by vector u to produce another matrix (a_ij * u_j)
      *  @param u  the vector to multiply by
      */
     def ** (u: VectorD): ParSparseMatrixD =
@@ -788,12 +804,13 @@ class ParSparseMatrixD (val d1: Int,
     } // **
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this sparse matrix by vector b to produce another matrix (a_ij * u_j)
+    /** Multiply in-place this sparse matrix by vector u to produce another matrix (a_ij * u_j)
      *  @param u  the vector to multiply by
      */
-    def **= (u: VectorD)
+    def **= (u: VectorD): ParSparseMatrixD =
     {
         for (i <- range1.par; e <- v(i)) this(i, e._1) = e._2 * u(e._1)
+        this
     } // **=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -811,9 +828,10 @@ class ParSparseMatrixD (val d1: Int,
     /** Divide in-place this sparse matrix by scalar x.
      *  @param x  the scalar to divide by
      */
-    def /= (x: Double)
+    def /= (x: Double): ParSparseMatrixD =
     {
         for (i <- range1.par; e <- v(i)) this(i, e._1) = e._2 / x
+        this
     } // /=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1078,7 +1096,36 @@ class ParSparseMatrixD (val d1: Int,
     def setDiag (x: Double) { for (i <- range1) this(i, i) = x }
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Invert this sparse matrix (requires a squareMatrix) and use partial pivoting.
+    /** Invert this sparse matrix (requires a squareMatrix) not using partial pivoting.
+     */
+    def inverse_npp: ParSparseMatrixD =
+    {
+        val b = new ParSparseMatrixD (this)           // copy this matrix into b
+        val c = new ParSparseMatrixD (dim1, 1.)       // let c represent the augmentation
+        for (i <- b.range1) {
+            var pivot = b(i, i)
+            if (pivot == 0.) flaw ("inverse_npp", "use inverse since you have a zero pivot")
+            for (j <- b.range2) {
+                b(i, j) = b(i, j) / pivot
+                c(i, j) = c(i, j) / pivot
+            } // for
+            for (k <- 0 until dim1 if k != i) {
+                val mul = b(k, i)
+                if (mul != 0.) {
+                    for (j <- b.range2) {
+                        val bval = b(i, j)
+                        val cval = c(i, j)
+                        if (bval != 0.) b(k, j) -= mul * bval
+                        if (cval != 0.) c(k, j) -= mul * cval
+                    } // for
+                } // if
+            } // for
+        } // for
+        c
+    } // inverse_npp
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Invert this sparse matrix (requires a squareMatrix) using partial pivoting.
      */
     def inverse: ParSparseMatrixD =
     {
@@ -1278,6 +1325,28 @@ class ParSparseMatrixD (val d1: Int,
         for (i <- range1; j <- 0 until i) sum += this(i, j)
         sum
     } // sumLower
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the abs sum of this matrix, i.e., the sum of the absolute value
+     *  of its elements.  This is useful for comparing matrices (a - b).sumAbs
+     */
+    def sumAbs: Double =
+    {
+        var sum = 0.
+        for (i <- range1; j <- range2) sum += abs (this(i, j))
+        sum
+    } // sumAbs
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the 1-norm of this matrix, i.e., the maximum 1-norm of the
+     *  column vectors.  This is useful for comparing matrices (a - b).norm1
+     */
+    def norm1: Double =
+    {
+        val c = new VectorD (dim2)
+        for (j <- range2) c(j) = col(j).norm1
+        c.max ()
+    } // norm1
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the determinant of this sparse matrix.
@@ -1361,7 +1430,7 @@ object ParSparseMatrixDTest extends App
 
     val z  = new ParSparseMatrixD (2, 2)
     z.set (Array (Array (1., 2.), Array (3., 2.)))
-    val b  = new VectorD (8., 7.)
+    val b  = VectorD (8., 7.)
     val lu = z.lud
 
     println ("z         = " + z)

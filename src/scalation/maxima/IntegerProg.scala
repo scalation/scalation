@@ -182,8 +182,8 @@ object IntegerProgTest extends App
 {
     val a = new MatrixD ((2, 2), 1., 1.,
                                  5., 9.)
-    val c = new VectorD         (5., 8.)
-    val b = new VectorD (6., 45.)
+    val c = VectorD             (5., 8.)
+    val b = VectorD (6., 45.)
 
     val ilp = new IntegerProg (a, b, c)
     ilp.solve (0, (a, b))

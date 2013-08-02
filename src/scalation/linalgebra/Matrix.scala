@@ -48,7 +48,7 @@ trait Matrix
      */
     def apply (i: Int): VectorD
 
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get a slice this matrix row-wise on range ir and column-wise on range jr.
      *  Ex: b = a(2..4, 3..5)
      *  @param ir  the row range
@@ -159,17 +159,17 @@ trait Matrix
     def sliceExclude (row: Int, col: Int): Matrix
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Select rows from this matrix according a basis.
-     *  @param basis  the row index positions (e.g., (0, 2, 5))
+    /** Select rows from this matrix according to the given index/basis.
+     *  @param rowIndex  the row index positions (e.g., (0, 2, 5))
      */
-    def selectRows (basis: Array [Int]): Matrix
+    def selectRows (rowIndex: Array [Int]): Matrix
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get column 'c' from the matrix, returning it as a vector.
-     *  @param c     the column to extract from the matrix
+    /** Get column 'col' from the matrix, returning it as a vector.
+     *  @param col   the column to extract from the matrix
      *  @param from  the position to start extracting from
      */
-    def col (c: Int, from: Int = 0): VectorD
+    def col (col: Int, from: Int = 0): VectorD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set column 'c' of the matrix to a vector.
@@ -178,11 +178,12 @@ trait Matrix
      */
     def setCol (col: Int, u: VectorD)
 
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Select columns from this matrix according a basis.
-     *  @param basis  the column index positions (e.g., (0, 2, 5))
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Select columns from this matrix according to the given index/basis.
+     *  Ex:  Can be used to divide a matrix into a basis and a non-basis.
+     *  @param colIndex  the column index positions (e.g., (0, 2, 5))
      */
-    def selectCols (basis: Array [Int]): Matrix
+    def selectCols (colIndex: Array [Int]): Matrix
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Transpose this matrix (rows => columns).
@@ -191,7 +192,7 @@ trait Matrix
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate this matrix and vector u.
-     *  @param b  the vector to be concatenated as the new last row in matrix
+     *  @param u  the vector to be concatenated as the new last row in matrix
      */
     def ++ (u: VectorD): Matrix
 
@@ -207,7 +208,7 @@ trait Matrix
     /** Add in-place this matrix and scalar x.
      *  @param x  the scalar to add
      */
-    def += (x: Double)
+    def += (x: Double): Matrix
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From this matrix subtract scalar x.
@@ -219,7 +220,7 @@ trait Matrix
     /** From this matrix subtract in-place scalar x.
      *  @param x  the scalar to subtract
      */
-    def -= (x: Double)
+    def -= (x: Double): Matrix
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply this matrix by vector u.
@@ -237,7 +238,7 @@ trait Matrix
     /** Multiply in-place this matrix by scalar x.
      *  @param x  the scalar to multiply by
      */
-    def *= (x: Double)
+    def *= (x: Double): Matrix
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply this matrix by vector u to produce another matrix (a_ij * u_j)
@@ -249,7 +250,7 @@ trait Matrix
     /** Multiply in-place this matrix by vector u to produce another matrix (a_ij * u_j)
      *  @param u  the vector to multiply by
      */
-    def **= (u: VectorD)
+    def **= (u: VectorD): Matrix
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide this matrix by scalar x.
@@ -257,13 +258,13 @@ trait Matrix
      */
     def / (x: Double): Matrix
 
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place this matrix by scalar x.
      *  @param x  the scalar to divide by
      */
-    def /= (x: Double)
+    def /= (x: Double): Matrix
 
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Raise this matrix to the pth power (for some integer p >= 2).
      *  @param p  the power to raise this matrix to
      */
@@ -281,7 +282,7 @@ trait Matrix
      */
     def min (e: Int = dim1): Double
 
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the magnitude of this matrix, the element value farthest from zero.
      */
     def mag: Double = abs (max ()) max abs (min ())
@@ -326,10 +327,10 @@ trait Matrix
      *  matrix from the LU Decomposition and counting the number of non-zero
      *  diagonal elements.
      */
-    def rank: Double =
+    def rank: Int =
     {
-        val max   = if (dim1 < dim2) dim1 else dim2   // rank <= min (m, n)
-        val u     = lud._2                            // upper triangular matrix
+        val max   = if (dim1 < dim2) dim1 else dim2      // rank <= min (m, n)
+        val u     = lud._2                               // upper triangular matrix
         var count = 0
         for (i <- 0 until max if this(i, i) != 0.) count += 1
         count
@@ -357,18 +358,23 @@ trait Matrix
     def setDiag (u: VectorD, k: Int = 0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the kth diagonal of this matrix to the scalar x.  Assumes dim2 >= dim1.
+    /** Set the main diagonal of this matrix to the scalar x.  Assumes dim2 >= dim1.
      *  @param x  the scalar to set the diagonal to
      */
     def setDiag (x: Double)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Invert this matrix (requires a squareMatrix) and use partial pivoting.
+    /** Invert this matrix (requires a squareMatrix) not using partial pivoting.
+     */
+    def inverse_npp: Matrix
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Invert this matrix (requires a squareMatrix) using partial pivoting.
      */
     def inverse: Matrix
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Invert in-place this matrix (requires a squareMatrix) and use partial pivoting.
+    /** Invert in-place this matrix (requires a squareMatrix) using partial pivoting.
      */
     def inverse_ip: Matrix
 
@@ -384,7 +390,7 @@ trait Matrix
      */ 
     def reduce_ip
 
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Clean values in matrix at or below the threshold by setting them to zero.
      *  Iterative algorithms give approximate values and if very close to zero,
      *  may throw off other calculations, e.g., in computing eigenvectors.
@@ -427,6 +433,18 @@ trait Matrix
     /** Compute the sum of the lower triangular region of this matrix.
      */
     def sumLower: Double
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the abs sum of this matrix, i.e., the sum of the absolute value
+     *  of its elements.  This is useful for comparing matrices (a - b).sumAbs
+     */
+    def sumAbs: Double
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the 1-norm of this matrix, i.e., the maximum 1-norm of the
+     *  column vectors.  This is useful for comparing matrices (a - b).norm1
+     */
+    def norm1: Double
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the determinant of this matrix.

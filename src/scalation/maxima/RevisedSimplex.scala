@@ -190,8 +190,8 @@ object RevisedSimplexTest extends App
     val a = new MatrixD ((3, 7), 0.,  3.,  3.,  1., -1., 1., -5,
                                  1.,  3., -1.,  0., -1., 1.,  3., 
                                  1.,  2.,  0.,  1.,  2., 0., -2.)
-    val c   = new VectorD      (-2., -3.,  4., -3., -1., 4., -6.)
-    val b   = new VectorD (3., 4., 5.)
+    val c   = VectorD          (-2., -3.,  4., -3., -1., 4., -6.)
+    val b   = VectorD (3., 4., 5.)
     val x_B = Array (3, 5, 0)
 
     val result = (new RevisedSimplex (a, b, c, x_B)).solve ()
@@ -205,8 +205,8 @@ object RevisedSimplexTest extends App
     //
     val a = new MatrixD ((2, 3), 3., 2., 1.,
                                  2., 5., 3.)
-    val b   = new VectorD (10., 15.)
-    val c   = new VectorD (2., 3., 4.)
+    val c   = VectorD           (2., 3., 4.)
+    val b   = VectorD (10., 15.)
     val x_B = Array (1, 2)
 
     val result = (new RevisedSimplex (a, b, c, x_B)).solve ()

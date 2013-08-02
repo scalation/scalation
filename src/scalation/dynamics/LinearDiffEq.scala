@@ -97,7 +97,7 @@ object LinearDiffEqTest extends App
 {
     val a  = new MatrixD ((2, 2), -2.,  0.5,                    // 2-by-2 matrix
                                    2., -2.)
-    val y0 = new VectorD (1., 0.5)
+    val y0 = VectorD (1., 0.5)
     val de = new LinearDiffEq (a, y0)
     de.print
 

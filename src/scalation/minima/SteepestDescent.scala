@@ -47,12 +47,6 @@ class SteepestDescent (f: FunctionV2S, exactLS: Boolean = true)
      */
     def setDerivatives (partials: Array [FunctionV2S]) { df = partials; given = true } 
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The objective function fg used by line search.
-     *  @param x  the coordinate values of the currrent point
-     */
-    def fg (x: VectorD): Double = f(x)   // no penalty functions for unconstrained case
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform an exact (GoldenSectionLS) or inexact (WolfeLS) line search.
      *  Search in direction 'dir', returning the distance 'z' to move in that direction.
@@ -62,7 +56,7 @@ class SteepestDescent (f: FunctionV2S, exactLS: Boolean = true)
      */
     def lineSearch (x: VectorD, dir: VectorD, step: Double = STEP): Double =
     {
-        def f_1D (z: Double): Double = fg(x + dir * z)    // create a 1D function
+        def f_1D (z: Double): Double = f(x + dir * z)     // create a 1D function
         val ls = if (exactLS) new GoldenSectionLS (f_1D)  // Golden Section line search
                  else new WolfeLS (f_1D, .0001, .1)       // Wolfe line search (c1 = .0001, c2 = .1)
         ls.search (step)                                  // perform a line search
@@ -110,8 +104,8 @@ class SteepestDescent (f: FunctionV2S, exactLS: Boolean = true)
  */
 object SteepestDescentTest extends App
 {
-    var x0 = new VectorD (0., 0.)                       // starting point
-    var x: VectorD = null                               // optimal solution
+    var x0 = VectorD (0., 0.)                       // starting point
+    var x: VectorD = null                           // optimal solution
 
     println ("\nProblem 1: (x_0 - 2)^2 + (x_1 - 3)^2 + 1") 
     def f (x: VectorD): Double = (x(0) - 2.) * (x(0) - 2.) + (x(1) - 3.) * (x(1) - 3.) + 1
@@ -120,7 +114,7 @@ object SteepestDescentTest extends App
     println ("optimal solution = " + x + ", objective value = " + f(x))
 
     println ("\nProblem 2 (with partials): (x_0 - 2)^2 + (x_1 - 3)^2 + 1") 
-    x0 = new VectorD (0., 0.)
+    x0 = VectorD (0., 0.)
     def df_dx0 (x: VectorD): Double = 2. * x(0) - 4.
     def df_dx1 (x: VectorD): Double = 2. * x(1) - 6.
     solver.setDerivatives (Array [FunctionV2S] (df_dx0, df_dx1))
@@ -129,7 +123,7 @@ object SteepestDescentTest extends App
 
     println ("\nProblem 3: x_0/4 + 5x_0^2 + x_0^4 - 9x_0^2 x_1 + 3x_1^2 + 2x_1^4")
     // @see http://math.fullerton.edu/mathews/n2003/gradientsearch/GradientSearchMod/Links/GradientSearchMod_lnk_5.html
-    x0 = new VectorD (0., 0.)
+    x0 = VectorD (0., 0.)
     def f3 (x: VectorD): Double = x(0)/4. + 5.*x(0)*x(0) + pow(x(0),4) -
                                   9.*x(0)*x(0)*x(1) + 3.*x(1)*x(1) + 2.*pow(x(1),4)
     val solver3 = new SteepestDescent (f3)

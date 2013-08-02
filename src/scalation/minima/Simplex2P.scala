@@ -1,5 +1,5 @@
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 1.0
  *  @date    Sun Sep  4 21:57:30 EDT 2011
@@ -18,9 +18,8 @@ import math.abs
 import util.control.Breaks.{breakable, break}
 
 import scalation.linalgebra.{MatrixD, VectorD}
-import scalation.util.Error
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class solves Linear Programming (LP) problems using a tableau based
  *  Simplex Algorithm.  Given a constraint matrix 'a', limit/RHS vector 'b' and
  *  cost vector 'c', find values for the solution/decision vector 'x' that minimize
@@ -52,9 +51,13 @@ import scalation.util.Error
  *  @param c  the N-length cost vector
  */
 class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
-      extends Error
+      extends MinimizerLP
 {
-    private val DEBUG    = false               // if in DEBUG mode, show all pivot step
+    private val DANTIZ   = true                // use Dantiz's pivot rule, else Bland's
+    private val DEBUG    = false               // DEBUG mode => show all pivot steps
+    private val CHECK    = true                // CHECK mode => check feasibility for each pivot
+    private val _0       = 0.                  // zero, for Floating Point Error (FPE) try setting to EPSILON
+
     private val M        = a.dim1              // the number of constraints (row)
     private val N        = a.dim2              // the number of decision variables
     private val R        = b.countNeg          // the number of artificial variables
@@ -72,7 +75,7 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
     private val t  = new MatrixD (MM, nn)                // the MM-by-nn simplex tableau
     private var jr = -1                                  // index counter for artificial variables
     for (i <- 0 until M) {
-         flip = if (b(i) < 0.) -1. else 1.
+         flip = if (b(i) < _0) -1. else 1.
          t.set (i, a(i))                                 // col x: constraint matrix a
          t(i, N + i) = flip                              // col y: slack/surplus variable matrix s
          if (flip < 0) { jr += 1; t(i, MpN + jr) = 1. }  // col r: artificial variable matrix r
@@ -81,20 +84,9 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
 
     private val x_B = Array.ofDim [Int] (M)              // the indices of the basis
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Find the best variable x_l to enter the basis.  Determine the index of
-     *  entering variable corresponding to column l (e.g., using Dantiz's Rule
-     *  or Bland's Rule).  Return -1 to indicate no such column.
-     *  t(M).firstPos (jj)        // use Bland's rule (lowest index, +ve)
-     *  t(M).argmaxPos (jj)       // use Dantiz's rule (min index, +ve, cycling possible)
-     */
-    def enteringMin () = t(M).firstPos (jj)          // minimization mode
-    //def enteringMax () = t(M).firstNeg (jj)        // maximization mode
-    private val entering: () => Int = enteringMin    // set the function in minimization mode
+    val checker = new CheckLP (a, b, c)      // checker determines if the LP solution is correct
 
-    private val checker = new CheckLP (a, b, c)      // checker determines if the LP solution is correct
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Initialize the basis to the slack and artificial variables.  Perform
      *  row operations to make cost row (t(M)) zero in artificial var columns. 
      *  If b(i) is negative have a surplus and artificial variable, otherwise,
@@ -104,7 +96,7 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
     {
         jr = -1
         for (i <- 0 until M) {
-            if (b(i) >= 0.) {
+            if (b(i) >= _0) {
                 x_B(i) = N + i        // put slack variable in basis
             } else {
                 jr += 1
@@ -114,7 +106,19 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
         } // for
     } // initBasis
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the best variable x_l to enter the basis.  Determine the index of
+     *  entering variable corresponding to column l (e.g., using Dantiz's Rule
+     *  or Bland's Rule).  Return -1 to indicate no such column.
+     *  t(M).argmaxPos (jj)       // use Dantiz's rule (index of max +ve, cycling possible)
+     *  t(M).firstPos (jj)        // use Bland's rule  (index of first +ve, FPE possible)
+     */
+    def entering (): Int =
+    {
+        if (DANTIZ) t(M).argmaxPos (jj) else t(M).firstPos (jj)
+    } // entering
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the best variable x_k to leave the basis given that x_l is entering.
      *  Determine the index of the leaving variable corresponding to row k using
      *  the Min-Ratio Rule.  Return -1 to indicate no such row.
@@ -124,7 +128,7 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
     {
         val b_ = t.col (jj)                                      // updated b column (RHS)
         var k  = -1
-        for (i <- 0 until M if t(i, l) > 0.) {                   // find the pivot row
+        for (i <- 0 until M if t(i, l) > _0) {                   // find the pivot row
             if (k == -1) k = i
             else if (b_(i) / t(i, l) <= b_(k) / t(k, l)) k = i   // lower ratio => reset k
         } // for
@@ -133,7 +137,7 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
         k
     } // leaving
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Pivot on entry (k, l) using Gauss-Jordan elimination to replace variable
      *  x_k with x_l in the basis.
      *  @param k  the leaving variable (row)
@@ -141,88 +145,99 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
      */
     def pivot (k: Int, l: Int)
     {
+        println ("pivot: entering = " + l + " leaving = " + k)
         t(k) /= t(k, l)                                     // make pivot 1
         for (i <- 0 to M if i != k) t(i) -= t(k) * t(i, l)  // zero rest of column l
         x_B(k) = l                                          // update basis (l replaces k)
-        if (DEBUG) println (this)
     } // pivot
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Run the simplex algorithm starting from an initial BFS and iteratively
      *  find a non-basic variable to replace a variable in the current basis
-     *  so long as the objective function improves.
+     *  so long as the objective function improves.  Runs a single phase and
+     *  return the optimal vector x.
      */
-    def solve ()
+    def solve_1 (): VectorD =
     {
-        var k = -1                     // the leaving variable (row)
-        var l = -1                     // the entering variable (column)
-        if (DEBUG) println (this)
+        if (DEBUG) showTableau (0)                   // for iter = 0
+        var k    = -1                                // the leaving variable (row)
+        var l    = -1                                // the entering variable (column)
 
         breakable { for (it <- 1 to MAX_ITER) {
-            l = entering (); if (l == -1) break    // -1 => optimal solution found
-            k = leaving (l); if (k == -1) break    // -1 => solution is unbounded
-            pivot (k, l)                           // pivot: k leaves and l enters
+            l = entering (); if (l == -1) break      // -1 => optimal solution found
+            k = leaving (l); if (k == -1) break      // -1 => solution is unbounded
+            pivot (k, l)                             // pivot: k leaves and l enters
+            if (CHECK && infeasible) break           // quit if infeasible
+            if (DEBUG) showTableau (it)
         }} // for
 
-        println ("solve: Final Tableau -----------------------------------------")
-        println (this)
-    } // solve
+        primal                                       // return the optimal vector x
+    } // solve_1
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether the current solution (x = primal) is still primal feasible.
+     */
+    def infeasible: Boolean =
+    {
+        if ( ! checker.isPrimalFeasible (primal)) {
+            flaw ("infeasible", "solution x is no longer PRIMAL FEASIBLE")
+            true
+        } else {
+            false
+        } // if
+    } // infeasible
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Remove the artifical variables and reset the cost row (M) in the tableau.
      */
     def removeArtificials ()
     {
-        nn -= R                        // reduce the effective width of the tableau
-        jj -= R                        // reset the index of the last column (jj)
-        t.setCol(jj, t.col(jj + R))    // move the b vector to the new jj column
-        t(M)(0 until N) = -c           // set cost row (M) in the tableau to given cost
-        if (DEBUG) println (this)
+        nn -= R                             // reduce the effective width of the tableau
+        jj -= R                             // reset the index of the last column (jj)
+        t.setCol(jj, t.col(jj + R))         // move the b vector to the new jj column
+        t(M)(0 until N) = -c                // set cost row (M) in the tableau to given cost
+        if (DEBUG) showTableau (-1)
         for (j <- 0 until N if x_B contains j) { 
             val pivotRow = t.col (j).argmax (M)    // find the pivot row where element = 1
             t(M) -= t(pivotRow) * t(M, j)          // make cost row 0 in pivot column (j)
         } // for
     } // removeArtificials
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve the LP minimization problem using two phases if neceassry.  Note:
      *  phase I is always minimization.  Two phases are necessary if the number
      *  of artificial variables R > 0.
      */
-    def solve2P (): Boolean =
+    def solve (): VectorD =
     {
-        var x: VectorD = null             // the decision variables
-        var y: VectorD = null             // the dual variables
-        var f = Double.PositiveInfinity   // worst possible value for minimization
+        var x: VectorD = null                    // the decision variables
+        var y: VectorD = null                    // the dual variables
+        var f = Double.PositiveInfinity          // worst possible value for minimization
 
         if (R > 0) {
-            t(M)(MpN until jj) = -1.      // set cost row (M) in the tableau to remove artificials
+            t(M)(MpN until jj) = -1.             // set cost row (M) in the tableau to remove artificials
         } else {
-            t(M)(0 until N) = -c          // set cost row (M) in the tableau to given cost vector
+            t(M)(0 until N) = -c                 // set cost row (M) in the tableau to given cost vector
         } // if
-        if (DEBUG) println (this)
+        initBasis ()                             // initialize the basis to the slack and artificial vars
 
-        initBasis ()                      // initialize the basis to the slack and artificial vars
-
-        if (R > 0) {                      // there are artificial variables => phase I required
-            println ("solve2P: Phase I ---------------------------------------------")
-            println (this)
+        if (R > 0) {                             // there are artificial variables => phase I required
+            println ("solve:  Phase I ---------------------------------------------")
             println ("decision = " + N + ", slack = " + (M-R)  + ", surplus = " + R + ", artificial = " + R)
-            solve ()                      // solve the phase I problem: optimal f = 0
-            x = primal; f = objective
-            println ("solve2P: Phase I solution x = " + x + ", f = " + f)
-            removeArtificials ()          // remove the artificial variables and reset cost row
+            x = solve_1 ()                       // solve the Phase I problem: optimal f = 0
+            f = objF (x)
+            println ("solve:  Phase I solution x = " + x + ", f = " + f)
+            removeArtificials ()                 // remove the artificial variables and reset cost row
         } // if
-        println ("solve2P: Phase II --------------------------------------------")
-        solve ()                          // solve the phase II problem for final solution
-        x = primal; y = dual; f = objective
-        println ("solve2P: Phase II solution x = " + x + ", f = " + f)
-        val correct = checker.isCorrect (x, y, f)
-        if (! correct) flaw ("solve2P", "the Phase II solution is NOT correct")
-        correct
-    } // solve2P
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        println ("solve:  Phase II --------------------------------------------")
+        x = solve_1 ()                           // solve the Phase II problem for final solution
+        f = objF (x)
+        println ("solve:  Phase II solution x = " + x + ", f = " + f)
+        x
+    } // solve
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the primal solution vector x (only the basic variables are non-zero).
      */
     def primal: VectorD =
@@ -232,17 +247,28 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
         x
     } // primal
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the dual solution vector y (cost row (M) under the slack columns).
      */
     def dual: VectorD = t(M)(N until MpN)
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the value of the objective function f(x) = c x.
      */
-    def objective: Double = t(M, jj)           // bottom, right cell in tableau
+    def objF (x: VectorD): Double = t(M, jj)      // bottom, right cell in tableau
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Show the current tableau.
+     *  @param iter  the number of iterations do far
+     */
+    def showTableau (iter: Int)
+    {
+        println ("showTableau: --------------------------------------------------------")
+        println (this)
+        println ("showTableau: after " + iter + " iterations, with limit of " + MAX_ITER)
+     } // showTableau
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert the current tableau and basis to a string suitable for display.
      */
     override def toString: String =
@@ -260,12 +286,12 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
 } // Simplex2P class
 
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This object is used to test the Simplex2P class.
  */
 object Simplex2PTest extends App
 {
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the Simplex2P Algorithm for solving Linear Programming problems.
      *  @param a the constraint matrix
      *  @param b the limit/RHS vector
@@ -273,18 +299,18 @@ object Simplex2PTest extends App
      */
     def test (a: MatrixD, b: VectorD, c: VectorD)
     {
-        val lp = new Simplex2P (a, b, c)
-        lp.solve2P ()
-        val x = lp.primal         // the primal solution vector x
-        val y = lp.dual           // the dual solution vector y
-        val f = lp.objective      // the minimum value of the objective function
+        val lp = new Simplex2P (a, b, c)   // test the Two-Phase Simplex Algoeithm
+        val x  = lp.solve ()               // the primal solution vector x
+        val y  = lp.dual                   // the dual solution vector y
+        val f  = lp.objF (x)               // the minimum value of the objective function
 
-        println ("primal    x = " + x)
-        println ("dual      y = " + y)
-        println ("objective f = " + f)
+        println ("primal x = " + x)
+        println ("dual   y = " + y)
+        println ("objF   f = " + f)
+        println ("optimal? = " + lp.check (x, y, f))
     } // test
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test case 1:
      *  Phase I  solution - not needed
      *  Phase II solution x = (1/3, 0, 13/3), x_B = (0, 2, 4), f = -17
@@ -295,12 +321,12 @@ object Simplex2PTest extends App
         val a = new MatrixD ((3, 3), 1., 1.,  2.,
                                      1., 1., -1.,
                                     -1., 1.,  1.)
-        val c = new VectorD         (1., 1., -4.)
-        val b = new VectorD (9., 2., 4.)
+        val c = VectorD             (1., 1., -4.)
+        val b = VectorD (9., 2., 4.)
         test (a, b, c)
     } // test1
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test case 2:
      *  Phase I  solution x = (.5, 1.5), x_B = (0, 1, 4), f =  0
      *  Phase II solution x = (0, 3),    x_B = (1, 2, 3), f = -6
@@ -312,12 +338,12 @@ object Simplex2PTest extends App
         val a = new MatrixD ((3, 2), 1.,  1.,
                                     -1.,  1.,
                                      0.,  1.)
-        val c = new VectorD         (1., -2.)
-        val b = new VectorD (-2., -1., 3.)
+        val c = VectorD             (1., -2.)
+        val b = VectorD (-2., -1., 3.)
         test (a, b, c)
     } // test2
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test case 3:
      *  Phase I  solution x = (2, 0, 4), x_B = (0, 2, 5), f = 0
      *  Phase II solution x = (2, 0, 4), x_B = (0, 2, 5), f = 36
@@ -329,12 +355,12 @@ object Simplex2PTest extends App
         val a = new MatrixD ((3, 3), 1.,  1., 1.,
                                      0.,  1., 2.,
                                     -1.,  2., 2.)
-        val c = new VectorD         (2., 10., 8.)
-        val b = new VectorD (-6., -8., -4.)
+        val c = VectorD             (2., 10., 8.)
+        val b = VectorD (-6., -8., -4.)
         test (a, b, c)
     } // test3
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test case 4:
      *  Phase I  solution - not needed
      *  Phase II solution x = (2/3, 10/3, 0), x_B = (0, 1, 5), f = -22/3
@@ -345,12 +371,12 @@ object Simplex2PTest extends App
         val a = new MatrixD ((3, 3), 1., 1.,  1.,
                                     -1., 2., -2.,
                                      2., 1.,  0)
-        val c = new VectorD        (-1., -2., 1.)
-        val b = new VectorD (4., 6., 5.)
+        val c = VectorD            (-1., -2., 1.)
+        val b = VectorD (4., 6., 5.)
         test (a, b, c)
     } // test4
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test case 5:
      *  Phase I  solution x = (4/5, 8/5), x_B = (0, 1), f = 0
      *  Phase II solution x = (4/5, 8/5), x_B = (0, 1), f = 8.8
@@ -360,8 +386,8 @@ object Simplex2PTest extends App
     {
         val a = new MatrixD ((2, 2), 3., 1.,
                                      1., 2.)
-        val c = new VectorD         (3., 4.)
-        val b = new VectorD (-4., -4.)
+        val c = VectorD             (3., 4.)
+        val b = VectorD (-4., -4.)
         test (a, b, c)
     } // test5
 

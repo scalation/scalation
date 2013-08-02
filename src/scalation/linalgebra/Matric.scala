@@ -9,6 +9,7 @@
 package scalation.linalgebra
 
 import scalation.math.Complex
+import scalation.math.Complex.abs
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -48,6 +49,30 @@ trait Matric
     def apply (i: Int): VectorC
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise on range ir and column-wise on range jr.
+     *  Ex: b = a(2..4, 3..5)
+     *  @param ir  the row range
+     *  @param jr  the column range
+     */
+    def apply (ir: Range, jr: Range): Matric
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise on range ir and column-wise at index j.
+     *  Ex: u = a(2..4, 3)
+     *  @param ir  the row range
+     *  @param j   the column index
+     */
+    def apply (ir: Range, j: Int): VectorC
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise at index i and column-wise on range jr.
+     *  Ex: u = a(2, 3..5)
+     *  @param i   the row index
+     *  @param jr  the column range
+     */
+    def apply (i: Int, jr: Range): VectorC
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set this matrix's element at the i,j-th index position to the scalar x.
      *  @param i  the row index
      *  @param j  the column index
@@ -63,28 +88,54 @@ trait Matric
     def update (i: Int, u: VectorC)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set all the elements in this matrix to the scalar x.
-     *  @param x  the scalar value to assign
+    /** Set a slice this matrix row-wise on range ir and column-wise at index j.
+     *  Ex: a(2..4, 3) = u
+     *  @param ir  the row range
+     *  @param j   the column index
+     *  @param u   the vector to assign
      */
-    def set (x: Complex) { for (i <- range1; j <- range2) this(i, j) = x }
+    def update (ir: Range, j: Int, u: VectorC)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set a slice this matrix row-wise at index i and column-wise on range jr.
+     *  Ex: a(2, 3..5) = u
+     *  @param i   the row index
+     *  @param jr  the column range
+     *  @param u   the vector to assign
+     */
+    def update (i: Int, jr: Range, u: VectorC)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set all the elements in this matrix to the scalar x.
      *  @param x  the scalar value to assign
      */
-    def set (x: Double) { for (i <- range1; j <- range2) this(i, j) = Complex (x) }
+    def set (x: Complex)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set all the elements in this matrix to the scalar x.
+     *  @param x  the scalar value to assign
+     */
+    def set (x: Double) { set (Complex (x)) }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the values in this matrix as copies of the values in 2D array u.
+     *  @param u  the 2D array of values to assign
+     */
+    def set (u: Array [Array [Complex]])
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set this matrix's ith row starting a column j to the vector u.
+     *  @param i  the row index
+     *  @param u  the vector value to assign
+     *  @param j  the starting column index
+     */
+    def set (i: Int, u: VectorC, j: Int = 0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set all the lower triangular elements in this matrix to the scalar x.
      *  @param x  the scalar value to assign
      */
     def setLower (x: Complex) { for (i <- range1; j <- 0 until i) this(i, j) = x }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the values in this matrix as copies of the values in 2D array u.
-     *  @param u  the 2D array of values to assign
-     */
-    def set (u: Array [Array [Complex]]) { for (i <- range1; j <- range2) this(i, j) = u(i)(j) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Iterate over the matrix row by row.
@@ -95,48 +146,6 @@ trait Matric
         var i = 0
         while (i < dim1) { f (this(i)()); i += 1 }
     } // foreach
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get row '_row' from the matrix, returning it as a vector.
-     *  @param _row  the row to extract from the matrix
-     *  @param from  the position to start extracting from
-     */
-    def row (_row: Int, from: Int = 0): VectorC
-/*
-    {
-        val c = new VectorC (dim2 - from)
-        for (j <- from until dim2) c(j - from) = this(_row, j)
-        c
-    } // row
-*/
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set row 'row' of the matrix to a vector.
-     *  @param row  the column to set
-     *  @param u    the vector to assign to the column
-     */
-    def setRow (row: Int, u: VectorC) { for (j <- range2) this(row, j) = u(j) }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get column '_col' from the matrix, returning it as a vector.
-     *  @param _col  the column to extract from the matrix
-     *  @param from  the position to start extracting from
-     */
-    def col (_col: Int, from: Int = 0): VectorC
-/*
-    {
-        val c = new VectorC (dim1 - from)
-        for (i <- from until dim1) c(i - from) = this(i, _col)
-        c
-    } // col
-*/
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set column 'col' of the matrix to a vector.
-     *  @param col  the column to set
-     *  @param u    the vector to assign to the column
-     */
-    def setCol (col: Int, u: VectorC) { for (i <- range1) this(i, col) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice this matrix row-wise from to end.
@@ -162,6 +171,33 @@ trait Matric
     def sliceExclude (row: Int, col: Int): Matric
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Select rows from this matrix according to the given index/basis.
+     *  @param rowIndex  the row index positions (e.g., (0, 2, 5))
+     */
+    def selectRows (rowIndex: Array [Int]): Matric
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get column 'col' from the matrix, returning it as a vector.
+     *  @param col   the column to extract from the matrix
+     *  @param from  the position to start extracting from
+     */
+    def col (col: Int, from: Int = 0): VectorC
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set column 'col' of the matrix to a vector.
+     *  @param col  the column to set
+     *  @param u    the vector to assign to the column
+     */
+    def setCol (col: Int, u: VectorC)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Select columns from this matrix according to the given index/basis.
+     *  Ex:  Can be used to divide a matrix into a basis and a non-basis.
+     *  @param colIndex  the column index positions (e.g., (0, 2, 5))
+     */
+    def selectCols (colIndex: Array [Int]): Matric
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return 1 if the condition is true else 0
      *  @param cond  the condition to evaluate
      */
@@ -173,58 +209,99 @@ trait Matric
     def t: Matric
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add this matrix and scalar s.
-     *  @param s  the scalar to add
+    /** Concatenate this matrix and vector u.
+     *  @param u  the vector to be concatenated as the new last row in matrix
      */
-    def + (s: Complex): Matric
+    def ++ (u: VectorC): Matric
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add in-place this matrix and scalar s.
-     *  @param s  the scalar to add
+    /** Add this matrix and scalar x.
+     *  @param x  the scalar to add
      */
-    def += (s: Complex)
+    def + (x: Complex): Matric
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract scalar s.
-     *  @param s  the scalar to subtract
+    /** Add in-place this matrix and scalar x.
+     *  @param x  the scalar to add
      */
-    def - (s: Complex): Matric
+    def += (x: Complex): Matric
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract in-place scalar s.
-     *  @param s  the scalar to subtract
+    /** From this matrix subtract scalar x.
+     *  @param x  the scalar to subtract
      */
-    def -= (s: Complex)
+    def - (x: Complex): Matric
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector b.
+    /** From this matrix subtract in-place scalar x.
+     *  @param x  the scalar to subtract
+     */
+    def -= (x: Complex): Matric
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply this matrix by vector u.
+     *  @param u  the vector to multiply by
+     */
+    def * (u: VectorC): VectorC
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply this matrix by scalar x.
+     *  @param x  the scalar to multiply by
+     */
+    def * (x: Complex): Matric
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply in-place this matrix by scalar x.
+     *  @param x  the scalar to multiply by
+     */
+    def *= (x: Complex): Matric
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply this matrix by vector u to produce another matrix (a_ij * b_j)
      *  @param b  the vector to multiply by
      */
-    def * (b: VectorC): VectorC
+    def ** (u: VectorC): Matric
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by scalar s.
-     *  @param s  the scalar to multiply by
+    /** Multiply in-place this matrix by vector u to produce another matrix (a_ij * b_j)
+     *  @param u  the vector to multiply by
      */
-    def * (s: Complex): Matric
+    def **= (u: VectorC): Matric
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by scalar s.
-     *  @param s  the scalar to multiply by
+    /** Divide this matrix by scalar x.
+     *  @param x  the scalar to divide by
      */
-    def *= (s: Complex)
+    def / (x: Complex): Matric
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector b to produce another matrix (a_ij * b_j)
-     *  @param b  the vector to multiply by
+    /** Divide in-place this matrix by scalar x.
+     *  @param x  the scalar to divide by
      */
-    def ** (b: VectorC): Matric
+    def /= (x: Complex): Matric
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by vector b to produce another matrix (a_ij * b_j)
-     *  @param b  the vector to multiply by
+    /** Raise this matrix to the pth power (for some integer p >= 2).
+     *  @param p  the power to raise this matrix to
      */
-    def **= (b: VectorC)
+    def ~^ (p: Int): Matric
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the maximum element in this matrix.
+     *  @param e  the ending row index (exclusive) for the search
+     */
+    def max (e: Int = dim1): Complex
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the minimum element in this matrix.
+     *  @param e  the ending row index (exclusive) for the search
+     */
+    def min (e: Int = dim1): Complex
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the magnitude of this matrix, the element value farthest from zero.
+     */
+    def mag: Complex = abs (max ()) max abs (min ())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Decompose this matrix into the product of lower and upper triangular
@@ -266,10 +343,10 @@ trait Matric
      *  matrix from the LU Decomposition and counting the number of non-zero
      *  diagonal elements.
      */
-    def rank: Double =
+    def rank: Int =
     {
-        val max   = if (dim1 < dim2) dim1 else dim2   // rank <= min (m, n)
-        val u     = lud._2                            // upper triangular matrix
+        val max   = if (dim1 < dim2) dim1 else dim2      // rank <= min (m, n)
+        val u     = lud._2                               // upper triangular matrix
         var count = 0
         for (i <- 0 until max if this(i, i) != 0.) count += 1
         count
@@ -284,14 +361,23 @@ trait Matric
     def diag (p: Int, q: Int): Matric
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the main diagonal of this matrix.  Assumes dim2 >= dim1.
+    /** Get the kth diagonal of this matrix.  Assumes dim2 >= dim1.
+     *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
-    def getDiag (): VectorC
+    def getDiag (k: Int = 0): VectorC
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the main diagonal of this matrix to the scalar value s.  Assumes dim2 >= dim1.
+    /** Set the kth diagonal of this matrix to the vector u.  Assumes dim2 >= dim1.
+     *  @param u  the vector to set the diagonal to
+     *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
-    def setDiag (s: Complex) { for (i <- range1) this(i, i) = s }
+    def setDiag (u: VectorC, k: Int = 0)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the main diagonal of this matrix to the scalar x.  Assumes dim2 >= dim1.
+     *  @param x  the scalar to set the diagonal to
+     */
+    def setDiag (x: Complex)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Invert this matrix (requires a squareMatrix) and use partial pivoting.
@@ -314,6 +400,15 @@ trait Matric
      *  embed an identity matrix.  A constraint on this m by n matrix is that n >= m.
      */ 
     def reduce_ip
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Clean values in matrix at or below the threshold by setting them to zero.
+     *  Iterative algorithms give approximate values and if very close to zero,
+     *  may throw off other calculations, e.g., in computing eigenvectors.
+     *  @param thres     the cutoff threshold (a small value)
+     *  @param relative  whether to use relative or absolute cutoff
+     */
+    def clean (thres: Double, relative: Boolean = true): Matric
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the (right) nullspace of this m by n matrix (requires n = m + 1)
@@ -349,6 +444,18 @@ trait Matric
     /** Compute the sum of the lower triangular region of this matrix.
      */
     def sumLower: Complex
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the abs sum of this matrix, i.e., the sum of the absolute value
+     *  of its elements.  This is useful for comparing matrices (a - b).sumAbs
+     */
+    def sumAbs: Complex
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the 1-norm of this matrix, i.e., the maximum 1-norm of the
+     *  column vectors.  This is useful for comparing matrices (a - b).norm1
+     */
+    def norm1: Complex
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the determinant of this matrix.

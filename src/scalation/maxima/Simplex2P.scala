@@ -299,8 +299,8 @@ object Simplex2PTest extends App
                                       2.,  1.,  0.,
                                       3., -4.,  0.,
                                       0.,  0.,  1.)
-        val c = new VectorD          (1.,  1.,  1.)
-        val b = new VectorD (5., 45., 27., 24., 4.)
+        val c = VectorD              (1.,  1.,  1.)
+        val b = VectorD (5., 45., 27., 24., 4.)
         test (a, b, c)
     } // test1
 
@@ -315,8 +315,8 @@ object Simplex2PTest extends App
         val a = new MatrixD ((3, 2),  5., 15.,
                                       4.,  4.,
                                      35., 20.)
-        val c = new VectorD        ( 13., 23.)
-        val b = new VectorD (480., 160., 1190.)
+        val c = VectorD            ( 13., 23.)
+        val b = VectorD (480., 160., 1190.)
         test (a, b, c)
     } // test2
 
@@ -332,8 +332,8 @@ object Simplex2PTest extends App
         val a = new MatrixD ((3, 4), .5,  -5.5, -2.5,   9.,
                                      .5,  -1.5, -0.5,   1.,
                                     1.0,   0.0,  0.0,   0.)
-        val c = new VectorD       (10.0, -57.0, -9.0, -24.)
-        val b = new VectorD ( 0.,   0.,  1.)
+        val c = VectorD           (10.0, -57.0, -9.0, -24.)
+        val b = VectorD (0., 0., 1.)
         test (a, b, c)
     } // test3
 
@@ -348,8 +348,8 @@ object Simplex2PTest extends App
     {
         val a = new MatrixD ((2, 4), -2., -9.,  1.,   9.,
                                       1.,  1., -1.,  -2.)
-        val c = new VectorD          (2.,  3., -1., -12.)
-        val b = new VectorD (3., 2.)
+        val c = VectorD              (2.,  3., -1., -12.)
+        val b = VectorD (3., 2.)
         test (a, b, c)
     } // test4
 
@@ -364,8 +364,8 @@ object Simplex2PTest extends App
     {
         val a = new MatrixD ((2, 2),  2., 3.,
                                       2., 0.)
-        val c = new VectorD          (1., 2.)
-        val b = new VectorD (16., -8.)
+        val c = VectorD              (1., 2.)
+        val b = VectorD (16., -8.)
         test (a, b, c)
     } // test5 ()
 
@@ -382,8 +382,8 @@ object Simplex2PTest extends App
                                       5., 9.,
                                       1., 0.,
                                       0., 1.)
-        val c = new VectorD          (5., 8.)
-        val b = new VectorD (6., 45., 1., -5)
+        val c = VectorD              (5., 8.)
+        val b = VectorD (6., 45., 1., -5)
         test (a, b, c)
     } // test6 ()
 

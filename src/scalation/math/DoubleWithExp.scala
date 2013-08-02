@@ -9,6 +9,8 @@
 
 package scalation.math
 
+// import scala.language.implicitConversions
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class defines an expontiation operator '~^' for Doubles.
  *  @param x  the base

@@ -14,6 +14,7 @@ import scalation.animation.{AnimateCommand, DgAnimator}
 import scalation.animation.CommandType._
 import scalation.dynamics.Derivatives.Derivative
 import scalation.linalgebra.VectorD
+import scalation.linalgebra_gen.VectorN
 import scalation.linalgebra_gen.Vectors.VectorI
 import scalation.random.{Uniform, Variate}
 import scalation.scala2d.{Ellipse, QCurve, Rectangle}
@@ -679,11 +680,11 @@ object PetriNetTest extends App
 
     //:: Define the places along with their initial markings by color.
 
-    val placeI = Array [PlaceI] (new PlaceI (100, 100, new VectorI (2, 2, 0)),
-                                 new PlaceI (500, 100, new VectorI (0, 0, 0)))
+    val placeI = Array [PlaceI] (new PlaceI (100, 100, VectorN (2, 2, 0)),
+                                 new PlaceI (500, 100, VectorN (0, 0, 0)))
 
-    val placeD = Array [PlaceD] (new PlaceD (100, 400, new VectorD (0., 0., 10.5)),
-                                 new PlaceD (500, 400, new VectorD (0., 0., 0.)))
+    val placeD = Array [PlaceD] (new PlaceD (100, 400, VectorD (0., 0., 10.5)),
+                                 new PlaceD (500, 400, VectorD (0., 0., 0.)))
 
     //:: Define the transitions.
 
@@ -697,10 +698,10 @@ object PetriNetTest extends App
     //:: Also, establish a back link to the containing Petri net.
 
     transt(0).connect (pnet,
-        Array [ArcI] (new ArcI (placeI(0), transt(0), true,  new VectorI (1, 1, 0))),
-        Array [ArcD] (new ArcD (placeD(0), transt(0), true,  new VectorD (0., 0., 5.5))),
-        Array [ArcI] (new ArcI (placeI(1), transt(0), false, new VectorI (1, 1, 0))),
-        Array [ArcD] (new ArcD (placeD(1), transt(0), false, new VectorD (0., 0., 5.5))))
+        Array [ArcI] (new ArcI (placeI(0), transt(0), true,  VectorN (1, 1, 0))),
+        Array [ArcD] (new ArcD (placeD(0), transt(0), true,  VectorD (0., 0., 5.5))),
+        Array [ArcI] (new ArcI (placeI(1), transt(0), false, VectorN (1, 1, 0))),
+        Array [ArcD] (new ArcD (placeD(1), transt(0), false, VectorD (0., 0., 5.5))))
 
     println (pnet)
     pnet.simulate (2, 10)

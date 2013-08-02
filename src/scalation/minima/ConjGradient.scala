@@ -71,7 +71,7 @@ class ConjGradient (f: FunctionV2S, g: FunctionV2S = null,
      *  function g.
      *  @param x  the coordinate values of the current point
      */
-    def fg (x: VectorD): Double =
+    override def fg (x: VectorD): Double =
     {
         val f_x = f(x)
         if (g == null) {                  // unconstrained

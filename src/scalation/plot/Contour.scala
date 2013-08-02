@@ -10,7 +10,7 @@ package scalation.plot
 
 import collection.mutable.ArrayBuffer
 import math.{ceil, floor, min, pow, round}
-import swing.{MainFrame, Panel, SimpleGUIApplication}
+import swing.{MainFrame, Panel}
 
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.calculus.Calculus.FunctionV2S
@@ -108,8 +108,8 @@ class Contour (f: FunctionV2S, lb: VectorD, ub: VectorD, path: ArrayBuffer [Vect
             //:: Draw squares for the color-coded values of the points of the function being plotted
 
             for (x <- lb(0) to ub(0) by deltaX/50.; y <- lb(1) to ub(1) by deltaY/50.) {
-                val vec   = new VectorD (x, y)
-                val frac  = (f(vec) - lbF) / deltaF        // fractional way from lower to upper bound
+                val vec  = VectorD (x, y)
+                val frac = (f(vec) - lbF) / deltaF         // fractional way from lower to upper bound
 
                 val rgb = if (frac > _2_3)                 // Red-Green-Blue (RGB) tuple values
                               ( ((frac-_2_3) * 765).toInt, ((1-frac) * 765).toInt, 0 )
@@ -163,7 +163,7 @@ class Contour (f: FunctionV2S, lb: VectorD, ub: VectorD, path: ArrayBuffer [Vect
         var minF = Double.PositiveInfinity
         var maxF = Double.NegativeInfinity
         for (x <- lb(0) to ub(0) by deltaX/50.; y <- lb(1) to ub(1) by deltaY/50.) {
-            val vec   = new VectorD (x, y)
+            val vec   = VectorD (x, y)
             val f_vec = f(vec)
             if (f_vec < minF) minF = f_vec
             if (f_vec > maxF) maxF = f_vec
@@ -197,10 +197,10 @@ class Contour (f: FunctionV2S, lb: VectorD, ub: VectorD, path: ArrayBuffer [Vect
 object ContourTest extends App
 {
     def f(x: VectorD): Double = (x(0)/2. - 3.) * (x(0)/2. - 3.) + (x(1)/3. - 2.) * (x(1)/3. - 2.)
-    val lb     = new VectorD (0., 0.)
-    val ub     = new VectorD (10., 10.)
+    val lb     = VectorD (0., 0.)
+    val ub     = VectorD (10., 10.)
     val deltaF = 18.
-    val path   = ArrayBuffer (new VectorD (0., 0.), new VectorD (3., 2.), new VectorD (6., 6.)) 
+    val path   = ArrayBuffer (VectorD (0., 0.), VectorD (3., 2.), VectorD (6., 6.)) 
     val plot   = new Contour (f, lb, ub, path)
     println ("plot = " + plot)
 

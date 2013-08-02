@@ -31,6 +31,16 @@ class SortedLinkedHashMap [A, B] (implicit val ordering: Ordering [A])
         for ((k, v) <- pairs) put (k, v)
     } // constructor
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Construct a SortedLinkedHashMap and put all (key, value) pairs into this map.
+     *  @param pairs  the (key, value) pairs to put in this map
+     */
+    def this (pairs: Tuple2 [A, B]*) (implicit ordering: Ordering [A])
+    {
+        this ()
+        for ((k, v) <- pairs) put (k, v)
+    } // constructor
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the first entry in the SortedLinkedHashMap.
      */

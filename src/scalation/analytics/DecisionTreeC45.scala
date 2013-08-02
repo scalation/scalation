@@ -226,20 +226,20 @@ class DecisionTreeC45 (val x: MatrixI, val y: Array [Int], featr: Array [String]
             if (value == 0) {
                 for (i <- 0 until m if x(i, f) <= threshold(f)) {
                     ny(x_index) = y(i)
-                    nx(x_index) = x.row(i)
+                    nx(x_index) = x(i)
                     x_index += 1
                 } // for
             } else {
                 for (i <- 0 until m if x(i, f) > threshold(f)) {
                     ny(x_index) = y(i)
-                    nx(x_index) = x.row(i)
+                    nx(x_index) = x(i)
                     x_index += 1
                 } // for
             } // if
         } else {                               // feature with discrete values
             for (i <- 0 until m if x(i, f) == value) {
                 ny(x_index) = y(i)
-                nx(x_index) = x.row(i)
+                nx(x_index) = x(i)
                 x_index += 1
             } // for
         } // if
@@ -440,9 +440,9 @@ object DecisionTreeC45Test extends App
     cl.printTree
     
 //  test sample ------------------------------------------------------------
-//  val z = new VectorD (2, 100,77.5, 0)                      // new data vector to classify
+//  val z = VectorD (2, 100,77.5, 0)                      // new data vector to classify
 //  println ("--- classify " + z + " = " + cl.classify (z) + "\n")
-//  val z2 = new VectorD (2, 100,77.6, 1)                      // /*new data vector to classify*/
+//  val z2 = VectorD (2, 100,77.6, 1)                      // /*new data vector to classify*/
 //  println ("--- classify " + z2 + " = " + cl.classify (z2) + "\n")
     
 } // DecisionTreeC45Test object

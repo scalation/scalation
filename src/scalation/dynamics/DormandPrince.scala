@@ -234,7 +234,7 @@ object DormandPrinceTest extends App
     val odes = Array [DerivativeV] (dx_dt, dy_dt, dz_dt)
 
     var ti  = .2
-    var p   = new VectorD (0., 1., 1.)
+    var p   = VectorD (0., 1., 1.)
     val p_r = new MatrixD (61, 3); for (k <- 0 until p.dim) p_r(0, k) = p(k)
     var tt  = new VectorD (61); tt(0) = 0.
     for (i <- 1 to 60) {

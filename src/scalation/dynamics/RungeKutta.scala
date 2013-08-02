@@ -131,7 +131,7 @@ object RungeKuttaTest extends App
     println ("\n==> at t = " + t + " y = " + integrate (derv3, y0, t))
 
     println ("\n==> at t = " + t + " y = " + 
-             integrateV (Array (derv1, derv2), new VectorD (1., 2.), t))
+             integrateV (Array (derv1, derv2), VectorD (1., 2.), t))
 
     // @see http://www.mathworks.com/help/techdoc/ref/ode23.html (Example 1)
 
@@ -141,9 +141,9 @@ object RungeKuttaTest extends App
     val odes = Array [DerivativeV] (dx_dt, dy_dt, dz_dt)
 
     var ti  = .2
-    var p   = new VectorD (0., 1., 1.)
+    var p   = VectorD (0., 1., 1.)
     val p_r = new MatrixD (61, 3); for (k <- 0 until p.dim) p_r(0, k) = p(k)
-    var tt  = new VectorD (61); tt(0)  = 0.
+    var tt  = VectorD (61); tt(0)  = 0.
     for (i <- 1 to 60) {
         tt(i) = ti * i
         p = integrateVV (odes, p, ti)

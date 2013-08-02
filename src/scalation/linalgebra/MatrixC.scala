@@ -8,9 +8,8 @@
 
 package scalation.linalgebra
 
-import math.abs
-
 import scalation.math.Complex
+import scalation.math.Complex.{abs, _0}
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -25,7 +24,12 @@ class MatrixC (val d1: Int,
        private var v:  Array [Array [Complex]] = null)
       extends Matric with Error with Serializable
 {
+    /** Dimension 1
+     */
     lazy val dim1 = d1
+
+    /** Dimension 2
+     */
     lazy val dim2 = d2
 
     if (v == null) {
@@ -130,6 +134,30 @@ class MatrixC (val d1: Int,
     def apply (i: Int): VectorC = new VectorC (v(i))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise on range ir and column-wise on range jr.
+     *  Ex: b = a(2..4, 3..5)
+     *  @param ir  the row range
+     *  @param jr  the column range
+     */
+    def apply (ir: Range, jr: Range): MatrixC = slice (ir.start, ir.end, jr.start, jr.end)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise on range ir and column-wise at index j.
+     *  Ex: u = a(2..4, 3)
+     *  @param ir  the row range
+     *  @param j   the column index
+     */
+    def apply (ir: Range, j: Int): VectorC = col(j)(ir)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get a slice this matrix row-wise at index i and column-wise on range jr.
+     *  Ex: u = a(2, 3..5)
+     *  @param i   the row index
+     *  @param jr  the column range
+     */
+    def apply (i: Int, jr: Range): VectorC = this(i)(jr)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set this matrix's element at the i,j-th index position to the scalar x.
      *  @param i  the row index
      *  @param j  the column index
@@ -145,14 +173,59 @@ class MatrixC (val d1: Int,
     def update (i: Int, u: VectorC) { v(i) = u() }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set this matrix's row at the i-th index position to the vector u.
-     *  @param i  the row index
-     *  @param j  the starting column index
-     *  @param u  the vector value to assign
+    /** Set a slice this matrix row-wise on range ir and column-wise on range jr.
+     *  Ex: a(2..4, 3..5) = b
+     *  @param ir  the row range
+     *  @param jr  the column range
+     *  @param b   the matrix to assign
      */
-    def set (i: Int, j: Int, u: VectorC)
+    def update (ir: Range, jr: Range, b: MatrixC)
     {
-        for (k <- 0 until u.dim) v(i)(j + k) = u(k)
+        for (i <- ir; j <- jr) v(i)(j) = b.v(i - ir.start)(j - jr.start)
+    } // update
+
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set a slice this matrix row-wise on range ir and column-wise at index j.
+     *  Ex: a(2..4, 3) = u
+     *  @param ir  the row range
+     *  @param j   the column index
+     *  @param u   the vector to assign
+     */
+    def update (ir: Range, j: Int, u: VectorC) { col(j)(ir) = u }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set a slice this matrix row-wise at index i and column-wise on range jr.
+     *  Ex: a(2, 3..5) = u
+     *  @param i   the row index
+     *  @param jr  the column range
+     *  @param u   the vector to assign
+     */
+    def update (i: Int, jr: Range, u: VectorC) { this(i)(jr) = u }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set all the elements in this matrix to the scalar x.
+     *  @param x  the scalar value to assign
+     */
+    def set (x: Complex) { for (i <- range1; j <- range2) v(i)(j) = x }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set all the values in this matrix as copies of the values in 2D array u.
+     *  @param u  the 2D array of values to assign
+     */
+    def set (u: Array [Array [Complex]])
+    {
+        for (i <- range1; j <- range2) v(i)(j) = u(i)(j)
+    } // set
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set this matrix's ith row starting at column j to the vector u.
+     *  @param i  the row index
+     *  @param u  the vector value to assign
+     *  @param j  the starting column index
+     */
+    def set (i: Int, u: VectorC, j: Int = 0)
+    {
+        for (k <- 0 until u.dim) v(i)(k+j) = u(k)
     } // set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -206,48 +279,56 @@ class MatrixC (val d1: Int,
     } // row
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Select rows from this matrix according a basis. 
-     *  @param basis  the row index positions (e.g., (0, 2, 5))
+    /** Select rows from this matrix according to the given index/basis.
+     *  @param rowIndex  the row index positions (e.g., (0, 2, 5))
      */
-    def selectRows (basis: Array [Int]): MatrixC =
+    def selectRows (rowIndex: Array [Int]): MatrixC =
     {
-        val c = new MatrixC (basis.length)
-        for (i <- c.range1) c.setRow (i, col(basis(i)))
+        val c = new MatrixC (rowIndex.length, dim2)
+        for (i <- c.range1) c.v(i) = v(rowIndex(i))
         c
-    } // selectCols
+    } // selectRows
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get column 'c' from the matrix, returning it as a vector.
-     *  @param c     the column to extract from the matrix
+    /** Get column 'col' from the matrix, returning it as a vector.
+     *  @param col   the column to extract from the matrix
      *  @param from  the position to start extracting from
      */
-    def col (c: Int, from: Int = 0): VectorC =
+    def col (col: Int, from: Int = 0): VectorC =
     {
         val u = new VectorC (dim1 - from)
-        for (i <- from until dim1) u(i-from) = v(i)(c)
+        for (i <- from until dim1) u(i-from) = v(i)(col)
         u
     } // col
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Select columns from this matrix according a basis. 
-     *  @param basis  the column index positions (e.g., (0, 2, 5))
+    /** Set column 'col' of the matrix to a vector.
+     *  @param col  the column to set
+     *  @param u    the vector to assign to the column
      */
-    def selectCols (basis: Array [Int]): MatrixC =
+    def setCol (col: Int, u: VectorC) { for (i <- range1) v(i)(col) = u(i) }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Select columns from this matrix according to the given index/basis.
+     *  Ex: Can be used to divide a matrix into a basis and a non-basis.
+     *  @param colIndex  the column index positions (e.g., (0, 2, 5))
+     */
+    def selectCols (colIndex: Array [Int]): MatrixC =
     {
-        val c = new MatrixC (basis.length)
-        for (j <- c.range1) c.setCol (j, col(basis(j)))
+        val c = new MatrixC (dim1, colIndex.length)
+        for (j <- c.range2) c.setCol (j, col(colIndex(j)))
         c
     } // selectCols
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate this matrix and vector b.
-     *  @param b  the vector to be concatenated as the new last row in matrix
+    /** Concatenate this matrix and vector u.
+     *  @param u  the vector to be concatenated as the new last row in matrix
      */
-    def ++ (b: VectorC): MatrixC =
+    def ++ (u: VectorC): MatrixC =
     {
-        if (b.dim != dim2) flaw ("++", "vector does not match row dimension")
+        if (u.dim != dim2) flaw ("++", "vector does not match row dimension")
         val c = new MatrixC (dim1 + 1, dim2)
-        for (i <- c.range1) c(i) = if (i < dim1) this(i) else b
+        for (i <- c.range1) c(i) = if (i < dim1) this(i) else u
         c
     } // ++
 
@@ -273,32 +354,34 @@ class MatrixC (val d1: Int,
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add in-place this matrix and matrix b.
-     *  @param b  the matrix to add (requires leDimensions)
+    /** Add this matrix and scalar x.
+     *  @param x  the scalar to add
      */
-    def += (b: MatrixC)
-    {
-        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) + b.v(i)(j)
-    } // +=
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add this matrix and scalar s.
-     *  @param s  the scalar to add
-     */
-    def + (s: Complex): MatrixC =
+    def + (x: Complex): MatrixC =
     {
         val c = new MatrixC (dim1, dim2)
-        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) + s
+        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) + x
         c
     } // +
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add in-place this matrix and scalar s.
-     *  @param s  the scalar to add
+    /** Add in-place this matrix and matrix b.
+     *  @param b  the matrix to add (requires leDimensions)
      */
-    def += (s: Complex)
+    def += (b: MatrixC): MatrixC =
     {
-        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) + s
+        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) + b.v(i)(j)
+        this
+    } // +=
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add in-place this matrix and scalar x.
+     *  @param x  the scalar to add
+     */
+    def += (x: Complex): MatrixC =
+    {
+        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) + x
+        this
     } // +=
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -313,32 +396,34 @@ class MatrixC (val d1: Int,
     } // -
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract in-place matrix b.
-     *  @param b  the matrix to subtract (requires leDimensions)
+    /** From this matrix subtract scalar x.
+     *  @param x  the scalar to subtract
      */
-    def -= (b: MatrixC)
-    {
-        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) - b.v(i)(j)
-    } // -=
- 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract scalar s.
-     *  @param s  the scalar to subtract
-     */
-    def - (s: Complex): MatrixC =
+    def - (x: Complex): MatrixC =
     {
         val c = new MatrixC (dim1, dim2)
-        for (i <- c.range1; j <- c.range2) c.v(i)(j) = v(i)(j) - s
+        for (i <- c.range1; j <- c.range2) c.v(i)(j) = v(i)(j) - x
         c
     } // -
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract in-place scalar s.
-     *  @param s  the scalar to subtract
+    /** From this matrix subtract in-place matrix b.
+     *  @param b  the matrix to subtract (requires leDimensions)
      */
-    def -= (s: Complex)
+    def -= (b: MatrixC): MatrixC =
     {
-        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) - s
+        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) - b.v(i)(j)
+        this
+    } // -=
+ 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** From this matrix subtract in-place scalar x.
+     *  @param x  the scalar to subtract
+     */
+    def -= (x: Complex): MatrixC =
+    {
+        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) - x
+        this
     } // -=
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -361,10 +446,48 @@ class MatrixC (val d1: Int,
     {
         val c = new MatrixC (dim1, b.dim2)
         for (i <- range1; j <- c.range2) {
-            var sum = Complex._0
+            var sum = _0
             for (k <- range2) sum += v(i)(k) * b.v(k)(j)
             c.v(i)(j) = sum
         } // for
+        c
+    } // *
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply this matrix by vector u (concise solution).
+     *  @param u  the vector to multiply by
+     *
+    def * (u: VectorC): VectorC =
+    {
+        val c = new VectorC (dim1)
+        for (i <- range1) c(i) = row(i) dot u
+        c
+    } // *
+     */
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply this matrix by vector u (efficient solution).
+     *  @param u  the vector to multiply by
+     */
+    def * (u: VectorC): VectorC =
+    {
+        val c = new VectorC (dim1)
+        for (i <- range1) {
+            var sum = _0
+            for (k <- range2) sum += v(i)(k) * u(k)
+            c(i) = sum
+        } // for
+        c
+    } // *
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply this matrix by scalar x.
+     *  @param x  the scalar to multiply by
+     */
+    def * (x: Complex): MatrixC =
+    {
+        val c = new MatrixC (dim1, dim2)
+        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) * x
         c
     } // *
 
@@ -373,104 +496,70 @@ class MatrixC (val d1: Int,
      *  same matrix (b == this), a copy of the this matrix is made.
      *  @param b  the matrix to multiply by (requires square and sameCrossDimensions)
      */
-    def *= (b: MatrixC)
+    def *= (b: MatrixC): MatrixC =
     {
         val c = if (b == this) new MatrixC (this) else b
         for (i <- range1) {
             val row_i = new VectorC (row(i))          // save so not overwritten
             for (j <- range1) {
-                var sum = Complex._0
+                var sum = _0
                 for (k <- range1) sum += row_i(k) * b.v(k)(j)
                 v(i)(j) = sum
             } // for
         } // for
+        this
     } // *=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector b (concise solution).
-     *  @param b  the vector to multiply by
-     *
-    def * (b: VectorC): VectorC =
-    {
-        val c = new VectorC (dim1)
-        for (i <- range1) c(i) = row(i) dot b
-        c
-    } // *
+    /** Multiply in-place this matrix by scalar x.
+     *  @param x  the scalar to multiply by
      */
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector b (efficient solution).
-     *  @param b  the vector to multiply by
-     */
-    def * (b: VectorC): VectorC =
+    def *= (x: Complex): MatrixC =
     {
-        val c = new VectorC (dim1)
-        for (i <- range1) {
-            var sum = Complex._0
-            for (k <- range2) sum += v(i)(k) * b(k)
-            c(i) = sum
-        } // for
-        c
-    } // *
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by scalar s.
-     *  @param s  the scalar to multiply by
-     */
-    def * (s: Complex): MatrixC =
-    {
-        val c = new MatrixC (dim1, dim2)
-        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) * s
-        c
-    } // *
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by scalar s.
-     *  @param s  the scalar to multiply by
-     */
-    def *= (s: Complex)
-    {
-        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) * s
+        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) * x
+        this
     } // *=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector b to produce another matrix (a_ij * b_j)
-     *  @param b  the vector to multiply by
+    /** Multiply this matrix by vector u to produce another matrix (a_ij * b_j)
+     *  @param u  the vector to multiply by
      */
-    def ** (b: VectorC): MatrixC =
+    def ** (u: VectorC): MatrixC =
     {
         val c = new MatrixC (dim1, dim2)
-        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) * b(j)
+        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) * u(j)
         c
     } // **
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by vector b to produce another matrix (a_ij * b_j)
-     *  @param b  the vector to multiply by
+    /** Multiply in-place this matrix by vector u to produce another matrix (a_ij * b_j)
+     *  @param u  the vector to multiply by
      */
-    def **= (b: VectorC)
+    def **= (u: VectorC): MatrixC =
     {
-        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) * b(j)
+        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) * u(j)
+        this
     } // **=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide this matrix by scalar s.
-     *  @param s  the scalar to divide by
+    /** Divide this matrix by scalar x.
+     *  @param x  the scalar to divide by
      */
-    def / (s: Complex): MatrixC =
+    def / (x: Complex): MatrixC =
     {
         val c = new MatrixC (dim1, dim2)
-        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) / s
+        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) / x
         c
     } // /
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide in-place this matrix by scalar s.
-     *  @param s  the scalar to divide by
+    /** Divide in-place this matrix by scalar x.
+     *  @param x  the scalar to divide by
      */
-    def /= (s: Complex)
+    def /= (x: Complex): MatrixC =
     {
-        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) / s
+        for (i <- range1; j <- range2) v(i)(j) = v(i)(j) / x
+        this
     } // /=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -484,7 +573,7 @@ class MatrixC (val d1: Int,
         if (! isSquare) flaw ("~^", "only defined on square matrices")
         val c = new MatrixC (dim1, dim1)
         for (i <- range1; j <- range1) {
-            var sum = Complex._0
+            var sum = _0
             for (k <- range1) sum += v(i)(k) * v(k)(j)
             c.v(i)(j) = sum
         } // for
@@ -529,9 +618,9 @@ class MatrixC (val d1: Int,
 
         for (i <- u.range1) {
             val pivot = u(i, i)
-            if (pivot == Complex._0) flaw ("lud_npp", "use lud since you have a zero pivot")
+            if (pivot == _0) flaw ("lud_npp", "use lud since you have a zero pivot")
             l(i, i) = Complex._1
-            for (j <- i + 1 until u.dim2) l(i, j) = Complex._0
+            for (j <- i + 1 until u.dim2) l(i, j) = _0
             for (k <- i + 1 until u.dim1) {
                 val mul = u(k, i) / pivot
                 l(k, i) = mul
@@ -553,13 +642,13 @@ class MatrixC (val d1: Int,
 
         for (i <- u.range1) {
             var pivot = u(i, i)
-            if (pivot == Complex._0) {
+            if (pivot == _0) {
                 val k = partialPivoting (u, i)   // find the maxiumum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u(i, i)                  // reset the pivot
             } // if
             l(i, i) = Complex._1
-            for (j <- i + 1 until u.dim2) l(i, j) = Complex._0
+            for (j <- i + 1 until u.dim2) l(i, j) = _0
             for (k <- i + 1 until u.dim1) {
                 val mul = u(k, i) / pivot
                 l(k, i) = mul
@@ -581,13 +670,13 @@ class MatrixC (val d1: Int,
 
         for (i <- u.range1) {
             var pivot = u(i, i)
-            if (pivot == Complex._0) {
+            if (pivot == _0) {
                 val k = partialPivoting (u, i)   // find the maxiumum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u(i, i)                  // reset the pivot
             } // if
             l(i, i) = Complex._1
-            for (j <- i + 1 until u.dim2) l(i, j) = Complex._0
+            for (j <- i + 1 until u.dim2) l(i, j) = _0
             for (k <- i + 1 until u.dim1) {
                 val mul = u(k, i) / pivot
                 l(k, i) = mul
@@ -683,7 +772,7 @@ class MatrixC (val d1: Int,
         for (i <- 0 until m; j <- 0 until n) {
             c.v(i)(j) = if (i <  dim1 && j <  dim2) v(i)(j)
                    else if (i >= dim1 && j >= dim2) b.v(i-dim1)(j-dim2)
-                      else                          Complex._0
+                      else                          _0
         } // for
         c
     } // diag
@@ -701,21 +790,40 @@ class MatrixC (val d1: Int,
         val c = new MatrixC (n, n)
 
         for (i <- 0 until n; j <- 0 until n) {
-            c.v(i)(j) = if (i < p || i > p + dim1) if (i == j) Complex._1 else Complex._0
+            c.v(i)(j) = if (i < p || i > p + dim1) if (i == j) Complex._1 else _0
                         else                       v(i-p)(j-p)
         } // for
         c
     } // diag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the main diagonal of this matrix.  Assumes dim2 >= dim1.
+    /** Get the kth diagonal of this matrix.  Assumes dim2 >= dim1.
+     *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
-    def getDiag (): VectorC =
+    def getDiag (k: Int = 0): VectorC =
     {
-        val c = new VectorC (dim1)
-        for (i <- range1) c(i) = v(i)(i)
+        val mm = dim1 - math.abs (k)
+        val c  = new VectorC (mm)
+        for (i <- 0 until mm) c(i) = v(i)(i+k)
         c
     } // getDiag
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the kth diagonal of this matrix to the vector u.  Assumes dim2 >= dim1.
+     *  @param u  the vector to set the diagonal to
+     *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
+     */
+    def setDiag (u: VectorC, k: Int = 0)
+    {
+        val mm = dim1 - math.abs (k)
+        for (i <- 0 until mm) v(i)(i+k) = u(i)
+    } // setDiag
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the main diagonal of this matrix to the scalar x.  Assumes dim2 >= dim1.
+     *  @param x  the scalar to set the diagonal to
+     */
+    def setDiag (x: Complex) { for (i <- range1) v(i)(i) = x }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Invert this matrix (requires a squareMatrix) and does not use partial pivoting.
@@ -723,11 +831,11 @@ class MatrixC (val d1: Int,
     def inverse_npp: MatrixC =
     {
         val b = new MatrixC (this)                           // copy this matrix into b
-        val c = new MatrixC (dim1, Complex._1, Complex._0)   // let c represent the augmentation
+        val c = new MatrixC (dim1, Complex._1, _0)           // let c represent the augmentation
 
         for (i <- b.range1) {
             val pivot = b.v(i)(i)
-            if (pivot == Complex._0) flaw ("inverse_npp", "use inverse since you have a zero pivot")
+            if (pivot == _0) flaw ("inverse_npp", "use inverse since you have a zero pivot")
             for (j <- b.range2) {
                 b.v(i)(j) /= pivot
                 c.v(i)(j) /= pivot
@@ -749,11 +857,11 @@ class MatrixC (val d1: Int,
     def inverse: MatrixC =
     {
         val b = new MatrixC (this)                           // copy this matrix into b
-        val c = new MatrixC (dim1, Complex._1, Complex._0)   // let c represent the augmentation
+        val c = new MatrixC (dim1, Complex._1, _0)           // let c represent the augmentation
 
         for (i <- b.range1) {
             var pivot = b.v(i)(i)
-            if (pivot == Complex._0) {
+            if (pivot == _0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 swap (c, i, k, 0)               // in c, swap rows i and k from column 0
@@ -780,11 +888,11 @@ class MatrixC (val d1: Int,
     def inverse_ip: MatrixC =
     {
         val b = this                                         // use this matrix for b
-        val c = new MatrixC (dim1, Complex._1, Complex._0)   // let c represent the augmentation
+        val c = new MatrixC (dim1, Complex._1, _0)   // let c represent the augmentation
 
         for (i <- b.range1) {
             var pivot = b.v(i)(i)
-            if (pivot == Complex._0) {
+            if (pivot == _0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 swap (c, i, k, 0)               // in c, swap rows i and k from column 0
@@ -816,7 +924,7 @@ class MatrixC (val d1: Int,
 
         for (i <- b.range1) {
             var pivot = b.v(i)(i)
-            if (pivot == Complex._0) {
+            if (pivot == _0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b.v(i)(i)               // reset the pivot
@@ -843,7 +951,7 @@ class MatrixC (val d1: Int,
 
         for (i <- b.range1) {
             var pivot = b.v(i)(i)
-            if (pivot == Complex._0) {
+            if (pivot == _0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b.v(i)(i)               // reset the pivot
@@ -857,6 +965,20 @@ class MatrixC (val d1: Int,
             } // for
         } // for
     } // reduce_ip
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Clean values in matrix at or below the threshold by setting them to zero.
+     *  Iterative algorithms give approximate values and if very close to zero,
+     *  may throw off other calculations, e.g., in computing eigenvectors.
+     *  @param thres     the cutoff threshold (a small value)
+     *  @param relative  whether to use relative or absolute cutoff
+     */
+    def clean (thres: Double, relative: Boolean = true): MatrixC =
+    {
+        val s = if (relative) mag else Complex._1             // use matrix magnitude or 1
+        for (i <- range1; j <- range2) if (abs (v(i)(j)) <= s * thres) v(i)(j) = _0
+        this
+    } // clean
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the (right) nullspace of this m by n matrix (requires n = m + 1)
@@ -893,7 +1015,7 @@ class MatrixC (val d1: Int,
     def trace: Complex =
     {
         if ( ! isSquare) flaw ("trace", "trace only works on square matrices")
-        var sum = Complex._0
+        var sum = _0
         for (i <- range1) sum += v(i)(i)
         sum
     } // trace
@@ -903,7 +1025,7 @@ class MatrixC (val d1: Int,
      */
     def sum: Complex =
     {
-        var sum = Complex._0
+        var sum = _0
         for (i <- range1; j <- range2) sum += v(i)(j)
         sum
     } // sum
@@ -913,10 +1035,32 @@ class MatrixC (val d1: Int,
      */
     def sumLower: Complex =
     {
-        var sum = Complex._0
+        var sum = _0
         for (i <- range1; j <- 0 until i) sum += v(i)(j)
         sum
     } // sumLower
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the abs sum of this matrix, i.e., the sum of the absolute value
+     *  of its elements.  This is useful for comparing matrices (a - b).sumAbs
+     */
+    def sumAbs: Complex =
+    {
+        var sum = _0
+        for (i <- range1; j <- range2) sum += abs (v(i)(j))
+        sum
+    } // sumAbs
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the 1-norm of this matrix, i.e., the maximum 1-norm of the
+     *  column vectors.  This is useful for comparing matrices (a - b).norm1
+     */
+    def norm1: Complex =
+    {
+        val c = new VectorC (dim2)
+        for (j <- range2) c(j) = col(j).norm1
+        c.max ()
+    } // norm1
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the determinant of this matrix.  The value of the determinant
@@ -926,7 +1070,7 @@ class MatrixC (val d1: Int,
     def det: Complex =
     {
         if ( ! isSquare) flaw ("det", "determinant only works on square matrices")
-        var sum = Complex._0
+        var sum = _0
         var b: MatrixC = null
         for (j <- range2) {
             b = sliceExclude (0, j)   // the submatrix that excludes row 0 and column j
@@ -954,7 +1098,7 @@ class MatrixC (val d1: Int,
      */
     def isNonnegative: Boolean =
     {
-        for (i <- range1; j <- range2 if v(i)(j) < Complex._0) return false
+        for (i <- range1; j <- range2 if v(i)(j) < _0) return false
         true
     } // isNonegative
 
@@ -1105,7 +1249,7 @@ object MatrixCTest extends App
 
     val z = new MatrixC ((2, 2), 1., 2.,
                                  3., 2.)
-    val b = new VectorC (8., 7.)
+    val b = VectorC (8., 7.)
     val lu  = z.lud
     val lu2 = z.lud_npp
 

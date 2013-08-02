@@ -76,8 +76,8 @@ object HouseholderTest extends App
 {
     import Householder.{house, houseR, houseV}
 
-    val x = new VectorD (2., 4., 6.)
-    val y = new VectorD (1., 2., 3., 4.)
+    val x = VectorD (2., 4., 6.)
+    val y = VectorD (1., 2., 3., 4.)
     
     println ("x          = " + x)
     println ("house (x)  = " + house (x))

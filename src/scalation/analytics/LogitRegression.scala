@@ -13,6 +13,7 @@ package scalation.analytics
 import math.{exp, log}
 
 import scalation.linalgebra.{MatrixD, QRDecomp, VectorD}
+import scalation.linalgebra_gen.VectorN
 import scalation.linalgebra_gen.Vectors.VectorI
 import scalation.math.DoubleWithExp._
 import scalation.minima.QuasiNewton
@@ -234,8 +235,8 @@ object LogitRegressionTest extends App
                                   1.0,    0.0,  278.0,  513.0,
                                   1.0,    0.0,    0.0,  253.0)
 
-    val y = new VectorI (0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1,
-                         1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1)
+    val y = VectorN (0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1,
+                     1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1)
 
     println ("x = " + x)
     println ("y = " + y)
@@ -244,11 +245,11 @@ object LogitRegressionTest extends App
     rg.train ()
     println ("fit = " + rg.fit)
 
-    val z  = new VectorD (1., 100., 100., 100.)         // predict y for one point
+    val z  = VectorD (1., 100., 100., 100.)         // predict y for one point
     val yp = rg.predict (z)
     println ("predict (" + z + ") = " + yp)
 
-//  val yyp = rg.predict (x)                    // predict y for several points
+//  val yyp = rg.predict (x)                        // predict y for several points
 //  println ("predict (" + x + ") = " + yyp)
 
 //  new Plot (x.col(1), y, yyp)

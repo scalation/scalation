@@ -162,7 +162,7 @@ object RegressionTest extends App
                                  1., 47.,  64.,
                                  1., 32.,  53.,
                                  1.,  1., 101.)
-    val y = new VectorD (745., 895., 442., 440., 1598.)
+    val y = VectorD (745., 895., 442., 440., 1598.)
 
     println ("x = " + x)
     println ("y = " + y)
@@ -171,7 +171,7 @@ object RegressionTest extends App
     rg.train ()
     println ("fit = " + rg.fit)
 
-    val z  = new VectorD (1., 20., 80.)         // predict y for one point
+    val z  = VectorD (1., 20., 80.)             // predict y for one point
     val yp = rg.predict (z)
     println ("predict (" + z + ") = " + yp)
 
@@ -198,7 +198,7 @@ object RegressionTest2 extends App
                                  1., 1., 2.,
                                  1., 2., 1.,
                                  1., 2., 2.)
-    val y = new VectorD (6., 8., 7., 9.)
+    val y = VectorD (6., 8., 7., 9.)
 
     println ("x = " + x)
     println ("y = " + y)
@@ -207,7 +207,7 @@ object RegressionTest2 extends App
     rg.train ()
     println ("fit = " + rg.fit)
 
-    val z  = new VectorD (1., 2., 3.)        // predict y for one point
+    val z  = VectorD (1., 2., 3.)            // predict y for one point
     val yp = rg.predict (z)
     println ("predict (" + z + ") = " + yp)
 
@@ -254,8 +254,8 @@ object  RegressionTest3 extends App
                                   1.,   48.,   90.5,   9.0,    99.,
                                   1.,   56.,   95.7,   7.0,    99.)
     //  response BP
-    val y = new VectorD (105., 115., 116., 117., 112., 121., 121., 110., 110., 114.,
-                         114., 115., 114., 106., 125., 114., 106., 113., 110., 122.)
+    val y = VectorD (105., 115., 116., 117., 112., 121., 121., 110., 110., 114.,
+                     114., 115., 114., 106., 125., 114., 106., 113., 110., 122.)
 
     val rg = new Regression (x, y)
     rg.train ()

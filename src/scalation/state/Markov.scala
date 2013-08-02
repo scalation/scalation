@@ -207,7 +207,7 @@ object MarkovTest extends App
                                               .0, .2, .8, .0,
                                               .3, .0, .5, .2,
                                               .1, .0, .7, .2))
-    var p = new VectorD (1., 0., 0., 0.)
+    var p = VectorD (1., 0., 0., 0.)
 
     println ("\nDiscrete-Time Markov Chain mc = " + mc + "\n")
     println ("\nDiscrete-Time Markov Chain: transient solution:")

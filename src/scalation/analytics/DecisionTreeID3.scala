@@ -14,6 +14,7 @@ import scala.collection.mutable.HashMap
 import scalation.math.Basic.log2
 import scalation.linalgebra.VectorD
 import scalation.linalgebra_gen.Matrices.MatrixI
+import scalation.linalgebra_gen.VectorN
 import scalation.linalgebra_gen.Vectors.VectorI
 import scalation.util.Error
 
@@ -239,7 +240,7 @@ object DecisionTreeID3Test extends App
     val cl = new DecisionTreeID3 (x, y, vc)               // create the classifier            
     cl.train ()
 
-    val z = new VectorI (2, 2, 1, 1)                      // new data vector to classify
+    val z = VectorN (2, 2, 1, 1)                          // new data vector to classify
     println ("--- classify " + z + " = " + cl.classify (z) + "\n")
 
 } // DecisionTreeID3Test object

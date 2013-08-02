@@ -91,7 +91,7 @@ object SimpleRegressionTest extends App
                                  1., 2.,
                                  1., 3.,
                                  1., 4.)
-    val y = new VectorD (2., 3., 5., 4., 6.)
+    val y = VectorD (2., 3., 5., 4., 6.)
 
     println ("x = " + x)
     println ("y = " + y)
@@ -100,7 +100,7 @@ object SimpleRegressionTest extends App
     rg.train ()
     println ("fit = " + rg.fit)
 
-    val z  = new VectorD (1., 5.)           // predict y for one point
+    val z  = VectorD (1., 5.)               // predict y for one point
     val yp = rg.predict (z)
     println ("predict (" + z + ") = " + yp)
 
@@ -119,10 +119,10 @@ object SimpleRegressionTest extends App
 object SimpleRegressionTest2 extends App
 {
     // 20 data points: just x1 coordinate
-    val x1 = new VectorD (  4.,   9.,  10.,  14.,   4.,   7.,  12.,  22.,   1.,   3.,
-                            8.,  11.,   5.,   6.,  10.,  11.,  16.,  13.,  13.,  10.)
-    val y  = new VectorD (390., 580., 650., 730., 410., 530., 600., 790., 350., 400.,
-                          590., 640., 450., 520., 690., 690., 770., 700., 730., 640.)
+    val x1 = VectorD (  4.,   9.,  10.,  14.,   4.,   7.,  12.,  22.,   1.,   3.,
+                        8.,  11.,   5.,   6.,  10.,  11.,  16.,  13.,  13.,  10.)
+    val y  = VectorD (390., 580., 650., 730., 410., 530., 600., 790., 350., 400.,
+                      590., 640., 450., 520., 690., 690., 770., 700., 730., 640.)
 
     println ("x1 = " + x1)
     println ("y  = " + y)
@@ -132,7 +132,7 @@ object SimpleRegressionTest2 extends App
     rg.train ()
     println ("fit = " + rg.fit)
 
-    val z  = new VectorD (1., 15.)          // predict y for one point
+    val z  = VectorD (1., 15.)             // predict y for one point
     val yp = rg.predict (z)
     println ("predict (" + z + ") = " + yp)
 

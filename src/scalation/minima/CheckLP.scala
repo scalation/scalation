@@ -59,18 +59,13 @@ class CheckLP (a: MatrixD, b: VectorD, c: VectorD)
         } // for
 
         val ax = a * x
-        // resource limit constraints: check that ax_i <= b_i | ax_ >= -b_i
+        // resource limit constraints: check that ax_i <= b_i
         for (i <- 0 until M) {
             val ax_i = ax(i)
             val b_i  = b(i)
-            if (b_i >= 0. && ax_i >  b_i + EPSILON) {
+            if (ax_i > b_i + EPSILON) {
                 flaw ("isPrimalFeasible", "constraint ax_i <= b_i violated for row " + i + ": "
                                                     + ax_i + " > " + b_i)
-                return false
-            } // if
-            if (b_i <  0. && ax_i < -b_i - EPSILON) {
-                flaw ("isPrimalFeasible", "constraint ax_i >= -b_i violated for row " + i + ": "
-                                                    + ax_i + " < " + -b_i)
                 return false
             } // if
         } // for

@@ -106,7 +106,7 @@ object SupportVectorMachineTest extends App
 {
     val x = new MatrixD ((2, 2), 1., 1.,
                                  2., 2.)
-    val y = new VectorD (1., -1.)
+    val y = VectorD (1., -1.)
 
     println ("x = " + x)
     println ("y = " + y)
@@ -115,7 +115,7 @@ object SupportVectorMachineTest extends App
     svm.train ()
     println ("fit = " + svm.fit)
 
-    val z  = new VectorD (3., 3.)           // classify y for one point
+    val z  = VectorD (3., 3.)               // classify y for one point
     val yp = svm.classify (z)
     println ("classify (" + z + ") = " + yp)
 

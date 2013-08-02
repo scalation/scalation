@@ -12,6 +12,7 @@ import scalation.dynamics.Derivatives.Derivative
 import scalation.dynamics.DormandPrince.integrateV
 //import scalation.dynamics.RungeKutta.integrateV
 import scalation.linalgebra.VectorD
+import scalation.linalgebra_gen.VectorN
 import scalation.linalgebra_gen.Vectors.VectorI
 import scalation.random.{Deterministic, Variate}
 
@@ -135,17 +136,17 @@ object PetriNetRulesTest extends App with PetriNetRules
 
     //:: Set sample values for tokens.
 
-    val t   = new VectorI (5, 4)       // tokens
-    val r_t = new VectorI (1, 1)       // rates
-    val b_t = new VectorI (1, 2)       // base requirement
-    val w_t = new VectorD (.01, .01)   // weight
+    val t   = VectorN (5, 4)         // tokens
+    val r_t = VectorN (1, 1)         // rates
+    val b_t = VectorN (1, 2)         // base requirement
+    val w_t = VectorD (.01, .01)     // weight
 
     //:: Set sample values for fluid.
 
-    val f   = new VectorD (5.5, 4.5)   // fluid levels
-    val r_f = new VectorD (.5, 1.0)    // rates
-    val b_f = new VectorD (1.5, 2.5)   // base requirement
-    val w_f = new VectorD (.01, .01)   // weight
+    val f   = VectorD (5.5, 4.5)     // fluid levels
+    val r_f = VectorD (.5, 1.0)      // rates
+    val b_f = VectorD (1.5, 2.5)     // base requirement
+    val w_f = VectorD (.01, .01)     // weight
 
     //:: Test the firing rules.
 
