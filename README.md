@@ -31,13 +31,13 @@ $ git clone git://github.com/scalation/scalation.git scalation
 2. Build the scalation system:
 
 ```
-$ ./sbt compile
+$ sbt compile
 ```
 
 4. Run examples (e.g., for process oriented):
 
 ```
-$ ./sbt run process.Bank
+$ sbt run process.Bank
 ```
 
 Please read the <code>LICENSE</code> file (an MIT style license).
