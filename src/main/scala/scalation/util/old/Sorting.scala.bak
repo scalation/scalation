@@ -1,0 +1,198 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.1
+ *  @date    Sat Oct 26 21:44:36 EDT 2013
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.util
+
+import scala.util.Random
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Sorting` class provides methods for finding medians, sorting and
+ *  indirect sorting.
+ *  @param a  the array to operate on
+ */
+class Sorting [T <% Ordered[T]] (a: Array [T])
+{
+    private val DEBUG = false                     // debug flag
+    private val n     = a.length                  // length of array a
+    private val rn    = new Random ()             // random number generator
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the 'k'-median of the 'l' to 'r' partition of array 'a' using
+     *  the quick-select algorithm.
+     *  @see http://en.wikipedia.org/wiki/Quickselect
+     *  @param l  the left cursor
+     *  @param r  the right cursor
+     *  @param k  the type of median (k-th smallest element)
+     */
+    def median (l: Int, r: Int, k: Int): T =
+    {
+        if (l == r) return a(l)
+//      val p = a(l + rn.nextInt (r-l+1))         // randomly choose pivot
+        val p = mid (a(l), a((l+l)/2), a(r))      // choose as middle of three
+        println ((l, k, r))
+        val m = partition (l, r, a(k))            // partition into left (<=) and right (>=)
+        if (m == k-1)     return a(m)
+        else if (m > k-1) median (l, m, k)
+        else              median (m+1, r, k)
+    } // median
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the 'k'-median ('k'-th smallest element) of array 'a'.
+     *  @param k  the type of median (e.g., k = (n+1)/2 is the median)
+     */
+    def median (k: Int = (n+1)/2): T = median (0, n-1, k)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Partition the array from 'i' to 'j' into a left partition (<= 'x') and
+     *  a right partition (>= 'x')
+     *  @param i  the left cursor
+     *  @param j  the right cursor
+     *  @param x  the pivot used for partitioning
+     */
+    def partition (i: Int, j: Int, x: T): Int =
+    {
+        var l = i; var r = j
+        while (l < r) {
+            while (a(l) < x) l += 1
+            while (a(r) > x) r -= 1
+            if (l <= r) { swap (l, r); l += 1; r -= 1 }
+        } // while
+        r
+    } // partition 
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Recursively sort the 'l' to 'r' partition of array 'a' using QuickSort.
+     *  @param l  the left cursor
+     *  @param r  the right cursor
+     */
+    def qsort (l: Int, r: Int)
+    {
+        if (r - l > 5) {
+//          val p = a(l + rn.nextInt (r-l+1))     // randomly choose pivot
+            val p = mid (a(l), a((l+r)/2), a(r))  // choose as middle of three
+            val m = partition (l, r, p)           // partition into left (<=) and right (>=)
+            qsort (l, m)                          // recursive sort left partition
+            qsort (m+1, r)                        // recursive sort right partition
+        } else {
+            selsort (l, r)
+        } // if
+    } // qsort
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Sort array 'a' using Quick-Sort.
+     */
+    def qsort () { qsort (0, n-1) }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Sort the 'l' to 'r' partition of array 'a' using Selection-Sort.
+     */
+    def selsort (l: Int, r: Int)
+    {
+        for (i <- l to r) {
+            var k = i
+            for (j <- i+1 to r if a(j) < a(k)) k = j
+            if (i != k) swap (i, k)
+        } // for
+    } // selsort
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Sort array 'a' using Selection-Sort.
+     */
+    def selsort () { selsort (0, n-1) }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether the array 'a' is sorted.
+     */
+    def isSorted: Boolean =
+    {
+        for (i <- 1 until n if a(i-1) > a(i)) return false
+        true
+    } // isSorted
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Swap the elements at 'i' and 'j', i.e., a(i) <-> a(j).
+     */
+    @inline private def swap (i: Int, j: Int) { val t = a(i); a(i) = a(j); a(j) = t }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the middle of three elements.
+     *  @param x  element 1
+     *  @param y  element 2
+     *  @param z  element 3
+     */
+    @inline private def mid (x: T, y: T, z: T): T =
+    {
+        if (x < y) if (y < z) y else if (x < z) z else x
+        else       if (y > z) y else if (x > z) z else x
+    } // mid
+
+} // Sorting class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SortingTest` object is used to test the `Sorting` class.
+ */
+object SortingTest extends App
+{
+    val a  = Array (9.0, 1.0, 8.0, 2.0, 7.0, 3.0, 6.0, 4.0, 5.0)  
+    val sa = new Sorting (a)
+    println ("median (1) = " + sa.median (1))
+    println ("median (2) = " + sa.median (2))
+    println ("median (3) = " + sa.median (3))
+    println ("median (4) = " + sa.median (4))
+    println ("median (5) = " + sa.median (5))
+    println ("isSorted   = " + sa.isSorted)
+    println ("unsorted a = " + a.deep)
+//  sa.selsort ()
+    sa.qsort ()
+    println ("isSorted   = " + sa.isSorted)
+    println ("sorted a   = " + a.deep)
+
+} // SortingTest
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SortingTest2` object is used to test the performance of the `Sorting`
+ *  class for sorting an array.
+ */
+object SortingTest2 extends App
+{
+    import scala.util.Sorting.quickSort
+    import Timer._
+
+    val n  = 1000000 
+    val rn = new Random ()
+    val a  = Array.ofDim [Double] (n)  
+    for (i <- 0 until n) a(i) = rn.nextDouble ()
+    val sa = new Sorting (a)
+    print ("quicksort: "); time { quickSort (a) }
+    print ("qsort:     "); time { sa.qsort () }
+    println ("isSorted   = " + sa.isSorted)
+
+} // SortingTest2
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SortingDTest2` object is used to test the performance of the `SortingD`
+ *  class for finding medians.
+ */
+object SortingTest3 extends App
+{
+    import Timer._
+
+    var med = 0.0
+    val n   = 1000000
+    val rn  = new Random ()
+    val a   = Array.ofDim [Double] (n)
+    for (i <- 0 until n) a(i) = rn.nextDouble ()
+    val sa  = new SortingD (a)
+    print ("median: "); time { med = sa.median () }
+    println ("median = " + med)
+
+} // SortingTest3
+

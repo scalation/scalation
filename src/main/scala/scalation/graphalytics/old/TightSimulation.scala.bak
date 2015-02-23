@@ -1,0 +1,445 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Arash Fard, Usman Nisar, Ayushi Jain
+ *  @version 1.1
+ *  @date    Thu Nov 25 11:28:31 EDT 2013
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.graphalytics
+
+import collection._
+import scala.collection.mutable.{ArrayBuffer, Map, HashMap, MutableList, Set, Stack}
+import math.{max, min, sqrt}
+import scala.util.control.Breaks.{break, breakable}
+import scala.util.Random
+
+import GraphTypes._
+import scalation.util.Timer.time
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The 'TightSimulation' class provides an implementation for graph pattern matching.
+ *  @see http://hipore.com/ijbd/2014/IJBD%20Vol%201%20No%201%202014.pdf
+ *  @param printSetting  '0' for match and '1' for ball
+ *  @param strongSim     'strict' for tight simulation
+ */
+class TightSimulation (printSetting: String, strongSim: String) 
+{
+    var listOfDistinctReducedSet = new ArrayList [immutable.Set [String]] ()   // contains total number of matches 
+                                                                               // after post processing
+    var mapOfBallWithSize = Map [Int, Long] ()                                 // contains balls left after
+                                                                               // postprocessing with diameter.
+    var listOfMatchedBallVertices = MutableList [Int] ()                       // contains list of center vertices 
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform strong or tight simulation based upon value of 'strongSim'.
+     *  @param q          the query graph Q(U, D, k)
+     *  @param g          the data graph  G(V, E, l)
+     *  @param queryName  the query graph relative file name
+     *  @param dataName   the data graph relative file name
+     */
+    def strongSim (q: Graph, g: Graph, queryName: String, dataName: String): HashMap [Int, Set [Int]] = 
+    {
+        var dataSize  = g.adj.length                        // Size of the data graph
+        var querySize = q.adj.length                        // Size of the query graph
+        val qmet      = new GraphMetrics2 (q.clone)         // creating graph metrics object of query graph
+        var (sim, dualTime) = time {dualSim (q, g)}         // performs dual simulation
+        println ("DUAL RESULT SIZE: "+ sim.values.flatten.toSet.size)          // to print dual simulation result
+        if (sim.size == 0) { println ("No dual match."); System.exit (0) }     // exit if no match after dual simulation
+        var newGraph = g
+        var graphPruningTime = 0.0
+        if (strongSim == "strict") {                         // will initially perform strict simulation 
+            println ("doing strict")
+            var pair = time { filterGraph (g, q, sim) }      // if doing strong sim more than once, must clone g
+            newGraph = pair._1                               // newGraph will be our pruned data graph
+            graphPruningTime = pair._2
+        } else println ("doing strong")
+        var prunedSize = sim.values.flatten.toSet.size       // size of feasible matches after strict simulation
+        val (qDiameter, diameterTime) = time { qmet.rad }    // get the query diameter
+        val balls = HashMap [Int, Ball] ()                    
+        var matchCenters = Set [Int] ()
+        var i = 0
+        var ballTime = 0.0
+        var filterTime = 0.0
+        var ballSum = 0
+  
+        for (center <- sim (qmet.selectivityCriteria (qmet.central))) {      // picking center based on eccentricity
+                                                                             // after applying selectivty criteria.  
+            i += 1                                                         
+            var t0 = System.nanoTime () / 1000000.0
+            val ball = new Ball (newGraph, center, qDiameter)                // creating a new ball for the selected center vertex
+            var t1 = System.nanoTime () / 1000000.0
+            ballSum += ball.nodesInBall.size                                 // calculate ball size
+            ballTime += (t1 - t0)                                            // time elapsed for creating a ball
+            t0 = System.nanoTime () / 1000000.0
+            var mat = dualFilter(q, sim.clone(), ball)                       // perform dual filter on the ball
+            t1 = System.nanoTime () / 1000000.0
+            filterTime += (t1 - t0)                                          // time elapsed for dual filter
+            balls.put (center, ball)
+            if (mat.size != 0) matchCenters += center
+            else {
+                println ("No match for ball centered at " + center + ".")
+                println ("-----------")
+            } // else
+        } // for
+
+        performPostProcessing (g, balls, matchCenters)            // Will do post processing after all the matches obtained
+        println ("SEQUENTIAL: \nData graph: \t" + dataName + "\t\tNumber of nodes:  " + dataSize +
+        "\nQuery graph: \t" + queryName + "\t\tNumber of nodes:  " + querySize +
+        "\n      Number of tight matches: \t " + matchCenters.size +
+        "\n    DualSim over entire graph:  " + dualTime + " ms" +
+        "\n                Graph pruning:  " + graphPruningTime + " ms" +
+        "\n     Graph size after pruning:  " + prunedSize + " nodes" +
+        "\n       Finding query diameter:  " + diameterTime + " ms" +
+        "\n               Query diameter:  " + qDiameter +
+        "\n                    Ball time:  " + ballTime +
+        "\n            Average ball size:  " + (ballSum/prunedSize.toDouble) +
+        "\n                  Filter time:  " + filterTime + 
+        "\n Creating and filtering balls:  " + (ballTime + filterTime) + " ms" +
+        "\n         Total Distinct Edges:  " + calculateTotalEdges (g, balls, matchCenters) +
+        "\n      Total Distinct Vertices:  " + calculateTotalVertices () )
+        println ("Ball Diameter Metrics(Min, Max, Mean, StdDev): " + calculateBallDiameterMetrics (balls) )
+        sim
+    } // strongSim
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** It provides an implementation for Dual Graph Simulation.
+     *  @param g  the data graph  G (V, E, l)
+     *  @param q  the query graph Q (U, D, k)
+     */
+    def dualSim (q: Graph, g: Graph): HashMap [Int, Set [Int]] = 
+    {
+        val sim = HashMap [Int, Set [Int] ] ()             // finds feasible matches for all query vertices
+        for (i <- 0 until q.size) sim += (i -> collection.mutable.Set (g.labelMap (q.label(i) ).toArray:_*) ) 
+        println ("INIT SIM SIZE: " + sim.values.flatten.toSet.size)
+        var flag = true
+        while (flag) {                                     // Performing pruning based on child and parent relationship
+            flag = false                                       
+            for (u <- 0 until q.size; w <- sim (u); v <- q.adj (u) if (g.adj (w) & sim (v) ).isEmpty) {
+                                                              // Performing pruning based on child relationship
+                sim (u) -= w
+                if (sim(u).isEmpty) {
+                    println ("u: " + u)
+                    println ("v: " + v)
+                    println ("w: " + w)
+                    println ("g.adj(w): " + g.adj (w))
+                    println ("sim(v): " + sim(v))
+                    return HashMap [Int, Set [Int] ] ()
+                 } // if
+                 flag = true
+             } // for                       
+        
+            for (u <- 0 until q.size; w <- sim (u); v <- q.par (u) if (g.par (w) & sim (v) ).isEmpty) {
+                                                                 // Performing pruning based on parent relationship
+                sim (u) -= w                 
+                if (sim (u).isEmpty) {
+                    println ("g.labelMap: " +g.labelMap (q.label (u) ) )
+                    println ("u: " + u)
+                    println ("v: " + v)
+                    println ("w: " + w)
+                    println ("g.par(w): " + g.par (w))
+                    println ("sim(v): " + sim (v))
+                    return HashMap [Int, Set [Int] ]()
+                } // if
+                flag = true
+            } // for
+       } // while
+       sim
+    } // dualSim
+  
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Pruned the data graph by consider only those vertices and edges which are part of feasible matches
+     *  after performing initial dual simulation
+     *  @param g  the data graph  G(V, E, l)
+     *  @param q  the query graph Q(U, D, k)
+     *  @param sim    mappings from a query vertex u_q to { graph vertices v_g }
+     */ 
+    def filterGraph (g: Graph, q: Graph,  sim: HashMap [Int, Set [Int]]): Graph = 
+    {
+        val nodesInSimset = sim.values.flatten.toSet      // get all the vertices of feasible matches
+        for (i <- 0 until g.adj.size) {                   // pruning all vertices which are not part of feasbile matches
+            g.adj (i) &= nodesInSimset                
+            g.par (i) &= nodesInSimset
+        } // for
+        var newAdjSet = Array.ofDim [ISet] (g.adj.size)
+        var newParList = Array.ofDim [ISet] (g.par.size)
+        for (i <- 0 until newAdjSet.size) {
+            newAdjSet (i) = collection.immutable.Set [Int]()
+            newParList (i) = collection.immutable.Set [Int]()
+        } // for
+        for (u <- 0 until q.size; w <- sim (u)) {         // preparing new adj and parent set for data graph based upon feasible vertices
+            for (v <- q.adj (u)) newAdjSet (w) |= (g.adj (w) & sim (v))
+            for (v <- q.par (u))  newParList(w) |= (g.par (w) & sim (v))
+        } // for
+        val g1 = new Graph (newAdjSet, g.label)           // creating a new data graph
+        g1.par = g.par
+        g1
+    } // filterGraph
+  
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Performs dual simulation onto the ball
+     *  @param query  the query graph Q(U, D, k)
+     *  @param sim    mappings from a query vertex u_q to { graph vertices v_g }
+     *  @param ball   the Ball B(Graph, Center, Radius)
+     */ 
+    def dualFilter (query: Graph, sim: HashMap [Int, Set [Int]], ball: Ball): HashMap [Int, Set [Int] ] = 
+    {
+        for (v <- sim.keySet) sim(v) &= ball.nodesInBall             // project simset onto ball
+        val filterSet = new Stack [(Int, Int)] ()
+        var filtered  = false
+        for ((u, simU) <- sim.iterator; v <- simU if ball.borderNodes.contains (v)) {
+                                                                        // filtering ball based on child relationship
+            filtered = false
+            breakable { for (u1 <- query.adj (u)) {
+                if ((ball.post (v) & sim (u1)).isEmpty) {
+                    filterSet.push ((u, v))
+                    filtered = true
+                    break
+                } // if
+            }} // breakable for
+
+            if (! filtered) {          // filtering ball based on parent relationship, 
+                                       //  if no child has been filtered out     
+                breakable { for (u2 <- query.par (u)) {
+                    if ((ball.pre (v) & sim (u2)).isEmpty) {
+                        filterSet.push ((u, v))
+                        break
+                    } // if
+                }} // breakable for
+            } // if
+ 
+        } // for
+
+        while (!filterSet.isEmpty) {       // refine child and parent relationship for the vertex v,  
+                                           // which is now not a feasible match    
+            val (u, v) = filterSet.pop ()
+            sim (u) -= v
+            for (u2 <- query.par (u); v2 <- (ball.pre (v) & sim (u2)) if (ball.post (v2) & sim (u) ).isEmpty) 
+            filterSet.push ((u2, v2))
+            for (u1 <- query.adj (u); v1 <- (ball.post (v) & sim (u1)) if (ball.pre (v1) & sim (u) ).isEmpty)
+            filterSet.push ((u1, v1))
+      } // while
+
+      var adjSet  = HashMap [Int, mutable.Set [Int]] ()
+      var parList = HashMap [Int, mutable.Set [Int]] ()
+
+      for ((u, uSim) <- sim.iterator) {    // create new adj and parent set for the ball after above pruning
+          for (v <- uSim) {
+              for (uc <- query.adj (u)) {
+                  for (vc <- (ball.post (v) & sim (uc)) ) {
+                      adjSet.getOrElseUpdate (v, Set [Int] ()) += vc
+                      parList.getOrElseUpdate (vc, Set [Int] ()) += v
+                  } // for
+              } // for
+          } // for
+      } // for
+
+      // Finding max perfect subgraph
+      var stack = new Stack [Int] ()
+      var visited = Set (ball.ballcenter)
+      stack.push (ball.ballcenter)
+
+      while (!stack.isEmpty) {
+          var v = stack.pop ()
+          for (child <- (adjSet.getOrElse (v, Set()) | parList.getOrElse (v, Set ()))) {
+              if (!visited.contains (child)) {
+                  stack.push (child)
+                  visited += child
+              } // if
+          } // for
+      } // while
+
+      for ( (v, simV) <- sim.iterator) sim (v) = simV & visited
+      //fixes the edges in the ball
+      //(note that it does not change the parent set; this is only used for printing)
+      //uncomment if you want to see the ball after finding maximum perfect subgraph
+      if (printSetting.trim.equals("0")) {
+          ball.adjSet = mutable.Map [Int, Set [Int]] ()
+          val matchNodes = sim.values.flatten.toSet
+          for ((n, nset) <- adjSet; nc <- nset) {
+              if ((matchNodes contains n) && (matchNodes contains nc)) ball.adjSet.getOrElseUpdate (n, Set () ) += nc
+          } // for
+      } // if
+  
+      for ( (v, simV) <- sim.iterator if simV.isEmpty) return HashMap [Int, Set [Int] ] ()
+      sim
+    } //dualFilter
+   
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Print the dual sim match set.
+     *  @param sim    mappings from a query vertex u_q to { graph vertices v_g }
+     */
+    def printDualSimMatch (sim: HashMap [Int, Set [Int] ] ) 
+    {
+        println("dualSim match:")
+        for ( (u, v) <- sim) println (u + "  " + v)
+        println ("-------------")
+    } // printDualSimMatch
+  
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Performs post processing after computing all the matches
+     *  @param g             the data graph  G(V, E, l)
+     *  @param balls         mappings from a center vertex to the Ball B(Graph, Center, Radius)
+     *  @param matchCenters  set of all vertices which are considered as center
+     */
+    def performPostProcessing (g: Graph, balls: HashMap [Int, Ball], matchCenters: Set [Int] ) 
+    {
+        var postProcessingTime = 0l
+        var t0 = 0l
+        var t1 = 0l
+        for (vert_id <- 0 until g.adj.length) {       // check for every vertex of a data graph
+            var ballstring = ""
+            var isMatch = 0
+            if (balls.keySet.contains (vert_id)) {    // if its a center vertex, then need to perform post processing
+                ballstring = balls.get (vert_id).get.getBallAsString ()      // get the ball as a string
+                t0 = System.nanoTime ()
+                                                                             // get all the nodes in sorted order in string format
+                var str = collection.immutable.Set (ballstring.replaceAll ("[\\[\\]\\-\\>,]*", " ").replaceAll ("  ", ",").replaceAll (" ","").split (","):_*)
+                if (checkInsertOfMatch (str)) {                                         // check whether its already contained in the result 
+                    if (matchCenters contains vert_id) {
+                        isMatch = 1
+                        listOfMatchedBallVertices += vert_id
+                    } // if
+                } else {                             // remove the entry from matchCenters
+                    ballstring = ""
+                    matchCenters -= vert_id
+                } // if
+                t1 = System.nanoTime ()
+                postProcessingTime += t1 - t0
+            } // if
+            println (vert_id + " " + g.label (vert_id) + " " + ballstring + " " + isMatch)
+        } // for
+        println ("Post Processing time is: " + (postProcessingTime / 1e6) + " ms")
+    } // performPostProcessing
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Checks whether a ball is subset or superset of any other ball and add its
+     *  entry accordingly in listofDistinctReduceSet and return True, if added in
+     *  the list else false.
+     *  @param str  set of vertices of a ball in string format
+     */
+    def checkInsertOfMatch (str: immutable.Set [String]): Boolean =
+    {
+        var isInsert = true
+        if(str == null || str.isEmpty || str.size==0) isInsert = false
+        else {
+            if (listOfDistinctReducedSet.isEmpty) listOfDistinctReducedSet.add (str)
+            else {
+                breakable { for (i <- 0 until listOfDistinctReducedSet.size) {
+                    if (str subsetOf listOfDistinctReducedSet.get (i)) {          // str is a subset  
+                                                                                  // update listOfDistinctReducedSet with str    
+                        listOfDistinctReducedSet.set (i, str)
+                        isInsert = false
+                    } else if (listOfDistinctReducedSet.get (i) subsetOf str) {   // str is a superset
+                        isInsert = false                        // listOfDistinctReducedSet already contain subset of str, so str not needed
+                        break
+                    } // if
+                }} // breakable for
+                if (isInsert) listOfDistinctReducedSet.add (str)    // if str is not in listOfDistinctReducedSet, add it
+            } // else
+        } // else
+        isInsert
+    } // checkInsertOfMatch
+  
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Count distinct vertices left after post processing.
+     */
+    def calculateTotalVertices (): Int = 
+    {
+        val totalSet = Set [String] ()
+        for (i <- 0 until listOfDistinctReducedSet.size ()) totalSet ++= listOfDistinctReducedSet.get (i)
+        totalSet.size
+    } // calculateTotalVertices
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Count distinct edges left after post processing.
+     *  @param g               the data graph  G(V, E, l)
+     *  @param balls           mappings from a center vertex to the Ball B(Graph, Center, Radius)
+     *  @param matchCenters    set of all vertices which are considered as center
+     */
+    def calculateTotalEdges (g: Graph, balls: HashMap [Int, Ball], matchCenters: Set [Int]): Int = 
+    {
+        val distinctEdges = Set [String] ()
+        for (vert_id <- 0 until g.adj.length; if balls.keySet.contains (vert_id)) {    
+            balls.get (vert_id).get.adjSet.foreach (i => i._2.foreach (j => distinctEdges += (i._1.toString+"_"+ j.toString)))
+        } // for
+        distinctEdges.size
+    } // calculateTotalEdges
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** To calculate the min, max, avg diameter and standard deviation
+     *  of the balls left after postprocessing.
+     *  @param balls  mappings from a center vertex to the Ball B(Graph, Center, Radius)
+     */
+    def calculateBallDiameterMetrics (balls: HashMap [Int, Ball] ): MutableList [Double] = 
+    {
+        var tb0 = 0l
+        var tb1 = 0l
+        tb0 = System.nanoTime ()
+        var maxDiameter = Long.MinValue
+        var minDiameter = Long.MaxValue
+        var dia = 0l
+        var sum = 0l
+        var sumDiffSqr = 0.0
+        for (vert_id <- listOfMatchedBallVertices) {
+            dia = balls.get (vert_id).get.getBallDiameter
+            maxDiameter = max (maxDiameter, dia)
+            minDiameter = min (minDiameter, dia)
+            sum += dia
+            mapOfBallWithSize += (vert_id -> dia)
+        } // for
+        val meanDiameter = sum.toDouble / listOfMatchedBallVertices.size.toDouble
+        for (vert_id <- listOfMatchedBallVertices) {
+            dia = balls.get (vert_id).get.getBallDiameter
+            sumDiffSqr += Math.pow ((dia - meanDiameter), 2)
+        } // for
+        val variance = sumDiffSqr / listOfMatchedBallVertices.size
+        val stdDev = sqrt (variance)
+        val ballMetricsSet = MutableList(minDiameter.toDouble,maxDiameter.toDouble,meanDiameter, stdDev)
+        tb1 = System.nanoTime ()
+        println ("Total Calculation time for balls diameter metrics: " + ((tb1 - tb0) / 1000000.0) + " ms")
+        ballMetricsSet
+    } // calculateBallDiameterMetrics
+    
+} // TightSimulation
+  
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `TightSimulationTest` object test the TightSimulation class by passing data graph, 
+ *  query graph absolute file path, print match/ball (0/1) and 'strict' as an argument.
+ */
+object TightSimulationTest extends App 
+{
+      if (args.length != 4) {
+          println ("args must be in the format:  <data_graph> <query_graph> <print match/ball (0/1)> <strong/strict (strong/strict)>")
+      } else {
+          val gfile = args (0)
+          val qfile = args (1)
+          val printSetting = args (2)
+          val strongSetting = args (3)
+          val g = Graph.apply (gfile, true)
+          val q = Graph.apply (qfile, true)
+          time { new TightSimulation (printSetting, strongSetting).strongSim (q, g, qfile, gfile) }
+      } // if
+
+} // TightSimulationTest
+  
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: ::::::::::::
+/** The `TightSimulationTest2` object test the TightSimulation class by feeding data graph, 
+ *  query graph absolute file path, print match/ball (0/1) and 'strict'.
+ */
+object TightSimulationTest2 extends App 
+{
+      val gfile = "/home/ayushi/experiment/check/todayData2"
+      val qfile = "/home/ayushi/experiment/check/todayQuery2"
+  //  val gfile = "" // Data Graph File Path
+  //  val qfile = "" // Query Graph file path
+      val printSetting = "0"
+      val strongSetting = "strict"
+      val g = Graph.apply(gfile, true)
+      val q = Graph.apply(qfile, true) 
+      time { new TightSimulation (printSetting, strongSetting).strongSim (q, g, qfile, gfile) }
+
+} // TightSimulationTest2
+

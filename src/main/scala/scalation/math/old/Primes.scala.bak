@@ -1,0 +1,58 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.0
+ *  @date    Wed Nov  2 19:24:25 EDT 2011
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.math
+
+import collection.mutable.ListBuffer
+import math.{floor, sqrt}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This object provides a method to generate prime numbers in a given range.
+ */
+object Primes
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Generate prime numbers between integers m and n.  FIX - need efficient alg. 
+     *  @see http://en.wikipedia.org/wiki/Formula_for_primes
+     *  @param m  the lower bound
+     *  @param n  the uppper bound
+     */
+    def genPrimes (m: Int = 1000, n: Int = 10000): ListBuffer [Int] =
+    {
+        val primes = new ListBuffer [Int] ()   // list to hold prime numbers
+        var jroot  = 0.                        // floor of square root of j
+        var sum    = 0.                        // sum of terms
+
+        for (j <- m to n) {                    // if integer j is prime, add to list
+            jroot = floor (sqrt (j))
+            sum   = 0.
+            for (s <- 2. to jroot by 1.) sum += floor (j / s) - floor ((j-1) / s)
+            if ((floor (-1. * sum / j)).toInt == 0) primes += j
+        } // for
+        primes
+    } // genPrimes
+
+} // Primes object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This object is use to test the Primes object.
+ */
+object PrimesTest extends App
+{
+    import Primes._
+    var i = 0
+    for (p <- genPrimes ()) {
+        print ("%7d, ".format (p))
+        i += 1
+        if (i % 10 == 0) println ()
+    } // for
+    println ()
+
+} // PrimesTest
+

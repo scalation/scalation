@@ -1,0 +1,314 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.1
+ *  @date    Thu Feb 14 14:06:00 EST 2013
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  @see www2.cs.cas.cz/mweb/download/publi/Ples2006.pdf
+ *  @see www.math.iit.edu/~fass/477577_Chapter_12.pdf
+ *  @see Handbook of Linear Algrbra, Chapter 45
+ *  @see cs.fit.edu/~dmitra/SciComp/11Spr/SVD-Presentation-Updated2.ppt
+ */
+
+// U N D E R   D E V E L O P M E N T - use SVD instead
+
+package scalation.linalgebra
+
+import math.abs
+import util.control.Breaks.{break, breakable}
+
+import scalation.linalgebra.Givens.{givens, givensRo, givensRoT, givensColUpdate, givensRowUpdate}
+import scalation.linalgebra.MatrixD.eye
+import scalation.math.ExtremeD.EPSILON
+import scalation.util.Error
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SVD3` class is used to compute the Singlar Value Decomposition (SVD) of
+ *  matrix 'aa' using the Golub-Kahan-Reinsch Algorithm.
+ *  Decompose matrix 'aa' into the product of three matrices:
+ *  <p>
+ *      aa = u * b * v.t
+ *  <p>
+ *  where 'u' is a matrix of orthogonal eigenvectors of 'aa * aa.t'
+ *        (LEFT SINGULAR VECTORS)
+ *        'v' is a matrix of orthogonal eigenvectors of 'aa.t * aa'
+ *        (RIGHT SINGULAR VECTORS) and
+ *        'b' is a diagonal matrix of square roots of eigenvalues of 'aa.t * aa' &' aa * aa.t'
+ *        (SINGULAR VALUES).
+ *  @param aa  the m-by-n matrix to deflate/decompose (algorithm requires m >= n)
+ */
+class SVD3 (aa: MatrixD)
+      extends SVDecomp with Error
+{
+    private val m          = aa.dim1              // number of rows
+    private val n          = aa.dim2              // number of columns
+
+    if (n > m) flaw ("constructor", "SVD3 requires m >= n")
+
+    private var uu         = eye (m)              // left orthogonal matrix  U = U_1 * ... U_k
+    private var vv         = eye (n)              // right orthogonal matrix V = V_1 * ... V_k
+    private var a          = new MatrixD (aa)     // work on modifiable copy of aa 
+    private var b: MatrixD = null                 // matrix to hold singular values
+    private var notflat    = true                 // whether matrix A is already deflated
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Deflate matrix 'aa' forming a diagonal matrix consisting of singular
+     *  values and return the singular values in a vector.
+     */
+    def deflate (): VectorD =
+    {
+        if (notflat) {
+            deflateV ()
+            return null
+        } // if
+        b.getDiag ()
+    } // deflate
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Deflate matrix 'aa' and dempose it using a Singular Value Decomposition
+     *  (SVD) algorithm.  Then return the three factors: 'u, b, v'.
+     *  @see Matrix Computation: Algorithm 8.6.2 SVD Algorithm.
+     */
+    def deflateV (): Tuple3 [MatrixD, MatrixD, MatrixD] =
+    {
+        var p  = 0                  // # zero elements in left end of superdiagonal
+        var q  = 0                  // # zero elements in right end of superdiagonal
+ 
+        breakable { while (true) {
+
+            for (i <- 0 until n-1) {
+                if (a(i, i+1) < EPSILON * (abs (a(i, i)) + abs (a(i+1, i+1)))) a(i, i+1) = 0.0
+            } // for
+
+            val pq = findMiddle (); p = pq._1; q = pq._2
+
+            if (q >= n-1) break
+
+            val k = findZero (p, n-q)
+            if (k >= 0) {
+                a(k, k+1) = 0.0
+                println ("deflateV: found zero on diagonal at " + k)
+            } else {
+                diagonStep (p, q)
+                println ("deflateV: uu = " + uu + "\ndeflateV: vv = " + vv)
+                println ("deflateV: b  = " + uu * aa * vv.t)
+                a = uu.t * a * vv
+//              b = uu * aa * vv.t                                         // FIX - merge a & b calc.
+                b = uu.t * aa * vv                                         // FIX - merge a & b calc.
+//              a = u.diag (p, q+m-n).t * a * v.diag (p, q)                // FIX - ??
+            } // if
+            println ("deflateV: a = " + a + "\ndeflateV: b = " + b)
+
+        }} // while
+        (uu, b, vv)
+    } // deflateV
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Take one step in converting the bidiagoanl matrix 'b' to a diagonal matrix.
+     *  That is, reduce the middle run of nonzero super-diagonal elements by one.
+     *  @see Matrix Computation: Algorithm 8.6.1 Golub-Kahan Step.
+     *  @param p  the size of the head of the super-diagonal
+     *  @param q  the size of the tail of the super-diagonal
+     */
+    private def diagonStep (p: Int, q: Int)
+    {
+        import SVD3.trailing
+        import Eigen_2by2.eigenvalues
+
+//      var b = new MatrixD (a)                       // make copy of a, for modification in place
+
+        val tt = trailing (a(p until n-q, p until n-q))                  // trailing 2-by-2 submatrix of a.t * a
+        val l  = eigenvalues (tt)                                        // the eigenvalues of the submatrix
+        println ("diagonStep: tt = " + tt + "\ndiagonStep: l = " + l)
+
+        val td = tt(1, 1)                                                // last diagonal element in a.t * a
+        val mu = if (abs (td - l(0)) <= abs (td - l(1))) l(0) else l(1)  // pick closest eigenvalue
+        var y  = a(p, p) * a(p, p) - mu
+        var z  = a(p, p) * a(p, p+1)
+        println ("diagonStep: (mu, y, z) = " + (mu, y, z))
+
+        for (k <- p until n-1-q) {
+
+            // Givens rotation 1: k, k+1, theta1 (c1, s1)
+            val cs1 = givens (y, z)
+            println ("diagonStep (" + k + "): rotation 1: (c1, s1) = " + cs1)
+//          givensColUpdate (a, k, k+1, c1, s1)
+            val v = givensRo (k, k+1, n, cs1)                      // right orthogonal matrix V_k
+            a  = a * v                                             // B = B * V_k
+            vv = vv * v                                            // V  FIX - ??
+            println ("diagonStep (" + k + "): rotation 1: v = " + v)
+            println ("diagonStep (" + k + "): rotation 1: a = " + a)
+
+            y = a(k, k); z = a(k+1, k)
+            println ("diagonStep: (y, z) = " + (y, z))
+
+            // Givens rotation 2: k, k+1, theta2 (c2, s2)
+            val cs2 = givens (y, z)
+            println ("diagonStep (" + k + "): rotation 2: (c2, s2) = " + cs2)
+//          givensRowUpdate (a, k, k+1, c2, s2)
+            val u = givensRoT (k, k+1, n, cs2)                     // left orthogonal matrix U_k^t
+//          a  = u.t * a                                           // B = U_k^t * B
+//          uu = uu * u                                            // U FIX - ??
+            a  = u * a
+            uu = uu * u.t                                          // U FIX - ??
+            println ("diagonStep (" + k + "): rotation 2: u = " + u)
+            println ("diagonStep (" + k + "): rotation 2: a = " + a)
+
+            if (k < n-2) {
+                y = a(k, k+1); z = a(k, k+2)
+                println ("diagonStep: (y, z) = " + (y, z))
+            } // if
+
+        } // for
+    } // diagonStep
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find/return the index of the first diagonal entry in 'a' from 'j' until 'k'
+     *  that is zero; otherwise -1 (not found).
+     *  @param j  strart the search here
+     *  @param k  end the search here
+     */
+    private def findZero (j: Int, k: Int): Int =
+    {
+        for (i <- j until k if a(i, i) == 0.0) return i
+        -1
+    } // findZero
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the run of nonzero elements in the middle of the super-diagonal
+     *  of matrix 'a' such that the tail super-diagonal contains only zeros.
+     *  Return p the size of the head and q the size of the tail.
+     */
+    private def findMiddle (): Tuple2 [Int, Int] =
+    {
+        var i = n - 1
+        while (i >= 1 && a(i-1, i) == 0.0) i -= 1
+        val q = n - 1 - i
+        while (i >= 1 && a(i-1, i) != 0.0) i -= 1
+        val p = i
+        println ("findMiddle: (p, q) = " + (p, q)) 
+        (p, q)
+    } // findMiddle
+
+} // SVD3 class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SVD3` companion object.
+ */
+object SVD3
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the trailing 2-by-2 submatrix of 'b.t * b' without multiplying
+     *  the full matrices.
+     *  @param b  the given bidiagonal matrix
+     */
+    def trailing (b: MatrixD): MatrixD =
+    {
+        println ("trailing: b = " + b)
+        val n3  = b.dim2 - 1
+        val n2  = n3 - 1
+        val n1  = n2 - 1
+        val b12 = if (n1 < 0) 0.0 else b(n1, n2)
+        val b22 = b(n2, n2)
+        val b23 = b(n2, n3)
+        val b33 = b(n3, n3)
+        new MatrixD ((2, 2), b12*b12 + b22*b22,  b22*b23,
+                             b22*b23,  b23*b23 + b33*b33) 
+    } // trailing
+
+} // SVD3 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SVD3Test` object is used to test the `SVD3` class starting with a matrix that
+ *  is already bidiagonalized and gives eigenvalues of 28, 18 for the first step.
+ *  @see http://ocw.mit.edu/ans7870/18/18.06/javademo/SVD/
+ */
+object SVD3Test extends App
+{
+    val bb = new MatrixD ((2, 2), 1.00,  2.00,
+                                  0.00,  2.00)
+
+    val u_ = new MatrixD ((2, 2), 0.75, -0.66,
+                                  0.66,  0.75)
+
+    val b_ = new MatrixD ((2, 2), 2.92,  0.00,
+                                  0.00,  0.68)
+
+    val v_ = new MatrixD ((2, 2), 0.26, -0.97,
+                                  0.97,  0.26)
+
+    println ("svd: (u_, b_, v_) = " + (u_, b_, v_))  // answer from Web page
+    println ("u_b_v_.t = " + u_ * b_ * v_.t)         // should equal the original bb
+    
+/*
+    val bb = new MatrixD ((3, 3), 3.0, 5.0, 0.0,     // original bidiagonal matrix
+                                  0.0, 1.0, 4.0,
+                                  0.0, 0.0, 2.0)
+*/
+    println ("bb = " + bb)
+
+    val svd = new SVD3 (bb)                           // Singular Value Decomposition
+    val (u, b, v) = svd.deflateV ()                 // factor bb
+    println ("svd.deflateV: (u, b, v) = " + (u, b, v))
+    println ("ubv.t = " + u * b * v.t)               // should equal the original bb
+
+} // SVD3Test obejct
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SVD3Test2` object is used to test the `SVD3` class starting with a general
+ *  matrix.
+ *  @see www.mathstat.uottawa.ca/~phofstra/MAT2342/SVDproblems.pdf
+ */
+object SVD3Test2 extends App
+{
+/*
+    val a = new MatrixD ((3, 2), 1.0, 2.0,           // original matrix
+                                 2.0, 2.0,
+                                 2.0, 1.0)
+*/
+    val a = new MatrixD ((4, 4), 0.9501, 0.8913, 0.8214, 0.9218,
+                                 0.2311, 0.7621, 0.4447, 0.7382,
+                                 0.6068, 0.4565, 0.6154, 0.1763,
+                                 0.4860, 0.0185, 0.7919, 0.4057)
+/*
+    val a = new MatrixD ((4, 3), 1.0,  2.0,  3.0,
+                                 4.0,  5.0,  6.0,
+                                 7.0,  8.0,  9.0,
+                                10.0, 11.0, 12.0)
+*/
+    println ("a = " + a)
+
+    val bid = new Bidiagonal (a)                     // Householder Bidiagonalization
+    val (uu, bb, vv) = bid.bidiagonalize ()          // bidiagonalize a
+    println ("bid.bidiagonalize: (uu, bb, vv) = " + (uu, bb, vv))
+
+    val svd = new SVD3 (bb)                           // Singular Value Decomposition
+    val (u, b, v) = svd.deflateV ()                 // factor bb
+    println ("svd.deflateV: (u, b, v) = " + (u, b, v))
+    println ("ubv.t = " + u * b * v.t)               // should equal the original a
+
+} // SVD3Test2 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SVD3Test3` object is used to test the `SVD3` companion object.
+ */
+object SVD3Test3 extends App
+{
+    import SVD3.trailing
+
+    val b = new MatrixD ((4, 4), 1.0, 5.0, 0.0, 0.0,    // the bidiagonal matrix
+                                 0.0, 2.0, 6.0, 0.0,
+                                 0.0, 0.0, 3.0, 7.0,
+                                 0.0, 0.0, 0.0, 4.0)
+    val n = b.dim2
+    println ("b = " + b)
+    println ("trailing b.t * b = " + trailing (b))
+    println ("check: " + (b.t * b)(n-2 to n, n-2 to n))
+
+} // SVD3Test3 object
+

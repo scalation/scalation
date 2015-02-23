@@ -1,0 +1,87 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Matthew Saltz, John Miller
+ *  @version 1.0
+ *  @date    Thu Jul 25 11:28:31 EDT 2013
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.graphalytics
+
+import java.lang.System.nanoTime
+
+// import collection.mutable.Set
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This class provides an implementation for Graph Simulation.
+ *  @param g  the data graph  G(V, E, l)
+ *  @param q  the query graph Q(U, D, k)
+ */
+class GraphSim2 (g: Graph2, q: Graph2)
+      extends PatternMatcher (g, q)
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Apply the Graph Simulation pattern matching algorithm to find the mappings
+     *  from the query graph 'q' to the data graph 'g'.  These are represented by a
+     *  multi-valued function 'phi' that maps each query graph vertex 'u' to a
+     *  set of data graph vertices '{v}'.
+     */
+    def mappings (): Array [ISet] = saltzGraphSim (feasibleMates ())
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Graph Simulation by itself can not produce bijections.
+     */
+    def bijections (): Set [Array [Int]] =
+    {
+        throw new UnsupportedOperationException ()
+    } // bijections
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Refine the mappings 'phi' using the two graph simulation conditions:
+     *  matching labels and matching children.
+     *  @param phi  array of mappings from a query vertex u to { graph vertices v }
+     */
+    def saltzGraphSim (phi: Array [ISet]): Array [ISet] =
+    {
+        var changed = true
+        while (changed) {
+            changed = false
+            for (u <- qRange; u_c <- q.adj (u)) {             // query vertex u and its child u_c
+                for (v <- phi (u)) {                          // graph vertex v matching u's label
+                    if ((g.adj (v) & phi (u_c)).isEmpty) {    // v requires child matching u_c's label
+                        phi (u) -= v                          // remove vertex v from phi(u)
+                        if (phi (u).isEmpty) return EMPTY     // no match for vertex u => no overall match
+                        changed = true
+                    } // if
+                } // for
+            } // for
+        } // while
+        phi
+    } // saltzGraphSim
+
+} // GraphSim2 class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This object is used to test the GraphSim2 class.
+ */
+object GraphSim2Test extends App
+{
+    val ns_per_ms = 1.E-6        // nanoseconds per millisecond
+    val gSize     = 1000         // size of the data graph
+    val qSize     =   10         // size of the query graph
+    val nLabels   =  100         // number of distinct labels
+    val gAvDegree =    5         // average vertex out degree for data graph
+    val qAvDegree =    2         // average vertex out degree for query graph
+
+    val g = GraphGenerator.generateRandomGraph (gSize, nLabels, gAvDegree)
+    val q = GraphGenerator.generateBFSQuery (qSize, qAvDegree, g)
+
+    val matcher = new GraphSim2 (g, q)
+    val t0  = nanoTime ()                          // start the timer
+    val phi = matcher.mappings ()
+    println ("GraphSim2: runtime = " + ((nanoTime () - t0) * ns_per_ms))
+    for (i <- phi.indices) println ("u_" + i + ": " + phi(i))
+
+} // GraphSim2Test object
+

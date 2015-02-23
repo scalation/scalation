@@ -1,0 +1,294 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Matthew Saltz
+ *  @version 1.0
+ *  @date    Thu Jul 25 11:28:31 EDT 2013
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.graphalytics
+
+import scala.util.Random
+import collection.mutable.Queue
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+// FIX: finish documentation
+object GraphGenerator
+{
+  val rand = new Random
+  def generateRandomGraph(size: Int, nLabels: Int, avDegree: Int): Graph2 = {
+    val adj = (0 until size).map{ node => 
+      val degree = rand.nextInt(avDegree * 2 + 1)
+      (0 until degree).map( _ => rand.nextInt(size) ).toSet.filter(_ != node)
+    }.toArray
+    val labels = randDistLabels(size, nLabels)
+    var labelMap = Graph2.buildLabelMapFromLabels(labels) 
+    new Graph2(adj, labels, labelMap)
+  }
+
+  def generateRandomGraphPLLabels(size: Int, nLabels: Int, avDegree: Int): Graph2 = {
+    val adj = Array.ofDim[Set[Int]](size).map( node => {
+      val degree = rand.nextInt(avDegree * 2 + 1)
+      (0 until degree).map( _ => rand.nextInt(size) ).toSet
+    })
+    // 2.1 is used in WWW graph pg 72 of m&m graph data
+    val labels = powDistLabels(size, nLabels, 2.1)
+    var labelMap = Graph2.buildLabelMapFromLabels(labels) 
+    new Graph2(adj, labels, labelMap)
+  }
+
+  def generatePLGraphRandLabels(size: Int, nLabels: Int, maxDegree: Int, 
+                                distPow: Double): Graph2 = {
+    val adj = (0 until size).map{ node => 
+      val degree = powInt(0, maxDegree, distPow)
+      (0 until degree).map( _ => rand.nextInt(size)).toSet.filter(_ != node)
+    }.toArray
+    val labels = randDistLabels(size, nLabels)
+    var labelMap = Graph2.buildLabelMapFromLabels(labels) 
+    new Graph2(adj, labels, labelMap)
+  }
+
+  def generatePLGraphPowLabels(size: Int, nLabels: Int, maxDegree: Int, 
+                                distPow: Double): Graph2 = {
+    val adj = Array.ofDim[Set[Int]](size).map( node => {
+      val degree = powInt(0, maxDegree, distPow)
+      (0 until degree).map( _ => rand.nextInt(size) ).toSet
+    })
+    val labels = powDistLabels(size, nLabels, distPow)
+    var labelMap = Graph2.buildLabelMapFromLabels(labels) 
+    new Graph2(adj, labels, labelMap)
+  }
+
+  def randDistLabels(size: Int, nLabels: Int) = 
+    Array.ofDim[Int](size).map( x => rand.nextInt(nLabels) )
+
+  def powDistLabels(size: Int, nLabels: Int, pow: Double) = 
+    Array.ofDim[Int](size).map( x => powInt(0, nLabels, pow) )
+
+  def gaussianDistLabels(size: Int, nLabels: Int) = 
+    Array.ofDim[Int](size).map( x => gaussInt(nLabels/2.0) ) 
+
+  def powInt(min: Int, max: Int, distPow: Double): Int = {
+    max - 1 - math.pow(((math.pow(max, distPow + 1) - 
+               math.pow(min, distPow + 1))*rand.nextDouble + 
+               math.pow(min, distPow + 1)), 
+               (1.0/(distPow + 1))).toInt 
+  }
+
+  // d: average value of the distribution
+  def gaussInt(d: Double) = 
+    (rand.nextGaussian()*2*d).toInt
+//    math.min(math.max((rand.nextGaussian()*d+d).toInt, 0), d*2).toInt
+
+  def generateRandomConnectedGraph (size: Int, nLabels: Int, avDegree: Int): Graph2 = {
+    var g = generateRandomGraph (size, nLabels, avDegree)
+    while(!g.isConnected) g = generateRandomGraph (size, nLabels, avDegree)
+    g
+  }
+
+ def generateBFSQuery(size: Int, avDegree: Int, g: Graph2): Graph2 = {
+   /* //randomly pick a start node in adj*/
+    var adjMap = Map[Int, Set[Int]]()
+    var nodes = Set[Int]()
+    val maxRestarts = 5000
+    var nRestarts = 0
+    var cycle = false
+    while (nodes.size < size && nRestarts < maxRestarts) {
+      if (nRestarts % 100 == 0) println("restarting " + nRestarts)
+      adjMap = Map[Int, Set[Int]]()
+      nodes = Set[Int]()
+      val q = Queue[Int]()
+      val start = rand.nextInt(g.size)
+      q.enqueue(start)
+      nodes += start
+      while (!q.isEmpty && nodes.size < size) {
+        var adjs = Set[Int]()
+        val newNode = q.dequeue
+        val newNodeChildren = g.adj(newNode)
+        if (!newNodeChildren.isEmpty) {
+          val nncArr = newNodeChildren.toArray
+          for(i <- 0 until rand.nextInt(avDegree * 2 + 1) if nodes.size < size) {
+            val newChild = nncArr.apply(rand.nextInt(newNodeChildren.size)) 
+            if (!nodes.contains(newChild)) {
+              nodes += newChild
+              q.enqueue(newChild)
+            } else { cycle = true }
+            if (newChild != newNode) adjs += newChild 
+          }
+          adjMap += (newNode -> (adjMap.getOrElse(newNode, Set[Int]()) ++ adjs))
+        }
+      }
+//      while (!q.isEmpty) {
+//        val newNode = q.dequeue
+//        val nChildren = g.adj(newNode)
+//        val nBallAdj = nChildren & nodes
+//        val adjArr = nBallAdj.toArray
+//        var adjs = Set[Int]()
+//        for (i <- 0 until rand.nextInt(avDegree * 2 + 1) if adjArr.size != 0) 
+//          adjs += adjArr.apply(rand.nextInt(adjArr.size)) 
+//        adjMap += (newNode -> (adjMap.getOrElse(newNode, Set[Int]()) ++ adjs))
+//      }
+
+      if(nodes.size < size) nRestarts += 1
+    }
+
+
+    if (nRestarts == maxRestarts) { 
+      println("could not find good query")
+      System.exit(-1)
+    }
+
+    val iter = nodes.iterator
+    // gives the nodes new ids
+    var newLabelMap = Map[Int, Int]() 
+    var c = 0 
+    for (x <- nodes) { 
+      newLabelMap += (x -> c)
+      c += 1
+    }
+    val newToOldLabels = Array.ofDim[Int](size)
+    newLabelMap.foreach{ case(oldL, newL) => 
+      newToOldLabels(newL) = oldL 
+    }
+    val adj = Array.ofDim[Set[Int]](size).map(x => Set[Int]())
+    for ((node, children) <- adjMap) {
+      adj(newLabelMap(node)) = children.map(x => newLabelMap(x)) 
+    }
+    val labels = newToOldLabels.map(x => g.labels(x)).toArray
+    val labelMap = Graph2.buildLabelMapFromLabels(labels)     
+    if (cycle) println("query has a cycle")
+    Graph2(adj, labels, labelMap)
+  }
+
+  def extractSubgraph(size: Int, g: Graph2): Graph2 = {
+   /* //randomly pick a start node in adj*/
+    var adjMap = Map[Int, Set[Int]]()
+    var nodes = Set[Int]()
+    val maxRestarts = 5000
+    var nRestarts = 0
+    while (nodes.size < size && nRestarts < maxRestarts) {
+      if (nRestarts % 100 == 0) println("restarting " + nRestarts)
+      adjMap = Map[Int, Set[Int]]()
+      nodes = Set[Int]()
+      val q = Queue[Int]()
+      val start = rand.nextInt(g.size)//g.adj.zipWithIndex.sortBy(-1 * _._1.size).apply(0)._2//
+      println("start node: " + start)
+      q.enqueue(start)
+      nodes += start
+      while (!q.isEmpty && nodes.size < size) {
+        var adjs = Set[Int]()
+        val newNode = q.dequeue
+        val newNodeChildren = g.adj(newNode)
+        if (!newNodeChildren.isEmpty) {
+          for(newChild <- newNodeChildren if nodes.size < size) {
+            if (!nodes.contains(newChild)) {
+              nodes += newChild
+              q.enqueue(newChild)
+            }
+          }
+        }
+      }
+      for (n <- nodes) {
+        val adjs = g.adj(n) & nodes
+        adjMap += (n -> adjs )
+      }
+      if(nodes.size < size) {
+        nRestarts += 1
+        println("nodes.size only " + nodes.size)
+      }
+    }
+    if (nRestarts == maxRestarts) { 
+      println("could not find good query")
+      System.exit(-1)
+    }
+
+    val iter = nodes.iterator
+    // gives the nodes new ids
+    var newLabelMap = Map[Int, Int]() 
+    var c = 0 
+    for (x <- nodes) { 
+      newLabelMap += (x -> c)
+      c += 1
+    }
+    val newToOldLabels = Array.ofDim[Int](size)
+    newLabelMap.foreach{ case(oldL, newL) => 
+      newToOldLabels(newL) = oldL 
+    }
+    val adj = Array.ofDim[Set[Int]](size).map(x => Set[Int]())
+    for ((node, children) <- adjMap) {
+      adj(newLabelMap(node)) = children.map(x => newLabelMap(x)) 
+    }
+    val labels = newToOldLabels.map(x => g.labels(x)).toArray
+    val labelMap = Graph2.buildLabelMapFromLabels(labels)     
+    Graph2(adj, labels, labelMap)
+  }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+object RandomConnectedGraphTest extends App {
+  (0 until 10).foreach{ _ =>
+  var g = GraphGenerator.generateRandomConnectedGraph(4, 100, 1)
+  g.print
+  println("CONNECTED?  " + g.isConnected)
+  }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+object IsConnectedTest extends App {
+  (0 until 10).foreach { _ =>
+    var g = GraphGenerator.generateRandomGraph(4, 100, 1)
+    g.print
+    println(g.isConnected)
+  }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+object PowerLawLabelTest extends App {
+  var g = GraphGenerator.generateRandomGraphPLLabels(200, 50, 2)
+  //g.print
+  g.labelMap.toSeq.sortBy(_._1).foreach{ println(_) }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+object PLGraphRandLabelTest extends App {
+  var g = GraphGenerator.generatePLGraphRandLabels(50, 10, 10, 2.1)
+  g.adj.sortBy(_.size).foreach{ println(_) }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+object PLGraphPowLabelTest extends App {
+  var g = GraphGenerator.generatePLGraphPowLabels(50, 10, 10, 2.1)
+  g.adj.sortBy(_.size).foreach{ println(_) }
+  g.labelMap.toSeq.sortBy(_._1).foreach{ println(_) }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+object ExtractSubgraphTest extends App {
+  var g = GraphGenerator.generateRandomGraph(1000000, 10, 16)
+  println("done generating data graph")
+  println("g.size: " + g.size)
+  println("g.nEdges: " + g.nEdges)
+  (2 until 10).foreach { i =>
+    //var q = GraphGenerator.extractSubgraph(g.size/i, g)
+    var q = GraphGenerator.generateBFSQuery(25, 3, g)
+    q.print
+    println(q.size)
+    println(q.nEdges)
+    println(q.nEdges/q.size.toDouble)
+  }
+  println("done")
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+object QueryGenerationTest extends App {
+  var g = GraphGenerator.generateRandomGraph(100000, 10, 3)
+//  g.print
+  println("g size: " + g.size)
+  println("g nEdges: " + g.nEdges)
+  println
+  println
+  var q = GraphGenerator.generateBFSQuery(10, 2, g)
+  println(q.nSelfLoops)
+ // q.print
+}
+

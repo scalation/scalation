@@ -1,0 +1,200 @@
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.1
+ *  @date    Sat Mar 22 14:39:30 EDT 2014
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  CMRG (Combined Multiple Recursive Generator)
+ */
+
+package scalation.random
+
+import scalation.util.Timer.time
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Random2` class generates random real numbers in the range (0, 1).
+ *  It uses the 'MRG31k3p' generator developed by L'Ecuyer and Touzin, described in
+ *  "FAST COMBINED MULTIPLE RECURSIVE GENERATORS WITH MULTIPLIERS OF THE FORM a = 2^q +/- 2^r"
+ *  MRG31k3p is a Combined Multiple Recursive Generator (CMRG) shown to have good
+ *  performance and statistical properties for simulations.  It is considered
+ *  to be a faster alternative to the popular 'MRG32k3' generator.
+ *  MRG31k3p combines MRG1 and MRG2.
+ *  <br>
+ *      MRG1: x_i = (0          + a_12 x_i-2 + a_13 x_i-3) % m1
+ *      MRG2: x_i = (a_21 x_i-1 + 0          + a_23 x_i-3) % m2
+ *  <br>
+ *  where a_12 = 2^22, a_13 = 2^7+1, a_21 = 2^15 and a_23 = 2^15+1.
+ *  @see http://www.informs-sim.org/wsc00papers/090.PDF
+ *  @see http://www.iro.umontreal.ca/~simardr/ssj/doc/pdf/guiderng.pdf
+ *  @param stream  the random number stream index
+ */
+case class Random2 (stream: Int = 0)
+{
+    private val m1     = 2147483647l                // modulus for MRG1 (2^31 - 1)
+    private val m2     = 2147462579l                // modulus for MRG2 (2^31 - 21069)
+    private val norm   = 4.656612873077393e-10      // normalization to (0, 1)
+    private val mask12 = 511l                       // mask to extract  9 lsb's
+    private val mask13 = 16777215l                  // mask to extract 23 lsb's
+    private val mask21 = 65535l                     // mask to extract 15 lsb's
+
+    // state variable
+    private var x1_1   = 12345l                     // x_i-1 for MRG1
+    private var x1_2   = 12345l                     // x_i-2 for MRG1
+    private var x1_3   = 12345l                     // x_i-3 for MRG1
+    private var x2_1   = 12345l                     // x_i-1 for MRG2
+    private var x2_2   = 12345l                     // x_i-2 for MRG2
+    private var x2_3   = 12345l                     // x_i-3 for MRG2
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the theorectical mean for the random number generator's gen method.
+     */
+    def mean: Double = 0.5
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the next random number as a Double in the interval (0, 1).
+     */
+    def gen: Double =
+    {
+        // Caluclate MRG1 (first component)
+
+        var y1 = (((x1_2 & mask12) << 22) + (x1_2 >> 9)) + (((x1_3 & mask13) << 7) + (x1_3 >> 24))
+        if (y1 > m1) y1 -= m1
+        y1 += x1_3
+        if (y1 > m1) y1 -= m1
+        x1_3 = x1_2; x1_2 = x1_1; x1_1 = y1
+
+        // Calculate MRG2 (second component)
+
+        y1 = ((x2_1 & mask21) << 15) + 21069 * (x2_1 >> 16)
+        if (y1 > m2) y1 -= m2
+        var y2 = ((x2_3 & mask21) << 15) + 21069 * (x2_3 >> 16)
+        if (y2 > m2) y2 -= m2
+        y2 += x2_3
+        if (y2 > m2) y2 -= m2
+        y2 += y1
+        if (y2 > m2) y2 -= m2
+        x2_3 = x2_2; x2_2 = x2_1; x2_1 = y2
+
+        // Combine MRG1 and MRG2
+
+        if (x1_1 <= x2_1) (x1_1 - x2_1 + m1) * norm else (x1_1 - x2_1) * norm
+    } // gen
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the next stream value as a Long integer.
+     */
+    def lgen: Long =
+    {
+        // Caluclate MRG1 (first component)
+
+        var y1 = (((x1_2 & mask12) << 22) + (x1_2 >> 9)) + (((x1_3 & mask13) << 7) + (x1_3 >> 24))
+        if (y1 > m1) y1 -= m1
+        y1 += x1_3
+        if (y1 > m1) y1 -= m1
+        x1_3 = x1_2; x1_2 = x1_1; x1_1 = y1
+
+        // Calculate MRG2 (second component)
+
+        y1 = ((x2_1 & mask21) << 15) + 21069 * (x2_1 >> 16)
+        if (y1 > m2) y1 -= m2
+        var y2 = ((x2_3 & mask21) << 15) + 21069 * (x2_3 >> 16)
+        if (y2 > m2) y2 -= m2
+        y2 += x2_3
+        if (y2 > m2) y2 -= m2
+        y2 += y1
+        if (y2 > m2) y2 -= m2
+        x2_3 = x2_2; x2_2 = x2_1; x2_1 = y2
+
+        // Combine MRG1 and MRG2
+
+        if (x1_1 <= x2_1) x1_1 - x2_1 + m1 else x1_1 - x2_1
+    } // lgen
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find and print out 100 (nStreams) seed values as a val declaration that
+     *  can be copied into a class to initialize the seeds (as done above).
+     *
+    def findSeeds - FIX
+    {
+        val streamLen = ((m - 1l) / nStreams).toLong
+        println ("    private val seeds: Array [Long] = Array (")
+        var seed = seed0
+        for (i <- 0 until nStreams) {
+            if (i % 5 != 4) {
+                print ("\t" + seed + "l,")
+                if (seed < 100000l) print ("\t")
+            } else if (i != nStreams - 1) {
+                println ("\t" + seed + "l,")
+            } else {
+                println ("\t" + seed + "l)")
+            } // if
+            var j = 0l
+            while (j < streamLen) { seed = lgen; j += 1 }
+//          for (j <- 0 until streamLen) seed = lgen         // limited to Int
+        } // for
+    } // find seeds
+     */
+
+} // Random2 class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Random2Test` object is used to test the `Random2` class.
+ */
+object Random2Test extends App
+{
+    val rng = Random2 ()
+    var sum = 0.0
+    time {  for (i <- 0 until 10000000) sum += rng.gen }
+    println ("sum = " + sum)
+} // Random2Test	
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The Random Number Generator `RNG2` object provides multiple pre-built
+ *  random number streams.
+ */
+object RNG2
+{
+    /** Array of random number streams
+     */
+    val rand = Array [Random2] (
+         Random2 (0),  Random2 (1),  Random2 (2),  Random2 (3),  Random2 (4),
+         Random2 (5),  Random2 (6),  Random2 (7),  Random2 (8),  Random2 (9),
+         Random2 (10), Random2 (11), Random2 (12), Random2 (13), Random2 (14),
+         Random2 (15), Random2 (16), Random2 (17), Random2 (18), Random2 (19),
+         Random2 (20), Random2 (21), Random2 (22), Random2 (23), Random2 (24),
+         Random2 (25), Random2 (26), Random2 (27), Random2 (28), Random2 (29),
+         Random2 (30), Random2 (31), Random2 (32), Random2 (33), Random2 (34),
+         Random2 (35), Random2 (36), Random2 (37), Random2 (38), Random2 (39),
+         Random2 (40), Random2 (41), Random2 (42), Random2 (43), Random2 (44),
+         Random2 (45), Random2 (46), Random2 (47), Random2 (48), Random2 (49),
+         Random2 (50), Random2 (51), Random2 (52), Random2 (53), Random2 (54),
+         Random2 (55), Random2 (56), Random2 (57), Random2 (58), Random2 (59),
+         Random2 (60), Random2 (61), Random2 (62), Random2 (63), Random2 (64),
+         Random2 (65), Random2 (66), Random2 (67), Random2 (68), Random2 (69),
+         Random2 (70), Random2 (71), Random2 (72), Random2 (73), Random2 (74),
+         Random2 (75), Random2 (76), Random2 (77), Random2 (78), Random2 (79),
+         Random2 (80), Random2 (81), Random2 (82), Random2 (83), Random2 (84),
+         Random2 (85), Random2 (86), Random2 (87), Random2 (88), Random2 (89),
+         Random2 (90), Random2 (91), Random2 (92), Random2 (93), Random2 (94),
+         Random2 (95), Random2 (96), Random2 (97), Random2 (98), Random2 (99))
+
+} // RNG2 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SeedFinder2` object find seeds for all the random number streams.
+ *
+object SeedFinder2 extends App
+{
+    val rng = Random2 ()
+    rng.findSeeds
+
+} // SeedFinder2 object
+ */
+
+
+
+

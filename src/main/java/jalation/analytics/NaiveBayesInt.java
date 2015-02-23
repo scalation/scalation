@@ -1,0 +1,221 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.1
+ *  @date    Tue Sep 16 14:45:38 EDT 2014
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package jalation.analytics;
+
+import java.util.Arrays;
+import static java.lang.System.out;
+
+import static jalation.util.Error.flaw;
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `NaiveBayesInt` class implements an Integer-Based Naive Bayes Classifier,
+ *  which is a commonly used such classifier for discrete input data.  The
+ *  classifier is trained using a data matrix 'x' and a classification vector 'y'.
+ *  Each data vector in the matrix is classified into one of 'k' classes numbered
+ *  0, ..., k-1.  Prior probabilities are calculated based on the population of
+ *  each class in the training-set.  Relative posterior probabilities are computed
+ *  by multiplying these by values computed using conditional probabilities.  The
+ *  classifier is naive, because it assumes feature independence and therefore
+ *  simply multiplies the conditional probabilities.
+ *  @param x   the integer-valued data vectors stored as rows of a matrix
+ *  @param y   the class vector, where y_i = class for row i of the matrix x
+ *  @param fn  the names for all features/variables
+ *  @param k   the number of classes
+ *  @param cn  the names for all classes
+ *  @param vc  the value count (number of distinct values) for each feature
+ *  @param me  use m-estimates (me == 0 => regular MLE estimates)
+ */
+public class NaiveBayesInt
+       extends ClassifierInt
+{
+    private final boolean DEBUG = true;       // debug flag
+
+    private final int []        popC;         // frequency counts for classes 0, ..., k-1
+    private final int [][][]    popX;         // conditional frequency counts for variable/feature j
+    private final double []     probC;        // probabilities for classes 0, ..., k-1
+    private final double [][][] probX;        // conditional probabilities for variable/feature j
+
+    private final int [][] x;
+    private final int [] y;
+    private final String [] fn;
+    private final int k;
+    private final String [] cn;
+    private final int [] vc;
+    private final int me;
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Construct an Integer-Based Naive Bayes Classifier.
+     *  @param x   the integer-valued data vectors stored as rows of a matrix
+     *  @param y   the class vector, where y_i = class for row i of the matrix x
+     *  @param fn  the names for all features/variables
+     *  @param k   the number of classes
+     *  @param cn  the names for all classes
+     *  @param vc  the value count (number of distinct values) for each feature
+     *  @param me  use m-estimates (me == 0 => regular MLE estimates)
+     */
+    public NaiveBayesInt (int [][] x_, int [] y_, String [] fn_, int k_, String [] cn_,
+                          int [] vc_, int me_)
+    {
+        super (x_, y_, fn_, k_, cn_);
+        x  = x_;
+        y  = y_;
+        fn = fn_;
+        k  = k_;
+        cn = cn_;
+        vc = (vc_ == null) ? vc_default () : vc_;    // set to default for binary data (2)
+        me = me_;
+
+        popC  = new int [k];
+        popX  = new int [n][][];
+        probC = new double [k];
+        probX = new double [n][][];
+
+        out.println ("vc = " + Arrays.toString (vc));
+        for (int j = 0; j < n; j++) {
+            popX[j]  = new int [vc[j]][k];             // hold #(X_j = v & C = i)
+            probX[j] = new double [vc[j]][k];          // hold P(X_j = v | C = i)
+        } // for
+    } // constructor
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Check the correlation of the feature vectors (fea).  If the correlations
+     *  are too high, the independence assumption may be dubious.
+     */
+    public void checkCorrelation ()
+    {
+        out.println ("checkCorrelation not yet implemented");
+    } // checkCorrelation
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Count the frequencies for 'y' having class 'i' and 'x' for cases 0, 1, ...
+     */
+    public void frequencies ()
+    {
+        for (int l = 0; l < m; l++) {
+            int i = y[l];                           // get the class
+            popC[i] += 1;
+            for (int j = 0 ; j < n; j++) {
+                popX[j][x[l][j]][i] += 1;
+           } // for
+        } // for
+
+        if (DEBUG) {
+            out.println ("popC   = " + Arrays.toString (popC));                  // #(C = i)
+            for (int j = 0; j < n; j++) {
+                out.println (fn[j] + ": popX[" + j + "] = " + Arrays.deepToString(popX[j]));   // #(X_j = v & C = i)
+            } // for
+        } // if
+    } // frequencies
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the classifier by computing the probabilities for C, and the
+     *  conditional probabilities for X_j.
+     */
+    public void train ()
+    {
+        frequencies ();
+        for (int i = 0; i < k; i++) {                           // for each class i
+            double pci  = (double) popC[i];
+            probC[i] = pci / md;
+            for (int j = 0; j < n; j++) {                       // for each feature j
+                double me_vc = me / (double) vc[j];
+                for (int v = 0; v < vc[j]; v++) {               // for each value v for feature j
+                    probX[j][v][i] = (popX[j][v][i] + me_vc) / (pci + me);
+                } // for
+            } // for
+        } // for
+
+        if (DEBUG) {
+            out.println ("probC   = " + Arrays.toString (probC));                  // P(C = i)
+            for (int j = 0; j < n; j++) {
+                out.println (fn[j] + ": probX[" + j + "] = " + Arrays.deepToString (probX[j]));   // P(X_j = v | C = i)
+            } // for
+        } // if
+    } // train
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a discrete data vector 'z', classify it returning the class number
+     *  (0, ..., k-1) with the highest relative posterior probability.
+     *  @param z  the data vector to classify
+     */
+    public int classify (int [] z)
+    {
+        double [] prob = new double [k];
+        for (int i = 0; i < k; i++) {
+            prob[i] = probC[i];                                   // P(C = i)
+            for (int j = 0; j < n; j++) prob[i] *= probX[j][z[j]][i];    // P(X_j = z_j | C = i)
+        } // for
+        out.println ("prob = " + Arrays.toString (prob));
+        return argmax (prob);          // class with the highest relative posterior probability
+    } // classify
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a continuous data vector 'z', classify it returning the class number
+     *  (0, ..., k-1) with the highest relative posterior probability.
+     *  @param z  the data vector to classify
+     */
+    public int classify (double [] z)
+    {
+        return 0;            // FIX, round z to int
+    } // classify
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the argument maximum of the vector 'p'.
+     *  @param p  the input vector
+     */
+    public int argmax (double [] p)
+    {
+        int im = 0;
+        for (int i = 1; i < p.length; i++) if (p[i] > p[im]) im = i;
+        return im;
+    } // argmax
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The maim method is used to test the 'NaiveBayesInt' class.
+     ** Ex: Classify whether a car is more likely to be stolen (1) or not (1).
+     *  http://www.inf.u-szeged.hu/~ormandi/ai2/06-naiveBayes-example.pdf
+     */
+    public static void main (String [] args)
+    {
+        // x0: Color:   Red (1), Yellow (0)
+        // x1: Type:    SUV (1), Sports (0)
+        // x2: Origin:  Domestic (1), Imported (0)
+        // features:               x0  x1  x2
+        int [][] x = {{1,  0,  1},                     // data matrix
+                      {1,  0,  1},
+                      {1,  0,  1},
+                      {0,  0,  1},
+                      {0,  0,  0},
+                      {0,  1,  0},
+                      {0,  1,  0},
+                      {0,  1,  1},
+                      {1,  1,  0},
+                      {1,  0,  0}};
+        int [] y = {1, 0, 1, 0, 1, 0, 1, 0, 0, 1};                  // classification vector: 0(No), 1(Yes))
+        String [] fn = {"Color", "Type", "Origin"};                 // feature/variable names
+        String [] cn = {"No", "Yes"};                               // class names
+
+        out.println ("x = " + Arrays.deepToString (x));
+        out.println ("y = " + Arrays.toString (y));
+        out.println ("---------------------------------------------------------------");
+
+        NaiveBayesInt bnb = new NaiveBayesInt (x, y, fn, 2, cn, null, 3);    // create the classifier
+
+        // train the classifier ---------------------------------------------------
+        bnb.train ();
+
+        // test sample ------------------------------------------------------------
+        int [] z1 = {1, 0, 1};                                  // new data vector to classify
+        int [] z2 = {1, 1, 1};                                  // new data vector to classify
+        out.println ("classify (" + Arrays.toString (z1) + ") = " + bnb.classify (z1) + "\n");
+        out.println ("classify (" + Arrays.toString (z2) + ") = " + bnb.classify (z2) + "\n");
+    } // main
+
+} // NaiveBayesInt class
+

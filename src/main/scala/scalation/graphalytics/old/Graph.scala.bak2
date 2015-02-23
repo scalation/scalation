@@ -1,0 +1,94 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Usman Nisar, John Miller
+ *  @version 1.0
+ *  @date    Mon May  6 10:50:37 EDT 2013
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.graphalytics
+
+
+import collection.mutable.{HashMap, Set}
+import scala.io.Source
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This class stores vertex-labeled directed graphs using arrays.
+ *  Each vertex in the graph has a label, a set of child vertices, and
+ *  optionally a set of parent vertices.
+ *  The class reads from a file to create the graph.
+ *  @param fname  the file name
+ *  @param dual   indicator of whether to store parent references as well
+ dj*/
+class Graph (fname: String, dual: Boolean = false)
+{
+    private val source = Source.fromFile (fname).getLines ().toArray
+
+    val n        = source.length                     // number of lines in file (# vertices)
+    val labels   = Array.ofDim [Int] (n)             // array of vertex labels
+    val children = Array.ofDim [Set [Int]] (n)       // array of sets of children
+    var parents:   Array [Set [Int]] = null          // array of sets of parents
+    val labelMap = HashMap [Int, Set [Int]] ()       // map: label -> vertices
+
+    for (i <-0 until n) children(i) = Set [Int] ()
+
+    if (dual) {                                              // allocate for parents
+        parents = Array.ofDim [Set [Int]] (n)
+        for (i <-0 until n) parents(i)  = Set [Int] ()
+    } // if
+  
+    for (line <- source) {                                   // create graph from file
+        val parts  = line.split (' ')
+        val id     = parts(0).toInt
+        labels(id) = parts(1).toInt
+        for (i <- 2 until parts.size) children(id) += parts(i).toInt
+    } // for
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Finish initialization of graph by setting the parents and the labelMap.
+     */
+    def initialize ()
+    {
+        for (id <- 0 until n) {
+           if (dual) for (cid <- children(id)) parents(cid) += id
+           labelMap.getOrElseUpdate (labels(id), Set(id)) += id
+        } // for
+    } // initialize
+  
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the set of children of a vertex.
+     *  @param id  the identifier of the vertex
+     */
+    def post (id: Int): Set [Int] = children(id)
+  
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the set of parents of a vertex.
+     *  @param id the identifier of the vertex
+     */
+    def pre (id: Int): Set [Int] = if (dual) parents(id) else null
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the labels for a given set of vertices.
+     *  @param set  the given set of vetices
+     */
+    def getLabels (set: Set [Int]): Set [Int] =
+    {
+        val lSet = Set[Int]()
+        for (v <- set) lSet += labels(v)
+        lSet
+    } // getLabels 
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Display the graph.
+     */  
+     def display ()
+     {
+         println ("\n\n******** Dump of graph " + fname + "********")
+         println ("\n-- Labels -- ")
+         println (labels.deep)
+         println ("\n-- Edges  --")
+         println (children.deep)   
+     } // display
+
+} // Graph class
+

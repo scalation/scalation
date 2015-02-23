@@ -1,0 +1,69 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Usman Nisar, John Miller
+ *  @version 1.0
+ *  @date    Mon May  6 10:50:37 EDT 2013
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.graphalytics
+
+import collection.mutable.{HashMap, Set}
+import io.Source.fromFile
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This class stores node-labeled directed graphs using two maps:
+ *  (1) map: id -> vertex label, and (2) map: id -> adjacency set (children)
+ *  Each vertex in the graph has an id, label, and set of child vertices.
+ *  The class reads from a file to create the graph.
+ *  @param fname  the file name
+ */
+class Graph (fname: String)
+{
+    type AdjSet = Set [Int]                                 // type for adjacency set
+
+    private val labels = HashMap [Int, String] ()           // map: id -> vertex label
+    private val adjSet = HashMap [Int, AdjSet] ()           // map: id -> adjacency sets
+
+    private val source = fromFile (fname).getLines ()       // lines in file
+  
+    for (line <- source) {                                  // build graph line by line
+        val parts = line.split (' ')
+        val id    = parts(0).toInt
+        labels   += id -> parts(1)                          // put: id -> vertex label
+        val child = Set [Int] ()
+        for (i <- 2 until parts.size) child += parts(i).toInt
+        adjSet   += id -> child                             // put: id -> child vertices
+     } // for
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the label for the vertex with the given id.
+     *  @param id  the vertex id
+     */
+    def label (id: Int): String = labels (id)
+  
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the set of all vertices in the graph.
+     */
+    def vertices (): AdjSet = labels.keySet.asInstanceOf [AdjSet]
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the set of children of the vertex with the given id.
+     *  @param id  the vertex id
+     */
+    def post (id: Int): AdjSet = if (adjSet contains id) adjSet (id) else Set [Int] ()
+  
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Display the graph.
+     */
+    def display ()
+    {
+        println("******** Dump of graph " + fname + " ********")
+        println ("Labels")
+        for (v <- labels) println (v._1 + " -> " + v._2)
+        println ("Edges")
+        for (v <- adjSet) println (v._1 + " -> " + v._2) 
+    } // display
+
+} // Graph class
+

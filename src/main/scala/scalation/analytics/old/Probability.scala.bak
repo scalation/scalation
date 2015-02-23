@@ -1,0 +1,261 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.1
+ *  @date    Thu Oct 24 11:59:36 EDT 2013
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.analytics
+
+import math.abs
+
+import scalation.linalgebra.MatrixD
+import scalation.linalgebra.VectorD
+import scalation.linalgebra_gen.VectorN
+import scalation.linalgebra_gen.Vectors.VectorI
+import scalation.math.Basic.log2
+import scalation.plot.Plot
+import scalation.util.Error
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Probability` object provides methods for operating on univariate and
+ *  bivariate probability distributions of discrete random variables 'X' and 'Y'.
+ *  A probability distribution is specified by its probabilty mass functions (pmf)
+ *  stored either as a "probabilty vector" for a univariate distribution or
+ *  a "probability matrix" for a bivariate distribution.
+ *  <p>
+ *      joint probability matrix:       pxy(i, j)  = P(X = x_i, Y = y_j)
+ *      marginal probability vector:    px(i)      = P(X = x_i)
+ *      conditional probability matrix: px_y(i, j) = P(X = x_i|Y = y_j)
+ *  <p>
+ */
+object Probability
+       extends Error
+{
+    private val EPSILON = 1E-9              // a number close to zero
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether the vector 'px' is a legitimate "probability vector".
+     *  The elements of the vector must be non-negative and add to one.
+     *  @param px  the probability vector
+     */
+    def isProbability (px: VectorD): Boolean = px.min () >= 0.0 || abs (px.sum - 1.0) < EPSILON
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether the matrix 'pxy' is a legitimate joint "probability matrix".
+     *  The elements of the matrix must be non-negative and add to one.
+     *  @param pxy  the probability matrix
+     */
+    def isProbability (pxy: MatrixD): Boolean = pxy.min () >= 0.0 || abs (pxy.sum - 1.0) < EPSILON
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given two independent random variables 'X' and 'Y', compute their
+     *  "joint probability", which is the outer product of their probability
+     *  vectors 'px' and 'py'.
+     */
+    def jointProbXY (px: VectorD, py: VectorD): MatrixD = px outer px
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a joint probability matrix 'pxy', compute the "marginal probability"
+     *  for random variable 'X', i.e, P(X = x).
+     *  @param pxy  the probability matrix
+     */
+    def margProbX (pxy: MatrixD): VectorD =
+    {
+        val px = new VectorD (pxy.dim1)
+        for (i <- 0 until pxy.dim1) px(i) = pxy(i).sum
+        px
+    } // margProbX
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a joint probability matrix 'pxy', compute the "marginal probability"
+     *  for random variable 'Y', i.e, P(Y = y).
+     *  @param pxy  the probability matrix
+     */
+    def margProbY (pxy: MatrixD): VectorD =
+    {
+        val py = new VectorD (pxy.dim2)
+        for (i <- 0 until pxy.dim2) px(i) = pxy.col(j).sum
+        py
+    } // margProbY
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a joint probability matrix 'pxy', compute the "conditional probability"
+     *  for random variable 'X' given random variable 'Y', i.e, P(X = x|Y = y).
+     *  @param pxy  the joint probability matrix
+     */
+    def condProbX_Y (pxy: MatrixD): MatrixD =
+    {
+        val px   = margProbX (pxy)
+        val px_y = new MatrixD (pxy.dim1, pxy.dim2)
+        for (i <- 0 until pxy.dim1) px_y(i) = pxy(i) / px(i)
+        px_y
+    } // condProbX_Y
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a joint probability matrix 'pxy', compute the "conditional probability"
+     *  for random variable 'Y' given random variable 'X', i.e, P(Y = y|X = x).
+     *  @param pxy  the joint probability matrix
+     */
+    def condProbY_X (pxy: MatrixD): MatrixD =
+    {
+        val py   = margProbY (pxy)
+        val py_x = new MatrixD (pxy.dim2, pxy.dim1)
+        for (j <- 0 until pxy.dim2) py_x(j) = pxy(j) / py(j)
+        py_x
+    } // condProbY_X
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a probability vector 'px', compute the "entropy" of random
+     *  variable 'X'.
+     *  @see http://en.wikipedia.org/wiki/Entropy_%28information_theory%29
+     *  @param px  the probability vector
+     */
+    def entropy (px: VectorD): Double =
+    {
+        var sum = 0.0
+        for (p <- px if p > 0.0) sum -= p * log2 (p)
+        sum
+    } // entropy
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a joint probability matrix 'pxy', compute the "joint entropy"
+     *  of random variables 'X' and 'Y'.
+     *  @param pxy  the joint probability matrix
+     */
+    def entropy (pxy: MatrixD): Double =
+    {
+        var sum = 0.0
+        for (i <- 0 until pxy.dim1; j <- 0 until pxy.dim2) {
+            val p = pxy(i, j)
+            if (p > 0.0) sum -= p * log2 (p)
+        } // for
+        sum
+    } // entropy
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a joint probability matrix 'pxy' and a conditional probability
+     *  matrix 'py_x', compute the "conditional entropy" of random variable 'X'
+     *  given random variable 'Y'.
+     *  @param pxy   the joint probability matrix
+     *  @param px_y  the conditional probability matrix
+     */
+    def entropy (pxy: MatrixD, px_y: MatrixD): Double =
+    {
+        if (pxy.dim1 != py_x.dim1 || pxy.dim2 != py_x.dim2)
+            flaw ("entropy", "joint and conditional probability matrices are not compatible")
+
+        var sum = 0.0
+        for (i <- 0 until pxy.dim1; j <- 0 until pxy.dim2) {
+            val p = pxy(i, j)
+            if (p > 0.0) sum -= p * log2 (px_y(i, j))
+        } // for
+        sum
+    } // entropy
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a joint probability matrix 'pxy', compute the mutual information
+     *  for random variables 'X' and 'Y'.
+     *  @param pxy  the probability matrix
+     */
+    def muInfo (pxy: MatrixD): Double =
+    {
+        val px = margProbX (pxy)
+        val py = margProbY (pxy)
+        var sum = 0.0
+        for (i <- 0 until pxy.dim1; j <- 0 until pxy.dim2) {
+            val p = pxy(i, j)
+            sum  += p * log2 (p / (px(i) * py(j)))
+        } // for
+        sum
+    } // muInfo
+
+/*
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a probability vector from one or more values (repeated values Double*).
+     *  @param x   the first Double
+     *  @param xs  the rest of the Doubles
+     *
+    def apply (x: Double, xs: Double*): ProbVector =
+    {
+        val p = new VectorD (1 + xs.length)
+        p(0)  = x
+        for (i <- 1 until p.dim) p(i) = xs(i-1)
+        new ProbVector (p)
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a vector of discrete values in the range 'a' to 'b', create a
+     *  probability vector based on the frequency counts of the values.
+     *  @param x  the given vector of discrete values
+     *
+    def apply (x: VectorI): ProbVector =
+    {
+        val a = x.min ()                     // minimum value
+        val b = x.max ()                     // maximum value
+        val m = b - a + 1                    // number of distinct values
+        val frq = new VectorD (m)            // hold frequency of each value
+        for (i <- 0 until x.dim) frq(x(i)-a) += 1.0
+        new ProbVector (frq / x.dim.toDouble)
+    } // apply
+
+    def apply (x: VectorI, y: VectorI): MatrixD =
+    {
+        val xa = x.min ()                     // minimum value
+        val xb = x.max ()                     // maximum value
+        val m  = xb - xa + 1                  // number of distinct values
+        val ya = y.min ()                     // minimum value
+        val yb = y.max ()                     // maximum value
+        val n  = yb - ya + 1                  // number of distinct values
+        val frq = new MatrixD (m, n)          // hold frequency of each value pair 
+        for (i <- 0 until x.dim; j <- 0 until y.dim) frq(x(i)-xa, y(j)-ya) += 1.0
+        frq / (x.dim.toDouble * y.dim.toDouble)
+    } // apply
+*/
+
+} // Probability object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/**The `ProbabilityTest` object is used to test the `Probability` object.
+ */
+object ProbabilityTest extends App
+{
+    // probability of 0, 1, 2 heads for 2 coins
+    val px = VectorD (.25, .5, .25)
+
+    // probability of 2, 3, ... 11, 12 for 2 dice
+    val py = VectorD (1/36.0, 2/36.0, 3/36.0, 4/36.0, 5/36.0, 6/6.0, 7/36.0, 
+                      6/36.0, 5/36.0, 4/36.0, 3/36.0, 2/36.0, 1/36.0)
+
+    println ("isProbability (" + px + ") = " + isProbability (px))
+    println ("isProbability (" + py + ") = " + isProbability (py))
+
+    val x = VectorD.range (0, 3)
+    new Plot (x, px)                        // plot the pmf for random variable X
+    val y = VectorD.range (2, 13)
+    new Plot (y, py)                        // plot the pmf for random variable Y
+
+    val pxy  = jointProb (px, py)
+    val px_y = condProbX (pxy)
+    val py_y = condProbY (pxy)
+
+    println ("joint probability pxy = " + pxy)
+    println ("conditional probability px_y = " + px_y)
+    println ("conditional probability py_y = " + py_x)
+
+    val hx   = entropy (px)
+    val hy   = entropy (py)
+    val hxy  = entropy (pxy)
+    val hx_y = entropy (pxy, px_y)
+    val ixy  = muInfo (pxy)
+
+    println ("hx   = " + hx)                // entropy of random variable X
+    println ("hy   = " + hy)                // entropy of random variable Y
+    println ("hxy  = " + hxy)               // joint entropy of random variables X and Y
+    println ("hx_y = " + hx_y)              // conditional entropy of random variables X given Y
+    println ("ixy  = " + ixy)               // mutual information of random variables X given Y
+
+} // ProbabilityTest
+

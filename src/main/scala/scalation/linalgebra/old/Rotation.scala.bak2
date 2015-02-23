@@ -1,0 +1,122 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.1
+ *  @date    Mon May 19 15:52:24 EDT 2014
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  @see fortranwiki.org/fortran/show/svd
+ */
+
+package scalation.linalgebra
+
+import math.{abs, log, max, sqrt}
+
+import scalation.math.DoubleWithExp._
+import scalation.math.ExtremeD.{EPSILON, MIN_NORMAL}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Rotation` class is a data structure for holding the results of rotating
+ *  by angle a.
+ *  @param cs  the cos (a)
+ *  @param sn  the sin (a)
+ *  @param r   the nonzero element of the rotated vector
+ */
+case class Rotation (cs: Double, sn: Double, r: Double)
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Rotation` object provides methods for rotating in a plane.
+ *  <p>
+ *      [  cs  sn  ]  .  [ f ]  =  [ r ]   where cs^2 + sn^2 = 1
+ *      [ -sn  cs  ]     [ g ]     [ 0 ]
+ *  <p>
+ */
+object Rotation
+{
+    private val EXPO    = (log (MIN_NORMAL / EPSILON) / log (2.0) / 2.0).toInt
+    private val SAF_MN2 = 2.0 ~^ EXPO
+    private val SAF_MX2 = 1.0 / SAF_MN2
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Rotate vector '[f, g]' to vector '[r, 0]' to make the second element 0.
+     *
+     *  @see LAPACK SUBROUTINE DLARTG (F, G, CS, SN, R)
+     *
+     *  @param f  the first element of the vector to be rotated
+     *  @param g  the second element of the vector to be rotated
+     */
+    def rotate (f: Double, g: Double): Rotation =
+    {
+        if (g == 0) return Rotation (1.0, 0.0, f)
+        if (f == 0) return Rotation (0.0, 0.0, g)
+
+        var f1    = f                           // working copy of f
+        var g1    = g                           // working copy of g
+        var cs    = 0.0                         // cosine
+        var sn    = 0.0                         // sine
+        var r     = 0.0                         // nonzero element
+        var scale = abs (f1) max abs (g1)       // max absolute value
+       
+        if (scale >= SAF_MX2) {
+            rot (SAF_MN2, SAF_MX2)
+        } else if (scale <= SAF_MN2) {
+            rot (SAF_MX2, SAF_MN2)
+        } else {
+            r  = sqrt (f1*f1 + g1*g1)
+            cs = f1 / r
+            sn = g1 / r
+        } // if
+
+        def rot (saf_a: Double, saf_b: Double)
+        {
+            var count = 0
+            do {
+                count += 1
+                f1    *= saf_a
+                g1    *= saf_a
+                scale  = abs (f1) max abs (g1)
+            } while (scale <= saf_b)
+            r  = sqrt (f1*f1 + g1*g1)
+            cs = f1 / r
+            sn = g1 / r
+            for (i <- 1 to count) r *= saf_b
+        } // rot
+
+        if (abs (f) > abs (g) && cs < 0.0) Rotation (-cs, -sn, -r)
+        else                               Rotation (cs, sn, r)
+    } // rotate
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Rotate the vector 'x to vector 'y' to make 'y(1) = 0'.
+     *  @param x  the vector to be rotated
+     */
+    def rotate (x: VectorD): Rotation = rotate (x(0), x(1))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given the cosine and sine for a rotation, form the rotation matrix.
+     *  @param q  the results of a rotation 
+     */
+    def formMatrix (q: Rotation): MatrixD = new MatrixD ((2, 2), q.cs, q.sn,
+                                                                -q.sn, q.cs)
+
+} // Rotation object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RotationTest` object is used to test the `Rotation` object,
+ */
+object RotationTest extends App
+{
+    import Rotation._
+
+    val x = VectorD (1.0, 2.0)
+    val q = rotate (x)
+    val a = formMatrix (q)
+
+    println ("x          = " + x)
+    println ("rotate (x) = " + q)
+    println ("a * x      = " + a * x)
+
+} // RotationTest
+

@@ -1,0 +1,48 @@
+
+Hi John,
+
+The attached excel sheet shows an equation defining an initial condition
+that you might want to use as a test for the advection equation.
+It is a form of the logistic equation
+
+http://en.wikipedia.org/wiki/Logistic_function
+
+The form on the spread sheet is
+
+y = h / (1 + exp( (x - x0) / d) )
+
+where h is the height, x0 is the inflection point, and d is the decay width.
+As you can see from the excel sheet, y -> h as x decreases, and y -> 0 as x increases.
+This is approximately the distribution of ligand in the column at the start of the
+run in my chromatography problem (i.e. the initial condition).
+More precisely, x0 corresponds to the input edge of the column, h is the concentration
+of solute flowing into the column and d -> 0 (very narrow decay).
+To make this work mathematically, I think you have to put x0 in somewhere
+in the middle of the calculated x-range, so that values of x that are less than x0
+correspond to locations in the tube feeding the solution into the column and
+values of x that are greater than x0 correspond to locations inside the column itself.
+This does not turn out to be a real problem, as we can just extend the column
+arbitrarily to the left, even in the more complex situation where ligand is being
+bound to the column, because at high ligand concentration the system is at steady state,
+that is, the column is saturated and so it acts just like an empty tube.
+
+If you can numerically solve this using constant velocity w, that would be a good test,
+because the solution is easy to deduce.  That is, the solution is known a priori:
+it is just the same logistic equation, but shifted as a function of time.
+
+y = h / (1 + exp( (x - x0 - t*w) / d) )
+
+Define the time-dependent value of the inflection point to be x0'
+      x0' = x0 + t*w
+which obviously increases linearly with t.  That is, the equation can be written as
+
+y = h / (1 + exp( (x - x0') / d) )
+
+Then, the curve shifts to higher values of x over time, but it keeps the same decay width d.  This approximates the behavior of material (solute) flowing into the column and moving through it over time (ignoring diffusion and binding).  When t*w becomes significantly greater than the length of the column, y is equal to h everywhere in the column (i.e., over the entire x-range). That is, the column becomes full of solute, because it is continuously being fed in at a constant concentration corresponding to h.
+
+The only problem I foresee in a numerical solution is that the value of y at the minimum value of the x-range depends (as time goes by) on the value of y where x is outside the x-range (less than the minimum x-value in the simulation).  Perhaps you would have to somehow enforce the condition for all values of t that  y = h at x = x[min].
+
+Have fun!
+
+Will
+

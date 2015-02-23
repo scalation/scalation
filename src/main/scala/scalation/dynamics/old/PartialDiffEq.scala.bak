@@ -1,0 +1,85 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.0
+ *  @date    Mon Mar  4 14:56:27 EST 2013
+ *  @see     LICENSE (MIT style license file)
+ *  @see gwu.geverstine.com/pdenum.pdf
+ */
+
+package scalation.dynamics
+
+import math.{ceil, exp, Pi, sin}
+
+import scalation.calculus.Calculus.FunctionS2S
+import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.math.DoubleWithExp._
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Let u(x, t) = temperature of a rod at position 0 < x < 1 and time t > 0
+ *  Solve the heat equation u_xx = 1/c * u_t with
+ *  boundary condition u(0, t) = u(1, t) = 0
+ *  initial condition  u(x, 0) = f(x)
+ */
+class PartialDiffEq (c: Double, f: FunctionS2S, h: Double, k: Double,
+                     x_lb: Double = 0., x_ub: Double = 1.)
+{
+    private val nx = (ceil ((x_ub - x_lb) / h)).toInt     // number of x values in grid
+    private val u = new MatrixD (nx, 2)                   // old/new temperatures as column vectors
+    private val r  = c * k / (h * h)
+
+    println ("r = " + r)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve for the temperature of the rod at time t, returning the vector of temperatures
+     *  representing the temperature profile of the rod over its length.
+     *  @param t  the time the solution is desired
+     */
+    def solve (t: Double): VectorD =
+    {    
+        val nt = (ceil (t / k)).toInt                     // number of t values in grid
+        for (i <- 1 until nx-1) u(i, 0) = f(i*h)          // initial values for t = 0
+
+        for (j <- 1 until nt) {
+            for (i <- 1 until nx-1) {
+                val jj    = (j + 1) % 2
+                val jj_p1 = j % 2
+                u(i, jj_p1) = r * u(i-1, jj) + (1. - 2.*r) * u(i, jj) + r * u(i+1, jj)
+            } // for
+            println ("at t = " + j*k + "\nu = " + u.col(0))
+            println ("u = " + u.col(1))
+        } // for
+        u.col(1)
+    } // solve
+
+} // PartialDiffEq
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This object is used to test the PartialDiffEq class.
+ */
+object PartialDiffEqTest extends App
+{
+    def f (x: Double): Double = if (x < .5) 2.*x else 2.*(1. - x)
+    val pde = new PartialDiffEq (1., f, .1, .0048)
+    pde.solve (.096)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the analytic solution to compare with the numerical solution.
+     *  @param t  compute the solution at time t
+     */
+    def ua (t: Double): VectorD = 
+    {
+        val u = new VectorD (10)
+        for (i <- 1 until 10; n <- 1 until 10) {
+            val x = .1 * i
+            val npi = n * Pi
+            u(i) += sin (.5 * npi) * sin (npi*x) * exp (-npi*npi*t) * 8./(npi*npi)
+        } // for
+        u
+    } // ua
+
+    println ("--at t = " + .096 + "\nu = " + ua (.096))
+
+} // PartialDiffEqTest
+

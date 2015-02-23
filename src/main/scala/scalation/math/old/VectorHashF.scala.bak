@@ -1,0 +1,84 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.0
+ *  @date    Wed Nov  2 19:24:25 EDT 2011
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.math
+
+import math.round
+
+import scalation.math.Vectors.{VectorD, VectorI}
+import scalation.util.Error
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This class provides hash functions for vectors of base type Int and Double. 
+ *  @param scale  the scale factor for converting doubles to integers.
+ *  @param m      the lower bound on prime numbers
+ *  @param n      the upper bound on prime numbers
+ */
+class VectorHashF (scale: Double = 10., m: Int = 1000, n: Int = 10000)
+      extends Error
+{
+     import Primes.genPrimes
+
+     private val prime = genPrimes (m, n)     // list of prime numbers between m and n
+     private val max   = prime.size           // number of primes in the list
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Hash a vector of integers into a long integer.
+     *  @param x  the vector of integers
+     */
+    def hashI (x: VectorI): Long =
+    {
+        if (x.dim > max) flaw ("hash", "not enough primes for computing hash function")
+        var accum = 0
+        for (i <- 0 until x.dim) accum ^= x(i) * prime (i)
+        accum
+    } // hashI
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Hash a vector of doubles into a long integer.
+     *  @param x  the vector of doubles
+     */
+    def hashD (x: VectorD): Long =
+    {
+        if (x.dim > max) flaw ("hash", "not enough primes for computing hash function")
+        var accum = 0
+        for (i <- 0 until x.dim) accum ^= (round (x(i) * prime (i) * scale)).toInt
+        accum
+    } // hashD
+
+} // VectorHashF class
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This object is use to test the VectorHashF class.
+ */
+object VectorHashFTest extends App
+{
+    val hf = new VectorHashF ()
+
+    val a = new VectorI (2, 3)
+    val b = new VectorI (4, 5)
+    val c = new VectorI (2, 3)
+    val d = new VectorI (3, 2)
+
+    println ("hashI (" + a + ") = " + hf.hashI (a))
+    println ("hashI (" + b + ") = " + hf.hashI (b))
+    println ("hashI (" + c + ") = " + hf.hashI (c))
+    println ("hashI (" + d + ") = " + hf.hashI (d))
+    
+    val e = new VectorD (.2, .3)
+    val f = new VectorD (.4, .5)
+    val g = new VectorD (.2, .3)
+    val h = new VectorD (.3, .2)
+
+    println ("hashD (" + e + ") = " + hf.hashD (e))
+    println ("hashD (" + f + ") = " + hf.hashD (f))
+    println ("hashD (" + g + ") = " + hf.hashD (g))
+    println ("hashD (" + h + ") = " + hf.hashD (h))
+    
+} // VectorHashFTest
+

@@ -1,0 +1,25 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.1
+ *  @date    Sun Dec 22 15:37:03 EST 2013
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.model
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `TimeUnits` object defines basic time units.
+ */
+object TimeUnits
+{
+    /** The number of seconds in one minute
+     */
+    val MINUTE = 60.0
+
+    /** The number of seconds in one hour
+     */
+    val HOUR = 3600.0
+
+} // TimeUnits object
+

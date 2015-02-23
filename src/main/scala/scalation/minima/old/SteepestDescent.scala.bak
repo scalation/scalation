@@ -1,0 +1,168 @@
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.0
+ *  @date    Wed Aug 24 19:53:22 EDT 2011
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.minima
+
+import math.{abs, max, pow}
+import util.control.Breaks.{breakable, break}
+
+import scalation.calculus.Calculus.{FunctionV2S, gradient, gradientD}
+import scalation.linalgebra.VectorD
+import scalation.util.Error
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This class solves Non-Linear Programming (NLP) problems using the Steepest
+ *  Descent algorithm.  Given a function 'f' and a starting point 'x', the
+ *  algorithm computes the gradient and takes steps in the opposite direction.
+ *  The algorithm iterates until it converges.  Optionally, a constraint function
+ *  'g' may also be given.  The class assumes that partial derivative functions
+ *  are not availble unless explicitly given via the setDerivatives method.
+ *
+ *  minimize    f(x)
+ *  subject to  g(x) <= 0
+ *
+ *  @param f  the vector-to-scalar objective function
+ *  @param g  the vector-to-scalar constraint function, if any
+ */
+class SteepestDescent (f: FunctionV2S, g: FunctionV2S = null)
+      extends Error
+{
+    // depending on the problem, the following constants (val) may need adjustment
+    private val DEBUG       = true           // debug flag for main algorithm
+    private val DEBUG_LS    = false          // debug flag for line search
+    private val EPSILON     = 1.E-10         // a value that is almost zero
+    private val MAX_ITER    = 100            // maximum number of major iterations allowed
+    private val MAX_LS_ITER = 4              // maximum number of line search iterations allowed
+    private val WEIGHT      = 1000.          // weight on penalty for constraint violation
+    private val INIT_STEP   = .5             // initial step size
+    private val SHRINK      = .5             // shrink factor for step size
+
+    private var step        = INIT_STEP      // the current step size
+    private var usePartials = false          // by default, won't have functions for partials
+    private var df: Array [FunctionV2S] = null  // array of partials
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the partial derivative functions.  If these functions are available,
+     *  they are more efficient and more accurate than estimating the values
+     *  using difference quotients (the default approach).
+     *  @param partials  the array of partial derivative functions
+     */
+    def setDerivatives (partials: Array [FunctionV2S])
+    {
+        if (g != null) flaw ("setDerivatives", "only works for unconstrained problems")
+        df = partials
+        usePartials = true
+    } // setDerivatives
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The objective function f re-scaled by a weighted penalty.
+     *  @param x  the coordinate values
+     */
+    def fg (x: VectorD): Double =
+    {
+       if (g == null) {                  // unconstrained
+            f(x)
+        } else {                          // constrained, g(x) <= 0
+            val penalty = max (g(x), 0.)
+            f(x) * (1. + WEIGHT * penalty * penalty)
+        } // if
+    } // fg
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform a Line Search (LS) by making multiple steps in the opposite
+     *  direction to the gradient.  Stop when the objective value fails to decrease.
+     *  Then reduce the step size and take half a step back.
+     *  @param y0  the starting point for the line search
+     *  @param gr  the gradient vector
+     */
+    def lineSearch (y0: VectorD, gr: VectorD): VectorD =
+    {
+        var y  = y0        // current point to evaluate
+        var f1 = 0.        // objective value before step
+        var f2 = 0.        // objective value after step
+
+        for (l <- 1 to MAX_LS_ITER) {
+            f1 = fg(y)                   // value before step
+            y -= gr * step               // step in the direction opposite the gradient
+            f2 = fg(y)                   // value after step
+            if (DEBUG_LS) println ("lineSearch: f2 = " + f2 + ", y = " + y)
+            if (f2 >= f1) {              // stepped too far, take half step back
+                step *= SHRINK; return y + gr * step   // return optimal solution vector
+            } // if
+        } // for
+        y                                // return optimal solution to the line search
+    } // lineSearch
+ 
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve the Non-Linear Programming problem using the Steepest Descent
+     *  algorithm returning the optimal solution x.
+     *  @param x0  the starting point
+     */
+    def solve (x0: VectorD): VectorD =
+    {
+        var x = x0                                          // current point
+        var xx: VectorD = null                              // next point
+        var gr: VectorD = null                              // gradient (unassigned)
+
+        breakable { for (k <- 1 to MAX_ITER) {              // determine direction search
+            gr = if (usePartials) gradientD (df, x)         // use functions for partials
+                 else             gradient (fg, x)          // use difference quotients
+            xx = lineSearch (x, gr)                         // step opposite the gradient
+            if (DEBUG) println ("solve: (k = " + k + ") move from " + x + " to " + xx
+                              + " where fg(xx) = " + fg(xx))
+
+            if (abs (fg(xx) - fg(x)) < EPSILON) break       // check for convergence
+            x = xx                                          // make the next point, the current point
+        }} // for
+        x                                                   // return the current point
+    } // solve
+
+} // SteepestDescent class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This object is used to test the SteepestDescent class.
+ */
+object SteepestDescentTest extends App
+{
+    var x0 = new VectorD (0., 0.)                       // starting point
+    var x: VectorD = null                               // optimal solution
+
+    println ("\nProblem 1: (x_0 - 2)^2 + (x_1 - 3)^2 + 1") 
+    def f (x: VectorD): Double = (x(0) - 2.) * (x(0) - 2.) + (x(1) - 3.) * (x(1) - 3.) + 1
+    val solver = new SteepestDescent (f)
+    x = solver.solve (x0)
+    println ("optimal solution = " + x + ", objective value = " + f(x))
+
+    println ("\nProblem 2 (with partials): (x_0 - 2)^2 + (x_1 - 3)^2 + 1") 
+    x0 = new VectorD (0., 0.)
+    def df_dx0 (x: VectorD): Double = 2. * x(0) - 4.
+    def df_dx1 (x: VectorD): Double = 2. * x(1) - 6.
+    solver.setDerivatives (Array [FunctionV2S] (df_dx0, df_dx1))
+    x = solver.solve (x0)
+    println ("optimal solution = " + x + ", objective value = " + f(x))
+
+    println ("\nProblem 3 (x_0 - 2)^2 + (x_1 - 3)^2 + 1 s.t. x_0 <= 1")
+    x0 = new VectorD (0., 0.)
+    def g (x: VectorD): Double = x(0) - 1.              // constraint: x(0) <= 1
+    val solver3 = new SteepestDescent (f, g)            // constrained optimization
+    x = solver3.solve (x0)
+    println ("optimal solution = " + x + ", objective value = " + f(x))
+
+    println ("\nProblem 4: x_0/4 + 5x_0^2 + x_0^4 - 9x_0^2 x_1 + 3x_1^2 + 2x_1^4")
+    // @see http://math.fullerton.edu/mathews/n2003/gradientsearch/GradientSearchMod/Links/GradientSearchMod_lnk_5.html
+    x0 = new VectorD (0., 0.)
+    def f4 (x: VectorD): Double = x(0)/4. + 5.*x(0)*x(0) + pow(x(0),4) -
+                                  9.*x(0)*x(0)*x(1) + 3.*x(1)*x(1) + 2.*pow(x(1),4)
+    val solver4 = new SteepestDescent (f4)
+    x = solver4.solve (x0)
+    println ("optimal solution = " + x + ", objective value = " + f(x))
+
+} // SteepestDescentTest
+
+
