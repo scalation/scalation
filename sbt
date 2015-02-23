@@ -1,1 +1,0 @@
-java -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:PermSize=256M -XX:MaxPermSize=512M -Xmx2G -jar `dirname $0`/sbt-launch.jar "$@"
