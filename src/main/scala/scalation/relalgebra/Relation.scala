@@ -147,7 +147,7 @@ object Relation
     {
         var first = true
         val lines = if (fileName contains "://") fromURL(new URL(fileName)).getLines
-        else fromFile (DATA_DIR + fileName).getLines
+        else fromFile (fileName).getLines
         var r3: Relation = null
         for (ln <- lines) {
             if (first) {
