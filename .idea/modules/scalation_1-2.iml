@@ -21,5 +21,11 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="SBT: org.jsoup:jsoup:1.8.2:jar" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-compiler:2.12.0-M2:jar" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.12.0-M2:jar" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-reflect:2.12.0-M2:jar" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang.modules:scala-parser-combinators_2.12.0-M2:1.0.4:jar" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang.modules:scala-xml_2.12.0-M2:1.0.4:jar" level="project" />
   </component>
 </module>
