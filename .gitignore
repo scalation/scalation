@@ -4,7 +4,7 @@
 # scalation specific
 *.bak*
 **/old/*
-
+*.scalaa
 
 
 # sbt specific
