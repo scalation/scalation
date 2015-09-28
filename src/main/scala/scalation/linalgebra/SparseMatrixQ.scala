@@ -10,9 +10,10 @@ package scalation.linalgebra
 
 import collection.mutable.LinkedEntry
 import io.Source.fromFile
+
 import scalation.math.Rational.{abs => ABS, _}
 
-import scalation.math._
+import scalation.math.{Rational, oneIf}
 import scalation.util.{Error, SortedLinkedHashMap}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

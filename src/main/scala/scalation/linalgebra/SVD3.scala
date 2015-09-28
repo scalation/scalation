@@ -22,7 +22,7 @@ import math.{abs, max, min, sqrt}
 import util.control.Breaks.{break, breakable}
 
 import scalation.linalgebra.Rotation._
-import scalation.math._
+import scalation.math.{double_exp, sign}
 import scalation.math.ExtremeD.{EPSILON, MIN_NORMAL, TOL}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

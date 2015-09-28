@@ -131,8 +131,10 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int, eta: Double = 1.0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the fit (weigth matrix 'w' and weigth matrix 'v').
+     *  FIX - make compatible with `Predictor`
      */
-    def fit: Tuple2 [MatrixD, MatrixD] = (w, v)
+    def fit2: Tuple2 [MatrixD, MatrixD] = (w, v)
+    def fit: VectorD = VectorD (-1.0, -1.0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given an input vector 'zi', predict the output/response vector 'zo'.

@@ -11,7 +11,7 @@ package scalation.linalgebra
 import math.{signum, sqrt}
 
 import scalation.linalgebra.MatrixD.{eye, outer}
-import scalation.math._
+import scalation.math.double_exp
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Householder` object provides methods to compute Householder vectors and

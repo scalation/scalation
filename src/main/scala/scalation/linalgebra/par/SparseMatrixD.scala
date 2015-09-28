@@ -12,7 +12,7 @@ import collection.mutable.LinkedEntry
 import math.abs
 
 import scalation.linalgebra.{MatriD, VectorD}
-import scalation.math._
+import scalation.math.{double_exp, oneIf}
 import scalation.util.{Error, SortedLinkedHashMap}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

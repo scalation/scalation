@@ -13,7 +13,7 @@ import math.{abs, cos, Pi, sin}
 import scalation.animation.{AnimateCommand, DgAnimator}
 import scalation.animation.CommandType._
 import scalation.linalgebra.{MatrixD, VectorD}
-import scalation.math._
+import scalation.math.double_exp
 import scalation.random.{Discrete, Exponential}
 import scalation.scala2d.{Ellipse, QArrow}
 import scalation.scala2d.Colors._

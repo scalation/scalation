@@ -12,7 +12,6 @@ import util.control.Breaks.{breakable, break}
 import collection.mutable.Set
 
 import scalation.linalgebra.{MatrixD, VectorD, VectorI}
-import scalation.math._
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

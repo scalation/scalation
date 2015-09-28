@@ -44,6 +44,7 @@ class AugSelNaiveBayes (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: 
     private val TOL   = 0.1                            // tolerance indicating negligible improvement adding features
     private val cor   = calcCorrelation                // feature correlation matrix
     private val par   = new VectorI (n)                // allocate the parent vector
+    private val vcp = new VectorI(n)                   // value count for the parent
 
     private val popC  = new VectorI (k)                // frequency counts for classes 0, ..., k-1
     private val probC = new VectorD (k)                // probabilities for classes 0, ..., k-1
@@ -53,15 +54,45 @@ class AugSelNaiveBayes (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: 
     if (vc == null) vc = vc_default                    // set to default for binary data (2)
     if (fset == null) fset = Array.fill (n) (true)     // set to default, all features included 
     computeParent ()                                   // initialize the parent of each feature
-    popX.alloc (fset, vc(), par)
-    probX.alloc (fset, vc(), par)
+    computeVcp ()                                      // initialize the value count of each parent feature
+
+    popX.alloc (fset, vc, vcp)
+    probX.alloc (fset, vc, vcp)
  
     if (DEBUG) {
         println ("feature set fset   = " + fset.deep)
         println ("parents par        = " + par)
         println ("value count vc     = " + vc)
+        println ("value count vcp    = " + vcp)
         println ("correlation matrix = " + cor)
     } // if
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the parent of each feature based on the correlation matrix.
+      *  Feature x_i is only a possible candidate for parent of feature x_j if i < j.
+      */
+    def computeParent ()
+    {
+        par(0) = -1                       // feature 0 has no parents
+        for (i <- 1 until n) {
+            if (fset(i)) {
+                val correl = cor(i).map ((x: Double) => abs (x))
+                for (a <- 0 until i if !fset(a)) correl(a) = 0
+                par(i) = if (correl.max () > thres) correl.argmax ()
+                else                           -1
+            } else par(i) = -1
+        } // for
+    } // computeParent
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the value count of each parent feature based on the parent vector.
+      */
+    def computeVcp ()
+    {
+        //set default value count to 1
+        vcp.set(1)
+        for (j <- 0 until n if (fset(j) && par(j) > -1)) vcp(j) = vc(par(j))
+    }
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the frequencies for 'y' having class 'i' and 'x' for cases 0, 1, ...
@@ -93,29 +124,23 @@ class AugSelNaiveBayes (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: 
      */
     def train (testStart: Int = 0, testEnd: Int = 0)
     {
-        frequencies (testStart, testEnd)                           // compute frequencies skipping test region
+        frequencies (testStart, testEnd)                                // compute frequencies skipping test region
 
-        for (i <- 0 until k) {                                     // for each class i
-            val pci = popC(i).toDouble                             // population of class i
-            probC(i) = pci / md                                    // probability of class i
+        for (i <- 0 until k) {                                          // for each class i
+            val pci = popC(i).toDouble                                  // population of class i
+            probC(i) = pci / md                                         // probability of class i
 
-            for (j <- 0 until n if fset(j)) {                      // for each feature j in fset
+            for (j <- 0 until n if fset(j)) {                           // for each feature j in fset
                 val me_vc = me / vc(j).toDouble
-                for (xj <- 0 until vc(j)) {                        // for each value for feature j: xj
-                    if (par(j) > -1) {
-                        for (xp <- 0 until vc(par(j))) {           // for each value for par(j): xp
-                            probX(i, j, xj, xp) = (popX(i, j, xj, xp) + me_vc) / (pci + me)
-                        } // for
-                    } else {
-                        probX(i, j, xj, 0) = (popX(i, j, xj, 0) + me_vc) / (pci + me)
-                    } // if
+                for (xj <- 0 until vc(j); xp <- 0 until vcp(j)) {       // for each value for feature j: xj, par(j): xp
+                    probX(i, j, xj, xp) = (popX(i, j, xj, xp) + me_vc) / (pci + me)
                 } // for
             } // for
         } // for
 
         if (DEBUG) {
-            println ("probC = " + probC)                           // P(C = i)
-            println ("probX = " + probX)                           // P(X_j = x | C = i)
+            println ("probC = " + probC)                                // P(C = i)
+            println ("probX = " + probX)                                // P(X_j = x | C = i)
         } // if
     } // train
 
@@ -146,30 +171,14 @@ class AugSelNaiveBayes (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: 
     def reset()
     {
         computeParent ()
+        computeVcp()
         popC.set (0)
         probC.set (0)
         popX.clear ()
         probX.clear ()
-        popX.alloc (fset, vc(), par)
-        probX.alloc (fset, vc(), par)
+        popX.alloc (fset, vc, vcp)
+        probX.alloc (fset, vc, vcp)
     } // reset
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the parent of each feature based on the correlation matrix.
-     *  Feature x_i is only a possible candidate for parent of feature x_j if i < j.
-     */
-    def computeParent ()
-    {
-        par(0) = -1                       // feature 0 has no parents
-        for (i <- 1 until n) {
-            if (fset(i)) {
-                val correl = cor(i).map ((x: Double) => abs (x))
-                for (a <- 0 until i if !fset(a)) correl(a) = 0
-                par(i) = if (correl.max () > thres) correl.argmax ()
-                         else                           -1
-            } else par(i) = -1
-        } // for
-    } // computeParent
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build the Augmented Selective Naive Bayes classier model by using backward-elimination

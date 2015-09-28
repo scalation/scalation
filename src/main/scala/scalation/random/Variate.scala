@@ -18,7 +18,7 @@ import math.{ceil, exp, floor, log, Pi, round, sqrt, tan}
 import scalation.calculus.Calculus.FunctionS2S
 import scalation.linalgebra.VectorD
 import scalation.math.Combinatorics.{betaF, choose, fac, gammaF}
-import scalation.math._
+import scalation.math.{double_exp, nexp}
 import scalation.math.ExtremeD.approx
 import scalation.util.Error
 
@@ -880,8 +880,9 @@ case class Randi0 (b: Int = 5, stream: Int = 0)
 
     def gen: Double = floor (width * r.gen).toInt
 
-} // Randi0
+    def iigen (bb: Int): Int = floor ((bb + 1) * r.gen).toInt
 
+} // Randi0
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class generates `Sharp` (Deterministic) random variates.

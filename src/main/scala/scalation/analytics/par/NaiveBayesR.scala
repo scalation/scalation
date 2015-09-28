@@ -13,9 +13,8 @@ import math.{ceil, floor}
 import scalation.analytics.ClassifierReal
 import scalation.linalgebra.{MatriD, VectorD, VectorI}
 import scalation.linalgebra.par.MatrixD
-import scalation.math._
 import scalation.random.Normal
-import scalation.stat.StatVector
+import scalation.stat.vectorD2StatVector
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NaiveBayesR` class implements a Gaussian Naive Bayes Classifier, which
@@ -54,7 +53,7 @@ class NaiveBayesR (x: MatrixD, y: VectorI, fn: Array [String], k: Int, cn: Array
      */
     def calcCorrelation: MatriD =
     {
-        val fea = for (j <- 0 until n) yield new StatVector (x.col(j))
+        val fea = for (j <- 0 until n) yield x.col(j)
         val cor = new MatrixD (n, n)
         for (j1 <- 0 until n; j2 <- 0 until j1) cor(j1, j2) = fea(j1) corr fea(j2)
         cor
@@ -79,8 +78,9 @@ class NaiveBayesR (x: MatrixD, y: VectorI, fn: Array [String], k: Int, cn: Array
         for (c <- 0 until k) {                  // for each class
             val pc = pop(c)                     // population of class c in training-set
             for (j <- 0 until n) {              // for each feature
-                mean(c, j) /= pc                                               // compute mean
-                varc(c, j) =  (varc(c, j) - pc * mean(c, j)~^2) / (pc - 1.0)   // compute variance
+                mean(c, j) /= pc                                                 // compute mean
+                val mean_cj = mean(c, j)
+                varc(c, j) =  (varc(c, j) - pc * mean_cj*mean_cj) / (pc - 1.0)   // compute variance
             } // for
         } // for
     

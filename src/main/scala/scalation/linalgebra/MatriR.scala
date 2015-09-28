@@ -10,7 +10,7 @@ package scalation.linalgebra
 
 import scalation.math.Real.{abs => ABS, _}
 
-import scalation.math._
+import scalation.math.Real
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

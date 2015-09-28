@@ -13,9 +13,9 @@ import util.Sorting.quickSort
 
 import math.{abs => ABS, max => MAX, sqrt}
 
-import scalation.math._
+import scalation.math.double_exp
 import scalation.util.Error
-import scalation.util.SortingD.qsort2
+import scalation.util.SortingD.{iqsort, qsort2}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VectorD` class stores and operates on Numeric Vectors of base type `Double`.
@@ -32,6 +32,10 @@ class VectorD (val dim: Int,
     } else if (dim != v.length) {
         flaw ("constructor", "dimension is wrong")
     } // if
+
+    /** Number of elements in the vector as a Double
+     */
+    val nd = dim.toDouble
 
     /** Range for the storage array
      */
@@ -103,8 +107,7 @@ class VectorD (val dim: Int,
     } // _oneAt
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert a `VectorD` into a `VectorI`.
-     *  @param u  the vector to convert
+    /** Convert 'this' `VectorD` into a `VectorI`.
      */
     def toInt: VectorI =
     {
@@ -112,6 +115,16 @@ class VectorD (val dim: Int,
         for (i <- range) c(i) = v(i).toInt
         c
     } // toInt
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `VectorD` into a `VectorD`.
+     */
+    def toDouble: VectorD =
+    {
+        val c = new VectorD (dim)
+        for (i <- range) c(i) = v(i).toDouble
+        c
+    } // toDouble
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's element at the 'i'-th index position. 
@@ -422,6 +435,24 @@ class VectorD (val dim: Int,
         c
     } // ~^
 
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compare 'this' vector with that vector 'b' for inequality.
+     *  @param b  that vector
+     */
+    def ≠ (b: VectorD) = this != b
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compare 'this' vector with that vector 'b' for less than or equal to.
+     *  @param b  that vector
+     */
+    def ≤ (b: VectorD) = this <= b
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compare 'this' vector with that vector 'b' for greater than or equal to.
+     *  @param b  that vector
+     */
+    def ≥ (b: VectorD) = this >= b
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Raise each element of 'this' vector to the 's'-th power.
      *  @param s  the scalar exponent
@@ -475,13 +506,30 @@ class VectorD (val dim: Int,
     def sumPos: Double = v.foldLeft (0.0)((s, x) => s + MAX (x, 0.0))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute mean the elements of 'this' vector.
+    /** Compute the mean of the elements of 'this' vector.
      */
-    def mean: Double = sum / v.length
+    def mean = sum / nd
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the (unbiased) sample variance of the elements of 'this' vector.
+     */
+    def variance = (normSq - sum * sum / nd) / (nd-1.0)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the population variance of the elements of 'this' vector.
+     *  This is also the (biased) MLE estimator for sample variance.
+     */
+    def pvariance = (normSq - sum * sum / nd) / nd
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Establish the rank order of the elements in 'self' vector, e.g.,
+     *  (8.0, 2.0, 4.0, 6.0) is (3, 0, 1, 2).
+     */
+    def rank: VectorI = new VectorI (iqsort (v))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Cumulate the values of 'this' vector from left to right (e.g., create a
-     *  cdf from a pmf). Example: (4, 2, 3, 1) --> (4, 6, 9, 10)
+     *  CDF from a pmf).  Example: (4, 2, 3, 1) --> (4, 6, 9, 10)
      */
     def cumulate: VectorD =
     {
@@ -516,6 +564,17 @@ class VectorD (val dim: Int,
         for (i <- range) sum += v(i) * b.v(i)
         sum
     } // dot
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
+     *  @param b  the other vector
+     */
+    def ∙ (b: VectorD): Double =
+    {
+        var sum: Double = 0.0
+        for (i <- range) sum += v(i) * b.v(i)
+        sum
+    } // ∙
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Euclidean norm (2-norm) squared of 'this' vector.
@@ -644,7 +703,18 @@ class VectorD (val dim: Int,
         for (i <- 0 until e if v(i) > 0.0) return i; -1
     } // firstPos
 
-   //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the index of the first occurrence of element 'x' in 'this' vector,
+     *  or -1 if not found.
+     *  @param x  the given element
+     *  @param e  the ending index (exclusive) for the search
+     */
+    def indexOf (x: Int, e: Int = dim): Int =
+    {
+        for (i <- 0 until e if v(i) == x) return i; -1
+    } // indexOf
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of strictly negative elements in 'this' vector.
      */
     def countNeg: Int =
@@ -918,6 +988,7 @@ object VectorDTest extends App
         println ("x.sum    = " + x.sum)
         println ("x.sumNE  = " + x.sumNE (0))
         println ("x dot y  = " + (x dot y))
+        println ("x ∙ y    = " + (x ∙ y))
         println ("x.normSq = " + x.normSq)
         println ("x.norm   = " + x.norm)
         println ("x < y    = " + (x < y))

@@ -13,9 +13,9 @@ import util.Sorting.quickSort
 
 import scalation.math.Real.{abs => ABS, max => MAX, _}
 
-import scalation.math._
+import scalation.math.Real
 import scalation.util.Error
-import scalation.util.SortingR.qsort2
+import scalation.util.SortingR.{iqsort, qsort2}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VectorR` class stores and operates on Numeric Vectors of base type `Real`.
@@ -32,6 +32,10 @@ class VectorR (val dim: Int,
     } else if (dim != v.length) {
         flaw ("constructor", "dimension is wrong")
     } // if
+
+    /** Number of elements in the vector as a Double
+     */
+    val nd = dim.toDouble
 
     /** Range for the storage array
      */
@@ -103,8 +107,17 @@ class VectorR (val dim: Int,
     } // _oneAt
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert a `VectorR` into a `VectorD`.
-     *  @param u  the vector to convert
+    /** Convert 'this' `VectorR` into a `VectorI`.
+     */
+    def toInt: VectorI =
+    {
+        val c = new VectorI (dim)
+        for (i <- range) c(i) = v(i).toInt
+        c
+    } // toInt
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `VectorR` into a `VectorD`.
      */
     def toDouble: VectorD =
     {
@@ -422,6 +435,24 @@ class VectorR (val dim: Int,
         c
     } // ~^
 
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compare 'this' vector with that vector 'b' for inequality.
+     *  @param b  that vector
+     */
+    def ≠ (b: VectorR) = this != b
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compare 'this' vector with that vector 'b' for less than or equal to.
+     *  @param b  that vector
+     */
+    def ≤ (b: VectorR) = this <= b
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compare 'this' vector with that vector 'b' for greater than or equal to.
+     *  @param b  that vector
+     */
+    def ≥ (b: VectorR) = this >= b
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Raise each element of 'this' vector to the 's'-th power.
      *  @param s  the scalar exponent
@@ -475,13 +506,30 @@ class VectorR (val dim: Int,
     def sumPos: Real = v.foldLeft (_0)((s, x) => s + MAX (x, _0))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute mean the elements of 'this' vector.
+    /** Compute the mean of the elements of 'this' vector.
      */
-    def mean: Real = sum / v.length
+    def mean = sum / nd
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the (unbiased) sample variance of the elements of 'this' vector.
+     */
+    def variance = (normSq - sum * sum / nd) / (nd-1.0)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the population variance of the elements of 'this' vector.
+     *  This is also the (biased) MLE estimator for sample variance.
+     */
+    def pvariance = (normSq - sum * sum / nd) / nd
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Establish the rank order of the elements in 'self' vector, e.g.,
+     *  (8.0, 2.0, 4.0, 6.0) is (3, 0, 1, 2).
+     */
+    def rank: VectorI = new VectorI (iqsort (v))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Cumulate the values of 'this' vector from left to right (e.g., create a
-     *  cdf from a pmf). Example: (4, 2, 3, 1) --> (4, 6, 9, 10)
+     *  CDF from a pmf).  Example: (4, 2, 3, 1) --> (4, 6, 9, 10)
      */
     def cumulate: VectorR =
     {
@@ -516,6 +564,17 @@ class VectorR (val dim: Int,
         for (i <- range) sum += v(i) * b.v(i)
         sum
     } // dot
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
+     *  @param b  the other vector
+     */
+    def ∙ (b: VectorR): Real =
+    {
+        var sum: Real = _0
+        for (i <- range) sum += v(i) * b.v(i)
+        sum
+    } // ∙
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Euclidean norm (2-norm) squared of 'this' vector.
@@ -644,7 +703,18 @@ class VectorR (val dim: Int,
         for (i <- 0 until e if v(i) > _0) return i; -1
     } // firstPos
 
-   //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the index of the first occurrence of element 'x' in 'this' vector,
+     *  or -1 if not found.
+     *  @param x  the given element
+     *  @param e  the ending index (exclusive) for the search
+     */
+    def indexOf (x: Int, e: Int = dim): Int =
+    {
+        for (i <- 0 until e if v(i) == x) return i; -1
+    } // indexOf
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of strictly negative elements in 'this' vector.
      */
     def countNeg: Int =
@@ -918,6 +988,7 @@ object VectorRTest extends App
         println ("x.sum    = " + x.sum)
         println ("x.sumNE  = " + x.sumNE (0))
         println ("x dot y  = " + (x dot y))
+        println ("x ∙ y    = " + (x ∙ y))
         println ("x.normSq = " + x.normSq)
         println ("x.norm   = " + x.norm)
         println ("x < y    = " + (x < y))

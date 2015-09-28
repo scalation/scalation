@@ -39,29 +39,52 @@ class AugNaiveBayes (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arr
     private val DEBUG = true                          // debug flag
     private val cor   = calcCorrelation               // feature correlation matrix
     private val par   = new VectorI (n)               // vector holding the parent for each feature/variable
+    private val vcp = new VectorI(n)                  // value count for the parent
 
     private val popC  = new VectorI (k)               // frequency counts for classes 0, ..., k-1
     private val probC = new VectorD (k)               // probabilities for classes 0, ..., k-1
     private val popX  = new HMatrix4 [Int] (k, n)     // conditional frequency counts for variable/feature j: xj
     private val probX = new HMatrix4 [Double] (k, n)  // conditional probabilities for variable/feature j: xj
 
-    // init 'par': feature x_i is only a possible candidate for parent of feature x_j if i < j
-
-    par(0) = -1                                       // feature 0 does not have a parent
-    for (i <- 1 until n) {
-        val correl = cor(i).map ((x: Double) => abs (x))
-        par(i) = if (correl.max () > thres) correl.argmax () else -1
-    } // for
+    computeParent ()
 
     if (vc == null) vc = vc_default                   // set to default for binary data (2)
-    popX.alloc (vc(), par)
-    probX.alloc (vc(), par)
+    computeVcp ()
+
+    popX.alloc (vc, vcp)
+    probX.alloc (vc, vcp)
 
     if (DEBUG) {
         println ("value count vc      = " + vc)
+        println ("value count vcp     = " + vcp)
         println ("correlation matrix  = " + cor)
         println ("parent features par = " + par)
     } // if
+
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the parent of each feature based on the correlation matrix.
+      *  Feature x_i is only a possible candidate for parent of feature x_j if
+      *  i < j
+      */
+    def computeParent ()
+    {
+        par(0) = -1                                       // feature 0 does not have a parent
+        for (i <- 1 until n) {
+            val correl = cor(i).map ((x: Double) => abs (x))
+            par(i) = if (correl.max () > thres) correl.argmax () else -1
+        } // for
+    } // computeParent
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the value counts of each parent feature based on the parent vector.
+      */
+    def computeVcp ()
+    {
+        //set default value count to 1
+        vcp.set(1)
+        for (j <- 0 until n if (par(j) > -1)) vcp(j) = vc(par(j))
+    }
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the frequencies for 'y' having class 'i' and 'x' for cases 0, 1, ...
@@ -103,14 +126,8 @@ class AugNaiveBayes (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arr
 
             for (j <- 0 until n) {                                 // for each feature j
                 val me_vc = me / vc(j).toDouble
-                for (xj <- 0 until vc(j)) {                        // for each value for feature j: xj
-                    if (par(j) > -1) {
-                        for (xp <- 0 until vc(par(j))) {           // for each value for par(j): xp
-                            probX(i, j, xj, xp) = (popX(i, j, xj, xp) + me_vc) / (pci + me)
-                        } //for
-                    } else {
-                        probX(i, j, xj, 0) = (popX(i, j, xj, 0) + me_vc) / (pci + me)
-                    } // if
+                for (xj <- 0 until vc(j); xp <- 0 until vcp(j)) {  // for each value for feature j: xj, par(j): xp
+                    probX(i, j, xj, xp) = (popX(i, j, xj, xp) + me_vc) / (pci + me)
                 } // for
             } // for
         } // for
@@ -150,8 +167,8 @@ class AugNaiveBayes (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arr
         probC.set (0)
         popX.clear ()
         probX.clear ()
-        popX.alloc (vc(), par)
-        probX.alloc (vc(), par)
+        popX.alloc (vc, vcp)
+        probX.alloc (vc, vcp)
     } // reset
 
 } // AugNaiveBayes class

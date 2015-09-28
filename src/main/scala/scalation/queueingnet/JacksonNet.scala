@@ -14,7 +14,7 @@ package scalation.queueingnet
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.linalgebra.MatrixD.eye
 import scalation.math.Combinatorics.fac
-import scalation.math._
+import scalation.math.double_exp
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `JacksonNet` class is used to solve Jackson Queueing Network problems.

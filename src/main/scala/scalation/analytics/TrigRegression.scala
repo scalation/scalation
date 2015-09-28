@@ -11,7 +11,6 @@ package scalation.analytics
 import math.{cos, Pi, sin}
 
 import scalation.linalgebra.{MatriD, MatrixD, VectorD}
-import scalation.math._
 import scalation.plot.Plot
 import scalation.util.{Error, time}
 
@@ -83,9 +82,9 @@ class TrigRegression (t: VectorD, y: VectorD, k: Int, w: Double = Pi, technique:
     def train (yy: VectorD) { rg.train (yy) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the fit (parameter vector b, quality of fit including rSquared).
+    /** Return the quality of fit including rSquared.
      */
-    def fit: Tuple4 [VectorD, Double, Double, Double] = rg.fit
+    def fit: VectorD = rg.fit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot expand (z),
@@ -113,7 +112,7 @@ class TrigRegression (t: VectorD, y: VectorD, k: Int, w: Double = Pi, technique:
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new R-squared value and the new F statistic.
      */
-    def backElim (): Tuple4 [Int, VectorD, Double, Double] = rg.backElim ()
+    def backElim (): Tuple3 [Int, VectorD, VectorD] = rg.backElim ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor (VIF) for each variable to test
@@ -140,7 +139,7 @@ object TrigRegressionTest extends App
     val noise = Normal (0.0, 500.0)
     val t     = VectorD.range (0, 100)
     val y     = new VectorD (t.dim)
-    for (i <- 0 until 100) y(i) = 10.0 - 10.0 * i + i~^2 + noise.gen
+    for (i <- 0 until 100) y(i) = 10.0 - 10.0 * i + i*i + noise.gen
 
     println ("t = " + t)
     println ("y = " + y)

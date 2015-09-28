@@ -10,7 +10,7 @@ package scalation.stat
 
 import math.sqrt
 
-import scalation.math._
+import scalation.linalgebra.VectorD
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MethodOfMoments` object provides methods for estimating parameters
@@ -22,22 +22,22 @@ object MethodOfMoments
 {
     /** Standard functional form for parameter estimating functions
      */
-    type ParamFunction = (StatVector) => Array [Double]
+    type ParamFunction = (VectorD) => Array [Double]
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Estimate the parameter 'p' for the `Bernoulli` distribution.
      *  @param x  the statistical data vector
      */
-    def bernoulli (x: StatVector) = Array (x.mean)
+    def bernoulli (x: VectorD) = Array (x.mean)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Estimate the parameters 'a' (alpha) and 'b' (beta) for the `Beta` distribution.
      *  @param x  the statistical data vector
      */
-    def beta (x: StatVector) =
+    def beta (x: VectorD) =
     {
         val (m, m2) = (x.mean, x.ms)                   // first 2 moments
-        val f = (m - m2) / (m2 - m~^2)
+        val f = (m - m2) / (m2 - m*m)
         Array (m * f, (1.0 - m) * f)
     } // beta
 
@@ -45,38 +45,38 @@ object MethodOfMoments
     /** Estimate the parameter 'mu' for the `Exponential` distribution.
      *  @param x  the statistical data vector
      */
-    def exponential (x: StatVector) = Array (x.mean)
+    def exponential (x: VectorD) = Array (x.mean)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Estimate the parameters 'a' (alpha) and 'b' (beta) for the `Gamma` distribution.
      *  @param x  the statistical data vector
      */
-    def gamma (x: StatVector) = 
+    def gamma (x: VectorD) = 
     {
         val (m, v) = (x.mean, x.variance)
-        Array (m~^2 / v, v / m)
+        Array (m*m / v, v / m)
     } // gamma
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Estimate the parameter 'p' for the `Geometric` distribution.
      *  @param x  the statistical data vector
      */
-    def geometric (x: StatVector) = Array (1.0 / x.mean)
+    def geometric (x: VectorD) = Array (1.0 / x.mean)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Estimate the parameters 'mu' and 'sigma2' for the `Normal` distribution.
      *  @param x  the statistical data vector
      */
-    def normal (x: StatVector) = Array (x.mean, x.variance)
+    def normal (x: VectorD) = Array (x.mean, x.variance)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Estimate the parameters 'a' and 'b' for the `Pareto` distribution.
      *  @param x  the statistical data vector
      */
-    def pareto (x: StatVector) =
+    def pareto (x: VectorD) =
     {
         val (m, m2) = (x.mean, x.ms)                   // first 2 moments
-        val f = m2 - m~^2
+        val f = m2 - m*m
         Array (1.0 + sqrt (m2 / f), m2 * (1.0 - sqrt (f / m2)) / m)
     } // pareto
 
@@ -84,13 +84,13 @@ object MethodOfMoments
     /** Estimate the parameter 'mu' for the `Poisson` distribution.
      *  @param x  the statistical data vector
      */
-    def poisson (x: StatVector) = Array (x.mean)
+    def poisson (x: VectorD) = Array (x.mean)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Estimate the parameters 'a' and 'b' for the `Uniform` distribution.
      *  @param x  the statistical data vector
      */
-    def uniform (x: StatVector) =
+    def uniform (x: VectorD) =
     {
         val (m, v) = (x.mean, x.variance)
         val d  = sqrt (3.0 * v)

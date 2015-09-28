@@ -15,7 +15,7 @@ package scalation.linalgebra
 
 import math.{abs, max, min, sqrt}
 
-import scalation.math._
+import scalation.math.{double_exp, sign}
 import scalation.math.ExtremeD.EPSILON
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -10,7 +10,7 @@ package scalation.linalgebra
 
 import scalation.math.Complex.{abs => ABS, _}
 
-import scalation.math._
+import scalation.math.Complex
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

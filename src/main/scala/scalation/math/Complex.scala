@@ -171,6 +171,26 @@ case class Complex (val re: Double, val im: Double = 0.0)
     } // compare
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compare 'this' complex number with that complex number 'd' for inequality.
+     *  @param d  that complex number
+     */
+    def ≠ (d: Complex) = this != d
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compare 'this' complex number with that complex number 'd' for less than
+     *  or equal to.
+     *  @param d  that complex number
+     */
+    def ≤ (d: Complex) = this <= d
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compare 'this' complex number with that complex number 'd' for greater 
+     *  than or equal to.
+     *  @param d  that complex number
+     */
+    def ≥ (d: Complex) = this >= d
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' complex number to a Complex.
      *  @param c  that complex number to convert
      */

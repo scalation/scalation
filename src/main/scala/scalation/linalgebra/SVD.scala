@@ -19,7 +19,7 @@ import math.abs
 
 import scalation.linalgebra.Givens.{givens, givensRo, givensRoT, givensColUpdate, givensRowUpdate}
 import scalation.linalgebra.MatrixD.eye
-import scalation.math._
+import scalation.math.double_exp
 import scalation.math.ExtremeD.EPSILON
 import scalation.util.Error
 

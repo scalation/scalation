@@ -8,10 +8,9 @@
 
 package scalation.analytics
 
-import math.exp
+import math.{exp, pow}
 
 import scalation.linalgebra.{MatriD, MatrixD, VectorD}
-import scalation.math._
 import scalation.minima.QuasiNewton
 import scalation.plot.Plot
 import scalation.util.Error
@@ -41,7 +40,6 @@ class NonLinRegression (x: MatrixD, y: VectorD,
 
     private val DEBUG      = false                 // debug flag
     private val m          = x.dim1                // number of data points (rows in matrix x)
-    private var b: VectorD = null                  // parameter vector (b0, b1, ... bp)
     private var rSquared   = -1.0                  // coefficient of determination (quality of fit)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -71,15 +69,15 @@ class NonLinRegression (x: MatrixD, y: VectorD,
         val bfgs = new QuasiNewton (sseF)           // minimize sse using NLP
         b        = bfgs.solve (b_init)              // estimate for b from optimizer
         val sse  = sseF (b)                         // residual/error sum of squares
-        val sst  = (y dot y) - y.sum~^2.0 / m       // total sum of squares
+        val sst  = (y dot y) - pow (y.sum, 2) / m   // total sum of squares
         rSquared = (sst - sse) / sst                // coefficient of determination
         if (DEBUG) println ("sse = " + sse)
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the fit (parameter vector b, quality of fit rSquared)
+    /** Return the quality of fit rSquared including rSquared.
      */
-    def fit: Tuple2 [VectorD, Double] = (b, rSquared)
+    def fit: VectorD = VectorD (rSquared)
 
    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = f(z, b),

@@ -11,7 +11,7 @@ package scalation.analytics
 import math.round
 
 import scalation.linalgebra.{MatriD, MatrixD, MatrixI, VectorD, VectorI}
-import scalation.stat.StatVector
+import scalation.stat.vectorD2StatVector
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -103,7 +103,7 @@ abstract class ClassifierInt (x: MatrixI, y: VectorI, fn: Array [String], k: Int
      */
     def calcCorrelation: MatriD =
     {
-        val fea = for (j <- 0 until n) yield new StatVector (x.col(j))
+        val fea = for (j <- 0 until n) yield x.col(j).toDouble
         val cor = new MatrixD (n, n)
         for (j1 <- 0 until n; j2 <- 0 until j1) cor(j1, j2) = fea(j1) corr fea(j2)
         cor

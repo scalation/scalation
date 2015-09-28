@@ -16,7 +16,7 @@ package scalation.random
 import math.{ceil, E, exp, floor, log, Pi, pow, round, sqrt}
 
 import scalation.linalgebra.VectorD
-import scalation.math._
+import scalation.math.double_exp
 import scalation.math.Combinatorics.{fac, gammaF, logfac}
 import scalation.math.ExtremeD.TOL
 

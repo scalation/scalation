@@ -8,13 +8,14 @@
 
 package scalation
 
-import language.implicitConversions
+//import language.implicitConversions
 
-import scalation.linalgebra.VectorD
+//import scalation.linalgebra.VectorD
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `graphalytics` package contains classes, traits and objects for
- *  graph analytics on Trees, DAGs and Directed Graphs. 
+/** The `graphalytics` package contains classes, traits and objects for graph
+ *  analytics on Trees, DAGs and Directed Graphs.  It provides an implicit
+ *  conversion when needed for converting doubles to vectors.
  */
 package object graphalytics
 {

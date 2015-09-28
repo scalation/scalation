@@ -8,7 +8,6 @@
 
 package scalation.linalgebra.gen
 
-import scalation.math._
 import scalation.math.ExtremeD.MIN_NORMAL
 import scalation.util.Error
 

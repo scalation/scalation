@@ -28,9 +28,12 @@ object BldSparseMatrix extends App with BldParams
         val MATRI     = kind(i)._6
         val ZERO      = kind(i)._8
         val ONE       = kind(i)._9
+        val BASE_LC   = BASE.toLowerCase
         val MATRIX    = { val m = MATRI.splitAt (MATRI.size-1); m._1 + "x" + m._2 }
         val IMPORT    = if (CUSTOM contains BASE) s"scalation.math.$BASE.{abs => ABS, _}"
-                                              else "math.{abs => ABS}"
+                        else "math.{abs => ABS}"
+        val IMPORT2   = if (CUSTOM contains BASE) s"scalation.math.{$BASE, oneIf}"
+                        else s"scalation.math.{${BASE_LC}_exp, oneIf}"
 
 // Beginning of string holding code template -----------------------------------
 
@@ -46,9 +49,10 @@ package scalation.linalgebra
 
 import collection.mutable.LinkedEntry
 import io.Source.fromFile
+
 import $IMPORT
 
-import scalation.math._
+import $IMPORT2
 import scalation.util.{Error, SortedLinkedHashMap}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

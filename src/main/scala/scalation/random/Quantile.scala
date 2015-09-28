@@ -10,7 +10,7 @@ package scalation.random
 
 import scala.math.{abs, exp, log, Pi, sqrt}
 
-import scalation.math._
+import scalation.math.{double_exp, cot}
 import scalation.math.Combinatorics.rBetaF
 import scalation.math.ExtremeD._
 import scalation.util.Error

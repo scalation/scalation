@@ -11,10 +11,9 @@ package scalation.graphalytics
 import collection.mutable.Queue
 import collection.mutable.{Set => SET}
 import math.pow
-import scala.util.Random
 
 import scalation.linalgebra.VectorI
-import scalation.random.RandomVecI
+import scalation.random.{Randi0, Random, RandomSet}
 
 import LabelType.TLabel
 
@@ -23,9 +22,17 @@ import LabelType.TLabel
  */
 object DigGen
 {
-    /** Random number generator
+    /** Random number generator in interval (0, 1)
      */
-    private val rand = new Random
+    private val ran = Random ()
+
+    /** Random number/integer generator: 0, 1, ...
+     */
+    private val rng = Randi0 ()
+
+    /** Random set generator
+     */
+    private val rsg = RandomSet ()
 
     //------------------------------------------------------------------------
     // Methods generating random graphs where the number of outgoing edges (the degree)
@@ -46,10 +53,9 @@ object DigGen
                         name: String = "g"): Digraph =
     {
         val ch = Array.ofDim [SET [Int]] (size)
-        for (i <- ch.indices) {                                    // for each vertex i
-            val degree = rand.nextInt (avDegree * 2 + 1)           // out degree for vertex i
-            val rvec   = RandomVecI (degree, size-1, i)            // random vector of integers
-            ch(i)      = SET ((rvec.igen)(): _*)                   // children of vertex i
+        for (i <- ch.indices) {
+            val degree = rng.iigen (avDegree * 2 + 1)              // out degree for vertex i
+            ch(i)      = rsg.igen (degree, size - 1, i)            // children of vertex i
         } // for
         val label = randDistLabels (size, nLabels)                 // vertex labels
         new Digraph (ch, label, inverse, name)
@@ -85,13 +91,11 @@ object DigGen
                                   name: String = "g"): Digraph =
     {
         val ch = Array.ofDim [SET [Int]] (size)
-        for (i <- ch.indices) {                                          // each vertex i
-            val degree = rand.nextInt (avDegree * 2 + 1)                  // out degree
-            for (j <- 0 until degree if ! (ch contains j)) ch(i) += j   // add the edge i -> j
+        for (i <- ch.indices) {
+            val degree = rng.iigen (avDegree * 2 + 1)              // out degree for vertex i
+            ch(i)      = rsg.igen (degree, size - 1, i)            // children of vertex i
         } // for
-
-        // 2.1 is used in WWW graph pg 72 of m&m graph data
-        val label = powDistLabels (size, nLabels, 2.1)
+        val label = powDistLabels (size, nLabels, 2.1)             // 2.1 is used in WWW graph pg 72 of m&m graph data
         new Digraph (ch, label, inverse, name)
     } // genRandomGraph_PowLabels
 
@@ -114,11 +118,10 @@ object DigGen
                           inverse: Boolean = false, name: String = "g"): Digraph =
     {
         val ch = Array.ofDim [SET [Int]] (size)
-        for (i <- ch.indices) {                                          // each vertex i
-            val degree = powInt (0, maxDegree, distPow)                   // out degree
-            for (j <- 0 until degree if ! (ch contains j)) ch(i) += j   // add the edge i -> j
+        for (i <- ch.indices) {
+            val degree = powInt (0, maxDegree, distPow)            // out degree
+            ch(i)      = rsg.igen (degree, size - 1, i)            // children of vertex i
         } // for
-
         val label = randDistLabels (size, nLabels)
         new Digraph (ch, label, inverse, name)
     } // genPowerLawGraph
@@ -137,11 +140,10 @@ object DigGen
                                     inverse: Boolean = false, name: String = "g"): Digraph =
     {
         val ch = Array.ofDim [SET [Int]] (size)
-        for (i <- ch.indices) {                                          // each vertex i
-            val degree = powInt (0, maxDegree, distPow)                   // out degree
-            for (j <- 0 until degree if ! (ch contains j)) ch(i) += j   // add the edge i -> j
+        for (i <- ch.indices) {
+            val degree = powInt (0, maxDegree, distPow)            // out degree
+            ch(i)      = rsg.igen (degree, size - 1, i)            // children of vertex i
         } // for
-
         val label = powDistLabels (size, nLabels, distPow)
         new Digraph (ch, label, inverse, name)
     } // genPowerLawGraph_PowLabels
@@ -173,26 +175,27 @@ object DigGen
 
         while (nodes.size < size && nRestarts < maxRestarts) {
             if (nRestarts % 100 == 0) println ("restarting " + nRestarts)
-            chMap     = Map [Int, SET [Int]] ()
+            chMap      = Map [Int, SET [Int]] ()
             nodes      = SET [Int] ()
             val q      = Queue [Int] ()
-            val start  = rand.nextInt (g.size)     // randomly pick a start node in ch 
+            val start  = rng.iigen (g.size - 1)     // randomly pick a start node in ch 
             q.enqueue (start)
             nodes += start
 
             while (! q.isEmpty && nodes.size < size) {
-                var chs = SET [Int] ()
-                val newNode = q.dequeue
-                val newNodeChildren = g.ch (newNode)
-                if (! newNodeChildren.isEmpty) {
-                    val nncArr = newNodeChildren.toArray
-                    for (i <- 0 until rand.nextInt (avDegree * 2 + 1) if nodes.size < size) {
-                        val newChild = nncArr (rand.nextInt (newNodeChildren.size)) 
-                        if (!nodes.contains(newChild)) { nodes += newChild; q.enqueue (newChild) }
+                var chs  = SET [Int] ()                                 // set of children to be formed
+                val v    = q.dequeue                                    // candidate vertex
+                val v_ch = g.ch (v)                                     // its children
+                if (v_ch.nonEmpty) {
+                    val v_chArr = v_ch.toArray                          // its children in an array
+                    val degree = rng.iigen (avDegree * 2 + 1)           // desired out degree
+                    for (i <- 0 until degree if nodes.size < size) {
+                        val newChild = v_chArr (rng.iigen (v_ch.size - 1)) 
+                        if (! (nodes contains newChild)) { nodes += newChild; q.enqueue (newChild) }
                         else cycle = true
-                        if (newChild != newNode) chs += newChild 
+                        if (newChild != v) chs += newChild               // add newChild
                     } // for
-                    chMap += (newNode -> (chMap.getOrElse (newNode, SET [Int] ()) ++ chs))
+                    chMap += (v -> (chMap.getOrElse (v, SET [Int] ()) ++ chs))
                 } // if
             } // while
 
@@ -201,96 +204,28 @@ object DigGen
     
         if (nRestarts == maxRestarts) { println ("genBFSQuery: could not find a good query"); return null }
     
-        // gives the nodes new ids (FIX: refactor to renumber)
-        var newLabelMap = Map [Int, Int] () 
+        // create a vertex map from old to new ids, e.g., 7 -> 0, 11 -> 1, 15 -> 2
+        var vertexMap = Map [Int, Int] () 
         var c = 0 
-        for (x <- nodes) { newLabelMap += (x -> c); c += 1 }
-        val newToOldLabels = Array.ofDim [Int] (size)
-        newLabelMap.foreach { case (oldL, newL) => newToOldLabels (newL) = oldL }
+        for (v <- nodes) { vertexMap += (v -> c); c += 1 }
+
+        // for each new id, record the old id
+        val new2OldIds = Array.ofDim [Int] (size)
+        vertexMap.foreach { case (oldId, newId) => new2OldIds(newId) = oldId }
+
+        // for each mapped vertex, assign its mapped children
         val ch = Array.ofDim [SET [Int]] (size).map (x => SET [Int] ())
-        for ((node, children) <- chMap) ch (newLabelMap (node)) = children.map (x => newLabelMap (x)) 
-        val label = newToOldLabels.map (x => g.label(x)).toArray
+        for ((v, v_ch) <- chMap) ch(vertexMap (v)) = v_ch.map (vertexMap (_)) 
+
+        // map the vertex labels
+        val label = new2OldIds.map (g.label(_)).toArray
         if (cycle) println ("genBFSQuery: query has a cycle")
         new Digraph (ch, label, inverse, name)
     } // genBFSQuery
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Extracts a subgraph of 'size' vertices from graph 'g' by performing a
-     *  breadth-first search from a random vertex.
-     *  @param size     the number of vertices to extract
-     *  @param g        the data graph to extract from
-     *  @param inverse  whether to create inverse adjacency (parents)
-     *  @param name     the name of the graph
-     */
-    def extractSubgraph (size: Int, g: Digraph, inverse: Boolean = false, name: String = "g"): Digraph =
-    {
-        val maxRestarts = 5000
-        var nRestarts   = 0
-        var chMap: Map [Int, SET [Int]] = null
-        var nodes:  SET [Int] = null
-
-        while (nodes.size < size && nRestarts < maxRestarts) {
-            if (nRestarts % 100 == 0) println ("restarting " + nRestarts)
-            chMap    = Map [Int, SET [Int]] ()
-            nodes     = SET [Int] ()
-            val q     = Queue [Int] ()
-            val start = rand.nextInt (g.size)         // randomly pick a start node in ch
-            println ("extractSubgraph: start node: " + start)
-            q.enqueue (start)
-            nodes += start
-
-            while (! q.isEmpty && nodes.size < size) {
-                var chs = SET [Int] ()
-                val newNode = q.dequeue
-                val newNodeChildren = g.ch (newNode)
-                if (! newNodeChildren.isEmpty) {
-                    for (newChild <- newNodeChildren if nodes.size < size) {
-                        if (! nodes.contains (newChild)) { nodes += newChild; q.enqueue (newChild) }
-                    } // for
-                } // if
-            } // while
-
-            for (n <- nodes) { val chs = g.ch(n) intersect nodes; chMap += (n -> chs ) }
-            if (nodes.size < size) {
-                nRestarts += 1
-                println ("nodes.size only " + nodes.size)
-            } // if
-        } // while
-
-        if (nRestarts == maxRestarts) { println ("extractSubgraph: could not find a good query"); return null }
-
-        // gives the nodes new ids (FIX: refactor to renumber)
-        var newLabelMap = Map [Int, Int] () 
-        var c = 0 
-        for (x <- nodes) { newLabelMap += (x -> c); c += 1 }
-        val newToOldLabels = Array.ofDim [Int] (size)
-        newLabelMap.foreach { case (oldL, newL) => newToOldLabels (newL) = oldL }
-        val ch = Array.ofDim [SET [Int]] (size).map (x => SET [Int] ())
-        for ((node, children) <- chMap) ch (newLabelMap(node)) = children.map (x => newLabelMap (x)) 
-        val label = newToOldLabels.map (x => g.label(x)).toArray
-        new Digraph (ch, label, inverse, name)
-    } // extractSubgraph
-
     //------------------------------------------------------------------------
     // Private helper methods.
     //------------------------------------------------------------------------
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Renumber the selected nodes (give them new consecutive ids).
-     *  @param node
-     *  @param chMap
-     *
-    private def renumber (node: SET [Int], chMap: Map [Int, SET [Int]]): Array [SET [Int]] =
-    {
-        var oldId2newId = Map [Int, Int] ()
-        var i = 0
-        for (v <- node) { oldId2newId += (v -> i); i += 1 }
-        val newToOldLabels = Array.ofDim [Int] (size)
-        for (
-        newLabelMap.foreach { case (oldL, newL) => newToOldLabels (newL) = oldL }
-        Array.ofDim [SET [Int]] (size).map (x => SET [Int] ())
-    } // renumber
-     */
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Returns an array with labels distributed between 0 and nLabels - 1
@@ -300,7 +235,7 @@ object DigGen
      */
     private def randDistLabels (size: Int, nLabels: Int): Array [TLabel] =
     {
-        Array.ofDim [TLabel] (size).map ( x => rand.nextInt (nLabels).asInstanceOf [TLabel])
+        Array.ofDim [TLabel] (size).map ( x => rng.iigen (nLabels - 1).asInstanceOf [TLabel])
     } // randDistLabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -316,17 +251,6 @@ object DigGen
     } // powDistLabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Returns an array with labels distributed between 0 and nLabels - 1
-     *  based on a Gaussian/Normal distribution.
-     *  @param size     the number of vertices
-     *  @param nLabels  the number of labels
-     */
-    private def gaussianDistLabels (size: Int, nLabels: Int): Array [TLabel] =
-    {
-        Array.ofDim [TLabel] (size).map ( x => gaussInt (nLabels / 2.0).asInstanceOf [TLabel])
-    } // gaussianDistLabels
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Returns a random integer between min and max with a frequency determined
      *  by a power law distribution.
      *  @param min      the minimum value
@@ -336,24 +260,17 @@ object DigGen
     private def powInt (min: Int, max: Int, distPow: Double): Int =
     {
         val exp = distPow + 1.0
-        max - 1 - pow (( (pow (max, exp) - pow (min, exp)) * rand.nextDouble + pow (min, exp) ),
+        max - 1 - pow (( (pow (max, exp) - pow (min, exp)) * ran.gen + pow (min, exp) ),
                        (1.0 / exp)).toInt
     } // powInt
-
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Returns an integer with a probability based on a gaussian distribution
-     *  centered at d
-     *  FIX: may need to truncate with math.min(math.max((rand.nextGaussian()*d+d).toInt, 0), d*2).toInt
-     *  @param d  the WHAT??
-     */
-    private def gaussInt (d: Double) = (rand.nextGaussian () * 2.0 * d).toInt
 
 } // DigGen class
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The 'DigGenTest' object is used to test the 'DigGen' class
- *  for building random graphs where a vertex's degree is uniformly distributed.
+/** The `DigGenTest` object is used to test the `DigGen` class for building
+ *  random graphs where a vertex's degree is uniformly distributed.
+ *  > run-main scalation.graphalytics.DigGenTest
  */
 object DigGenTest extends App
 {
@@ -381,8 +298,9 @@ object DigGenTest extends App
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The 'DigGenTest2' object is used to test the 'DigGen' class
- *  for building power law graphs.
+/** The `DigGenTest2` object is used to test the `DigGen` class for building
+ *  power law graphs.
+ *  > run-main scalation.graphalytics.DigGenTest2
  */
 object DigGenTest2 extends App
 {
@@ -401,21 +319,28 @@ object DigGenTest2 extends App
 
 } // DigGenTest2
 
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `DigGenTest3` object is used to test the `DigGen` class
- *  for extracting query graphs from data graphs.
+/** The `DigGenTest3` object is used to test the `DigGen` class for extracting
+ *  query graphs from data graphs.
+ *  > run-main scalation.graphalytics.DigGenTest3
  */
 object DigGenTest3 extends App
 {
     import DigGen._
 
-    var g = genRandomGraph (1000000, 10, 16)
+    println ("DigGenTest3: test genRandomGraph")
+    val nVertices = 1000
+    val avDegree  =   10     
+    val nLabels   =   16
+    var g = genRandomGraph (nVertices, avDegree, nLabels)
     println ("done generating data graph")
-    println ("g.size: " + g.size)
-    println ("g.nEdges: " + g.nEdges)
+    println ("g.size   = " + g.size)
+    println ("g.nEdges = " + g.nEdges)
+
     println ("DigGenTest3: test genBFSQuery")
-    (2 until 10).foreach { i =>
-        var q = genBFSQuery (25, 3, g)
+    (1 until 5).foreach { i =>
+        var q = genBFSQuery (20, 3, g)
         q.print ()
         println (q.size)
         println (q.nEdges)

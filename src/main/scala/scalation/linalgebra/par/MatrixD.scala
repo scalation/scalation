@@ -15,7 +15,7 @@ import io.Source.fromFile
 
 import scalation.linalgebra.{MatriD, VectorD}
 import scalation.linalgebra.par.MatrixD.eye
-import scalation.math._
+import scalation.math.{double_exp, oneIf}
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -10,9 +10,7 @@ package scalation.random
 
 import math.floor
 
-import scalation.math._
-import scalation.util.Error
-import scalation.util.time
+import scalation.util.{Error, time}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RNG` abstract class is the base class for all ScalaTion Random Number
@@ -102,7 +100,7 @@ object RNGTest extends App with Error
         var chi2 = 0.0                                         // sum up for Chi-square statistic
         for (i <- sum.indices) {
             val o = sum(i)                                     // observed value: height of histogram
-            chi2 += (o - e)~^2 / e
+            chi2 += (o - e)*(o - e) / e
             print ("\tsum (" + i + ") = " + o + " : " + e + " ")
             if (i % 5 == 4) println ()
         } // for

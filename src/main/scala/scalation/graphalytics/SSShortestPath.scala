@@ -10,7 +10,7 @@ package scalation.graphalytics
 
 import collection.mutable.{Map, PriorityQueue}
 import collection.mutable.{Set => SET}
-import language.implicitConversions
+//import language.implicitConversions
 
 import scalation.linalgebra.{MatriD, MatrixD, SparseMatrixD, VectorD, VectorI}
 import scalation.linalgebra.SparseMatrixD.RowMap
@@ -104,7 +104,7 @@ object SSShortestPath
     /** Convert `VectorD` to `Double` by taking the minimum.  This is used
      *  to handle labels that are vectors.
      */
-    implicit def vectorD2Double (x: VectorD): Double = x.min ()
+//  implicit def vectorD2Double (x: VectorD): Double = x.min ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create an `SSShortestPath` object from a multi-digraph.  First convert

@@ -12,7 +12,7 @@ import scalation.analytics.ClassifierInt
 import scalation.linalgebra.{MatriD, MatrixI, VectorD, VectorI}
 import scalation.linalgebra.gen.HMatrix3
 import scalation.linalgebra.par.MatrixD
-import scalation.stat.StatVector
+import scalation.stat.vectorD2StatVector
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NaiveBayes` class implements an Integer-Based Naive Bayes Classifier,
@@ -62,7 +62,7 @@ class NaiveBayes (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Array 
      */
     override def calcCorrelation: MatriD =
     {
-        val fea = for (j <- 0 until n) yield new StatVector (x.col(j))
+        val fea = for (j <- 0 until n) yield x.col(j).toDouble
         val cor = new MatrixD (n, n)
         for (j1 <- 0 until n; j2 <- 0 until j1) cor(j1, j2) = fea(j1) corr fea(j2)
         cor

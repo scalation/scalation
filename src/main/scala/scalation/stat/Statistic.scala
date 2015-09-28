@@ -8,18 +8,16 @@
 
 package scalation.stat
 
+import collection.mutable.ListBuffer
 import math.sqrt
 
-import collection.mutable.ListBuffer
-
 import scalation.math.ExtremeD
-import scalation.math._
 import scalation.random.{Quantile, Uniform}
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Statistic` class is used to collect values and compute sample statistics
- *  on them (e.g., Waiting Time).  Contrast with TimeStatistic defined below.
+ *  on them (e.g., Waiting Time).  Contrast with `TimeStatistic` defined below.
  *  @param name      the name for this statistic (e.g., WatingTime)
  *  @param unbiased  whether the estimators are restricted to be unbiased
  */
@@ -101,7 +99,7 @@ class Statistic (val name: String = "stat", unbiased: Boolean = false)
      */
     def variance: Double =
     {
-        if (n == 0) 0.0 else (sumSq - sum~^2/nd) / (if (unbiased) nd - 1.0 else nd)
+        if (n == 0) 0.0 else (sumSq - sum*sum/nd) / (if (unbiased) nd - 1.0 else nd)
     } // variance
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -290,7 +288,7 @@ class TimeStatistic (override val name: String = "p-stat",
     override def variance: Double =
     {
         val totalTime = _lastTime - _startTime
-        if (totalTime <= 0.0) 0.0 else (sumSq - sum~^2/totalTime) / totalTime
+        if (totalTime <= 0.0) 0.0 else (sumSq - sum*sum/totalTime) / totalTime
     } // variance
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
