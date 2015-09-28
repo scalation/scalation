@@ -1,10 +1,19 @@
 *.class
 *.log
 
+# scalation specific
+*.bak*
+**/old/*
+
+
+
 # sbt specific
 .cache
 .history
 .lib/
+bin/*
+project/*
+store/*
 dist/*
 target/
 lib_managed/
