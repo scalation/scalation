@@ -13,9 +13,10 @@ package apps.optimization
 import math.{min, sqrt}
 
 import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.stat.StatVector
+//import scalation.math.DoubleWithExp._
 import scalation.math._
 import scalation.minima.ConjGradient
-import scalation.stat.vectorD2StatVector
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -37,10 +38,10 @@ class PortfolioOpt (r: MatrixD, label: Array [String])
     def calcStats ()
     {
         for (j <- 0 until n) {
-            val r_j = r.col(j)                      // data for the j-th instrument
+            val r_j = new StatVector (r.col(j))     // data for the j-th instrument
             r_mean(j) = r_j.mean                    // mean for instrument j
             for (k <- 0 until n) {
-                r_cov(j, k) = r_j cov r.col(k)      // covariance for instrument j with k
+                r_cov(j, k) = r_j.cov (r.col(k))    // covariance for instrument j with k
             } // for
         } // for
         println ("r_mean = " + r_mean)

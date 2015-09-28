@@ -149,27 +149,35 @@ class HMatrix4 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Allocate the 3rd and 4th dimensions of the hypermatrix based on the given
-     *  value counts for the dimensions.
-     *  @param vc3   value count array giving sizes for 3rd dimension based on j
-     *  @param vc4   value count array giving sizes for 4th dimension based on j
+     *  value count and parent vector.  Used in `AugNaiveBayes` class.
+     *  @param vc   value count array giving sizes for 3rd dimension based on j
+     *  @param par  parent vector for 4th dimension based on par(j)
      */
-    def alloc (vc3: VectorI, vc4: VectorI)
+    def alloc (vc: Array [Int], par: VectorI)
     {
-        if (vc3.size != dim2) flaw ("alloc", "Dimensions mismatch")
-        for (i <- range1; j <- range2) hmat(i)(j) = Array.ofDim [T] (vc3(j), vc4(j))
+        if (vc.length != dim2) flaw ("alloc", "Dimensions mismatch")
+
+        for (i <- range1; j <- range2) {
+            hmat(i)(j) = if (par(j) > -1) Array.ofDim [T] (vc(j), vc(par(j)))  // has parent
+                         else             Array.ofDim [T] (vc(j), 1)           // no parent
+        } // for
     } // alloc
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Allocate the 3rd and 4th dimensions of the hypermatrix based on the given
-     *  j-index set, value counts for the dimensions.
+     *  j-index set, value count and parent vector.  Used in `AugSelNaiveBayes` class.
      *  @param jset  the set of index values for the second dimension (j) that are active
-     *  @param vc3   value count array giving sizes for 3rd dimension based on j
-     *  @param vc4   value count array giving sizes for 4th dimension based on j
+     *  @param vc    value count array giving sizes for 3rd dimension based on j
+     *  @param par   parent vector for 4th dimension based on par(j)
      */
-    def alloc (jset: Array [Boolean], vc3: VectorI, vc4: VectorI)
+    def alloc (jset: Array [Boolean], vc: Array [Int], par: VectorI)
     {
-        if (vc3.size != dim2) flaw ("alloc", "Dimensions mismatch")
-        for (i <- range1; j <- range2 if jset(j)) hmat(i)(j) = Array.ofDim [T] (vc3(j), vc4(j))
+        if (vc.length != dim2) flaw ("alloc", "Dimensions mismatch")
+
+        for (i <- range1; j <- range2 if jset(j)) {
+            hmat(i)(j) = if (par(j) > -1) Array.ofDim [T] (vc(j), vc(par(j)))  // has parent
+                         else             Array.ofDim [T] (vc(j), 1)           // no parent
+        } // for
     } // alloc
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -247,7 +255,7 @@ class HMatrix4 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Clear (make null) all contents in the 3rd and 4th dimensions of the hypermatrix.
-     */
+      */
     def clear () = { for (i <- range1; j <- range2) hmat(i)(j) = null }
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -258,7 +266,7 @@ class HMatrix4 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
         val sb = new StringBuilder ("\nHMatrix4(")
         if (dim1 == 0) return sb.append (")").mkString
         for (i <- range1) {
-            for (j <- range2 if (hmat(i)(j) != null)) {
+            for (j <- range2) {
                 sb.append (hmat(i)(j).deep + ", ")
                 if (j == dim2-1) sb.replace (sb.length-1, sb.length, "\n\t")
             } // for

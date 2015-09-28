@@ -10,7 +10,7 @@ package scalation.linalgebra
 
 import math.{abs => ABS}
 
-import scalation.math.double_exp
+import scalation.math._
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

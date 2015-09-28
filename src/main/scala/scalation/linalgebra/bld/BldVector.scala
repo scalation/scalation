@@ -29,7 +29,6 @@ object BldVector extends App with BldParams
         val ZERO      = k._8
         val ONE       = k._9
         val REGEX     = k._10
-        val BASE_LC   = BASE.toLowerCase
         val EXPON     = if (BASE == "Complex" || BASE == "Real") "Double" else BASE
         val ORD       = if (BASE == "StrNum") "(StrO.ord)" else if (CUSTOM contains BASE) s"($BASE.ord)" else ""
         val FROM_STR1 = if (CUSTOM contains BASE) s"$BASE (x)" else s"x.to$BASE"
@@ -37,10 +36,6 @@ object BldVector extends App with BldParams
         val IMPORT    = if (BASE == "StrNum") "scalation.math.StrO.{abs => ABS, max => MAX, _}"
                         else if (CUSTOM contains BASE) s"scalation.math.$BASE.{abs => ABS, max => MAX, _}"
                         else "math.{abs => ABS, max => MAX, sqrt}"
-        val IMPORT2   = if (BASE == "StrNum") "scalation.math.StrO"
-                        else if (CUSTOM contains BASE) s"scalation.math.$BASE"
-                        else s"scalation.math.${BASE_LC}_exp"
-
 
 // Beginning of string holding code template -----------------------------------
 
@@ -59,9 +54,9 @@ import util.Sorting.quickSort
 
 import $IMPORT
 
-import $IMPORT2
+import scalation.math._
 import scalation.util.Error
-import scalation.util.$SORTING.{iqsort, qsort2}
+import scalation.util.$SORTING.qsort2
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `$VECTOR` class stores and operates on Numeric Vectors of base type `$BASE`.
@@ -78,10 +73,6 @@ class $VECTOR (val dim: Int,
     } else if (dim != v.length) {
         flaw ("constructor", "dimension is wrong")
     } // if
-
-    /** Number of elements in the vector as a Double
-     */
-    val nd = dim.toDouble
 
     /** Range for the storage array
      */
@@ -153,24 +144,15 @@ class $VECTOR (val dim: Int,
     } // _oneAt
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `$VECTOR` into a `VectorI`.
+    /** Convert a `$VECTOR` into a `$VECTOR2`.
+     *  @param u  the vector to convert
      */
-    def toInt: VectorI =
+    def to$BASE2: $VECTOR2 =
     {
-        val c = new VectorI (dim)
-        for (i <- range) c(i) = v(i).toInt
+        val c = new $VECTOR2 (dim)
+        for (i <- range) c(i) = v(i).to$BASE2
         c
-    } // toInt
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `$VECTOR` into a `VectorD`.
-     */
-    def toDouble: VectorD =
-    {
-        val c = new VectorD (dim)
-        for (i <- range) c(i) = v(i).toDouble
-        c
-    } // toDouble
+    } // to$BASE2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's element at the 'i'-th index position. 
@@ -481,24 +463,6 @@ class $VECTOR (val dim: Int,
         c
     } // ~^
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare 'this' vector with that vector 'b' for inequality.
-     *  @param b  that vector
-     */
-    def ≠ (b: $VECTOR) = this != b
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare 'this' vector with that vector 'b' for less than or equal to.
-     *  @param b  that vector
-     */
-    def ≤ (b: $VECTOR) = this <= b
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare 'this' vector with that vector 'b' for greater than or equal to.
-     *  @param b  that vector
-     */
-    def ≥ (b: $VECTOR) = this >= b
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Raise each element of 'this' vector to the 's'-th power.
      *  @param s  the scalar exponent
@@ -552,30 +516,13 @@ class $VECTOR (val dim: Int,
     def sumPos: $BASE = v.foldLeft ($ZERO)((s, x) => s + MAX (x, $ZERO))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the mean of the elements of 'this' vector.
+    /** Compute mean the elements of 'this' vector.
      */
-    def mean = sum / nd
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the (unbiased) sample variance of the elements of 'this' vector.
-     */
-    def variance = (normSq - sum * sum / nd) / (nd-1.0)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the population variance of the elements of 'this' vector.
-     *  This is also the (biased) MLE estimator for sample variance.
-     */
-    def pvariance = (normSq - sum * sum / nd) / nd
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Establish the rank order of the elements in 'self' vector, e.g.,
-     *  (8.0, 2.0, 4.0, 6.0) is (3, 0, 1, 2).
-     */
-    def rank: VectorI = new VectorI (iqsort (v))
+    def mean: $BASE = sum / v.length
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Cumulate the values of 'this' vector from left to right (e.g., create a
-     *  CDF from a pmf).  Example: (4, 2, 3, 1) --> (4, 6, 9, 10)
+     *  cdf from a pmf). Example: (4, 2, 3, 1) --> (4, 6, 9, 10)
      */
     def cumulate: $VECTOR =
     {
@@ -610,17 +557,6 @@ class $VECTOR (val dim: Int,
         for (i <- range) sum += v(i) * b.v(i)
         sum
     } // dot
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
-     *  @param b  the other vector
-     */
-    def ∙ (b: $VECTOR): $BASE =
-    {
-        var sum: $BASE = $ZERO
-        for (i <- range) sum += v(i) * b.v(i)
-        sum
-    } // ∙
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Euclidean norm (2-norm) squared of 'this' vector.
@@ -749,18 +685,7 @@ class $VECTOR (val dim: Int,
         for (i <- 0 until e if v(i) > $ZERO) return i; -1
     } // firstPos
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the index of the first occurrence of element 'x' in 'this' vector,
-     *  or -1 if not found.
-     *  @param x  the given element
-     *  @param e  the ending index (exclusive) for the search
-     */
-    def indexOf (x: Int, e: Int = dim): Int =
-    {
-        for (i <- 0 until e if v(i) == x) return i; -1
-    } // indexOf
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+   //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of strictly negative elements in 'this' vector.
      */
     def countNeg: Int =
@@ -1034,7 +959,6 @@ object ${VECTOR}Test extends App
         println ("x.sum    = " + x.sum)
         println ("x.sumNE  = " + x.sumNE (0))
         println ("x dot y  = " + (x dot y))
-        println ("x ∙ y    = " + (x ∙ y))
         println ("x.normSq = " + x.normSq)
         println ("x.norm   = " + x.norm)
         println ("x < y    = " + (x < y))

@@ -74,9 +74,9 @@ class ANOVA (t: VectorI, y: VectorD, levels: Int, technique: RegTechnique = Fac_
     def train (yy: VectorD) { rg.train (yy) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including rSquared.
+    /** Return the fit (parameter vector b, quality of fit rSquared).
      */
-    def fit: VectorD = rg.fit
+    def fit: Tuple4 [VectorD, Double, Double, Double] = rg.fit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
@@ -97,7 +97,7 @@ class ANOVA (t: VectorI, y: VectorD, levels: Int, technique: RegTechnique = Fac_
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new R-squared value and the new F statistic.
      */
-    def backElim (): Tuple3 [Int, VectorD, VectorD] = rg.backElim ()
+    def backElim (): Tuple4 [Int, VectorD, Double, Double] = rg.backElim ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor (VIF) for each variable to test

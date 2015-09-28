@@ -49,6 +49,10 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
      */
     private val rsm = new Regression (x, y, technique)
 
+    /** The parameter vector to be fit
+     */
+    private var b: VectorD = null
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create all forms/terms for each point placing them in a new matrix.
      */
@@ -113,9 +117,14 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
     def train (yy: VectorD) { rsm.train (yy) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including rSquared.
+    /** Return the fit (parameter vector b, quality of fit including rSquared).
      */
-    def fit: VectorD = rsm.fit
+    def fit: Tuple4 [VectorD, Double, Double, Double] =
+    {
+        val res = rsm.fit
+        b = res._1
+        res
+    } // fit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a point z, use the quadratic rsm regression equation to predict a
@@ -153,7 +162,7 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new R-squared value and the new F statistic.
      */
-    def backElim (): Tuple3 [Int, VectorD, VectorD] = rsm.backElim ()
+    def backElim (): Tuple4 [Int, VectorD, Double, Double] = rsm.backElim ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor (VIF) for each variable to test

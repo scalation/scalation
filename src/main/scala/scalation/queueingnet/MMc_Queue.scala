@@ -10,7 +10,7 @@
 package scalation.queueingnet
 
 import scalation.math.Combinatorics.fac
-import scalation.math.double_exp
+import scalation.math._
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

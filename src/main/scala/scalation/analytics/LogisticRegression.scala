@@ -14,6 +14,7 @@ package scalation.analytics
 import math.{exp, log}
 
 import scalation.linalgebra.{MatrixD, VectorD, VectorI}
+import scalation.math._
 import scalation.minima.QuasiNewton
 import scalation.plot.Plot
 import scalation.util.Error

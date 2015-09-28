@@ -33,73 +33,51 @@ package object math
     val log_10 = log (10.0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The `Int_Exp` value class adds an exponentiation operator 'x ~^ y' and a
-     *  near_eq operator 'x =~ y' to `Int`.
+    /** The `Int_Exp` adds an exponentiation operator 'x ~^ y' and a near_eq
+     *  operator 'x =~ y' to `Int`.
      *  The '~^' has higher precedence than '*' or '/'.
-     *  @param self  the underlying object to be accessed via the self accessor
+     *  @param x  the base parameter
      */
-    class Int_Exp (val self: Int) extends AnyVal
+    case class Int_Exp (x: Int)
     { 
-        def ~^ (y: Int)     = scala.math.pow (self, y).toInt 
-        def =~ (y: Double)  = near_eq (self, y)
-        def !=~ (y: Double) = ! near_eq (self, y)
-        def ≠ (y: Int)      = self != y
-        def ≤ (y: Int)      = self <= y
-        def ≥ (y: Int)      = self >= y
+        def ~^ (y: Int)     = scala.math.pow (x, y).toInt 
+        def =~ (y: Double)  = near_eq (x, y)
+        def !=~ (y: Double) = ! near_eq (x, y)
     } // Int_Exp class
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The `Long_Exp` value class adds an exponentiation operator 'x ~^ y' and a
-     *  near_eq operator 'x =~ y' to `Long`.
+    /** The `Long_Exp` adds an exponentiation operator 'x ~^ y' and a near_eq
+     *  operator 'x =~ y' to `Long`.
      *  The '~^' has higher precedence than '*' or '/'.
-     *  @param self  the underlying object to be accessed via the self accessor
+     *  @param x  the base parameter
      */
-    class Long_Exp (val self: Long) extends AnyVal
+    case class Long_Exp (x: Long)
     {
-        def ~^ (y: Long)    = pow (self, y) 
-        def =~ (y: Double)  = near_eq (self, y)
-        def !=~ (y: Double) = ! near_eq (self, y)
-        def ≠ (y: Long)     = self != y
-        def ≤ (y: Long)     = self <= y
-        def ≥ (y: Long)     = self >= y
+        def ~^ (y: Long)    = pow (x, y) 
+        def =~ (y: Double)  = near_eq (x, y)
+        def !=~ (y: Double) = ! near_eq (x, y)
     } // Long_Exp class
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The `Double_Exp` value class adds an exponentiation operator 'x ~^ y' and
-     *  a near_eq operator 'x =~ y' to `Double`.
+    /** The `Double_Exp` adds an exponentiation operator 'x ~^ y' and a near_eq
+     *  operator 'x =~ y' to `Double`.
      *  The '~^' has higher precedence than '*' or '/'.
-     *  @param self  the underlying object to be accessed via the self accessor
+     *  @param x  the base parameter
      */
-    case class Double_Exp (val self: Double)
+    case class Double_Exp (x: Double)
     {
-        def ~^ (y: Double)  = scala.math.pow (self, y)
-        def =~ (y: Double)  = near_eq (self, y)
-        def !=~ (y: Double) = ! near_eq (self, y)
-        def ≠ (y: Double)   = self != y
-        def ≤ (y: Double)   = self <= y
-        def ≥ (y: Double)   = self >= y
+        def ~^ (y: Double)  = scala.math.pow (x, y)
+        def =~ (y: Double)  = near_eq (x, y)
+        def !=~ (y: Double) = ! near_eq (x, y)
     } // Double_Exp class
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Implicit conversion from 'Int' to 'Int_Exp', which supports exponentiation
-     *  and nearly equals.
+    /** Implicit conversion from 'Int' to 'Int_Exp', which supports exponentiation.
      *  @param x  the base parameter
      */
-    implicit def int_exp (x: Int) = new Int_Exp (x)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Implicit conversion from 'Long' to 'Long_Exp', which supports exponentiation
-     *  and nearly equals.
-     *  @param x  the base parameter
-     */
-    implicit def long_exp (x: Long) = new Long_Exp (x)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Implicit conversion from 'Double' to 'Double_Exp', which supports exponentiation
-     *  and nearly equals.
-     *  @param x  the base parameter
-     */
-    implicit def double_exp (x: Double) = new Double_Exp (x)
+    implicit def int_exp (x: Int)       = Int_Exp (x)
+    implicit def long_exp (x: Long)     = Long_Exp (x)
+    implicit def double_exp (x: Double) = Double_Exp (x)
 
     /** The threshold used for near equality
      */

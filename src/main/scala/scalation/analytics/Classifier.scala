@@ -71,10 +71,10 @@ trait Classifier
         for (i <- 0 until nx) {
             val testStart = i * testSize
             val testEnd   = testStart + testSize
-            reset ()
 //          println (s"testStart = $testStart, testEnd = $testEnd, testSize = $testSize)
             train (testStart, testEnd)
             sum += test (testStart, testEnd)
+            reset ()
         } // for
 
         val avg = sum / nx.toDouble

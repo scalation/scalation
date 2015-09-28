@@ -10,11 +10,10 @@ package scalation.stat
 
 import math.{abs, cos}
 
-import scalation.linalgebra.VectorD
 import scalation.random.Random
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `BatchVector` class contains a `VectorD` for maintaining experimental
+/** The `BatchVector` class contains a `StatVector` for maintaining experimental
  *  data in multiple batches and methods for computing statistics on these data.
  *  Ex:  It can be used to support the Method of Batch Means (MBM).
  *  @param name       name of the batch statistic
@@ -26,11 +25,11 @@ class BatchVector (name: String, private var _bSize: Int = 10, private var _nBat
     /** The vector containing all the elements from all the batches.
      *  FIX: with more clever coding the 'y' vector would not be necessary
      */
-    private var y = new VectorD (bSize * nBatches)
+    private var y = new StatVector (bSize * nBatches)
 
     /** The vector containing the means from all the batches.
      */
-    private var yb = new VectorD (nBatches)
+    private var yb = new StatVector (nBatches)
 
     /** The index in the y vector of the next element to add.
      */

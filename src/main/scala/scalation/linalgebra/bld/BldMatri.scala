@@ -27,14 +27,10 @@ object BldMatri extends App with BldParams
         val MATRI     = k._6
         val ZERO      = k._8
         val ONE       = k._9
-        val BASE_LC   = BASE.toLowerCase
         val MATRIX    = { val m = MATRI.splitAt (MATRI.size-1); m._1 + "x" + m._2 }
         val IMPORT    = if (BASE == "StrNum") "scalation.math.StrO.{abs => ABS, _}"
                         else if (CUSTOM contains BASE) s"scalation.math.$BASE.{abs => ABS, _}"
                         else "math.{abs => ABS}"
-        val IMPORT2   = if (BASE == "StrNum") "scalation.math.StrO"
-                        else if (CUSTOM contains BASE) s"scalation.math.$BASE"
-                        else s"scalation.math.${BASE_LC}_exp"
 
 // Beginning of string holding code template -----------------------------------
 
@@ -50,7 +46,7 @@ package scalation.linalgebra
 
 import $IMPORT
 
-import $IMPORT2
+import scalation.math._
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

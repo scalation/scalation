@@ -9,7 +9,7 @@
 package scalation.linalgebra.par
 
 import scalation.linalgebra.{Factorization, VectorD}
-import scalation.math.double_exp
+import scalation.math._
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

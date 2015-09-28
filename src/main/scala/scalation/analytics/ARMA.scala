@@ -17,10 +17,10 @@ package scalation.analytics
 import math.min
 
 import scalation.linalgebra.{MatriD, MatrixD, VectorD}
-import scalation.math.double_exp
+import scalation.math._
 import scalation.plot.Plot
 import scalation.random.Random
-import scalation.stat.vectorD2StatVector
+import scalation.stat.StatVector
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -38,10 +38,10 @@ class ARMA (y: VectorD, t: VectorD)
     private val n    = y.dim                      // size of the input vector
     private val m    = min (n, 20)                // maximum lag to consider
             val mu   = y.sum / n.toDouble         // the sample mean
-    private val x    = new VectorD (y - mu)       // work with mean zero time series
+    private val x    = new StatVector (y - mu)    // work with mean zero time series
             val sig2 = x.variance                 // the sample variance
     private val c    = new VectorD (m+1)          // auto-covariance
-    for (t <- 0 until m+1) c(t) = x acov t
+    for (t <- 0 until m+1) c(t) = x.acov (t)
             val acf = c / sig2                    // Auto-Correlation Function (ACF)
             var pacf: VectorD = null              // Partial Auto-Correlation Function (PACF)
 
@@ -159,14 +159,6 @@ class ARMA (y: VectorD, t: VectorD)
     {
         0.0    // FIX: not yet implemented
     } // predict
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including rSquared.
-     */
-    def fit: VectorD =
-    {
-        VectorD (0.0)        // FIX: not yet implemented
-    } // fit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given several time vectors, forecast the y-values.

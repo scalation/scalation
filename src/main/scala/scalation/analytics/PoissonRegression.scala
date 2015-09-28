@@ -13,6 +13,7 @@ package scalation.analytics
 import math.{exp, log, round}
 
 import scalation.linalgebra.{MatriD, MatrixD, VectorD, VectorI}
+import scalation.math._
 import scalation.math.Combinatorics.fac
 import scalation.minima.QuasiNewton
 import scalation.plot.Plot
@@ -41,6 +42,7 @@ class PoissonRegression (x: MatrixD, y: VectorI, fn: Array [String] = null)
     private val k          = x.dim2 - 1               // number of variables 
     private val n          = x.dim1.toDouble          // number of data points (rows)
     private val r_df       = (n-1.0) / (n-k-1.0)      // ratio of degrees of freedom
+    private var b: VectorD = null                     // parameter vector (b_0, b_1, ... b_k)
     private var n_dev      = -1.0                     // null dev: -LL, for null model (intercept only)
     private var r_dev      = -1.0                     // residual dev: -LL, for full model
     private var aic        = -1.0                     // Akaike’s Information Criterion
@@ -108,13 +110,13 @@ class PoissonRegression (x: MatrixD, y: VectorI, fn: Array [String] = null)
     } // train_null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including rSquared. Assumes both train_null and
-     *  train have already been called.
+    /** Return the fit (parameter vector b, quality of fit). Assumes both
+     *  train_null and train have already been called.
      */
-    def fit: VectorD = 
+    def fit: Tuple5 [VectorD, Double, Double, Double, Double] = 
     {
         pseudo_rSq = 1.0 - r_dev / n_dev
-        VectorD (n_dev, r_dev, aic, pseudo_rSq)
+        (b, n_dev, r_dev, aic, pseudo_rSq)
     } // fit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -242,16 +244,15 @@ object PoissonRegressionTest extends App
     val rg = new PoissonRegression (x, y)
     rg.train_null ()                                    // train based on null model
     rg.train ()                                         // train based on full model
-    val b  = rg.coefficient                             // obtain coefficients
-    val ft = rg.fit                                     // obtain quality of fit
+    val res = rg.fit                                    // obtain results
 
     println ("---------------------------------------------------------------")
     println ("Poisson Regression Regression Results")
-    println ("b          = " + b)
-    println ("n_dev      = " + ft(0))
-    println ("r_dev      = " + ft(1))
-    println ("aic        = " + ft(2))
-    println ("pseudo_rSq = " + ft(3))
+    println ("b          = " + res._1)
+    println ("n_dev      = " + res._2)
+    println ("r_dev      = " + res._3)
+    println ("aic        = " + res._4)
+    println ("pseudo_rSq = " + res._5)
 
     z = VectorD (1.0, 15.0)                            // predict point z
     println ("predict (" + z + ") = " + rg.predict (z))

@@ -15,7 +15,7 @@ import util.control.Breaks.{breakable, break}
 
 import scalation.linalgebra.{MatrixD, VectorD}
 //import scalation.linalgebra.SparseMatrixD
-import scalation.math.double_exp
+import scalation.math._
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

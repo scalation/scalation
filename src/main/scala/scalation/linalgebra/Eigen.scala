@@ -17,7 +17,7 @@ import util.control.Breaks.{breakable, break}
 
 import scalation.linalgebra.Householder.house
 import scalation.linalgebra.MatrixD.{eye, outer}
-import scalation.math.double_exp
+import scalation.math._
 import scalation.math.ExtremeD.TOL
 import scalation.util.Error
 

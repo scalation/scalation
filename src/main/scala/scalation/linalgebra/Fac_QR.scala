@@ -8,7 +8,7 @@
 
 package scalation.linalgebra
 
-import scalation.math.double_exp
+import scalation.math._
 import scalation.util.Error
 
 import MatrixD.eye

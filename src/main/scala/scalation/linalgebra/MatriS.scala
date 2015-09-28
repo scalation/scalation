@@ -10,7 +10,7 @@ package scalation.linalgebra
 
 import scalation.math.StrO.{abs => ABS, _}
 
-import scalation.math.StrO
+import scalation.math._
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

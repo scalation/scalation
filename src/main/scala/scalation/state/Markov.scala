@@ -14,7 +14,7 @@ import scalation.animation.{AnimateCommand, DgAnimator}
 import scalation.animation.CommandType._
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.linalgebra.MatrixD.eye
-import scalation.math.double_exp
+import scalation.math._
 import scalation.random.Discrete
 import scalation.scala2d.{Ellipse, QArrow}
 import scalation.scala2d.Colors._

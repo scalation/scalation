@@ -186,26 +186,6 @@ case class Rational (val num: Long, val den: Long = 1l)
     def compare (q: Rational): Int = num * q.den compare q.num * den
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare 'this' rational number with that rational number 'q' for inequality.
-     *  @param q  that rational number
-     */
-    def ≠ (q: Rational) = this != q
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare 'this' rational number with that rational number 'q' for less than
-     *  or equal to.
-     *  @param q  that rational number
-     */
-    def ≤ (q: Rational) = this <= q
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare 'this' rational number with that rational number 'q' for greater 
-     *  than or equal to.
-     *  @param q  that rational number
-     */
-    def ≥ (q: Rational) = this >= q
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert that/this rational number to a Rational.
      *  @param q  that rational number to convert
      */

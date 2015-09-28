@@ -180,7 +180,7 @@ class HMatrix3 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' hypermatrix to a string.
-     */
+      */
     override def toString: String = 
     {
         val sb = new StringBuilder ("\nHMatrix3(")

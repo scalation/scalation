@@ -13,7 +13,7 @@ import math.pow
 
 import scalation.calculus.Calculus.FunctionV2S
 import scalation.linalgebra.VectorD
-import scalation.math.double_exp
+import scalation.math._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This object used to test several Non-Linear Programming (NLP) algorithms on

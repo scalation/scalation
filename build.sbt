@@ -15,9 +15,5 @@ fork := true
 
 // javaOptions += "-Xmx4G
 
-libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value
-
-libraryDependencies += "org.scala-lang" % "scala-compiler" % scalaVersion.value
-
 libraryDependencies += "org.jsoup" % "jsoup" % "1.8.2"
 

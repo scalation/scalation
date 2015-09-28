@@ -12,7 +12,7 @@ import math.{abs, exp, Pi, round, sqrt}
 
 import scalation.linalgebra.{Fac_Cholesky, MatrixD, VectorD, VectorI}
 import scalation.math.Combinatorics.fac
-import scalation.math.double_exp
+import scalation.math._
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -214,8 +214,6 @@ case class RandomVecI (count: Int = 10, max: Int = 20, skip: Int = -1, unique: B
 {
     _discrete = true
 
-    if (unique && max < count) flaw ("constructor", "requires max >= count")
-
     private val mu  = max / 2.0                         // mean
     private val rng = Randi0 (max, stream)              // random integer generator
 
@@ -227,6 +225,7 @@ case class RandomVecI (count: Int = 10, max: Int = 20, skip: Int = -1, unique: B
 
     def igen: VectorI =
     {
+        if (unique && max < count) flaw ("constructor", "requires max >= count")
         val y   = new VectorI (count)
         var num = 0
         for (i <- 0 until count) {

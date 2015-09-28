@@ -11,9 +11,10 @@
 
 package scalation.analytics
 
-import math.{exp, pow}
+import math.exp
 
 import scalation.linalgebra.{MatriD, MatrixD, VectorD}
+import scalation.math._
 import scalation.minima.QuasiNewton
 import scalation.plot.Plot
 import scalation.util.Error
@@ -38,6 +39,7 @@ class ExpRegression (x: MatrixD, nonneg: Boolean, y: VectorD)
     if (x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
     if (nonneg && ! y.isNonnegative) flaw ("constructor", "response vector y must be nonnegative")
 
+    private var b: VectorD = null                // parameter vector
     private val k          = x.dim2 - 1          // number of variables (k = n-1)
     private val m          = x.dim1.toDouble     // number of data points (rows)
     private val r_df       = (m-1.0) / (m-k-1.0) // ratio of degrees of freedom
@@ -84,22 +86,22 @@ class ExpRegression (x: MatrixD, nonneg: Boolean, y: VectorD)
      */
     def train ()
     {
-        val b0   = new VectorD (x.dim2)             // use b_0 = 0 for starting guess for parameters
-        val bfgs = new QuasiNewton (ll)             // minimizer for -2LL
-        b        = bfgs.solve (b0)                  // find optimal solution for parameters
-        val e    = y / (x * b)                      // residual/error vector
-        val sse  = e dot e                          // residual/error sum of squares
-        val sst  = (y dot y) - pow (y.sum, 2) / m   // total sum of squares
-        val ssr  = sst - sse                        // regression sum of squares
-        rSquared = ssr / sst                        // coefficient of determination (R-squared)
-        rBarSq   = 1.0 - (1.0-rSquared) * r_df      // R-bar-squared (adjusted R-squared)
-        fStat    = ssr * (m-k-1.0)  / (sse * k)     // F statistic (msr / mse)
+        val b0   = new VectorD (x.dim2)         // use b_0 = 0 for starting guess for parameters
+        val bfgs = new QuasiNewton (ll)         // minimizer for -2LL
+        b        = bfgs.solve (b0)              // find optimal solution for parameters
+        val e    = y / (x * b)                  // residual/error vector
+        val sse  = e dot e                      // residual/error sum of squares
+        val sst  = (y dot y) - y.sum~^2.0 / m   // total sum of squares
+        val ssr  = sst - sse                    // regression sum of squares
+        rSquared = ssr / sst                    // coefficient of determination (R-squared)
+        rBarSq   = 1.0 - (1.0-rSquared) * r_df  // R-bar-squared (adjusted R-squared)
+        fStat    = ssr * (m-k-1.0)  / (sse * k) // F statistic (msr / mse)
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the fit (parameter vector b, quality of fit including rSquared).
      */
-    def fit: VectorD = VectorD (rSquared, rBarSq, fStat)
+    def fit: Tuple4 [VectorD, Double, Double, Double] = (b, rSquared, rBarSq, fStat)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
@@ -177,7 +179,7 @@ object ExpRegressionTest2 extends App
         val erg = new ExpRegression (x, true, y)
         erg.train ()
 
-        (n, k, b, erg.coefficient, erg.fit(0))
+        (n, k, b, erg.fit._1, erg.fit._2)
     } // test
 
     val tests = Array.ofDim [Tuple5 [Int, Int, VectorD, VectorD, Double]] (10)

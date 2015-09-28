@@ -14,14 +14,13 @@ import collection.mutable.{HashMap, ListBuffer, PriorityQueue}
 
 import scalation.animation.{AnimateCommand, DgAnimator}
 import scalation.animation.CommandType._
-import scalation.linalgebra.VectorD
 import scalation.math.ExtremeD.MAX_VALUE
 import scalation.model.Modelable
 import scalation.random.{Uniform, Variate}
 import scalation.scala2d.Colors._
 import scalation.scala2d.R2
 import scalation.scala2d.Shapes.Shape
-import scalation.stat.{Statistic, StatTable}
+import scalation.stat.{Statistic, StatTable, StatVector}
 import scalation.util.Identifiable
 import scalation.util.Monitor.trace
 
@@ -45,7 +44,7 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
 
     /** The map of stat vectors records the means of each replication
      */
-    val statV = HashMap [String, VectorD] ()
+    val statV = HashMap [String, StatVector] ()
 
     /** The stop time for the model
      */
@@ -139,7 +138,7 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
     def resetStats (rep: Int)
     {
         if (rep == 1) {
-            for (stat <- getStatistics) statV += stat.name -> new VectorD (reps)
+            for (stat <- getStatistics) statV += stat.name -> new StatVector (reps)
         } // for
         for (stat <- getStatistics) {
             statV (stat.name)(rep - 1) = stat.mean

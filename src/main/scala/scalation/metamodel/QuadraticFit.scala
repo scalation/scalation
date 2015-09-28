@@ -13,7 +13,7 @@ import math.pow
 import scalation.analytics.Regression
 import scalation.calculus.Calculus.FunctionV2S
 import scalation.linalgebra.{MatrixD, VectorD}
-import scalation.math.double_exp
+import scalation.math._
 import scalation.minima.QuasiNewton
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -151,9 +151,10 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
     {
         reg = new Regression (xx, yy)
         reg.train ()
-        b = reg.coefficient                     // coefficients in regression equation
+        val res = reg.fit
+        b = res._1                               // coefficients in regression equation
         println ("b = " + b)
-        println ("fit = " + reg.fit)            // coefficient of determination, etc.
+        println ("fit: R-squared = " + res._2)   // coefficient of determination
     } // fit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -163,9 +164,9 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
     def reduce ()
     {
         val res = reg.backElim ()
-        b = res._2                              // coefficients in regression equation
+        b = res._2
         println ("b = " + b)
-        println ("fit = " + res._3)             // coefficient of determination
+        println ("fit: R-squared = " + res._3)   // coefficient of determination
     } // reduce
 
 } // QuadraticFit class

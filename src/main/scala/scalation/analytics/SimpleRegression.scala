@@ -9,6 +9,7 @@
 package scalation.analytics
 
 import scalation.linalgebra.{MatriD, MatrixD, VectorD}
+import scalation.math._
 import scalation.plot.Plot
 import scalation.util.Error
 
@@ -30,9 +31,9 @@ class SimpleRegression (x: MatrixD, y: VectorD)
     if (x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
 
     private val n = x.dim1.toDouble    // number of data points (rows)
-    private var rSquared = -1.0        // coefficient of determination (quality of fit)
+    private val b = new VectorD (2)    // parameter vector (b_0, b_1)
 
-    b = new VectorD (2)                // parameter vector (b_0, b_1)
+    private var rSquared = -1.0        // coefficient of determination (quality of fit)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
@@ -50,19 +51,19 @@ class SimpleRegression (x: MatrixD, y: VectorD)
         val ssy = y dot y                      // sum of squares y
         val sxy = x1 dot y                     // sum of cross products
 
-        b(1) = (n * sxy - sx * sy) / (n * ssx - sx*sx)     // slope
-        b(0) = (sy - b(1) * sx) / n                        // intercept
+        b(1) = (n * sxy - sx * sy) / (n * ssx - sx~^2.0)     // slope
+        b(0) = (sy - b(1) * sx) / n                          // intercept
 
         val e   = y - x * b                    // residual/error vector
         val sse = e dot e                      // residual/error sum of squares
-        val sst = ssy - sy*sy / n              // total sum of squares
+        val sst = ssy - sy~^ 2.0 / n           // total sum of squares
         rSquared = (sst - sse) / sst           // coefficient of determination
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit includinhg rSquared.
+    /** Return the fit (parameter vector b, quality of fit rSquared)
      */
-    def fit: VectorD = VectorD (rSquared)
+    def fit: Tuple2 [VectorD, Double] = (b, rSquared)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,

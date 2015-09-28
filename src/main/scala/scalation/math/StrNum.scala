@@ -168,26 +168,6 @@ object StrO
          */	
         def compare (s: StrNum, t: StrNum): Int = s.ss compare t.ss
 
-        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Compare 'this' string number with that string number 't' for inequality.
-         *  @param t  that string number
-         */
-        def ≠ (t: StrNum) = this != t
-
-        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Compare 'this' string number with that string number 't' for less than
-         *  or equal to.
-         *  @param t  that string number
-         */
-        def ≤ (t: StrNum) = this <= t
-
-        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Compare 'this' string number with that string number 't' for greater
-         *  than or equal to.
-         *  @param t  that string number
-         */
-        def ≥ (t: StrNum) = this >= t
-
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         def fromDouble (d: Double): StrNum = d.toString
 

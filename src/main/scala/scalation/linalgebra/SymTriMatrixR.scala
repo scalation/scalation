@@ -9,10 +9,9 @@
 package scalation.linalgebra
 
 import io.Source.fromFile
-
 import scalation.math.Real.{abs => ABS, _}
 
-import scalation.math.{Real, oneIf}
+import scalation.math._
 import scalation.util.Error
 
 import MatrixR.eye

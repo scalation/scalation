@@ -264,26 +264,6 @@ case class Real (hi: Double, lo: Double = 0.0) // extends strictfp
         if (hi == y.hi) lo compare y.lo else hi compare y.hi
     } // compare
 
-   //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare 'this' real number with that real number 'y' for inequality.
-     *  @param y  that real number
-     */
-    def ≠ (y: Real) = this != y
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare 'this' real number with that real number 'y' for less than
-     *  or equal to.
-     *  @param y  that real number
-     */
-    def ≤ (y: Real) = this <= y
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare 'this' real number with that real number 'y' for greater
-     *  than or equal to.
-     *  @param y  that real number
-     */
-    def ≥ (y: Real) = this >= y
-
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert that/'this' real number to a `Real.
      *  @param x  that real number to convert

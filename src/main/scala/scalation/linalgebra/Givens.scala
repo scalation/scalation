@@ -15,7 +15,7 @@ import java.lang.Math.copySign
 import math.{abs, sqrt}
 
 import scalation.linalgebra.MatrixD.eye
-import scalation.math.double_exp
+import scalation.math._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Givens` objects has methods for determinng values 'c = cos(theta)' and
