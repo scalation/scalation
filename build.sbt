@@ -14,6 +14,7 @@ fork := true
 // scalacOptions += "-feature"
 
 // javaOptions += "-Xmx4G
+
 publishArtifact in (Compile, packageDoc) := false
 
 libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value
