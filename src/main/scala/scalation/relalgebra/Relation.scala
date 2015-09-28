@@ -146,8 +146,8 @@ object Relation
                domain: String, eSep: String): Relation =
     {
         var first = true
-        val lines = fromURL(new URL(fileName)).getLines
-//        else fromFile (DATA_DIR + fileName).getLines
+        val lines = if (fileName contains "://") fromURL(new URL(fileName)).getLines
+        else fromFile (DATA_DIR + fileName).getLines
         var r3: Relation = null
         for (ln <- lines) {
             if (first) {
