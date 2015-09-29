@@ -819,8 +819,15 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
       *  @param sos  the sequence of strings holding the values
       *  @param typ  the string of corresponding types, e.g., "SDI"
       */
-    def row (sos: Seq [String], typ: String): Row =
+    def row (sos: Seq [String], typ_ : String): Row =
     {
+        var types =""
+        if (typ_ == null) {
+
+            (0 to sos.length).foreach( i => types += "X" )
+        }else{
+            types = typ_
+        }
         (for (j <- sos.indices) yield
         typ(j) match {
             case 'C' => Complex (sos(j))
