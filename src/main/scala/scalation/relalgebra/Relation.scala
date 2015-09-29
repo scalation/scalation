@@ -829,7 +829,7 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
             types = typ_
         }
         (for (j <- sos.indices) yield
-        typ(j) match {
+        types(j) match {
             case 'C' => Complex (sos(j))
             case 'D' => new StringOps (sos(j)).toDouble
             case 'I' => new StringOps (sos(j)).toInt
