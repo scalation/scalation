@@ -821,15 +821,15 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
       */
     def row (sos: Seq [String], typ_ : String): Row =
     {
-        var types =""
+        var typ =""
         if (typ_ == null) {
 
-            (0 to sos.length).foreach( i => types += "X" )
+            (0 to sos.length).foreach( i => typ += "X" )
         }else{
-            types = typ_
+            typ = typ_
         }
         (for (j <- sos.indices) yield
-        types(j) match {
+        typ(j) match {
             case 'C' => Complex (sos(j))
             case 'D' => new StringOps (sos(j)).toDouble
             case 'I' => new StringOps (sos(j)).toInt
