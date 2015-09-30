@@ -1,14 +1,17 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
+ *  @builder scalation.util.bld.BldSorting
  *  @version 1.2
- *  @date    Sat Oct 26 21:44:36 EDT 2013
+ *  @date    Sat Sep 26 20:25:19 EDT 2015
  *  @see     LICENSE (MIT style license file).
  */
 
 package scalation.util
 
 import scala.util.Random
+
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SortingI` class provides direct and indirect methods to:
@@ -18,7 +21,7 @@ import scala.util.Random
  *      sort small arrays using SelectionSort
  *  <p>
  *  Direct methods are faster, but modify the array, while indirect methods are
- *  slower, but do not modify the array.  This class is specialized for Ints.
+ *  slower, but do not modify the array.  This class is specialized for Int.
  *  @see `Sorting` for a generic version of this class.
  *  @param a  the array to operate on
  */
@@ -490,10 +493,10 @@ object SortingI
  */
 object SortingITest extends App
 {
-    var md = 0.0
+    var md = 0
     val rn = new Random ()
     val n  = 1000000
-    val a  = Array (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a  = Array [Int] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     val aa = Array.ofDim [Int] (n)
 
     // test direct k-medians (will modify the data array)
@@ -501,10 +504,10 @@ object SortingITest extends App
     println ("--------------------------------------------------------------")
     println ("Test direct: a = " + a.deep)
     for (k <- 1 to 5) {
-        val med = new SortingI (Array (9, 1, 8, 2, 7, 3, 6, 4, 5))
+        val med = new SortingI (Array [Int] (9, 1, 8, 2, 7, 3, 6, 4, 5))
         println ("median (" + k + ") = " + med.median (k))
     } // for
-    val med = new SortingI (Array (9, 1, 8, 2, 7, 3, 6, 4, 5))
+    val med = new SortingI (Array [Int] (9, 1, 8, 2, 7, 3, 6, 4, 5))
     println ("median ()  = " + med.median ())
 
     // test indirect k-medians (will not modify the data array)
@@ -554,13 +557,13 @@ object SortingITest2 extends App
     var rk: Array [Int] = null                              // to hold rank order
     val n  = 1000000 
     val rn = new Random ()
-    val a  = Array (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a  = Array [Int] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     val aa = Array.ofDim [Int] (n) 
 
     // test direct sorting (will modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a1 = Array (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a1 = Array [Int] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test direct: a1 = " + a1.deep)
     val srt = new SortingI (a1)
     srt.qsort ()
@@ -570,7 +573,7 @@ object SortingITest2 extends App
     // test indirect sorting (will not modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a2 = Array (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a2 = Array [Int] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test indirect: a2 = " + a2.deep)
     val isrt = new SortingI (a2)
     rk = isrt.iqsort ()
@@ -615,13 +618,13 @@ object SortingITest3 extends App
     var rk: Array [Int] = null                              // to hold rank order
     val n  = 10000
     val rn = new Random ()
-    val a  = Array (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a  = Array [Int] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     val aa = Array.ofDim [Int] (n)
 
     // test direct sorting (will modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a1 = Array (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a1 = Array [Int] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test direct: a1 = " + a1.deep)
     val srt = new SortingI (a1)
     srt.selsort ()
@@ -631,7 +634,7 @@ object SortingITest3 extends App
     // test indirect sorting (will not modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a2 = Array (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a2 = Array [Int] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test indirect: a2 = " + a2.deep)
     val isrt = new SortingI (a2)
     rk = isrt.iselsort ()
@@ -674,13 +677,13 @@ object SortingITest4 extends App
     var rk: Array [Int] = null                              // to hold rank order
     val n  = 1000000
     val rn = new Random ()
-    val a  = Array (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a  = Array [Int] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     val aa = Array.ofDim [Int] (n)
 
     // test direct sorting (will modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a1 = Array (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a1 = Array [Int] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test direct: a1 = " + a1.deep)
     val srt = new SortingI (a1)
     srt.qsort2 ()
@@ -690,7 +693,7 @@ object SortingITest4 extends App
     // test indirect sorting (will not modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a2 = Array (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a2 = Array [Int] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test indirect: a2 = " + a2.deep)
     val isrt = new SortingI (a2)
     rk = isrt.iqsort2 ()
@@ -735,13 +738,13 @@ object SortingITest5 extends App
     var rk: Array [Int] = null                              // to hold rank order
     val n  = 10000
     val rn = new Random ()
-    val a  = Array (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a  = Array [Int] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     val aa = Array.ofDim [Int] (n)
 
     // test direct sorting (will modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a1 = Array (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a1 = Array [Int] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test direct: a1 = " + a1.deep)
     val srt = new SortingI (a1)
     srt.selsort2 ()
@@ -751,7 +754,7 @@ object SortingITest5 extends App
     // test indirect sorting (will not modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a2 = Array (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a2 = Array [Int] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test indirect: a2 = " + a2.deep)
     val isrt = new SortingI (a2)
     rk = isrt.iselsort2 ()

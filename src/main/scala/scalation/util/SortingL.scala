@@ -1,14 +1,17 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
+ *  @builder scalation.util.bld.BldSorting
  *  @version 1.2
- *  @date    Sat Oct 26 21:44:36 EDT 2013
+ *  @date    Sat Sep 26 20:25:19 EDT 2015
  *  @see     LICENSE (MIT style license file).
  */
 
 package scalation.util
 
 import scala.util.Random
+
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SortingL` class provides direct and indirect methods to:
@@ -18,7 +21,7 @@ import scala.util.Random
  *      sort small arrays using SelectionSort
  *  <p>
  *  Direct methods are faster, but modify the array, while indirect methods are
- *  slower, but do not modify the array.  This class is specialized for Longs.
+ *  slower, but do not modify the array.  This class is specialized for Long.
  *  @see `Sorting` for a generic version of this class.
  *  @param a  the array to operate on
  */
@@ -582,8 +585,8 @@ object SortingLTest2 extends App
     println ("--------------------------------------------------------------")
     println ("Performance Test direct: aa.length = " + aa.length)
     for (k <- 0 until 20) {
-//      for (i <- 0 until n) aa(i) = rn.nextLong ()
-//      print ("quicksort:   "); time { quickSort (aa) }    // Scala's QuickSort
+        for (i <- 0 until n) aa(i) = rn.nextLong ()
+        print ("quicksort:   "); time { quickSort (aa) }    // Scala's QuickSort
         for (i <- 0 until n) aa(i) = rn.nextLong ()
         val srt = new SortingL (aa)
         print ("qsort:       "); time { srt.qsort () }
@@ -702,8 +705,8 @@ object SortingLTest4 extends App
     println ("--------------------------------------------------------------")
     println ("Performance Test direct: aa.length = " + aa.length)
     for (k <- 0 until 20) {
-//      for (i <- 0 until n) aa(i) = rn.nextLong ()
-//      print ("quicksort:   "); time { quickSort (aa) }    // Scala's QuickSort
+        for (i <- 0 until n) aa(i) = rn.nextLong ()
+        print ("quicksort:   "); time { quickSort (aa) }    // Scala's QuickSort
         for (i <- 0 until n) aa(i) = rn.nextLong ()
         val srt = new SortingL (aa)
         print ("qsort2:       "); time { srt.qsort2 () }

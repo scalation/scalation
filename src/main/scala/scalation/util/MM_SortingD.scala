@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @maker   scalation.util.bld.BldMM_Sorting
+ *  @builder scalation.util.bld.BldMM_Sorting
  *  @version 1.2
  *  @date    Sat Sep 26 20:25:19 EDT 2015
  *  @see     LICENSE (MIT style license file).
@@ -21,7 +21,7 @@ import scala.util.Random
  *      sort small arrays using SelectionSort
  *  <p>
  *  Direct methods are faster, but modify the array, while indirect methods are
- *  slower, but do not modify the array.  This class is specialized for Doubles.
+ *  slower, but do not modify the array.  This class is specialized for Double.
  *  @see `Sorting` for a generic version of this class.
  *  @param a  the array to operate on
  */

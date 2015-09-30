@@ -203,11 +203,10 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
      */
     def report
     {
-        
         println ("Coefficients:")
-        println ("        | Estimate |   StdErr |  t value | Pr(>|t|)")
+        println ("        | Estimate   |   StdErr   |  t value | Pr(>|t|)")
         for (j <- 0 until b.dim) {
-            println ("%7s | %8.3f | %8.3f | %8.3f | %8.3f".format ("x" + sub(j), b(j), stdErr(j), t(j), p(j)))
+            println ("%7s | %10.6f | %10.6f | %8.4f | %9.5f".format ("x" + sub(j), b(j), stdErr(j), t(j), p(j)))
         } // for
         println ()
         println ("Residual stdErr: %.3f on %d degrees of freedom".format (sqrt (sse/(m-k-1.0)), k.toInt))

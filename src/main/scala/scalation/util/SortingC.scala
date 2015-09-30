@@ -1,17 +1,17 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
+ *  @builder scalation.util.bld.BldSorting
  *  @version 1.2
- *  @date    Sat Oct 26 21:44:36 EDT 2013
+ *  @date    Sat Sep 26 20:25:19 EDT 2015
  *  @see     LICENSE (MIT style license file).
  */
 
 package scalation.util
 
 import scala.util.Random
-
 import scalation.math.Complex
-import scalation.math.Complex._
+import scalation.math.Complex._0
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SortingC` class provides direct and indirect methods to:
@@ -21,7 +21,7 @@ import scalation.math.Complex._
  *      sort small arrays using SelectionSort
  *  <p>
  *  Direct methods are faster, but modify the array, while indirect methods are
- *  slower, but do not modify the array.  This class is specialized for Complexes.
+ *  slower, but do not modify the array.  This class is specialized for Complex.
  *  @see `Sorting` for a generic version of this class.
  *  @param a  the array to operate on
  */
@@ -493,10 +493,10 @@ object SortingC
  */
 object SortingCTest extends App
 {
-    var md = Complex (0.0)
+    var md = _0
     val rn = new Random ()
     val n  = 1000000
-    val a  = Array [Complex] (9.0, 1.0, 8.0, 2.0, 7.0, 3.0, 6.0, 4.0, 5.0)
+    val a  = Array [Complex] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     val aa = Array.ofDim [Complex] (n)
 
     // test direct k-medians (will modify the data array)
@@ -504,10 +504,10 @@ object SortingCTest extends App
     println ("--------------------------------------------------------------")
     println ("Test direct: a = " + a.deep)
     for (k <- 1 to 5) {
-        val med = new SortingC (Array [Complex] (9.0, 1.0, 8.0, 2.0, 7.0, 3.0, 6.0, 4.0, 5.0))
+        val med = new SortingC (Array [Complex] (9, 1, 8, 2, 7, 3, 6, 4, 5))
         println ("median (" + k + ") = " + med.median (k))
     } // for
-    val med = new SortingC (Array [Complex] (9.0, 1.0, 8.0, 2.0, 7.0, 3.0, 6.0, 4.0, 5.0))
+    val med = new SortingC (Array [Complex] (9, 1, 8, 2, 7, 3, 6, 4, 5))
     println ("median ()  = " + med.median ())
 
     // test indirect k-medians (will not modify the data array)
@@ -557,13 +557,13 @@ object SortingCTest2 extends App
     var rk: Array [Int] = null                              // to hold rank order
     val n  = 1000000 
     val rn = new Random ()
-    val a  = Array [Complex] (9.0, 1.0, 8.0, 2.0, 7.0, 3.0, 6.0, 4.0, 5.0)
+    val a  = Array [Complex] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     val aa = Array.ofDim [Complex] (n) 
 
     // test direct sorting (will modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a1 = Array [Complex] (9.0, 1.0, 8.0, 2.0, 7.0, 3.0, 6.0, 4.0, 5.0)
+    val a1 = Array [Complex] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test direct: a1 = " + a1.deep)
     val srt = new SortingC (a1)
     srt.qsort ()
@@ -573,7 +573,7 @@ object SortingCTest2 extends App
     // test indirect sorting (will not modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a2 = Array [Complex] (9.0, 1.0, 8.0, 2.0, 7.0, 3.0, 6.0, 4.0, 5.0)
+    val a2 = Array [Complex] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test indirect: a2 = " + a2.deep)
     val isrt = new SortingC (a2)
     rk = isrt.iqsort ()
@@ -618,13 +618,13 @@ object SortingCTest3 extends App
     var rk: Array [Int] = null                              // to hold rank order
     val n  = 10000
     val rn = new Random ()
-    val a  = Array [Complex] (9.0, 1.0, 8.0, 2.0, 7.0, 3.0, 6.0, 4.0, 5.0)
+    val a  = Array [Complex] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     val aa = Array.ofDim [Complex] (n)
 
     // test direct sorting (will modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a1 = Array [Complex] (9.0, 1.0, 8.0, 2.0, 7.0, 3.0, 6.0, 4.0, 5.0)
+    val a1 = Array [Complex] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test direct: a1 = " + a1.deep)
     val srt = new SortingC (a1)
     srt.selsort ()
@@ -634,7 +634,7 @@ object SortingCTest3 extends App
     // test indirect sorting (will not modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a2 = Array [Complex] (9.0, 1.0, 8.0, 2.0, 7.0, 3.0, 6.0, 4.0, 5.0)
+    val a2 = Array [Complex] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test indirect: a2 = " + a2.deep)
     val isrt = new SortingC (a2)
     rk = isrt.iselsort ()
@@ -677,13 +677,13 @@ object SortingCTest4 extends App
     var rk: Array [Int] = null                              // to hold rank order
     val n  = 1000000
     val rn = new Random ()
-    val a  = Array [Complex] (9.0, 1.0, 8.0, 2.0, 7.0, 3.0, 6.0, 4.0, 5.0)
+    val a  = Array [Complex] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     val aa = Array.ofDim [Complex] (n)
 
     // test direct sorting (will modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a1 = Array [Complex] (9.0, 1.0, 8.0, 2.0, 7.0, 3.0, 6.0, 4.0, 5.0)
+    val a1 = Array [Complex] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test direct: a1 = " + a1.deep)
     val srt = new SortingC (a1)
     srt.qsort2 ()
@@ -693,7 +693,7 @@ object SortingCTest4 extends App
     // test indirect sorting (will not modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a2 = Array [Complex] (9.0, 1.0, 8.0, 2.0, 7.0, 3.0, 6.0, 4.0, 5.0)
+    val a2 = Array [Complex] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test indirect: a2 = " + a2.deep)
     val isrt = new SortingC (a2)
     rk = isrt.iqsort2 ()
@@ -738,13 +738,13 @@ object SortingCTest5 extends App
     var rk: Array [Int] = null                              // to hold rank order
     val n  = 10000
     val rn = new Random ()
-    val a  = Array [Complex] (9.0, 1.0, 8.0, 2.0, 7.0, 3.0, 6.0, 4.0, 5.0)
+    val a  = Array [Complex] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     val aa = Array.ofDim [Complex] (n)
 
     // test direct sorting (will modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a1 = Array [Complex] (9.0, 1.0, 8.0, 2.0, 7.0, 3.0, 6.0, 4.0, 5.0)
+    val a1 = Array [Complex] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test direct: a1 = " + a1.deep)
     val srt = new SortingC (a1)
     srt.selsort2 ()
@@ -754,7 +754,7 @@ object SortingCTest5 extends App
     // test indirect sorting (will not modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a2 = Array [Complex] (9.0, 1.0, 8.0, 2.0, 7.0, 3.0, 6.0, 4.0, 5.0)
+    val a2 = Array [Complex] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test indirect: a2 = " + a2.deep)
     val isrt = new SortingC (a2)
     rk = isrt.iselsort2 ()

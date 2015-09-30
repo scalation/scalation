@@ -11,20 +11,20 @@ package scalation.util.bld
 import java.io.{File, PrintWriter}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `BldMM_Sorting` object is used to build memory mapped array classes for
+/** The `BldSorting` object is used to build memory mapped array classes for
  *  various base types.
- *  > run-main scalation.util.bld.BldMM_Sorting
+ *  > run-main scalation.util.bld.BldSorting
  */
-object BldMM_Sorting extends App with BldParams
+object BldSorting extends App with BldParams
 {
-    println ("BldMM_Sorting: generate code for MM_Sorting classes")
+    println ("BldSorting: generate code for Sorting classes")
 
     for (k <- kind) {
         val MM_ARRAY  = k._1
         val BASE      = k._2
         val ESIZE     = k._3
         val BASE2     = k._4
-        val SORTING   = k._5
+        val SORTING   = k._5.drop (3)       // drop "MM_"
         val ZERO      = k._6
         val ONE       = k._7
         val IMPORT    = if (BASE == "StrNum") "import scalation.math.StrO"
@@ -39,7 +39,7 @@ object BldMM_Sorting extends App with BldParams
         val code = raw"""
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @builder scalation.util.bld.BldMM_Sorting
+ *  @builder scalation.util.bld.BldSorting
  *  @version 1.2
  *  @date    Sat Sep 26 20:25:19 EDT 2015
  *  @see     LICENSE (MIT style license file).
@@ -63,7 +63,7 @@ $IMPORT2
  *  @see `Sorting` for a generic version of this class.
  *  @param a  the array to operate on
  */
-class $SORTING (a: $MM_ARRAY)
+class $SORTING (a: Array [$BASE])
 {
     private val n = a.length                      // length of array a
 
@@ -464,31 +464,31 @@ object $SORTING
     /** Find the median value in the array.
      *  @param a  the array to be examined
      */
-    def median (a: $MM_ARRAY, k: Int): $BASE = (new $SORTING (a)).median (k)
+    def median (a: Array [$BASE], k: Int): $BASE = (new $SORTING (a)).median (k)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Fast, ascending, unstable sort.
      *  @param a  the array to be sorted
      */
-    def qsort (a: $MM_ARRAY) { (new $SORTING (a)).qsort () }
+    def qsort (a: Array [$BASE]) { (new $SORTING (a)).qsort () }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slow, ascending, stable sort.
      *  @param a  the array to be sorted
      */
-    def selsort (a: $MM_ARRAY) { (new $SORTING (a)).selsort () }
+    def selsort (a: Array [$BASE]) { (new $SORTING (a)).selsort () }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Fast, descending, unstable sort.
      *  @param a  the array to be sorted
      */
-    def qsort2 (a: $MM_ARRAY) { (new $SORTING (a)).qsort2 () }
+    def qsort2 (a: Array [$BASE]) { (new $SORTING (a)).qsort2 () }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slow, descending, stable sort.
      *  @param a  the array to be sorted
      */
-    def selsort2 (a: $MM_ARRAY) { (new $SORTING (a)).selsort2 () }
+    def selsort2 (a: Array [$BASE]) { (new $SORTING (a)).selsort2 () }
 
     // Indirect median and sorting -------------------------------------------
 
@@ -496,31 +496,31 @@ object $SORTING
     /** Indirectly find the median value in the array.
      *  @param a  the array to be examined
      */
-    def imedian (a: $MM_ARRAY, k: Int): $BASE = (new $SORTING (a)).imedian (k)
+    def imedian (a: Array [$BASE], k: Int): $BASE = (new $SORTING (a)).imedian (k)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Fast, ascending, unstable indirect sort.
      *  @param a  the array to be sorted
      */
-    def iqsort (a: $MM_ARRAY): Array [Int] = (new $SORTING (a)).iqsort ()
+    def iqsort (a: Array [$BASE]): Array [Int] = (new $SORTING (a)).iqsort ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slow, ascending, stable indirect sort.
      *  @param a  the array to be sorted
      */
-    def iselsort (a: $MM_ARRAY): Array [Int] = (new $SORTING (a)).iselsort ()
+    def iselsort (a: Array [$BASE]): Array [Int] = (new $SORTING (a)).iselsort ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Fast, descending, unstable indirect sort.
      *  @param a  the array to be sorted
      */
-//  def iqsort2 (a: $MM_ARRAY) { (new $SORTING (a)).iqsort2 () }   // FIX: implement
+//  def iqsort2 (a: Array [$BASE]) { (new $SORTING (a)).iqsort2 () }   // FIX: implement
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slow, descending, stable indirect sort.
      *  @param a  the array to be sorted
      */
-    def iselsort2 (a: $MM_ARRAY): Array [Int] = (new $SORTING (a)).iselsort2 ()
+    def iselsort2 (a: Array [$BASE]): Array [Int] = (new $SORTING (a)).iselsort2 ()
 
 } // $SORTING
 
@@ -534,18 +534,18 @@ object ${SORTING}Test extends App
     var md = $ZERO
     val rn = new Random ()
     val n  = 1000000
-    val a  = $MM_ARRAY (9, 1, 8, 2, 7, 3, 6, 4, 5)
-    val aa = $MM_ARRAY.ofDim (n)
+    val a  = Array [$BASE] (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val aa = Array.ofDim [$BASE] (n)
 
     // test direct k-medians (will modify the data array)
 
     println ("--------------------------------------------------------------")
     println ("Test direct: a = " + a.deep)
     for (k <- 1 to 5) {
-        val med = new $SORTING ($MM_ARRAY (9, 1, 8, 2, 7, 3, 6, 4, 5))
+        val med = new $SORTING (Array [$BASE] (9, 1, 8, 2, 7, 3, 6, 4, 5))
         println ("median (" + k + ") = " + med.median (k))
     } // for
-    val med = new $SORTING ($MM_ARRAY (9, 1, 8, 2, 7, 3, 6, 4, 5))
+    val med = new $SORTING (Array [$BASE] (9, 1, 8, 2, 7, 3, 6, 4, 5))
     println ("median ()  = " + med.median ())
 
     // test indirect k-medians (will not modify the data array)
@@ -595,13 +595,13 @@ object ${SORTING}Test2 extends App
     var rk: Array [Int] = null                              // to hold rank order
     val n  = 1000000 
     val rn = new Random ()
-    val a  = $MM_ARRAY (9, 1, 8, 2, 7, 3, 6, 4, 5)
-    val aa = $MM_ARRAY.ofDim (n) 
+    val a  = Array [$BASE] (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val aa = Array.ofDim [$BASE] (n) 
 
     // test direct sorting (will modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a1 = $MM_ARRAY (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a1 = Array [$BASE] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test direct: a1 = " + a1.deep)
     val srt = new $SORTING (a1)
     srt.qsort ()
@@ -611,7 +611,7 @@ object ${SORTING}Test2 extends App
     // test indirect sorting (will not modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a2 = $MM_ARRAY (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a2 = Array [$BASE] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test indirect: a2 = " + a2.deep)
     val isrt = new $SORTING (a2)
     rk = isrt.iqsort ()
@@ -623,8 +623,8 @@ object ${SORTING}Test2 extends App
     println ("--------------------------------------------------------------")
     println ("Performance Test direct: aa.length = " + aa.length)
     for (k <- 0 until 20) {
-//      for (i <- 0 until n) aa(i) = rn.next$BASE2 ()
-//      print ("quicksort:   "); time { quickSort (aa) }    // Scala's QuickSort
+        for (i <- 0 until n) aa(i) = rn.next$BASE2 ()
+        print ("quicksort:   "); time { quickSort (aa) }    // Scala's QuickSort
         for (i <- 0 until n) aa(i) = rn.next$BASE2 ()
         val srt = new $SORTING (aa)
         print ("qsort:       "); time { srt.qsort () }
@@ -656,13 +656,13 @@ object ${SORTING}Test3 extends App
     var rk: Array [Int] = null                              // to hold rank order
     val n  = 10000
     val rn = new Random ()
-    val a  = $MM_ARRAY (9, 1, 8, 2, 7, 3, 6, 4, 5)
-    val aa = $MM_ARRAY.ofDim (n)
+    val a  = Array [$BASE] (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val aa = Array.ofDim [$BASE] (n)
 
     // test direct sorting (will modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a1 = $MM_ARRAY (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a1 = Array [$BASE] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test direct: a1 = " + a1.deep)
     val srt = new $SORTING (a1)
     srt.selsort ()
@@ -672,7 +672,7 @@ object ${SORTING}Test3 extends App
     // test indirect sorting (will not modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a2 = $MM_ARRAY (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a2 = Array [$BASE] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test indirect: a2 = " + a2.deep)
     val isrt = new $SORTING (a2)
     rk = isrt.iselsort ()
@@ -715,13 +715,13 @@ object ${SORTING}Test4 extends App
     var rk: Array [Int] = null                              // to hold rank order
     val n  = 1000000
     val rn = new Random ()
-    val a  = $MM_ARRAY (9, 1, 8, 2, 7, 3, 6, 4, 5)
-    val aa = $MM_ARRAY.ofDim (n)
+    val a  = Array [$BASE] (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val aa = Array.ofDim [$BASE] (n)
 
     // test direct sorting (will modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a1 = $MM_ARRAY (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a1 = Array [$BASE] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test direct: a1 = " + a1.deep)
     val srt = new $SORTING (a1)
     srt.qsort2 ()
@@ -731,7 +731,7 @@ object ${SORTING}Test4 extends App
     // test indirect sorting (will not modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a2 = $MM_ARRAY (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a2 = Array [$BASE] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test indirect: a2 = " + a2.deep)
     val isrt = new $SORTING (a2)
     rk = isrt.iqsort2 ()
@@ -743,8 +743,8 @@ object ${SORTING}Test4 extends App
     println ("--------------------------------------------------------------")
     println ("Performance Test direct: aa.length = " + aa.length)
     for (k <- 0 until 20) {
-//      for (i <- 0 until n) aa(i) = rn.next$BASE2 ()
-//      print ("quicksort:   "); time { quickSort (aa) }    // Scala's QuickSort
+        for (i <- 0 until n) aa(i) = rn.next$BASE2 ()
+        print ("quicksort:   "); time { quickSort (aa) }    // Scala's QuickSort
         for (i <- 0 until n) aa(i) = rn.next$BASE2 ()
         val srt = new $SORTING (aa)
         print ("qsort2:       "); time { srt.qsort2 () }
@@ -776,13 +776,13 @@ object ${SORTING}Test5 extends App
     var rk: Array [Int] = null                              // to hold rank order
     val n  = 10000
     val rn = new Random ()
-    val a  = $MM_ARRAY (9, 1, 8, 2, 7, 3, 6, 4, 5)
-    val aa = $MM_ARRAY.ofDim (n)
+    val a  = Array [$BASE] (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val aa = Array.ofDim [$BASE] (n)
 
     // test direct sorting (will modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a1 = $MM_ARRAY (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a1 = Array [$BASE] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test direct: a1 = " + a1.deep)
     val srt = new $SORTING (a1)
     srt.selsort2 ()
@@ -792,7 +792,7 @@ object ${SORTING}Test5 extends App
     // test indirect sorting (will not modify the data array)
 
     println ("--------------------------------------------------------------")
-    val a2 = $MM_ARRAY (9, 1, 8, 2, 7, 3, 6, 4, 5)
+    val a2 = Array [$BASE] (9, 1, 8, 2, 7, 3, 6, 4, 5)
     println ("Test indirect: a2 = " + a2.deep)
     val isrt = new $SORTING (a2)
     rk = isrt.iselsort2 ()
@@ -834,5 +834,5 @@ object ${SORTING}Test5 extends App
         writer.close ()
     } // for
 
-} // BldMM_Sorting object
+} // BldSorting object
 

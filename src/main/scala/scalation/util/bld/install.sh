@@ -55,3 +55,28 @@ cp MM_SortingQ.scalaa ../MM_SortingQ.scala
 echo cp MM_SortingS.scalaa ../MM_SortingS.scala
 cp MM_SortingS.scalaa ../MM_SortingS.scala
 
+
+#######################################################################
+# install sorting classes
+
+echo cp SortingI.scalaa ../SortingI.scala
+cp SortingI.scalaa ../SortingI.scala
+
+echo cp SortingL.scalaa ../SortingL.scala
+cp SortingL.scalaa ../SortingL.scala
+
+echo cp SortingD.scalaa ../SortingD.scala
+cp SortingD.scalaa ../SortingD.scala
+
+echo cp SortingC.scalaa ../SortingC.scala
+cp SortingC.scalaa ../SortingC.scala
+
+echo cp SortingR.scalaa ../SortingR.scala
+cp SortingR.scalaa ../SortingR.scala
+
+echo cp SortingQ.scalaa ../SortingQ.scala
+cp SortingQ.scalaa ../SortingQ.scala
+
+echo cp SortingS.scalaa ../SortingS.scala
+cp SortingS.scalaa ../SortingS.scala
+

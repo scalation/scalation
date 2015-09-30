@@ -9,7 +9,7 @@
 package scalation.analytics
 
 import scalation.linalgebra.{MatrixD, VectorD, VectorI}
-import scalation.linalgebra.MatrixD.:+
+import scalation.linalgebra.MatrixD.:+^
 import scalation.linalgebra.VectorD.one
 
 import RegTechnique._
@@ -33,7 +33,7 @@ object GZLM extends GLM
     def apply (x: MatrixD, y: VectorI, cn: Array [String]): LogisticRegression =
     {
         if (add_1)
-            new LogisticRegression (:+ (one (x.dim1), x), y, cn)
+            new LogisticRegression (:+^ (one (x.dim1), x), y, cn)
         else
             new LogisticRegression (x, y, cn)
     } // apply
@@ -48,7 +48,7 @@ object GZLM extends GLM
     def apply (x: MatrixD, y: VectorI, fn: Array [String], poisson: Boolean): PoissonRegression =
     {
         if (add_1)
-            new PoissonRegression (:+ (one (x.dim1), x), y, fn)
+            new PoissonRegression (:+^ (one (x.dim1), x), y, fn)
         else
             new PoissonRegression (x, y, fn)
     } // apply
@@ -62,7 +62,7 @@ object GZLM extends GLM
     def apply (x: MatrixD, nonneg: Boolean, y: VectorD): ExpRegression =
     {
         if (add_1)
-            new ExpRegression (:+ (one (x.dim1), x), nonneg, y)
+            new ExpRegression (:+^ (one (x.dim1), x), nonneg, y)
         else
             new ExpRegression (x, nonneg, y)
     } // apply
