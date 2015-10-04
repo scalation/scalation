@@ -7,6 +7,7 @@
 
 <center>
 <h1> SCALAble SimulaTION - ScalaTion </h1>
+[![Build Status](https://travis-ci.org/mvnural/scalation.svg)](https://travis-ci.org/mvnural/scalation)
 <p>
 <a href = "#papers">Papers</a> | <a href = "#scaladoc">Scaladoc</a> | <a href = "#source-code"> Source Code</a>
 </center>
