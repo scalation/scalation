@@ -32,7 +32,8 @@ Recommended:
 ### Issue the following command to checkout from github (requires git)
 `git clone https://github.com/scalation/scalation.git scalation_1.2`
 
-### (Alternative Method) Download one of the following two files from ScalaTion website (http://cobweb.cs.uga.edu/~jam/scalation_1.2/README.html)
+### (Alternative Method)
+Download one of the following two files from ScalaTion website (http://cobweb.cs.uga.edu/~jam/scalation_1.2/README.html)
 
 <a href = "http://cobweb.cs.uga.edu/~jam/scalation_1.2.tar.gz"> scalation_1.2.tar.gz </a> <br> <b>OR</b> <br>
 <a href = "http://cobweb.cs.uga.edu/~jam/scalation_1.2.zip"> scalation_1.2.zip </a>
@@ -44,21 +45,6 @@ Recommended:
 $ tar xvfz scalation_1.2.tar.gz <br> <b>OR</b> <br>
 $ unzip scalation_1.2.zip
 </code></pre>
-
-
-
-<!--
-<p>
-<h4>3. Export the SCALATION_CLASSES environment variable to point at class files</h4>
-
-<pre><code>
-export SCALATION_CLASSES=$HOME/scalation_1.2/target/scala-2.12.0-M2/classes
-</code></pre>
-
-<p>
-Adjust the prefix to correspond to where you installed scalation.
-Ideally, put the export in one of your dot files (e.g., .profile or .bashrc).
--->
 
 ## Usage
 
@@ -102,52 +88,39 @@ For more information about the source code, see
 
 ## Papers/Documentation ##
 
-
-<ol>
-<li>
-John A. Miller, Jun Han and Maria Hybinette,
+1. John A. Miller, Jun Han and Maria Hybinette,
 <a href = "http://informs-sim.org/wsc10papers/067.pdf">
 "Using Domain Specific Languages for Modeling and Simulation: ScalaTion as a Case Study,"</a>
 Proceedings of the 2010 ACM/IEEE Winter Simulation Conference (WSC'10),
 Baltimore, Maryland (December 2010) pp. 741-752.
 
-
-<li>
-Michael E. Cotterell, John A. Miller, Tom Horton,
+2. Michael E. Cotterell, John A. Miller, Tom Horton,
 <a href = "http://arxiv.org/abs/1112.1751">
 "Unicode in Domain-Specific Programming Languages for Modeling & Simulation:
 ScalaTion as a Case Study,"</a>
 Arxiv preprint arXiv:1112.175
 (December 2011) pp. 1-10.
 
-
-<li>
-Michael E. Cotterell, John A. Miller, Jun Han and Tom Horton,
+3. Michael E. Cotterell, John A. Miller, Jun Han and Tom Horton,
 <a href = "../scalation_papers/alasim/alasim_extended_abstract.pdf">
 "Extending ScalaTion, a Domain-Specific Language for Modeling & Simulation, for Simulation Optimization,"</a>
 Proceedings of the AlaSim International Modeling and Simulation Conference & Exhibition (AlaSim'12),
 Huntsville, Alabama (May 2012) pp. 1-1.
 
-<p>
-<li>
-Yung Long Li,
+4. Yung Long Li,
 <a href = "../home/theses/li_thesis/thesis/TR_Yung_Long_Li.pdf">
 "Evaluation of Parallel Implementations of Dense and Sparse
 Matrices for the ScalaTion Library," </a>
 Technical Report,
 University of Georgia (December 2012) pp. 1-60.
 
-<p>
-<li>
-John A. Miller, Michael E. Cotterell and Stephen J. Buckley,
+5. John A. Miller, Michael E. Cotterell and Stephen J. Buckley,
 <a href = "http://informs-sim.org/wsc13papers/includes/files/104.pdf">
 "Supporting a Modeling Continuum in ScalaTion: From Predictive Analytics to Simulation Modeling,"</a>
 Proceedings of the 2013 ACM/IEEE Winter Simulation Conference (WSC'13),
 Washington, DC (December 2013) pp. 1191-1202. 
 
-
-<li>
-Matthew Saltz, Ayushi Jain, Abhishek Kothari, Arash Fard, John A. Miller, and Lakshmish Ramaswamy,
+6. Matthew Saltz, Ayushi Jain, Abhishek Kothari, Arash Fard, John A. Miller, and Lakshmish Ramaswamy,
 <a href = "http://www.thecloudcomputing.org/2014/AdvanceProgram-ICWS-SCC-CLOUD-MS-BigDataCongress-SERVICES-2014.pdf">
 "DualIso: An Algorithm for Subgraph Pattern Matching on Very Large Labeled Graphs,"</a>
 <I> Proceedings of the 3rd IEEE International Congress on Big Data </I>
@@ -155,7 +128,5 @@ Matthew Saltz, Ayushi Jain, Abhishek Kothari, Arash Fard, John A. Miller, and La
 Anchorage, Alaska (June-July 2014) pp. 498-505.
 <br>
 Online <a href = "../home/theses/jain_thesis/bigdata_2014/BigDataCong2014_DualIso_Supplement.pdf">supplement</a>
-
-</ol>
 
 
