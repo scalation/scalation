@@ -1,7 +1,7 @@
-#SCALAble SimulaTION - ScalaTion
-
 ##Build Status
 [![Build Status](https://travis-ci.org/mvnural/scalation.svg)](https://travis-ci.org/mvnural/scalation)
+
+#SCALAble SimulaTION - ScalaTion
 
 Welcome to **ScalaTion**, the Scala-based system for Simulation, Optimization and Analytics.
 
