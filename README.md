@@ -75,12 +75,12 @@ Ideally, put the export in one of your dot files (e.g., .profile or .bashrc).
 <h4>3. To compile code or run apps, enter sbt and type compile, run-main or exit </h4>
 
 <pre><code>
-$ cd scalation_1.2 <br>
-$ sbt <br>
-> compile <br>
-> run-main apps.process.Bank <br>
-> run-main scalation.analytics.RegressionTest <br>
-> exit
+cd scalation_1.2
+sbt
+compile
+run-main apps.process.Bank
+run-main scalation.analytics.RegressionTest
+exit
 </code></pre>
 
 <p>
