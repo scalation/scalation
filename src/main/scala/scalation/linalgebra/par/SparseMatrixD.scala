@@ -29,16 +29,6 @@ class SparseMatrixD (val d1: Int,
                      val d2: Int)
       extends MatriD with Error with Serializable
 {
-
-       def +:(u: scalation.linalgebra.VectorD): scalation.linalgebra.MatriD = ???
-        def +:^(u: scalation.linalgebra.VectorD): scalation.linalgebra.MatriD = ???
-        def ++(b: scalation.linalgebra.MatrixD): scalation.linalgebra.MatrixD = ???
-        def ++^(b: scalation.linalgebra.MatrixD): scalation.linalgebra.MatrixD = ???
-   def ++(b: scalation.linalgebra.MatriD): scalation.linalgebra.MatriD = ???
-   def ++^(b: scalation.linalgebra.MatriD): scalation.linalgebra.MatriD = ???
-
-
-
     /** Dimension 1
      */
     lazy val dim1 = d1
@@ -377,30 +367,76 @@ class SparseMatrixD (val d1: Int,
     } // t
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate this matrix and (row) vector u, i.e., append u.
-     *  @param u  the vector to be concatenated as the new last row in matrix
+    /** Concatenate (row) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
+     *  @param u  the vector to be prepended as the new first row in new matrix
      */
-    def ++ (u: VectorD): SparseMatrixD =
+    def +: (u: VectorD): SparseMatrixD =
     {
-        if (u.dim != dim2) flaw ("++", "vector does not match row dimension")
+        if (u.dim != dim2) flaw ("+:", "vector does not match row dimension")
+        val c = new SparseMatrixD (dim1 + 1, dim2)
+        for (i <- c.range1) c(i) = if (i == 0) u else this(i - 1)
+        c
+    } // +:
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate (column) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
+     *  @param u  the vector to be prepended as the new first column in new matrix
+     */
+    def +^: (u: VectorD): SparseMatrixD =
+    {
+        if (u.dim != dim1) flaw ("+^:", "vector does not match column dimension")
+        val c = new SparseMatrixD (dim1, dim2 + 1)
+        for (j <- c.range2) c.setCol (j, if (j == 0) u else col (j - 1))
+        c
+    } // +^:
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate 'this' matrix and (row) vector 'u', i.e., append 'u' to 'this'.
+     *  @param u  the vector to be appended as the new last row in new matrix
+     */
+    def :+ (u: VectorD): SparseMatrixD =
+    {
+        if (u.dim != dim2) flaw (":+", "vector does not match row dimension")
         val c = new SparseMatrixD (dim1 + 1, dim2)
         for (i <- c.range1) c(i) = if (i < dim1) this(i) else u
+        c
+    } // :+
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate 'this' matrix and (column) vector 'u', i.e., append 'u' to 'this'.
+     *  @param u  the vector to be appended as the new last column in new matrix
+     */
+    def :^+ (u: VectorD): SparseMatrixD =
+    {
+        if (u.dim != dim1) flaw (":^+", "vector does not match column dimension")
+        val c = new SparseMatrixD (dim1, dim2 + 1)
+        for (j <- c.range2) c.setCol (j, if (j < dim2) col (j) else u)
+        c
+    } // :^+
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate (row-wise) 'this' matrix and matrix 'b'.
+     *  @param b  the matrix to be concatenated as the new last rows in new matrix
+     */
+    def ++ (b: MatriD): SparseMatrixD =
+    {
+        if (b.dim2 != dim2) flaw ("++", "matrix b does not match row dimension")
+        val c = new SparseMatrixD (dim1 + b.dim1, dim2)
+        for (i <- c.range1) c(i) = if (i < dim1) this(i) else b(i - dim1)
         c
     } // ++
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate this matrix and (column) vector u, i.e., append u.
-     *  @param u  the vector to be concatenated as the new last column in matrix
+    /** Concatenate (column-wise) 'this' matrix and matrix 'b'.
+     *  @param b  the matrix to be concatenated as the new last columns in new matrix
      */
-    def :+ (u: VectorD): SparseMatrixD =
+    def ++^ (b: MatriD): SparseMatrixD =
     {
-        if (u.dim != dim1) flaw (":+", "vector does not match column dimension")
-
-        val c = new SparseMatrixD (dim1, dim2 + 1)
-        for (j <- c.range2) c.setCol (j, if (j < dim2) col (j) else u)
+        if (b.dim1 != dim1) flaw ("++^", "matrix b does not match column dimension")
+        val c = new SparseMatrixD (dim1, dim2 + b.dim2)
+        for (j <- c.range2) c.setCol (j, if (j < dim2) col (j) else b.col (j - dim2))
         c
-    } // :+
+    } // ++^
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' sparse matrix and sparse matrix 'b'.

@@ -94,13 +94,13 @@ class IntegerLP (a: MatrixD, b: VectorD, c: VectorD, excl: Set [Int] = Set ())
         for (j <- 0 until N) {                          // loop over the variables x_j
             if (x_le(j) >= 0.0) {                       // check for x_j <= bound
                 println ("x_" + j + " <= " + x_le(j))
-                aa = aa.+: (c.oneAt (j))                // add row to constraint matrix
+                aa = aa :+ c.oneAt (j)                  // add row to constraint matrix
                 bb = bb ++ x_le(j)                      // add element to limit vector
             } // if
                 
             if (x_ge(j) >= 0.0) {                       // check for x_j >= bound
                 println ("x_" + j + " >= " + x_ge(j))
-                aa = aa.+: (c.oneAt (j))                // add row to constraint matrix
+                aa = aa :+ c.oneAt (j)                  // add row to constraint matrix
                 bb = bb ++ -x_ge(j)                     // add element to limit vector
             } // if
         } // for

@@ -11,7 +11,6 @@ package scalation.analytics.par
 import scalation.calculus.Calculus.FunctionS2S
 import scalation.linalgebra.{VectorD, VectorI}
 import scalation.linalgebra.par.MatrixD
-import scalation.linalgebra.par.MatrixD.+:
 import scalation.linalgebra.VectorD.one
 
 import scalation.analytics.RegTechnique._
@@ -59,7 +58,7 @@ trait GLM
     def apply (x: MatrixD, y: VectorD): Regression =
     {
         if (add_1)
-            new Regression (+: (one (x.dim1), x), y, technique)
+            new Regression (one (x.dim1) +^: x, y, technique)
         else
             new Regression (x, y, technique)
     } // apply
@@ -71,7 +70,7 @@ trait GLM
     def apply (xy: MatrixD): Regression =
     {
         if (add_1)
-            new Regression (+: (one (xy.dim1), xy.sliceCol (0, xy.dim2-1)), xy.col (xy.dim2-1),
+            new Regression (one (xy.dim1) +^: xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1),
                             technique)
         else
             new Regression (xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1), technique)
@@ -107,7 +106,7 @@ trait GLM
     def apply (x: MatrixD, y: VectorD, transform: FunctionS2S): TranRegression =
     {
         if (add_1)
-            new TranRegression (+: (one (x.dim1), x), y, transform, technique)
+            new TranRegression (one (x.dim1) +^: x, y, transform, technique)
         else
             new TranRegression (x, y, transform, technique)
     } // apply
@@ -120,7 +119,7 @@ trait GLM
     def apply (xy: MatrixD, transform: FunctionS2S): TranRegression =
     {
         if (add_1)
-            new TranRegression (+: (one (xy.dim1), xy.sliceCol (0, xy.dim2-1)), xy.col (xy.dim2-1),
+            new TranRegression (one (xy.dim1) +^: xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1),
                             transform, technique)
         else
             new TranRegression (xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1), transform, technique)

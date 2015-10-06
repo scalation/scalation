@@ -24,14 +24,61 @@ object CDF
        extends Error
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::    
+    /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the Standard
+     *  Normal distribution using the Hart function.  Recoded in Scala from C code
+     *  @see stackoverflow.com/questions/2328258/cumulative-normal-distribution-function-in-c-c
+     *  which was recoded from VB code.
+     *  @see www.codeplanet.eu/files/download/accuratecumnorm.pdf
+     *  @param x   the x coordinate, argument to F(x)
+     */  
+    def normalCDF (x: Double): Double =
+    {
+        val z = abs (x)
+        if (z > 37.0) return 0.0
+
+        val RT2PI = 2.506628274631           // sqrt (4.0* acos (0.0))
+        val SPLIT = 7.07106781186547
+
+        val N0 = 220.206867912376
+        val N1 = 221.213596169931
+        val N2 = 112.079291497871
+        val N3 = 33.912866078383
+        val N4 = 6.37396220353165
+        val N5 = 0.700383064443688
+        val N6 = 3.52624965998911e-02
+        val M0 = 440.413735824752
+
+        val M1 = 793.826512519948
+        val M2 = 637.333633378831
+        val M3 = 296.564248779674
+        val M4 = 86.7807322029461
+        val M5 = 16.064177579207
+        val M6 = 1.75566716318264
+        val M7 = 8.83883476483184e-02
+
+        val e = exp (-z * z / 2.0)
+
+        val c = if (z < SPLIT) {
+            val n = (((((N6*z + N5)*z + N4)*z + N3)*z + N2)*z + N1)*z + N0
+            val d = ((((((M7*z + M6)*z + M5)*z + M4)*z + M3)*z + M2)*z + M1)*z + M0
+            e * n / d
+        } else {
+            val f = z + 1.0 / (z + 2.0/(z + 3.0/(z + 4.0/(z + 13.0/20.0))))
+            e / (RT2PI * f)
+        } // if
+
+        if (x <= 0.0) c else 1.0 - c
+    } // normalCDF
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::    
     /** Compute the Cumulative Distribution Function (CDF) for the Normal
      *  distribution using a composite fifth-order Gauss-Legendre quadrature.
      *  @author John D. Cook (Adapted to Scala by Michael E. Cotterell)
-     *  @see http://www.johndcook.com/blog/cpp_phi/jam
+     *  @see www.johndcook.com/blog/cpp_phi
      *  @see [AS 1965] Abramowitz & Stegun. "Handbook of Mathematical Functions"
      *       (June) (1965) 
      *  @param x   the x coordinate, argument to F(x)
-     */  
+     *
     def normalCDF (x: Double): Double =
     {
         val a1 =  0.254829592
@@ -42,14 +89,15 @@ object CDF
         val p  =  0.3275911
 
         val sign = if (x < 0) -1 else 1
-        val y = abs (x) / sqrt (2.0);
+        val y = abs (x) / sqrt (2.0)
 
         // A&S formula 7.1.26
-        val t = 1.0 / (1.0 + p * y);
-        val z = 1.0 - (((((a5*t + a4) * t) + a3) * t + a2) * t + a1) * t * exp (-y*y);
+        val t = 1.0 / (1.0 + p * y)
+        val z = 1.0 - (((((a5*t + a4) * t) + a3) * t + a2) * t + a1) * t * exp (-y*y)
 
-        0.5 * (1.0 + sign * z);
+        0.5 * (1.0 + sign * z)
     } // normalCDF
+     */  
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Cumulative Distribution Function (CDF) for the Normal

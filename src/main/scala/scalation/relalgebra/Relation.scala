@@ -19,17 +19,15 @@
 package scalation.relalgebra
 
 import java.io.{FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream, PrintWriter}
-import java.net.URL
 
-import collection.immutable.StringOps
-import collection.mutable.Map
-import io.Source.{fromFile, fromURL}
+import scala.collection.immutable.StringOps
+import scala.collection.mutable.Map
 
 import scalation.linalgebra._
 import scalation.linalgebra.MatrixKind._
 import scalation.math.{Complex, Rational, Real}
 import scalation.math.StrO._
-import scalation.util.{DATA_DIR, STORE_DIR, Error, SEP}
+import scalation.util.{DATA_DIR, getFromURL_File, STORE_DIR, Error, SEP}
 
 import TableObj._
 
@@ -82,10 +80,8 @@ object Relation
     def apply (fileName: String, name: String, colName: Seq [String], key: Int,
                domain: String, skip: Int, eSep: String): Relation =
     {
-        var cnt   = skip
-        val lines = if (fileName contains "://") fromURL (new URL(fileName)).getLines
-                    else                         fromFile (DATA_DIR + fileName).getLines
-
+        var cnt    = skip
+        val lines  = getFromURL_File (fileName)
         val newCol = Vector.fill [Vec] (colName.length)(null)
         val r3     = Relation (name, colName, newCol, key, domain)
         for (ln <- lines) {
@@ -107,9 +103,7 @@ object Relation
     def apply (fileName: String, name: String, key: Int, domain: String, eSep: String): Relation =
     {
         var first = true
-        val lines = if (fileName contains "://") fromURL (new URL(fileName)).getLines
-                    else                         fromFile (DATA_DIR + fileName).getLines
-
+        val lines = getFromURL_File (fileName)
         var r3: Relation = null
         for (ln <- lines) {
             if (first) {
@@ -135,10 +129,8 @@ object Relation
     def apply (fileName: String, name: String, colName: Seq [String], key: Int,
                domain: String): Relation =
     {
-        var eSep  = ","
-        val lines = if (fileName contains "://") fromURL (new URL(fileName)).getLines
-                    else                         fromFile (DATA_DIR + fileName).getLines
-
+        var eSep   = ","
+        val lines  = getFromURL_File (fileName)
         val newCol = Vector.fill [Vec] (colName.length)(null)
         val r3     = Relation (name, colName, newCol, key, domain)
         for (ln <- lines) r3.add (r3.row (ln.split (eSep), domain))

@@ -268,32 +268,56 @@ class MatrixI (val d1: Int,
     } // t
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate 'this' matrix and (row) vector 'u', i.e. append 'u' to 'this'.
-     *  @param u  the vector to be concatenated as the new last row in matrix
+    /** Concatenate (row) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
+     *  @param u  the vector to be prepended as the new first row in new matrix
      */
     def +: (u: VectorI): MatrixI =
     {
         if (u.dim != dim2) flaw ("+:", "vector does not match row dimension")
         val c = new MatrixI (dim1 + 1, dim2)
-        for (i <- c.range1) c(i) = if (i < dim1) this(i) else u
+        for (i <- c.range1) c(i) = if (i == 0) u else this(i - 1)
         c
     } // +:
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate 'this' matrix and (column) vector 'u', i.e. append 'u' to 'this'.
-     *  @param u  the vector to be concatenated as the new last column in matrix
+    /** Concatenate (column) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
+     *  @param u  the vector to be prepended as the new first column in new matrix
      */
-    def +:^ (u: VectorI): MatrixI =
+    def +^: (u: VectorI): MatrixI =
     {
-        if (u.dim != dim1) flaw ("+:^", "vector does not match column dimension")
+        if (u.dim != dim1) flaw ("+^:", "vector does not match column dimension")
+        val c = new MatrixI (dim1, dim2 + 1)
+        for (j <- c.range2) c.setCol (j, if (j == 0) u else col (j - 1))
+        c
+    } // +^:
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate 'this' matrix and (row) vector 'u', i.e., append 'u' to 'this'.
+     *  @param u  the vector to be appended as the new last row in new matrix
+     */
+    def :+ (u: VectorI): MatrixI =
+    {
+        if (u.dim != dim2) flaw (":+", "vector does not match row dimension")
+        val c = new MatrixI (dim1 + 1, dim2)
+        for (i <- c.range1) c(i) = if (i < dim1) this(i) else u
+        c
+    } // :+
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate 'this' matrix and (column) vector 'u', i.e., append 'u' to 'this'.
+     *  @param u  the vector to be appended as the new last column in new matrix
+     */
+    def :^+ (u: VectorI): MatrixI =
+    {
+        if (u.dim != dim1) flaw (":^+", "vector does not match column dimension")
         val c = new MatrixI (dim1, dim2 + 1)
         for (j <- c.range2) c.setCol (j, if (j < dim2) col (j) else u)
         c
-    } // +:^
+    } // :^+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate (row-wise) 'this' matrix and matrix 'b'.
-     *  @param b  the matrix to be concatenated as the new last rows in matrix
+     *  @param b  the matrix to be concatenated as the new last rows in new matrix
      */
     def ++ (b: MatriI): MatrixI =
     {
@@ -305,7 +329,7 @@ class MatrixI (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate (column-wise) 'this' matrix and matrix 'b'.
-     *  @param b  the matrix to be concatenated as the new last columns in matrix
+     *  @param b  the matrix to be concatenated as the new last columns in new matrix
      */
     def ++^ (b: MatriI): MatrixI =
     {
@@ -1391,32 +1415,6 @@ object MatrixI extends Error
     } // eye
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate (row) vector 'u' and matrix 'a', i.e., prepend 'u'.
-     *  @param u  the vector to be concatenated as the new first row in matrix
-     */
-    def :+ (u: VectorI, a: MatrixI): MatrixI =
-    {
-        if (u.dim != a.dim2) flaw (":+", "vector does not match row dimension")
-
-        val c = new MatrixI (a.dim1 + 1, a.dim2)
-        for (i <- c.range1) c(i) = if (i == 0) u else a(i - 1)
-        c
-    } // :+
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate (column) vector 'u' and matrix 'a', i.e., prepend 'u'.
-     *  @param u  the vector to be concatenated as the new first column in matrix
-     */
-    def :+^ (u: VectorI, a: MatrixI): MatrixI =
-    {
-        if (u.dim != a.dim1) flaw (":+^", "vector does not match column dimension")
-
-        val c = new MatrixI (a.dim1, a.dim2 + 1)
-        for (j <- c.range2) c.setCol (j, if (j == 0) u else a.col (j - 1))
-        c
-    } // :+^
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate (row) vectors 'u' and 'w' to form a matrix with 2 rows.
      *  @param u  the vector to be concatenated as the new first row in matrix
      *  @param w  the vector to be concatenated as the new second row in matrix
@@ -1424,7 +1422,6 @@ object MatrixI extends Error
     def ++ (u: VectorI, w: VectorI): MatrixI =
     {
         if (u.dim != w.dim) flaw ("++", "vector dimensions do not match")
-
         val c = new MatrixI (2, u.dim)
         c(0) = u
         c(1) = w
@@ -1439,7 +1436,6 @@ object MatrixI extends Error
     def ++^ (u: VectorI, w: VectorI): MatrixI =
     {
         if (u.dim != w.dim) flaw ("++^", "vector dimensions do not match")
-
         val c = new MatrixI (u.dim, 2)
         c.setCol (0, u)
         c.setCol (1, w)

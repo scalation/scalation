@@ -384,8 +384,8 @@ class SymTri$MATRIX (val d1: Int)
     def t: SymTri$MATRIX = this
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate 'this' tridiagonal matrix and (row) vector 'u', i.e., append 'u'.
-     *  @param u  the vector to be concatenated as the new last row in matrix
+    /** Concatenate (row) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
+     *  @param u  the vector to be prepended as the new first row in new matrix
      */
     def +: (u: $VECTOR): SymTri$MATRIX =
     {
@@ -393,17 +393,35 @@ class SymTri$MATRIX (val d1: Int)
     } // +:
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate 'this' tridiagonal matrix and (column) vector 'u', i.e., append 'u'.
-     *  @param u  the vector to be concatenated as the new last column in matrix
+    /** Concatenate (column) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
+     *  @param u  the vector to be prepended as the new first column in new matrix
      */
-    def +:^ (u: $VECTOR): SymTri$MATRIX =
+    def +^: (u: $VECTOR): SymTri$MATRIX =
     {
-        throw new NoSuchMethodException ("SymTri$MATRIX does not support +:^")
-    } // +:^
+        throw new NoSuchMethodException ("SymTri$MATRIX does not support +^:")
+    } // +^:
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate 'this' matrix and (row) vector 'u', i.e., append 'u' to 'this'.
+     *  @param u  the vector to be appended as the new last row in new matrix
+     */
+    def :+ (u: $VECTOR): SymTri$MATRIX =
+    {
+        throw new NoSuchMethodException ("SymTri$MATRIX does not support :+")
+    } // :+
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate 'this' matrix and (column) vector 'u', i.e., append 'u' to 'this'.
+     *  @param u  the vector to be appended as the new last column in new matrix
+     */
+    def :^+ (u: $VECTOR): SymTri$MATRIX =
+    {
+        throw new NoSuchMethodException ("SymTri$MATRIX does not support :^+")
+    } // :^+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate (row-wise) 'this' matrix and matrix 'b'.
-     *  @param b  the matrix to be concatenated as the new last rows in matrix
+     *  @param b  the matrix to be concatenated as the new last rows in new matrix
      */
     def ++ (b: $MATRI): SymTri$MATRIX =
     {
@@ -412,7 +430,7 @@ class SymTri$MATRIX (val d1: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate (column-wise) 'this' matrix and matrix 'b'.
-     *  @param b  the matrix to be concatenated as the new last columns in matrix
+     *  @param b  the matrix to be concatenated as the new last columns in new matrix
      */
     def ++^ (b: $MATRI): SymTri$MATRIX =
     {

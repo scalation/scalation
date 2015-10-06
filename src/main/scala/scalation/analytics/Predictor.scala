@@ -19,13 +19,13 @@ trait Predictor
      */
     protected var b: VectorD = null
 
-    /** Rresidual/error vector [e_0, e_1, ... e_m-1]
+    /** Residual/error vector [e_0, e_1, ... e_m-1]
      */
     protected var e: VectorD = null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given a set of data vectors (x's) and their corresponding (y's), fit a
-     *  prediction function y = f(x).
+    /** Given a set of data vectors 'x's and their corresponding responses 'y's,
+     *  train the prediction function 'y = f(x)' by fitting its parameters.
      */
     def train ()
 
@@ -43,6 +43,11 @@ trait Predictor
     /** Return the quality of fit including rSquared.
      */
     def fit: VectorD
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the labels for the fit.  Override when necessary.
+     */
+    def fitLabels: Array [String] = Array ("rSquared", "rBarSq", "fStat")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a new continuous data vector z, predict the y-value of f(z).

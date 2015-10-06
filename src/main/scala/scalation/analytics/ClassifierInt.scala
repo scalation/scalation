@@ -8,11 +8,11 @@
 
 package scalation.analytics
 
-import math.round
+import scala.math.round
 
 import scalation.linalgebra.{MatriD, MatrixD, MatrixI, VectorD, VectorI}
 import scalation.stat.vectorD2StatVector
-import scalation.util.Error
+import scalation.util.{Error, getFromURL_File}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ClassifierInt` abstract class provides a common foundation for several
@@ -119,8 +119,6 @@ abstract class ClassifierInt (x: MatrixI, y: VectorI, fn: Array [String], k: Int
  */
 object ClassifierInt
 {
-    import io.Source.fromFile
-
     private val SEP = ','                     // the token separation character
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -134,7 +132,7 @@ object ClassifierInt
      */
     def apply (fname: String, m: Int, n: Int, skip: Int = 1, cc: Int = -1): MatrixI =
     {
-        val lines = fromFile (fname).getLines
+        val lines = getFromURL_File (fname)
         val xy    = new MatrixI (m, n)
         var i     = 0
         for (ln <- lines) { xy(i) = VectorI (ln.split (SEP), skip); i += 1; }
@@ -148,5 +146,5 @@ object ClassifierInt
         xy
     } // apply
 
-} // ClassifierInt companion object
+} // ClassifierInt object
 

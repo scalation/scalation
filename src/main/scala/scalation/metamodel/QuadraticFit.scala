@@ -189,7 +189,7 @@ object QuadraticFitTest extends App
     // create the data/design matrix
     val (xx, yy) = qf.response ()                    // compute the response surface for the grid
     println ("design matrix + repsonse vector")
-    println (xx.+: (yy))        
+    println (xx :+ yy)        
 
     // fit a multi-dimensional quadratic function
     println ("fit from regression")
@@ -230,7 +230,7 @@ object QuadraticFitTest2 extends App
     // create the data/design matrix
     val (xx, yy) = qf.response ()                    // compute the response surface for the grid
     println ("design matrix + repsonse vector")
-    println (xx.+: (yy))        
+    println (xx :+ yy)        
 
     // fit a multi-dimensional quadratic function
     println ("fit from regression")
@@ -268,7 +268,7 @@ object QuadraticFitTest3 extends App
     // create the data/design matrix
     val (xx, yy) = qf.response ()                    // compute the response surface for the grid
     println ("design matrix + repsonse vector")
-    println (xx.+: (yy))
+    println (xx :+ yy)
 
     // fit a multi-dimensional quadratic function
     println ("fit from regression")

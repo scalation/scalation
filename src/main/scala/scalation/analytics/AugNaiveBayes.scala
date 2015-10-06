@@ -227,8 +227,7 @@ object AugNaiveBayesTest extends App
 
     import scalation.linalgebra.MatrixI
 
-//  println ("xy = " + (x +: y))                        // FIX: issue with "+:" being right associative
-    println ("xy = " + (x.+: (y)))
+    println ("xy = " + (x :^+ y))
     println ("---------------------------------------------------------------")
 
     val anb = new AugNaiveBayes (x, y, fn, 2, cn)       // create the classifier

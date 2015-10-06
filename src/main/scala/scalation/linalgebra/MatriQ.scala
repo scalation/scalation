@@ -27,7 +27,8 @@ import scalation.util.Error
  * or ending with "npp".
  *------------------------------------------------------------------------------
  *                  row-wise                 column-wise
- * Append:       matrix +: vector         matrix +:^ vector
+ * Prepend:      vector +: matrix         vector +^: matrix  (right associative)
+ * Append:       matrix :+ vector         matrix :^+ vector
  * Concatenate:  matrix ++ matrix         matrix ++^ matrix
  */
 trait MatriQ
@@ -234,26 +235,38 @@ trait MatriQ
     def t: MatriQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate 'this' matrix and (row) vector 'u', i.e. append 'u' to 'this'.
-     *  @param u  the vector to be concatenated as the new last row in matrix
+    /** Concatenate (row) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
+     *  @param u  the vector to be prepended as the new first row in new matrix
      */
     def +: (u: VectorQ): MatriQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate 'this' matrix and (column) vector 'u', i.e. append 'u' to 'this'.
-     *  @param u  the vector to be concatenated as the new last column in matrix
+    /** Concatenate (column) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
+     *  @param u  the vector to be prepended as the new first column in new matrix
      */
-    def +:^ (u: VectorQ): MatriQ
+    def +^: (u: VectorQ): MatriQ
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate 'this' matrix and (row) vector 'u', i.e., append 'u' to 'this'.
+     *  @param u  the vector to be appended as the new last row in new matrix
+     */
+    def :+ (u: VectorQ): MatriQ
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate 'this' matrix and (column) vector 'u', i.e., append 'u' to 'this'.
+     *  @param u  the vector to be appended as the new last column in new matrix
+     */
+    def :^+ (u: VectorQ): MatriQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate (row-wise) 'this' matrix and matrix 'b'.
-     *  @param b  the matrix to be concatenated as the new last rows in matrix
+     *  @param b  the matrix to be concatenated as the new last rows in new matrix
      */
     def ++ (b: MatriQ): MatriQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate (column-wise) 'this' matrix and matrix 'b'.
-     *  @param b  the matrix to be concatenated as the new last columns in matrix
+     *  @param b  the matrix to be concatenated as the new last columns in new matrix
      */
     def ++^ (b: MatriQ): MatriQ
 

@@ -20,9 +20,8 @@ package scalation.relalgebra
 
 import java.io.{FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream, PrintWriter}
 
-import collection.immutable.StringOps
-import collection.mutable.Map
-import io.Source.fromFile
+import scala.collection.immutable.StringOps
+import scala.collection.mutable.Map
 
 import scalation.linalgebra._
 import scalation.linalgebra.MatrixKind._

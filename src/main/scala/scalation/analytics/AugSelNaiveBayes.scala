@@ -283,7 +283,7 @@ object AugSelNaiveBayesTest extends App
     val fn = Array ("Color", "Type", "Origin")       // feature/variable names
     val cn = Array ("No", "Yes")                     // class names
 
-    println ("xy = " + (x.+: (y)))
+    println ("xy = " + (x :^+ y))
     println ("---------------------------------------------------------------")
 
     val asnb = new AugSelNaiveBayes (x, y, fn, 2, cn)  // create the classifier

@@ -413,34 +413,56 @@ class SparseMatrixL (val d1: Int,
     } // t
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate 'this' matrix and (row) vector 'u', i.e., append 'u'.
-     *  @param u  the vector to be concatenated as the new last row in matrix
+    /** Concatenate (row) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
+     *  @param u  the vector to be prepended as the new first row in new matrix
      */
     def +: (u: VectorL): SparseMatrixL =
     {
         if (u.dim != dim2) flaw ("+:", "vector does not match row dimension")
-
         val c = new SparseMatrixL (dim1 + 1, dim2)
-        for (i <- c.range1) c(i) = if (i < dim1) this(i) else u
+        for (i <- c.range1) c(i) = if (i == 0) u else this(i - 1)
         c
     } // +:
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate 'this' matrix and (column) vector 'u', i.e., append 'u'.
-     *  @param u  the vector to be concatenated as the new last column in matrix
+    /** Concatenate (column) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
+     *  @param u  the vector to be prepended as the new first column in new matrix
      */
-    def +:^ (u: VectorL): SparseMatrixL =
+    def +^: (u: VectorL): SparseMatrixL =
     {
-        if (u.dim != dim1) flaw ("+:^", "vector does not match column dimension")
+        if (u.dim != dim1) flaw ("+^:", "vector does not match column dimension")
+        val c = new SparseMatrixL (dim1, dim2 + 1)
+        for (j <- c.range2) c.setCol (j, if (j == 0) u else col (j - 1))
+        c
+    } // +^:
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate 'this' matrix and (row) vector 'u', i.e., append 'u' to 'this'.
+     *  @param u  the vector to be appended as the new last row in new matrix
+     */
+    def :+ (u: VectorL): SparseMatrixL =
+    {
+        if (u.dim != dim2) flaw (":+", "vector does not match row dimension")
+        val c = new SparseMatrixL (dim1 + 1, dim2)
+        for (i <- c.range1) c(i) = if (i < dim1) this(i) else u
+        c
+    } // :+
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate 'this' matrix and (column) vector 'u', i.e., append 'u' to 'this'.
+     *  @param u  the vector to be appended as the new last column in new matrix
+     */
+    def :^+ (u: VectorL): SparseMatrixL =
+    {
+        if (u.dim != dim1) flaw (":^+", "vector does not match column dimension")
         val c = new SparseMatrixL (dim1, dim2 + 1)
         for (j <- c.range2) c.setCol (j, if (j < dim2) col (j) else u)
         c
-    } // +:^
+    } // :^+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate (row-wise) 'this' matrix and matrix 'b'.
-     *  @param b  the matrix to be concatenated as the new last rows in matrix
+     *  @param b  the matrix to be concatenated as the new last rows in new matrix
      */
     def ++ (b: MatriL): SparseMatrixL =
     {
@@ -452,7 +474,7 @@ class SparseMatrixL (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate (column-wise) 'this' matrix and matrix 'b'.
-     *  @param b  the matrix to be concatenated as the new last columns in matrix
+     *  @param b  the matrix to be concatenated as the new last columns in new matrix
      */
     def ++^ (b: MatriL): SparseMatrixL =
     {

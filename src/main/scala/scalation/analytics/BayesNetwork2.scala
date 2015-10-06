@@ -261,7 +261,7 @@ object BayesNetwork2Test extends App
     // feature/variable names
     val cn = Array ("No", "Yes") // class names
 
-    println ("xy = " + (x.+: (y)))
+    println ("xy = " + (x :^+ y))
     println ("---------------------------------------------------------------")
 
     val bn2 = new BayesNetwork2 (x, y, fn, 2, cn)      // create the classifier

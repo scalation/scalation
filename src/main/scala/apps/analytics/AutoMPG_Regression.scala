@@ -15,10 +15,11 @@ import scalation.linalgebra.{VectorD,  MatrixD}
 /** The `AutoMPG_Regression` object performs regression on the UCI AutoMPG
  *  dataset.
  *  @see archive.ics.uci.edu/ml/datasets/Auto+MPG
+ *  > run-main apps.analytics.AutoMPG_Regression
  */
 object AutoMPG_Regression extends App
 {
-    val xy = new MatrixD ((391,  8),  8, 307, 130, 3504, 12, 70, 1, 18, 
+    val xy = new MatrixD ((392,  8),  8, 307, 130, 3504, 12, 70, 1, 18, 
                                       8, 350, 165, 3693, 11.5, 70, 1, 15, 
                                       8, 318, 150, 3436, 11, 70, 1, 18, 
                                       8, 304, 150, 3433, 12, 70, 1, 16, 

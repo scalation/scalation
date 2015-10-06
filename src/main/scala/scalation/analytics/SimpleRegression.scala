@@ -9,6 +9,7 @@
 package scalation.analytics
 
 import scalation.linalgebra.{MatriD, MatrixD, VectorD}
+import scalation.math.double_exp
 import scalation.plot.Plot
 import scalation.util.Error
 
@@ -29,10 +30,14 @@ class SimpleRegression (x: MatrixD, y: VectorD)
     if (x.dim2 != 2)     flaw ("constructor", "design matrix must have 2 columns")
     if (x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
 
-    private val n = x.dim1.toDouble    // number of data points (rows)
-    private var rSquared = -1.0        // coefficient of determination (quality of fit)
+    private val k        = 1                       // number of variables (k = n-1 where n = 2)
+    private val m        = x.dim1.toDouble         // number of data points (rows)
+    private val r_df     = (m-1.0) / (m-2.0)       // ratio of degrees of freedom
+    private var rSquared = -1.0                    // coefficient of determination (quality of fit)
+    private var rBarSq   = -1.0                    // adjusted R-squared
+    private var fStat    = -1.0                    // F statistic (quality of fit)
 
-    b = new VectorD (2)                // parameter vector (b_0, b_1)
+    b = new VectorD (2)                            // parameter vector (b_0, b_1)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
@@ -43,26 +48,39 @@ class SimpleRegression (x: MatrixD, y: VectorD)
      */
     def train ()
     {
-        val x1  = x.col(1)                     // get column 1 of x = [(1.0, x1)]
-        val sx  = x1.sum                       // sum of x values
-        val sy  = y.sum                        // sum of y values
-        val ssx = x1 dot x1                    // sum of squares x
-        val ssy = y dot y                      // sum of squares y
-        val sxy = x1 dot y                     // sum of cross products
+        val x1  = x.col(1)                         // get column 1 of x = [(1.0, x1)]
+        val sx  = x1.sum                           // sum of x values
+        val sy  = y.sum                            // sum of y values
+        val ssx = x1 dot x1                        // sum of squares x
+        val ssy = y dot y                          // sum of squares y
+        val sxy = x1 dot y                         // sum of cross products
 
-        b(1) = (n * sxy - sx * sy) / (n * ssx - sx*sx)     // slope
-        b(0) = (sy - b(1) * sx) / n                        // intercept
+        b(1) = (m * sxy - sx * sy) / (m * ssx - sx*sx)     // slope
+        b(0) = (sy - b(1) * sx) / m                        // intercept
 
-        val e   = y - x * b                    // residual/error vector
-        val sse = e dot e                      // residual/error sum of squares
-        val sst = ssy - sy*sy / n              // total sum of squares
-        rSquared = (sst - sse) / sst           // coefficient of determination
+        val e   = y - x * b                        // residual/error vector
+        diagnose (y, e)
     } // train
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute diagostics for the regression model.
+     *  @param yy  the response vector
+     *  @param e   the residual/error vector
+     */
+    def diagnose (yy: VectorD, e: VectorD)
+    {
+        val sse  = e dot e                                 // residual/error sum of squares
+        val sst  = (yy dot yy) - yy.sum~^2.0 / m           // total sum of squares
+        val ssr  = sst - sse                               // regression sum of squares
+        rSquared = ssr / sst                               // coefficient of determination
+        rBarSq   = 1.0 - (1.0-rSquared) * r_df             // R-bar-squared (adjusted R-squared)
+        fStat    = ssr * (m-2.0) / sse                     // F statistic (msr / mse)
+    } // diagnose
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit includinhg rSquared.
      */
-    def fit: VectorD = VectorD (rSquared)
+    def fit: VectorD = VectorD (rSquared, rBarSq, fStat)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,

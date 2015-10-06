@@ -10,7 +10,9 @@ package scalation
 
 import java.io.File
 import java.lang.System.nanoTime
+import java.net.{URL, MalformedURLException}
 
+import scala.io.Source.{fromFile, fromURL}
 import scala.util.Properties.envOrElse
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -70,6 +72,30 @@ package object util
         val t1 = nanoTime ()
         (result, (t1 - t0) * NS_PER_MS)
     } // time
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return a line iterator for a line-oriented data source (e.g., CSV file).
+     *  The data source is accessed via (1) URL, (2) file's absolute path, or
+     *  (3) file's relative path (relative to 'DATA-DIR').
+     *  @see stackoverflow.com/questions/5713558/detect-and-extract-url-from-a-string
+     *  @param path  the path name of the data source (via URL or file's path name)
+     */
+    def getFromURL_File (path: String): Iterator [String] =
+    {
+       val urlPat = "(?i)(https?|ftp|file)://.*"          // (?i) => case insensitive
+       if (path matches urlPat) {
+           try {
+               return fromURL (new URL (path)).getLines
+           } catch {
+               case mue: MalformedURLException => 
+           } // try    
+       } // if
+
+      val file = new File (path)
+//    if (file.isAbsolute ()) fromFile (file).getLines
+      if (file.exists ()) fromFile (file).getLines
+      else                fromFile (DATA_DIR + path).getLines
+    } // getFromURL_File
 
 } // util package object 
 
