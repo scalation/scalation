@@ -152,15 +152,6 @@ class ARMA (y: VectorD, t: VectorD)
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** For all the time points in vector t, predict the value of y = f(t) by ...
-     *  @param z  the time-vector indicating time points to forecast
-     */
-    def predict (y: VectorD): Double = 
-    {
-        0.0    // FIX: not yet implemented
-    } // predict
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit including rSquared.
      */
     def fit: VectorD =
@@ -168,13 +159,13 @@ class ARMA (y: VectorD, t: VectorD)
         VectorD (0.0)        // FIX: not yet implemented
     } // fit
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given several time vectors, forecast the y-values.
-     *  @param z  the matrix containing row time-vectors to use for prediction
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** For all the time points in vector t, predict the value of y = f(t) by ...
+     *  @param z  the time-vector indicating time points to forecast
      */
-    def predict (z: MatriD): VectorD =
+    def predict (y: VectorD): Double = 
     {
-        throw new UnsupportedOperationException ()
+        0.0    // FIX: not yet implemented
     } // predict
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

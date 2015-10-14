@@ -113,7 +113,7 @@ class ExpRegression (x: MatrixD, nonneg: Boolean, y: VectorD)
      *  each row zi of matrix z.
      *  @param z  the new matrix to predict
      */
-    def predict (z: MatriD): VectorD = z * b
+    override def predict (z: MatriD): VectorD = z * b
 
 } // ExpRegression class
 

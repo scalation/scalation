@@ -117,6 +117,16 @@ class VectorI (val dim: Int,
     } // toInt
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `VectorI` into a `VectorL`.
+      */
+    def toLong: VectorL =
+    {
+        val c = new VectorL (dim)
+        for (i <- range) c(i) = v(i).toLong
+        c
+    } // toLong
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' `VectorI` into a `VectorD`.
      */
     def toDouble: VectorD =
@@ -713,6 +723,13 @@ class VectorI (val dim: Int,
     {
         for (i <- 0 until e if v(i) == x) return i; -1
     } // indexOf
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find and return index of first element satisfying predicate 'p', or
+     *  -1 if not found.
+     *  @param p  the predicate to check
+     */
+    def indexWhere (p: (Int) => Boolean): Int = v.indexWhere (p)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of strictly negative elements in 'this' vector.

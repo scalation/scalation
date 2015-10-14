@@ -132,16 +132,6 @@ class PoissonRegression (x: MatrixD, y: VectorI, fn: Array [String] = null)
      */
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of 'y = f(z)' by evaluating the formula 'y = exp (b dot z)',
-     *  for each row 'z(i)' of matrix z.
-     *  @param z  the new matrix to predict
-     */
-    def predict (z: MatriD): VectorD =
-    {
-        VectorD (for (i <- 0 until z.dim1) yield predict (z(i)))
-    } // predict
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new R-squared value and the new F statistic.

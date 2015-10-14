@@ -132,14 +132,7 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
      *  each row of matrix z.
      *  @param z  the new matrix to predict
      */
-    def predict (z: MatriD): VectorD = z * b
-/*
-    {
-        val ypp = new VectorD (z.dim1)
-        for (i <- 0 until z.dim1) ypp(i) = predict (z(i))
-        ypp
-    } // predict
-*/
+    override def predict (z: MatriD): VectorD = z * b
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable

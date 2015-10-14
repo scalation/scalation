@@ -154,7 +154,7 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
      *  each row of matrix z.
      *  @param z  the new matrix to predict
      */
-    def predict (z: MatriD): VectorD = z * b
+    override def predict (z: MatriD): VectorD = z * b
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable

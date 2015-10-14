@@ -1,6 +1,6 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  Matthew Saltz, John Miller
+/** @author  Matthew Saltz, John Miller, Aravind Kalimurthy
  *  @version 1.2
  *  @date    Thu Jul 25 11:28:31 EDT 2013
  *  @see     LICENSE (MIT style license file).
@@ -187,7 +187,7 @@ object MDigGen
             nodes += start
 
             while (! q.isEmpty && nodes.size < size) {
-                var chs = SET [Int] ()
+                val chs = SET [Int] ()
                 val newNode = q.dequeue
                 val newNodeChildren = g.ch (newNode)
                 if (! newNodeChildren.isEmpty) {
@@ -202,22 +202,31 @@ object MDigGen
                 } // if
             } // while
 
-            if(nodes.size < size) nRestarts += 1
+            if (nodes.size < size) nRestarts += 1
         } // while
     
         if (nRestarts == maxRestarts) { println ("genBFSQuery: could not find a good query"); return null }
     
-        // gives the nodes new ids (FIX: refactor to renumber)
-        var newLabelMap = Map [Int, Int] () 
-        var c = 0 
-        for (x <- nodes) { newLabelMap += (x -> c); c += 1 }
-        val newToOldLabels = Array.ofDim [Int] (size)
-        newLabelMap.foreach { case (oldL, newL) => newToOldLabels (newL) = oldL }
+        // create a vertex map from old to new ids, e.g., 7 -> 0, 11 -> 1, 15 -> 2
+        val vertexMap = Map [Int, Int] ()
+        var c = 0
+        for (v <- nodes) { vertexMap += (v -> c); c += 1 }
+
+        // for each new id, record the old id
+        val new2OldIds = Array.ofDim [Int] (size)
+        vertexMap.foreach { case (oldId, newId) => new2OldIds(newId) = oldId }
+
+        // for each mapped vertex, assign its mapped children
         val ch = Array.ofDim [SET [Int]] (size).map (x => SET [Int] ())
-        for ((node, children) <- chMap) ch (newLabelMap (node)) = children.map (x => newLabelMap (x)) 
-        val label = newToOldLabels.map (x => g.label(x)).toArray
+        for ((v, v_ch) <- chMap) ch(vertexMap (v)) = v_ch.map (vertexMap (_))
+
+        // map the vertex, edge labels
+        val qlabel  = new2OldIds.map (g.label(_)).toArray
+        val qelabel = Map [Tuple2 [Int, Int], TLabel] ()
+        for (i <- ch.indices; j <- ch(i)) qelabel += (i, j) -> g.elabel((new2OldIds(i), new2OldIds(j)))
+
         if (cycle) println ("genBFSQuery: query has a cycle")
-        new MDigraph (ch, label, elabel, inverse, name)
+        new MDigraph (ch, qlabel, qelabel, inverse, name)
     } // genBFSQuery
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -246,7 +255,7 @@ object MDigGen
             nodes += start
 
             while (! q.isEmpty && nodes.size < size) {
-                var chs = SET [Int] ()
+                val chs = SET [Int] ()
                 val newNode = q.dequeue
                 val newNodeChildren = g.ch (newNode)
                 if (! newNodeChildren.isEmpty) {
@@ -266,7 +275,7 @@ object MDigGen
         if (nRestarts == maxRestarts) { println ("extractSubgraph: could not find a good query"); return null }
 
         // gives the nodes new ids (FIX: refactor to renumber)
-        var newLabelMap = Map [Int, Int] () 
+        val newLabelMap = Map [Int, Int] () 
         var c = 0 
         for (x <- nodes) { newLabelMap += (x -> c); c += 1 }
         val newToOldLabels = Array.ofDim [Int] (size)
@@ -288,7 +297,7 @@ object MDigGen
      *
     private def renumber (node: SET [Int], chMap: Map [Int, SET [Int]]): Array [SET [Int]] =
     {
-        var oldId2newId = Map [Int, Int] ()
+        val oldId2newId = Map [Int, Int] ()
         var i = 0
         for (v <- node) { oldId2newId += (v -> i); i += 1 }
         val newToOldLabels = Array.ofDim [Int] (size)
@@ -369,44 +378,40 @@ object MDigGen
 
 } // MDigGen class
 
+import MDigGen._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The 'MDigGenTest' object is used to test the 'MDigGen' class
- *  for building random graphs where a vertex's degree is uniformly distributed.
+/** The 'MDigGenTest' object is used to test the 'MDigGen' class for building
+ *  random graphs where a vertex's degree is uniformly distributed.
+ *  > run-main scalation.graphalytics.MDigGenTest
  */
 object MDigGenTest extends App
 {
-    import MDigGen._
-
     println ("MDigGenTest: test genRandomGraph")
-    (0 until 10).foreach { _ =>
+    (1 to 5).foreach { _ =>
         val g = genRandomGraph (4, 100, 5, 1)
         g.print ()
         println ("CONNECTED?  " + g.isConnected)
     } // foreach
 
     println ("MDigGenTest: test genRandomConnectedGraph")
-    (0 until 10).foreach { _ =>
-        val g = genRandomConnectedGraph (4, 100, 5, 1)
-        g.print ()
-    } // foreach
+    (1 to 5).foreach { _ => genRandomConnectedGraph (4, 100, 5, 1).print () }
 
     println ("MDigGenTest: test geneRandomGraph_PowLabels")
     val g1 = genRandomGraph_PowLabels (200, 50, 2)
     g1.print ()
     println (s"g1.labelMap = ${g1.labelMap}")
  
-} // MDigGenTest
+} // MDigGenTest object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The 'MDigGenTest2' object is used to test the 'MDigGen' class
- *  for building power law graphs.
+/** The 'MDigGenTest2' object is used to test the 'MDigGen' class for building
+ *  power law graphs.
+ *  > run-main scalation.graphalytics.MDigGenTest2
  */
 object MDigGenTest2 extends App
 {
-    import MDigGen._
-
     println ("MDigGenTest2: test genPowerLawGraph")
     val g2 = genPowerLawGraph (50, 10, 10, 2.1)
     g2.print ()
@@ -415,32 +420,38 @@ object MDigGenTest2 extends App
     println ("MDigGenTest2: test genPowerLawGraph_PowLabels")
     val g3 = genPowerLawGraph_PowLabels (50, 10, 10, 2.1)
     g3.print ()
-    g3.ch.sortBy (_.size).foreach { println(_) }
+    g3.ch.sortBy (_.size).foreach { println (_) }
     println (s"g3.labelMap = ${g3.labelMap}")
 
-} // MDigGenTest2
+} // MDigGenTest2 object
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `MDigGenTest3` object is used to test the `MDigGen` class
- *  for extracting query graphs from data graphs.
+/** The `MDigGenTest3` object is used to test the `MDigGen` class for extracting
+ *  query graphs from data graphs.
+ *  > run-main scalation.graphalytics.MDigGenTest3
  */
 object MDigGenTest3 extends App
 {
-    import MDigGen._
-
-    var g = genRandomGraph (1000000, 10, 5, 16)
+    val nVertices = 10000
+    val nLabels   =    10
+    val eLabels   =     5
+    val avDegree  =    16
+    val g = genRandomGraph (nVertices, nLabels, eLabels, avDegree)
     println ("done generating data graph")
-    println ("g.size: " + g.size)
-    println ("g.nEdges: " + g.nEdges)
+    println ("g.size    = " + g.size)
+    println ("g.nEdges  = " + g.nEdges)
+    println ("av degree = " + g.nEdges / g.size.toDouble)
+
     println ("MDigGenTest3: test genBFSQuery")
-    (2 until 10).foreach { i =>
-        var q = genBFSQuery (25, 3, g)
+    (1 to 5).foreach { _ =>
+        val q = genBFSQuery (25, 3, g)
         q.print ()
-        println (q.size)
-        println (q.nEdges)
-        println (q.nEdges / q.size.toDouble)
+        println ("q.size    = " + q.size)
+        println ("q.nEdges  = " + q.nEdges)
+        println ("av degree = " + q.nEdges / q.size.toDouble)
     } // foreach
     println ("done")
 
-} // MDigGenTest3
+} // MDigGenTest3 object
 

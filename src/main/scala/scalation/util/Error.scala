@@ -10,22 +10,24 @@ package scalation.util
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Error` trait is used to report errors showing the class and method within
- *  which the error or flaw occurred.
+ *  which the error or flaw occurred.  For performance reasons, 'getClass' is
+ *  commented out.  Uncomment to include this information.
  */
 trait Error
 {
     /** Name of the class where the error occurred
      */
-    private val className = getClass.getSimpleName ()
+//  private val className = getClass.getSimpleName ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show the flaw by printing the error message.
      *  @param method   the method where the error occurred
      *  @param message  the error message
      */
-    def flaw (method: String, message: String)
+    final def flaw (method: String, message: String)
     {
-        println ("ERROR @ " + className + "." + method +  ": " + message)
+//      println ("ERROR @ " + className + "." + method +  ": " + message)
+        println ("ERROR @ " + method +  ": " + message)
     } // flaw
 
 } // Error trait

@@ -130,7 +130,7 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
      *  each row of matrix z.
      *  @param z  the new matrix to predict
      */
-    def predict (z: MatriD): VectorD = z * b
+    override def predict (z: MatriD): VectorD = z * b
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable

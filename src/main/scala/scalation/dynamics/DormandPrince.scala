@@ -19,7 +19,7 @@ import scalation.util.Error
  *  Given an unknown, time-dependent function 'y(t)' governed by an Ordinary
  *  Differential Equation (ODE) of the form
  *  <p>
- *  d/dt y(t) = f(t, y)
+ *      d/dt y(t) = f(t, y)
  *  <p>
  *  compute 'y(t)' using a (4,5)-order Dormand-Prince Integrator (DOPRI).  Note:
  *  the integrateV method for a system of separable ODEs is mixed in from the

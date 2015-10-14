@@ -138,7 +138,7 @@ class Regression_WLS (x: MatrixD, y: VectorD, private var w: VectorD = null, tec
      *  each row of matrix z.
      *  @param z  the new matrix to predict
      */
-    def predict (z: MatriD): VectorD = z * b
+    override def predict (z: MatriD): VectorD = z * b
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable

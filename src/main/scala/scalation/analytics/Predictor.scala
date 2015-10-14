@@ -63,10 +63,13 @@ trait Predictor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given several new continuous data vectors stored as rows in a matrix,
-     *  predict all the y-values of f(z_i).
+     *  predict all the 'y'-values of 'predict (z_i)'.  May override for efficiency.
      *  @param z  the matrix containing row vectors to use for prediction
      */
-    def predict (z: MatriD): VectorD    // FIX
+    def predict (z: MatriD): VectorD =
+    {
+        VectorD (for (i <- 0 until z.dim1) yield predict (z(i)))
+    } // predict
 
 } // Predictor trait
 

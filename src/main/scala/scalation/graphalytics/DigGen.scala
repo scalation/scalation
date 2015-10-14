@@ -266,6 +266,7 @@ object DigGen
 
 } // DigGen class
 
+import DigGen._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DigGenTest` object is used to test the `DigGen` class for building
@@ -274,20 +275,15 @@ object DigGen
  */
 object DigGenTest extends App
 {
-    import DigGen._
-
     println ("DigGenTest: test genRandomGraph")
-    (0 until 10).foreach { _ =>
+    (1 to 5).foreach { _ =>
         val g = genRandomGraph (4, 100, 1)
         g.print ()
         println ("CONNECTED?  " + g.isConnected)
     } // foreach
 
     println ("DigGenTest: test genRandomConnectedGraph")
-    (0 until 10).foreach { _ =>
-        val g = genRandomConnectedGraph (4, 100, 1)
-        g.print ()
-    } // foreach
+    (1 to 5).foreach { _ => genRandomConnectedGraph (4, 100, 1).print () }
 
     println ("DigGenTest: test geneRandomGraph_PowLabels")
     val g1 = genRandomGraph_PowLabels (200, 50, 2)
@@ -304,8 +300,6 @@ object DigGenTest extends App
  */
 object DigGenTest2 extends App
 {
-    import DigGen._
-
     println ("DigGenTest2: test genPowerLawGraph")
     val g2 = genPowerLawGraph (50, 10, 10, 2.1)
     g2.print ()
@@ -327,24 +321,23 @@ object DigGenTest2 extends App
  */
 object DigGenTest3 extends App
 {
-    import DigGen._
-
     println ("DigGenTest3: test genRandomGraph")
-    val nVertices = 1000
-    val avDegree  =   10     
-    val nLabels   =   16
-    var g = genRandomGraph (nVertices, avDegree, nLabels)
+    val nVertices = 10000
+    val nLabels   =    10
+    val avDegree  =    16     
+    var g = genRandomGraph (nVertices, nLabels, avDegree)
     println ("done generating data graph")
-    println ("g.size   = " + g.size)
-    println ("g.nEdges = " + g.nEdges)
+    println ("g.size     = " + g.size)
+    println ("g.nEdges   = " + g.nEdges)
+    println ("av degreee = " + g.nEdges / g.size.toDouble)
 
     println ("DigGenTest3: test genBFSQuery")
-    (1 until 5).foreach { i =>
+    (1 to 5).foreach { _ =>
         var q = genBFSQuery (20, 3, g)
         q.print ()
-        println (q.size)
-        println (q.nEdges)
-        println (q.nEdges / q.size.toDouble)
+        println ("q.size     = " + q.size)
+        println ("q.nEdges   = " + q.nEdges)
+        println ("av degreee = " + q.nEdges / q.size.toDouble)
     } // foreach
     println ("done")
 

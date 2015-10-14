@@ -4,6 +4,7 @@
  *  @version 1.2
  *  @date    Sun Nov  4 19:20:05 EST 2012
  *  @see     LICENSE (MIT style license file).
+ *
  *  @see     www.scala-lang.org/api/current/scala/collection/mutable/LinkedHashMap.html
  */
 
