@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import math.{abs, pow, sqrt}
+import math.{abs, log, pow, sqrt}
 
 import scalation.linalgebra.{Fac_Cholesky, Fac_QR, Factorization, MatriD, MatrixD, VectorD}
 import scalation.math.double_exp
@@ -66,6 +66,8 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
     private var rSquared   = -1.0                              // coefficient of determination (quality of fit)
     private var rBarSq     = -1.0                              // Adjusted R-squared
     private var fStat      = -1.0                              // F statistic (quality of fit)
+    private var aic        = -1.0                              // Akaike Information Criterion (AIC)
+    private var bic        = -1.0                              // Bayesian Information Criterion (BIC)
 
     private var stdErr: VectorD = null                         // standard error of coefficients for each x_j
     private var t: VectorD      = null                         // t statistics for each x_j
@@ -119,18 +121,20 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
      */
     def diagnose (yy: VectorD, e: VectorD)
     {
-        sse        = e dot e                                    // residual/error sum of squares
-        val sst    = (yy dot yy) - yy.sum~^2.0 / m              // total sum of squares
-        val ssr    = sst - sse                                  // regression sum of squares
-        rSquared   = ssr / sst                                  // coefficient of determination
-        rBarSq     = 1.0 - (1.0-rSquared) * r_df                // R-bar-squared (adjusted R-squared)
-        fStat      = ssr * (m-k-1.0)  / (sse * k)               // F statistic (msr / mse)
+        sse      = e dot e                                       // residual/error sum of squares
+        val sst  = (yy dot yy) - yy.sum~^2.0 / m                 // total sum of squares
+        val ssr  = sst - sse                                     // regression sum of squares
+        rSquared = ssr / sst                                     // coefficient of determination
+        rBarSq   = 1.0 - (1.0-rSquared) * r_df                   // R-bar-squared (adjusted R-squared)
+        fStat    = ssr * (m-k-1.0)  / (sse * k)                  // F statistic (msr / mse)
+        aic      = m * log (sse) - m * log (m) + 2.0 * (k+1)     // Akaike Information Criterion (AIC)
+        bic      = aic + (k+1) * (log (m) - 2.0)                 // Bayesian Information Criterion (BIC)
 
-        val facCho = new Fac_Cholesky (x.t * x)                 // FIX - avoid re-calulating
-        val varEst = sse / (m-k-1.0)                            // variance estimate
-        val l      = facCho.factor1 ()                          // cholesky factorization
-        val varCov = l.inverse.t * l.inverse * varEst           // variance covariance matrix
-        val vars   = varCov.getDiag ()                          // individual variances
+        val facCho = new Fac_Cholesky (x.t * x)                  // FIX - avoid re-calulating
+        val varEst = sse / (m-k-1.0)                             // variance estimate
+        val l      = facCho.factor1 ()                           // cholesky factorization
+        val varCov = l.inverse.t * l.inverse * varEst            // variance covariance matrix
+        val vars   = varCov.getDiag ()                           // individual variances
 
         stdErr = vars.map ((x: Double) => sqrt (x))                                   // standard error of coefficients
         t      = b / stdErr                                                           // Student's T statistic
@@ -209,9 +213,11 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
             println ("%7s | %10.6f | %10.6f | %8.4f | %9.5f".format ("x" + sub(j), b(j), stdErr(j), t(j), p(j)))
         } // for
         println ()
-        println ("Residual stdErr: %.3f on %d degrees of freedom".format (sqrt (sse/(m-k-1.0)), k.toInt))
-        println ("Multiple rSquared:  %.4f, Adjusted rSquared:  %.4f".format (rSquared, rBarSq))
-        println ("F-statistic: %.3f on %d and %d DF".format (fStat, k.toInt, (m-k-1).toInt))
+        println ("Residual stdErr: %.4f on %d degrees of freedom".format (sqrt (sse/(m-k-1.0)), k.toInt))
+        println ("R-Squared:       %.4f, Adjusted rSquared:  %.4f".format (rSquared, rBarSq))
+        println ("F-Statistic:     %.4f on %d and %d DF".format (fStat, k.toInt, (m-k-1).toInt))
+        println ("AIC:             %.4f".format (aic))
+        println ("BIC:             %.4f".format (bic))
         println ("-" * 80)
     } // report
 

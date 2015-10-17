@@ -21,7 +21,7 @@ package scalation.relalgebra
 import java.io.{FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream, PrintWriter}
 
 import scala.collection.immutable.StringOps
-import scala.collection.mutable.Map
+import scala.collection.mutable.{ArrayBuffer, Map}
 
 import scalation.linalgebra._
 import scalation.linalgebra.MatrixKind._
@@ -120,16 +120,22 @@ object Relation
     {
         var first = true
         val lines = getFromURL_File (fileName)
-        var r3: Relation = null
+        var colBuffer: Array [ArrayBuffer [String]] = null
+        var colName: Seq [String] = null
+        var newCol: Vector [Vec] = null
+
         for (ln <- lines) {
             if (first) {
-                val colName = ln.split (eSep)
-                val newCol  = Vector.fill [Vec] (colName.length)(null)
-                r3 = Relation (name, colName, newCol, key, domain)
+                colName   = ln.split (eSep)
+                colBuffer = Array.ofDim (colName.length)
+                for (i <- colBuffer.indices) colBuffer(i) = new ArrayBuffer ()
                 first = false
-            } else r3.add (r3.row (ln.split (eSep), domain))
+            } else {
+                val values = ln.split (eSep)
+                values.indices.foreach (i => { colBuffer(i) += values(i) })
+            } // if
         } // for
-        r3
+        Relation (name, colName, colBuffer.indices.map (i => VectorS (colBuffer(i).toArray)).toVector, key, domain)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -9,12 +9,9 @@
 
 package scalation.analytics
 
-import java.io.{BufferedWriter, File, FileWriter}
-
-import collection.mutable.Set
-import io.Source
-import math.abs
-import util.control.Breaks
+import scala.collection.mutable.Set
+import scala.math.abs
+import scala.util.control.Breaks
 
 import scalation.linalgebra.{MatrixD, VectorD, VectorI}
 import scalation.util.Error
