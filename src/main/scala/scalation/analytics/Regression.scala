@@ -8,10 +8,10 @@
 
 package scalation.analytics
 
-import play.api.libs.json.{JsArray, JsString, JsObject, JsValue}
-import math.{abs, log, pow, sqrt}
+import play.api.libs.json.{JsArray, JsObject, JsString, JsValue}
 
-import scalation.linalgebra.{Fac_Cholesky, Fac_QR, Factorization, MatriD, MatrixD, VectorD}
+import scala.math.{abs, log, sqrt}
+import scalation.linalgebra.{Fac_Cholesky, Fac_QR, MatriD, MatrixD, VectorD}
 import scalation.math.double_exp
 import scalation.plot.Plot
 import scalation.random.CDF.studentTCDF
@@ -28,7 +28,7 @@ object RegTechnique extends Enumeration
     
 } // RegTechnique
 
-import RegTechnique._
+import scalation.analytics.RegTechnique._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Regression` class supports multiple linear regression.  In this case,
@@ -227,8 +227,8 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
         builder ++= "Residual stdErr: %.3f on %d degrees of freedom".format (sqrt (sse/(m-k-1.0)), k.toInt) + "\n"
         builder ++= "Multiple rSquared:  %.4f, Adjusted rSquared:  %.4f".format (rSquared, rBarSq) + "\n"
         builder ++= "F-statistic: %.3f on %d and %d DF".format (fStat, k.toInt, (m-k-1).toInt) + "\n"
-        builder ++= "Akiake Information Criterion (AIC): %.4f".format (aic) + "\n"
-        builder ++= "Schwarz Criterion (SBIC): %.4f".format (sbic) + "\n"
+        builder ++= "Aikake Information Criterion (AIC): %.4f".format (aic) + "\n"
+        builder ++= "Schwarz Criterion (SBIC): %.4f".format (bic) + "\n"
         builder ++= "-" * 80 + "\n"
         builder ++= "Coefficients:" + "\n"
         builder ++= "        | Estimate   |   StdErr   |  t value | Pr(>|t|)" + "\n"
@@ -246,7 +246,7 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
             "Adjusted rSquared" -> JsString("%.4f".format(rBarSq)),
             "F-Statistic" -> JsString("%.3f on %d and %d DF".format (fStat, k.toInt, (m-k-1).toInt)),
             "AIC"-> JsString("%.4f".format(aic)),
-            "SBIC" -> JsString("%.4f".format(sbic))
+            "SBIC" -> JsString("%.4f".format(bic))
         ))
 
         var coefficientArray = JsArray()
