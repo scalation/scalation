@@ -8,9 +8,8 @@
 
 package scalation.random
 
-import scala.math.{abs, atan, exp, Pi, pow, sqrt}
-
-import scalation.math.Combinatorics.{rBetaF, rBetaC}
+import scala.math.{Pi, abs, atan, exp, pow}
+import scalation.math.Combinatorics.{rBetaC, rBetaF}
 import scalation.math.ExtremeD._
 import scalation.util.Error
 
@@ -130,9 +129,9 @@ object CDF
             0.5 + (1.0/Pi) * atan (x)
         } else if (df == 2) {                    // Explicit Formula
             0.5 + (x/2.0) * pow (2.0 + x*x, -0.5)
-        } else if (df < 2*x*x) {                 // [JKB 1995]
-            val z = 0.5 * rBetaF (df / (df + x*x), 0.5*df, 0.5)
-            if (x > 0) 1.0 - z else z
+//        } else if (df < 2*x*x) {                 // [JKB 1995]
+//            val z = 0.5 * rBetaF (df / (df + x*x), 0.5*df, 0.5)
+//            if (x > 0) 1.0 - z else z
         } else if (df < 30) {                    // [JKB 1995]
             val z = 0.5 * rBetaC (x*x / (df + x*x), 0.5, 0.5*df)
             if (x > 0) 1.0 - z else z

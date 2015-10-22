@@ -8,14 +8,12 @@
 
 package scalation.stat
 
-import math.{ceil, floor, min, round}
-
+import scala.math.{ceil, floor, min}
 import scalation.linalgebra.{MatrixD, VectorD}
-import scalation.random.{Normal, Uniform}
-import scalation.scala2d.{Panel, VizFrame}
-import scalation.scala2d.{Line, Rectangle}
+import scalation.random.Uniform
 import scalation.scala2d.Colors._
-import scalation.scala2d.Shapes.{BasicStroke, Dimension, Graphics, Graphics2D}
+import scalation.scala2d.Shapes.{BasicStroke, Graphics, Graphics2D}
+import scalation.scala2d.{Line, Panel, Rectangle, VizFrame}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Histogram` class takes a vector of values, counts the number of values
@@ -28,9 +26,27 @@ import scalation.scala2d.Shapes.{BasicStroke, Dimension, Graphics, Graphics2D}
 class Histogram (value: VectorD, numIntervals: Int, _title: String = "Histogram")
       extends VizFrame (_title, null)
 {
+        def canvas = new Canvas (getW, getH, value, numIntervals)
+        getContentPane ().add (canvas)
+        setVisible  (true)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert a Histogram to a string.
+     */
+    override def toString = canvas.toString
+
+} // Histogram class
+
+class FramelessHistogram (frameW : Int, frameH : Int, value: VectorD, numIntervals: Int, _title: String = "Histogram") {
+    def canvas = new Canvas(frameW, frameH, value, numIntervals)
+}
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Create a canvas on which to draw the histogram.
+  */
+class Canvas(frameW : Int, frameH : Int, value : VectorD, numIntervals : Int ) extends Panel
+{
     private val EPSILON       = 1E-9
-    private val frameW        = getW
-    private val frameH        = getH
     private val offset        = 50
     private val baseX         = offset
     private val baseY         = frameH - offset
@@ -43,84 +59,72 @@ class Histogram (value: VectorD, numIntervals: Int, _title: String = "Histogram"
     private val bar           = Rectangle ()
     private val axis          = Line ()
 
+    setBackground (white)
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a canvas on which to draw the histogram.
-     */
-    class Canvas extends Panel
+    /** Paint the canvas by drawing the rectangles (vertical bars) making up
+      *  the histogram.
+      *  @param gr  low-res graphics environment
+      */
+    override def paintComponent (gr: Graphics)
     {
-        setBackground (white)
+        super.paintComponent (gr)
+        val g2d = gr.asInstanceOf [Graphics2D]            // use hi-res
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Paint the canvas by drawing the rectangles (vertical bars) making up
-         *  the histogram.
-         *  @param gr  low-res graphics environment
-         */
-        override def paintComponent (gr: Graphics)
-        {
-            super.paintComponent (gr)
-            val g2d = gr.asInstanceOf [Graphics2D]            // use hi-res
+        var x_pos = 0
+        var y_pos = 0
+        var step  = 0.0
 
-            var x_pos = 0
-            var y_pos = 0
-            var step  = 0.0
+        //:: Draw the axes
 
-            //:: Draw the axes
+        g2d.setPaint (black)
+        g2d.setStroke (new BasicStroke (2.0f))
+        axis.setLine (baseX - 1, baseY + 1, baseX + 10 + frameW - 2 * offset, baseY + 1)
+        g2d.draw (axis)
+        axis.setLine (baseX - 1, offset - 10, baseX - 1, baseY + 1)
+        g2d.draw (axis)
 
+        //:: Draw the labels on the axes
+
+        y_pos = baseY + 15
+        step  = (maxValue - minValue) / 10.0
+        for (j <- 0 to 10) {
+            val x_val = clip (minValue + j * step)
+            x_pos = offset - 8 + j * (frameW - 2 * offset) / 10
+            g2d.drawString (x_val, x_pos, y_pos)
+        } // for
+
+        x_pos = baseX - 30
+        for (j <- 0 to 20) {
+            val y_val = clip ((20 - j) * maxHistogram / 20)
+            y_pos = offset + 2 + j * (frameH - 2 * offset) / 20
+            g2d.drawString (y_val, x_pos, y_pos)
+        } // for
+
+        //:: Draw the bars making up the histogram
+
+        for (p <- c) {
+            bar.setFrame (p(0), p(1), p(2), p(3))    // x, y, w, h
+            g2d.setPaint (blue)
+            g2d.fill (bar)
             g2d.setPaint (black)
-            g2d.setStroke (new BasicStroke (2.0f))
-            axis.setLine (baseX - 1, baseY + 1, baseX + 10 + frameW - 2 * offset, baseY + 1)
-            g2d.draw (axis)
-            axis.setLine (baseX - 1, offset - 10, baseX - 1, baseY + 1)
-            g2d.draw (axis)
-
-            //:: Draw the labels on the axes
-
-            y_pos = baseY + 15
-            step  = (maxValue - minValue) / 10.0
-            for (j <- 0 to 10) {
-                val x_val = clip (minValue + j * step)
-                x_pos = offset - 8 + j * (frameW - 2 * offset) / 10 
-                g2d.drawString (x_val, x_pos, y_pos)
-            } // for
-
-            x_pos = baseX - 30
-            for (j <- 0 to 20) {
-                val y_val = clip ((20 - j) * maxHistogram / 20)
-                y_pos = offset + 2 + j * (frameH - 2 * offset) / 20 
-                g2d.drawString (y_val, x_pos, y_pos)
-            } // for
-
-            //:: Draw the bars making up the histogram
-
-            for (p <- c) {
-                bar.setFrame (p(0), p(1), p(2), p(3))    // x, y, w, h
-                g2d.setPaint (blue)
-                g2d.fill (bar)
-                g2d.setPaint (black)
-                g2d.draw (bar)
-            } // for
-        } // paintComponent
-
-    } // Canvas class
-
-    {
-        getContentPane ().add (new Canvas ())
-        setVisible  (true)
-    } // primary constructor
+            g2d.draw (bar)
+        } // for
+    } // paintComponent
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert value to string and cut out the first four characters.
-     *  @param x  the value to convert and cut
-     */
+      *  @param x  the value to convert and cut
+      */
     def clip (x: Double): String =
     {
-        val s = x.toString 
+        val s = x.toString
         s.substring (0, min (s.length, 4))
     } // clip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the counts for each interval in the histogram.
-     */
+      */
     def computeHistogram (): VectorD =
     {
         val h = new VectorD (numIntervals)
@@ -133,7 +137,7 @@ class Histogram (value: VectorD, numIntervals: Int, _title: String = "Histogram"
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute coordinates (x, y, w, h) for each of bars used to draw the histogram.
-     */
+      */
     def computeCoordinates (): MatrixD =
     {
         val c      = new MatrixD (numIntervals, 4)
@@ -152,10 +156,13 @@ class Histogram (value: VectorD, numIntervals: Int, _title: String = "Histogram"
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert a Histogram to a string.
-     */
+      */
     override def toString = histogram.toString
 
-} // Histogram class
+} // Canvas class
+
+
+
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

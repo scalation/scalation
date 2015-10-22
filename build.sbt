@@ -21,3 +21,5 @@ libraryDependencies += "org.scala-lang" % "scala-compiler" % scalaVersion.value
 
 libraryDependencies += "org.jsoup" % "jsoup" % "1.8.2"
 
+libraryDependencies += "com.typesafe.play" % "play-json_2.11" % "2.4.3"
+

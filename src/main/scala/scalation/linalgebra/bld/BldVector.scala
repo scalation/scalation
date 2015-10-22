@@ -163,6 +163,16 @@ class $VECTOR (val dim: Int,
     } // toInt
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `$VECTOR` into a `VectorL`.
+     */
+    def toInt: VectorL =
+    {
+        val c = new VectorL (dim)
+        for (i <- range) c(i) = v(i).toLong
+        c
+    } // toLong
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' `$VECTOR` into a `VectorD`.
      */
     def toDouble: VectorD =
@@ -173,7 +183,7 @@ class $VECTOR (val dim: Int,
     } // toDouble
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get 'this' vector's element at the 'i'-th index position. 
+    /** Get 'this' vector's element at the 'i'-th index position.
      *  @param i  the given index
      */
     def apply (i: Int): $BASE = v(i)
@@ -190,7 +200,7 @@ class $VECTOR (val dim: Int,
     def apply (): Array [$BASE] = v
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set 'this' vector's element at the 'i'-th index position. 
+    /** Set 'this' vector's element at the 'i'-th index position.
      *  @param i  the given index
      *  @param x  the value to assign
      */
@@ -228,7 +238,7 @@ class $VECTOR (val dim: Int,
      */
     def foreach [U] (f: $BASE => U)
     {
-        var i = 0    
+        var i = 0
         while (i < dim) { f (v(i)); i += 1 }
     } // foreach
 
@@ -299,7 +309,7 @@ class $VECTOR (val dim: Int,
     /** Add 'this' vector and vector 'b'.
      *  @param b  the vector to add
      */
-    def + (b: $VECTOR): $VECTOR = 
+    def + (b: $VECTOR): $VECTOR =
     {
         val c = new $VECTOR (dim)
         for (i <- range) c.v(i) = v(i) + b.v(i)
@@ -316,7 +326,7 @@ class $VECTOR (val dim: Int,
         for (i <- range) c.v(i) = v(i) + s
         c
     } // +
- 
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' vector and scalar 's._1' only at position 's._2'.
      *  @param s  the (scalar, position) to add
@@ -339,7 +349,7 @@ class $VECTOR (val dim: Int,
      *  @param s  the scalar to add
      */
     def += (s: $BASE): $VECTOR = { for (i <- range) v(i) += s; this }
- 
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the negative of 'this' vector (unary minus).
      */
@@ -349,7 +359,7 @@ class $VECTOR (val dim: Int,
         for (i <- range) c.v(i) = -v(i)
         c
     } // unary_-
- 
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract vector 'b'.
      *  @param b  the vector to subtract
@@ -360,7 +370,7 @@ class $VECTOR (val dim: Int,
         for (i <- range) c.v(i) = v(i) - b.v(i)
         c
     } // -
- 
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract scalar 's'.
      *  @param s  the scalar to subtract
@@ -394,7 +404,7 @@ class $VECTOR (val dim: Int,
      *  @param s  the scalar to add
      */
     def -= (s: $BASE): $VECTOR = { for (i <- range) v(i) -= s; this }
- 
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' vector by vector 'b'.
      *  @param b  the vector to multiply by
@@ -879,7 +889,7 @@ class $VECTOR (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' vector to a String.
      */
-    override def toString: String = 
+    override def toString: String =
     {
         var sb = new StringBuilder ("$VECTOR(")
         if (dim == 0) return sb.append (")").mkString
@@ -889,7 +899,7 @@ class $VECTOR (val dim: Int,
         } // for
         sb.replace (sb.length-1, sb.length, ")").mkString
     } // toString
-  
+
 } // $VECTOR class
 
 

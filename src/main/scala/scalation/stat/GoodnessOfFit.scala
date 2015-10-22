@@ -8,9 +8,9 @@
 
 package scalation.stat
 
-import math.{floor, round, sqrt}
-
+import scala.math.sqrt
 import scalation.linalgebra.VectorD
+import scalation.random.Quantile._
 import scalation.random.{Quantile, Variate}
 import scalation.util.Error
 
@@ -24,17 +24,22 @@ import scalation.util.Error
 class GoodnessOfFit (d: VectorD, dmin: Double, dmax: Double, intervals: Int = 10)
       extends Error
 {
+    val dStand = d.standardize
+    val values = equalProbabilityInterval(normalInv, intervals)
+    println(values.deep)
     private val EPSILON = 1E-9                                  // number close to zero
     private val n       = d.dim                                 // number of sample data points
-    private val ratio   = intervals / (dmax - dmin + EPSILON)   // intervals to data range ratio
+//    private val ratio   = intervals / (dStand.max() - dStand.min() + EPSILON)   // intervals to data range ratio
+    //private val transformed : VectorD = d.map(value : Double => (value - d.mean) / d.stddev)
 
     if (n < 5 * intervals) flaw ("constructor", "not enough data to fit distribution")
 
     private val histo = new Array [Int] (intervals)             // histogram
     for (i <- 0 until n) {
-        val j = floor ((d(i) - dmin) * ratio).toInt
+        val j : Int = values.indexWhere(value => dStand(i) < value )
+//        val j = floor ((dStand(i) - dStand.min()) * ratio).toInt
         if (0 <= j && j < intervals) histo(j) += 1              // add to count for interval j
-        else println ("lost value = " + d(i))
+        else println ("lost value = " + dStand(i))
     } // for
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -54,10 +59,11 @@ class GoodnessOfFit (d: VectorD, dmin: Double, dmax: Double, intervals: Int = 10
         var chi2 = 0.0            // ChiSquare statistic
         var nz   = 0              // number of nonzero intervals
 
+        val values = equalProbabilityInterval(normalInv, intervals)
         for (j <- 0 until intervals) {
-            x = j / ratio + dmin
+            x = values(j)
             o = histo(j)
-            e = round (n * rv.pf (x + .5) / ratio)
+            e = n / intervals
             if (e >= 4) { chi2 += (o - e)*(o - e) / e; nz += 1 }         // big enough
             println ("\thisto (" + x + ") = " + o + " : " + e + " ")
         } // for
@@ -69,6 +75,14 @@ class GoodnessOfFit (d: VectorD, dmin: Double, dmax: Double, intervals: Int = 10
         println ("\nchi2 = " + chi2 + " : chi2(0.95, " + nz + ") = " + cutoff)
         chi2 <= cutoff
     } // fit
+
+    def equalProbabilityInterval (inverseCDF : (Double, Array[Int])=> Double, intervals : Int): Array[Double] ={
+        val values = Array.ofDim[Double](intervals)
+        for (y <- 1 to intervals){
+            values(y -1) = inverseCDF(y/intervals.toDouble, Array())
+        }
+        values
+    }
 
 } // GoodnessOfFit class
 

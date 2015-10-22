@@ -119,6 +119,16 @@ class VectorS (val dim: Int,
     } // toInt
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `VectorS` into a `VectorL`.
+      */
+    def toLong: VectorL =
+    {
+        val c = new VectorL (dim)
+        for (i <- range) c(i) = v(i).toLong
+        c
+    } // toLong
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' `VectorS` into a `VectorD`.
      */
     def toDouble: VectorD =
@@ -861,6 +871,7 @@ object VectorS
      */
     def apply (x: StrNum, xs: StrNum*): VectorS =
     {
+        println("debug: 1+xs.length = " + (1 + xs.length))
         val c = new VectorS (1 + xs.length)
         c(0)  = x
         for (i <- 0 until c.dim-1) c.v(i+1) = xs(i)

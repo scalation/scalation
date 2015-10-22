@@ -55,6 +55,22 @@ object MM_Relation
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a relation from a sequence of row/tuples.  These rows must be converted
+      *  to columns.
+      *  @param name     the name of the relation
+      *  @param colName  the names of columns
+      *  @param row      the sequence of rows to be converted to columns for the columnar relation
+      *  @param key      the column number for the primary key (< 0 => no primary key)
+      */
+    def apply (name: String, colName: Seq [String], row: Seq [Row], key: Int): MM_Relation =
+    {
+        val equivCol = Vector.fill [Vec] (colName.length)(null)
+        val r2 = MM_Relation (name, colName, equivCol, key, null)
+        for (tuple <- row) r2.add_2 (tuple)
+        r2
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Read the relation with the given 'name' into memory using serialization.
      *  @param name  the name of the relation to load
      */
@@ -708,9 +724,8 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'tuple to 'this' relation as a new row.
-     *  FIX:  want an efficient, covariant, mutable data structue, but Array is invariant.
+     *  Caveat: assumes the type of each column is determined by the first row
      *  @param tuple  an aggregation of columns values (new row)
-     *  @param typ    the string of corresponding types, e.g., "SDI"
      */
     def add (tuple: Row)
     {
@@ -722,7 +737,24 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
                             println (s"add: for column $j of tuple $tuple"); throw cce
                    } // try
               ).toVector
-    } // add 
+    } // add
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add 'tuple to 'this' relation as a new row.
+      *  Type is determined by sampling values for columns
+      *  @param tuple  an aggregation of columns values (new row)
+      */
+    def add_2 (tuple: Row)
+    {
+        col = (for (j <- tuple.indices) yield
+        try {
+            Vec.:+ (col(j), StrNum(tuple(j).toString))
+        } catch {
+            case cce: ClassCastException =>
+                println (s"add: for column $j of tuple $tuple"); throw cce
+        } // try
+          ).toVector
+    } // add_2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' relation into a string column by column.

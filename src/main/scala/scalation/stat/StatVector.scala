@@ -8,9 +8,8 @@
 
 package scalation.stat
 
-import math.{ceil, sqrt}
-
-import scalation.linalgebra.{VectorD, VectorI}
+import scala.math.{ceil, sqrt}
+import scalation.linalgebra.VectorD
 import scalation.math.double_exp
 import scalation.random.Quantile.studentTInv
 import scalation.util.SortingD.imedian
@@ -158,6 +157,7 @@ class StatVector (val self: VectorD)
      */
     def precise (threshold: Double = .2, p: Double = .95): Boolean = precision (p) <= threshold
 
+    def standardize : VectorD = (self - self.mean) / self.stddev
 } // StatVector class
 
 
@@ -177,6 +177,7 @@ object StatVectorTest extends App //with Stat
     println ("x.mean      = " + x.mean)           // mean (from VectorD)
     println ("x.variance  = " + x.variance)       // variance (from VectorD)
     println ("x.pvariance = " + x.pvariance)      // population variance (from VectorD)
+    println ("x.standardize = " + x.standardize)
 
     println ("x.median () = " + x.median ())      // median
     println ("x.amedian   = " + x.amedian)        // averaged median

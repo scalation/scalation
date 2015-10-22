@@ -8,7 +8,11 @@
 
 package scalation.analytics
 
+import play.api.libs.json.JsValue
+
+import scala.math._
 import scalation.linalgebra.{MatriD, VectorD, VectorI}
+import scalation.util.Unicode._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Predictor` trait provides a common framework for several predictors.
@@ -48,6 +52,15 @@ trait Predictor
     /** Return the labels for the fit.  Override when necessary.
      */
     def fitLabels: Array [String] = Array ("rSquared", "rBarSq", "fStat")
+
+    def reportToString: String = {
+        val builder = new StringBuilder()
+        builder.toString
+    }
+
+    def jsonReport : JsValue = {
+        null
+    }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a new continuous data vector z, predict the y-value of f(z).

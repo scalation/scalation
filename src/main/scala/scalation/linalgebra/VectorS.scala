@@ -9,6 +9,7 @@
 package scalation.linalgebra
 
 import collection.Traversable
+import scala.collection.mutable.{ArrayBuffer, Map}
 import util.Sorting.quickSort
 
 import scalation.math.StrO.{abs => ABS, max => MAX, _}
@@ -117,8 +118,18 @@ class VectorS (val dim: Int,
     } // toInt
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `VectorS` into a `VectorL`.
+      */
+    def toLong: VectorL =
+    {
+        val c = new VectorL (dim)
+        for (i <- range) c(i) = v(i).toLong
+        c
+    } // toLong
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' `VectorS` into a `VectorD`.
-     */
+      */
     def toDouble: VectorD =
     {
         val c = new VectorD (dim)
@@ -1001,6 +1012,7 @@ object VectorSTest extends App
     println ("z = " + z)
     println ("z.map (_ * 2)    = " + z.map ((e: StrNum) => e * 2))
     println ("z.filter (_ > 2) = " + z.filter (_ > 2))
+
 
 } // VectorSTest
 

@@ -8,14 +8,15 @@
 
 package scalation.analytics
 
-import math.{abs, pow, sqrt}
+import play.api.libs.json.{JsArray, JsString, JsObject, JsValue}
 
-import scalation.linalgebra.{Fac_Cholesky, Fac_QR, Factorization, MatriD, MatrixD, VectorD}
+import scala.math.{abs, log, sqrt}
+import scalation.linalgebra.{Fac_Cholesky, Fac_QR, MatriD, MatrixD, VectorD}
 import scalation.math.double_exp
 import scalation.plot.Plot
 import scalation.random.CDF.studentTCDF
-import scalation.util.{Error, time}
 import scalation.util.Unicode.sub
+import scalation.util.{Error, time}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RegTechnique` object defines the implementation techniques available.
@@ -27,7 +28,7 @@ object RegTechnique extends Enumeration
     
 } // RegTechnique
 
-import RegTechnique._
+import scalation.analytics.RegTechnique._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Regression` class supports multiple linear regression.  In this case,
@@ -70,6 +71,9 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
     private var stdErr: VectorD = null                         // standard error of coefficients for each x_j
     private var t: VectorD      = null                         // t statistics for each x_j
     private var p: VectorD      = null                         // p values for each x_j
+    private var aic : Double    = Double.NaN
+    private var sbic : Double    = Double.NaN
+
 
     private val fac = technique match {                        // select the factorization technique
         case Fac_QR       => new Fac_QR (x)                    // QR Factorization
@@ -135,6 +139,8 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
         stdErr = vars.map ((x: Double) => sqrt (x))                                   // standard error of coefficients
         t      = b / stdErr                                                           // Student's T statistic
         p      = t.map ((x: Double) => 2.0 * studentTCDF (-abs (x), (m-k-1).toInt))   // p values
+        aic    = m*log (sse) - m*log (m) + 2*(k+1)
+        sbic    = m*log (sse) - m*log (m) + (k+1)*log (m)
     } // diagnose
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -214,6 +220,55 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
         println ("F-statistic: %.3f on %d and %d DF".format (fStat, k.toInt, (m-k-1).toInt))
         println ("-" * 80)
     } // report
+
+    override def reportToString: String = {
+        val builder = new StringBuilder()
+        builder ++= "Residual stdErr: %.3f on %d degrees of freedom".format (sqrt (sse/(m-k-1.0)), k.toInt) + "\n"
+        builder ++= "Multiple rSquared:  %.4f, Adjusted rSquared:  %.4f".format (rSquared, rBarSq) + "\n"
+        builder ++= "F-statistic: %.3f on %d and %d DF".format (fStat, k.toInt, (m-k-1).toInt) + "\n"
+        builder ++= "Akiake Information Criterion (AIC): %.4f".format (aic) + "\n"
+        builder ++= "Schwarz Criterion (SBIC): %.4f".format (sbic) + "\n"
+        builder ++= "-" * 80 + "\n"
+        builder ++= "Coefficients:" + "\n"
+        builder ++= "        | Estimate   |   StdErr   |  t value | Pr(>|t|)" + "\n"
+        for (j <- 0 until b.dim) {
+            builder ++= "%7s | %10.6f | %10.6f | %8.4f | %9.5f".format ("x" + sub(j), b(j), stdErr(j), t(j), p(j)) + "\n"
+        } // for
+        builder.toString()
+    }
+
+    override def jsonReport : JsValue = {
+        val fit = JsObject(Seq(
+            "Degrees of Freedom" -> JsString("" + k.toInt),
+            "Residual Standard Error" -> JsString("%.3f".format(sqrt(sse/(m-k-1.0)))),
+            "Multiple rSquared" -> JsString("%.4f".format(rSquared)),
+            "Adjusted rSquared" -> JsString("%.4f".format(rBarSq)),
+            "F-Statistic" -> JsString("%.3f on %d and %d DF".format (fStat, k.toInt, (m-k-1).toInt)),
+            "AIC"-> JsString("%.4f".format(aic)),
+            "SBIC" -> JsString("%.4f".format(sbic))
+        ))
+
+        var coefficientArray = JsArray()
+
+        for (j <-0 until b.dim){
+           coefficientArray = coefficientArray :+ JsObject(Seq(
+                "Variable" -> JsString(if(j==0) "intercept" else j.toString),
+                "Estimate" -> JsString("%.6f".format(b(j))),
+                "StdErr" -> JsString("%.6f".format(stdErr(j))),
+                "t value" -> JsString("%.4f".format(t(j))),
+                "Pr(>|t|)" -> JsString("%.5f".format(p(j)))
+            ))
+        }
+
+        val coefficients = JsObject(Seq(
+            "values" -> coefficientArray
+        ))
+
+        JsObject(Seq(
+            "fit" -> fit,
+            "coefficients" -> coefficients
+        ))
+    }
 
 } // Regression class
 
