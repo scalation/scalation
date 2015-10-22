@@ -168,7 +168,7 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int, eta: Double = 1.0)
      *  May use this method if the output is one dimensional or interested in 1st value.
      *  @param zi  the new input vectors (stored as rows in a matrix)
      */
-    def predict (zi: MatriD): VectorD = predictAll (zi)(0)
+    override def predict (zi: MatriD): VectorD = predictAll (zi)(0)
 
 } // NeuralNet class
 

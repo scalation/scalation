@@ -885,6 +885,47 @@ case class Randi0 (b: Int = 5, stream: Int = 0)
 } // Randi0
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This class generates `Randi0` random variates (random integers: 0, ..., b).
+ *  This discrete RV models equiprobable integral outcomes starting with 0.
+ *  The 'iigen' methods will produce unique random integers.
+ *  @param b       the upper bound (>= 0) (inclusive)
+ *  @param stream  the random number stream
+ */
+case class RandiU0 (b: Int = 5, stream: Int = 0)
+     extends Variate (stream)
+{
+    if (b < 0) flaw ("constructor", "parameter b must be non-negative")
+    _discrete = true
+
+    val previous = collection.mutable.Set [Int] ()
+
+    private val width = b + 1
+
+    val mean = b / 2.0
+
+    def pf (z: Double): Double =
+    {
+        val k = floor (z).toInt
+        if (k == z && k <= b) 1.0 / width.toDouble else 0.0
+    } // pf
+
+    def gen: Double = floor (width * r.gen).toInt
+
+    def iigen (bb: Int): Int = 
+    {
+        if (previous.size == bb) {
+            flaw ("iigen", "all unique values have been exhausted - starting over")
+            previous.clear ()
+        } // if
+        var i = -1
+        do i  = floor ((bb + 1) * r.gen).toInt while (previous contains i)
+        previous += i
+        i
+    } // iigen
+
+} // RandiU0
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class generates `Sharp` (Deterministic) random variates.
  *  This discrete RV models the case when the variance is 0.
  *  @param x       the value for this constant distribution

@@ -145,6 +145,8 @@ class QuasiNewton (f: FunctionV2S, g: FunctionV2S = null,
      */
     def solve (x0: VectorD, step: Double = STEP, toler: Double = TOL): VectorD =
     {
+        if (DEBUG) println ("QuasiNewton.solve: starting at x0 = " + x0)
+
         var x:  Pair = (x0, gradient (fg, x0))        // current (point, gradient)
         var xx: Pair = (null, null)                   // next (point, gradient)
         var s:  VectorD = null                        // step vector
@@ -152,6 +154,8 @@ class QuasiNewton (f: FunctionV2S, g: FunctionV2S = null,
 
         binv = eye (x0.dim)                           // inverse of approx. Hessian matrix
 //      b    = eye (x0.dim)                           // approx. Hessian matrix (either use b or binv)
+
+        if (DEBUG) println ("solve: ||gradient||^2 = " + x._2.normSq)
 
         for (k <- 1 to MAX_ITER if x._2.normSq > TOL) {
             s  = dir * lineSearch (x._1, dir)         // update step vector

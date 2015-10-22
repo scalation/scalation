@@ -8,16 +8,14 @@
 
 package apps.analytics
 
-import io.Source.fromFile
-
-import scalation.analytics.NaiveBayes
+import scalation.analytics.{AugNaiveBayes, NaiveBayes}
 import scalation.linalgebra.{MatrixI, VectorI}
-import scalation.util.{PackageInfo, time}
+import scalation.util.{PackageInfo, getFromURL_File, time}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PokerBayes` object is a sample application that uses the `NaiveBayes`
- *  class.  Classify a poker hand consisting of 5 cards.  The hand is to be
- *  classified as one of the following types of hands:
+ *  and `AugNaiveBayes` classes.  Classify a poker hand consisting of 5 cards.
+ *  The hand is to be classified as one of the following types of hands:
  *
  *    0: Nothing in hand; not a recognized poker hand 
  *    1: One pair; one pair of equal ranks within five cards
@@ -30,8 +28,8 @@ import scalation.util.{PackageInfo, time}
  *    8: Straight flush; straight + flush
  *    9: Royal flush; {Ace, King, Queen, Jack, Ten} + flush
  *
- *  @see http://archive.ics.uci.edu/ml/machine-learning-databases/poker/poker-hand.names
- *  @see http://archive.ics.uci.edu/ml/datasets/Poker+Hand
+ *  @see archive.ics.uci.edu/ml/machine-learning-databases/poker/poker-hand.names
+ *  @see archive.ics.uci.edu/ml/datasets/Poker+Hand
  */
 object PokerBayes extends App with PackageInfo
 {
@@ -45,7 +43,7 @@ object PokerBayes extends App with PackageInfo
 
     // read data from CSV file: each line becomes a vector in matrix xy
     var i = 0
-    for (line <- fromFile (fname).getLines) { xy(i) = VectorI (line.split (',')); i += 1 }
+    for (line <- getFromURL_File (fname)) { xy(i) = VectorI (line.split (',')); i += 1 }
     for (i <- 0 until xy.dim1; j <- 0 until xy.dim2 - 1) xy(i, j) -= 1           // start at 0 => shift by -1
 
 //  println ("xy = " + xy)
@@ -63,12 +61,15 @@ object PokerBayes extends App with PackageInfo
 
     val vc = VectorI (4, 13, 4, 13, 4, 13, 4, 13, 4, 13)          // value count: distinct values for each feature
 
-    val nb = NaiveBayes (xy, fn, k, cn, vc)                       // create a classifier
+    val nb  = NaiveBayes (xy, fn, k, cn, vc)                      // create a Naive Bayes classifier
+    val anb = NaiveBayes (xy, fn, k, cn, vc)                      // create an Augmented Naive Bayes classifier
   
     time { nb.train () }                                          // train the classifier
+    time { anb.train () }                                         // train the classifier
 
     val z = VectorI (3, 3, 2, 3, 0, 8, 3, 5, 2, 5)                // new data vector/hand to classify
-    println ("classify (" + z + ") = " + nb.classify (z))         // answer = 2 (Two Pair)
+    println (s"nb.classify ($z)  = ${nb.classify (z)}")           // answer = 2 (Two Pair)
+    println (s"anb.classify ($z) = ${anb.classify (z)}")          // answer = 2 (Two Pair)
 
 } // PokerBayes object
 

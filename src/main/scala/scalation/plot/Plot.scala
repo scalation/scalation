@@ -8,11 +8,13 @@
 
 package scalation.plot
 
-import scala.math.{ceil, floor, min, pow, round}
-import scalation.linalgebra.VectorD
+import math.{ceil, floor, min, pow, round}
+
+import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.scala2d.{Panel, VizFrame}
+import scalation.scala2d.{Ellipse, Line}
 import scalation.scala2d.Colors._
-import scalation.scala2d.Shapes.{BasicStroke, Graphics, Graphics2D}
-import scalation.scala2d.{Ellipse, Line, Panel, VizFrame}
+import scalation.scala2d.Shapes.{BasicStroke, Dimension, Graphics, Graphics2D}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Plot` class takes 'x' and 'y' vectors of data values and plots the '(x, y)'
@@ -26,33 +28,40 @@ import scalation.scala2d.{Ellipse, Line, Panel, VizFrame}
 class Plot (x: VectorD, y: VectorD, z: VectorD = null, _title: String = "Plot y vs. x")
       extends VizFrame (_title, null)
 {
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a canvas on which to draw the plot.
-     */
-    {
-        getContentPane ().add (new Canvas (x, y, z, getW, getH))
-        setVisible (true)
-    } // primary constructor
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert a Plot vectors to a string.
-     */
-    override def toString = "Plot (y = " + y + " vs. x = " + x + ")"
+    getContentPane ().add (new Canvas (x, y, z, getW, getH))
+    setVisible (true)
 
 } // Plot class
 
-class FramelessPlot(x: VectorD, y: VectorD, z: VectorD = null, var width: Int = 640, var height : Int = 480){
 
-    def canvas : Panel  = { new Canvas(x, y, z, width, height) }
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `FramelessPlot` class is used for embedded applications.
+ *  @param x       the x vector of data values (horizontal)
+ *  @param y       the y vector of data values (primary vertical)
+ *  @param z       the z vector of data values (secondary vertical) to compare with y
+ *  @param width   the width
+ *  @param height  the height
+ */
+class FramelessPlot (x: VectorD, y: VectorD, z: VectorD = null, var width: Int = 640, var height: Int = 480)
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Dynamically create and return a drawing canvas.
+     */
+    def canvas: Canvas = new Canvas (x, y, z, width, height)
 
-}
-
+} // FramelessPlot class
+ 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** Create a canvas on which to draw the plot.
-  */
-class Canvas(x: VectorD, y: VectorD, z: VectorD, width : Int, height: Int) extends Panel
+/** The `Canvas` class provides a canvas on which to draw the plot.
+ *  @param x       the x vector of data values (horizontal)
+ *  @param y       the y vector of data values (primary vertical)
+ *  @param z       the z vector of data values (secondary vertical) to compare with y
+ *  @param width   the width
+ *  @param height  the height
+ */
+class Canvas (x: VectorD, y: VectorD, z: VectorD, width: Int, height: Int)
+      extends Panel
 {
     private val EPSILON   = 1E-9
     private val frameW    = width
@@ -76,8 +85,8 @@ class Canvas(x: VectorD, y: VectorD, z: VectorD, width : Int, height: Int) exten
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Paint the canvas by plotting the data points.
-      *  @param gr  low-res graphics environment
-      */
+     *  @param gr  low-res graphics environment
+     */
     override def paintComponent (gr: Graphics)
     {
         super.paintComponent (gr)
@@ -141,19 +150,25 @@ class Canvas(x: VectorD, y: VectorD, z: VectorD, width : Int, height: Int) exten
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert value to string and cut out the first four characters.
-      *  @param x  the value to convert and cut
-      */
+     *  @param x  the value to convert and cut
+     */
     def clip (x: Double): String =
     {
-        val s = x.toString
+        val s = x.toString 
         s.substring (0, min (s.length, 4))
     } // clip
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert a Plot vectors to a string.
+     */
+    override def toString = "Plot (y = " + y + " vs. x = " + x + ")"
 
 } // Canvas class
 
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PlotTest` object is used to test the `Plot` class.
+ *  > run-main scalation.plot.PlotTest
  */
 object PlotTest extends App
 {

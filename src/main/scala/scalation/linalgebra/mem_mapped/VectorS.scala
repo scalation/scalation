@@ -726,6 +726,13 @@ class VectorS (val dim: Int,
         for (i <- 0 until e if v(i) == x) return i; -1
     } // indexOf
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find and return index of first element satisfying predicate 'p', or
+     *  -1 if not found.
+     *  @param p  the predicate to check
+     */
+    def indexWhere (p: (StrNum) => Boolean): Int = v.indexWhere (p)
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of strictly negative elements in 'this' vector.
      */

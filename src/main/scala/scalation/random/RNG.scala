@@ -8,7 +8,7 @@
 
 package scalation.random
 
-import math.floor
+import scala.math.floor
 
 import scalation.util.{Error, time}
 
@@ -49,6 +49,29 @@ abstract class RNG (stream: Int)
     def igen: Int
 
 } // RNG class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RNGStream` object allows for random selection of streams for applications
+ *  where reproducibility of random numbers is not desired.
+ */
+object RNGStream
+{
+    /** Use Java's random number generator to randomly select one of ScalaTion's
+     *  random number streams:  0 until RandomSeeds.seeds.length
+     *  "If you use the nullary constructor, new Random(), then System.currentTimeMillis()
+     *  will be used for the seed, which is good enough for almost all cases."
+     *  @see stackoverflow.com/questions/22530702/what-is-seed-in-util-random
+     *  @see docs.oracle.com/javase/8/docs/api/index.html
+     */
+    private val javaRNG = new java.util.Random ()
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return a randomly selected random number stream.
+     */
+    def ranStream: Int = javaRNG.nextInt (RandomSeeds.seeds.length)
+
+} // RNGStream
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

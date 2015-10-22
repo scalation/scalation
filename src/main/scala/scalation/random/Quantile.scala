@@ -51,6 +51,17 @@ object Quantile
     } // check
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the 'p'-th quantile for the Uniform distribution function.
+     *  @param p   the p-th quantile, e.g., .95 (95%)
+     *  @param ab  the endpoints of the Uniform distribution
+     */
+    def uniformInv (p: Double, ab: Array [Int] = Array ()): Double =
+    {
+        val (a, b) = if (ab.length == 0) (0, 1) else (ab(0), ab(1))
+        a + p * (b - a)
+    } // uniformInv
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the 'p'-th quantile for the "standard normal distribution" function.
      *  @author Peter J. Acklam (Adapted to Scala by John Miller)
      *-------------------------------------------------------------------------

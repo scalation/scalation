@@ -20,7 +20,7 @@ package scalation.relalgebra
 
 import java.io.{FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream, PrintWriter}
 
-import scala.collection.immutable.{VectorBuilder, StringOps}
+import scala.collection.immutable.StringOps
 import scala.collection.mutable.{ArrayBuffer, Map}
 
 import scalation.linalgebra._
@@ -56,12 +56,12 @@ object Relation
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a relation from a sequence of row/tuples.  These rows must be converted
-      *  to columns.
-      *  @param name     the name of the relation
-      *  @param colName  the names of columns
-      *  @param row      the sequence of rows to be converted to columns for the columnar relation
-      *  @param key      the column number for the primary key (< 0 => no primary key)
-      */
+     *  to columns.
+     *  @param name     the name of the relation
+     *  @param colName  the names of columns
+     *  @param row      the sequence of rows to be converted to columns for the columnar relation
+     *  @param key      the column number for the primary key (< 0 => no primary key)
+     */
     def apply (name: String, colName: Seq [String], row: Seq [Row], key: Int): Relation =
     {
         val equivCol = Vector.fill [Vec] (colName.length)(null)
@@ -120,30 +120,22 @@ object Relation
     {
         var first = true
         val lines = getFromURL_File (fileName)
-        var r3: Relation = null
-        var colBuffer : Array[ArrayBuffer[String]] = null
-        var colName : Seq[String] = null
-        var newCol : Vector[Vec] = null
+        var colBuffer: Array [ArrayBuffer [String]] = null
+        var colName: Seq [String] = null
+        var newCol: Vector [Vec] = null
+
         for (ln <- lines) {
             if (first) {
-                colName = ln.split (eSep)
-                colBuffer = Array.ofDim(colName.length)
-//                colBuffer.foreach( buffer => buffer = new ArrayBuffer())
-                for (i <- 0 until colBuffer.length){
-                    colBuffer(i) = new ArrayBuffer()
-                }
+                colName   = ln.split (eSep)
+                colBuffer = Array.ofDim (colName.length)
+                for (i <- colBuffer.indices) colBuffer(i) = new ArrayBuffer ()
                 first = false
             } else {
-                //r3.add (r3.row (ln.split (eSep), domain))
-                val values = ln.split(eSep)
-                values.indices.foreach(i => {
-                    colBuffer(i) += values(i)
-                })
-            }
+                val values = ln.split (eSep)
+                values.indices.foreach (i => { colBuffer(i) += values(i) })
+            } // if
         } // for
-        r3 = Relation (name, colName, colBuffer.indices.map(i => VectorS(colBuffer(i).toArray)).toVector, key, domain)
-        r3
-
+        Relation (name, colName, colBuffer.indices.map (i => VectorS (colBuffer(i).toArray)).toVector, key, domain)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -737,9 +729,10 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
     def row (i: Int): Row = col.map (Vec (_, i)).toVector
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add 'tuple to 'this' relation as a new row.
-     *  Caveat: assumes the type of each column is determined by the first row
+    /** Add 'tuple' to 'this' relation as a new row.
+     *  FIX:  want an efficient, covariant, mutable data structue, but Array is invariant.
      *  @param tuple  an aggregation of columns values (new row)
+     *  @param typ    the string of corresponding types, e.g., "SDI"
      */
     def add (tuple: Row)
     {
@@ -748,26 +741,26 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
                        Vec.:+ (col(j), tuple(j))
                    } catch {
                        case cce: ClassCastException =>
-                            println (s"add: for column $j of tuple $tuple"); throw cce
+                           println (s"add: for column $j of tuple $tuple"); throw cce
                    } // try
               ).toVector
-    } // add
+    } // add 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add 'tuple to 'this' relation as a new row.
-      *  Type is determined by sampling values for columns
-      *  @param tuple  an aggregation of columns values (new row)
-      */
+    /** Add 'tuple' to 'this' relation as a new row.
+     *  Type is determined by sampling values for columns
+     *  @param tuple  an aggregation of columns values (new row)
+     */
     def add_2 (tuple: Row)
     {
         col = (for (j <- tuple.indices) yield
-        try {
-            Vec.:+ (col(j), StrNum(tuple(j).toString))
-        } catch {
-            case cce: ClassCastException =>
-                println (s"add: for column $j of tuple $tuple"); throw cce
-        } // try
-          ).toVector
+                   try {
+                       Vec.:+ (col(j), StrNum (tuple(j).toString))
+                   } catch {
+                       case cce: ClassCastException =>
+                           println (s"add: for column $j of tuple $tuple"); throw cce
+                   } // try
+              ).toVector
     } // add_2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

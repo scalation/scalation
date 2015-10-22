@@ -84,7 +84,7 @@ Create and run HelloWorld.scala, see <a href = "https://www.assembla.com/spaces/
 
 
 For more information about the source code, see 
-<a href = "src/README_src.hmtl">src/README_src.hmtl</a>.
+<a href = "src/README_src.html">src/README_src.html</a>.
 
 ## Papers/Documentation ##
 

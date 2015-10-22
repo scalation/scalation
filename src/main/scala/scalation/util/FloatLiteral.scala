@@ -8,8 +8,7 @@
 
 package scalation.util
 
-import io.Source
-import util.matching.Regex
+import scala.util.matching.Regex
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `FloatLiteral` object is used to add '0' to floating point literals, which end in a
@@ -23,7 +22,7 @@ object FloatLiteral extends App
 {
     val DEBUG = if (args.length > 1 && args(1) == "DEBUG") true else false
 
-    val lines = Source.fromFile (args(0)).getLines ()
+    val lines = getFromURL_File (args(0))
 
     for (line <- lines) {
         

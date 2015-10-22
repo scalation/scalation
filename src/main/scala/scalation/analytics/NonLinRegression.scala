@@ -102,18 +102,6 @@ class NonLinRegression (x: MatrixD, y: VectorD,
      */
     def predict (z: VectorD): Double = f(z, b)
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula y = f(z_i, b) for
-     *  each row of matrix z.
-     *  @param z  the new matrix to predict
-     */
-    def predict (z: MatriD): VectorD =
-    {
-        val zp = new VectorD (z.dim1)
-        for (i <- 0 until z.dim1) zp(i) = f(z(i), b)
-        zp
-    } // predict
-
 } // NonLinRegression class
 
 

@@ -98,7 +98,7 @@ class PolyRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = 
      *  each row zi of matrix z.
      *  @param z  the new matrix to predict
      */
-    def predict (z: MatriD): VectorD = rg.predict (z)
+    override def predict (z: MatriD): VectorD = rg.predict (z)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable

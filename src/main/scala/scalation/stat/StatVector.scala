@@ -8,8 +8,9 @@
 
 package scalation.stat
 
-import scala.math.{ceil, sqrt}
-import scalation.linalgebra.VectorD
+import math.{ceil, sqrt}
+
+import scalation.linalgebra.{VectorD, VectorI}
 import scalation.math.double_exp
 import scalation.random.Quantile.studentTInv
 import scalation.util.SortingD.imedian
@@ -157,7 +158,12 @@ class StatVector (val self: VectorD)
      */
     def precise (threshold: Double = .2, p: Double = .95): Boolean = precision (p) <= threshold
 
-    def standardize : VectorD = (self - self.mean) / self.stddev
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Produce a standardized version of the vector by subtracting the mean and
+     *  dividing by the standard deviation (e.g., Normal -> Standard Normal).
+     */
+    def standardize: VectorD = (self - self.mean) / self.stddev
+
 } // StatVector class
 
 
@@ -177,7 +183,6 @@ object StatVectorTest extends App //with Stat
     println ("x.mean      = " + x.mean)           // mean (from VectorD)
     println ("x.variance  = " + x.variance)       // variance (from VectorD)
     println ("x.pvariance = " + x.pvariance)      // population variance (from VectorD)
-    println ("x.standardize = " + x.standardize)
 
     println ("x.median () = " + x.median ())      // median
     println ("x.amedian   = " + x.amedian)        // averaged median
@@ -195,6 +200,10 @@ object StatVectorTest extends App //with Stat
     println ("x.interval  = " + x.interval ())    // confidence interval (half width)
     println ("x.precision = " + x.precision ())   // relative precision
 
+    val z = x.standardize                         // standardized version of vector
+    println ("z.mean   = " + z.mean)              // mean (should be 0)
+    println ("z.stddev = " + z.stddev)            // standard deviation (should be 1)
+
 } // StatVectorTest object
 
 
@@ -202,6 +211,7 @@ object StatVectorTest extends App //with Stat
 /** The `StatVectorTest2` object provides an example of how to use the `StatVector`
  *  class to implement the Method of Independent Replications (MIR) following
  *  a simple two-stage procedure.
+ *  > run-main scalation.stat.StatVectorTest2
  */
 object StatVectorTest2 extends App
 {
