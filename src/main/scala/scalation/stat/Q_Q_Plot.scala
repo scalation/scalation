@@ -9,7 +9,7 @@
 package scalation.stat
 
 import scalation.linalgebra.VectorD
-import scalation.plot.Plot
+import scalation.plot.{FramelessPlot, Plot}
 import scalation.random.Distribution
 import scalation.util.Error
 
@@ -20,33 +20,48 @@ import scalation.util.Error
 object Q_Q_Plot
        extends Error
 {
-    private val DEBUG = true               // debug flag
+    /** Debug flag
+     */
+    private val DEBUG = false
+
+    /** Whether the plot is to be embedded or has its own frame
+     *  To change, set to true before calling plot
+     */
+    var frameless = false
+
+    /** Whether to transform the data to zero mean and unit standard deviation
+     *  To change, set to true before calling plot
+     */
+    var makeStandard = false             
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Produce a Q-Q plot for the two data vectors.
-     *  @param fv  the first data vector
-     *  @param gv  the second data vector
+     *  @param fv         the first data vector
+     *  @param gv         the second data vector
      */
-    def plot (fv: VectorD, gv: VectorD)
+    def plot (fv: VectorD, gv: VectorD): FramelessPlot =
     {
         val n = fv.dim
         if (gv.dim != n) flaw ("plot", "vectors must have the same size")
+        val fv_ = if (makeStandard) fv.standardize else fv
         val pv = new VectorD (n)
         for (i <- 1 until n) {
             val p   = i / n.toDouble
             pv(i-1) = p
-            if (DEBUG) println ("pv = " + pv + ", fv = " + fv(i-1) + ", gv = " + gv(i-1))
+            if (DEBUG) println ("pv = " + pv + ", fv = " + fv_(i-1) + ", gv = " + gv(i-1))
         } // for
-        new Plot (pv, fv, gv)
+
+        if (frameless) new FramelessPlot (pv, fv_, gv)
+        else { new Plot (pv, fv_, gv); null }
     } // plot
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Produce a Q-Q plot for the data vector and the distribution.
-     *  @param fv    the data vector
-     *  @param gInv  the inverse CDF
-     *  @param g_df  the degrees of freedom for the distribution
+     *  @param fv         the data vector
+     *  @param gInv       the inverse CDF
+     *  @param g_df       the degrees of freedom for the distribution
      */
-    def plot (fv: VectorD, gInv: Distribution, g_df: Array [Int])
+    def plot (fv: VectorD, gInv: Distribution, g_df: Array [Int]): FramelessPlot =
     {
         val n = fv.dim
         val gv = new VectorD (n)          // to hold vector of values for gInv
@@ -59,13 +74,14 @@ object Q_Q_Plot
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Produce a Q-Q plot for the two distribution.
-     *  @param fInv  the first inverse CDF
-     *  @param f_df  the degrees of freedom for the first distribution
-     *  @param gInv  the second inverse CDF
-     *  @param g_df  the degrees of freedom for the second distribution
-     *  @param n     the number of intervals
+     *  @param fInv       the first inverse CDF
+     *  @param f_df       the degrees of freedom for the first distribution
+     *  @param gInv       the second inverse CDF
+     *  @param g_df       the degrees of freedom for the second distribution
+     *  @param n          the number of intervals
      */
-    def plot (fInv: Distribution, f_df: Array [Int], gInv: Distribution, g_df: Array [Int], n: Int)
+    def plot (fInv: Distribution, f_df: Array [Int], gInv: Distribution, g_df: Array [Int],
+              n: Int): FramelessPlot =
     {
         val fv = new VectorD (n)          // to hold vector of values for fInv
         val gv = new VectorD (n)          // to hold vector of values for gInv
@@ -82,6 +98,7 @@ object Q_Q_Plot
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Q_Q_PlotTest` object is used to test the `Q_Q_Plot` object.
+ *  > run-main scalation.stat.Q_Q_PlotTest
  */
 object Q_Q_PlotTest extends App
 {

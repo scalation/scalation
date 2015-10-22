@@ -158,6 +158,12 @@ class StatVector (val self: VectorD)
      */
     def precise (threshold: Double = .2, p: Double = .95): Boolean = precision (p) <= threshold
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Produce a standardized version of the vector by subtracting the mean and
+     *  dividing by the standard deviation (e.g., Normal -> Standard Normal).
+     */
+    def standardize: VectorD = (self - self.mean) / self.stddev
+
 } // StatVector class
 
 
@@ -194,6 +200,10 @@ object StatVectorTest extends App //with Stat
     println ("x.interval  = " + x.interval ())    // confidence interval (half width)
     println ("x.precision = " + x.precision ())   // relative precision
 
+    val z = x.standardize                         // standardized version of vector
+    println ("z.mean   = " + z.mean)              // mean (should be 0)
+    println ("z.stddev = " + z.stddev)            // standard deviation (should be 1)
+
 } // StatVectorTest object
 
 
@@ -201,6 +211,7 @@ object StatVectorTest extends App //with Stat
 /** The `StatVectorTest2` object provides an example of how to use the `StatVector`
  *  class to implement the Method of Independent Replications (MIR) following
  *  a simple two-stage procedure.
+ *  > run-main scalation.stat.StatVectorTest2
  */
 object StatVectorTest2 extends App
 {

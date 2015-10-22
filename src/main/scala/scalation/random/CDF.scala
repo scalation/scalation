@@ -8,8 +8,10 @@
 
 package scalation.random
 
+import scala.collection.mutable.ArrayBuffer
 import scala.math.{abs, atan, exp, Pi, pow, sqrt}
 
+import scalation.linalgebra.VectorD
 import scalation.math.Combinatorics.{rBetaF, rBetaC}
 import scalation.math.ExtremeD._
 import scalation.util.Error
@@ -17,12 +19,75 @@ import scalation.util.Error
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CDF` object contains methods for computing 'F(x)', the Cumulative
  *  Distribution Functions (CDF's) for popular sampling distributions:
- *  StandardNormal, StudentT, ChiSquare and Fisher.
+ *  StandardNormal, StudentT, ChiSquare and Fisher, as well as the Uniform
+ *  Distribution. 
  *  For a given CDF 'F' with argument 'x', compute 'p = F(x)'.
  */
 object CDF
        extends Error
 {
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
+     *  Uniform distribution.
+     *  @param x  the x coordinate, argument to F(x)
+     *  @param b  the upper endpoint of the uniform distribution 
+     *  @param a  the lower endpoint of the uniform distribution 
+     */
+    def uniformCDF (x: Double, a: Double, b: Double): Double =
+    {
+        if (a >= b) flaw ("uniformCDF", "requires parameter b > parameter a")
+        if (x <= a)     0.0
+        else if (x < b) (x - a) / (b - a)
+        else            1.0
+    } // uniformCDF
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
+     *  Uniform distribution.
+     *  @param x   the x coordinate, argument to F(x)
+     *  @param ab  the endpoints of the uniform distribution 
+     */
+    def uniformCDF (x: Double, ab: Array [Int] = Array ()): Double =
+    {
+        val (a, b) = if (ab.length == 0) (0, 1) else (ab(0), ab(1))
+        uniformCDF (x, a, b)
+    } // uniformInv
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::    
+    /** Build an empirical CDF from input data vector 'x'.
+     *  Ex: x = (2, 1, 2, 3, 2) -> cdf = ((1, .2), (2, .6), (3, .2))
+     *  @param x  the input data vector
+     */
+    def buildEmpiricalCDF (x: VectorD): Tuple2 [VectorD, VectorD] =
+    {
+        val zbuf = ArrayBuffer [Double] ()
+        val cbuf = ArrayBuffer [Double] ()
+        val z = x
+        z.sort
+        for (i <- z.indices) {
+            if (i == 0 || z(i) != z(i-1)) {
+               zbuf += z(i)
+               cbuf += 1.0
+            } else {
+               cbuf(cbuf.size - 1) += 1.0
+            } // if
+        } // for
+        (VectorD (zbuf.toSeq), VectorD (cbuf.toSeq).cumulate / x.dim.toDouble)
+    } // buildEmpiricalCDF
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
+     *  Empirical distribution 'eCDF'.
+     *  @param x     the x coordinate, argument to F(x)
+     *  @param eCDF  the Empirical CDF
+     */
+    def empiricalCDF (x: Double, eCDF: Tuple2 [VectorD, VectorD]): Double =
+    {
+        if (x < eCDF._1(0)) 0.0
+        else if (x < eCDF._1(eCDF._1.dim-1)) eCDF._2 (eCDF._1.indexWhere (_ > x) - 1)
+        else 1.0
+    } // empiricalCDF
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::    
     /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the Standard
      *  Normal distribution using the Hart function.  Recoded in Scala from C code
@@ -241,14 +306,13 @@ object CDF
 
 } // CDF object
 
+import CDF._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CDFTest` trait provides methods for testing the `CDF` object.
  */
 trait CDFTest
 {
-    import CDF._
-
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the given CDF 'ff' over a range of 'x' values for the given degrees
      *  of freedom (df).
@@ -293,6 +357,20 @@ trait CDFTest
 
 } // CDFTest trait
 
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `CDFTest_Empirical` object is used to test the 'buildEmpiricalCDF' method
+ *  in the `CDF` object.
+ *  > run-main scalation.random.CDFTest_Empirical
+ */
+object CDFTest_Empirical extends App
+{
+    val eCDF = buildEmpiricalCDF (VectorD (2.0, 1.0, 2.0, 3.0, 2.0))
+    println ("F(x)   = " + eCDF)
+    for (i <- 1 to 7) println (s"empiricalCDF (${i/2.0}, eCDF) = ${empiricalCDF (i/2.0, eCDF)}")
+
+} // CDFTest_Empirical
+     
  
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CDFTest_Normal` object is used to test the 'normalCDF' method in the

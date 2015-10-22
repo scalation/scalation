@@ -28,9 +28,44 @@ import scalation.scala2d.Shapes.{BasicStroke, Dimension, Graphics, Graphics2D}
 class Plot (x: VectorD, y: VectorD, z: VectorD = null, _title: String = "Plot y vs. x")
       extends VizFrame (_title, null)
 {
+    getContentPane ().add (new Canvas (x, y, z, getW, getH))
+    setVisible (true)
+
+} // Plot class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `FramelessPlot` class is used for embedded applications.
+ *  @param x       the x vector of data values (horizontal)
+ *  @param y       the y vector of data values (primary vertical)
+ *  @param z       the z vector of data values (secondary vertical) to compare with y
+ *  @param width   the width
+ *  @param height  the height
+ */
+class FramelessPlot (x: VectorD, y: VectorD, z: VectorD = null, var width: Int = 640, var height: Int = 480)
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Dynamically create and return a drawing canvas.
+     */
+    def canvas: Canvas = new Canvas (x, y, z, width, height)
+
+} // FramelessPlot class
+ 
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Canvas` class provides a canvas on which to draw the plot.
+ *  @param x       the x vector of data values (horizontal)
+ *  @param y       the y vector of data values (primary vertical)
+ *  @param z       the z vector of data values (secondary vertical) to compare with y
+ *  @param width   the width
+ *  @param height  the height
+ */
+class Canvas (x: VectorD, y: VectorD, z: VectorD, width: Int, height: Int)
+      extends Panel
+{
     private val EPSILON   = 1E-9
-    private val frameW    = getW
-    private val frameH    = getH
+    private val frameW    = width
+    private val frameH    = height
     private val offset    = 50
     private val baseX     = offset
     private val baseY     = frameH - offset
@@ -46,84 +81,72 @@ class Plot (x: VectorD, y: VectorD, z: VectorD = null, _title: String = "Plot y 
     private val dot       = Ellipse ()
     private val axis      = Line ()
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a canvas on which to draw the plot.
+    setBackground (white)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Paint the canvas by plotting the data points.
+     *  @param gr  low-res graphics environment
      */
-    class Canvas extends Panel
+    override def paintComponent (gr: Graphics)
     {
-        setBackground (white)
+        super.paintComponent (gr)
+        val g2d = gr.asInstanceOf [Graphics2D]            // use hi-res
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Paint the canvas by plotting the data points.
-        *  @param gr  low-res graphics environment
-         */
-        override def paintComponent (gr: Graphics)
-        {
-            super.paintComponent (gr)
-            val g2d = gr.asInstanceOf [Graphics2D]            // use hi-res
+        var x_pos = 0
+        var y_pos = 0
+        var step  = 0.0
 
-            var x_pos = 0
-            var y_pos = 0
-            var step  = 0.0
+        //:: Draw the axes
 
-            //:: Draw the axes
+        g2d.setPaint (black)
+        g2d.setStroke (new BasicStroke (2.0f))
+        axis.setLine (baseX - 1, baseY + 1, baseX + 10 + frameW - 2 * offset, baseY + 1)
+        g2d.draw (axis)
+        axis.setLine (baseX - 1, offset - 10, baseX - 1, baseY + 1)
+        g2d.draw (axis)
 
+        //:: Draw the labels on the axes
+
+        y_pos = baseY + 15
+        step  = deltaX / stepsX.asInstanceOf [Double]       // for x-axis
+        for (j <- 0 to stepsX) {
+            val x_val = clip (minX + j * step)
+            x_pos = offset - 8 + j * (frameW - 2 * offset) / stepsX
+            g2d.drawString (x_val, x_pos, y_pos)
+        } // for
+
+        x_pos = baseX - 30
+        step  = deltaY / stepsY.asInstanceOf [Double]       // for y-axis
+        for (j <- 0 to stepsY) {
+            val y_val = clip (maxY - j * step)
+            y_pos = offset + 2 + j * (frameH - 2 * offset) / stepsY
+            g2d.drawString (y_val, x_pos, y_pos)
+        } // for
+
+        //:: Draw the dots for the data points being plotted
+
+        for (i <- 0 until y.dim) {
+            val xx = round ((x(i) - minX) * (frameW - 2 * offset).asInstanceOf [Double])
+            x_pos = (xx / deltaX).asInstanceOf [Int] + offset
+            val yy = round ((maxY - y(i)) * (frameH - 2 * offset).asInstanceOf [Double])
+            y_pos = (yy / deltaY).asInstanceOf [Int] + offset
+            dot.setFrame (x_pos, y_pos, diameter, diameter)         // x, y, w, h
             g2d.setPaint (black)
-            g2d.setStroke (new BasicStroke (2.0f))
-            axis.setLine (baseX - 1, baseY + 1, baseX + 10 + frameW - 2 * offset, baseY + 1)
-            g2d.draw (axis)
-            axis.setLine (baseX - 1, offset - 10, baseX - 1, baseY + 1)
-            g2d.draw (axis)
+            g2d.fill (dot)
+        } // for
 
-            //:: Draw the labels on the axes
-
-            y_pos = baseY + 15
-            step  = deltaX / stepsX.asInstanceOf [Double]       // for x-axis
-            for (j <- 0 to stepsX) {
-                val x_val = clip (minX + j * step)
-                x_pos = offset - 8 + j * (frameW - 2 * offset) / stepsX
-                g2d.drawString (x_val, x_pos, y_pos)
-            } // for
-
-            x_pos = baseX - 30
-            step  = deltaY / stepsY.asInstanceOf [Double]       // for y-axis
-            for (j <- 0 to stepsY) {
-                val y_val = clip (maxY - j * step)
-                y_pos = offset + 2 + j * (frameH - 2 * offset) / stepsY
-                g2d.drawString (y_val, x_pos, y_pos)
-            } // for
-
-            //:: Draw the dots for the data points being plotted
-
-            for (i <- 0 until y.dim) {
+        if (z != null) {
+            for (i <- 0 until min (y.dim, z.dim)) {
                 val xx = round ((x(i) - minX) * (frameW - 2 * offset).asInstanceOf [Double])
                 x_pos = (xx / deltaX).asInstanceOf [Int] + offset
-                val yy = round ((maxY - y(i)) * (frameH - 2 * offset).asInstanceOf [Double])
+                val yy = round ((maxY - z(i)) * (frameH - 2 * offset).asInstanceOf [Double])
                 y_pos = (yy / deltaY).asInstanceOf [Int] + offset
-                dot.setFrame (x_pos, y_pos, diameter, diameter)         // x, y, w, h
-                g2d.setPaint (black)
+                dot.setFrame (x_pos, y_pos, diameter, diameter)         // x, z, w, h
+                g2d.setPaint (red)
                 g2d.fill (dot)
             } // for
-
-            if (z != null) {
-                for (i <- 0 until min (y.dim, z.dim)) {
-                    val xx = round ((x(i) - minX) * (frameW - 2 * offset).asInstanceOf [Double])
-                    x_pos = (xx / deltaX).asInstanceOf [Int] + offset
-                    val yy = round ((maxY - z(i)) * (frameH - 2 * offset).asInstanceOf [Double])
-                    y_pos = (yy / deltaY).asInstanceOf [Int] + offset
-                    dot.setFrame (x_pos, y_pos, diameter, diameter)         // x, z, w, h
-                    g2d.setPaint (red)
-                    g2d.fill (dot)
-                } // for
-            } // if
-        } // paintComponent
-
-    } // Canvas class
-
-    {
-        getContentPane ().add (new Canvas ())
-        setVisible (true)
-    } // primary constructor
+        } // if
+    } // paintComponent
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert value to string and cut out the first four characters.
@@ -140,11 +163,12 @@ class Plot (x: VectorD, y: VectorD, z: VectorD = null, _title: String = "Plot y 
      */
     override def toString = "Plot (y = " + y + " vs. x = " + x + ")"
 
-} // Plot class
+} // Canvas class
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `PlotTest` object is used to test the `Plota` class.
+/** The `PlotTest` object is used to test the `Plot` class.
+ *  > run-main scalation.plot.PlotTest
  */
 object PlotTest extends App
 {
