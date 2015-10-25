@@ -5,20 +5,48 @@
  *  @date    Sat Jan 26 22:05:46 EST 2013
  *  @see     LICENSE (MIT style license file).
  *-----------------------------------------------------------------------------
- *  GoodnessOfFit_CS:  Chi-square goodness of fit test for equal width intervals
- *  GoodnessOfFit_CS2: Chi-square goodness of fit test for equal probability intervals
- *  GoodnessOfFit_G:   G goodness of fit test
- *  GoodnessOfFit_KS:  KS goodness of fit test
- *  GoodnessOfFit_AD:  AD goodness of fit test
+ *  `GoodnessOfFit_CS`:  Chi-Square (CS) goodness of fit test for equal width intervals
+ *  @see also
+ *       `GoodnessOfFit_CS2`: Chi-Square (CS) goodness of fit test for equal probability intervals
+ *       `GoodnessOfFit_KS`:  Kolmogorov-Smirnov (KS) goodness of fit test
  */
 
 package scalation.stat
 
-import math.{floor, round, sqrt}
+import math.{floor, log, round, sqrt}
 
 import scalation.linalgebra.VectorD
 import scalation.random.{Quantile, Variate}
 import scalation.util.Error
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GoodnessOfFit_CS` companion object provides two discrepancy metrics to capture
+ *  the differences between observed 'o' and expected 'o' counts.
+ *  @see en.wikipedia.org/wiki/G-test
+ */
+object GoodnessOfFit_CS
+{
+    /** Type definition for difference metric
+     */
+    type Metric = (Double, Double) => Double
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Metric developed by Pearson and used in standard Chi-Square Test.
+     *  @param o  the observed count in the given interval
+     *  @param e  the expected count in the given interval
+     */
+    final def pearson (o: Double, e: Double): Double = (o - e)*(o - e) / e
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Metric developed by Sokal and Rohlf and used in G Test.
+     *  @param o  the observed count in the given interval
+     *  @param e  the expected count in the given interval
+     */
+    final def sokal (o: Double, e: Double): Double = 2.0 * o * log (o/e)
+
+} // GoodnessOfFit_CS
+
+import GoodnessOfFit_CS._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GoodnessOfFit_CS` class is used to fit data to probability distibutions.
@@ -55,9 +83,10 @@ class GoodnessOfFit_CS (d: VectorD, dmin: Double, dmax: Double, intervals: Int =
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform a Chi-square goodness of fit test, matching the histogram of the
      *  given data d with the random variable's probability function pf (pdf).
-     *  @param rv  the random variate to test
+     *  @param rv   the random variate to test
+     *  @param met  the discrepancy metric to use (defaults to pearson)
      */
-    def fit (rv: Variate): Boolean =
+    def fit (rv: Variate, met: Metric = pearson): Boolean =
     {
         println ("-------------------------------------------------------------")
         println ("Test goodness of fit for " + rv.getClass.getSimpleName ())
@@ -73,7 +102,7 @@ class GoodnessOfFit_CS (d: VectorD, dmin: Double, dmax: Double, intervals: Int =
             x = j / ratio + dmin
             o = histo(j)
             e = round (n * rv.pf (x + .5) / ratio)
-            if (e >= 4) { chi2 += (o - e)*(o - e) / e; nz += 1 }         // big enough
+            if (e >= 4) { chi2 += met (o, e); nz += 1 }              // big enough
             println ("\thisto (" + x + ") = " + o + " : " + e + " ")
         } // for
 
@@ -128,10 +157,12 @@ object GoodnessOfFit_CSTest extends App
     val gof = new GoodnessOfFit_CS (d, dmin, dmax)
 
     val uniform = new Uniform (dmin, dmax)
-    println ("fit = " + gof.fit (uniform))
+    println ("pearson fit = " + gof.fit (uniform))
+    println ("sokal fit   = " + gof.fit (uniform, sokal))
     
     val normal = new Normal (dmu, dsig2)
-    println ("fit = " + gof.fit (normal))
+    println ("pearson fit = " + gof.fit (normal))
+    println ("sokal fit   = " + gof.fit (normal, sokal))
 
 } // GoodnessOfFit_CSTest object
 

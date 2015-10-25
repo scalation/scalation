@@ -10,7 +10,7 @@ package scalation.stat
 
 import scalation.linalgebra.VectorD
 import scalation.plot.{FramelessPlot, Plot}
-import scalation.random.Distribution
+import scalation.random.{Distribution, Parameters}
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -61,7 +61,7 @@ object Q_Q_Plot
      *  @param gInv       the inverse CDF
      *  @param g_df       the degrees of freedom for the distribution
      */
-    def plot (fv: VectorD, gInv: Distribution, g_df: Array [Int]): FramelessPlot =
+    def plot (fv: VectorD, gInv: Distribution, g_df: Parameters): FramelessPlot =
     {
         val n = fv.dim
         val gv = new VectorD (n)          // to hold vector of values for gInv
@@ -80,7 +80,7 @@ object Q_Q_Plot
      *  @param g_df       the degrees of freedom for the second distribution
      *  @param n          the number of intervals
      */
-    def plot (fInv: Distribution, f_df: Array [Int], gInv: Distribution, g_df: Array [Int],
+    def plot (fInv: Distribution, f_df: Parameters, gInv: Distribution, g_df: Parameters,
               n: Int): FramelessPlot =
     {
         val fv = new VectorD (n)          // to hold vector of values for fInv
@@ -104,7 +104,7 @@ object Q_Q_PlotTest extends App
 {
      import scalation.random.Quantile.{normalInv, studentTInv}
 
-     Q_Q_Plot.plot (normalInv, Array (), studentTInv, Array (10), 100)
+     Q_Q_Plot.plot (normalInv, null, studentTInv, Vector (10), 100)
 
 } // Q_Q_PlotTest object
 

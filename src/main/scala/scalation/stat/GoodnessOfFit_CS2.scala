@@ -5,7 +5,8 @@
  *  @date    Mon Oct 19 18:53:29 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *-----------------------------------------------------------------------------
- *  GoodnessOfFit_CS2: Chi-square goodness of fit test for equal probability intervals
+ *  `GoodnessOfFit_CS2`: Chi-square goodness of fit test for equal probability intervals
+ *  @see also `GoodnessOfFit_CS2`, `GoodnessOfFit_KS`
  */
 
 package scalation.stat
@@ -14,8 +15,10 @@ import scala.math.sqrt
 
 import scalation.linalgebra.VectorD
 import scalation.random.Quantile.chiSquareInv
-import scalation.random.{Distribution, Quantile}
+import scalation.random.{Distribution, Parameters, Quantile}
 import scalation.util.Error
+
+import GoodnessOfFit_CS._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GoodnessOfFit__CS2` class is used to fit data to probability distibutions.
@@ -36,7 +39,7 @@ import scalation.util.Error
  *  @param makeStandard  whether to transform the data to zero mean and unit standard deviation
  */
 class GoodnessOfFit__CS2 (private var d: VectorD, dmin: Double, dmax: Double, iCDF: Distribution,
-                      parms: Array [Int] = Array (), intervals: Int = 10, makeStandard: Boolean = true)
+                      parms: Parameters = null, intervals: Int = 10, makeStandard: Boolean = true)
       extends Error
 {
     private val DEBUG   = true                                     // debug flag
@@ -58,8 +61,9 @@ class GoodnessOfFit__CS2 (private var d: VectorD, dmin: Double, dmax: Double, iC
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform a Chi-square goodness of fit test, matching the histogram of the
      *  given data 'd' with the random variable's probability function pf (pdf).
+     *  @param met  the discrepancy metric to use (defaults to pearson)
      */
-    def fit (): Boolean =
+    def fit (met: Metric = pearson): Boolean =
     {
         println ("-------------------------------------------------------------")
         println ("Test goodness of fit for " + iCDF.getClass.getSimpleName ())
@@ -74,7 +78,7 @@ class GoodnessOfFit__CS2 (private var d: VectorD, dmin: Double, dmax: Double, iC
         for (j <- 0 until intervals) {
             x = endPt(j)
             o = histo(j)
-            if (e >= 4) { chi2 += (o - e)*(o - e) / e; nz += 1 }         // big enough
+            if (e >= 4) { chi2 += met (o, e); nz += 1 }              // big enough
             println ("\thisto (" + x + ") = " + o + " : " + e + " ")
         } // for
 
@@ -135,7 +139,7 @@ object GoodnessOfFit__CS2Test extends App
     println ("dsig  = " + dsig)
     println ("-------------------------------------------------------------")
 
-    val gof1 = new GoodnessOfFit__CS2 (d, dmin, dmax, uniformInv, Array (36, 56), 10, false)
+    val gof1 = new GoodnessOfFit__CS2 (d, dmin, dmax, uniformInv, Vector (36, 56), 10, false)
     println ("fit = " + gof1.fit ())
     
     val gof2 = new GoodnessOfFit__CS2 (d, dmin, dmax, normalInv)

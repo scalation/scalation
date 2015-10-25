@@ -13,7 +13,9 @@ import scala.math.{abs, atan, exp, Pi, pow, sqrt}
 
 import scalation.linalgebra.VectorD
 import scalation.math.Combinatorics.{rBetaF, rBetaC}
+import scalation.math.nexp
 import scalation.math.ExtremeD._
+import scalation.plot.Plot
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -26,6 +28,10 @@ import scalation.util.Error
 object CDF
        extends Error
 {
+    /** Type definition for parameters to a distribution
+     */
+    type Parameters = Vector [Double]
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
      *  Uniform distribution.
@@ -45,13 +51,37 @@ object CDF
     /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
      *  Uniform distribution.
      *  @param x   the x coordinate, argument to F(x)
-     *  @param ab  the endpoints of the uniform distribution 
+     *  @param pr  parameters giving the endpoints of the uniform distribution 
      */
-    def uniformCDF (x: Double, ab: Array [Int] = Array ()): Double =
+    def uniformCDF (x: Double, pr: Parameters = null): Double =
     {
-        val (a, b) = if (ab.length == 0) (0, 1) else (ab(0), ab(1))
+        val (a, b) = if (pr == null) (0.0, 1.0) else (pr(0), pr(1))
         uniformCDF (x, a, b)
-    } // uniformInv
+    } // uniformCDF
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
+     *  Exponentail distribution.
+     *  @param x  the x coordinate, argument to F(x)
+     *  @param λ  the rate parameter
+     */
+    def exponentialCDF (x: Double, λ: Double): Double =
+    {
+        if (λ <= 0.0) flaw ("exponentialCDF", "requires parameter lambda λ > 0")
+        if (x > 0) 1.0 - nexp (λ * x) else 0.0
+    } // exponentialCDF
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
+     *  Exponentail distribution.
+     *  @param x     the x coordinate, argument to F(x)
+     *  @param parm  parameter giving the rate 
+     */
+    def exponentialCDF (x: Double, pr: Parameters = null): Double =
+    {
+        val λ = if (pr == null) 1.0 else pr(0)
+        exponentialCDF (x, λ)
+    } // exponentialCDF
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::    
     /** Build an empirical CDF from input data vector 'x'.
@@ -136,7 +166,7 @@ object CDF
     } // normalCDF
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::    
-    /** Compute the Cumulative Distribution Function (CDF) for the Normal
+    /** Compute the Cumulative Distribution Function (CDF) for the Standard Normal
      *  distribution using a composite fifth-order Gauss-Legendre quadrature.
      *  @author John D. Cook (Adapted to Scala by Michael E. Cotterell)
      *  @see www.johndcook.com/blog/cpp_phi
@@ -168,11 +198,13 @@ object CDF
     /** Compute the Cumulative Distribution Function (CDF) for the Normal
      *  distribution.
      *  @param x   the x coordinate, argument to F(x)
-     *  @param df  the array of degrees of freedom Array (), not used
+     *  @param pr  parameters for the mean and standard deviation
      */
-    def normalCDF (x: Double, df: Array [Int] = Array ()): Double =
+    def normalCDF (x: Double, pr: Parameters = null): Double =
     {
-        normalCDF (x)
+        val (μ, σ) = if (pr == null) (0.0, 1.0) else (pr(0), pr(1))
+        if (σ <= 0.0) flaw ("normalCDF", "requires parameter σ > 0")
+        normalCDF ((x - μ) / σ)
     } // normalCDF
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -184,7 +216,7 @@ object CDF
      *  @param x   the x coordinate, argument to F(x)
      *  @param df  the degrees of freedom (must be > 0)
      */    
-    def studentTCDF (x: Double, df: Int = 4): Double =
+    def studentTCDF (x: Double, df: Int): Double =
     {
         if (df <= 0) {
             flaw ("studentTCDF", "parameter df must be strictly positive")
@@ -210,11 +242,12 @@ object CDF
     /** Compute the Cumulative Distribution Function (CDF) for "Student's t"
      *  distribution.
      *  @param x   the x coordinate, argument to F(x)
-     *  @param df  the array of degrees of freedom Array (), one value
+     *  @param pr  parameter for the degrees of freedom
      */
-    def studentTCDF (x: Double, df: Array [Int]): Double =
+    def studentTCDF (x: Double, pr: Parameters = null): Double =
     {
-        studentTCDF (x, df(0))
+        val df = if (pr == null) 9 else pr(0).toInt
+        studentTCDF (x, df)
     } // studentTCDF
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -224,10 +257,10 @@ object CDF
      *  @param x   the x coordinate, argument to F(x)
      *  @param df  the degrees of freedom
      */
-    def chiSquareCDF (x: Double, df: Int = 4): Double =
+    def chiSquareCDF (x: Double, df: Int): Double =
     {
         if (x < 0.0) {
-            flaw ("chiSquareCDF", "parameter x should be nonnegative")
+            flaw ("chiSquareCDF", "coordinate x should be nonnegative")
             return 0.0
         } // if
         if (df <= 0) {
@@ -254,24 +287,25 @@ object CDF
     /** Compute the Cumulative Distribution Function (CDF) for the ChiSquare
      *  distribution.
      *  @param x   the x coordinate, argument to F(x)
-     *  @param df  the array of degrees of freedom Array (), one value
+     *  @param df  parameter for the degrees of freedom
      */
-    def chiSquareCDF (x: Double, df: Array [Int]): Double =
+    def chiSquareCDF (x: Double, pr: Parameters = null): Double =
     {
-        chiSquareCDF (x, df(0))
+        val df = if (pr == null) 9 else pr(0).toInt
+        chiSquareCDF (x, df)
     } // chiSquareCDF
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Cumulative Distribution Function (CDF) for the Fisher (F)
      *  distribution using beta functions.
      *  @param x    the x coordinate, argument to F(x)
-     *  @param df1  the degrees of freedom 1
-     *  @param df2  the degrees of freedom 2
+     *  @param df1  the degrees of freedom 1 (numerator)
+     *  @param df2  the degrees of freedom 2 (denominator)
      */
     def fisherCDF (x: Double, df1: Int, df2: Int): Double =
     {
         if (x < 0.0) {
-            flaw ("fisherCDF", "parameter x should be nonnegative")
+            flaw ("fisherCDF", "coordinate x should be nonnegative")
             return 0.0
         } // if
         if (df1 <= 0 || df2 <= 0) {
@@ -297,11 +331,12 @@ object CDF
     /** Compute the Cumulative Distribution Function (CDF) for the Fisher (F)
      *  distribution using beta functions.
      *  @param x   the x coordinate, argument to F(x)
-     *  @param df  the array of degrees of freedom Array (df1, df2)
+     *  @param df  parameters for degrees of freedom numerator and denominator
      */
-    def fisherCDF (x: Double, df: Array [Int]): Double =
+    def fisherCDF (x: Double, pr: Parameters = null): Double =
     {
-        fisherCDF (x, df(0), df(1))
+        val (df1, df2) = if (pr == null) (2, 9) else (pr(0).toInt, pr(1).toInt)
+        fisherCDF (x, df1, df2)
     } // fisherCDF
 
 } // CDF object
@@ -320,18 +355,22 @@ trait CDFTest
      *  @param name   the name of CDF F(.)
      *  @param x_min  the minimum of value of x to test
      *  @param x_max  the maximum of value of x to test
-     *  @param df     the array giving the degrees of freedom
+     *  @param pr     parameters for the distribution, e.g., the degrees of freedom
      */
-    def test_df (ff: Distribution, name: String, x_min: Double, x_max: Double, df: Array [Int] = Array ())
+    def test_df (ff: Distribution, name: String, x_min: Double, x_max: Double, pr: Parameters = null)
     {
         println ("-----------------------------------------------------------")
         println (s"Test the $name function")
-        val n = 16
+        val n = 32
+        val x = new VectorD (n + 1)
+        val p = new VectorD (n + 1)
         val dx = (x_max - x_min) / n.toDouble
         for (i <- 0 to n) {
-            val x = x_min + i * dx
-            println (s"$name ($x, ${df.deep})\t = ${ff(x, df)}")
+            x(i) = x_min + i * dx
+            p(i) = ff(x(i), pr)
+            println (s"$name (${x(i)}, $pr)\t = ${p(i)}")
         } // for
+        new Plot (x, p, null, name + ": p = F(x)")
     } // test_df
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -341,22 +380,52 @@ trait CDFTest
     def test (cdf: String)
     {
         cdf match {
+
+        case "uniformCDF" =>
+            test_df (uniformCDF, cdf, -0.5, 1.5)
+
+        case "exponentialCDF" =>
+            test_df (exponentialCDF, cdf, 0.0, 4.0)
+
+        case "empiricalCDF" =>
+            println (s"distribution $cdf currently is not yet implemented")
+
         case "normalCDF" =>
-            test_df (CDF.normalCDF, "normalCDF", -4.0, 4.0)
+            test_df (normalCDF, cdf, -4.0, 4.0)
+
         case "studentTCDF" =>
-            for (df <- 1 to 30)
-                test_df (studentTCDF, "studentTCDF", -4.0, 4.0, Array (df))
+            for (df <- 1 to 30) test_df (studentTCDF, cdf, -4.0, 4.0, Vector (df))
+
         case "chiSquareCDF" =>
-            for (df <- 1 to 30)
-                test_df (chiSquareCDF, "chiSquareCDF", 0.0, 2.0*df, Array (df))
-        case _ =>
+            for (df <- 1 to 30) test_df (chiSquareCDF, cdf, 0.0, 2.0*df, Vector (df))
+
+        case "fisherCDF" =>
             for (df1 <- 1 to 10; df2 <- 1 to 10)
-                test_df (fisherCDF, "fisherCDF", 0.0, 4.0*(df1/df2.toDouble), Array (df1, df2))
+                test_df (fisherCDF, cdf, 0.0, 4.0*(df1/df2.toDouble), Vector (df1, df2))
+
+        case _ =>
+            println (s"distribution $cdf currently is not supported")
         } // match
     } // test
 
 } // CDFTest trait
 
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `CDFTest_Uniform` object is used to test the 'UniformCDF' method in the
+ *  `CDF` object.
+ *  > run-main scalation.random.CDFTest_Uniform
+ */
+object CDFTest_Uniform extends App with CDFTest { test ("uniformCDF") }
+
+ 
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `CDFTest_Exponential` object is used to test the 'ExponentialCDF' method in the
+ *  `CDF` object.
+ *  > run-main scalation.random.CDFTest_Exponential
+ */
+object CDFTest_Exponential extends App with CDFTest { test ("exponentialCDF") }
+
+ 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CDFTest_Empirical` object is used to test the 'buildEmpiricalCDF' method

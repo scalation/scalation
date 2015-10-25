@@ -401,11 +401,11 @@ case class Exponential (mu: Double = 1.0, stream: Int = 0)
 {
     if (mu <= 0.0) flaw ("constructor", "parameter mu must be positive")
 
-    private val l = 1.0 / mu          // lambda
+    private val λ = 1.0 / mu          // lambda, the rate parameter
 
     val mean = mu
 
-    def pf (z: Double): Double = if (z >= 0) l * nexp (l*z) else 0.0
+    def pf (z: Double): Double = if (z >= 0) λ * nexp (λ*z) else 0.0
 
     def gen: Double = -mu * log (r.gen)
 

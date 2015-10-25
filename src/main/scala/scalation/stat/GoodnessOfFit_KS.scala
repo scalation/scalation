@@ -6,6 +6,7 @@
  *  @see     LICENSE (MIT style license file).
  *-----------------------------------------------------------------------------
  *  GoodnessOfFit_KS:  KS goodness of fit test
+ *  @see also `GoodnessOfFit_CS`, `GoodnessOfFit_CS2`
  */
 
 //  U N D E R   D E V E L O P M E N T 
@@ -14,8 +15,10 @@ package scalation.stat
 
 import scala.math.{floor, round, sqrt}
 
-import scalation.linalgebra.VectorD
-import scalation.random.{Distribution, Quantile, Variate}
+import scalation.linalgebra.{MatrixD, SVD, VectorD}
+import scalation.math.double_exp
+import scalation.math.Combinatorics.fac
+import scalation.random.{Distribution, Parameters, Quantile, Variate}
 import scalation.random.CDF.buildEmpiricalCDF
 import scalation.util.Error
 
@@ -25,6 +28,8 @@ import scalation.util.Error
  */
 object GoodnessOfFit_KS
 {
+    private val DEBUG = true              // debug flag
+
     private val b = Array (0.37872256037043, 1.30748185078790, 0.08861783849346)
 
     private val c = Array (-0.37782822932809,  1.67819837908004,
@@ -35,7 +40,7 @@ object GoodnessOfFit_KS
                             0.00000575586834)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the critical value for a KS Test using the Lilliefors approximation.
+    /** Compute the critical value for the KS Test using the Lilliefors approximation.
      *  Caveat:  assumes alpha = .05 and is only accurate to two digits.
      *  @see www.utdallas.edu/~herve/Abdi-Lillie2007-pretty.pdf
      *  FIX - use a more flexible and accurate approximation.
@@ -53,9 +58,67 @@ object GoodnessOfFit_KS
         sum
     } // lilliefors
 
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the Cummulative Distribution Function for the critical values
+     *  for the KS Test.
+     *  @see sa-ijas.stat.unipd.it/sites/sa-ijas.stat.unipd.it/files/IJAS_3-4_2009_07_Facchinetti.pdf
+     *  FIX - it's returning NaN
+     *  @param dm  the maximum distance between empirical and theoretical distribution
+     *  @param n   the number of data points
+     */
+    def facchinettiCDF (dm: Double, n: Int): Double =
+    {
+        // parameters definition
+        val nD = n * dm
+        val m1 = round (n*dm + 0.5).toInt
+        val m2 = round (n - n*dm - 0.5).toInt
+        val l1 = round (2.0*n*dm + 0.5).toInt
+        val n1 = n * (1 + dm)
+        val n2 = n * (1 - dm)
+
+        // B matrix -> bb
+        val bb = new MatrixD (2*(n+1), 2*(n+1))
+
+        // B11 matrix
+        for (k <- m1+1 to n+1) bb(k, k) = 1.0
+        for (r <- m1 to n-1; k <- r+1 to n) {
+            bb(k+1, r+1) = fac(n-r)/(fac(k-r)*fac(n-k))*(((k-r)/(n1-r))~^(k-r))*(((n1-k)/(n1-r))~^(n-k))
+        } // for
+
+        // B22 matrix
+        for (k <- n+2 to n+2+m2) bb(k, k) = 1.0
+        for (r <- 0 to m2-1; k <- r+1 to m2) {
+            bb(k+n+2, r+n+2) = fac(n-r)/(fac(k-r)*fac(n-k))*(((k-r)/(n2-r))~^(k-r))*(((n2-k)/(n2-r))~^(n-k))
+        } // for
+
+        // B21 matrix
+        for (r <- m1 to m2; k <- r to m2) {
+            bb(k+n+2, r+1) = fac(n-r)/(fac(k-r)*fac(n-k))*(((k-r+2*nD)/(n1-r))~^(k-r))*(((n2-k)/(n1-r))~^(n-k))
+        } // for
+
+        // B12 matrix
+        for (r <- 0 to n-l1; k <- l1+r to n) {
+            bb(k+1,r+n+2) = fac(n-r)/(fac(k-r)*fac(n-k))*(((k-r-2*nD)/(n2-r))~^(k-r))*(((n1-k)/(n2-r))~^(n-k))
+        } // for
+
+        // C vector -> cc
+        val cc = new VectorD (2*(n+1))
+        for (k <- m1 to n) cc(k+1) = fac(n)/(fac(k)*fac(n-k))*(((k-nD)/n)~^k)*(((n1-k)/n)~^(n-k))      // C1 vector
+        for (k <- 0 to m2) cc(n+2+k) = fac(n)/(fac(k)*fac(n-k))*(((k+nD)/n)~^k)*(((n2-k)/n)~^(n-k))    // C2 vector
+
+        if (DEBUG) { println ("bb = " + bb); println ("cc = " + cc) }
+
+        // system solution
+        val bb_fac = new SVD (bb)                // Use Singular Value Decomposition: pinv (bb)
+        val z      = bb_fac.solve (cc)
+        if (DEBUG) println ("z = " + z)
+        val alpha  = z.sum
+        1.0 - alpha                              // return cdf
+    } // facchinettiCDF
+
 } // GoodnessOfFit_KS object
 
-import GoodnessOfFit_KS.lilliefors
+import GoodnessOfFit_KS._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GoodnessOfFit_KS` class is used to fit data to probability distibutions.
@@ -87,7 +150,7 @@ class GoodnessOfFit_KS (private var d: VectorD, makeStandard: Boolean = true)
      *  @param cdf    the Cummulative Distribritution Function to test
      *  @param parms  the parameters for the distribution
      */
-    def fit (cdf: Distribution, parms: Array [Int] = Array ()): Boolean =
+    def fit (cdf: Distribution, parms: Parameters = null): Boolean =
     {
         println ("-------------------------------------------------------------")
         println ("Test goodness of fit for " + cdf.getClass.getSimpleName ())
@@ -150,7 +213,7 @@ object GoodnessOfFit_KSTest extends App
     println ("-------------------------------------------------------------")
 
     val gof1 = new GoodnessOfFit_KS (d, false)
-    println ("fit = " + gof1.fit (uniformCDF, Array (dmin.toInt, dmax.toInt)))
+    println ("fit = " + gof1.fit (uniformCDF, Vector (dmin, dmax)))
     
     val gof2 = new GoodnessOfFit_KS (d)
     println ("fit = " + gof2.fit (normalCDF))
@@ -168,4 +231,16 @@ object GoodnessOfFit_KSTest2 extends App
      println ("lilliefors = " + lilliefors (0.1030, 50))
 
 } // GoodnessOfFit_KSTest2
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GoodnessOfFit_KSTest3` object is used to test the `GoodnessOfFit_KS` object.
+ *  @see sa-ijas.stat.unipd.it/sites/sa-ijas.stat.unipd.it/files/IJAS_3-4_2009_07_Facchinetti.pdf
+ *  > run-main scalation.stat.GoodnessOfFit_KSTest3
+ */
+object GoodnessOfFit_KSTest3 extends App
+{
+     println ("facchinettiCDF = " + facchinettiCDF (0.50945, 5))   // answer = .10
+
+} // GoodnessOfFit_KSTest3
 

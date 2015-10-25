@@ -10,11 +10,9 @@ package scalation.random
 
 import scala.math.{abs, exp, log, Pi, sqrt}
 
-import scalation.linalgebra.VectorD
 import scalation.math.{double_exp, cot}
 import scalation.math.Combinatorics.rBetaF
 import scalation.math.ExtremeD._
-import scalation.plot.Plot
 import scalation.util.Error
 
 import CDF.{chiSquareCDF, fisherCDF}
@@ -59,20 +57,9 @@ object Quantile
      */
     def uniformInv (p: Double, pr: Parameters = null): Double =
     {
-        val (a, b) = if (pr == null) (0.0, 1.0) else (pr(0), pr(1))
+        val (a, b) = if (pr == 0) (0.0, 1.0) else (pr(0), pr(1))
         a + p * (b - a)
     } // uniformInv
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the 'p'-th quantile for the Exponential distribution function.
-     *  @param p   the p-th quantile, e.g., .95 (95%)
-     *  @param pr  parameter for the rate
-     */
-    def exponentialInv (p: Double, pr: Parameters = null): Double =
-    {
-        val λ = if (pr == null) 1.0 else pr(0)
-        -log (1.0 - p) / λ
-    } // exponentialInv
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the 'p'-th quantile for the "standard normal distribution" function.
@@ -94,10 +81,10 @@ object Quantile
      *  WWW URL:     http://www.math.uio.no/~jacklam
      *  @see home.online.no/~pjacklam/notes/invnorm/impl/sprouse/ltqnorm.c
      *-------------------------------------------------------------------------
-     *  @param p   the p-th quantile, e.g., .95 (95%)
-     *  @param pr  parameter for the distribution (currently not used)
+     *  @param p    the p-th quantile, e.g., .95 (95%)
+     *  @param _df  the degrees of freedom (not used for Normal)
      */
-    def normalInv (p: Double = .95, pr: Parameters = null): Double =
+    def normalInv (p: Double = .95, _df: Parameters = null): Double =
     {
         val extreme = check (p)                        // handle extreme cases
         if (extreme._1) return extreme._2
@@ -173,7 +160,7 @@ object Quantile
 
         val sign = if (p < 0.5) -1.0 else 1.0
 
-        val df = if (pr == null) 9 else pr(0).toInt
+        val df = pr(0).toInt
         if (df <= 0) { flaw ("studentTInv", "parameter df must be positive"); return NaN }
         if (df == 1) return -cot (p * Pi)
         if (df == 2) return sign * sqrt (1.0 / (2.0 * p * (1.0 - p)) - 2.0)
@@ -217,7 +204,7 @@ object Quantile
 
         val sign = if (p < 0.5) -1.0 else 1.0
 
-        val df = if (pr == null) 9 else pr(0).toInt
+        val df = pr(0).toInt
         if (df <= 0) { flaw ("studentTInv", "parameter df must be strictly positive"); return NaN }
         if (df == 1) return -cot (p * Pi)
         if (df == 2) return sign * sqrt (1.0 / (2.0 * p * (1.0 - p)) - 2.0)
@@ -258,7 +245,7 @@ object Quantile
         val extreme = check (p, 0.0)                   // handle extreme cases
         if (extreme._1) return extreme._2
 
-        val df = if (pr == null) 9 else pr(0).toInt
+        val df = pr(0).toInt
         if (df <= 0 || df >= 50) {
             flaw ("chiSquareInv", "parameter df must be in the set {1, 2, ..., 49}")
             return NaN
@@ -302,8 +289,8 @@ object Quantile
         val extreme = check (p, 0.0)                   // handle extreme cases
         if (extreme._1) return extreme._2
 
-        val df1 = if (pr == null) 2 else pr(0).toInt          // degrees of freedom 1
-        val df2 = if (pr == null) 9 else pr(1).toInt          // degrees of freedom 2
+        val df1 = pr(0).toInt          // degrees of freedom 1
+        val df2 = pr(1).toInt          // degrees of freedom 2
         if (df1 <= 0 || df2 <= 0) {
             flaw ("fisherInv", "parameters df1 and df2 must be strictly positive")
             return NaN
@@ -332,7 +319,7 @@ object Quantile
      */
     def fisherInv (p: Double, df: Tuple2 [Int, Int]): Double =
     {
-        fisherInv (p, Vector (df._1.toDouble, df._2.toDouble))
+        fisherInv (p, Vector (df._1, df._2))
     } // fisherInv
 
 } // Quantile object
@@ -357,14 +344,10 @@ trait QuantileTest
         println ("-----------------------------------------------------------")
         println (s"Test the $name function")
         val n = 40
-        val p = new VectorD (n)
-        val x = new VectorD (n)
-        for (i <- 1 until n) {
-            p(i) = i / n.toDouble
-            x(i) = fi(p(i), pr)
-            println (s"$name (${p(i)}, $pr)\t = ${x(i)}")
+        for (i <- 0 to n) {
+            val p = i / n.toDouble
+            println (s"$name ($p, $pr)\t = ${fi(p, pr)}")
         } // for
-        new Plot (p, x, null, name + ": x = Finv(p)")
     } // test_df
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -374,31 +357,18 @@ trait QuantileTest
     def test (icdf: String)
     {
         icdf match {
-
-        case "uniformInv" =>
-            test_df (uniformInv, icdf)
-
-        case "exponentialInv" =>
-            test_df (exponentialInv, icdf)
-
-        case "empiricalInv" =>
-            println (s"distribution $icdf currently is not yet implemented")
-
         case "normalInv" =>
-            test_df (normalInv, icdf)
-
+            test_df (normalInv, "normalInv")
         case "studentTInv" =>
-            for (df <- 1 to 30) test_df (studentTInv, icdf, Vector (df))
-
+            for (df <- 1 to 30)
+                test_df (studentTInv, "studentTInv", Vector (df))
+//              test_df (studentTInv2, "studentTInv", Vector (df))
         case "chiSquareInv" =>
-            for (df <- 1 to 30) test_df (chiSquareInv, icdf, Vector (df))
-
-        case "fisherInv" =>
-            for (df1 <- 1 to 10; df2 <- 1 to 10)
-                test_df (fisherInv, icdf, Vector (df1, df2))
-
+            for (df <- 1 to 30)
+                test_df (chiSquareInv, "chiSquareInv", Vector (df))
         case _ =>
-            println (s"distribution $icdf currently is not supported")
+            for (df1 <- 1 to 10; df2 <- 1 to 10)
+                test_df (fisherInv, "fisherInv", Vector (df1, df2))
         } // match
     } // test
 
@@ -406,24 +376,8 @@ trait QuantileTest
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `QuantileTest_Uniform` object is used to test the 'uniformQuantile' method
- *  in the `Quantile` object.
- *  > run-main scalation.random.QuantileTest_Uniform
- */
-object QuantileTest_Uniform extends App with QuantileTest { test ("uniformInv") }
-
-
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `QuantileTest_Exponential` object is used to test the 'exponentialQuantile' method
- *  in the `Quantile` object.
- *  > run-main scalation.random.QuantileTest_Exponential
- */
-object QuantileTest_Exponential extends App with QuantileTest { test ("exponentialInv") }
-
-
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `QuantileTest_Normal` object is used to test the 'normalQuantile' method
- *  in the `Quantile` object.
+ *  in the  `Quantile` object.
  *  > run-main scalation.random.QuantileTest_Normal
  */
 object QuantileTest_Normal extends App with QuantileTest { test ("normalInv") }

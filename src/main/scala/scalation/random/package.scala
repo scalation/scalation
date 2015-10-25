@@ -13,13 +13,18 @@ package scalation
  */
 package object random
 {
+    /** Type definition for parameters to a distribution. `Vector` is used instead
+     *  of `Array` since they are covariant, while Scala arrays are not.
+     */
+    type Parameters = Vector [Double]
+
     /** The function type for distribution functions, including
      *  (1) Cumulative Distribution Function (CDF)
      *  (2) inverse Cumulative Distribution Function (iCDF)
-     *  The parameters are Double for coordinate 'x' or probability 'p'
-     *  and a array of degrees of freedom.
+     *  The arguments are `Double` for coordinate 'x' or probability 'p' and a
+     *  `Vector` of parameters, e.g., degrees of freedom.
      */
-    type Distribution = (Double, Array [Int]) => Double
+    type Distribution = (Double, Parameters) => Double
 
 } // random package object 
 
