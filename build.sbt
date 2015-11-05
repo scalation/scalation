@@ -9,6 +9,8 @@ version := "1.2"
 
 scalaVersion := "2.12.0-M2"
 
+crossScalaVersions := Seq("2.12.0-M2", "2.11.7")
+
 fork := true
 
 // scalacOptions += "-feature"
