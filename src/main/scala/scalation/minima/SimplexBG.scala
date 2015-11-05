@@ -5,8 +5,12 @@
  *  @date    Sat Aug 20 23:20:26 EDT 2011
  *  @see     LICENSE (MIT style license file).
  *
- *  @see math.uc.edu/~halpern/Linear.progr.folder/Handouts.lp.02/Revisedsimplex.pdf
+ *  @see www.cise.ufl.edu/research/sparse/Morgan/bg.htm
+ *  @see www.cise.ufl.edu/research/sparse/Morgan/chapter2.htm
+ *  @see www.optimization-online.org/DB_FILE/2013/05/3897.pdf
  */
+
+// U N D E R   D E V E L O P M E N T 
 
 package scalation.minima
 
@@ -16,29 +20,30 @@ import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.random.Randi
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class solves Linear Programming (LP) problems using the Revised Simplex
- *  Algorithm.  Given a constraint matrix 'a', constant vector 'b' and cost
- *  vector 'c', find values for the solution/decision vector 'x' that minimize
- *  the objective function 'f(x)', while satisfying all of the constraints, i.e.,
+/** The `SimplexBG` class solves Linear Programming (LP) problems using the Bartels-Golub
+ *  (BG) Simplex Algorithm.  Given a constraint matrix 'a', constant vector 'b'
+ *  and cost vector 'c', find values for the solution/decision vector 'x' that
+ *  minimize the objective function 'f(x)', while satisfying all of the constraints,
+ *  i.e.,
  *
  *  minimize    f(x) = c x
  *  subject to  a x <= b, x >= 0
  *
- *  The Revised Simplex Algorithm operates on 'b_inv', which is the inverse of the
- *  basis-matrix ('ba' = 'B').  It has benefits over the Simplex Algorithm (less memory
- *  and reduced chance of round off errors).
+ *  The BG Simplex Algorithm performs LU Fractorization/Decomposition of the
+ *  basis-matrix ('ba' = 'B') rather than computing inverses ('b_inv').  It has
+ *  benefits over the (Revised) Simplex Algorithm (less runtime, less memory,
+ *  and much reduced chance of round off errors).
  *
  *  @param a    the constraint matrix
  *  @param b    the constant/limit vector
  *  @param c    the cost/revenue vector
  *  @param x_B  the initial basis (set of indices where x_i is in the basis)
  */
-class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] = null)
+class SimplexBG (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] = null)
       extends MinimizerLP
 {
     private val DEBUG    = false                       // debug flag
     private val CHECK    = true                        // CHECK mode => check feasibility for each pivot
-    private val PERIOD   = 1000000                     // number of pivots between rebuilds of b_inv
     private val M        = a.dim1                      // number of constraints (rows in a)
     private val N        = a.dim2                      // number of original variables (columns in a)
     private val MAX_ITER = 200 * N                     // maximum number of iterations
@@ -47,17 +52,21 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     if (c.dim != N) flaw ("constructor", "c.dim = " + c.dim + " != " + N)
 
     if (x_B == null) x_B = setBasis ()
-    private val ba       = a.selectCols (x_B)          // basis (selected columns from matrix-a)
-    private var b_inv    = ba.inverse                  // basis of matrix-a inverted
+    private val ba       = a.selectCols (x_B)          // basis-matrix (selected columns from matrix-a)
+    private val lu       = ba.lud                      // perform an LU Decomposition on the basis-matrix
+//  private var l_inv    = lu._1.inverse               // L-inverted
+//  private var u_inv    = lu._2.inverse               // U-inverted  (b_inv = u_inv * l_inv)
 
     private val c_B      = c.select (x_B)              // cost for basic variables
-    private val c_       = c_B * b_inv                 // adjusted cost
-    private val b_       = b_inv * b                   // adjusted constants
+//  private val c_       = c_B * (u_inv * l_inv)       // adjusted cost via inverse
+    private val c_       = c_B                         // adjusted cost via back-substitution - FIX
+//  private val b_       = (u_inv * l_inv) * b         // adjusted constants via inverse
+    private val b_       = ba.solve (lu, b)            // adjusted constants via back-substitution
 
     private var u: VectorD = null                      // vector used for leaving
     private var z: VectorD = null                      // vector used for entering
 
-    val checker = new CheckLP (a, b, c)                    // LP checker
+    val checker = new CheckLP (a, b, c)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** There are M+N variables, N decision and M slack variables, of which,
@@ -92,7 +101,8 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
      */
     def leaving (l: Int): Int =
     {
-        u = b_inv * a.col(l)
+//      u = (u_inv * l_inv) * a.col(l)
+        u = ba.solve (lu, a.col(l))
         if (unbounded (u)) return -1
         var k = 0
         var r_min = Double.PositiveInfinity
@@ -115,7 +125,8 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     } // unbounded
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Pivot by replacing x_k with x_l in the basis.  Update b_inv, b_ and c_.
+    /** Pivot by replacing x_k with x_l in the basis.  Update b_inv (actually lu),
+     *  b_ and c_.
      *  @param k  the leaving variable
      *  @param l  the entering variable
      */
@@ -123,27 +134,17 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     {
         println ("pivot: entering = " + l + " leaving = " + k)
         x_B(k) = l                                           // update basis (l replaces k)
-        b_inv(k) /= u(k)
+//      b_inv(k) /= u(k)                                     // FIX
         b_(k)    /= u(k)
         for (i <- 0 until M if i != k) {
-            b_inv(i) -= b_inv(k) * u(i)
+//          b_inv(i) -= b_inv(k) * u(i)                      // FIX
             b_ (i)   -= b_(k) * u(i)
         } // for
-        c_ -= b_inv(k) * z(l)
+//      c_ -= b_inv(k) * z(l)                                // FIX
     } // pivot
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Rebuild the b_inv matrix from the original a matrix, by setting basis columns
-     *  and inverting that matrix in-place.
-     */
-    def rebuild ()
-    {
-        for (j <- 0 until x_B.length) b_inv.setCol (j, a.col (x_B(j)))
-        b_inv = b_inv.inverse_ip
-    } // rebuild
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve a Linear Programming (LP) problem using the Revised Simplex Algorithm.
+    /** Solve a Linear Programming (LP) problem using the BG Simplex Algorithm.
      *  Iteratively pivot until there an optimal solution is found or it is
      *  determined that the solution is unbounded.  Return the optimal vector x.
      */
@@ -157,7 +158,7 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
             l = entering (); if (l == -1) break      // -1 => optimal solution found
             k = leaving (l); if (k == -1) break      // -1 => solution is unbounded
             pivot (k, l)                             // pivot: k leaves and l enters
-            if (it % PERIOD == 0) rebuild ()         // rebuild b_inv
+            if (CHECK && infeasible) break           // quit if infeasible
             if (DEBUG) showTableau (it)
         }} // for
 
@@ -165,9 +166,22 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     } // solve
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether the current solution (x = primal) is still primal feasible.
+     */
+    def infeasible: Boolean =
+    {
+        if ( ! checker.isPrimalFeasible (primal)) {
+            flaw ("infeasible", "solution x is no longer PRIMAL FEASIBLE")
+            true
+        } else {
+            false
+        } // if
+    } // infeasible
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the primal (basis only) solution vector (x).
      */
-    def primal: VectorD = b_inv * b
+    def primal: VectorD = ba.solve (lu, b)            // (u_inv * l_inv)  * b
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the full primal solution vector (xx).
@@ -191,7 +205,7 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     def objF (x: VectorD): Double = c.select (x_B) dot x
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Show the current revised tableau.
+    /** Show the current BG tableau.
      *  @param iter  the number of iterations do far
      */
     def showTableau (iter: Int)
@@ -202,10 +216,11 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
      } // showTableau
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert the current revised tableau (basis, b_inv, b_, and c_) to a string.
+    /** Convert the current BG tableau (basis, b_inv, b_, and c_) to a string.
      */
     override def toString: String =
     {
+        val b_inv = a.selectCols (x_B).inverse        // compute b_inv to show tableau
         var s = new StringBuilder ()
         for (i <- 0 until M) {
             s ++= "x" + x_B(i) + " | " + b_inv(i) + " | " + b_(i) + "\n"
@@ -214,17 +229,16 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
         s.toString
     } // toString
 
-} // RevisedSimplex class
+} // SimplexBG class
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `RevisedSimplexTest` object is used to test the `RevisedSimplex` class.
- *  > run-main scalation.minima.RevisedSimplexTest
+/** This object is used to test the SimplexBG class.
  */
-object RevisedSimplexTest extends App
+object SimplexBGTest extends App
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Test the Revised Simplex Algorithm for solving Linear Programming problems.
+    /** Test the BG Simplex Algorithm for solving Linear Programming problems.
      *  @param a    the constraint matrix
      *  @param b    the limit/RHS vector
      *  @param c    the cost vector
@@ -232,8 +246,8 @@ object RevisedSimplexTest extends App
      */
     def test (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int] = null)
     {
-//      val lp = new RevisedSimplex (a, b, c, x_B)    // test with user specified basis
-        val lp = new RevisedSimplex (a, b, c)         // test with default basis
+//      val lp = new SimplexBG (a, b, c, x_B)    // test with user specified basis
+        val lp = new SimplexBG (a, b, c)         // test with default basis
         val x  = lp.solve ()                          // the primal solution vector x
         val xx = lp.primalFull (x)                    // the full primal solution vector xx
         val y  = lp.dual                              // the dual solution vector y
@@ -247,7 +261,7 @@ object RevisedSimplexTest extends App
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test case 1:  Initialize matrix 'a', vectors 'b' and 'c', and optionally
-     *  the basis 'x_B'.  For Revised Simplex, matrix 'a' must be augmented with
+     *  the basis 'x_B'.  For BG Simplex, matrix 'a' must be augmented with
      *  an identity matrix and vector 'c' augmented with zeros.
      *-------------------------------------------------------------------------
      *  Minimize    z = -1x_0 - 2x_1 + 1x_2 - 1x_3 - 4x_4 + 2x_5 
@@ -334,5 +348,5 @@ object RevisedSimplexTest extends App
     println ("\ntest4 ========================================================")
     test4 ()
 
-} // RevisedSimplexTest object
+} // SimplexBGTest object
 

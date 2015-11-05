@@ -29,7 +29,7 @@ import scalation.util.Error
 trait MinimizerLP
       extends Error
 {
-    protected val EPSILON  = 1E-9                  // number close to zero
+    protected val EPSILON = 1E-9                   // number close to zero
     protected val checker: CheckLP                 // used to check LP solution
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
