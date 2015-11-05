@@ -24,3 +24,24 @@ project/plugins/project/
 # Scala-IDE specific
 .scala_dependencies
 .worksheet
+build
+.classpath
+.project
+.settings
+.cache-main
+bin
+org.scala-ide.sdt.core/META-INF/MANIFEST.MF
+org.scala-ide.sdt.update-site/site.xml
+
+
+#VIM specific
+tags
+.*.swp
+.*.swo
+
+#MAC OS specific
+.DS_Store
+
+#Intellij IDEA specific
+.idea
+
