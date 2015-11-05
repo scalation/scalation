@@ -13,25 +13,27 @@ import scala.math.{abs, atan, exp, Pi, pow, sqrt}
 
 import scalation.linalgebra.VectorD
 import scalation.math.Combinatorics.{rBetaF, rBetaC}
-import scalation.math.nexp
+import scalation.math.{double_exp, nexp}
 import scalation.math.ExtremeD._
 import scalation.plot.Plot
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CDF` object contains methods for computing 'F(x)', the Cumulative
- *  Distribution Functions (CDF's) for popular sampling distributions:
- *  StandardNormal, StudentT, ChiSquare and Fisher, as well as the Uniform
- *  Distribution. 
+ *  Distribution Functions (CDF's) for popular distributions:
+ *  Uniform
+ *  Exponential
+ *  Weibel 
+ *  Empirical
+ *  StandardNormal
+ *  StudentT
+ *  ChiSquare
+ *  Fisher
  *  For a given CDF 'F' with argument 'x', compute 'p = F(x)'.
  */
 object CDF
        extends Error
 {
-    /** Type definition for parameters to a distribution
-     */
-    type Parameters = Vector [Double]
-
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
      *  Uniform distribution.
@@ -83,9 +85,34 @@ object CDF
         exponentialCDF (x, λ)
     } // exponentialCDF
 
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
+     *  weibullCDF distribution.
+     *  @param x  the x coordinate, argument to F(x)
+     *  @param α  the shape parameter
+     *  @param β  the scale parameter
+     */
+    def weibullCDF (x: Double, α: Double, β: Double): Double =
+    {
+        if (α <= 0.0 || β <= 0.0) flaw ("weibullCDF", "parameters α and β must be positive")
+        if (x > 0.0) 1.0 - nexp ((x/β)~^α) else 0.0
+    } // weibullCDF
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
+     *  weibullCDF distribution.
+     *  @param x     the x coordinate, argument to F(x)
+     *  @param parm  parameters giving the shape and scale
+     */
+    def weibullCDF (x: Double, pr: Parameters = null): Double =
+    {
+        val (α, β) = if (pr == null) (2.0, 2.0) else (pr(0), pr(1))
+        weibullCDF (x, α, β)
+    } // weibullCDF
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::    
     /** Build an empirical CDF from input data vector 'x'.
-     *  Ex: x = (2, 1, 2, 3, 2) -> cdf = ((1, .2), (2, .6), (3, .2))
+     *  Ex: x = (2, 1, 2, 3, 2) -> cdf = ((1, .2), (2, .8), (3, 1.))
      *  @param x  the input data vector
      */
     def buildEmpiricalCDF (x: VectorD): Tuple2 [VectorD, VectorD] =
@@ -390,6 +417,9 @@ trait CDFTest
         case "empiricalCDF" =>
             println (s"distribution $cdf currently is not yet implemented")
 
+        case "weibullCDF" =>
+            test_df (weibullCDF, cdf, 0.0, 4.0)
+
         case "normalCDF" =>
             test_df (normalCDF, cdf, -4.0, 4.0)
 
@@ -410,6 +440,7 @@ trait CDFTest
 
 } // CDFTest trait
 
+
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CDFTest_Uniform` object is used to test the 'UniformCDF' method in the
  *  `CDF` object.
@@ -425,7 +456,14 @@ object CDFTest_Uniform extends App with CDFTest { test ("uniformCDF") }
  */
 object CDFTest_Exponential extends App with CDFTest { test ("exponentialCDF") }
 
- 
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `CDFTest_Weibull` object is used to test the 'WeibullCDF' method in the
+ *  `CDF` object.
+ *  > run-main scalation.random.CDFTest_Weibull
+ */
+object CDFTest_Weibull extends App with CDFTest { test ("weibullCDF") }
+
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CDFTest_Empirical` object is used to test the 'buildEmpiricalCDF' method

@@ -17,7 +17,7 @@ import scalation.math.ExtremeD._
 import scalation.plot.Plot
 import scalation.util.Error
 
-import CDF.{chiSquareCDF, fisherCDF}
+import CDF.{buildEmpiricalCDF, chiSquareCDF, fisherCDF}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Quantile` object contains methods for computing 'Finv', the "inverse"
@@ -73,6 +73,27 @@ object Quantile
         val λ = if (pr == null) 1.0 else pr(0)
         -log (1.0 - p) / λ
     } // exponentialInv
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the 'p'-th quantile for the Empirical distribution function.
+     *  @param p     the p-th quantile, e.g., .95 (95%)
+     *  @param eCDF  the empirical CDF
+     */
+    def empiricalInv (p: Double, eCDF: Tuple2 [VectorD, VectorD]): Double =
+    {
+        eCDF._1 (eCDF._2.indexWhere (p <= _))
+    } // empiricalInv
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the 'p'-th quantile for the Empirical distribution function.
+     *  @param p     the p-th quantile, e.g., .95 (95%)
+     *  @param data  parameters as data
+     */
+    def empiricalInv (p: Double, data: Parameters): Double =
+    {
+        val eCDF = buildEmpiricalCDF (VectorD (data))
+        eCDF._1 (eCDF._2.indexWhere (p <= _))
+    } // empiricalInv
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the 'p'-th quantile for the "standard normal distribution" function.
@@ -382,7 +403,7 @@ trait QuantileTest
             test_df (exponentialInv, icdf)
 
         case "empiricalInv" =>
-            println (s"distribution $icdf currently is not yet implemented")
+            test_df (empiricalInv, icdf, Vector (2.0, 1.0, 2.0, 3.0, 2.0))
 
         case "normalInv" =>
             test_df (normalInv, icdf)
@@ -406,7 +427,7 @@ trait QuantileTest
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `QuantileTest_Uniform` object is used to test the 'uniformQuantile' method
+/** The `QuantileTest_Uniform` object is used to test the 'uniformInv' method
  *  in the `Quantile` object.
  *  > run-main scalation.random.QuantileTest_Uniform
  */
@@ -414,7 +435,7 @@ object QuantileTest_Uniform extends App with QuantileTest { test ("uniformInv") 
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `QuantileTest_Exponential` object is used to test the 'exponentialQuantile' method
+/** The `QuantileTest_Exponential` object is used to test the 'exponentialInv' method
  *  in the `Quantile` object.
  *  > run-main scalation.random.QuantileTest_Exponential
  */
@@ -422,7 +443,15 @@ object QuantileTest_Exponential extends App with QuantileTest { test ("exponenti
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `QuantileTest_Normal` object is used to test the 'normalQuantile' method
+/** The `QuantileTest_Empirical` object is used to test the 'empiricalInv' method
+ *  in the `Quantile` object.
+ *  > run-main scalation.random.QuantileTest_Empirical
+ */
+object QuantileTest_Empirical extends App with QuantileTest { test ("empiricalInv") }
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `QuantileTest_Normal` object is used to test the 'normalInv' method
  *  in the `Quantile` object.
  *  > run-main scalation.random.QuantileTest_Normal
  */
@@ -430,7 +459,7 @@ object QuantileTest_Normal extends App with QuantileTest { test ("normalInv") }
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `QuantileTest_StudentT` object is used to test the 'studentTQuantile' method
+/** The `QuantileTest_StudentT` object is used to test the 'studentTInv' method
  *  in the `Quantile` object.
  *  > run-main scalation.random.QuantileTest_StudentT
  */
@@ -438,7 +467,7 @@ object QuantileTest_StudentT extends App with QuantileTest { test ("studentTInv"
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `QuantileTest_ChiSquare` object is used to test the 'chiSquareQuantile' method
+/** The `QuantileTest_ChiSquare` object is used to test the 'chiSquareInv' method
  *  in the `Quantile` object.
  *  > run-main scalation.random.QuantileTest_ChiSquare
  */
@@ -446,7 +475,7 @@ object QuantileTest_ChiSquare extends App with QuantileTest { test ("chiSquareIn
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `QuantileTest_Fisher` object is used to test the 'fisherQuantile' method
+/** The `QuantileTest_Fisher` object is used to test the 'fisherInv' method
  *  in the `Quantile` object.
  *  > run-main scalation.random.QuantileTest_Fisher
  */

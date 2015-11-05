@@ -9,22 +9,23 @@
  *  @see also `GoodnessOfFit_CS`, `GoodnessOfFit_CS2`
  */
 
-//  U N D E R   D E V E L O P M E N T 
-
 package scalation.stat
 
-import scala.math.{floor, round, sqrt}
+import scala.math.{exp, min, pow, sqrt}
 
-import scalation.linalgebra.{MatrixD, SVD, VectorD}
-import scalation.math.double_exp
-import scalation.math.Combinatorics.fac
+import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.random.{Distribution, Parameters, Quantile, Variate}
 import scalation.random.CDF.buildEmpiricalCDF
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `GoodnessOfFit_KS` object provides a method to approximate the critical
- *  values for the KS Test.
+/** The `GoodnessOfFit_KS` object provides methods to approximate the critical
+ *  values/p-values for the KS Test.
+ *  <p>
+ *      P(D_n < d)
+ *  <p>
+ *  @see www.jstatsoft.org/article/view/v008i18/kolmo.pdf
+ *  @see sa-ijas.stat.unipd.it/sites/sa-ijas.stat.unipd.it/files/IJAS_3-4_2009_07_Facchinetti.pdf
  */
 object GoodnessOfFit_KS
 {
@@ -44,13 +45,13 @@ object GoodnessOfFit_KS
      *  Caveat:  assumes alpha = .05 and is only accurate to two digits.
      *  @see www.utdallas.edu/~herve/Abdi-Lillie2007-pretty.pdf
      *  FIX - use a more flexible and accurate approximation.
-     *  @param dm  the maximum distance between empirical and theoretical distribution
-     *  @param n   the number of data points
+     *  @param d  the maximum distance between empirical and theoretical distribution
+     *  @param n  the number of data points
      */
-    def lilliefors (dm: Double, n: Int): Double =
+    def lilliefors (d: Double, n: Int): Double =
     {
         val b1n = b(1) + n
-        val dm2 = 1.0 / (dm * dm)
+        val dm2 = 1.0 / (d * d)
         val a = ( -b1n + sqrt (b1n*b1n - 4.0 * b(2) * (b(0) - dm2)) ) / (2.0 * b(2))
         var aa = a 
         var sum = c(0)
@@ -59,62 +60,66 @@ object GoodnessOfFit_KS
     } // lilliefors
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Cummulative Distribution Function for the critical values
-     *  for the KS Test.
-     *  @see sa-ijas.stat.unipd.it/sites/sa-ijas.stat.unipd.it/files/IJAS_3-4_2009_07_Facchinetti.pdf
-     *  FIX - it's returning NaN
-     *  @param dm  the maximum distance between empirical and theoretical distribution
-     *  @param n   the number of data points
+    /** Compute the Cummulative Distribution Function (CDF) for 'P(D_n < d)'.
+     *  It can used for p-values or critical values for the KS test.
+     *  Translated from C code given in paper below.
+     *  @see www.jstatsoft.org/article/view/v008i18/kolmo.pdf
+     *  @param d  the maximum distance between empirical and theoretical distribution
+     *  @param n  the number of data points
      */
-    def facchinettiCDF (dm: Double, n: Int): Double =
+    def ksCDF (d: Double, n: Int): Double =
     {
-        // parameters definition
-        val nD = n * dm
-        val m1 = round (n*dm + 0.5).toInt
-        val m2 = round (n - n*dm - 0.5).toInt
-        val l1 = round (2.0*n*dm + 0.5).toInt
-        val n1 = n * (1 + dm)
-        val n2 = n * (1 - dm)
+        var s = d*d*n
+        if (s > 7.24 || (s > 3.76 && n > 99)) {
+            return 1.0 - 2.9 * exp (-(2.000071 + 0.331/sqrt(n) + 1.409/n) * s)
+        } // if
 
-        // B matrix -> bb
-        val bb = new MatrixD (2*(n+1), 2*(n+1))
+        val k  = (n*d).toInt + 1
+        val m  = 2*k - 1
+        val h  = k - n*d
+        val hh = new MatrixD (m, m)
+        for (i <- 0 until m; j <- 0 to min (i+1, m-1)) hh(i, j) = 1.0
 
-        // B11 matrix
-        for (k <- m1+1 to n+1) bb(k, k) = 1.0
-        for (r <- m1 to n-1; k <- r+1 to n) {
-            bb(k+1, r+1) = fac(n-r)/(fac(k-r)*fac(n-k))*(((k-r)/(n1-r))~^(k-r))*(((n1-k)/(n1-r))~^(n-k))
+        for (i <- 0 until m) {
+            hh(i, 0)   -= pow (h, i+1)                    // first column
+            hh(m-1, i) -= pow (h, m-i)                    // last row
         } // for
 
-        // B22 matrix
-        for (k <- n+2 to n+2+m2) bb(k, k) = 1.0
-        for (r <- 0 to m2-1; k <- r+1 to m2) {
-            bb(k+n+2, r+n+2) = fac(n-r)/(fac(k-r)*fac(n-k))*(((k-r)/(n2-r))~^(k-r))*(((n2-k)/(n2-r))~^(n-k))
+        hh(m-1, 0) += (if (2*h - 1 > 0) pow (2*h - 1, m) else 0.0)
+        for (i <- 0 until m; j <- 0 until m) {
+            if (i-j+1 > 0) for (g <- 1 to i-j+1) hh(i, j) /= g
         } // for
 
-        // B21 matrix
-        for (r <- m1 to m2; k <- r to m2) {
-            bb(k+n+2, r+1) = fac(n-r)/(fac(k-r)*fac(n-k))*(((k-r+2*nD)/(n1-r))~^(k-r))*(((n2-k)/(n1-r))~^(n-k))
+        val eH = 0
+        var (qq, eQ) = mPower (hh, eH, n)
+        s = qq(k-1, k-1)
+        for (i <- 1 to n) {
+            s = s*i / n
+            if (s < 1e-140) { s *= 1e140; eQ -= 140 }
         } // for
+        s * pow (10.0, eQ)
+    } // ksCDF
 
-        // B12 matrix
-        for (r <- 0 to n-l1; k <- l1+r to n) {
-            bb(k+1,r+n+2) = fac(n-r)/(fac(k-r)*fac(n-k))*(((k-r-2*nD)/(n2-r))~^(k-r))*(((n1-k)/(n2-r))~^(n-k))
-        } // for
-
-        // C vector -> cc
-        val cc = new VectorD (2*(n+1))
-        for (k <- m1 to n) cc(k+1) = fac(n)/(fac(k)*fac(n-k))*(((k-nD)/n)~^k)*(((n1-k)/n)~^(n-k))      // C1 vector
-        for (k <- 0 to m2) cc(n+2+k) = fac(n)/(fac(k)*fac(n-k))*(((k+nD)/n)~^k)*(((n2-k)/n)~^(n-k))    // C2 vector
-
-        if (DEBUG) { println ("bb = " + bb); println ("cc = " + cc) }
-
-        // system solution
-        val bb_fac = new SVD (bb)                // Use Singular Value Decomposition: pinv (bb)
-        val z      = bb_fac.solve (cc)
-        if (DEBUG) println ("z = " + z)
-        val alpha  = z.sum
-        1.0 - alpha                              // return cdf
-    } // facchinettiCDF
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide and conquer algorithm to raise matrix 'a' to the 'n'-th power,
+     *  returning 'v = a^n' and 'eV' = final exponential shift.
+     *  Translated from C code given in paper below.
+     *  @see www.jstatsoft.org/article/view/v008i18/kolmo.pdf
+     *  @param a   the matrix whose n-th power is sought
+     *  @patam eA  the initial shift on the exponent
+     *  @param n   the power to raise the matrix a to
+     */
+    private def mPower (a: MatrixD, eA: Int, n: Int): Tuple2 [MatrixD, Int] =
+    {
+        if (n == 1) return (new MatrixD (a), eA)
+        var (v, eV) = mPower (a ,eA, n/2)
+        val (b, eB) = (v * v, 2 * eV)
+        if (n % 2 == 0) { v = b; eV = eB }
+        else { v = a * b; eV = eA + eB }
+        val mid = a.dim1 / 2
+        if (v(mid, mid) > 1e140) { v *= 1e-140; eV += 140 }
+        (v, eV)
+    } // mPower
 
 } // GoodnessOfFit_KS object
 
@@ -144,13 +149,13 @@ class GoodnessOfFit_KS (private var d: VectorD, makeStandard: Boolean = true)
     private val eCDF = buildEmpiricalCDF (d)                    // Empirical CDF for data vector d
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform a KS goodness of fit test, matching the CDF of thegiven data 'd' with
+    /** Perform a KS goodness of fit test, matching the CDF of the given data 'd' with
      *  the random variable's Cummulative Distribritution Function (CDF).
      *  @see www.usna.edu/Users/math/dphillip/sa421.f13/chapter02.pdf
      *  @param cdf    the Cummulative Distribritution Function to test
      *  @param parms  the parameters for the distribution
      */
-    def fit (cdf: Distribution, parms: Parameters = null): Boolean =
+    def fit (cdf: Distribution, parms: Parameters = null): Double =
     {
         println ("-------------------------------------------------------------")
         println ("Test goodness of fit for " + cdf.getClass.getSimpleName ())
@@ -167,9 +172,14 @@ class GoodnessOfFit_KS (private var d: VectorD, makeStandard: Boolean = true)
             println ("y  = " + y)                         // theoretical distribution F(x_i)
         } // if
 
+/*******
         val critical = lilliefors (d_max, n)              // approximate critical value
         println (s"d_max = $d_max <=? critical = $critical")
         d_max <= critical                                 // false => null hypothesis rejected
+*******/
+
+        ksCDF (d_max, n)                                   // p-value for the KS Test
+       
     } // fit
 
 } // GoodnessOfFit_KS class
@@ -235,12 +245,12 @@ object GoodnessOfFit_KSTest2 extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GoodnessOfFit_KSTest3` object is used to test the `GoodnessOfFit_KS` object.
- *  @see sa-ijas.stat.unipd.it/sites/sa-ijas.stat.unipd.it/files/IJAS_3-4_2009_07_Facchinetti.pdf
+ *  @see www.jstatsoft.org/article/view/v008i18/kolmo.pdf
  *  > run-main scalation.stat.GoodnessOfFit_KSTest3
  */
 object GoodnessOfFit_KSTest3 extends App
 {
-     println ("facchinettiCDF = " + facchinettiCDF (0.50945, 5))   // answer = .10
+     println ("ksCDF = " + ksCDF (0.2, 10))     // p-value answer = 0.251281
 
 } // GoodnessOfFit_KSTest3
 
