@@ -10,7 +10,7 @@
 
 package scalation.graphalytics
 
-import collection.mutable.Map
+import collection.mutable.{ArrayBuffer, Map}
 import collection.mutable.{Set => SET}
 //import collection.mutable.{HashSet => SET}
 
@@ -36,6 +36,10 @@ class Digraph (val ch:      Array [SET [Int]],
                val vid:     Array [Int] = null)
       extends Cloneable
 {
+    /** Debug flag
+     */
+    private val DEBUG = true
+
     /** The map from label to the set of vertices with the label
      */
     val labelMap = buildLabelMap (label)
@@ -112,6 +116,58 @@ class Digraph (val ch:      Array [SET [Int]],
     /** Determine whether 'this' digraph is (weakly) connected.
      */
     def isConnected: Boolean = (new DigDFS (this)).weakComps == 1
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Take the union 'this' digraph and 'g2'.
+     *  @param g2  the other digraph
+     */
+    def union (g2: Digraph): Digraph =
+    {
+        val vv     = if (vid == null)    Array.range (0, ch.length) else vid
+        val uu     = if (g2.vid == null) Array.range (0, g2.ch.length) else g2.vid
+        val vmap   = Map [Int, Int] ()
+        val umap   = Map [Int, Int] ()
+        val _vid   = ArrayBuffer [Int] ()
+        val _label = ArrayBuffer [TLabel] ()
+        var (i, j, k) = (0, 0, 0)
+        var (more_i, more_j) = (true, true)
+
+        while (more_i || more_j) {
+           if (i >= vv.length) more_i = false
+           if (j >= uu.length) more_j = false
+           if (more_i && (! more_i || vv(i) < uu(j))) {
+               _vid += vv(i)
+               vmap += (k -> i)
+               _label += label(i)
+               i += 1
+           } else if (more_j && (! more_i || vv(i) > uu(j))) {
+               _vid += uu(j)
+               umap += (k -> j)
+               _label += g2.label(j)
+               j += 1
+           } else if (more_i && more_j) {
+               _vid += vv(i)
+               vmap += (k -> i)
+               umap += (k -> j)
+               _label += label(i)
+               i += 1; j += 1
+           } // if
+           k += 1
+        } // while
+
+        if (DEBUG) println ("_vid = " + _vid)
+
+        val _ch = Array.ofDim [SET [Int]] (_vid.size)
+
+        for (k <- _vid.indices) {
+            val vi = vmap.getOrElse (k, -1)
+            val uj = umap.getOrElse (k, -1)
+            _ch(k) = if (vi >= 0 && uj >= 0) ch(vi) union g2.ch(uj)
+                     else if (vi >= 0) ch(vi)
+                     else g2.ch(uj)
+        } // for
+        new Digraph (_ch, _label.toArray, inverse, name + "_" + g2.name, _vid.toArray)
+    } // union
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check whether the endpoint vertex id of each edge is within bounds: 0..maxId.
@@ -301,4 +357,20 @@ object DigraphTest2 extends App
     DigGen.genRandomGraph (nVertices, nLabels, outDegree, inverse, name).print ()
 
 } // DigraphTest2 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `DigraphTest3` object is used to test the `Digraph` class using the
+ *  digraphs given in the `Digraph` companion object.
+ *  > run-main scalation.graphalytics.DigraphTest3
+ */
+object DigraphTest3 extends App
+{
+    import Digraph._
+    q1.print ()
+    q2.print ()
+    val q3 = q1 union q2
+    q3.print ()
+
+} // DigraphTest3 object
 

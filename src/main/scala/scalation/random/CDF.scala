@@ -263,8 +263,9 @@ object CDF
         val eps = EPSILON                                          // machine epsilon
         val min = MIN_VALUE
           
-        var ccum = 0.0; var cum = 0.0;
-        var del = 0.0; var temp = 0.0; var xden = 0.0; var xnum = 0.0; var xsq = 0.0
+        var (ccum, cum) = (0.0, 0.0)
+        var (del, temp) = (0.0, 0.0)
+        var (xden, xnum, xsq) = (0.0, 0.0, 0.0)
 
         var i = 0
         val y = abs (x)
@@ -325,7 +326,6 @@ object CDF
 
           cum
     } // normalCDF
-     
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::    
     /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the Standard
