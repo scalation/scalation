@@ -9,6 +9,7 @@
 package scalation.graphalytics
 
 import scalation.linalgebra.VectorD
+import scalation.math.ExtremeD.MAX_VALUE
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `LabelType` specifies (data) type for vertex and edge labels.
@@ -19,24 +20,31 @@ object LabelType
 {
     /** Type for label, e.g., Int, Double, String, VectorD, etc. (not made generic for speed)
      */
-    type TLabel = Int          // change and recompile (FIX: use Scala Macros)
-//  type TLabel = Double
+//  type TLabel = Int          // change and recompile (FIX: use Scala Macros)
+    type TLabel = Double
 //  type TLabel = String
 //  type TLabel = VectorD
 
     /** The default value for the TLabel type
      */
-    val TLabel_DEFAULT = 0          // change and recompile (FIX: use Scala Macros)
-//  val TLabel_DEFAULT = 0.0
+//  val TLabel_DEFAULT = 0          // change and recompile (FIX: use Scala Macros)
+    val TLabel_DEFAULT = 0.0
 //  val TLabel_DEFAULT = null
 //  val TLabel_DEFAULT = new VectorD (0)
+
+    /** The maximum value for the TLabel type
+     */
+//  val TLabel_MAX = Int.MaxValue          // change and recompile (FIX: use Scala Macros)
+    val TLabel_MAX = MAX_VALUE
+//  val TLabel_MAX = null
+//  val TLabel_MAX = new VectorD (MAX_VALUE)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert to the string to a TLabel type.
      *  @param s  the string to convert
      */
-    def toTLabel (s: String): TLabel = s.toInt                   // for Int
-//  def toTLabel (s: String): TLabel = s.toDouble                // for Double
+//  def toTLabel (s: String): TLabel = s.toInt                   // for Int
+    def toTLabel (s: String): TLabel = s.toDouble                // for Double
 //  def toTLabel (s: String): TLabel = s                         // for String
 //  def toTLabel (s: String): TLabel = VectorD (s)               // for VectorD
 
