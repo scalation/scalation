@@ -20,7 +20,7 @@ class SpanningTree (g: Digraph)
     private val DEBUG = true                           // debug flag
     private val size  = g.size                         // the number of nodes for the spanning tree
     private val root  = new TreeNode (0, 0)            // for vertex 0 in g, create a root node
-    private val stree = new ColorTree (root, 3.5)      // make a tree based on this root, est. depth 
+    private val stree = new Tree (root, 3.5)           // make a tree based on this root, est. depth 
     private val n_map = Map [Int, TreeNode] ()         // node map from node id to tree node
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

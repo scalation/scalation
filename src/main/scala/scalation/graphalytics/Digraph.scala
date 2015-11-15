@@ -10,9 +10,9 @@
 
 package scalation.graphalytics
 
-import collection.mutable.{ArrayBuffer, Map}
-import collection.mutable.{Set => SET}
-//import collection.mutable.{HashSet => SET}
+import scala.collection.mutable.{ArrayBuffer, Map}
+import scala.collection.mutable.{Set => SET}
+//import scala.collection.mutable.{HashSet => SET}
 
 import LabelType.TLabel
 
@@ -29,11 +29,11 @@ import LabelType.TLabel
  *  @param name     the name of the digraph
  *  @param vid      the vertex id (facilitates partitioning)
  */
-class Digraph (val ch:      Array [SET [Int]],
-               val label:   Array [TLabel] = Array.ofDim (0),
-               val inverse: Boolean = false,
-               val name:    String = "g",
-               val vid:     Array [Int] = null)
+class Digraph (val ch:         Array [SET [Int]],
+               val label:      Array [TLabel] = Array.ofDim (0),
+               val inverse:    Boolean = false,
+               val name:       String = "g",
+               val vid:        Array [Int] = null)
       extends Cloneable
 {
     /** Debug flag
@@ -201,6 +201,16 @@ class Digraph (val ch:      Array [SET [Int]],
     def getVerticesWithLabel (l: Int) = labelMap.getOrElse (l, SET [Int] ())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Make this directed graph work like an undirected graph by making sure that
+     *  for every edge 'u -> v', there is a 'v -> u' edge.
+     */
+    def makeUndirected (): Digraph =
+    {
+        for (u <- 0 until size; v <- ch(u)) ch(v) += u
+        this
+    } // makeUndirected
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' digraph to a string in a shallow sense.  Large arrays are
      *  not converted.  Use 'print' to show all information.
      */
@@ -218,8 +228,10 @@ class Digraph (val ch:      Array [SET [Int]],
     {
         var ch_i = ch(i).toString
         if (clip) ch_i = ch_i.replace ("Set(", "").replace (")", "")
-        if (vid == null) s"$i, ${label(i)}, $ch_i"
-        else             s"$i, [${vid(i)}], ${label(i)}, $ch_i"
+        if (vid == null) if (i < label.length) s"$i, ${label(i)}, $ch_i"
+                         else                  s"$i, $ch_i"
+        else             if (i < label.length) s"$i, [${vid(i)}], ${label(i)}, $ch_i"
+                         else                  s"$i, [${vid(i)}], $ch_i"
     } // toLine
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -237,10 +249,36 @@ class Digraph (val ch:      Array [SET [Int]],
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Digraph` companion object contains the example query digraphs.
+/** The `Digraph` companion object contains build methods and example query digraphs.
  */
 object Digraph
 {
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build an `Digraph` from a `Tree`.
+     *  @param tree     the base `Tree` for building the `Digraph`
+     *  @param name     the name for the new digraph
+     *  @param inverse  whether to add parent references
+     */
+    def apply (tree: Tree, name: String = "t", inverse: Boolean = false): Digraph =
+    {
+        val _ch    = Array.ofDim [SET [Int]] (tree.size)
+        val _label = Array.ofDim [TLabel] (tree.size)
+        val g = new Digraph (_ch, _label, inverse, name)
+
+        def traverse (n: TreeNode)
+        {
+            g.ch(n.nid) = SET [Int] ()
+            g.label(n.nid) += n.label
+            for (c <- n.child) {
+                g.ch(n.nid) += c.nid
+                traverse (c)
+            } // for
+        } // traverse
+
+        traverse (tree.root)
+        g
+    } // apply
+
     // -----------------------------------------------------------------------
     // Simple data and query digraphs.
     // -----------------------------------------------------------------------
@@ -373,4 +411,22 @@ object DigraphTest3 extends App
     q3.print ()
 
 } // DigraphTest3 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `DigraphTest4` object is used to test the `Digraph` class by calling
+ *  the apply in the `Digraph` companion object.
+ *  > run-main scalation.graphalytics.DigraphTest4
+ */
+object DigraphTest4 extends App
+{
+    val pred = Array (-1, 0, 0, 1, 1, 2, 2)
+    val labl = Array (10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0)
+    val t = Tree (pred, labl, 3.0, "t")
+    t.printTree
+    t.aniTree
+    val g = Digraph (t)
+    g.print ()
+
+} // DigraphTest4 object
 

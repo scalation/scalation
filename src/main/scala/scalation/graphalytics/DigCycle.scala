@@ -8,10 +8,10 @@
 
 package scalation.graphalytics
 
-import scala.collection.immutable.{Set => SET}
+import scala.collection.mutable.{Set => SET}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Cycle` class provides a means for building a precedence/directed graph
+/** The `DigCycle` class provides a means for building a precedence/directed graph
  *  and checking it for cycles.  For cycle detection, vertices are marked with
  *  traffic-light colors:
  *    - Green means go/unexplored,
@@ -19,7 +19,7 @@ import scala.collection.immutable.{Set => SET}
  *    - Red mean stop/already fully explored.
  *  @param g  the graph in which to check for cycles
  */
-case class Cycle (g: Graph)
+case class DigCycle (g: Digraph)
 {
     /** vertices are marked with traffic-light colors ('G'reen, 'Y'ellow, 'R'ed)
      */
@@ -49,34 +49,34 @@ case class Cycle (g: Graph)
         false
     } // loopback
 
-} // Cycle class
+} // DigCycle class
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `CycleTest` object tests the `Cycle` class using a label-free precedence
- *  graph.  Graphs are created by passing in an array of adjacency sets (one for
+/** The `DigCycleTest` object tests the `DigCycle` class using a label-free precedence
+ *  graph.  Digraphs are created by passing in an array of adjacency sets (one for
  *  each vertex).
- *  > run-main scalation.graphalytics.CycleTest
+ *  > run-main scalation.graphalytics.DigCycleTest
  */
-object CycleTest extends App
+object DigCycleTest extends App
 {
     /** Test precedence graph 1 (does not have a cycle)
      */
-    val pg1 = new Graph (Array (SET (1, 2),        // edges from 0:  0 -> 1, 0 -> 2
-                                SET (2),           // edges from 1:  1 -> 2
-                                SET [Int] ()))     // edges from 2:  no such edges
-    println ("Precedence Graph pg1: ----------------------------------------------")
+    val pg1 = new Digraph (Array (SET (1, 2),        // edges from 0:  0 -> 1, 0 -> 2
+                                  SET (2),           // edges from 1:  1 -> 2
+                                  SET [Int] ()))     // edges from 2:  no such edges
+    println ("Precedence Digraph pg1: --------------------------------------------")
     pg1.print ()
-    println ("pg1 has cycle? = " + Cycle (pg1).hasCycle)
+    println ("pg1 has cycle? = " + DigCycle (pg1).hasCycle)
     
     /** Test precedence graph 2 (has a cycle)
      */
-    val pg2 = new Graph (Array (SET (1, 2),        // edges from 0:  0 -> 1, 0 -> 2
-                                SET (2),           // edges from 1:  1 -> 2
-                                SET (0)))          // edges form 2:  2 -> 0
-    println ("Precedence Graph pg2: ----------------------------------------------")
+    val pg2 = new Digraph (Array (SET (1, 2),        // edges from 0:  0 -> 1, 0 -> 2
+                                  SET (2),           // edges from 1:  1 -> 2
+                                  SET (0)))          // edges form 2:  2 -> 0
+    println ("Precedence Diraph pg2: --------------------------------------------")
     pg2.print ()
-    println ("pg2 has cycle? = " + Cycle (pg2).hasCycle)
+    println ("pg2 has cycle? = " + DigCycle (pg2).hasCycle)
     
-} // CycleTest object
+} // DigCycleTest object
 

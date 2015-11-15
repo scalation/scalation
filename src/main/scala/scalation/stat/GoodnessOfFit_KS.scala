@@ -11,11 +11,11 @@
 
 package scalation.stat
 
-import scala.math.{exp, min, pow, sqrt}
+import scala.math.{abs, exp, max, min, pow, sqrt}
 
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.random.{Distribution, Parameters, Quantile, Variate}
-import scalation.random.CDF.buildEmpiricalCDF
+import scalation.random.CDF.{buildEmpiricalCDF, normalCDF}
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -126,27 +126,33 @@ object GoodnessOfFit_KS
 import GoodnessOfFit_KS._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `GoodnessOfFit_KS` class is used to fit data to probability distibutions.
- *  It uses the Kolmogorov-Srminov goodness of fit test.
- *  @see www.eg.bucknell.edu/~xmeng/Course/CS6337/Note/master/node66.html
- *  Compute the following for each unique data point 'x_i'.
+/** The `GoodnessOfFit_KS` class is used to fit data to a probability distibution.
+ *  It uses the Kolmogorov-Smirnov Goodness of Fit Test.  Determine the maximum
+ *  absolute difference 'd_max' between the data points 'd_i' and the theoretical
+ *  value from a CDF F,
  *  <p>
- *      d_max = max_i {| Fe(x_i) - F(x_i)|}
+ *      d_max = max 1≤i≤n {|Fe(d_i) - F(d_i)|}                   (concept)
+ *  <p>
+ *      d_max = max 1≤i≤n {F(d_i) − (i−1)/n, i/n − F(d_i)}       (calculation)
  *  <p>
  *  where Fe(.) is the empirical distribution and F(.) is the theorectical distribution.
+ *  If 'd_max' is large, the fit should be rejected.
+ *  @see www.eg.bucknell.edu/~xmeng/Course/CS6337/Note/master/node66.html
+ *  @see www.itl.nist.gov/div898/handbook/eda/section3/eda35g.htm
+ *---------------------------------------------------------------------------------
  *  @param d             the sample data points
  *  @param makeStandard  whether to transform the data to zero mean and unit standard deviation
  */
 class GoodnessOfFit_KS (private var d: VectorD, makeStandard: Boolean = true)
       extends Error
 {
-    private val DEBUG  = true                                    // debug flag
-    private val n      = d.dim                                   // number of sample data points
-    private val sqrt_n = sqrt (n)                                // square root of n
+    private val DEBUG = true                                    // debug flag
+    private val n     = d.dim                                   // number of sample data points
+    private val nd    = n.toDouble                              // n as a double
 
     if (makeStandard) d = d.standardize
 
-    private val eCDF = buildEmpiricalCDF (d)                    // Empirical CDF for data vector d
+//  private val eCDF = buildEmpiricalCDF (d)                    // Empirical CDF for data vector d
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform a KS goodness of fit test, matching the CDF of the given data 'd' with
@@ -161,15 +167,21 @@ class GoodnessOfFit_KS (private var d: VectorD, makeStandard: Boolean = true)
         println ("Test goodness of fit for " + cdf.getClass.getSimpleName ())
         println ("-------------------------------------------------------------")
 
+/*******
         val ey = eCDF._2
         val y = VectorD ((for (x: Double <- eCDF._1) yield cdf (x, parms)).toSeq)
-
         val d_max = (ey - y).mag                          // maximum absolute difference
+*******/
+
+        d.sort ()
+        val d_max = d.indices.map (i => {
+            val cdfDi = cdf (d(i), parms)
+            max (abs (cdfDi - i/nd), abs ((i+1)/nd - cdfDi))
+        }).max
 
         if (DEBUG) {
-            println ("x  = " + eCDF._1)                   // x coordinates
-            println ("ey = " + ey)                        // empirical distribution Fe(x_i)
-            println ("y  = " + y)                         // theoretical distribution F(x_i)
+            println ("d     = " + d)                      // data vector
+            println ("d_max = " + d_max)                  // maximum absolute distance
         } // if
 
 /*******
@@ -178,8 +190,7 @@ class GoodnessOfFit_KS (private var d: VectorD, makeStandard: Boolean = true)
         d_max <= critical                                 // false => null hypothesis rejected
 *******/
 
-        ksCDF (d_max, n)                                   // p-value for the KS Test
-       
+        1.0 - ksCDF (d_max, n)                            // p-value for the KS Test
     } // fit
 
 } // GoodnessOfFit_KS class
@@ -192,7 +203,7 @@ class GoodnessOfFit_KS (private var d: VectorD, makeStandard: Boolean = true)
  */
 object GoodnessOfFit_KSTest extends App
 {
-    import scalation.random.CDF.{normalCDF, uniformCDF}
+    import scalation.random.CDF.uniformCDF
 
     val d = VectorD (36.0, 37.0, 38.0, 38.0, 39.0, 39.0, 40.0, 40.0, 40.0, 40.0,
                      41.0, 41.0, 41.0, 41.0, 41.0, 41.0, 42.0, 42.0, 42.0, 42.0,
@@ -240,7 +251,7 @@ object GoodnessOfFit_KSTest2 extends App
 {
      println ("lilliefors = " + lilliefors (0.1030, 50))
 
-} // GoodnessOfFit_KSTest2
+} // GoodnessOfFit_KSTest2 object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -252,5 +263,30 @@ object GoodnessOfFit_KSTest3 extends App
 {
      println ("ksCDF = " + ksCDF (0.2, 10))     // p-value answer = 0.251281
 
-} // GoodnessOfFit_KSTest3
+} // GoodnessOfFit_KSTest3 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GoodnessOfFit_KSTest4` object is used to test the `GoodnessOfFit_KS` object.
+ *  Fifty data points generated by a random variate generator for the Normal distribution
+ *  are tested to see if they pass the Normality test.
+ *  > run-main scalation.stat.GoodnessOfFit_KSTest4
+ */
+object GoodnessOfFit_KSTest4 extends App
+{
+    val d = VectorD (-0.62645381,  0.18364332, -0.83562861,  1.59528080,  0.32950777,
+                     -0.82046838,  0.48742905,  0.73832471,  0.57578135, -0.30538839,
+                      1.51178117,  0.38984324, -0.62124058, -2.21469989,  1.12493092,
+                     -0.04493361, -0.01619026,  0.94383621,  0.82122120,  0.59390132,
+                      0.91897737,  0.78213630,  0.07456498, -1.98935170,  0.61982575,
+                     -0.05612874, -0.15579551, -1.47075238, -0.47815006,  0.41794156,
+                      1.35867955, -0.10278773,  0.38767161, -0.05380504, -1.37705956,
+                     -0.41499456, -0.39428995, -0.05931340,  1.10002537,  0.76317575,
+                     -0.16452360, -0.25336168,  0.69696338,  0.55666320, -0.68875569,
+                     -0.70749516,  0.36458196,  0.76853292, -0.11234621,  0.88110773)
+    println (d)
+    val gof = new GoodnessOfFit_KS (d)
+    println ("fit = " + gof.fit (normalCDF))
+
+} // GoodnessOfFit_KSTest4 object
 

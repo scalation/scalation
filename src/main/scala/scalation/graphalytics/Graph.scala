@@ -10,7 +10,7 @@
 
 package scalation.graphalytics
 
-import collection.immutable.{Set => SET}
+import scala.collection.immutable.{Set => SET}
 
 import LabelType.TLabel
 
@@ -149,7 +149,8 @@ class Graph (val ch:      Array [SET [Int]],
     {
         var ch_i = ch(i).toString
         if (clip) ch_i = ch_i.replace ("Set(", "").replace (")", "")
-        s"$i, ${label(i)}, $ch_i"
+        if (i < label.length) s"$i, ${label(i)}, $ch_i"
+        else                  s"$i, $ch_i"
     } // toLine
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

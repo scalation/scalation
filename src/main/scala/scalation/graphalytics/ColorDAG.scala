@@ -37,7 +37,7 @@ class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
     val nodes  = Array.ofDim [Array [DagNode]] (stages)   // a ragged array of DagNode arrays to hold the nodes in the DAG
     val edges  = ListBuffer [Edge] ()                     // a list to hold the edges of the DAG
 
-    val colors = ColorTree (colorDepth, minColors, maxColors)     // get a new ColorTree object with specified limits on child nodes
+    val colors = Tree (colorDepth, minColors, maxColors)  // get a new tree object with specified limits on child nodes
     val nColors = colors.size                             // get the number of colors in the ColorTree
  
     val randIn  = new Randi (1, maxIn, seed)              // random number generator for number of incoming edges for a node
@@ -246,9 +246,9 @@ class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
         println ("nodes(i): [in colors], [out colors]")
         for (s <- nodes; n <- s) {                                  // node n in stage s
             print ("node(" + n.id + "):\t[")
-            for (n_in <- n.inColors) print (n_in.id + " ")
+            for (n_in <- n.inColors) print (n_in.nid + " ")
             print ("],\t[")
-            for (n_out <- n.outColors) print (n_out.id + " ")
+            for (n_out <- n.outColors) print (n_out.nid + " ")
             println ("]")
         } // for
     } // printColors

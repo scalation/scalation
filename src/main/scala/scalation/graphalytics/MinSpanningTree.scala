@@ -1,16 +1,14 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  John Miller
+/** @author  John Miller, Peng Hao
  *  @version 1.2
  *  @date    Sat Nov  7 21:01:31 EST 2015
  *  @see     LICENSE (MIT style license file).
  */
 
-//  U N D E R   D E V E L O P M E N T
-
 package scalation.graphalytics
 
-import scala.collection.mutable.Map
+import scala.collection.mutable.{Map, Set => SET}
 //import scala.collection.mutable.PriorityQueue
 
 import scalation.math.ExtremeD.MAX_VALUE
@@ -24,15 +22,15 @@ import LabelType._
  *  implements Prim's algorithm.
  *  @see www.cse.ust.hk/~dekai/271/notes/L07/L07.pdf
  *  @param g  the multi-digraph to build the spanning tree from
+ *  @param min  whether to to create a minimum (true) or maximum (false) spanning tree
  */
-class MinSpanningTree (g: MDigraph)
+class MinSpanningTree (g: MDigraph, min: Boolean = true)
       extends Error
 {
     private val DEBUG = true                           // debug flag
     private val size  = g.size                         // the number of nodes for the spanning tree
     private val root  = new TreeNode (0, 0)            // for vertex 0 in g, create a root node
-    private val stree = new ColorTree (root, 3.5)      // make a tree based on this root, est. depth 
-    private val n_map = Map [Int, TreeNode] ()         // node map from node id to tree node
+    private var stree: Tree = null                     // spanning tree built by calling span
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print the spanning tree.
@@ -40,7 +38,7 @@ class MinSpanningTree (g: MDigraph)
     def printSTree { stree.printTree }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Print the spanning tree.
+    /** Animate the display of the spanning tree.
      */
     def aniSTree { stree.aniTree }
 
@@ -48,32 +46,45 @@ class MinSpanningTree (g: MDigraph)
     /** Create a minimum cost spanning tree for the given graph, returning true
      *  if a complete spanning tree connecting all of g's vertices can be created.
      */
-    def span (): Boolean =
+    def span (): Tree =
     {
         val pred = makeITree ()                        // make an inverted tree
-        for (ni <- 1 until size) {
-            val pi = pred(ni)
-            if (DEBUG) println (s"pi = $pi, ni = $ni")
-            val p = n_map.getOrElse (pi, { val pp = new TreeNode (pi, 1); n_map += pi -> pp; pp })
-            val n = n_map.getOrElse (ni, { val nn = new TreeNode (ni, p.lev+1); n_map += ni -> nn; nn })
-            stree.add (p, n)
-        } // for
-        true                      // FIX - check for completeness
+        stree = Tree (pred, null, 3.5, "st")           // build spanning tree from pred array
+        stree
     } // span
 
     private val key  = Array.fill (size)(MAX_VALUE)    // cost/key array
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The `Elem` class is used for ordering elements on a priority queue.
+     *  @param idx  the index of a node
+     *  @param key  the ordering key (based on cost) for a node
+     */
+    case class Elem (idx: Int, key: TLabel)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The `NodeOrder` object defines the order of node indices based on
      *  their 'key' value.  Using -key to get "smallest first" in priority queue.
+     *  This is for minimum spanning trees ('min' = true)
      */
-    object NodeOrder extends Ordering [Int]
+    object NodeOrder extends Ordering [Elem]
     {
-        def compare (ni1: Int, ni2: Int): Int = -key(ni1) compare -key(ni2)
+        def compare (e1: Elem, e2: Elem): Int = -e1.key compare -e2.key
     } // NodeOrder
 
-    private val qu   = PriorityQueue (Seq.range (0, size): _*)(NodeOrder)   // priority queue of vertices
-    private val out  = Array.fill (size)(true)                              // status of outside spanning tree
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The `NodeOrder` object defines the order of node indices based on
+     *  their 'key' value.  Using +key to get "largest first" in priority queue.
+     *  This is for maximum spanning trees ('min' = false)
+     */
+    object NodeOrder2 extends Ordering [Elem]
+    {
+        def compare (e1: Elem, e2: Elem): Int = e1.key compare e2.key
+    } // NodeOrder2
+
+    private val qu = PriorityQueue ()(if (min) NodeOrder else NodeOrder2)   // priority queue of vertices
+    for (i <- 0 until size) { qu.enqueue (Elem (i, key(i))) }               // put all vertices in priority queue
+    private val out = Array.fill (size)(true)                               // status of outside spanning tree
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Make an inverted tree by recording the predecessor/parent array.
@@ -82,20 +93,22 @@ class MinSpanningTree (g: MDigraph)
      */
     def makeITree (): Array [Int] =
     {
-        val pred = Array.ofDim [Int] (size)            // predecessor node array
-        key(0)   = TLabel_DEFAULT                      // start at the root (node index 0)
-        pred(0)  = -1                                  // it has no predecessor/parent
-        while (qu.nonEmpty) {                          // until all vertices in spanning tree
-            val pi = qu.dequeue                        // return and remove least cost vertex
-            for (ni <- g.ch (pi)) {                    // iterate through its children
-                val cost = g.elabel (pi, ni)           // get cost from edge label
+        val pred = Array.fill (size)(-1)                                 // predecessor node array
+        key(0)   = TLabel_DEFAULT                                        // start at the root (node index 0)
+        pred(0)  = -1                                                    // it has no predecessor/parent
+        while (qu.nonEmpty) {                                            // until all vertices in spanning tree
+            if (DEBUG) qu.printInOrder
+            val pi = qu.dequeue ().idx                                   // return and remove least cost vertex
+            if (DEBUG) println ("makeITree: dequeued pi = " + pi)
+            for (ni <- g.ch(pi)) {                                       // iterate through its children
+                val cost = g.elabel (pi, ni)                             // get cost from edge label
                 if (out(ni) && cost < key(ni)) {
-                   key(ni) = cost                      // lower the cost for node index ni
-                   qu.increaseKey (ni, ni)             // reposition ni toward front in priority queue
-                   pred(ni) = pi                       // set pred of ni to parent pi
+                   qu.increaseKey (Elem (ni, key(ni)), Elem (ni, cost))  // reposition ni toward front in priority queue
+                   key(ni) = cost                                        // lower the cost for node index ni
+                   pred(ni) = pi                                         // set pred of ni to parent pi
                 } // if
             } // for
-            out(pi) = false                            // now finished with pi
+            out(pi) = false                                              // now finished with pi
         } // while
         if (DEBUG) println ("pred = " + pred.deep)
         pred
@@ -114,11 +127,82 @@ object MinSpanningTreeTest extends App
     g.print ()
 
     val st = new MinSpanningTree (g)
-    if (! st.span ()) print ("un")
-    println ("able to complete a spanning tree for graph " + g.name)
+    st.span ()
+    println ("spanning tree for graph " + g.name)
     println ("-" * 60)
     st.printSTree
     st.aniSTree
 
 } // MinSpanningTreeTest object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `MinSpanningTreeTest2` object is used to test the `MinSpanningTree` class.
+ *  @see www.cse.ust.hk/~dekai/271/notes/L07/L07.pdf
+ *  > run-main scalation.graphalytics.MinSpanningTreeTest2
+ */
+object MinSpanningTreeTest2 extends App
+{
+    val g = new MDigraph (Array (SET (1, 3, 4),               // ch(0)
+                                 SET (2, 3),                  // ch(1)
+                                 SET (3, 5),                  // ch(2)
+                                 SET (4, 5),                  // ch(3)
+                                 SET (),                      // ch(4)
+                                 SET ()),                     // ch(5)
+                                 Array.fill (6)(-1),          // vertex labels
+                          Map ((0, 1) -> 1.0,                 // edge lables
+                               (0, 3) -> 10.0,
+                               (0, 4) -> 3.0,
+                               (1, 2) -> 2.0,
+                               (1, 3) -> 3.0,
+                               (2, 3) -> 4.0,
+                               (2, 5) -> 5.0,
+                               (3, 4) -> 4.0,
+                               (3, 5) -> 1.0))
+    g.print ()
+
+    val st = new MinSpanningTree (g)
+    st.span ()
+    println ("spanning tree for graph " + g.name)
+    println ("-" * 60)
+    st.printSTree
+    st.aniSTree
+
+} // MinSpanningTreeTest2 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `MinSpanningTreeTest3` object is used to test the `MinSpanningTree` class.
+ *  This test the Maximum Spanning Tree option.
+ *  @see www.cse.ust.hk/~dekai/271/notes/L07/L07.pdf
+ *  > run-main scalation.graphalytics.MinSpanningTreeTest3
+ */
+object MinSpanningTreeTest3 extends App
+{
+    val g = new MDigraph (Array (SET (1, 3, 4),               // ch(0)
+                                 SET (2, 3),                  // ch(1)
+                                 SET (3, 5),                  // ch(2)
+                                 SET (4, 5),                  // ch(3)
+                                 SET (),                      // ch(4)
+                                 SET ()),                     // ch(5)
+                                 Array.fill (6)(-1),          // vertex labels
+                          Map ((0, 1) -> 1.0,                 // edge lables
+                               (0, 3) -> 10.0,
+                               (0, 4) -> 3.0,
+                               (1, 2) -> 2.0,
+                               (1, 3) -> 3.0,
+                               (2, 3) -> 4.0,
+                               (2, 5) -> 5.0,
+                               (3, 4) -> 4.0,
+                               (3, 5) -> 1.0))
+    g.print ()
+
+    val st = new MinSpanningTree (g, false)
+    st.span ()
+    println ("spanning tree for graph " + g.name)
+    println ("-" * 60)
+    st.printSTree
+    st.aniSTree
+
+} // MinSpanningTreeTest3 object
 

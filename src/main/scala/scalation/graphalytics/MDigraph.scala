@@ -16,12 +16,16 @@ import collection.mutable.{Set => SET}
 
 import LabelType.TLabel
 
-object PairType
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `EdgeType` object define basic type for represeting edges.
+ */
+object EdgeType
 {
-    type Pair = Tuple2 [Int, Int]
-} // PairType
+    type Pair = Tuple2 [Int, Int]         // edge = (vertex, vertex)
 
-import PairType.Pair
+} // EdgeType
+
+import EdgeType.Pair
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDigraph` class stores vertex/edge-labeled multi-directed graphs using
@@ -71,6 +75,19 @@ class MDigraph (ch:      Array [SET [Int]],
     } // checkElabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Make this multi-directed graph work like an undirected graph by making
+     *  sure that for every edge 'u -> v', there is a 'v -> u' edge and that
+     *  they have same edge label.
+     */
+    override def makeUndirected (): MDigraph =
+    {
+        super.makeUndirected ()
+        val edges = elabel.clone.keys
+        for ((u, v) <- edges) elabel += (v, u) -> elabel(u, v)
+        this
+    } // makeUndirected
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' multi-digraph to a string in a shallow sense.
      *  Large arrays are not converted.  Use 'print' to show all information.
      */
@@ -107,7 +124,8 @@ class MDigraph (ch:      Array [SET [Int]],
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `MDigraph` companion object provides builder methods.
+/** The `MDigraph` companion object provides builder methods and example query
+ *  multi-digraphs.
  */
 object MDigraph
 {
@@ -117,10 +135,22 @@ object MDigraph
      *  @param eLab  the edge labels
      *  @param name  the name for the new multi-digraph
      */
-    def apply (g: Digraph, eLab: Map [Tuple2 [Int, Int], TLabel], name: String) =
+    def apply (g: Digraph, eLab: Map [Pair, TLabel], name: String): MDigraph =
     {
         val g2 = g.clone ()
         new MDigraph (g2.ch, g2.label, eLab, g2.inverse, name)
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build an `MDigraph` from a `Tree`.
+     *  @param tree     the base `Tree` for building the `Digraph`
+     *  @param name     the name for the new digraph
+     *  @param inverse  whether to add parent references
+     */
+    def apply (tree: Tree, name: String = "t", inverse: Boolean = false): MDigraph =
+    {
+        val dg = Digraph (tree, name, inverse)
+        MDigraph (dg, tree.labelMap, name)
     } // apply
 
     // -----------------------------------------------------------------------
@@ -130,20 +160,20 @@ object MDigraph
     // data multi-digraph g1 -------------------------------------------------
 
     val g1 = MDigraph (Digraph.g1,
-                       Map ((1, 0) -> -1,
-                            (1, 2) -> -1,
-                            (1, 3) -> -1,
-                            (1, 4) -> -1,
-                            (2, 0) -> -1,
-                            (3, 4) -> -2),                // change from -1 to -2 filter out vertices
+                       Map [Pair, TLabel] ((1, 0) -> -1,
+                                           (1, 2) -> -1,
+                                           (1, 3) -> -1,
+                                           (1, 4) -> -1,
+                                           (2, 0) -> -1,
+                                           (3, 4) -> -2),                // change from -1 to -2 filter out vertices
                        "g1")
 
      // query multi-digraph q1 ------------------------------------------------
 
      val q1 = MDigraph (Digraph.q1,
-                        Map ((0, 1) -> -1,
-                             (0, 2) -> -1,
-                             (2, 1) -> -1),
+                        Map [Pair, TLabel] ((0, 1) -> -1,
+                                            (0, 2) -> -1,
+                                            (2, 1) -> -1),
                         "q1")
 
     val g1p = new MDigraph (g1.ch, g1.label, g1.elabel, true, g1.name)    // with parents
@@ -161,52 +191,52 @@ object MDigraph
     // data multi-digraph g2 -------------------------------------------------
 
      val g2 = MDigraph (Digraph.g2,
-                        Map ((0, 1) -> 1,
-                             (1, 0) -> 1,
-                             (1, 2) -> 1,
-                             (1, 3) -> 1,
-                             (1, 4) -> 1,                   // 2
-                             (1, 5) -> 1,
-                             (5, 6) -> 1,
-                             (5, 10) -> 1,
-                             (6, 7) -> 1,
-                             (6, 4) -> 1,                   // 2
-                             (6, 8) -> 1,
-                             (6, 9) -> 1,
-                             (7, 1) -> 1,
-                             (10, 11) -> 1,
-                             (11, 12) -> 1,
-                             (12, 11) -> 1,
-                             (12, 13) -> 1,
-                             (14, 13) -> 1,
-                             (14, 15) -> 1,
-                             (15, 16) -> 1,
-                             (16, 17) -> 1,
-                             (16, 18) -> 1,
-                             (17, 14) -> 1,
-                             (17, 19) -> 1,
-                             (18, 20) -> 1,
-                             (19, 14) -> 1,
-                             (20, 19) -> 1,
-                             (20, 21) -> 1,
-                             (22, 21) -> 1,
-                             (22, 23) -> 1,
-                             (23, 25) -> 1,
-                             (25, 24) -> 1,
-                             (25, 26) -> 1,
-                             (26, 28) -> 1,
-                             (28, 27) -> 1,
-                             (28, 29) -> 1,
-                             (29, 22) -> 1),
+                        Map [Pair, TLabel] ((0, 1) -> 1,
+                                            (1, 0) -> 1,
+                                            (1, 2) -> 1,
+                                            (1, 3) -> 1,
+                                            (1, 4) -> 1,                   // 2
+                                            (1, 5) -> 1,
+                                            (5, 6) -> 1,
+                                            (5, 10) -> 1,
+                                            (6, 7) -> 1,
+                                            (6, 4) -> 1,                   // 2
+                                            (6, 8) -> 1,
+                                            (6, 9) -> 1,
+                                            (7, 1) -> 1,
+                                            (10, 11) -> 1,
+                                            (11, 12) -> 1,
+                                            (12, 11) -> 1,
+                                            (12, 13) -> 1,
+                                            (14, 13) -> 1,
+                                            (14, 15) -> 1,
+                                            (15, 16) -> 1,
+                                            (16, 17) -> 1,
+                                            (16, 18) -> 1,
+                                            (17, 14) -> 1,
+                                            (17, 19) -> 1,
+                                            (18, 20) -> 1,
+                                            (19, 14) -> 1,
+                                            (20, 19) -> 1,
+                                            (20, 21) -> 1,
+                                            (22, 21) -> 1,
+                                            (22, 23) -> 1,
+                                            (23, 25) -> 1,
+                                            (25, 24) -> 1,
+                                            (25, 26) -> 1,
+                                            (26, 28) -> 1,
+                                            (28, 27) -> 1,
+                                            (28, 29) -> 1,
+                                            (29, 22) -> 1),
                         "g2")
 
      // query multi-digraph q2 ------------------------------------------------
 
      val q2 = MDigraph (Digraph.q2,
-                        Map ((0, 1) -> 1,
-                             (1, 0) -> 1,
-                             (1, 2) -> 1,
-                             (1, 3) -> 1),
+                        Map [Pair, TLabel] ((0, 1) -> 1,
+                                            (1, 0) -> 1,
+                                            (1, 2) -> 1,
+                                            (1, 3) -> 1),
                         "q2")
                          
     val g2p = new MDigraph (g2.ch, g2.label, g2.elabel, true, g2.name)    // with parents

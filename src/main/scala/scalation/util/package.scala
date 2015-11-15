@@ -82,7 +82,7 @@ package object util
      */
     def getFromURL_File (path: String): Iterator [String] =
     {
-       val urlPat = "(?i)(https?|ftp|file)://.*"          // (?i) => case insensitive
+       val urlPat = "(?i)((https?|ftp|file)://|file:/).*"     // (?i) => case insensitive
        if (path matches urlPat) {
            try {
                return fromURL (new URL (path)).getLines
