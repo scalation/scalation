@@ -19,6 +19,20 @@ package scalation
  */
 package object graphalytics
 {
+    import scalation.util.SEP
+
+    /** The `EdgeType` object define basic type for represeting edges.
+     */
+    type Pair = Tuple2 [Int, Int]         // edge = (vertex, vertex)
+
+    /** The relative path for base directory
+     */
+    val BASE = "data" + SEP + "graphalytics" + SEP
+
+    /** The standard file extension for graphs
+     */
+    val EXT = ".grp"
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /*  Implicit conversion from 'Double' to 'VectorD' for cases when TLable
      *  is a vector.

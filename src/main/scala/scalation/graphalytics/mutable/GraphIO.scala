@@ -6,27 +6,30 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.graphalytics
+package scalation.graphalytics.mutable
 
 import java.io.PrintWriter
 
-import collection.immutable.{Set => SET}
-import io.Source.fromFile
+import scala.collection.mutable.{Set => SET}
+import scala.io.Source.fromFile
 
+import scalation.graphalytics.BASE
+
+import GraphIO.EXT
 import LabelType.{TLabel, toTLabel}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `GraphIO` class is used to write graphs to a file.
- *  @param g  the graph to write
+/** The `GraphIO` class is used to write digraphs to a file.
+ *  @param g  the digraph to write
  */
 class GraphIO (g: Graph)
 {
     private val DEBUG = true                                     // debug flag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Write graph 'g' to a file in the following format:
+    /** Write digraph 'g' to a file in the following format:
      *  <p>
-     *      Graph (<name>, <inverse> <nVertices>
+     *      Graph (<name>, <inverse>, <nVertices>
      *      <vertexId> <label> <chVertex0> <chVertex1> ...
             ...
             )
@@ -89,22 +92,26 @@ class GraphIO (g: Graph)
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `GraphIO` object is the companion object to the `GraphIO` class and is used
- *  for reading graphs from files.
+/** The `GraphIO` object is the companion object to the `GraphIO` class and
+ *  is used for reading digraphs from files.
  */
 object GraphIO
 {
+    /** The standard file extension for digraphs
+     */
+    val EXT = ".dig"
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given an array of integers as straings, make the corresponding set.
      *  @param line  the element string array
      */
     def makeSet (eStrArr: Array [String]): SET [Int] =
     {
-        if (eStrArr(0) == "") SET [Int] () else eStrArr.map (_.toInt).toSet.asInstanceOf [SET [Int]]
+        if (eStrArr(0) == "") SET [Int] () else SET (eStrArr.map (_.toInt): _*)
     } // makeSet
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Read a graph from a file based on the format used by 'print' and 'write':
+    /** Read a digraph from a file based on the format used by 'print' and 'write':
      *  <p>
      *      Graph (<name>, <inverse>, <nVertices>
      *      <vertexId>, <label>, <chVertex0>, <chVertex1> ...
@@ -151,7 +158,7 @@ object GraphIO
         val label  = lLines.map (x => toTLabel (x.trim)).toArray         // make the label array
         val eLines = fromFile (eFile).getLines                    // get the lines from eFile
         val ch     = eLines.map ( line =>                         // make the adj array
-            if (line.trim != "") line.split (" ").map (x => x.trim.toInt).toSet
+            if (line.trim != "") line.split (" ").map (x => x.trim.toInt).toSet.asInstanceOf [SET [Int]]
             else SET [Int] ()
         ).toArray
         new Graph (ch, label)
@@ -165,11 +172,11 @@ object GraphIO
      */
     def read2PajekFile (lFile: String, eFile: String, inverse: Boolean = false): Graph =
     {
-        val lLines = fromFile (lFile).getLines          // get the lines from lFile
+        val lLines = fromFile (lFile).getLines               // get the lines from lFile
         val label  = lLines.map (x => toTLabel (x.trim)).toArray
         val ch     = Array.ofDim [SET [Int]] (label.size)
         for (i <- ch.indices) ch(i) = SET [Int] ()
-        val eLines = fromFile (eFile).getLines          // get the lines from eFile
+        val eLines = fromFile (eFile).getLines               // get the lines from eFile
         for (line <- eLines) {
             val splitL = line.split (" ").map (_.trim)
             val adjs   = splitL.slice (1, splitL.length).map(_.trim.toInt).toSet
@@ -180,10 +187,11 @@ object GraphIO
 
 } // GraphIO object
 
+import GraphGen._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphIOTest` object is used to test the `GraphIO` class and object.
- *  > run-main scalation.graphalytics.GraphIOTest
+ *  > run-main scalation.graphalytics.mutable.GraphIOTest
  */
 object GraphIOTest extends App
 {
@@ -195,8 +203,9 @@ object GraphIOTest extends App
 
     // Create a random graph and print it out
 
-    val ran_graph = GraphGen.genRandomGraph (size, nLabels, avDegree, inverse, "ran_graph")
+    val ran_graph = genRandomGraph (size, nLabels, avDegree, inverse, "ran_graph")
     println (s"ran_graph = $ran_graph")
+    ran_graph.print (false)
     ran_graph.print ()
 
     // Write the graph to a file

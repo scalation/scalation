@@ -5,10 +5,11 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.graphalytics
+package scalation.graphalytics.mutable
 
-import collection.mutable.{Map, Queue, Set => SET}
-import math.max
+import scala.collection.mutable.{Map, Queue}
+import scala.collection.mutable.{Set => SET}
+import scala.math.max
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Ball` class provides an implementation for ball construction.
@@ -117,9 +118,4 @@ class Ball (srcGraph: Graph, val center: Int, radius: Int)
     } // getBallDiameter
   
 } // Ball class
-
-
-object BallTest extends App
-{
-} // BallTest object
 

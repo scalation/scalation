@@ -9,7 +9,7 @@
 package scalation.graphalytics
 
 import collection.immutable.{Set => SET}
-import collection._
+import collection.mutable.Set
 import collection.mutable.{HashMap, MutableList}
 import util.control.Breaks._
 
@@ -27,7 +27,7 @@ import LabelType.TLabel
 class GraphqlOpt (g: Graph, q: Graph) 
 {
      private var phi           = Array.ofDim [SET [Int]] (q.size)     // initialize empty feasible match sets
-     private var matches       = mutable.Set [Array [Int]] ()         // initialize empty matches
+     private var matches       = Set [Array [Int]] ()                 // initialize empty matches
      private var matchedVertex = Array.fill (q.size) {-1}             // initialize matched vertex for each u to -1
      private val qProfileMap   = HashMap [Int, MutableList [TLabel]] ()  // initialize profile mapping of each query vertex 'u' to empty list
      private val gProfileMap   = HashMap [Int, MutableList [TLabel]] ()  // initialize profile mapping of each data vertex 'v' to empty list
@@ -56,7 +56,7 @@ class GraphqlOpt (g: Graph, q: Graph)
       */
      def bijections () 
      {
-         matches = mutable.Set [Array [Int]] ()
+         matches = Set [Array [Int]] ()
          phi     = feasibleMates ()                               // initial mappings from label match
          println ("Neighbor Local Pruning started")
          neighborProfilePruning ()                                // neighborhood local pruning, Section 4.2 of the GraphQL paper
@@ -202,7 +202,7 @@ class GraphqlOpt (g: Graph, q: Graph)
       */
      def getNeighborProfile (graph: Graph, u: Int) : MutableList [TLabel] = 
      {
-         var profileList = scala.collection.mutable.MutableList [TLabel] ()
+         var profileList = MutableList [TLabel] ()
          for (vertex <- graph.ch (u)) profileList += graph.label (vertex)
          for (vertex <- graph.pa (u)) profileList += graph.label (vertex)
          profileList += graph.label (u)

@@ -17,7 +17,6 @@ import scalation.random.{Randi, Variate}
 import scalation.scala2d.Colors._
 import scalation.scala2d.{Ellipse, QCurve, R2}
 
-import EdgeType.Pair
 import LabelType._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -26,12 +25,15 @@ import LabelType._
  *  @param lev    the level of the node in the tree
  *  @param label  the node/incoming edge label
  *  @param colr   the color of the node
+ *  @param ord    the birth order
  */
 class TreeNode (val nid: Int,
                 val lev: Int,
                 var label: TLabel = TLabel_DEFAULT,
-                var colr: Color = null)
+                var colr: Color = null,
+                var ord: Int = 0)
 {
+     val DEBUG = true
      if (colr == null) colr = randomColor (nid)
      val loc   = R2 (0.0, 0.0)
      val child = new ArrayBuffer [TreeNode] ()
@@ -45,6 +47,33 @@ class TreeNode (val nid: Int,
     {
         if (n == null) false else if (this == n) true else isAncestor (n.parent)
     } // isAncestor
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether 'this' node is a leaf.
+     */           
+    def isLeaf: Boolean = child.size == 0
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the left sibling of 'this' node.
+     */           
+    def leftSibling: TreeNode =
+    {
+        val ls= if (parent != null && ord > 0) parent.child(ord - 1)
+                else null
+        if (DEBUG) println (s"leftSibling ($nid) = $ls") 
+        ls
+    } // if
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the right sibling of 'this' node.
+     */           
+    def rightSibling: TreeNode =
+    {
+        val rs = if (parent != null && ord < parent.child.size - 1) parent.child(ord + 1)
+                 else null
+        if (DEBUG) println (s"rightSibling ($nid) = $rs") 
+        rs
+    } // if
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert a tree node to a string.
@@ -172,7 +201,10 @@ class Tree (val root: TreeNode, depth: Double, val name: String = "tree")
         val n    = new TreeNode (nCount, p.lev+1)     // add node n
         nodes   += n                                  // add node n to nodes list
         n.parent = p                                  // comment out, if parent references not needed
-        if (p != null) p.child += n                   // add n as child of p
+        if (p != null) {
+            p.child += n                              // add n as child of p
+            n.ord = p.child.size - 1                  // record n's birth order
+        } // if
         n                                             // return node n
     } // add
 
@@ -187,7 +219,10 @@ class Tree (val root: TreeNode, depth: Double, val name: String = "tree")
         nCount  += 1
         nodes   += n                                  // add node n to nodes list
         n.parent = p                                  // comment out, if parent references not needed
-        if (p != null) p.child += n                   // add n as child of p
+        if (p != null) {
+            p.child += n                              // add n as child of p
+            n.ord = p.child.size - 1                  // record n's birth order
+        } // if
         n                                             // return node n
     } // add
 

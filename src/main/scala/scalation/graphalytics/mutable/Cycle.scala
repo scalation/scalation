@@ -6,11 +6,11 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.graphalytics
+package scalation.graphalytics.mutable
 
-import scala.collection.immutable.{Set => SET}
+import scala.collection.mutable.{Set => SET}
 
-import TrafficLight._
+import scalation.graphalytics.TrafficLight._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Cycle` object provides a means for building a precedence/directed graph
@@ -23,7 +23,7 @@ import TrafficLight._
 object Cycle
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine whether the graph contains a cycle.
+    /** Determine whether the directed graph contains a cycle.
      *  @param g  the graph in which to check for cycles
      */
     def hasCycle (g: Graph): Boolean = 
@@ -47,15 +47,15 @@ object Cycle
        false
     } // hasCycle
 
-} // Cycle object
+} // Cycle
 
 import Cycle.hasCycle
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `CycleTest` object tests the `Cycle` object using a label-free precedence
+/** The `CycleTest` object tests the `Cycle` class using a label-free precedence
  *  graph.  Graphs are created by passing in an array of adjacency sets (one for
  *  each vertex).
- *  > run-main scalation.graphalytics.CycleTest
+ *  > run-main scalation.graphalytics.mutable.CycleTest
  */
 object CycleTest extends App
 {
@@ -64,7 +64,7 @@ object CycleTest extends App
     val pg1 = new Graph (Array (SET (1, 2),        // edges from 0:  0 -> 1, 0 -> 2
                                 SET (2),           // edges from 1:  1 -> 2
                                 SET [Int] ()))     // edges from 2:  no such edges
-    println ("Precedence Graph pg1: ----------------------------------------------")
+    println ("Precedence Graph pg1: --------------------------------------------")
     pg1.print ()
     println ("pg1 has cycle? = " + hasCycle (pg1))
     
@@ -73,7 +73,7 @@ object CycleTest extends App
     val pg2 = new Graph (Array (SET (1, 2),        // edges from 0:  0 -> 1, 0 -> 2
                                 SET (2),           // edges from 1:  1 -> 2
                                 SET (0)))          // edges form 2:  2 -> 0
-    println ("Precedence Graph pg2: ----------------------------------------------")
+    println ("Precedence Diraph pg2: --------------------------------------------")
     pg2.print ()
     println ("pg2 has cycle? = " + hasCycle (pg2))
     

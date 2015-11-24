@@ -119,7 +119,7 @@ class Graph (val ch:      Array [SET [Int]],
      *  vertices to be renumbered.
      *  @param g  the other digraph
      */
-    def same (g: Digraph): Boolean =
+    def same (g: Graph): Boolean =
     {
         if (size != g.size) return false
         for (u <- ch.indices; u_c <- ch(u) if ! (g.ch(u) contains u_c)) return false

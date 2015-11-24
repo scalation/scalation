@@ -6,30 +6,34 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.graphalytics
+package scalation.graphalytics.mutable
 
 import java.io.PrintWriter
 
-import collection.immutable.{Set => SET}
-import io.Source.fromFile
+import scala.collection.mutable.Map
+import scala.collection.mutable.{Set => SET}
+import scala.io.Source.fromFile
+
+import scalation.graphalytics.BASE
 
 import LabelType.{TLabel, toTLabel}
+import MGraphIO.EXT
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `GraphIO` class is used to write graphs to a file.
- *  @param g  the graph to write
+/** The `MGraphIO` class is used to write multi-digraphs to a file.
+ *  @param g  the multi-digraph to write
  */
-class GraphIO (g: Graph)
+class MGraphIO (g: MGraph)
 {
     private val DEBUG = true                                     // debug flag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Write graph 'g' to a file in the following format:
+    /** Write multi-digraph 'g' to a file in the following format:
      *  <p>
-     *      Graph (<name>, <inverse> <nVertices>
+     *      MGraph (<name>, <inverse>, <nVertices>
      *      <vertexId> <label> <chVertex0> <chVertex1> ...
-            ...
-            )
+     *      ...
+     *      )
      *  <p>
      *  @param name  the file-name containing the graph's vertex, edge and label information
      *  @param base  the base sub-directory for storing graphs
@@ -40,8 +44,9 @@ class GraphIO (g: Graph)
         val gFile = base + name + ext                             // relative path-name for file
         val pw    = new PrintWriter (gFile)
         if (DEBUG) println (s"write: gFile = $gFile")
-        pw.println (s"Graph (${g.name}, ${g.inverse}, ${g.size}")
+        pw.println (s"MGraph (${g.name}, ${g.inverse}, ${g.size}")
         for (i <- g.ch.indices) pw.println (g.toLine (i))
+        for ((k, v) <- g.elabel) pw.println (s"$k -> $v")
         pw.println (")")
         pw.close ()
     } // write
@@ -85,28 +90,41 @@ class GraphIO (g: Graph)
         edgeLine.close
     } // write2Neo4JFiles
 
-} // GraphIO class
+} // MGraphIO class
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `GraphIO` object is the companion object to the `GraphIO` class and is used
- *  for reading graphs from files.
+/** The `MGraphIO` object is the companion object to the `MGraphIO` class and
+ *  is used for reading graphs from files or graph databases.
  */
-object GraphIO
+object MGraphIO
 {
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given an array of integers as straings, make the corresponding set.
-     *  @param line  the element string array
+    /** The standard file extension for digraphs
      */
-    def makeSet (eStrArr: Array [String]): SET [Int] =
+    val EXT = ".mdg"
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Make a set of child vertices '(v_0, v_1, ...)' from a string array.
+     *  @param strArr  the string array 
+     */
+    def makeSet (strArr: Array [String]): SET [Int] =
     {
-        if (eStrArr(0) == "") SET [Int] () else eStrArr.map (_.toInt).toSet.asInstanceOf [SET [Int]]
+        if (strArr(0) == "") SET [Int] () else SET (strArr.map (_.toInt): _*)
     } // makeSet
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Read a graph from a file based on the format used by 'print' and 'write':
+    /** Make an edge tuple '(u, v)' from a string array.
+     *  @param strArr  the string array 
+     */
+    def makeTuple (strArr: Array [String]): Tuple2 [Int, Int] =
+    {
+        (strArr(0).replace ("(", "").toInt, strArr(1).replace (")", "").toInt)
+    } // makeTuple
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Read a multi-digraph from a file based on the format used by 'print' and 'write':
      *  <p>
-     *      Graph (<name>, <inverse>, <nVertices>
+     *      MGraph (<name>, <inverse>, <nVertices>
      *      <vertexId>, <label>, <chVertex0>, <chVertex1> ...
      *      ...
      *      )
@@ -116,22 +134,27 @@ object GraphIO
      *  @param ext   the standard file extension for graph
      *  @param sep   the character separating the values (e.g., ',', ' ', '\t')
      */
-    def apply (name: String, base: String = BASE, ext: String = EXT, sep: Char = ','): Graph =
+    def apply (name: String, base: String = BASE, ext: String = EXT, sep: Char = ','): MGraph =
     {
-        val gFile = base + name + ext                             // relative path-name for file
-        val l     = fromFile (gFile).getLines.toArray             // get the lines from gFile
-        var l0    = l(0).split ('(')(1).split (sep).map (_.trim)  // array for line 0
-        val n     = l0(2).toInt                                   // number of lines in file
-        val ch    = Array.ofDim [SET [Int]] (n)                   // adjacency: array of children (ch)
-        val label = Array.ofDim [TLabel] (n)                      // array of vertex labels
+        val gFile  = base + name + ext                             // relative path-name for file
+        val l      = fromFile (gFile).getLines.toArray             // get the lines from gFile
+        var l0     = l(0).split ('(')(1).split (sep).map (_.trim)  // array for line 0
+        val n      = l0(2).toInt                                   // number of vertices
+        val ch     = Array.ofDim [SET [Int]] (n)                   // adjacency: array of children (ch)
+        val label  = Array.ofDim [TLabel] (n)                      // array of vertex labels
+        val elabel = Map [Tuple2 [Int, Int], TLabel] ()            // map of edge labels
         println (s"apply: read $n vertices from $gFile")
 
         for (i <- ch.indices) {
-            val li   = l(i+1).split (sep).map (_.trim)            // line i (>0) splits into i, label, ch
-            label(i) = toTLabel (li(1))                           // make vertex label
-            ch(i)    = makeSet (li.slice (2, li.length))          // make ch set
+            val li   = l(i+1).split (sep).map (_.trim)             // line i (>0) splits into i, label, ch
+            label(i) = toTLabel (li(1))                            // make vertex label
+            ch(i)    = makeSet (li.slice (2, li.length) )          // make ch set
         } // for
-        new Graph (ch, label, l0(1) == "true", l0(0))
+        for (i <- n+1 until l.length-1) {
+            val li  = l(i).split ("->").map (_.trim)               // line i (>n) splits into (u, v) -> elabel
+            elabel += makeTuple (li(0).split (sep)) -> toTLabel (li(1))
+        } // for
+        new MGraph (ch, label, elabel, l0(1) == "true", l0(0))
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -145,16 +168,16 @@ object GraphIO
      *  @param eFile  the file the edges (to create adjacency sets)
      *  @param inverse   whether to store inverse adjacency sets (parents)
      */
-    def read2Files (lFile: String, eFile: String, inverse: Boolean = false): Graph =
+    def read2Files (lFile: String, eFile: String, inverse: Boolean = false): MGraph =
     {
-        val lLines = fromFile (lFile).getLines                    // get the lines from lFile
-        val label  = lLines.map (x => toTLabel (x.trim)).toArray         // make the label array
-        val eLines = fromFile (eFile).getLines                    // get the lines from eFile
-        val ch     = eLines.map ( line =>                         // make the adj array
-            if (line.trim != "") line.split (" ").map (x => x.trim.toInt).toSet
+        val lLines = fromFile (lFile).getLines               // get the lines from lFile
+        val label  = lLines.map (x => toTLabel (x.trim)).toArray    // make the label array
+        val eLines = fromFile (eFile).getLines               // get the lines from eFile
+        val ch     = eLines.map ( line =>                    // make the adj array
+            if (line.trim != "") line.split (" ").map (x => x.trim.toInt).toSet.asInstanceOf [SET [Int]]
             else SET [Int] ()
         ).toArray
-        new Graph (ch, label)
+        new MGraph (ch, label)
     } // read2Files
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -163,53 +186,56 @@ object GraphIO
      *  @param eFile     the file the edges (to create adjacency sets)
      *  @param inverse   whether to store inverse adjacency sets (parents)
      */
-    def read2PajekFile (lFile: String, eFile: String, inverse: Boolean = false): Graph =
+    def read2PajekFile (lFile: String, eFile: String, inverse: Boolean = false): MGraph =
     {
-        val lLines = fromFile (lFile).getLines          // get the lines from lFile
+        val lLines = fromFile (lFile).getLines               // get the lines from lFile
         val label  = lLines.map (x => toTLabel (x.trim)).toArray
         val ch     = Array.ofDim [SET [Int]] (label.size)
         for (i <- ch.indices) ch(i) = SET [Int] ()
-        val eLines = fromFile (eFile).getLines          // get the lines from eFile
+        val eLines = fromFile (eFile).getLines               // get the lines from eFile
         for (line <- eLines) {
             val splitL = line.split (" ").map (_.trim)
             val adjs   = splitL.slice (1, splitL.length).map(_.trim.toInt).toSet
             ch(splitL(0).toInt-1) ++= adjs
         } // for
-        new Graph (ch, label)
+        new MGraph (ch, label)
     } // read2PajekFile
 
-} // GraphIO object
+} // MGraphIO object
 
+import MGraphGen._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `GraphIOTest` object is used to test the `GraphIO` class and object.
- *  > run-main scalation.graphalytics.GraphIOTest
+/** The `MGraphIOTest` object is used to test the `MGraphIO` class and object.
+ *  > run-main scalation.graphalytics.mutable.MGraphIOTest
  */
-object GraphIOTest extends App
+object MGraphIOTest extends App
 {
     val name     = "ran_graph"    // the name of the graph
     val size     = 50             // size of the graph
     val nLabels  = 10             // number of distinct vertex labels
-    val avDegree =   5            // average vertex out degree for the graph
+    val eLabels  =  5             // number of distinct edge labels
+    val avDegree =  3             // average vertex out degree for the graph
     val inverse  = false
 
     // Create a random graph and print it out
 
-    val ran_graph = GraphGen.genRandomGraph (size, nLabels, avDegree, inverse, "ran_graph")
+    val ran_graph = genRandomGraph (size, nLabels, eLabels, avDegree, inverse, "ran_graph")
     println (s"ran_graph = $ran_graph")
+    ran_graph.print (false)
     ran_graph.print ()
 
     // Write the graph to a file
 
     println ("start writing graph to " + name)
-    (new GraphIO (ran_graph)).write ()
+    (new MGraphIO (ran_graph)).write ()
     println ("end writing graph to " + name)
 
     // Read the file to create a new indentical graph
 
-    val g = GraphIO (name)
+    val g = MGraphIO (name)
     println (s"g = $g")
     g.print ()
 
-} // GraphIOTest object
+} // MGraphIOTest object
 

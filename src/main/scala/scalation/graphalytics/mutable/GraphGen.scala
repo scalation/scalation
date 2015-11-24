@@ -1,0 +1,345 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Matthew Saltz, John Miller
+ *  @version 1.2
+ *  @date    Thu Jul 25 11:28:31 EDT 2013
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.graphalytics.mutable
+
+import scala.collection.mutable.Queue
+import scala.collection.mutable.{Set => SET}
+import scala.math.pow
+
+import scalation.linalgebra.VectorI
+import scalation.random.{Randi0, Random, RandomSet}
+
+import LabelType.TLabel
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphGen` object is used to build random graph with various characteristics.
+ */
+object GraphGen
+{
+    /** Random number generator in interval (0, 1)
+     */
+    private val ran = Random ()
+
+    /** Random number/integer generator: 0, 1, ...
+     */
+    private val rng = Randi0 ()
+
+    /** Random set generator
+     */
+    private val rsg = RandomSet ()
+
+    //------------------------------------------------------------------------
+    // Methods generating random graphs where the number of outgoing edges (the degree)
+    // for a vertex is uniformly distributed.
+    //------------------------------------------------------------------------
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Generates a random graph with the specified size (number of vertices), 
+     *  average degree and labels evenly distributed across vertices from 0 to
+     *  nLabels - 1.  Not necessarily a connected graph.
+     *  @param size      the number of vertices to generate
+     *  @param nLabels   the number of labels (distributed uniformly)
+     *  @param avDegree  the average degree
+     *  @param inverse   whether to create inverse adjacency (parents)
+     *  @param name      the name of the graph
+     */
+    def genRandomGraph (size: Int, nLabels: Int, avDegree: Int, inverse: Boolean = false,
+                        name: String = "g"): Graph =
+    {
+        val ch = Array.ofDim [SET [Int]] (size)
+        for (i <- ch.indices) {
+            val degree = rng.iigen (avDegree * 2 + 1)              // out degree for vertex i
+            ch(i)      = rsg.igen (degree, size - 1, i)            // children of vertex i
+        } // for
+        val label = randDistLabels (size, nLabels)                 // vertex labels
+        new Graph (ch, label, inverse, name)
+    } // genRandomGraph
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Generates a random connected graph by using genRandomGraph and
+     *  checking whether it is connected.
+     *  @param size      the number of vertices to generate
+     *  @param nLabels   the number of labels (distributed uniformly)
+     *  @param avDegree  the average degree
+     *  @param inverse   whether to create inverse adjacency (parents)
+     *  @param name      the name of the graph
+     */
+    def genRandomConnectedGraph (size: Int, nLabels: Int, avDegree: Int, inverse: Boolean = false,
+                                 name: String = "g"): Graph =
+    {
+        var g: Graph = null
+        do g = genRandomGraph (size, nLabels, avDegree, inverse, name) while (! g.isConnected)
+        g
+    } // genRandomConnectedGraph
+  
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Generates a random graph with labels distributed based on a power law
+     *  distribution (currently with the magic number 2.1 for the power law exponent).
+     *  @param size      the number of vertices to generate
+     *  @param nLabels   the number of labels (distributed according to power law)
+     *  @param avDegree  the average degree
+     *  @param inverse   whether to create inverse adjacency (parents)
+     *  @param name      the name of the graph
+     */
+    def genRandomGraph_PowLabels (size: Int, nLabels: Int, avDegree: Int, inverse: Boolean = false,
+                                  name: String = "g"): Graph =
+    {
+        val ch = Array.ofDim [SET [Int]] (size)
+        for (i <- ch.indices) {
+            val degree = rng.iigen (avDegree * 2 + 1)              // out degree for vertex i
+            ch(i)      = rsg.igen (degree, size - 1, i)            // children of vertex i
+        } // for
+        val label = powDistLabels (size, nLabels, 2.1)             // 2.1 is used in WWW graph pg 72 of m&m graph data
+        new Graph (ch, label, inverse, name)
+    } // genRandomGraph_PowLabels
+
+    //------------------------------------------------------------------------
+    // Methods generating random graphs where the number of outgoing edges (the degree)
+    // for a vertex follows a power law distribution.
+    //------------------------------------------------------------------------
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Generates a graph with power law degree distribution with exponent 'distPow'
+     *  and uniformly distributed labels.
+     *  @param size       the number of vertices 
+     *  @param nLabels    the number of labels (distributed uniformly)
+     *  @param maxDegree  the maximum allowed degree for any vertex
+     *  @param distPow    the power/exponent
+     *  @param inverse    whether to create inverse adjacency (parents)
+     *  @param name       the name of the graph
+     */
+    def genPowerLawGraph (size: Int, nLabels: Int, maxDegree: Int, distPow: Double,
+                          inverse: Boolean = false, name: String = "g"): Graph =
+    {
+        val ch = Array.ofDim [SET [Int]] (size)
+        for (i <- ch.indices) {
+            val degree = powInt (0, maxDegree, distPow)            // out degree
+            ch(i)      = rsg.igen (degree, size - 1, i)            // children of vertex i
+        } // for
+        val label = randDistLabels (size, nLabels)
+        new Graph (ch, label, inverse, name)
+    } // genPowerLawGraph
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Generates a graph with power law degree distribution with exponent 'distPow'
+     *  and power law distributed labels.
+     *  @param size       the number of vertices 
+     *  @param nLabels    the number of labels (distributed according to power law)
+     *  @param maxDegree  the maximum allowed degree for any vertex
+     *  @param distPow    the power/exponent
+     *  @param inverse    whether to create inverse adjacency (parents)
+     *  @param name       the name of the graph
+     */
+    def genPowerLawGraph_PowLabels (size: Int, nLabels: Int, maxDegree: Int, distPow: Double,
+                                    inverse: Boolean = false, name: String = "g"): Graph =
+    {
+        val ch = Array.ofDim [SET [Int]] (size)
+        for (i <- ch.indices) {
+            val degree = powInt (0, maxDegree, distPow)            // out degree
+            ch(i)      = rsg.igen (degree, size - 1, i)            // children of vertex i
+        } // for
+        val label = powDistLabels (size, nLabels, distPow)
+        new Graph (ch, label, inverse, name)
+    } // genPowerLawGraph_PowLabels
+
+    //------------------------------------------------------------------------
+    // Methods for generating/extracting query graphs from data graphs.
+    // Ensures that matches will exist. 
+    //------------------------------------------------------------------------
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a graph 'g', performs a breadth first search starting at a random vertex
+     *  until the breadth first tree contains 'size' vertices.  At each junction,
+     *  it chooses a random number of children to traverse, with that random
+     *  number averaging to 'avDegree'.
+     *  @param size      the number of vertices to extract
+     *  @param avDegree  the average out degree
+     *  @param g         the data graph to extract from
+     *  @param inverse   whether to create inverse adjacency (parents)
+     *  @param name      the name of the graph
+     */
+    def genBFSQuery (size: Int, avDegree: Int, g: Graph, inverse: Boolean = false,
+                     name: String = "g"): Graph =
+    {
+        val maxRestarts = 5000
+        var nRestarts   = 0
+        var cycle       = false
+        var nodes       = SET [Int] ()
+        var chMap: Map [Int, SET [Int]] = null
+
+        while (nodes.size < size && nRestarts < maxRestarts) {
+            if (nRestarts % 100 == 0) println ("restarting " + nRestarts)
+            chMap      = Map [Int, SET [Int]] ()
+            nodes      = SET [Int] ()
+            val q      = Queue [Int] ()
+            val start  = rng.iigen (g.size - 1)     // randomly pick a start node in ch 
+            q.enqueue (start)
+            nodes += start
+
+            while (! q.isEmpty && nodes.size < size) {
+                var chs  = SET [Int] ()                                 // set of children to be formed
+                val v    = q.dequeue                                    // candidate vertex
+                val v_ch = g.ch (v)                                     // its children
+                if (v_ch.nonEmpty) {
+                    val v_chArr = v_ch.toArray                          // its children in an array
+                    val degree = rng.iigen (avDegree * 2 + 1)           // desired out degree
+                    for (i <- 0 until degree if nodes.size < size) {
+                        val newChild = v_chArr (rng.iigen (v_ch.size - 1)) 
+                        if (! (nodes contains newChild)) { nodes += newChild; q.enqueue (newChild) }
+                        else cycle = true
+                        if (newChild != v) chs += newChild               // add newChild
+                    } // for
+                    chMap += (v -> (chMap.getOrElse (v, SET [Int] ()) ++ chs))
+                } // if
+            } // while
+
+            if(nodes.size < size) nRestarts += 1
+        } // while
+    
+        if (nRestarts == maxRestarts) { println ("genBFSQuery: could not find a good query"); return null }
+    
+        // create a vertex map from old to new ids, e.g., 7 -> 0, 11 -> 1, 15 -> 2
+        var vertexMap = Map [Int, Int] () 
+        var c = 0 
+        for (v <- nodes) { vertexMap += (v -> c); c += 1 }
+
+        // for each new id, record the old id
+        val new2OldIds = Array.ofDim [Int] (size)
+        vertexMap.foreach { case (oldId, newId) => new2OldIds(newId) = oldId }
+
+        // for each mapped vertex, assign its mapped children
+        val ch = Array.ofDim [SET [Int]] (size).map (x => SET [Int] ())
+        for ((v, v_ch) <- chMap) ch(vertexMap (v)) = v_ch.map (vertexMap (_)) 
+
+        // map the vertex labels
+        val label = new2OldIds.map (g.label(_)).toArray
+        if (cycle) println ("genBFSQuery: query has a cycle")
+        new Graph (ch, label, inverse, name)
+    } // genBFSQuery
+
+    //------------------------------------------------------------------------
+    // Private helper methods.
+    //------------------------------------------------------------------------
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Returns an array with labels distributed between 0 and nLabels - 1
+     *  based on a uniform distribution.
+     *  @param size     the number of vertices
+     *  @param nLabels  the number of labels
+     */
+    private def randDistLabels (size: Int, nLabels: Int): Array [TLabel] =
+    {
+        Array.ofDim [TLabel] (size).map ( x => rng.iigen (nLabels - 1).asInstanceOf [TLabel])
+    } // randDistLabels
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Returns an array with labels distributed between 0 and nLabels - 1
+     *  based on a power law distribution.
+     *  @param size     the number of vertices
+     *  @param nLabels  the number of labels
+     *  @param pow      the power/exponent
+     */
+    private def powDistLabels (size: Int, nLabels: Int, pow: Double): Array [TLabel] =
+    {
+        Array.ofDim [TLabel] (size).map ( x => powInt (0, nLabels, pow).asInstanceOf [TLabel])
+    } // powDistLabels
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Returns a random integer between min and max with a frequency determined
+     *  by a power law distribution.
+     *  @param min      the minimum value
+     *  @param max      the maximum value
+     *  @param distPow  the power distribution
+     */
+    private def powInt (min: Int, max: Int, distPow: Double): Int =
+    {
+        val exp = distPow + 1.0
+        max - 1 - pow (( (pow (max, exp) - pow (min, exp)) * ran.gen + pow (min, exp) ),
+                       (1.0 / exp)).toInt
+    } // powInt
+
+} // GraphGen class
+
+import GraphGen._
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphGenTest` object is used to test the `GraphGen` class for building
+ *  random graphs where a vertex's degree is uniformly distributed.
+ *  > run-main scalation.graphalytics.mutable.GraphGenTest
+ */
+object GraphGenTest extends App
+{
+    println ("GraphGenTest: test genRandomGraph")
+    (1 to 5).foreach { _ =>
+        val g = genRandomGraph (4, 100, 1)
+        g.print ()
+        println ("CONNECTED?  " + g.isConnected)
+    } // foreach
+
+    println ("GraphGenTest: test genRandomConnectedGraph")
+    (1 to 5).foreach { _ => genRandomConnectedGraph (4, 100, 1).print () }
+
+    println ("GraphGenTest: test geneRandomGraph_PowLabels")
+    val g1 = genRandomGraph_PowLabels (200, 50, 2)
+    g1.print ()
+    println (s"g1.labelMap = ${g1.labelMap}")
+ 
+} // GraphGenTest
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphGenTest2` object is used to test the `GraphGen` class for building
+ *  power law graphs.
+ *  > run-main scalation.graphalytics.mutable.GraphGenTest2
+ */
+object GraphGenTest2 extends App
+{
+    println ("GraphGenTest2: test genPowerLawGraph")
+    val g2 = genPowerLawGraph (50, 10, 10, 2.1)
+    g2.print ()
+    g2.ch.sortBy (_.size).foreach { println(_) }
+
+    println ("GraphGenTest2: test genPowerLawGraph_PowLabels")
+    val g3 = genPowerLawGraph_PowLabels (50, 10, 10, 2.1)
+    g3.print ()
+    g3.ch.sortBy (_.size).foreach { println(_) }
+    println (s"g3.labelMap = ${g3.labelMap}")
+
+} // GraphGenTest2
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphGenTest3` object is used to test the `GraphGen` class for extracting
+ *  query graphs from data graphs.
+ *  > run-main scalation.graphalytics.mutable.GraphGenTest3
+ */
+object GraphGenTest3 extends App
+{
+    println ("GraphGenTest3: test genRandomGraph")
+    val nVertices = 10000
+    val nLabels   =    10
+    val avDegree  =    16     
+    var g = genRandomGraph (nVertices, nLabels, avDegree)
+    println ("done generating data graph")
+    println ("g.size     = " + g.size)
+    println ("g.nEdges   = " + g.nEdges)
+    println ("av degreee = " + g.nEdges / g.size.toDouble)
+
+    println ("GraphGenTest3: test genBFSQuery")
+    (1 to 5).foreach { _ =>
+        var q = genBFSQuery (20, 3, g)
+        q.print ()
+        println ("q.size     = " + q.size)
+        println ("q.nEdges   = " + q.nEdges)
+        println ("av degreee = " + q.nEdges / q.size.toDouble)
+    } // foreach
+    println ("done")
+
+} // GraphGenTest3
+
