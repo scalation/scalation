@@ -12,6 +12,9 @@ import scalation.linalgebra.{MatriD, VectorD, VectorI}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Predictor` trait provides a common framework for several predictors.
+ *  A predictor is for unbounded responses (real or integer).  When the number
+ *  of distinct responses is bounded by some integer 'k', a classifier should
+ *  be used.  
  */
 trait Predictor
 {

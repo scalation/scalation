@@ -12,6 +12,9 @@ import scalation.linalgebra.{VectorD, VectorI}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Classifier` trait provides a common framework for several classifiers.
+ *  A classifier is for bounded responses.  When the number of distinct responses
+ *  cannot be bounded by some integer 'k', a predictor should be used.
+
  */
 trait Classifier
 {

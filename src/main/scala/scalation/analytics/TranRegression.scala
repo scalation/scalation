@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import math.log
+import math.{exp, log}
 
 import scalation.calculus.Calculus.FunctionS2S
 import scalation.linalgebra.{MatriD, MatrixD, VectorD}
@@ -26,11 +26,15 @@ import RegTechnique._
  *  <p>
  *  where 'e' represents the residuals (the part not explained by the model) and
  *  'transform' is the function (defaults to log) used to transform the response vector 'y'.
+ *  Common tranforms: log (y), sqrt (y) when y > 0
+ *  More generally, a Box-Cox Transformation may be applied.
+ *  @see citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.469.7176&rep=rep1&type=pdf
  *  Use Least-Squares (minimizing the residuals) to fit the parameter vector
  *  <p>
  *      b  =  x_pinv * y
  *  <p>
  *  where 'x_pinv' is the pseudo-inverse.
+ *  Caveat: this class does not provide transformations on columns of matrix 'x'.
  *  @see www.ams.sunysb.edu/~zhu/ams57213/Team3.pptx
  *  @param x          the design/data matrix
  *  @param y          the response vector
@@ -66,6 +70,11 @@ class TranRegression (x: MatrixD, y: VectorD, transform: FunctionS2S = log, tech
     /** Return the quality of fit including rSquared.
      */
     def fit: VectorD = rg.fit
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the vector of residuals/errors.
+     */
+    override def residual: VectorD = rg.residual
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
@@ -105,6 +114,7 @@ class TranRegression (x: MatrixD, y: VectorD, transform: FunctionS2S = log, tech
  *  <p>
  *      log (y)  =  b dot x  =  b_0 + b_1*x_1 + b_2*x_2.
  *  <p>
+ *  > run-main scalation.analytics.TranRegressionTest
  */
 object TranRegressionTest extends App
 {
@@ -127,7 +137,9 @@ object TranRegressionTest extends App
     println ("predict (" + z + ") = " + yp)
 
     val yyp = trg.predict (x)                             // predict y for several points
-    println ("predict (" + x + ") = " + yyp)
+    val yy = yyp.map ((x: Double) => exp (x))
+    println ("predict  (" + x + ")\n = " + yyp)           // transformed valued
+    println ("original (" + x + ")\n = " + yy)            // original scale
 
     new Plot (x.col(1), y, yyp)
     new Plot (x.col(2), y, yyp)

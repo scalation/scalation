@@ -33,19 +33,31 @@ object Unicode
 {
     /** Unicode characters for superscripts to 0, 1, ... 9
      */
-    val sup  = Array ('⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹')
+    val supc = Array ('⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹')
 
     /** Unicode numbers for superscripts to 0, 1, ... 9
      */
     val supn = Array ('\u2070', '\u00b9', '\u00b2', '\u00b3', '\u2074', '\u2075', '\u2076', '\u2077', '\u2078', '\u2079')
 
-    /** Unicode subscripts to 0, 1, ... 9
+    /** Unicode characters for subscripts to 0, 1, ... 9
      */
-    val sub  = Array ('₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉')
+    val subc = Array ('₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉')
 
     /** Unicode numbers for subscripts to 0, 1, ... 9
      */
     val subn = Array ('\u2080', '\u2081', '\u2082', '\u2083', '\u2084', '\u2085', '\u2086', '\u2087', '\u2088', '\u2089')
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Unicode characters for superscripts derived for integer 'i'.
+     *  @param i  the integer to convert into a subscript
+     */
+    def sup (i: Int) = for (c <- i.toString) yield supc(c - '0')
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Unicode characters for subscripts derived from integer 'i'
+     *  @param i  the integer to convert into a subscript
+     */
+    def sub (i: Int) = for (c <- i.toString) yield subc(c - '0')
 
 } // Unicode object
 
@@ -71,10 +83,13 @@ object UnicodeTest extends App
  
     println (∙)
 
-    println ("sup  = " + sup.deep)
+    println ("supc = " + supc.deep)
     println ("supn = " + supn.deep)
-    println ("sub  = " + sub.deep)
+    println ("subc = " + subc.deep)
     println ("subn = " + subn.deep)
+
+    println ("sup (12) = " + sup (12))
+    println ("sub (12) = " + sub (12))
 
 } // UnicodeTest object
 

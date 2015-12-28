@@ -36,8 +36,9 @@ trait Vec
 object Vec
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the 'i'th element.
-     *  @param  i  the index position 
+    /** Return the 'i'th element of vector 'x'.
+     *  @param x  the vector to access
+     *  @param i  the index position 
      */
     def apply (x: Vec, i: Int): Any =
     {
@@ -52,6 +53,27 @@ object Vec
         case _  =>  println ("apply: vector type not supported"); 0
         } // match
     } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Update the 'i'th element of vector 'x'.
+     *  @param x  the vector to update
+     *  @param i  the index position
+     *  @param s  the scalar to assign
+     */
+    def update [T <: Any] (x: Vec, i: Int, s: T)
+    {
+        s match {
+        case _: Complex  => x.asInstanceOf [VectorC] (i) = s.asInstanceOf [Complex]
+        case _: Double   => x.asInstanceOf [VectorD] (i) = s.asInstanceOf [Double]
+        case _: Int      => x.asInstanceOf [VectorI] (i) = s.asInstanceOf [Int]
+        case _: Long     => x.asInstanceOf [VectorL] (i) = s.asInstanceOf [Long]
+        case _: Rational => x.asInstanceOf [VectorQ] (i) = s.asInstanceOf [Rational]
+        case _: Real     => x.asInstanceOf [VectorR] (i) = s.asInstanceOf [Real]
+        case _: StrNum   => x.asInstanceOf [VectorS] (i) = s.asInstanceOf [StrNum]
+        case _: String   => x.asInstanceOf [VectorS] (i) = s.asInstanceOf [String]
+        case _  =>  println ("update: vector type not supported")
+        } // match
+    } // update
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate vectors 'x' and 'y'.
@@ -75,7 +97,7 @@ object Vec
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Copy of vector 'x' with scalar 's' appended.
      *  @param x  the vector
-     *  @param y  the scalar to append
+     *  @param s  the scalar to append
      */
     def :+ [T <: Any] (x: Vec, s: T): Vec =
     {

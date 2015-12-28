@@ -90,6 +90,11 @@ class ANCOVA (x_ : MatrixD, t: VectorI, y: VectorD, levels: Int, technique: RegT
     def fit: VectorD = rg.fit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the vector of residuals/errors.
+     */
+    override def residual: VectorD = rg.residual
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
      *  e.g., (b0, b1, b2) dot (1, z1, z2).
      *  @param z  the new vector to predict

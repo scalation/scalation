@@ -87,6 +87,11 @@ class TrigRegression (t: VectorD, y: VectorD, k: Int, w: Double = Pi, technique:
     def fit: VectorD = rg.fit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the vector of residuals/errors.
+     */
+    override def residual: VectorD = rg.residual
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot expand (z),
      *  e.g., (b_0, b_1, b_2) dot (1, z, z^2).
      *  @param z  the new scalar to predict

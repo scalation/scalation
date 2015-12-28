@@ -21,7 +21,7 @@ import scalation.util.Error
 import GoodnessOfFit_CS._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `GoodnessOfFit__CS2` class is used to fit data to probability distibutions.
+/** The `GoodnessOfFit_CS2` class is used to fit data to probability distibutions.
  *  Suggestions: each interval should have 'E_i = n*p_i >= 5' and intervals >= sqrt (n).
  *  It uses the Chi-square goodness of fit test with equal probability intervals.
  *  @see www.eg.bucknell.edu/~xmeng/Course/CS6337/Note/master/node66.html
@@ -38,7 +38,7 @@ import GoodnessOfFit_CS._
  *  @param intervals     the number of intervals for the data's histogram
  *  @param makeStandard  whether to transform the data to zero mean and unit standard deviation
  */
-class GoodnessOfFit__CS2 (private var d: VectorD, dmin: Double, dmax: Double, iCDF: Distribution,
+class GoodnessOfFit_CS2 (private var d: VectorD, dmin: Double, dmax: Double, iCDF: Distribution,
                       parms: Parameters = null, intervals: Int = 10, makeStandard: Boolean = true)
       extends Error
 {
@@ -99,15 +99,15 @@ class GoodnessOfFit__CS2 (private var d: VectorD, dmin: Double, dmax: Double, iC
         VectorD (for (y <- 1 to intervals) yield iCDF (y / intervals.toDouble, parms))
     } // equalProbabilityInterval
 
-} // GoodnessOfFit__CS2 class
+} // GoodnessOfFit_CS2 class
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `GoodnessOfFitTest` object is used to test the `GoodnessOfFit` class.
+/** The `GoodnessOfFit_CS2Test` object is used to test the `GoodnessOfFit_CS` class.
  *  @see http://www.seattlecentral.edu/qelp/sets/057/057.html
-    > run-main scalation.stat.GoodnessOfFit__CS2Test
+    > run-main scalation.stat.GoodnessOfFit_CS2Test
  */
-object GoodnessOfFit__CS2Test extends App
+object GoodnessOfFit_CS2Test extends App
 {
     import scalation.random.Quantile.{uniformInv, normalInv}
 
@@ -139,11 +139,11 @@ object GoodnessOfFit__CS2Test extends App
     println ("dsig  = " + dsig)
     println ("-------------------------------------------------------------")
 
-    val gof1 = new GoodnessOfFit__CS2 (d, dmin, dmax, uniformInv, Vector (36, 56), 10, false)
+    val gof1 = new GoodnessOfFit_CS2 (d, dmin, dmax, uniformInv, Vector (36, 56), 10, false)
     println ("fit = " + gof1.fit ())
     
-    val gof2 = new GoodnessOfFit__CS2 (d, dmin, dmax, normalInv)
+    val gof2 = new GoodnessOfFit_CS2 (d, dmin, dmax, normalInv)
     println ("fit = " + gof2.fit ())
 
-} // GoodnessOfFit__CS2Test object
+} // GoodnessOfFit_CS2Test object
 

@@ -540,6 +540,33 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
     } // selectAt
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Update the column named 'cName' using function 'func' for elements with
+     *  value 'matchStr'.
+     *  @param cName     the name of the column to be updated
+     *  @param func      the function used to assign updated values
+     *  @param matchStr  the string to be matched to elements
+     */
+    def update [T <: Any] (cName: String, func: () => String, matchStr: String)
+    {
+        val colPos = colMap (cName)
+        val c = col(colPos)
+        for (i <- 0 until c.size if Vec(c, i) == matchStr) Vec(c, i) = func ()
+    } // update
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Update the column named 'cName' using function 'func' for elements where
+     *  the predicate 'pred' evaluates to true.
+     *  @param cName  the name of the column to be updated
+     *  @param func   the function used to assign updated values         // FIX - generalize type
+     *  @param pred   the predicated used to select elements for update
+     *
+    def update [T <: Any] (cName: String, func: () => String, pred: () => Boolean)
+    {
+        // FIX - to be implemented
+    } // update
+     */
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether 'this' relation and 'r2' are incompatible by having
      *  differing numbers of columns or differing domain strings.
      *  @param r2  the other relation
@@ -889,6 +916,18 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
         case BIDIAGONAL      => (BidMatrixI (colVec), Vec.toInt (col(colPosV)))
         } // match
     } // toMatriII
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert the 'colPos' column of 'this' relation into a vector of doubles.
+     *  @param colPos  the column position to use for the vector
+     */
+    def toVectorD (colPos: Int): VectorD = Vec.toDouble (col(colPos))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert the 'colPos' column of 'this' relation into a vector of integers.
+     *  @param colPos  the column position to use for the vector
+     */
+    def toVectorI (colPos: Int): VectorI = Vec.toInt (col(colPos))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Save 'this' relation in a file using serialization.

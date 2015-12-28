@@ -10,7 +10,8 @@ package scalation.relalgebra
 
 import scala.util.control.Breaks.{break, breakable}
 import scalation.analytics.GLM
-import scalation.linalgebra.{MatrixD, Vec, VectorS, mem_mapped}
+import scalation.linalgebra.Converter.mapToInt
+import scalation.linalgebra.{MatrixD, MatrixI, Vec, VectorS, mem_mapped}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MakeSchema` object attempts to infers the domain of a relation without a
@@ -19,6 +20,21 @@ import scalation.linalgebra.{MatrixD, Vec, VectorS, mem_mapped}
  */
 object MakeSchema
 {
+    /** Transition matrix: state = function (state, datatype)
+     */
+    private val tMatrix = new MatrixI ((4, 4), 0, 1, 2, 3,    // Int
+                                               1, 1, 2, 3,    // Long
+                                               2, 2, 2, 3,    // Double
+                                               3, 3, 3, 3)    // String
+
+    /** Regular expression for integers
+     */
+    private val intPattern = "[\\-\\+]?\\d+".r.pattern
+
+    /** Regular expression for floating point numbers
+     */
+    private val doublePattern = "[\\-\\+]?\\d*(\\.\\d+)?".r.pattern
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Infer the domains of a domain-less relation and create a new relation with
      *  the inferred domains (e.g., "IIDIS").
@@ -63,27 +79,25 @@ object MakeSchema
     def analyzeType (c: VectorS, samplePercent: Int = 100, mapString: Boolean = false):
                      Tuple2[Vec, String] =
     {
-        import scalation.linalgebra.Converter.mapToInt
-
-        val np  = c.dim * (samplePercent / 100.0)
-        var typ = "I"
-        val intPattern    = "[\\-\\+]?\\d+".r.pattern
-        val doublePattern = "[\\-\\+]?\\d*(\\.\\d+)?".r.pattern
+        val np    = c.dim * (samplePercent / 100.0)
+        var state = 0
 
         breakable {for (i <- 0 until np.toInt) {
-            if (! intPattern.matcher (c(i).toString).matches ()) {
-                if (doublePattern.matcher (c(i).toString).matches ()) typ = "D"
-                else { typ = "S"; break }
-            } else if (c(i).toLong > Int.MaxValue || c(i).toLong < Int.MinValue) {
-                typ = "L"
-            } // if
+            val typ = if (intPattern.matcher (c(i).toString).matches ())
+                          if (c(i).toLong > Int.MaxValue || c(i).toLong < Int.MinValue) 1
+                          else 0
+                      else if (doublePattern.matcher (c(i).toString).matches ()) 2
+                      else 3
+
+            state = tMatrix(state, typ)
+            if (state == 3) break
         }} // breakable for
 
-        typ match {
-        case "I" => (c.toInt, "I")
-        case "L" => (c.toLong, "L")
-        case "D" => (c.toDouble, "D")
-        case _   => if (mapString) (mapToInt(c)._1, "I") else (c, "S")
+        state match {
+        case 0 => (c.toInt, "I")
+        case 1 => (c.toLong, "L")
+        case 2 => (c.toDouble, "D")
+        case _ => if (mapString) (mapToInt(c)._1, "I") else (c, "S")
         } // match
     } // analyzeType
 
@@ -99,24 +113,26 @@ object MakeSchema
      {
         import scalation.linalgebra.mem_mapped.Converter.mapToInt
 
-        val np  = c.dim * (samplePercent / 100.0)
-        var typ = "I"
-        val intPattern    = "[\\-\\+]?\\d+".r.pattern
-        val doublePattern = "[\\-\\+]?\\d*(\\.\\d+)?".r.pattern
+        val np    = c.dim * (samplePercent / 100.0)
+        var state = 0
 
-        breakable { for (i <- 0 until np.toInt) {
-            if (! intPattern.matcher (c(i).toString).matches ()) {
-                if (doublePattern.matcher(c(i).toString).matches()) typ = "D"
-                else { typ = "S"; break }
-            } else if (c(i).toLong > Int.MaxValue || c(i).toLong < Int.MinValue) typ = "L"
-        }} // breakable for
+         breakable {for (i <- 0 until np.toInt) {
+             val typ = if (intPattern.matcher (c(i).toString).matches ())
+                           if (c(i).toLong > Int.MaxValue || c(i).toLong < Int.MinValue) 1
+                           else 0
+                       else if (doublePattern.matcher (c(i).toString).matches ()) 2
+                       else 3
 
-        typ match {
-        case "I" => (c.toInt, "I")
-        case "L" => (c.toLong, "L")
-        case "D" => (c.toDouble, "D")
-        case _   => if (mapString) (mapToInt(c)._1, "I") else (c, "S")
-        } // match
+             state = tMatrix(state, typ)
+             if (state == 3) break
+         }} // breakable for
+
+         state match {
+             case 0 => (c.toInt, "I")
+             case 1 => (c.toLong, "L")
+             case 2 => (c.toDouble, "D")
+             case _ => if (mapString) (mapToInt(c)._1, "I") else (c, "S")
+         } // match
     } // mm_analyzeType
 
 } // MakeSchema object
@@ -133,7 +149,7 @@ object MakeSchemaTest extends App
              "ProductID", "SalesPersonID", "Quantity", "ProductActualCost", "SalesTotalCost", "Deviation"),
         Seq (Vector [Any] (1,  20130101, 44347, 121907, 1, 1, 1, 1, 2,  11.0,  13, 2.0),
              Vector [Any] (1,  20130101, 44347, 121907, 1, 1, 2, 1, 1,  22.5,  24.0, 1.5),
-             Vector [Any] (1,  20130101, "s44347", 121907, 1, 1, 3, 1, 1,  42.0,  43.5, 1.5),
+             Vector [Any] (1,  20130101, "s44347", 121907, 1, 1, 3, 1, 1,  42.0,  43.5, 1.5),   // made a string for testing
              Vector [Any] (2,  20130101, 44519, 122159, 1, 2, 3, 1, 1,  42.0,  43.5, 1.5),
              Vector [Any] (2,  20130101, 44519, 122159, 1, 2, 4, 1, 3,  54.0,  60.0, 6.0),
              Vector [Any] (3,  20130101, 52415, 143335, 1, 3, 2, 2, 2,  11.0,  13.0, 2.0),

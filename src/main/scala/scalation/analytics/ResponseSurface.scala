@@ -118,6 +118,11 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
     def fit: VectorD = rsm.fit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the vector of residuals/errors.
+     */
+    override def residual: VectorD = rsm.residual
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a point z, use the quadratic rsm regression equation to predict a
      *  value for the function at z.
      *  for 1D:  b_0 + b_1*z_0 + b_2*z_0^2

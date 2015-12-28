@@ -19,6 +19,7 @@ import scalation.stat.Statistic
 /** The `Machine` object defines a particular scenario under which to execute the
  *  Machine model.
  *  @see scalation.event.ModelTest for another example of test code.
+ *  > run-main apps.event.Machine
  */
 object Machine extends App with Modelable
 {

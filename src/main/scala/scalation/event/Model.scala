@@ -194,6 +194,7 @@ class Model (name: String, animating: Boolean = false)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ModelTest` object is used to test the `Model` class.
+ *  > run-main scalation.event.ModelTest
  */
 object ModelTest extends App
 {
@@ -229,7 +230,7 @@ object ModelTest extends App
          *  @param delay  the time delay for this event's occurrence
          */
         case class Arrival (call: Entity, delay: Double)
-             extends Event (call, this, delay, t_a_stat, null)
+             extends Event (call, this, delay, t_a_stat, aProto)
         {
             override def occur ()
             {

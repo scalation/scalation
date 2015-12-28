@@ -18,6 +18,7 @@ import scalation.stat.Statistic
  *  the Call Center model.  It is the same as `CallCenter`, except that causal links
  *  are added to enable the model to be animated as an Event Graph.
  *  @see scalation.event.ModelTest for another example of test code.
+ *  > run-main apps.event.CallCenter2
  */
 object CallCenter2 extends App with Modelable
 {

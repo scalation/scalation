@@ -44,7 +44,7 @@ object GoodnessOfFit_CS
      */
     final def sokal (o: Double, e: Double): Double = 2.0 * o * log (o/e)
 
-} // GoodnessOfFit_CS
+} // GoodnessOfFit_CS object
 
 import GoodnessOfFit_CS._
 
