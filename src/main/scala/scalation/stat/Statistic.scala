@@ -226,7 +226,7 @@ object Statistic
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TimeStatistic` class is used to collect values and compute time-persistent
  *  statistics on them (e.g., Number in Queue).
- *  @see http://staff.unak.is/andy/Year%203%20Simulation/Laboratories/v4manual/internal.htm
+ *  @see staff.unak.is/andy/Year%203%20Simulation/Laboratories/v4manual/internal.htm
  *  @param name        the name for this statistic (e.g., NumberInQueue or tellerQ)
  *  @param _lastTime   the time of last observation
  *  @param _startTime  the time observation began

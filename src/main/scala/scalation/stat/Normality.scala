@@ -18,7 +18,7 @@ import scalation.linalgebra.VectorD
  *  powerful goodness-of-fit tests tend to frequently reject Normality.
  *  @see stats.stackexchange.com/questions/29731/regression-when-the-ols-residuals-are-not-normally-distributed
  *  @see stats.stackexchange.com/questions/2492/is-normality-testing-essentially-useless
- *  @see https://en.wikipedia.org/wiki/D%27Agostino%27s_K-squared_test
+ *  @see en.wikipedia.org/wiki/D%27Agostino%27s_K-squared_test
  */
 object Normality
 {
@@ -52,7 +52,7 @@ object Normality
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NormalityTest` object is used to test the `Normality` object.
- *  @see http://www.seattlecentral.edu/qelp/sets/057/057.html
+ *  @see www.seattlecentral.edu/qelp/sets/057/057.html
  *  > run-main scalation.stat.NormalityTest
  */
 object NormalityTest extends App
