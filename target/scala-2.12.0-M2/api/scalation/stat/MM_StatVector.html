@@ -1,0 +1,613 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>MM_StatVector - scalation.stat.MM_StatVector</title>
+          <meta name="description" content="MM StatVector - scalation.stat.MM StatVector" />
+          <meta name="keywords" content="MM StatVector scalation.stat.MM StatVector" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'scalation.stat.MM_StatVector';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <img alt="Class" src="../../lib/class_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="scalation">scalation</a>.<a href="package.html" class="extype" name="scalation.stat">stat</a></p>
+        <h1>MM_StatVector</h1><h3><span class="morelinks"><div>Related Doc:
+            <a href="package.html" class="extype" name="scalation.stat">package stat</a>
+          </div></span></h3><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <span class="name">MM_StatVector</span><span class="result"> extends <span class="extype" name="scala.AnyVal">AnyVal</span></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>The <code>MM_StatVector</code> value class provides methods for computing statistics
+ on data vectors.  Both maximum likelihood and unbiased estimators are
+ supported.  Unbiased should only be used on sample (not population) data.
+ Ex:  It can be used to support the Method of Independent Replications (MIR).
+ For efficiency, <code>MM_StatVector</code> is a value class that enriches the <code>VectorD</code>.
+ The corresponding implicit conversion in the <code>stat</code> package object.</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>stackoverflow.com/questions/14861862/how-do-you-enrich-value-classes-without-overhead
+-----------------------------------------------------------------------------</p></span></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyVal">AnyVal</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div class="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalation.stat.MM_StatVector"><span>MM_StatVector</span></li><li class="in" name="scala.AnyVal"><span>AnyVal</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div class="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="scalation.stat.MM_StatVector#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(self:scalation.linalgebra.mem_mapped.VectorD):scalation.stat.MM_StatVector"></a><a id="&lt;init&gt;:MM_StatVector"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">MM_StatVector</span><span class="params">(<span name="self">self: <a href="../linalgebra/mem_mapped/VectorD.html" class="extype" name="scalation.linalgebra.mem_mapped.VectorD">VectorD</a></span>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@&lt;init&gt;(self:scalation.linalgebra.mem_mapped.VectorD):scalation.stat.MM_StatVector" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">self</dt><dd class="cmt"><p>the underlying object to be accessed via the 'self' accessor</p></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+
+        <div class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.Any#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.Any###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@##():Int" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.Any#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalation.stat.MM_StatVector#acorr" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="acorr(k:Int):Double"></a><a id="acorr(Int):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">acorr</span><span class="params">(<span name="k">k: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@acorr(k:Int):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute the 'k'-lag auto-correlation of 'self' vector.</p><div class="fullcomment"><div class="comment cmt"><p>Compute the 'k'-lag auto-correlation of 'self' vector.</p></div><dl class="paramcmts block"><dt class="param">k</dt><dd class="cmt"><p>the lag parameter</p></dd></dl></div>
+    </li><li name="scalation.stat.MM_StatVector#acov" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="acov(k:Int):Double"></a><a id="acov(Int):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">acov</span><span class="params">(<span name="k">k: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@acov(k:Int):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute the 'k'-lag auto-covariance of 'self' vector.</p><div class="fullcomment"><div class="comment cmt"><p>Compute the 'k'-lag auto-covariance of 'self' vector.</p></div><dl class="paramcmts block"><dt class="param">k</dt><dd class="cmt"><p>the lag parameter</p></dd></dl></div>
+    </li><li name="scalation.stat.MM_StatVector#amedian" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="amedian:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">amedian</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@amedian:Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute the averaged median, which is the median when 'dim' is odd and
+ the average of the median and the next'k'-median when 'dim' is even.</p>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalation.stat.MM_StatVector#corr" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="corr(y:scalation.linalgebra.mem_mapped.VectorD):Double"></a><a id="corr(VectorD):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">corr</span><span class="params">(<span name="y">y: <a href="../linalgebra/mem_mapped/VectorD.html" class="extype" name="scalation.linalgebra.mem_mapped.VectorD">VectorD</a></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@corr(y:scalation.linalgebra.mem_mapped.VectorD):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute Pearson's correlation of 'self' vector with vector 'y'.</p><div class="fullcomment"><div class="comment cmt"><p>Compute Pearson's correlation of 'self' vector with vector 'y'.</p></div><dl class="paramcmts block"><dt class="param">y</dt><dd class="cmt"><p>the other vector</p></dd></dl></div>
+    </li><li name="scalation.stat.MM_StatVector#cov" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="cov(y:scalation.linalgebra.mem_mapped.VectorD):Double"></a><a id="cov(VectorD):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">cov</span><span class="params">(<span name="y">y: <a href="../linalgebra/mem_mapped/VectorD.html" class="extype" name="scalation.linalgebra.mem_mapped.VectorD">VectorD</a></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@cov(y:scalation.linalgebra.mem_mapped.VectorD):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute the sample covariance of 'self' vector with vector 'y'.</p><div class="fullcomment"><div class="comment cmt"><p>Compute the sample covariance of 'self' vector with vector 'y'.</p></div><dl class="paramcmts block"><dt class="param">y</dt><dd class="cmt"><p>the other vector</p></dd></dl></div>
+    </li><li name="scala.AnyVal#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_&lt;:AnyVal]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Predef.Class">Class</span>[_ &lt;: <span class="extype" name="scala.AnyVal">AnyVal</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@getClass():Class[_&lt;:AnyVal]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyVal → Any</dd></dl></div>
+    </li><li name="scalation.stat.MM_StatVector#interval" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="interval(p:Double):Double"></a><a id="interval(Double):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">interval</span><span class="params">(<span name="p">p: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">.95</span></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@interval(p:Double):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute the confidence interval half-width for the given confidence level.</p><div class="fullcomment"><div class="comment cmt"><p>Compute the confidence interval half-width for the given confidence level.
+ The Confidence Interval (CI) is on the mean, i.e., CI = [mean +/- interval].</p></div><dl class="paramcmts block"><dt class="param">p</dt><dd class="cmt"><p>the confidence level</p></dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalation.stat.MM_StatVector#kurtosis" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="kurtosis(unbiased:Boolean):Double"></a><a id="kurtosis(Boolean):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">kurtosis</span><span class="params">(<span name="unbiased">unbiased: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@kurtosis(unbiased:Boolean):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute the kurtosis of 'self' vector.</p><div class="fullcomment"><div class="comment cmt"><p>Compute the kurtosis of 'self' vector.  High kurtosis (&gt; 3) indicates a
+ distribution with heavier tails than a Normal distribution.</p><p>     E(X - μ)<sup>4 / σ</sup>4</p></div><dl class="paramcmts block"><dt class="param">unbiased</dt><dd class="cmt"><p>whether to shift the result so Normal is at 0 rather than 3</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>www.mathworks.com/help/stats/kurtosis.html</p></span></dd></dl></div>
+    </li><li name="scalation.stat.MM_StatVector#median" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="median(k:Int):Double"></a><a id="median(Int):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">median</span><span class="params">(<span name="k">k: <span class="extype" name="scala.Int">Int</span> = <span class="symbol"><span class="name"><a href="#self:scalation.linalgebra.mem_mapped.VectorD">(self.dim+1)/2</a></span></span></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@median(k:Int):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute the 'k'-median ('k'-th smallest value) of 'self' vector.</p><div class="fullcomment"><div class="comment cmt"><p>Compute the 'k'-median ('k'-th smallest value) of 'self' vector.  Setting
+ 'k = (dim+1)/2' gives the regular median.</p></div><dl class="paramcmts block"><dt class="param">k</dt><dd class="cmt"><p>the type of median (k-th smallest value)</p></dd></dl></div>
+    </li><li name="scalation.stat.MM_StatVector#ms" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ms:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ms</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@ms:Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute the mean square (ms) of 'self' vector.</p>
+    </li><li name="scalation.stat.MM_StatVector#pcorr" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="pcorr(y:scalation.linalgebra.mem_mapped.VectorD):Double"></a><a id="pcorr(VectorD):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">pcorr</span><span class="params">(<span name="y">y: <a href="../linalgebra/mem_mapped/VectorD.html" class="extype" name="scalation.linalgebra.mem_mapped.VectorD">VectorD</a></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@pcorr(y:scalation.linalgebra.mem_mapped.VectorD):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute the population Pearson's correlation of 'self' vector with vector 'y'.</p><div class="fullcomment"><div class="comment cmt"><p>Compute the population Pearson's correlation of 'self' vector with vector 'y'.</p></div><dl class="paramcmts block"><dt class="param">y</dt><dd class="cmt"><p>the other vector</p></dd></dl></div>
+    </li><li name="scalation.stat.MM_StatVector#pcov" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="pcov(y:scalation.linalgebra.mem_mapped.VectorD):Double"></a><a id="pcov(VectorD):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">pcov</span><span class="params">(<span name="y">y: <a href="../linalgebra/mem_mapped/VectorD.html" class="extype" name="scalation.linalgebra.mem_mapped.VectorD">VectorD</a></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@pcov(y:scalation.linalgebra.mem_mapped.VectorD):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute the population covariance of 'self' vector with vector 'y'.</p><div class="fullcomment"><div class="comment cmt"><p>Compute the population covariance of 'self' vector with vector 'y'.</p></div><dl class="paramcmts block"><dt class="param">y</dt><dd class="cmt"><p>the other vector</p></dd></dl></div>
+    </li><li name="scalation.stat.MM_StatVector#precise" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="precise(threshold:Double,p:Double):Boolean"></a><a id="precise(Double,Double):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">precise</span><span class="params">(<span name="threshold">threshold: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">.2</span></span>, <span name="p">p: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">.95</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@precise(threshold:Double,p:Double):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Determine if the Confidence Interval (CI) on the mean is tight enough.</p><div class="fullcomment"><div class="comment cmt"><p>Determine if the Confidence Interval (CI) on the mean is tight enough.</p></div><dl class="paramcmts block"><dt class="param">threshold</dt><dd class="cmt"><p>the cut-off value for CI to be considered tight</p></dd><dt class="param">p</dt><dd class="cmt"><p>the confidence level</p></dd></dl></div>
+    </li><li name="scalation.stat.MM_StatVector#precision" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="precision(p:Double):Double"></a><a id="precision(Double):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">precision</span><span class="params">(<span name="p">p: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">.95</span></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@precision(p:Double):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute the relative precision, i.e., the ratio of the confidence interval
+ half-width and the mean.</p><div class="fullcomment"><div class="comment cmt"><p>Compute the relative precision, i.e., the ratio of the confidence interval
+ half-width and the mean.</p></div><dl class="paramcmts block"><dt class="param">p</dt><dd class="cmt"><p>the confidence level</p></dd></dl></div>
+    </li><li name="scalation.stat.MM_StatVector#pstddev" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="pstddev:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">pstddev</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@pstddev:Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute the population standard deviation of 'self' vector.</p><div class="fullcomment"><div class="comment cmt"><p>Compute the population standard deviation of 'self' vector.</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>VectorD for pvariance</p></span></dd></dl></div>
+    </li><li name="scalation.stat.MM_StatVector#rms" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="rms:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">rms</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@rms:Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute the root mean square (rms) of 'self' vector.</p>
+    </li><li name="scalation.stat.MM_StatVector#scorr" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="scorr(y:scalation.linalgebra.mem_mapped.VectorD):Double"></a><a id="scorr(VectorD):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">scorr</span><span class="params">(<span name="y">y: <a href="../linalgebra/mem_mapped/VectorD.html" class="extype" name="scalation.linalgebra.mem_mapped.VectorD">VectorD</a></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@scorr(y:scalation.linalgebra.mem_mapped.VectorD):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute Spearman's rank correlation of 'self' vector with vector 'y'.</p><div class="fullcomment"><div class="comment cmt"><p>Compute Spearman's rank correlation of 'self' vector with vector 'y'.</p></div><dl class="paramcmts block"><dt class="param">y</dt><dd class="cmt"><p>the other vector</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient</p></span></dd></dl></div>
+    </li><li name="scalation.stat.MM_StatVector#self" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="self:scalation.linalgebra.mem_mapped.VectorD"></a><a id="self:VectorD"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">self</span><span class="result">: <a href="../linalgebra/mem_mapped/VectorD.html" class="extype" name="scalation.linalgebra.mem_mapped.VectorD">VectorD</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@self:scalation.linalgebra.mem_mapped.VectorD" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">the underlying object to be accessed via the 'self' accessor</p>
+    </li><li name="scalation.stat.MM_StatVector#skew" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="skew(unbiased:Boolean):Double"></a><a id="skew(Boolean):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">skew</span><span class="params">(<span name="unbiased">unbiased: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@skew(unbiased:Boolean):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute the skewness of 'self' vector.</p><div class="fullcomment"><div class="comment cmt"><p>Compute the skewness of 'self' vector.  Negative skewness indicates the
+ distribution is elongated on the left, zero skewness indicates it is
+ symmetric, and positive skewness indicates it is elongated on the right.</p><p>     E(X - μ)<sup>3 / σ</sup>3</p></div><dl class="paramcmts block"><dt class="param">unbiased</dt><dd class="cmt"><p>whether to correct for bias</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>www.mathworks.com/help/stats/skewness.html</p></span></dd></dl></div>
+    </li><li name="scalation.stat.MM_StatVector#standardize" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="standardize:scalation.linalgebra.mem_mapped.VectorD"></a><a id="standardize:VectorD"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">standardize</span><span class="result">: <a href="../linalgebra/mem_mapped/VectorD.html" class="extype" name="scalation.linalgebra.mem_mapped.VectorD">VectorD</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@standardize:scalation.linalgebra.mem_mapped.VectorD" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Produce a standardized version of the vector by subtracting the mean and
+ dividing by the standard deviation (e.g., Normal -&gt; Standard Normal).</p>
+    </li><li name="scalation.stat.MM_StatVector#stddev" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="stddev:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">stddev</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@stddev:Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute the standard deviation of 'self' vector.</p>
+    </li><li name="scalation.stat.MM_StatVector#t_sigma" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="t_sigma(p:Double):Double"></a><a id="t_sigma(Double):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">t_sigma</span><span class="params">(<span name="p">p: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">.95</span></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@t_sigma(p:Double):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute the product of the critical value from the t-distribution and the
+ standard deviation of the vector.</p><div class="fullcomment"><div class="comment cmt"><p>Compute the product of the critical value from the t-distribution and the
+ standard deviation of the vector.</p></div><dl class="paramcmts block"><dt class="param">p</dt><dd class="cmt"><p>the confidence level</p></dd></dl></div>
+    </li><li name="scala.Any#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.stat.MM_StatVector@toString():String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyVal">
+              <h3>Inherited from <span class="extype" name="scala.AnyVal">AnyVal</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

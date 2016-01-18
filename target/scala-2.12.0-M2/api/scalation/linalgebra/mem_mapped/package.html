@@ -1,0 +1,1130 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>mem_mapped - scalation.linalgebra.mem_mapped</title>
+          <meta name="description" content="mem mapped - scalation.linalgebra.mem mapped" />
+          <meta name="keywords" content="mem mapped scalation.linalgebra.mem mapped" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../index.html';
+            var hash = 'scalation.linalgebra.mem_mapped.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../../lib/package_big.png" />
+        <p id="owner"><a href="../../package.html" class="extype" name="scalation">scalation</a>.<a href="../package.html" class="extype" name="scalation.linalgebra">linalgebra</a></p>
+        <h1>mem_mapped</h1><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">mem_mapped</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalation.linalgebra.mem_mapped.MatriC" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="MatriCextendsError"></a><a id="MatriC:MatriC"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MatriC.html"><span class="name">MatriC</span></a><span class="result"> extends <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatriCextendsError" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatriC</code> trait specifies the operations to be defined by the concrete
+ classes implementing <code>Complex</code> matrices, i.e.,
+     MatrixC           - dense matrix
+     BidMatrixC        - bidiagonal matrix - useful for computing Singular Values
+     SparseMatrixC     - sparse matrix - majority of elements should be zero
+     SymTriMatrixC     - symmetric triangular matrix - useful for computing Eigenvalues
+     par.MatrixC       - parallel dense matrix
+     par.SparseMatrixC - parallel sparse matrix
+Some of the classes provide a few custom methods, e.g., methods beginning with &quot;times&quot;
+or ending with &quot;npp&quot;.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatriC</code> trait specifies the operations to be defined by the concrete
+ classes implementing <code>Complex</code> matrices, i.e.,
+     MatrixC           - dense matrix
+     BidMatrixC        - bidiagonal matrix - useful for computing Singular Values
+     SparseMatrixC     - sparse matrix - majority of elements should be zero
+     SymTriMatrixC     - symmetric triangular matrix - useful for computing Eigenvalues
+     par.MatrixC       - parallel dense matrix
+     par.SparseMatrixC - parallel sparse matrix
+Some of the classes provide a few custom methods, e.g., methods beginning with &quot;times&quot;
+or ending with &quot;npp&quot;.
+------------------------------------------------------------------------------
+                 row-wise                 column-wise
+Append:       matrix +: vector         matrix +:<sup> vector
+Concatenate:  matrix ++ matrix         matrix ++</sup> matrix
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatriD" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="MatriDextendsError"></a><a id="MatriD:MatriD"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MatriD.html"><span class="name">MatriD</span></a><span class="result"> extends <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatriDextendsError" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatriD</code> trait specifies the operations to be defined by the concrete
+ classes implementing <code>Double</code> matrices, i.e.,
+     MatrixD           - dense matrix
+     BidMatrixD        - bidiagonal matrix - useful for computing Singular Values
+     SparseMatrixD     - sparse matrix - majority of elements should be zero
+     SymTriMatrixD     - symmetric triangular matrix - useful for computing Eigenvalues
+     par.MatrixD       - parallel dense matrix
+     par.SparseMatrixD - parallel sparse matrix
+Some of the classes provide a few custom methods, e.g., methods beginning with &quot;times&quot;
+or ending with &quot;npp&quot;.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatriD</code> trait specifies the operations to be defined by the concrete
+ classes implementing <code>Double</code> matrices, i.e.,
+     MatrixD           - dense matrix
+     BidMatrixD        - bidiagonal matrix - useful for computing Singular Values
+     SparseMatrixD     - sparse matrix - majority of elements should be zero
+     SymTriMatrixD     - symmetric triangular matrix - useful for computing Eigenvalues
+     par.MatrixD       - parallel dense matrix
+     par.SparseMatrixD - parallel sparse matrix
+Some of the classes provide a few custom methods, e.g., methods beginning with &quot;times&quot;
+or ending with &quot;npp&quot;.
+------------------------------------------------------------------------------
+                 row-wise                 column-wise
+Append:       matrix +: vector         matrix +:<sup> vector
+Concatenate:  matrix ++ matrix         matrix ++</sup> matrix
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatriI" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="MatriIextendsError"></a><a id="MatriI:MatriI"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MatriI.html"><span class="name">MatriI</span></a><span class="result"> extends <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatriIextendsError" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatriI</code> trait specifies the operations to be defined by the concrete
+ classes implementing <code>Int</code> matrices, i.e.,
+     MatrixI           - dense matrix
+     BidMatrixI        - bidiagonal matrix - useful for computing Singular Values
+     SparseMatrixI     - sparse matrix - majority of elements should be zero
+     SymTriMatrixI     - symmetric triangular matrix - useful for computing Eigenvalues
+     par.MatrixI       - parallel dense matrix
+     par.SparseMatrixI - parallel sparse matrix
+Some of the classes provide a few custom methods, e.g., methods beginning with &quot;times&quot;
+or ending with &quot;npp&quot;.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatriI</code> trait specifies the operations to be defined by the concrete
+ classes implementing <code>Int</code> matrices, i.e.,
+     MatrixI           - dense matrix
+     BidMatrixI        - bidiagonal matrix - useful for computing Singular Values
+     SparseMatrixI     - sparse matrix - majority of elements should be zero
+     SymTriMatrixI     - symmetric triangular matrix - useful for computing Eigenvalues
+     par.MatrixI       - parallel dense matrix
+     par.SparseMatrixI - parallel sparse matrix
+Some of the classes provide a few custom methods, e.g., methods beginning with &quot;times&quot;
+or ending with &quot;npp&quot;.
+------------------------------------------------------------------------------
+                 row-wise                 column-wise
+Append:       matrix +: vector         matrix +:<sup> vector
+Concatenate:  matrix ++ matrix         matrix ++</sup> matrix
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatriL" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="MatriLextendsError"></a><a id="MatriL:MatriL"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MatriL.html"><span class="name">MatriL</span></a><span class="result"> extends <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatriLextendsError" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatriL</code> trait specifies the operations to be defined by the concrete
+ classes implementing <code>Long</code> matrices, i.e.,
+     MatrixL           - dense matrix
+     BidMatrixL        - bidiagonal matrix - useful for computing Singular Values
+     SparseMatrixL     - sparse matrix - majority of elements should be zero
+     SymTriMatrixL     - symmetric triangular matrix - useful for computing Eigenvalues
+     par.MatrixL       - parallel dense matrix
+     par.SparseMatrixL - parallel sparse matrix
+Some of the classes provide a few custom methods, e.g., methods beginning with &quot;times&quot;
+or ending with &quot;npp&quot;.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatriL</code> trait specifies the operations to be defined by the concrete
+ classes implementing <code>Long</code> matrices, i.e.,
+     MatrixL           - dense matrix
+     BidMatrixL        - bidiagonal matrix - useful for computing Singular Values
+     SparseMatrixL     - sparse matrix - majority of elements should be zero
+     SymTriMatrixL     - symmetric triangular matrix - useful for computing Eigenvalues
+     par.MatrixL       - parallel dense matrix
+     par.SparseMatrixL - parallel sparse matrix
+Some of the classes provide a few custom methods, e.g., methods beginning with &quot;times&quot;
+or ending with &quot;npp&quot;.
+------------------------------------------------------------------------------
+                 row-wise                 column-wise
+Append:       matrix +: vector         matrix +:<sup> vector
+Concatenate:  matrix ++ matrix         matrix ++</sup> matrix
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatriQ" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="MatriQextendsError"></a><a id="MatriQ:MatriQ"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MatriQ.html"><span class="name">MatriQ</span></a><span class="result"> extends <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatriQextendsError" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatriQ</code> trait specifies the operations to be defined by the concrete
+ classes implementing <code>Rational</code> matrices, i.e.,
+     MatrixQ           - dense matrix
+     BidMatrixQ        - bidiagonal matrix - useful for computing Singular Values
+     SparseMatrixQ     - sparse matrix - majority of elements should be zero
+     SymTriMatrixQ     - symmetric triangular matrix - useful for computing Eigenvalues
+     par.MatrixQ       - parallel dense matrix
+     par.SparseMatrixQ - parallel sparse matrix
+Some of the classes provide a few custom methods, e.g., methods beginning with &quot;times&quot;
+or ending with &quot;npp&quot;.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatriQ</code> trait specifies the operations to be defined by the concrete
+ classes implementing <code>Rational</code> matrices, i.e.,
+     MatrixQ           - dense matrix
+     BidMatrixQ        - bidiagonal matrix - useful for computing Singular Values
+     SparseMatrixQ     - sparse matrix - majority of elements should be zero
+     SymTriMatrixQ     - symmetric triangular matrix - useful for computing Eigenvalues
+     par.MatrixQ       - parallel dense matrix
+     par.SparseMatrixQ - parallel sparse matrix
+Some of the classes provide a few custom methods, e.g., methods beginning with &quot;times&quot;
+or ending with &quot;npp&quot;.
+------------------------------------------------------------------------------
+                 row-wise                 column-wise
+Append:       matrix +: vector         matrix +:<sup> vector
+Concatenate:  matrix ++ matrix         matrix ++</sup> matrix
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatriR" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="MatriRextendsError"></a><a id="MatriR:MatriR"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MatriR.html"><span class="name">MatriR</span></a><span class="result"> extends <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatriRextendsError" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatriR</code> trait specifies the operations to be defined by the concrete
+ classes implementing <code>Real</code> matrices, i.e.,
+     MatrixR           - dense matrix
+     BidMatrixR        - bidiagonal matrix - useful for computing Singular Values
+     SparseMatrixR     - sparse matrix - majority of elements should be zero
+     SymTriMatrixR     - symmetric triangular matrix - useful for computing Eigenvalues
+     par.MatrixR       - parallel dense matrix
+     par.SparseMatrixR - parallel sparse matrix
+Some of the classes provide a few custom methods, e.g., methods beginning with &quot;times&quot;
+or ending with &quot;npp&quot;.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatriR</code> trait specifies the operations to be defined by the concrete
+ classes implementing <code>Real</code> matrices, i.e.,
+     MatrixR           - dense matrix
+     BidMatrixR        - bidiagonal matrix - useful for computing Singular Values
+     SparseMatrixR     - sparse matrix - majority of elements should be zero
+     SymTriMatrixR     - symmetric triangular matrix - useful for computing Eigenvalues
+     par.MatrixR       - parallel dense matrix
+     par.SparseMatrixR - parallel sparse matrix
+Some of the classes provide a few custom methods, e.g., methods beginning with &quot;times&quot;
+or ending with &quot;npp&quot;.
+------------------------------------------------------------------------------
+                 row-wise                 column-wise
+Append:       matrix +: vector         matrix +:<sup> vector
+Concatenate:  matrix ++ matrix         matrix ++</sup> matrix
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatriS" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="MatriSextendsError"></a><a id="MatriS:MatriS"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MatriS.html"><span class="name">MatriS</span></a><span class="result"> extends <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatriSextendsError" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatriS</code> trait specifies the operations to be defined by the concrete
+ classes implementing <code>StrNum</code> matrices, i.e.,
+     MatrixS           - dense matrix
+     BidMatrixS        - bidiagonal matrix - useful for computing Singular Values
+     SparseMatrixS     - sparse matrix - majority of elements should be zero
+     SymTriMatrixS     - symmetric triangular matrix - useful for computing Eigenvalues
+     par.MatrixS       - parallel dense matrix
+     par.SparseMatrixS - parallel sparse matrix
+Some of the classes provide a few custom methods, e.g., methods beginning with &quot;times&quot;
+or ending with &quot;npp&quot;.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatriS</code> trait specifies the operations to be defined by the concrete
+ classes implementing <code>StrNum</code> matrices, i.e.,
+     MatrixS           - dense matrix
+     BidMatrixS        - bidiagonal matrix - useful for computing Singular Values
+     SparseMatrixS     - sparse matrix - majority of elements should be zero
+     SymTriMatrixS     - symmetric triangular matrix - useful for computing Eigenvalues
+     par.MatrixS       - parallel dense matrix
+     par.SparseMatrixS - parallel sparse matrix
+Some of the classes provide a few custom methods, e.g., methods beginning with &quot;times&quot;
+or ending with &quot;npp&quot;.
+------------------------------------------------------------------------------
+                 row-wise                 column-wise
+Append:       matrix +: vector         matrix +:<sup> vector
+Concatenate:  matrix ++ matrix         matrix ++</sup> matrix
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatrixC" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MatrixCextendsMatriCwithErrorwithSerializable"></a><a id="MatrixC:MatrixC"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixC.html"><span class="name">MatrixC</span></a><span class="result"> extends <a href="MatriC.html" class="extype" name="scalation.linalgebra.mem_mapped.MatriC">MatriC</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatrixCextendsMatriCwithErrorwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatrixC</code> class stores and operates on Numeric Matrices of type <code>Complex</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatrixC</code> class stores and operates on Numeric Matrices of type <code>Complex</code>.
+ This class follows the <code>gen.MatrixN</code> framework and is provided for efficiency.</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatrixD" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MatrixDextendsMatriDwithErrorwithSerializable"></a><a id="MatrixD:MatrixD"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixD.html"><span class="name">MatrixD</span></a><span class="result"> extends <a href="MatriD.html" class="extype" name="scalation.linalgebra.mem_mapped.MatriD">MatriD</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatrixDextendsMatriDwithErrorwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatrixD</code> class stores and operates on Numeric Matrices of type <code>Double</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatrixD</code> class stores and operates on Numeric Matrices of type <code>Double</code>.
+ This class follows the <code>gen.MatrixN</code> framework and is provided for efficiency.</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatrixI" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MatrixIextendsMatriIwithErrorwithSerializable"></a><a id="MatrixI:MatrixI"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixI.html"><span class="name">MatrixI</span></a><span class="result"> extends <a href="MatriI.html" class="extype" name="scalation.linalgebra.mem_mapped.MatriI">MatriI</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatrixIextendsMatriIwithErrorwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatrixI</code> class stores and operates on Numeric Matrices of type <code>Int</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatrixI</code> class stores and operates on Numeric Matrices of type <code>Int</code>.
+ This class follows the <code>gen.MatrixN</code> framework and is provided for efficiency.</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatrixL" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MatrixLextendsMatriLwithErrorwithSerializable"></a><a id="MatrixL:MatrixL"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixL.html"><span class="name">MatrixL</span></a><span class="result"> extends <a href="MatriL.html" class="extype" name="scalation.linalgebra.mem_mapped.MatriL">MatriL</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatrixLextendsMatriLwithErrorwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatrixL</code> class stores and operates on Numeric Matrices of type <code>Long</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatrixL</code> class stores and operates on Numeric Matrices of type <code>Long</code>.
+ This class follows the <code>gen.MatrixN</code> framework and is provided for efficiency.</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatrixQ" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MatrixQextendsMatriQwithErrorwithSerializable"></a><a id="MatrixQ:MatrixQ"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixQ.html"><span class="name">MatrixQ</span></a><span class="result"> extends <a href="MatriQ.html" class="extype" name="scalation.linalgebra.mem_mapped.MatriQ">MatriQ</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatrixQextendsMatriQwithErrorwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatrixQ</code> class stores and operates on Numeric Matrices of type <code>Rational</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatrixQ</code> class stores and operates on Numeric Matrices of type <code>Rational</code>.
+ This class follows the <code>gen.MatrixN</code> framework and is provided for efficiency.</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatrixR" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MatrixRextendsMatriRwithErrorwithSerializable"></a><a id="MatrixR:MatrixR"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixR.html"><span class="name">MatrixR</span></a><span class="result"> extends <a href="MatriR.html" class="extype" name="scalation.linalgebra.mem_mapped.MatriR">MatriR</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatrixRextendsMatriRwithErrorwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatrixR</code> class stores and operates on Numeric Matrices of type <code>Real</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatrixR</code> class stores and operates on Numeric Matrices of type <code>Real</code>.
+ This class follows the <code>gen.MatrixN</code> framework and is provided for efficiency.</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.Vec" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="VecextendsAnyRef"></a><a id="Vec:Vec"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Vec.html"><span class="name">Vec</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VecextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Vec</code> trait establishes a common base type for all vectors (e.g., VectorD).</p>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorC" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="VectorCextendsTraversable[scalation.math.Complex]withPartiallyOrdered[scalation.linalgebra.mem_mapped.VectorC]withVecwithErrorwithSerializable"></a><a id="VectorC:VectorC"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorC.html"><span class="name">VectorC</span></a><span class="result"> extends <span class="extype" name="scala.collection.Traversable">Traversable</span>[<a href="../../math/Complex.html" class="extype" name="scalation.math.Complex">Complex</a>] with <span class="extype" name="scala.PartiallyOrdered">PartiallyOrdered</span>[<a href="VectorC.html" class="extype" name="scalation.linalgebra.mem_mapped.VectorC">VectorC</a>] with <a href="Vec.html" class="extype" name="scalation.linalgebra.mem_mapped.Vec">Vec</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorCextendsTraversable[scalation.math.Complex]withPartiallyOrdered[scalation.linalgebra.mem_mapped.VectorC]withVecwithErrorwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorC</code> class stores and operates on Numeric Vectors of base type <code>Complex</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VectorC</code> class stores and operates on Numeric Vectors of base type <code>Complex</code>.
+ It follows the framework of <code>gen.VectorN [T]</code> and is provided for performance.</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorD" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="VectorDextendsTraversable[Double]withPartiallyOrdered[scalation.linalgebra.mem_mapped.VectorD]withVecwithErrorwithSerializable"></a><a id="VectorD:VectorD"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorD.html"><span class="name">VectorD</span></a><span class="result"> extends <span class="extype" name="scala.collection.Traversable">Traversable</span>[<span class="extype" name="scala.Double">Double</span>] with <span class="extype" name="scala.PartiallyOrdered">PartiallyOrdered</span>[<a href="VectorD.html" class="extype" name="scalation.linalgebra.mem_mapped.VectorD">VectorD</a>] with <a href="Vec.html" class="extype" name="scalation.linalgebra.mem_mapped.Vec">Vec</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorDextendsTraversable[Double]withPartiallyOrdered[scalation.linalgebra.mem_mapped.VectorD]withVecwithErrorwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorD</code> class stores and operates on Numeric Vectors of base type <code>Double</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VectorD</code> class stores and operates on Numeric Vectors of base type <code>Double</code>.
+ It follows the framework of <code>gen.VectorN [T]</code> and is provided for performance.</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorI" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="VectorIextendsTraversable[Int]withPartiallyOrdered[scalation.linalgebra.mem_mapped.VectorI]withVecwithErrorwithSerializable"></a><a id="VectorI:VectorI"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorI.html"><span class="name">VectorI</span></a><span class="result"> extends <span class="extype" name="scala.collection.Traversable">Traversable</span>[<span class="extype" name="scala.Int">Int</span>] with <span class="extype" name="scala.PartiallyOrdered">PartiallyOrdered</span>[<a href="VectorI.html" class="extype" name="scalation.linalgebra.mem_mapped.VectorI">VectorI</a>] with <a href="Vec.html" class="extype" name="scalation.linalgebra.mem_mapped.Vec">Vec</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorIextendsTraversable[Int]withPartiallyOrdered[scalation.linalgebra.mem_mapped.VectorI]withVecwithErrorwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorI</code> class stores and operates on Numeric Vectors of base type <code>Int</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VectorI</code> class stores and operates on Numeric Vectors of base type <code>Int</code>.
+ It follows the framework of <code>gen.VectorN [T]</code> and is provided for performance.</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorL" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="VectorLextendsTraversable[Long]withPartiallyOrdered[scalation.linalgebra.mem_mapped.VectorL]withVecwithErrorwithSerializable"></a><a id="VectorL:VectorL"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorL.html"><span class="name">VectorL</span></a><span class="result"> extends <span class="extype" name="scala.collection.Traversable">Traversable</span>[<span class="extype" name="scala.Long">Long</span>] with <span class="extype" name="scala.PartiallyOrdered">PartiallyOrdered</span>[<a href="VectorL.html" class="extype" name="scalation.linalgebra.mem_mapped.VectorL">VectorL</a>] with <a href="Vec.html" class="extype" name="scalation.linalgebra.mem_mapped.Vec">Vec</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorLextendsTraversable[Long]withPartiallyOrdered[scalation.linalgebra.mem_mapped.VectorL]withVecwithErrorwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorL</code> class stores and operates on Numeric Vectors of base type <code>Long</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VectorL</code> class stores and operates on Numeric Vectors of base type <code>Long</code>.
+ It follows the framework of <code>gen.VectorN [T]</code> and is provided for performance.</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorQ" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="VectorQextendsTraversable[scalation.math.Rational]withPartiallyOrdered[scalation.linalgebra.mem_mapped.VectorQ]withVecwithErrorwithSerializable"></a><a id="VectorQ:VectorQ"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorQ.html"><span class="name">VectorQ</span></a><span class="result"> extends <span class="extype" name="scala.collection.Traversable">Traversable</span>[<a href="../../math/Rational.html" class="extype" name="scalation.math.Rational">Rational</a>] with <span class="extype" name="scala.PartiallyOrdered">PartiallyOrdered</span>[<a href="VectorQ.html" class="extype" name="scalation.linalgebra.mem_mapped.VectorQ">VectorQ</a>] with <a href="Vec.html" class="extype" name="scalation.linalgebra.mem_mapped.Vec">Vec</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorQextendsTraversable[scalation.math.Rational]withPartiallyOrdered[scalation.linalgebra.mem_mapped.VectorQ]withVecwithErrorwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorQ</code> class stores and operates on Numeric Vectors of base type <code>Rational</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VectorQ</code> class stores and operates on Numeric Vectors of base type <code>Rational</code>.
+ It follows the framework of <code>gen.VectorN [T]</code> and is provided for performance.</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorR" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="VectorRextendsTraversable[scalation.math.Real]withPartiallyOrdered[scalation.linalgebra.mem_mapped.VectorR]withVecwithErrorwithSerializable"></a><a id="VectorR:VectorR"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorR.html"><span class="name">VectorR</span></a><span class="result"> extends <span class="extype" name="scala.collection.Traversable">Traversable</span>[<a href="../../math/Real.html" class="extype" name="scalation.math.Real">Real</a>] with <span class="extype" name="scala.PartiallyOrdered">PartiallyOrdered</span>[<a href="VectorR.html" class="extype" name="scalation.linalgebra.mem_mapped.VectorR">VectorR</a>] with <a href="Vec.html" class="extype" name="scalation.linalgebra.mem_mapped.Vec">Vec</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorRextendsTraversable[scalation.math.Real]withPartiallyOrdered[scalation.linalgebra.mem_mapped.VectorR]withVecwithErrorwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorR</code> class stores and operates on Numeric Vectors of base type <code>Real</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VectorR</code> class stores and operates on Numeric Vectors of base type <code>Real</code>.
+ It follows the framework of <code>gen.VectorN [T]</code> and is provided for performance.</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorS" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="VectorSextendsTraversable[scalation.math.StrO.StrNum]withPartiallyOrdered[scalation.linalgebra.mem_mapped.VectorS]withVecwithErrorwithSerializable"></a><a id="VectorS:VectorS"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorS.html"><span class="name">VectorS</span></a><span class="result"> extends <span class="extype" name="scala.collection.Traversable">Traversable</span>[<a href="../../math/StrO$$StrNum.html" class="extype" name="scalation.math.StrO.StrNum">StrNum</a>] with <span class="extype" name="scala.PartiallyOrdered">PartiallyOrdered</span>[<a href="VectorS.html" class="extype" name="scalation.linalgebra.mem_mapped.VectorS">VectorS</a>] with <a href="Vec.html" class="extype" name="scalation.linalgebra.mem_mapped.Vec">Vec</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorSextendsTraversable[scalation.math.StrO.StrNum]withPartiallyOrdered[scalation.linalgebra.mem_mapped.VectorS]withVecwithErrorwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorS</code> class stores and operates on Numeric Vectors of base type <code>StrNum</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VectorS</code> class stores and operates on Numeric Vectors of base type <code>StrNum</code>.
+ It follows the framework of <code>gen.VectorN [T]</code> and is provided for performance.</p></div></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scalation.linalgebra.mem_mapped.Converter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Converter"></a><a id="Converter:Converter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Converter$.html"><span class="name">Converter</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@Converter" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Converter</code> object converts string number vectors to integer vectors.</p>
+    </li><li name="scalation.linalgebra.mem_mapped.MatrixC" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MatrixC"></a><a id="MatrixC:MatrixC"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixC$.html"><span class="name">MatrixC</span></a><span class="result"> extends <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatrixC" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatrixC</code> companion object provides operations for <code>MatrixC</code> that don't require
+ 'this' (like static methods in Java).</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatrixC</code> companion object provides operations for <code>MatrixC</code> that don't require
+ 'this' (like static methods in Java).  It provides factory methods for building
+ matrices from files or vectors.
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatrixCTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MatrixCTest"></a><a id="MatrixCTest:MatrixCTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixCTest$.html"><span class="name">MatrixCTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="../../util/PackageInfo.html" class="extype" name="scalation.util.PackageInfo">PackageInfo</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatrixCTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatrixCTest</code> object tests the operations provided by <code>MatrixC</code> class.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatrixCTest</code> object tests the operations provided by <code>MatrixC</code> class.
+ &gt; run-main scalation.linalgebra.MatrixCTest
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatrixD" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MatrixD"></a><a id="MatrixD:MatrixD"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixD$.html"><span class="name">MatrixD</span></a><span class="result"> extends <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatrixD" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatrixD</code> companion object provides operations for <code>MatrixD</code> that don't require
+ 'this' (like static methods in Java).</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatrixD</code> companion object provides operations for <code>MatrixD</code> that don't require
+ 'this' (like static methods in Java).  It provides factory methods for building
+ matrices from files or vectors.
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatrixDTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MatrixDTest"></a><a id="MatrixDTest:MatrixDTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixDTest$.html"><span class="name">MatrixDTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="../../util/PackageInfo.html" class="extype" name="scalation.util.PackageInfo">PackageInfo</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatrixDTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatrixDTest</code> object tests the operations provided by <code>MatrixD</code> class.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatrixDTest</code> object tests the operations provided by <code>MatrixD</code> class.
+ &gt; run-main scalation.linalgebra.MatrixDTest
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatrixI" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MatrixI"></a><a id="MatrixI:MatrixI"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixI$.html"><span class="name">MatrixI</span></a><span class="result"> extends <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatrixI" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatrixI</code> companion object provides operations for <code>MatrixI</code> that don't require
+ 'this' (like static methods in Java).</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatrixI</code> companion object provides operations for <code>MatrixI</code> that don't require
+ 'this' (like static methods in Java).  It provides factory methods for building
+ matrices from files or vectors.
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatrixITest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MatrixITest"></a><a id="MatrixITest:MatrixITest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixITest$.html"><span class="name">MatrixITest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="../../util/PackageInfo.html" class="extype" name="scalation.util.PackageInfo">PackageInfo</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatrixITest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatrixITest</code> object tests the operations provided by <code>MatrixI</code> class.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatrixITest</code> object tests the operations provided by <code>MatrixI</code> class.
+ &gt; run-main scalation.linalgebra.MatrixITest
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatrixL" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MatrixL"></a><a id="MatrixL:MatrixL"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixL$.html"><span class="name">MatrixL</span></a><span class="result"> extends <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatrixL" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatrixL</code> companion object provides operations for <code>MatrixL</code> that don't require
+ 'this' (like static methods in Java).</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatrixL</code> companion object provides operations for <code>MatrixL</code> that don't require
+ 'this' (like static methods in Java).  It provides factory methods for building
+ matrices from files or vectors.
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatrixLTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MatrixLTest"></a><a id="MatrixLTest:MatrixLTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixLTest$.html"><span class="name">MatrixLTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="../../util/PackageInfo.html" class="extype" name="scalation.util.PackageInfo">PackageInfo</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatrixLTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatrixLTest</code> object tests the operations provided by <code>MatrixL</code> class.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatrixLTest</code> object tests the operations provided by <code>MatrixL</code> class.
+ &gt; run-main scalation.linalgebra.MatrixLTest
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatrixQ" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MatrixQ"></a><a id="MatrixQ:MatrixQ"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixQ$.html"><span class="name">MatrixQ</span></a><span class="result"> extends <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatrixQ" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatrixQ</code> companion object provides operations for <code>MatrixQ</code> that don't require
+ 'this' (like static methods in Java).</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatrixQ</code> companion object provides operations for <code>MatrixQ</code> that don't require
+ 'this' (like static methods in Java).  It provides factory methods for building
+ matrices from files or vectors.
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatrixQTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MatrixQTest"></a><a id="MatrixQTest:MatrixQTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixQTest$.html"><span class="name">MatrixQTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="../../util/PackageInfo.html" class="extype" name="scalation.util.PackageInfo">PackageInfo</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatrixQTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatrixQTest</code> object tests the operations provided by <code>MatrixQ</code> class.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatrixQTest</code> object tests the operations provided by <code>MatrixQ</code> class.
+ &gt; run-main scalation.linalgebra.MatrixQTest
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatrixR" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MatrixR"></a><a id="MatrixR:MatrixR"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixR$.html"><span class="name">MatrixR</span></a><span class="result"> extends <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatrixR" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatrixR</code> companion object provides operations for <code>MatrixR</code> that don't require
+ 'this' (like static methods in Java).</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatrixR</code> companion object provides operations for <code>MatrixR</code> that don't require
+ 'this' (like static methods in Java).  It provides factory methods for building
+ matrices from files or vectors.
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.MatrixRTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MatrixRTest"></a><a id="MatrixRTest:MatrixRTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixRTest$.html"><span class="name">MatrixRTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="../../util/PackageInfo.html" class="extype" name="scalation.util.PackageInfo">PackageInfo</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@MatrixRTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>MatrixRTest</code> object tests the operations provided by <code>MatrixR</code> class.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>MatrixRTest</code> object tests the operations provided by <code>MatrixR</code> class.
+ &gt; run-main scalation.linalgebra.MatrixRTest
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.Vec" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Vec"></a><a id="Vec:Vec"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Vec$.html"><span class="name">Vec</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@Vec" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Vec</code> object provides a minimal set of functions that apply across all
+ types of vectors.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Vec</code> object provides a minimal set of functions that apply across all
+ types of vectors.</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><code>scalation.relalgebra.Relation</code></p></span></dd></dl></div>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorC" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="VectorC"></a><a id="VectorC:VectorC"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorC$.html"><span class="name">VectorC</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorC" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorC</code> object is the companion object for the <code>VectorC</code> class.</p>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorCTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="VectorCTest"></a><a id="VectorCTest:VectorCTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorCTest$.html"><span class="name">VectorCTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorCTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorCTest</code> object tests the operations provided by <code>VectorC</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VectorCTest</code> object tests the operations provided by <code>VectorC</code>.
+ &gt; run-main scalation.linalgebra.mem_mapped.VectorCTest
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorD" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="VectorD"></a><a id="VectorD:VectorD"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorD$.html"><span class="name">VectorD</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorD" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorD</code> object is the companion object for the <code>VectorD</code> class.</p>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorDTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="VectorDTest"></a><a id="VectorDTest:VectorDTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorDTest$.html"><span class="name">VectorDTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorDTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorDTest</code> object tests the operations provided by <code>VectorD</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VectorDTest</code> object tests the operations provided by <code>VectorD</code>.
+ &gt; run-main scalation.linalgebra.mem_mapped.VectorDTest
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorI" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="VectorI"></a><a id="VectorI:VectorI"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorI$.html"><span class="name">VectorI</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorI" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorI</code> object is the companion object for the <code>VectorI</code> class.</p>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorITest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="VectorITest"></a><a id="VectorITest:VectorITest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorITest$.html"><span class="name">VectorITest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorITest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorITest</code> object tests the operations provided by <code>VectorI</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VectorITest</code> object tests the operations provided by <code>VectorI</code>.
+ &gt; run-main scalation.linalgebra.mem_mapped.VectorITest
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorL" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="VectorL"></a><a id="VectorL:VectorL"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorL$.html"><span class="name">VectorL</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorL" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorL</code> object is the companion object for the <code>VectorL</code> class.</p>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorLTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="VectorLTest"></a><a id="VectorLTest:VectorLTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorLTest$.html"><span class="name">VectorLTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorLTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorLTest</code> object tests the operations provided by <code>VectorL</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VectorLTest</code> object tests the operations provided by <code>VectorL</code>.
+ &gt; run-main scalation.linalgebra.mem_mapped.VectorLTest
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorQ" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="VectorQ"></a><a id="VectorQ:VectorQ"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorQ$.html"><span class="name">VectorQ</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorQ" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorQ</code> object is the companion object for the <code>VectorQ</code> class.</p>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorQTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="VectorQTest"></a><a id="VectorQTest:VectorQTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorQTest$.html"><span class="name">VectorQTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorQTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorQTest</code> object tests the operations provided by <code>VectorQ</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VectorQTest</code> object tests the operations provided by <code>VectorQ</code>.
+ &gt; run-main scalation.linalgebra.mem_mapped.VectorQTest
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorR" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="VectorR"></a><a id="VectorR:VectorR"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorR$.html"><span class="name">VectorR</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorR" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorR</code> object is the companion object for the <code>VectorR</code> class.</p>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorRTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="VectorRTest"></a><a id="VectorRTest:VectorRTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorRTest$.html"><span class="name">VectorRTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorRTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorRTest</code> object tests the operations provided by <code>VectorR</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VectorRTest</code> object tests the operations provided by <code>VectorR</code>.
+ &gt; run-main scalation.linalgebra.mem_mapped.VectorRTest
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorS" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="VectorS"></a><a id="VectorS:VectorS"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorS$.html"><span class="name">VectorS</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorS" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorS</code> object is the companion object for the <code>VectorS</code> class.</p>
+    </li><li name="scalation.linalgebra.mem_mapped.VectorSTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="VectorSTest"></a><a id="VectorSTest:VectorSTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorSTest$.html"><span class="name">VectorSTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@VectorSTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorSTest</code> object tests the operations provided by <code>VectorS</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VectorSTest</code> object tests the operations provided by <code>VectorS</code>.
+ &gt; run-main scalation.linalgebra.mem_mapped.VectorSTest
+</p></div></div>
+    </li><li name="scalation.linalgebra.mem_mapped.bld" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="bld"></a><a id="bld:bld"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="bld/package.html"><span class="name">bld</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.mem_mapped.package@bld" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

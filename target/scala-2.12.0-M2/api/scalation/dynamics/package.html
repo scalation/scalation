@@ -1,0 +1,393 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>dynamics - scalation.dynamics</title>
+          <meta name="description" content="dynamics - scalation.dynamics" />
+          <meta name="keywords" content="dynamics scalation.dynamics" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'scalation.dynamics.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../lib/package_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="scalation">scalation</a></p>
+        <h1>dynamics</h1><span class="permalink">
+      <a href="../../index.html#scalation.dynamics.package" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">dynamics</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>The dynamics package contains classes, traits and objects for
+ system dynamics simulations using Ordinary Differential Equations (ODEs).
+</p></div><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div class="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalation.dynamics"><span>dynamics</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div class="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalation.dynamics.Integrator" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="IntegratorextendsError"></a><a id="Integrator:Integrator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Integrator.html"><span class="name">Integrator</span></a><span class="result"> extends <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics.package@IntegratorextendsError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Integrator</code> trait provides a template for writing numerical integrators
+ (e.g., Runge-Kutta (RK4) or Dormand-Prince (DOPRI)) to produce trajectories for
+ first-order Ordinary Differential Equations (ODE's).</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Integrator</code> trait provides a template for writing numerical integrators
+ (e.g., Runge-Kutta (RK4) or Dormand-Prince (DOPRI)) to produce trajectories for
+ first-order Ordinary Differential Equations (ODE's).  The ODE is of the form:</p><p> d/dt y(t) = f(t, y)  with initial condition y0 = y(t0)</p><p> If 'f' is a linear function of the form 'a(t) * y(t) + b(t)', then the ODE is
+ linear, if 'a(t) = a' (i.e., a constant) the ODE has constant coefficients and
+ if 'b(t) = 0' the ODE is homogeneous.  Note this package provides a solver (not
+ an integrator) as an option for linear, constant coefficient, homogeneous,
+ first-order ODE.</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>scalation.dynamics.LinearDiffEq.scala</p></span></dd></dl></div>
+    </li><li name="scalation.dynamics.LinearDiffEq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="LinearDiffEqextendsError"></a><a id="LinearDiffEq:LinearDiffEq"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="LinearDiffEq.html"><span class="name">LinearDiffEq</span></a><span class="result"> extends <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics.package@LinearDiffEqextendsError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>LinearDiffEq</code> class may be used for solving a system of linear differential
+ equations that are ordinary and first-order with constant coefficients of the form</p><div class="fullcomment"><div class="comment cmt"><p>The <code>LinearDiffEq</code> class may be used for solving a system of linear differential
+ equations that are ordinary and first-order with constant coefficients of the form</p><p> d/dt y(t) = a * y(t)</p><p> 'y(t)' is the vector function of time and 'a' is the coefficient matrix.  The
+ initial value vector 'y0 = y(0)' must also be given.  Note, higher-order differential
+ equations may be converted to first-order by introducing additional variables.
+ The above equation is the homogeneous case.
+ Caveats: the following cases are not currently handled:
+ (i) The non-homogeneous equation: d/dt y(t) = a * y(t) + f(t).
+ (ii) Complex or repeated eigenvalues.</p></div></div>
+    </li><li name="scalation.dynamics.NLS_ODE" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="NLS_ODEextendsPredictorwithError"></a><a id="NLS_ODE:NLS_ODE"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="NLS_ODE.html"><span class="name">NLS_ODE</span></a><span class="result"> extends <a href="../analytics/Predictor.html" class="extype" name="scalation.analytics.Predictor">Predictor</a> with <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics.package@NLS_ODEextendsPredictorwithError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Given an Ordinary Differential Equation (ODE) paramaterized using the vector 'b'
+ with Initial Value (IV) 'y0', estimate the parameter values 'b' for the ODE
+ using weighted Nonlinear Least Squares (NLS).</p><div class="fullcomment"><div class="comment cmt"><p>Given an Ordinary Differential Equation (ODE) paramaterized using the vector 'b'
+ with Initial Value (IV) 'y0', estimate the parameter values 'b' for the ODE
+ using weighted Nonlinear Least Squares (NLS).</p><p>     ODE:  dy/dt = f(t, y)
+     IV:   y(t0) = y0</p><p>     Times series data:  z(t0), z(t1), ... z(tn)</p></div></div>
+    </li><li name="scalation.dynamics.SSA" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SSAextendsError"></a><a id="SSA:SSA"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SSA.html"><span class="name">SSA</span></a><span class="result"> extends <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics.package@SSAextendsError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>SSA</code> class implements the Gillespie Stochastic Simulation Algorithm (SSA).</p>
+    </li></ol>
+            </div>
+
+        
+
+        <div class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scalation.dynamics.Derivatives" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Derivatives"></a><a id="Derivatives:Derivatives"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Derivatives$.html"><span class="name">Derivatives</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics.package@Derivatives" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Derivatives</code> object is used to define types of time derivative functions.</p>
+    </li><li name="scalation.dynamics.DormandPrince" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DormandPrince"></a><a id="DormandPrince:DormandPrince"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="DormandPrince$.html"><span class="name">DormandPrince</span></a><span class="result"> extends <a href="Integrator.html" class="extype" name="scalation.dynamics.Integrator">Integrator</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics.package@DormandPrince" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>DormandPrince</code> object provides a state-of-the-art numerical ODE solver.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>DormandPrince</code> object provides a state-of-the-art numerical ODE solver.
+ Given an unknown, time-dependent function 'y(t)' governed by an Ordinary
+ Differential Equation (ODE) of the form</p><p>     d/dt y(t) = f(t, y)</p><p> compute 'y(t)' using a (4,5)-order Dormand-Prince Integrator (DOPRI).  Note:
+ the integrateV method for a system of separable ODEs is mixed in from the
+ Integrator trait.</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://adorio-research.org/wordpress/?p=6565</p></span></dd></dl></div>
+    </li><li name="scalation.dynamics.DormandPrinceTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DormandPrinceTest"></a><a id="DormandPrinceTest:DormandPrinceTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="DormandPrinceTest$.html"><span class="name">DormandPrinceTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics.package@DormandPrinceTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>DormandPrinceTest</code> object is used to test the <code>DormandPrince</code> object.</p>
+    </li><li name="scalation.dynamics.LinearDiffEqTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="LinearDiffEqTest"></a><a id="LinearDiffEqTest:LinearDiffEqTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="LinearDiffEqTest$.html"><span class="name">LinearDiffEqTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics.package@LinearDiffEqTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>LinearDiffEqTest</code> object to test the <code>LinearDiffEq</code> class using example at</p><div class="fullcomment"><div class="comment cmt"><p>The <code>LinearDiffEqTest</code> object to test the <code>LinearDiffEq</code> class using example at</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>biomed.tamu.edu/faculty/wu/BMEN_452/Eigenvalue%20Problems.doc
+ The eigenvalues should be (-3, -1)
+ The constant matrix should be [ (.375, .625), (-.75, 1.25) ]</p></span></dd></dl></div>
+    </li><li name="scalation.dynamics.NLS_ODETest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="NLS_ODETest"></a><a id="NLS_ODETest:NLS_ODETest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="NLS_ODETest$.html"><span class="name">NLS_ODETest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics.package@NLS_ODETest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VectorDTest</code> object tests the operations provided by <code>VectorD</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VectorDTest</code> object tests the operations provided by <code>VectorD</code>.
+ &gt; run-main scalation.dynamics.NLS_ODETest
+</p></div></div>
+    </li><li name="scalation.dynamics.Radau" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Radau"></a><a id="Radau:Radau"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Radau$.html"><span class="name">Radau</span></a><span class="result"> extends <a href="Integrator.html" class="extype" name="scalation.dynamics.Integrator">Integrator</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics.package@Radau" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Radau</code> object implements Radau IIA, which is a simple Ordinary Differential
+ Equation (ODE) solver for moderately stiff systems.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Radau</code> object implements Radau IIA, which is a simple Ordinary Differential
+ Equation (ODE) solver for moderately stiff systems.  Solve for 'y' given</p><p> d/dt  y = f(t, y).</p></div></div>
+    </li><li name="scalation.dynamics.RadauTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RadauTest"></a><a id="RadauTest:RadauTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RadauTest$.html"><span class="name">RadauTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics.package@RadauTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the Radau5 object.</p>
+    </li><li name="scalation.dynamics.RungeKutta" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RungeKutta"></a><a id="RungeKutta:RungeKutta"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RungeKutta$.html"><span class="name">RungeKutta</span></a><span class="result"> extends <a href="Integrator.html" class="extype" name="scalation.dynamics.Integrator">Integrator</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics.package@RungeKutta" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>RungeKutta</code> object provides an implementation of a classical numerical
+ ODE solver.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>RungeKutta</code> object provides an implementation of a classical numerical
+ ODE solver.  Given an unknown, time-dependent function 'y(t)' governed by an
+ Ordinary Differential Equation (ODE) of the form:</p><p> d/dt y(t) = f(t, y)</p><p> Compute 'y(t)' using a 4th-order Runge-Kutta Integrator (RK4).  Note: the
+ integrateV method for a system of separable ODEs is mixed in from the
+ Integrator trait.
+</p></div></div>
+    </li><li name="scalation.dynamics.RungeKuttaTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RungeKuttaTest"></a><a id="RungeKuttaTest:RungeKuttaTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RungeKuttaTest$.html"><span class="name">RungeKuttaTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics.package@RungeKuttaTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>RungeKuttaTest</code> object is used to test the <code>RungeKutta</code> object.</p>
+    </li><li name="scalation.dynamics.SSATest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SSATest"></a><a id="SSATest:SSATest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SSATest$.html"><span class="name">SSATest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics.package@SSATest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>SSATest</code> object tests the <code>SSA</code> class.</p>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

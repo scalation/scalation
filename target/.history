@@ -1,0 +1,500 @@
+run-main scalation.relalgebra.RelationTest2
+run-main scalation.relalgebra.RelationTest3
+clean
+compile
+doc
+exit
+run-main scalation.util.QuasiQuoteTest
+exit
+compile
+run-main scalation.util.QuasiQuoteTest
+exit
+compile
+exit
+compile
+run-main scalation.util.QuasiQuoteTest
+exit
+run-main scalation.util.QuasiQuoteTest
+exit
+compile
+run-main scalation.analytics.KalmanFilterTest
+sbt run-main scalation.relalgebra.CatalogTest
+run-main scalation.relalgebra.CatalogTest
+run-main scalation.random.VariateSetTest
+compile
+run-main sclation.grapalytics.DigGenTest3
+run-main scalation.graphalytics.DigGenTest
+run-main scalation.graphalytics.DigGenTest3
+compile
+run-main scalation.graphalytics.DigGenTest3
+run-main scalation.relalgebra.RelationTest4
+run-main scalation.linalgebra.bld.BldVector
+compile
+run-main scalation.analytics.RegressionTest
+run-main scalation.analytics.RegressionTest3
+run-main scalation.util.UnicodeTest
+run-main scalation.analytics.RegressionTest3
+clean
+compile
+doc
+exit
+compile
+run-main scalation.util.MemoryMappedFileTest
+compile
+exit
+run-main scalation.util.MemoryMappedFileTest
+run-main scalation.util.MemoryMappedFileTes
+compile
+run-main scalation.util.MemoryMappedFileTes
+run-main scalation.util.MemoryMappedFileTest
+compile
+run-main scalation.util.MemoryMappedFileTest
+run-main scalation.util.MemoryMappedFileDTest
+compile
+run-main scalation.util.MemoryMappedFileDTest
+compile
+run-main scalation.util.MM_ArrayD
+run-main scalation.util.MM_ArrayDTest
+compile
+run-main scalation.util.MM_ArrayDTest
+run-main scalation.util.MM_ArrayTest
+compile
+run-main scalation.linalgebra.mem_mapped.VectorDTest
+compile
+un-main scalation.linalgebra.mem_mapped.VectorDTest
+run-main scalation.linalgebra.mem_mapped.VectorDTest
+run-main scalation.util.MM_ArrayTest
+compile
+run-main scalation.linalgebra.mem_mapped.VectorDTest
+run-main scalation.linalgebra.bld.BldMM_Array
+run-main scalation.util.bld.BldMM_Array
+compile
+run-main scalation.util.bld.BldMM_Array
+compile
+run-main scalation.util.bld.BldMM_Array
+compile
+run-main scalation.util.bld.BldMM_Array
+compile
+run-main scalation.util.bld.BldMM_Array
+compile
+run-main scalation.util.bld.BldMM_Array
+compile
+run-main scalation.util.bld.BldMM_Array
+compile
+run-main scalation.util.bld.BldMM_Sorting
+compile
+run-main scalation.util.bld.BldMM_Sorting
+compile
+run-main scalation.util.bld.BldMM_Sorting
+run-main scalation.util.bld.BldMM_Array
+run-main scalation.util.bld.BldMM_Sorting
+compile
+run-main scalation.util.bld.BldMM_Array
+compile
+run-main scalation.util.bld.BldMM_Array
+run-main scalation.util.bld.BldMM_Sorting
+compile
+clean
+compile
+doc
+run-main scalation.util.bld.BldMM_Array
+run-main scalation.util.bld.BldMM_Sorting
+compile
+run-main scalation.linalgebra.mem_mapped.bld.BldVector
+compile
+run-main scalation.linalgebra.mem_mapped.bld.BldVector
+compile
+run-main scalation.linalgebra.mem_mapped.bld.BldVector
+compile
+run-main scalation.linalgebra.bld.BldAll
+compile
+ls
+compile
+run-main scalation.linalgebra.mem_mapped.bld.BldVector
+run-main scalation.linalgebra.mem_mapped.bld.BldMatri
+compile
+run-main scalation.linalgebra.mem_mapped.bld.BldMatri
+run-main scalation.linalgebra.mem_mapped.bld.BldVector
+compile
+run-main scalation.linalgebra.bld.mem_mapped.BldMatrix
+run-main scalation.linalgebra.mem_mapped.bld.BldMatrix
+compile
+run-main scalation.linalgebra.mem_mapped.bld.BldMatrix
+compile
+run-main scalation.linalgebra.bld.BldAll
+compile
+run-main scalation.linalgebra.bld.BldAll
+compile
+run-main scalation.linalgebra.bld.BldAll
+compile
+clean
+compile
+doc
+compile
+run-main scalation.linalgebra.bld.BldAll
+compile
+run-main scalation.linalgebra.mem_mapped.bld.BldAll
+compile
+doc
+exit
+compile
+run-main scalation.util.bld.BldSorting
+compile
+run-main scalation.util.bld.BldSorting
+compile
+run-main scalation.util.bld.BldSorting
+run-main scalation.util.bld.BldAll
+compile
+clean
+compile
+doc
+exit
+compile
+run-main scalation.random.CDFTest_Normal
+compile
+run-main scalation.linalgebra.bld.BldMatri
+run-main scalation.linalgebra.bld.BldMatrix
+run-main scalation.linalgebra.bld.BldAll
+compile
+run-main apps.analytics.AutoMPG_Regression
+compile
+run-main scalation.linalgebra.mem_mapped.bld.BldAll
+compile
+clean
+compile
+doc
+exit
+compile
+run-main scalation.relalgebra.BpTreeMapTest
+compile
+run-main scalation.relalgebra.BpTreeMapTest
+[info] key = 3 value = Some(9)
+[info] key = 4 value = None
+[info] key = 5 value = Some(25)
+[info] key = 6 value = None
+[info] key = 7 value = Some(49)
+[info] key = 8 value = None
+[info] key = 9 value = Some(81)
+[info] key = 10 value = None
+[info] key = 11 value = Some(121)
+[info] key = 12 value = None
+[info] key = 13 value = Some(169)
+[info] key = 14 value = None
+[info] key = 15 value = Some(225)
+[info] key = 16 value = None
+[info] key = 17 value = Some(289)
+[info] key = 18 value = None
+[info] key = 19 value = Some(361)
+[info] key = 20 value = None
+[info] key = 21 value = Some(441)
+[info] key = 22 value = None
+[info] key = 23 value = Some(529)
+[info] key = 24 value = None
+[info] key = 25 value = Some(625)
+[info] key = 26 value = None
+[info] key = 27 value = Some(729)
+[info] key = 28 value = None
+[info] key = 29 value = Some(841)
+[info] key = 30 value = None
+[info] key = 31 value = Some(961)
+[info] key = 32 value = None
+[info] key = 33 value = Some(1089)
+[info] key = 34 value = None
+[info] key = 35 value = Some(1225)
+[info] key = 36 value = None
+[info] key = 37 value = Some(1369)
+[info] key = 38 value = None
+[info] key = 39 value = Some(1521)
+[info] key = 40 value = None
+[info] key = 41 value = Some(1681)
+[info] key = 42 value = None
+[info] key = 43 value = Some(1849)
+[info] key = 44 value = None
+[info] key = 45 value = Some(2025)
+[info] key = 46 value = None
+[info] key = 47 value = Some(2209)
+[info] key = 48 value = None
+[info] key = 49 value = Some(2401)
+[info] key = 50 value = None
+[info] key = 51 value = Some(2601)
+[info] key = 52 value = None
+[info] key = 53 value = Some(2809)
+[info] key = 54 value = None
+[info] key = 55 value = Some(3025)
+[info] key = 56 value = None
+[info] key = 57 value = Some(3249)
+[info] key = 58 value = None
+[info] key = 59 value = Some(3481)
+[info] key = 60 value = None
+[info] key = 61 value = Some(3721)
+[info] key = 62 value = None
+[info] key = 63 value = Some(3969)
+[info] key = 64 value = None
+[info] key = 65 value = Some(4225)
+run-main scalation.relalgebra.BpTreeMapTest
+run-main scalation.util.BpTreeMapTest
+compile
+run-main scalation.graphalytics.StrictSimTest2
+compile
+run-main scalation.linalgebra.VectorDTest
+run-main scalation.dynamics.NLS_ODETest
+compile
+run-main scalation.dynamics.NLS_ODETest
+compile
+clean
+compile
+doc
+compile
+run-main scalation.linalgebra.mem_mapped.bld.BldAll
+compile
+run-main scalation.linalgebra.BldAll
+run-main scalation.linalgebra.bld.BldAll
+compile
+clean
+compile
+doc
+sbt
+compile
+run-main scalation.util.BpTreeMapTest2
+clean
+compile
+doc
+exit
+compile
+clean
+compile
+doc
+exit
+compile
+doc
+exit
+compile
+run-main scalation.stat.StatVectorTest
+run-main scalation.stat.GoodnessOfFit2Test
+run-main scalation.stat.GoodnessOfFitTest
+run-main scalation.stat.GoodnessOfFit2Test
+compile
+run-main scalation.stat.HistogramTest
+run-main scalation.plot.PlotTest
+compile
+run-main scalation.stat.Q_Q_PlotTest
+clean
+run-main scalation.random.CDFTest_Empirical
+compile
+run-main scalation.stat.GoodnessOfFit_KSTest
+compile
+run-main scalation.stat.GoodnessOfFit_KSTest2
+run-main scalation.stat.GoodnessOfFit_KSTest
+clean
+compile
+doc
+exit
+run-main scalation.stat.GoodnessOfFit_CSTest
+compile
+vompile
+compile
+run-main scalation.random.CDFTest_Uniform
+run-main scalation.random.CDFTest_Exponential
+run-main scalation.random.CDFTest_Uniform
+run-main scalation.random.CDFTest_Normal
+run-main scalation.random.CDFTest_StudentT
+run-main scalation.random.CDFTest_ChiSquare
+run-main scalation.random.CDFTest_Fisher
+run-main scalation.random.QuantileTest_Uniform
+run-main scalation.random.QuantileTest_Exponential
+run-main scalation.random.QuantileTest_Normal
+compile
+run-main scalation.stat.GoodnessOfFit_KSTest3
+clean
+compile
+doc
+exit
+compile
+run-main scalation.stat.GoodnessOfFit_KSTest3
+h[
+run-main scalation.stat.GoodnessOfFit_KSTest3
+[
+run-main scalation.stat.GoodnessOfFit_KSTest3
+clean
+compile
+run-main scalation.stat.Q_Q_PlotTest
+run-main scalation.stat.Q_Q_PlotTest2
+compile
+doc
+exit
+run-main scalation.random.QuantileTest_Empirical
+run-main scalation.stat.Q_Q_PlotTest2
+clean
+compile
+run-main scalation.random.CDFTest_Weibull
+clean
+compile
+doc
+exit
+compile
+:w
+compile
+[
+compile
+run-main scalation.minima.RevisedSimplexLUTest
+complie
+compile
+complie
+compile
+run-main scalation.random.CDFTest_Normal
+run-main scalation.random.CDFTest_Normal_Diff
+clean
+compile
+doc
+compile
+doc
+exit
+compile
+run-main scalation.random.CDFTest_Normal_Diff
+compile
+run-main scalation.graphalytics.DigraphTest3
+clean
+compile
+doc
+cd ..
+exit
+run-main scalation.graphalytics.ColorTreeTest
+run-main scalation.graphalytics.ColorTreeTest2
+compile
+run-main scalation.grapalytics.SpanningTreeTest
+run-main scalation.graphalytics.SpanningTreeTest
+run-main scalation.graphalytics.ColorTreeTest
+run-main scalation.graphalytics.SpanningTreeTest
+run-main scalation.graphalytics.ColorTreeTest2
+run-main scalation.graphalytics.ColorTreeTest3
+run-main scalation.graphalytics.SpanningTreeTest
+run-main scalation.graphalytics.ColorTreeTest3
+run-main scalation.graphalytics.SpanningTreeTest
+run-main scalation.graphalytics.MinSpanningTreeTest
+compile
+run-main scalation.graphalytics.MinSpanningTreeTest
+clean
+compile
+doc
+exit
+run-main scalation.graphalytics.MinSpanningTreeTest
+compile
+run-main scalation.graphalytics.MinSpanningTreeTest
+run-main scalation.util.PriorityQueueTest
+run-main scalation.graphalytics.MinSpanningTreeTest
+clean
+compile
+doc
+cd ..
+exit
+run-main scalation.graphalytics.MinSpanningTreeTest
+run-main scalation.graphalytics.SpanningTreeTest
+run-main scalation.graphalytics.MinSpanningTreeTest
+run-main scalation.graphalytics.MinSpanningTreeTest2
+compile
+run-main scalation.stat.GoodnessOfFit_KSTest4
+run-main scalation.stat.GoodnessofFit_KSTest4
+run-main scalation.graphalytics.TreeTest4
+run-main scalation.graphalytics.DigraphTest4
+run-main scalation.graphalytics.TreeTest4
+run-main scalation.graphalytics.DigraphTest4
+run-main scalation.graphalytics.TreeTest4
+run-main scalation.graphalytics.DigraphTest4
+run-main scalation.graphalytics.SpanningTreeTest
+run-main scalation.graphalytics.MinSpanningTreeTest
+run-main scalation.graphalytics.TreeTest4
+run-main scalation.graphalytics.MinSpanningTreeTest
+compile
+run-main scalation.grapalytics.CycleTest
+compile
+run-main scalation.graphalytics.CycleTest
+run-main scalation.graphalytics.GraphTest
+run-main scalation.graphalytics.CycleTest
+run-main scalation.graphalytics.DigCycleTest
+compile
+run-main scalation.graphalytics.DigCycleTest
+compile
+run-main scalation.graphalytics.BoundedTreeWidthBNTest
+run-main scalation.graphalytics.MinSpanningTreeTest
+run-main scalation.graphalytics.MinSpanningTreeTest2
+run-main scalation.graphalytics.BoundedTreeWidthBNTest
+compile
+run-main scalation.graphalytics.BoundedTreeWidthBNTest
+compile
+run-main scalation.graphalytics.MinSpanningTreeTest3
+clean
+compile
+run-main scalation.stat.GoodnessOfFit_KSTest4
+clean
+compile
+doc
+exit
+compile
+run-main scalation.graphalytics.BiconnectedCompTest
+compile
+run-main scalation.graphalytics.BiconnectedCompTest
+run-main scalation.graphalytics.BiconnectedCompTest2
+run-main scalation.graphalytics.DigTopSortTest
+run-main scalation.graphalytics.CycleTest
+run-main scalation.graphalytics.DigCycleTest
+run-main scalation.graphalytics.DigTopSortTest
+run-main scalation.graphalytics.CycleTest
+run-main scalation.graphalytics.TopSortTest
+run-main scalation.graphalytics.DigTopSortTest
+clean
+compile
+doc
+cd ..
+cd bin
+exit
+run-main scalation.graphalytics.DigTopSortTest
+run-main scalation.graphalytics.TopSortTest
+compile
+run-main scalation.graphalytics.BiconnectedCompTest2
+run-main scalation.graphalytics.mutable.BiconnectedCompTest2
+run-main scalation.graphalytics.BiconnectedCompTest
+run-main scalation.graphalytics.mutable.BiconnectedCompTest2
+compile
+run-main scalation.graphalytics.TreeLayoutTest
+run-main scalation.graphalytics.mutable.BiconnectedCompTest2
+run-main scalation.graphalytics.TreeLayoutTest
+clean
+compile
+doc
+exit
+run-main scalation.event.ModelTest
+run-main apps.event.Bank2
+run-main apps.event.Bank
+run-main apps.event.CallCenter2
+run-main apps.event.CallCenter
+run-main apps.event.Machine
+run-main scalation.event.ModelTest
+compile
+run-main scalation.util.UnicodeTest
+run-main scalation.relalgebra.MissingValuesTest
+exit
+compile
+exit
+run-main scalation.stat.StatVectorTest
+run-main scalation.stat.NormalityTest
+clean
+compile
+doc
+compile
+run-main scalation.analytics.TranRegressionTest
+compile
+doc
+exit
+run-main scalation.analytics.LogisticRegressionTest
+run-main scalation.analytics.LogisticRegressionTest2
+run-main scalation.analytics.LogisticRegressionTes
+run-main scalation.analytics.LogisticRegressionTest
+run-main scalation.analytics.LogisticRegressionTest2
+compile
+run-main scalation.stat.MM_StatVectorTest
+run-main scalation.stat.StatVectorTest
+compile
+clean
+compile
+doc
+exit

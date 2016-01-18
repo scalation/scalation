@@ -1,0 +1,1677 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>random - scalation.random</title>
+          <meta name="description" content="random - scalation.random" />
+          <meta name="keywords" content="random scalation.random" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'scalation.random.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../lib/package_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="scalation">scalation</a></p>
+        <h1>random</h1><span class="permalink">
+      <a href="../../index.html#scalation.random.package" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">random</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>The <code>random</code> package contains classes, traits and objects for
+ the generation of random numbers.
+</p></div><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div class="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalation.random"><span>random</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div class="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalation.random.Bernoulli" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="BernoulliextendsVariatewithProductwithSerializable"></a><a id="Bernoulli:Bernoulli"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Bernoulli.html"><span class="name">Bernoulli</span></a><span class="params">(<span name="p">p: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">.5</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@BernoulliextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Bernoulli</code> random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Bernoulli</code> random variates.
+ This discrete RV models the one trial (success is 1, failure is 0).</p></div><dl class="paramcmts block"><dt class="param">p</dt><dd class="cmt"><p>the probability of success</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/bernoulli/Introduction.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.Beta" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="BetaextendsVariatewithProductwithSerializable"></a><a id="Beta:Beta"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Beta.html"><span class="name">Beta</span></a><span class="params">(<span name="alpha">alpha: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">2</span></span>, <span name="beta">beta: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">3</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@BetaextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Beta</code> random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Beta</code> random variates.
+ This continuous RV models random proportions.
+ Beta =  Gamma1 / (Gamma1 + Gamma2).</p></div><dl class="paramcmts block"><dt class="param">alpha</dt><dd class="cmt"><p>the shape parameter for Gamma1</p></dd><dt class="param">beta</dt><dd class="cmt"><p>the shape parameter for Gamma2</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/special/Beta.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.Binomial" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="BinomialextendsVariatewithProductwithSerializable"></a><a id="Binomial:Binomial"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Binomial.html"><span class="name">Binomial</span></a><span class="params">(<span name="p">p: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">.5</span></span>, <span name="n">n: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">10</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@BinomialextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Binomial</code> random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Binomial</code> random variates.
+ This discrete RV models the number of successes in n trials.</p></div><dl class="paramcmts block"><dt class="param">p</dt><dd class="cmt"><p>the probability of success</p></dd><dt class="param">n</dt><dd class="cmt"><p>the number of independent trials</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/bernoulli/Binomial.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.CDFTest" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="CDFTestextendsAnyRef"></a><a id="CDFTest:CDFTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="CDFTest.html"><span class="name">CDFTest</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@CDFTestextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>CDFTest</code> trait provides methods for testing the <code>CDF</code> object.</p>
+    </li><li name="scalation.random.Cauchy" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="CauchyextendsVariatewithProductwithSerializable"></a><a id="Cauchy:Cauchy"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Cauchy.html"><span class="name">Cauchy</span></a><span class="params">(<span name="alpha">alpha: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">2.5</span></span>, <span name="beta">beta: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">1.0</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@CauchyextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Cauchy</code> (or Lorentz) random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Cauchy</code> (or Lorentz) random variates.
+ This continuous RV models data with heavier tails than normally distributed.</p></div><dl class="paramcmts block"><dt class="param">alpha</dt><dd class="cmt"><p>the location parameter (median)</p></dd><dt class="param">beta</dt><dd class="cmt"><p>the scale parameter</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/special/Cauchy.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.ChiSquare" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ChiSquareextendsVariatewithProductwithSerializable"></a><a id="ChiSquare:ChiSquare"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="ChiSquare.html"><span class="name">ChiSquare</span></a><span class="params">(<span name="df">df: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">2</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@ChiSquareextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>ChiSquare</code> random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>ChiSquare</code> random variates.
+ This continuous RV models the variance of a distribution.
+ http://www.math.uah.edu/stat/special/ChiSquare.html</p></div><dl class="paramcmts block"><dt class="param">df</dt><dd class="cmt"><p>the degrees of freedom</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl></div>
+    </li><li name="scalation.random.Dice" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DiceextendsVariatewithProductwithSerializable"></a><a id="Dice:Dice"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Dice.html"><span class="name">Dice</span></a><span class="params">(<span name="cdf">cdf: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Double">Double</span>] = <span class="symbol">Array (.1, .3, .5, .7, .9, 1.0)</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@DiceextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Dice</code> random variates for a given distribution specified
+ using a cumulative distribution function (cdf).</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Dice</code> random variates for a given distribution specified
+ using a cumulative distribution function (cdf). This discrete RV models the
+ roll of dice numbered 0, 1, ..., n-1.  Add 1 for 1 to n.</p></div><dl class="paramcmts block"><dt class="param">cdf</dt><dd class="cmt"><p>the distribution function (cdf)</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl></div>
+    </li><li name="scalation.random.Discrete" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DiscreteextendsVariatewithProductwithSerializable"></a><a id="Discrete:Discrete"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Discrete.html"><span class="name">Discrete</span></a><span class="params">(<span name="dist">dist: <a href="../linalgebra/VectorD.html" class="extype" name="scalation.linalgebra.VectorD">VectorD</a> = <span class="symbol"><span class="name"><a href="../package.html">VectorD (.2, .2, .2, .2, .2)</a></span></span></span>, <span name="x">x: <a href="../linalgebra/VectorD.html" class="extype" name="scalation.linalgebra.VectorD">VectorD</a> = <span class="symbol">null</span></span>, <span name="cumulative">cumulative: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@DiscreteextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates generalized <code>Discrete</code> random variates for a given
+ distribution specified using either a probability mass function (pmf)
+ or a cumulative distribution function (cdf).</p><div class="fullcomment"><div class="comment cmt"><p>This class generates generalized <code>Discrete</code> random variates for a given
+ distribution specified using either a probability mass function (pmf)
+ or a cumulative distribution function (cdf).
+ This discrete RV models arbitrary experiments with discrete outcomes.</p></div><dl class="paramcmts block"><dt class="param">dist</dt><dd class="cmt"><p>the distribution function (pdf or cdf)</p></dd><dt class="param">x</dt><dd class="cmt"><p>the x-coordinate values (mass points)</p></dd><dt class="param">cumulative</dt><dd class="cmt"><p>whether dist is cumulative (cdf) or not (pmf)</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl></div>
+    </li><li name="scalation.random.DiscreteF" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DiscreteFextendsVariatewithProductwithSerializable"></a><a id="DiscreteF:DiscreteF"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="DiscreteF.html"><span class="name">DiscreteF</span></a><span class="params">(<span name="f">f: <span class="extype" name="scala.Array">Array</span>[<a href="../calculus/Calculus$.html#FunctionS2S=Double=&gt;Double" class="extmbr" name="scalation.calculus.Calculus.FunctionS2S">FunctionS2S</a>]</span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@DiscreteFextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>DiscreteF</code> class generates generalized <code>Discrete</code> random variates for a
+ distribution specified via an array of functions (FunctionS2S).</p><div class="fullcomment"><div class="comment cmt"><p>The <code>DiscreteF</code> class generates generalized <code>Discrete</code> random variates for a
+ distribution specified via an array of functions (FunctionS2S).  At a
+ particular time 't', the functions must some to one.
+ This discrete RV models time-varying experiments with discrete outcomes.</p></div><dl class="paramcmts block"><dt class="param">f</dt><dd class="cmt"><p>the array of time-based functions</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl></div>
+    </li><li name="scalation.random.Distribution" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Distribution=(Double,scalation.random.package.Parameters)=&gt;Double"></a><a id="Distribution:Distribution"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Distribution</span><span class="result"> = (<span class="extype" name="scala.Double">Double</span>, <a href="#Parameters=Vector[Double]" class="extmbr" name="scalation.random.Parameters">Parameters</a>) ⇒ <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@Distribution=(Double,scalation.random.package.Parameters)=&gt;Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The function type for distribution functions, including
+ (1) Cumulative Distribution Function (CDF)
+ (2) inverse Cumulative Distribution Function (iCDF)
+ The arguments are <code>Double</code> for coordinate 'x' or probability 'p' and a
+ <code>Vector</code> of parameters, e.g., degrees of freedom.</p>
+    </li><li name="scalation.random.Erlang" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ErlangextendsVariatewithProductwithSerializable"></a><a id="Erlang:Erlang"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Erlang.html"><span class="name">Erlang</span></a><span class="params">(<span name="mu">mu: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">1.0</span></span>, <span name="k">k: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">2</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@ErlangextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Erlang</code> random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Erlang</code> random variates.
+ This continuous RV models the time until k stages complete.</p></div><dl class="paramcmts block"><dt class="param">mu</dt><dd class="cmt"><p>the mean of exponential samples (Erlang mean = mu * k)</p></dd><dt class="param">k</dt><dd class="cmt"><p>the number of stages (or Exponential samples)</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/poisson/Gamma.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.Exponential" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ExponentialextendsVariatewithProductwithSerializable"></a><a id="Exponential:Exponential"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Exponential.html"><span class="name">Exponential</span></a><span class="params">(<span name="mu">mu: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">1.0</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@ExponentialextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Exponential</code> random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Exponential</code> random variates.
+ This continuous RV models the time until an event occurs.
+ http://www.math.uah.edu/stat/poisson/Exponential.html</p></div><dl class="paramcmts block"><dt class="param">mu</dt><dd class="cmt"><p>the mean</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl></div>
+    </li><li name="scalation.random.Fisher" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="FisherextendsVariatewithProductwithSerializable"></a><a id="Fisher:Fisher"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Fisher.html"><span class="name">Fisher</span></a><span class="params">(<span name="df1">df1: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">6</span></span>, <span name="df2">df2: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">4</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@FisherextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Fisher</code> (F-Distribution) random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Fisher</code> (F-Distribution) random variates.
+ This continuous RV models the ratio of variances.</p></div><dl class="paramcmts block"><dt class="param">df1</dt><dd class="cmt"><p>the degrees of freedom for numerator Chi-Square</p></dd><dt class="param">df2</dt><dd class="cmt"><p>the degrees of freedom for denominator Chi-Square</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/special/Fisher.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.Gamma" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="GammaextendsVariatewithProductwithSerializable"></a><a id="Gamma:Gamma"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Gamma.html"><span class="name">Gamma</span></a><span class="params">(<span name="alpha">alpha: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">1.0</span></span>, <span name="beta">beta: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">1.0</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@GammaextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Gamma</code> random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Gamma</code> random variates.
+ This continuous RV models the time until an event occurs.
+ Note: variance = alpha * beta ^ 2.</p></div><dl class="paramcmts block"><dt class="param">alpha</dt><dd class="cmt"><p>the shape parameter</p></dd><dt class="param">beta</dt><dd class="cmt"><p>the scale parameter</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/poisson/Gamma.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.Geometric" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="GeometricextendsVariatewithProductwithSerializable"></a><a id="Geometric:Geometric"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Geometric.html"><span class="name">Geometric</span></a><span class="params">(<span name="p">p: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">.5</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@GeometricextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Geometric</code> random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Geometric</code> random variates.
+ This discrete RV models the number of failures before the first success.</p></div><dl class="paramcmts block"><dt class="param">p</dt><dd class="cmt"><p>the probability of success</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/bernoulli/Geometric.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.HyperExponential" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="HyperExponentialextendsVariatewithProductwithSerializable"></a><a id="HyperExponential:HyperExponential"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="HyperExponential.html"><span class="name">HyperExponential</span></a><span class="params">(<span name="p">p: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">.5</span></span>, <span name="mu1">mu1: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">1</span></span>, <span name="mu2">mu2: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">2</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@HyperExponentialextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>HyperExponential</code> random variates (two rates).</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>HyperExponential</code> random variates (two rates).
+ This continuous RV models the time until an event occurs (higher coefficient
+ of variation than exponential distribution).</p></div><dl class="paramcmts block"><dt class="param">p</dt><dd class="cmt"><p>the probability of first vs. second rates</p></dd><dt class="param">mu1</dt><dd class="cmt"><p>the first mean (1 / lambda1)</p></dd><dt class="param">mu2</dt><dd class="cmt"><p>the second mean (1 / lambda2)</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl></div>
+    </li><li name="scalation.random.HyperGeometric" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="HyperGeometricextendsVariatewithProductwithSerializable"></a><a id="HyperGeometric:HyperGeometric"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="HyperGeometric.html"><span class="name">HyperGeometric</span></a><span class="params">(<span name="p">p: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">.5</span></span>, <span name="n">n: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">5</span></span>, <span name="pop">pop: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">10</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@HyperGeometricextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>HyperGeometric</code> random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>HyperGeometric</code> random variates.
+ This discrete RV models the number of successes in n draws from a finite population.</p></div><dl class="paramcmts block"><dt class="param">p</dt><dd class="cmt"><p>the probability of success (red balls)</p></dd><dt class="param">n</dt><dd class="cmt"><p>the number of draws (balls drawn)</p></dd><dt class="param">pop</dt><dd class="cmt"><p>the size of the finite population (total number of balls)</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/urn/Hypergeometric.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.LogNormal" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="LogNormalextendsVariatewithProductwithSerializable"></a><a id="LogNormal:LogNormal"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="LogNormal.html"><span class="name">LogNormal</span></a><span class="params">(<span name="mu">mu: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">0.0</span></span>, <span name="sigma2">sigma2: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">1.0</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@LogNormalextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>LogNormal</code> random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>LogNormal</code> random variates.
+ This continuous RV models data that is normally distributed after a log transformation.</p></div><dl class="paramcmts block"><dt class="param">mu</dt><dd class="cmt"><p>the mean for underlying Normal</p></dd><dt class="param">sigma2</dt><dd class="cmt"><p>the variance (sigma squared) for underlying Normal</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/special/LogNormal.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.Logistic" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="LogisticextendsVariatewithProductwithSerializable"></a><a id="Logistic:Logistic"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Logistic.html"><span class="name">Logistic</span></a><span class="params">(<span name="a">a: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">0.0</span></span>, <span name="b">b: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">1.0</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@LogisticextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Logistic</code> random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Logistic</code> random variates.
+ This continuous RV models logisticlly distributed data (stretched Normal).</p></div><dl class="paramcmts block"><dt class="param">a</dt><dd class="cmt"><p>the location parameter</p></dd><dt class="param">b</dt><dd class="cmt"><p>the scale parameter</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/special/Logistic.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.Multinomial" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MultinomialextendsVariatewithProductwithSerializable"></a><a id="Multinomial:Multinomial"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Multinomial.html"><span class="name">Multinomial</span></a><span class="params">(<span name="p">p: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Double">Double</span>] = <span class="symbol">Array (.4, .3, .3)</span></span>, <span name="n">n: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">5</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@MultinomialextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Multinomial</code> random variates vectors.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Multinomial</code> random variates vectors.
+ This discrete RV models the ...?</p></div><dl class="paramcmts block"><dt class="param">p</dt><dd class="cmt"><p>array of probabilities</p></dd><dt class="param">n</dt><dd class="cmt"><p>the number of independent trials</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/bernoulli/Multinomial.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.NHPoissonProcess" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="NHPoissonProcessextendsTimeVariatewithProductwithSerializable"></a><a id="NHPoissonProcess:NHPoissonProcess"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="NHPoissonProcess.html"><span class="name">NHPoissonProcess</span></a><span class="params">(<span name="lambda">lambda: <a href="../linalgebra/VectorD.html" class="extype" name="scalation.linalgebra.VectorD">VectorD</a></span>, <span name="dt">dt: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">1.0</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="TimeVariate.html" class="extype" name="scalation.random.TimeVariate">TimeVariate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@NHPoissonProcessextendsTimeVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates arrival times according to a <code>NHPoissonProces</code>, an
+ Non-Homogeneous Process Process (NHPP), where the arrival rate function
+ 'lambda(t)' is piecewise constant.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates arrival times according to a <code>NHPoissonProces</code>, an
+ Non-Homogeneous Process Process (NHPP), where the arrival rate function
+ 'lambda(t)' is piecewise constant.  Rates are constant over basic time
+ intervals of length 'dt'.</p></div><dl class="paramcmts block"><dt class="param">lambda</dt><dd class="cmt"><p>the vector of arrival rates</p></dd><dt class="param">dt</dt><dd class="cmt"><p>the length the basic time intervals</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://en.wikipedia.org/wiki/Poisson_process#Non-homogeneous</p></span></dd></dl></div>
+    </li><li name="scalation.random.NegativeBinomial" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="NegativeBinomialextendsVariatewithProductwithSerializable"></a><a id="NegativeBinomial:NegativeBinomial"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="NegativeBinomial.html"><span class="name">NegativeBinomial</span></a><span class="params">(<span name="p">p: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">.5</span></span>, <span name="s">s: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">2</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@NegativeBinomialextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>NegativeBinomial</code> random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>NegativeBinomial</code> random variates.
+ This discrete RV models the number of failures before s-th success.</p></div><dl class="paramcmts block"><dt class="param">p</dt><dd class="cmt"><p>the probability of success</p></dd><dt class="param">s</dt><dd class="cmt"><p>the number of successes</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/bernoulli/NegativeBinomial.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.Normal" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="NormalextendsVariatewithProductwithSerializable"></a><a id="Normal:Normal"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Normal.html"><span class="name">Normal</span></a><span class="params">(<span name="mu">mu: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">0.0</span></span>, <span name="sigma2">sigma2: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">1.0</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@NormalextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Normal</code> (Gaussian) random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Normal</code> (Gaussian) random variates.
+ This continuous RV models normally distributed data (bell curve).
+ When summed, most distributions tend to Normal (Central Limit Theorem).</p></div><dl class="paramcmts block"><dt class="param">mu</dt><dd class="cmt"><p>the mean</p></dd><dt class="param">sigma2</dt><dd class="cmt"><p>the variance (sigma squared)</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/special/Normal.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.NormalVec" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="NormalVecextendsVariateVecwithProductwithSerializable"></a><a id="NormalVec:NormalVec"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="NormalVec.html"><span class="name">NormalVec</span></a><span class="params">(<span name="mu">mu: <a href="../linalgebra/VectorD.html" class="extype" name="scalation.linalgebra.VectorD">VectorD</a></span>, <span name="cov">cov: <a href="../linalgebra/MatrixD.html" class="extype" name="scalation.linalgebra.MatrixD">MatrixD</a></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="VariateVec.html" class="extype" name="scalation.random.VariateVec">VariateVec</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@NormalVecextendsVariateVecwithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>NormalVec</code> class generates Normal (Gaussian) random variate vectors according
+ to the Multivariate Normal distribution with mean 'mu' and covariance 'cov'.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>NormalVec</code> class generates Normal (Gaussian) random variate vectors according
+ to the Multivariate Normal distribution with mean 'mu' and covariance 'cov'.
+ This continuous RVV models normally distributed multidimensional data.</p></div><dl class="paramcmts block"><dt class="param">mu</dt><dd class="cmt"><p>the mean vector</p></dd><dt class="param">cov</dt><dd class="cmt"><p>the covariance matrix</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.statlect.com/mcdnrm1.htm</p></span><span class="cmt"><p>http://onlinelibrary.wiley.com/doi/10.1111/1467-9639.00037/pdf</p></span></dd></dl></div>
+    </li><li name="scalation.random.Parameters" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Parameters=Vector[Double]"></a><a id="Parameters:Parameters"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Parameters</span><span class="result"> = <span class="extype" name="scala.collection.immutable.Vector">Vector</span>[<span class="extype" name="scala.Double">Double</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@Parameters=Vector[Double]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Type definition for parameters to a distribution.</p><div class="fullcomment"><div class="comment cmt"><p>Type definition for parameters to a distribution. <code>Vector</code> is used instead
+ of <code>Array</code> since they are covariant, while Scala arrays are not.
+</p></div></div>
+    </li><li name="scalation.random.Pareto" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ParetoextendsVariatewithProductwithSerializable"></a><a id="Pareto:Pareto"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Pareto.html"><span class="name">Pareto</span></a><span class="params">(<span name="a">a: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">1.0</span></span>, <span name="b">b: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">0.0</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@ParetoextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Pareto</code> random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Pareto</code> random variates.
+ This continuous RV models Pareto distributed data.</p></div><dl class="paramcmts block"><dt class="param">a</dt><dd class="cmt"><p>the shape parameter</p></dd><dt class="param">b</dt><dd class="cmt"><p>the scale parameter</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/special/Pareto.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.PermutedVecD" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="PermutedVecDextendsVariateVecwithProductwithSerializable"></a><a id="PermutedVecD:PermutedVecD"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="PermutedVecD.html"><span class="name">PermutedVecD</span></a><span class="params">(<span name="x">x: <a href="../linalgebra/VectorD.html" class="extype" name="scalation.linalgebra.VectorD">VectorD</a></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="VariateVec.html" class="extype" name="scalation.random.VariateVec">VariateVec</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@PermutedVecDextendsVariateVecwithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>PermutedVecD</code> class generates random permutations of a vector of doubles.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>PermutedVecD</code> class generates random permutations of a vector of doubles.</p></div><dl class="paramcmts block"><dt class="param">x</dt><dd class="cmt"><p>the vector of doubles to permute</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>maths-people.anu.edu.au/~brent/pd/Arndt-thesis.pdf</p></span></dd></dl></div>
+    </li><li name="scalation.random.PermutedVecI" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="PermutedVecIextendsVariateVecwithProductwithSerializable"></a><a id="PermutedVecI:PermutedVecI"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="PermutedVecI.html"><span class="name">PermutedVecI</span></a><span class="params">(<span name="x">x: <a href="../linalgebra/VectorI.html" class="extype" name="scalation.linalgebra.VectorI">VectorI</a></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="VariateVec.html" class="extype" name="scalation.random.VariateVec">VariateVec</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@PermutedVecIextendsVariateVecwithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>PermutedVecI</code> class generates random permutations of a vector of integers.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>PermutedVecI</code> class generates random permutations of a vector of integers.</p></div><dl class="paramcmts block"><dt class="param">x</dt><dd class="cmt"><p>the vector of integers to permute</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>maths-people.anu.edu.au/~brent/pd/Arndt-thesis.pdf</p></span></dd></dl></div>
+    </li><li name="scalation.random.Poisson" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="PoissonextendsVariatewithProductwithSerializable"></a><a id="Poisson:Poisson"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Poisson.html"><span class="name">Poisson</span></a><span class="params">(<span name="mu">mu: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">2.0</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@PoissonextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Poisson</code> random variates (discrete).</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Poisson</code> random variates (discrete).
+ This discrete RV models the number of events in a time interval of unit length.</p></div><dl class="paramcmts block"><dt class="param">mu</dt><dd class="cmt"><p>the mean</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/poisson/Poisson.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.PoissonProcess" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="PoissonProcessextendsTimeVariatewithProductwithSerializable"></a><a id="PoissonProcess:PoissonProcess"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="PoissonProcess.html"><span class="name">PoissonProcess</span></a><span class="params">(<span name="lambda">lambda: <span class="extype" name="scala.Double">Double</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="TimeVariate.html" class="extype" name="scalation.random.TimeVariate">TimeVariate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@PoissonProcessextendsTimeVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates arrival times according to a <code>PoissonProcess</code>.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates arrival times according to a <code>PoissonProcess</code>.
+ Given the current arrival time 't', generate the next arrival time.</p></div><dl class="paramcmts block"><dt class="param">lambda</dt><dd class="cmt"><p>the arrival rate (arrivals per unit time)</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://en.wikipedia.org/wiki/Poisson_process</p></span></dd></dl></div>
+    </li><li name="scalation.random.ProbabilityVec" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ProbabilityVecextendsVariateVecwithProductwithSerializable"></a><a id="ProbabilityVec:ProbabilityVec"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="ProbabilityVec.html"><span class="name">ProbabilityVec</span></a><span class="params">(<span name="n">n: <span class="extype" name="scala.Int">Int</span></span>, <span name="d">d: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">0.5</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="VariateVec.html" class="extype" name="scalation.random.VariateVec">VariateVec</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@ProbabilityVecextendsVariateVecwithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>ProbabilityVec</code> class generates a probability vector where the ith
+ probability is '1/n' with a +/- randomizing displacement of at most 'd'.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>ProbabilityVec</code> class generates a probability vector where the ith
+ probability is '1/n' with a +/- randomizing displacement of at most 'd'.
+ Note, the probability vector must add to one.</p></div><dl class="paramcmts block"><dt class="param">n</dt><dd class="cmt"><p>the dimension/size of the probability vector</p></dd><dt class="param">d</dt><dd class="cmt"><p>the randomizing displacement, must be in [0, 1]</p></dd></dl></div>
+    </li><li name="scalation.random.QuantileTest" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="QuantileTestextendsAnyRef"></a><a id="QuantileTest:QuantileTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="QuantileTest.html"><span class="name">QuantileTest</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@QuantileTestextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>QuantileTest</code> trait provides methods for testing the <code>Quantile</code> object.</p>
+    </li><li name="scalation.random.RNG" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="RNGextendsError"></a><a id="RNG:RNG"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="RNG.html"><span class="name">RNG</span></a><span class="result"> extends <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@RNGextendsError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>RNG</code> abstract class is the base class for all ScalaTion Random Number
+ Generators (RNGs).</p><div class="fullcomment"><div class="comment cmt"><p>The <code>RNG</code> abstract class is the base class for all ScalaTion Random Number
+ Generators (RNGs).  The subclasses must implement a 'gen' method that generates
+ random real numbers in the range (0, 1).  They must also implement an 'igen'
+ methods to return stream values.</p></div></div>
+    </li><li name="scalation.random.Randi" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RandiextendsVariatewithProductwithSerializable"></a><a id="Randi:Randi"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Randi.html"><span class="name">Randi</span></a><span class="params">(<span name="a">a: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>, <span name="b">b: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">5</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@RandiextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Randi</code> random variates (random integers: a, ..., b).</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Randi</code> random variates (random integers: a, ..., b).
+ This discrete RV models equiprobable integral outcomes.</p></div><dl class="paramcmts block"><dt class="param">a</dt><dd class="cmt"><p>the lower bound (inclusive)</p></dd><dt class="param">b</dt><dd class="cmt"><p>the upper bound (inclusive)</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/special/UniformDiscrete.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.Randi0" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Randi0extendsVariatewithProductwithSerializable"></a><a id="Randi0:Randi0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Randi0.html"><span class="name">Randi0</span></a><span class="params">(<span name="b">b: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">5</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@Randi0extendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Randi0</code> random variates (random integers: 0, ..., b).</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Randi0</code> random variates (random integers: 0, ..., b).
+ This discrete RV models equiprobable integral outcomes starting with 0.</p></div><dl class="paramcmts block"><dt class="param">b</dt><dd class="cmt"><p>the upper bound (&gt;= 0) (inclusive)</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl></div>
+    </li><li name="scalation.random.RandiU0" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RandiU0extendsVariatewithProductwithSerializable"></a><a id="RandiU0:RandiU0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="RandiU0.html"><span class="name">RandiU0</span></a><span class="params">(<span name="b">b: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">5</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@RandiU0extendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Randi0</code> random variates (random integers: 0, ..., b).</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Randi0</code> random variates (random integers: 0, ..., b).
+ This discrete RV models equiprobable integral outcomes starting with 0.
+ The 'iigen' methods will produce unique random integers.</p></div><dl class="paramcmts block"><dt class="param">b</dt><dd class="cmt"><p>the upper bound (&gt;= 0) (inclusive)</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl></div>
+    </li><li name="scalation.random.Random" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RandomextendsRNGwithProductwithSerializable"></a><a id="Random:Random"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Random.html"><span class="name">Random</span></a><span class="params">(<span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="RNG.html" class="extype" name="scalation.random.RNG">RNG</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@RandomextendsRNGwithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Random</code> class generates random real numbers in the range (0, 1).</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Random</code> class generates random real numbers in the range (0, 1).
+ It implements, using 64-bit integers (Long's), the 'MRG31k3p' generator
+ developed by L'Ecuyer and Touzin, described in &quot;FAST COMBINED MULTIPLE
+ RECURSIVE GENERATORS WITH MULTIPLIERS OF THE FORM a = 2<sup>q +/- 2</sup>r&quot;.
+ MRG31k3p is a Combined Multiple Recursive Generator (CMRG) shown to have good
+ performance and statistical properties for simulations.  It has a period of
+ about 2<sup>185 and is considered to be a faster alternative to the popular
+ 'MRG32k3' generator.  MRG31k3p combines MRG1 and MRG2.
+ <br>
+     MRG1: x_i = (0          + a_12 x_i-2 + a_13 x_i-3) % M1
+     MRG2: x_i = (a_21 x_i-1 + 0          + a_23 x_i-3) % M2
+ <br>
+ where a_12 = 2</sup>22, a_13 = 2<sup>7+1, a_21 = 2</sup>15 and a_23 = 2^15+1.</p></div><dl class="paramcmts block"><dt class="param">stream</dt><dd class="cmt"><p>the random number stream index</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.iro.umontreal.ca/~simardr/ssj/doc/pdf/guiderng.pdf</p></span><span class="cmt"><p>http://www.informs-sim.org/wsc00papers/090.PDF</p></span></dd></dl></div>
+    </li><li name="scalation.random.Random2" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Random2extendsRNGwithProductwithSerializable"></a><a id="Random2:Random2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Random2.html"><span class="name">Random2</span></a><span class="params">(<span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="RNG.html" class="extype" name="scalation.random.RNG">RNG</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@Random2extendsRNGwithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Random2</code> class generates random real numbers in the range (0, 1).</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Random2</code> class generates random real numbers in the range (0, 1).
+ It implements, using 32-bit integers (Int's), the 'MRG31k3p' generator
+ developed by L'Ecuyer and Touzin, described in &quot;FAST COMBINED MULTIPLE
+ RECURSIVE GENERATORS WITH MULTIPLIERS OF THE FORM a = 2<sup>q +/- 2</sup>r&quot;.
+ MRG31k3p is a Combined Multiple Recursive Generator (CMRG) shown to have good
+ performance and statistical properties for simulations.  It has a period of
+ about 2<sup>185 and is considered to be a faster alternative to the popular
+ 'MRG32k3' generator.  MRG31k3p combines MRG1 and MRG2.
+ <br>
+     MRG1: x_i = (0          + a_12 x_i-2 + a_13 x_i-3) % M1
+     MRG2: x_i = (a_21 x_i-1 + 0          + a_23 x_i-3) % M2
+ <br>
+ where a_12 = 2</sup>22, a_13 = 2<sup>7+1, a_21 = 2</sup>15 and a_23 = 2^15+1.</p></div><dl class="paramcmts block"><dt class="param">stream</dt><dd class="cmt"><p>the random number stream index</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.iro.umontreal.ca/~simardr/ssj/doc/pdf/guiderng.pdf</p></span><span class="cmt"><p>http://www.informs-sim.org/wsc00papers/090.PDF</p></span></dd></dl></div>
+    </li><li name="scalation.random.Random3" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Random3extendsRNGwithProductwithSerializable"></a><a id="Random3:Random3"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Random3.html"><span class="name">Random3</span></a><span class="params">(<span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="RNG.html" class="extype" name="scalation.random.RNG">RNG</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@Random3extendsRNGwithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Random3</code> class generates random real numbers in the range (0, 1).</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Random3</code> class generates random real numbers in the range (0, 1).
+ It implements, using 64-bit integers (Int's), the 'MINSTD' generator, which
+ is a multiplicative Linear Congruential Generator (LCG).
+ These generators were commonly used in the last century.
+ <br>
+     x_i = a x_i-1 % m
+ <br></p></div><dl class="paramcmts block"><dt class="param">stream</dt><dd class="cmt"><p>the random number stream index</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.34.1024</p></span><span class="cmt"><p><code>Random</code></p></span><span class="cmt"><p>http://random.mat.sbg.ac.at/results/karl/server/node4.html#SECTION00042000000000000000
+ In case a better generator is needed, a Multiple Recursive Generator (MRG)
+ or Composite Multiple Recursive Generator (CMRG) should be used.</p></span></dd></dl></div>
+    </li><li name="scalation.random.RandomSet" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RandomSetextendsVariateSetwithProductwithSerializable"></a><a id="RandomSet:RandomSet"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="RandomSet.html"><span class="name">RandomSet</span></a><span class="params">(<span name="count">count: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">10</span></span>, <span name="max">max: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">20</span></span>, <span name="skip">skip: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="VariateSet.html" class="extype" name="scalation.random.VariateSet">VariateSet</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@RandomSetextendsVariateSetwithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>RandomSet</code> class generates a random set/subset of integers.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>RandomSet</code> class generates a random set/subset of integers.</p></div><dl class="paramcmts block"><dt class="param">count</dt><dd class="cmt"><p>the size of the set (number of integer elements)</p></dd><dt class="param">max</dt><dd class="cmt"><p>generate integers in the range 0 (inclusive) to max (inclusive)</p></dd><dt class="param">skip</dt><dd class="cmt"><p>skip this number, i.e, do not use it</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl></div>
+    </li><li name="scalation.random.RandomVecI" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RandomVecIextendsVariateVecwithProductwithSerializable"></a><a id="RandomVecI:RandomVecI"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="RandomVecI.html"><span class="name">RandomVecI</span></a><span class="params">(<span name="count">count: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">10</span></span>, <span name="max">max: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">20</span></span>, <span name="skip">skip: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>, <span name="unique">unique: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">true</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="VariateVec.html" class="extype" name="scalation.random.VariateVec">VariateVec</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@RandomVecIextendsVariateVecwithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>RandomVecI</code> class generates a random vector of integers.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>RandomVecI</code> class generates a random vector of integers.
+ Ex: (3, 2, 0, 4, 1) has count = 5 and max = 4.</p></div><dl class="paramcmts block"><dt class="param">count</dt><dd class="cmt"><p>the size of the vector (number of integer elements)</p></dd><dt class="param">max</dt><dd class="cmt"><p>generate integers in the range 0 (inclusive) to max (inclusive)</p></dd><dt class="param">skip</dt><dd class="cmt"><p>skip this number, i.e, do not use it</p></dd><dt class="param">unique</dt><dd class="cmt"><p>whether the integers must be unique</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl></div>
+    </li><li name="scalation.random.Sharp" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SharpextendsVariatewithProductwithSerializable"></a><a id="Sharp:Sharp"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Sharp.html"><span class="name">Sharp</span></a><span class="params">(<span name="x">x: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">1</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@SharpextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Sharp</code> (Deterministic) random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Sharp</code> (Deterministic) random variates.
+ This discrete RV models the case when the variance is 0.</p></div><dl class="paramcmts block"><dt class="param">x</dt><dd class="cmt"><p>the value for this constant distribution</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl></div>
+    </li><li name="scalation.random.StudentT" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="StudentTextendsVariatewithProductwithSerializable"></a><a id="StudentT:StudentT"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="StudentT.html"><span class="name">StudentT</span></a><span class="params">(<span name="df">df: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">4</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@StudentTextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>StudentT</code> random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>StudentT</code> random variates.
+ This continuous RV models cases where data are normally distributed, but
+ variability increases since the variance is unknown.</p></div><dl class="paramcmts block"><dt class="param">df</dt><dd class="cmt"><p>the degrees of freedom</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/special/Student.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.TimeVariate" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="TimeVariateextendsVariate"></a><a id="TimeVariate:TimeVariate"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="TimeVariate.html"><span class="name">TimeVariate</span></a><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@TimeVariateextendsVariate" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>TimeVariate</code> abstract class serves as a superclass for time-based
+ random variates such Poisson Processes.</p>
+    </li><li name="scalation.random.Trapezoidal" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="TrapezoidalextendsVariatewithProductwithSerializable"></a><a id="Trapezoidal:Trapezoidal"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Trapezoidal.html"><span class="name">Trapezoidal</span></a><span class="params">(<span name="a">a: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">0.0</span></span>, <span name="c">c: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">2.0</span></span>, <span name="d">d: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">7.0</span></span>, <span name="b">b: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">10.0</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@TrapezoidalextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Trapezoidal</code> random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Trapezoidal</code> random variates.
+ This continuous RV models cases where outcomes cluster between two modes.
+ Both <code>Uniform and </code>Triangular<code> are special cases of </code>Trapezoidal<code>.</code></p></div><dl class="paramcmts block"><dt class="param">a</dt><dd class="cmt"><p>the minimum</p></dd><dt class="param">c</dt><dd class="cmt"><p>the first mode</p></dd><dt class="param">d</dt><dd class="cmt"><p>the second mode</p></dd><dt class="param">b</dt><dd class="cmt"><p>the maximum</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://iopscience.iop.org/0026-1394/44/2/003/pdf/0026-1394_44_2_003.pdf</p></span></dd></dl></div>
+    </li><li name="scalation.random.Triangular" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="TriangularextendsVariatewithProductwithSerializable"></a><a id="Triangular:Triangular"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Triangular.html"><span class="name">Triangular</span></a><span class="params">(<span name="a">a: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">0</span></span>, <span name="b">b: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">5</span></span>, <span name="c">c: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">Double.MaxValue</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@TriangularextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates simple <code>Triangular</code> random variates with the mode in the middle.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates simple <code>Triangular</code> random variates with the mode in the middle.
+ This continuous RV models cases where outcomes cluster around the mode.</p></div><dl class="paramcmts block"><dt class="param">a</dt><dd class="cmt"><p>the lower bound</p></dd><dt class="param">b</dt><dd class="cmt"><p>the upper bound</p></dd><dt class="param">c</dt><dd class="cmt"><p>the mode</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/special/Triangle.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.Trinomial" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="TrinomialextendsVariatewithProductwithSerializable"></a><a id="Trinomial:Trinomial"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Trinomial.html"><span class="name">Trinomial</span></a><span class="params">(<span name="p">p: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">1.0/3.0</span></span>, <span name="q">q: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">1.0/3.0</span></span>, <span name="n">n: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">10</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@TrinomialextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Trinomial</code> random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Trinomial</code> random variates.  While Binomial is based on
+ trials with two outcomes, success (1) or failure (0).  Trinomial is based on
+ trials with three outcomes, high (2), medium (1) or low (0).
+ This discrete RV models the result of 'n' trials.</p></div><dl class="paramcmts block"><dt class="param">p</dt><dd class="cmt"><p>the probability of high (2)</p></dd><dt class="param">q</dt><dd class="cmt"><p>the probability of medium (1)</p></dd><dt class="param">n</dt><dd class="cmt"><p>the number of independent trials</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>https://onlinecourses.science.psu.edu/stat414/node/106</p></span></dd></dl></div>
+    </li><li name="scalation.random.Uniform" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="UniformextendsVariatewithProductwithSerializable"></a><a id="Uniform:Uniform"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Uniform.html"><span class="name">Uniform</span></a><span class="params">(<span name="a">a: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">0.0</span></span>, <span name="b">b: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">5.0</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@UniformextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Uniform</code> random variates in the range (a, b).</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Uniform</code> random variates in the range (a, b).
+ This continuous RV models equiprobable outcomes.</p></div><dl class="paramcmts block"><dt class="param">a</dt><dd class="cmt"><p>the lower bound</p></dd><dt class="param">b</dt><dd class="cmt"><p>the upper bound</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/special/UniformContinuous.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.Variate" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="VariateextendsError"></a><a id="Variate:Variate"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Variate.html"><span class="name">Variate</span></a><span class="result"> extends <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@VariateextendsError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Variate</code> abstract class serves as a base class for all the random variate
+ (RV)  generators.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Variate</code> abstract class serves as a base class for all the random variate
+ (RV)  generators.  They use one of the Random Number Generators (RNG's) from
+ <code>Random</code> to generate numbers following their particular distribution.
+ Random Variate Generators (RVG's) for thirty popular probability distributions
+ are implemented as extensions of Variate.  Still need to add one.</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><code>VariateVec</code> for Random MultiVariate Generators (RMVG's).
+-----------------------------------------------------------------------------</p></span><span class="cmt"><p>http://www.math.uah.edu/stat/special/index.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.VariateSet" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="VariateSetextendsError"></a><a id="VariateSet:VariateSet"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="VariateSet.html"><span class="name">VariateSet</span></a><span class="result"> extends <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@VariateSetextendsError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VariateSet</code> abstract class serves as a base class for all the random
+ variate set (RVS) generators.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VariateSet</code> abstract class serves as a base class for all the random
+ variate set (RVS) generators. They use one of the Random Number Generators
+ (RNG's) from Random.scala to generate numbers following their particular
+ multivariate distribution.
+-----------------------------------------------------------------------------</p></div></div>
+    </li><li name="scalation.random.VariateVec" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="VariateVecextendsError"></a><a id="VariateVec:VariateVec"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="VariateVec.html"><span class="name">VariateVec</span></a><span class="result"> extends <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@VariateVecextendsError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VariateVec</code> abstract class serves as a base class for all the random
+ variate vector (RVV) generators.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VariateVec</code> abstract class serves as a base class for all the random
+ variate vector (RVV) generators. They use one of the Random Number Generators
+ (RNG's) from Random.scala to generate numbers following their particular
+ multivariate distribution.
+-----------------------------------------------------------------------------</p></div></div>
+    </li><li name="scalation.random.Weibull" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="WeibullextendsVariatewithProductwithSerializable"></a><a id="Weibull:Weibull"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Weibull.html"><span class="name">Weibull</span></a><span class="params">(<span name="alpha">alpha: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">2.0</span></span>, <span name="beta">beta: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">2.0</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@WeibullextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>Weibull</code> random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>Weibull</code> random variates.
+ This continuous RV models the time for an event to occur.</p></div><dl class="paramcmts block"><dt class="param">alpha</dt><dd class="cmt"><p>the shape parameter</p></dd><dt class="param">beta</dt><dd class="cmt"><p>the scale parameter</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.uah.edu/stat/special/Weibull.html</p></span></dd></dl></div>
+    </li><li name="scalation.random._HyperExponential" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="_HyperExponentialextendsVariatewithProductwithSerializable"></a><a id="_HyperExponential:_HyperExponential"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="_HyperExponential.html"><span class="name">_HyperExponential</span></a><span class="params">(<span name="mu">mu: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">1.0</span></span>, <span name="sigma">sigma: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">2</span></span>, <span name="stream">stream: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="Variate.html" class="extype" name="scalation.random.Variate">Variate</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@_HyperExponentialextendsVariatewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class generates <code>HyperExponential</code> random variates.</p><div class="fullcomment"><div class="comment cmt"><p>This class generates <code>HyperExponential</code> random variates.
+ This continuous RV models the time until an event occurs (higher coefficient
+ of variation than exponential distribution). FIX</p></div><dl class="paramcmts block"><dt class="param">mu</dt><dd class="cmt"><p>the mean</p></dd><dt class="param">sigma</dt><dd class="cmt"><p>the standard deviation</p></dd><dt class="param">stream</dt><dd class="cmt"><p>the random number stream</p></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scalation.random.CDF" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CDF"></a><a id="CDF:CDF"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="CDF$.html"><span class="name">CDF</span></a><span class="result"> extends <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@CDF" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>CDF</code> object contains methods for computing 'F(x)', the Cumulative
+ Distribution Functions (CDF's) for popular distributions:
+ Uniform
+ Exponential
+ Weibel
+ Empirical
+ StandardNormal
+ StudentT
+ ChiSquare
+ Fisher
+ For a given CDF 'F' with argument 'x', compute 'p = F(x)'.</p>
+    </li><li name="scalation.random.CDFTest_ChiSquare" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="CDFTest_ChiSquare"></a><a id="CDFTest_ChiSquare:CDFTest_ChiSquare"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="CDFTest_ChiSquare$.html"><span class="name">CDFTest_ChiSquare</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="CDFTest.html" class="extype" name="scalation.random.CDFTest">CDFTest</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@CDFTest_ChiSquare" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>CDFTest_ChiSquare</code> object is used to test the 'chiSquareCDF' method in the
+ <code>CDF</code> object.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>CDFTest_ChiSquare</code> object is used to test the 'chiSquareCDF' method in the
+ <code>CDF</code> object.
+ &gt; run-main scalation.random.CDFTest_ChiSquare
+</p></div></div>
+    </li><li name="scalation.random.CDFTest_Empirical" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="CDFTest_Empirical"></a><a id="CDFTest_Empirical:CDFTest_Empirical"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="CDFTest_Empirical$.html"><span class="name">CDFTest_Empirical</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@CDFTest_Empirical" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>CDFTest_Empirical</code> object is used to test the 'buildEmpiricalCDF' method
+ in the <code>CDF</code> object.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>CDFTest_Empirical</code> object is used to test the 'buildEmpiricalCDF' method
+ in the <code>CDF</code> object.
+ &gt; run-main scalation.random.CDFTest_Empirical
+</p></div></div>
+    </li><li name="scalation.random.CDFTest_Exponential" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="CDFTest_Exponential"></a><a id="CDFTest_Exponential:CDFTest_Exponential"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="CDFTest_Exponential$.html"><span class="name">CDFTest_Exponential</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="CDFTest.html" class="extype" name="scalation.random.CDFTest">CDFTest</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@CDFTest_Exponential" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>CDFTest_Exponential</code> object is used to test the 'ExponentialCDF' method in the
+ <code>CDF</code> object.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>CDFTest_Exponential</code> object is used to test the 'ExponentialCDF' method in the
+ <code>CDF</code> object.
+ &gt; run-main scalation.random.CDFTest_Exponential
+</p></div></div>
+    </li><li name="scalation.random.CDFTest_Fisher" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="CDFTest_Fisher"></a><a id="CDFTest_Fisher:CDFTest_Fisher"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="CDFTest_Fisher$.html"><span class="name">CDFTest_Fisher</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="CDFTest.html" class="extype" name="scalation.random.CDFTest">CDFTest</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@CDFTest_Fisher" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>CDFTest_Fisher</code> object is used to test the 'fisherCDF' method in the
+ <code>CDF</code> object.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>CDFTest_Fisher</code> object is used to test the 'fisherCDF' method in the
+ <code>CDF</code> object.
+ &gt; run-main scalation.random.CDFTest_Fisher
+</p></div></div>
+    </li><li name="scalation.random.CDFTest_Normal" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="CDFTest_Normal"></a><a id="CDFTest_Normal:CDFTest_Normal"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="CDFTest_Normal$.html"><span class="name">CDFTest_Normal</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="CDFTest.html" class="extype" name="scalation.random.CDFTest">CDFTest</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@CDFTest_Normal" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>CDFTest_Normal</code> object is used to test the 'normalCDF' method in the
+ <code>CDF</code> object.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>CDFTest_Normal</code> object is used to test the 'normalCDF' method in the
+ <code>CDF</code> object.
+ &gt; run-main scalation.random.CDFTest_Normal
+</p></div></div>
+    </li><li name="scalation.random.CDFTest_Normal_Diff" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="CDFTest_Normal_Diff"></a><a id="CDFTest_Normal_Diff:CDFTest_Normal_Diff"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="CDFTest_Normal_Diff$.html"><span class="name">CDFTest_Normal_Diff</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="CDFTest.html" class="extype" name="scalation.random.CDFTest">CDFTest</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@CDFTest_Normal_Diff" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>CDFTest_Normal</code> object is used to test difference between different
+ implementations of the 'normalCDF' method in the <code>CDF</code> object.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>CDFTest_Normal</code> object is used to test difference between different
+ implementations of the 'normalCDF' method in the <code>CDF</code> object.
+ &gt; run-main scalation.random.CDFTest_Normal_Diff
+</p></div></div>
+    </li><li name="scalation.random.CDFTest_StudentT" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="CDFTest_StudentT"></a><a id="CDFTest_StudentT:CDFTest_StudentT"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="CDFTest_StudentT$.html"><span class="name">CDFTest_StudentT</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="CDFTest.html" class="extype" name="scalation.random.CDFTest">CDFTest</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@CDFTest_StudentT" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>CDFTest_StudentT</code> object is used to test the 'studentTCDF' method in the
+ <code>CDF</code> object.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>CDFTest_StudentT</code> object is used to test the 'studentTCDF' method in the
+ <code>CDF</code> object.
+ &gt; run-main scalation.random.CDFTest_StudentT
+</p></div></div>
+    </li><li name="scalation.random.CDFTest_Uniform" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="CDFTest_Uniform"></a><a id="CDFTest_Uniform:CDFTest_Uniform"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="CDFTest_Uniform$.html"><span class="name">CDFTest_Uniform</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="CDFTest.html" class="extype" name="scalation.random.CDFTest">CDFTest</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@CDFTest_Uniform" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>CDFTest_Uniform</code> object is used to test the 'UniformCDF' method in the
+ <code>CDF</code> object.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>CDFTest_Uniform</code> object is used to test the 'UniformCDF' method in the
+ <code>CDF</code> object.
+ &gt; run-main scalation.random.CDFTest_Uniform
+</p></div></div>
+    </li><li name="scalation.random.CDFTest_Weibull" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="CDFTest_Weibull"></a><a id="CDFTest_Weibull:CDFTest_Weibull"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="CDFTest_Weibull$.html"><span class="name">CDFTest_Weibull</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="CDFTest.html" class="extype" name="scalation.random.CDFTest">CDFTest</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@CDFTest_Weibull" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>CDFTest_Weibull</code> object is used to test the 'WeibullCDF' method in the
+ <code>CDF</code> object.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>CDFTest_Weibull</code> object is used to test the 'WeibullCDF' method in the
+ <code>CDF</code> object.
+ &gt; run-main scalation.random.CDFTest_Weibull
+</p></div></div>
+    </li><li name="scalation.random.PoissonProcessTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PoissonProcessTest"></a><a id="PoissonProcessTest:PoissonProcessTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="PoissonProcessTest$.html"><span class="name">PoissonProcessTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@PoissonProcessTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>PoissonProcessTest</code> object is used to test both the <code>PoissonProcess</code> and
+ <code>NHPoissonProcess</code> classes.</p>
+    </li><li name="scalation.random.Quantile" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Quantile"></a><a id="Quantile:Quantile"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Quantile$.html"><span class="name">Quantile</span></a><span class="result"> extends <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@Quantile" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Quantile</code> object contains methods for computing 'Finv', the &quot;inverse&quot;
+ Cumulative Distribution Functions (iCDF's) for popular sampling distributions:
+ StandardNormal, StudentT, ChiSquare and Fisher.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Quantile</code> object contains methods for computing 'Finv', the &quot;inverse&quot;
+ Cumulative Distribution Functions (iCDF's) for popular sampling distributions:
+ StandardNormal, StudentT, ChiSquare and Fisher.
+ For a given CDF 'F' and probability/quantile 'p', compute 'x' such that 'F(x) = p'.
+ The iCDF may be thought of as giving value of 'x' for which the area under the
+ curve from -infinity to 'x' of the probability density function (pdf) is equal to 'p'.
+</p></div></div>
+    </li><li name="scalation.random.QuantileTest_ChiSquare" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="QuantileTest_ChiSquare"></a><a id="QuantileTest_ChiSquare:QuantileTest_ChiSquare"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="QuantileTest_ChiSquare$.html"><span class="name">QuantileTest_ChiSquare</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="QuantileTest.html" class="extype" name="scalation.random.QuantileTest">QuantileTest</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@QuantileTest_ChiSquare" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>QuantileTest_ChiSquare</code> object is used to test the 'chiSquareInv' method
+ in the <code>Quantile</code> object.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>QuantileTest_ChiSquare</code> object is used to test the 'chiSquareInv' method
+ in the <code>Quantile</code> object.
+ &gt; run-main scalation.random.QuantileTest_ChiSquare
+</p></div></div>
+    </li><li name="scalation.random.QuantileTest_Empirical" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="QuantileTest_Empirical"></a><a id="QuantileTest_Empirical:QuantileTest_Empirical"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="QuantileTest_Empirical$.html"><span class="name">QuantileTest_Empirical</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="QuantileTest.html" class="extype" name="scalation.random.QuantileTest">QuantileTest</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@QuantileTest_Empirical" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>QuantileTest_Empirical</code> object is used to test the 'empiricalInv' method
+ in the <code>Quantile</code> object.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>QuantileTest_Empirical</code> object is used to test the 'empiricalInv' method
+ in the <code>Quantile</code> object.
+ &gt; run-main scalation.random.QuantileTest_Empirical
+</p></div></div>
+    </li><li name="scalation.random.QuantileTest_Exponential" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="QuantileTest_Exponential"></a><a id="QuantileTest_Exponential:QuantileTest_Exponential"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="QuantileTest_Exponential$.html"><span class="name">QuantileTest_Exponential</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="QuantileTest.html" class="extype" name="scalation.random.QuantileTest">QuantileTest</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@QuantileTest_Exponential" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>QuantileTest_Exponential</code> object is used to test the 'exponentialInv' method
+ in the <code>Quantile</code> object.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>QuantileTest_Exponential</code> object is used to test the 'exponentialInv' method
+ in the <code>Quantile</code> object.
+ &gt; run-main scalation.random.QuantileTest_Exponential
+</p></div></div>
+    </li><li name="scalation.random.QuantileTest_Fisher" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="QuantileTest_Fisher"></a><a id="QuantileTest_Fisher:QuantileTest_Fisher"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="QuantileTest_Fisher$.html"><span class="name">QuantileTest_Fisher</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="QuantileTest.html" class="extype" name="scalation.random.QuantileTest">QuantileTest</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@QuantileTest_Fisher" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>QuantileTest_Fisher</code> object is used to test the 'fisherInv' method
+ in the <code>Quantile</code> object.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>QuantileTest_Fisher</code> object is used to test the 'fisherInv' method
+ in the <code>Quantile</code> object.
+ &gt; run-main scalation.random.QuantileTest_Fisher
+</p></div></div>
+    </li><li name="scalation.random.QuantileTest_Normal" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="QuantileTest_Normal"></a><a id="QuantileTest_Normal:QuantileTest_Normal"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="QuantileTest_Normal$.html"><span class="name">QuantileTest_Normal</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="QuantileTest.html" class="extype" name="scalation.random.QuantileTest">QuantileTest</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@QuantileTest_Normal" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>QuantileTest_Normal</code> object is used to test the 'normalInv' method
+ in the <code>Quantile</code> object.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>QuantileTest_Normal</code> object is used to test the 'normalInv' method
+ in the <code>Quantile</code> object.
+ &gt; run-main scalation.random.QuantileTest_Normal
+</p></div></div>
+    </li><li name="scalation.random.QuantileTest_StudentT" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="QuantileTest_StudentT"></a><a id="QuantileTest_StudentT:QuantileTest_StudentT"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="QuantileTest_StudentT$.html"><span class="name">QuantileTest_StudentT</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="QuantileTest.html" class="extype" name="scalation.random.QuantileTest">QuantileTest</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@QuantileTest_StudentT" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>QuantileTest_StudentT</code> object is used to test the 'studentTInv' method
+ in the <code>Quantile</code> object.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>QuantileTest_StudentT</code> object is used to test the 'studentTInv' method
+ in the <code>Quantile</code> object.
+ &gt; run-main scalation.random.QuantileTest_StudentT
+</p></div></div>
+    </li><li name="scalation.random.QuantileTest_Uniform" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="QuantileTest_Uniform"></a><a id="QuantileTest_Uniform:QuantileTest_Uniform"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="QuantileTest_Uniform$.html"><span class="name">QuantileTest_Uniform</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="QuantileTest.html" class="extype" name="scalation.random.QuantileTest">QuantileTest</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@QuantileTest_Uniform" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>QuantileTest_Uniform</code> object is used to test the 'uniformInv' method
+ in the <code>Quantile</code> object.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>QuantileTest_Uniform</code> object is used to test the 'uniformInv' method
+ in the <code>Quantile</code> object.
+ &gt; run-main scalation.random.QuantileTest_Uniform
+</p></div></div>
+    </li><li name="scalation.random.RNGStream" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RNGStream"></a><a id="RNGStream:RNGStream"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RNGStream$.html"><span class="name">RNGStream</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@RNGStream" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>RNGStream</code> object allows for random selection of streams for applications
+ where reproducibility of random numbers is not desired.</p>
+    </li><li name="scalation.random.RNGTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RNGTest"></a><a id="RNGTest:RNGTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RNGTest$.html"><span class="name">RNGTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@RNGTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>RNGTest</code> object conducts three simple tests of the Random Number
+ Generators: (1) Spped Test, (2) Means Test and (3) Chi-square Goodness of Fit Test.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>RNGTest</code> object conducts three simple tests of the Random Number
+ Generators: (1) Spped Test, (2) Means Test and (3) Chi-square Goodness of Fit Test.
+ FIX: need to add (3) Variance Test and (4) K-S Goodness of Fit Test.
+</p></div></div>
+    </li><li name="scalation.random.RandomSeeds" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RandomSeeds"></a><a id="RandomSeeds:RandomSeeds"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RandomSeeds$.html"><span class="name">RandomSeeds</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@RandomSeeds" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The first 1000 seeds for the 'MRG31k3p' random number generator.</p>
+    </li><li name="scalation.random.RandomSeeds3" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RandomSeeds3"></a><a id="RandomSeeds3:RandomSeeds3"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RandomSeeds3$.html"><span class="name">RandomSeeds3</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@RandomSeeds3" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The first 1000 seeds for the LCG random number generator.</p>
+    </li><li name="scalation.random.StreamMaker" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="StreamMaker"></a><a id="StreamMaker:StreamMaker"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="StreamMaker$.html"><span class="name">StreamMaker</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@StreamMaker" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>StreamMaker</code> object computes seeds for <code>Random</code> and <code>Random2</code>, both
+ of which implement the 'MRG31k3p' random number generator.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>StreamMaker</code> object computes seeds for <code>Random</code> and <code>Random2</code>, both
+ of which implement the 'MRG31k3p' random number generator.  This generator
+ has a period length around 2^185.  Each seed is a 6-dimensional vector of
+ 32-bit integers.</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.iro.umontreal.ca/~simardr/ssj/indexe.html</p></span></dd></dl></div>
+    </li><li name="scalation.random.StreamMaker3" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="StreamMaker3"></a><a id="StreamMaker3:StreamMaker3"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="StreamMaker3$.html"><span class="name">StreamMaker3</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@StreamMaker3" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>StreamMaker3</code> object finds seeds for the <code>Random3</code> random number generator.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>StreamMaker3</code> object finds seeds for the <code>Random3</code> random number generator.
+ This generator has a period length around 2^31.  Each seed is a 32-bit integer.
+</p></div></div>
+    </li><li name="scalation.random.StreamMakerGen" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="StreamMakerGen"></a><a id="StreamMakerGen:StreamMakerGen"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="StreamMakerGen$.html"><span class="name">StreamMakerGen</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@StreamMakerGen" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>StreamMakerGen</code> object generates and prints the first 'k' seeds for the
+ the 'MRG31k3p' random number generator's streams.</p>
+    </li><li name="scalation.random.VariateSetTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="VariateSetTest"></a><a id="VariateSetTest:VariateSetTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="VariateSetTest$.html"><span class="name">VariateSetTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@VariateSetTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VariateSetTest</code> object is used to test the Random Variate Set (RVS)
+ generators from the classes derived from <code>VariateSet</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VariateSetTest</code> object is used to test the Random Variate Set (RVS)
+ generators from the classes derived from <code>VariateSet</code>.
+ &gt; run-main scalation.random.VariateSetTest
+</p></div></div>
+    </li><li name="scalation.random.VariateTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="VariateTest"></a><a id="VariateTest:VariateTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="VariateTest$.html"><span class="name">VariateTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@VariateTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VariateTest</code> object conducts two simple tests of the Random Variate
+ Generators: (1) Means Test and (2) Chi-square Goodness of Fit Test.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VariateTest</code> object conducts two simple tests of the Random Variate
+ Generators: (1) Means Test and (2) Chi-square Goodness of Fit Test.
+ FIX: need to add (3) Variance Test and (4) K-S Goodness of Fit Test.
+</p></div></div>
+    </li><li name="scalation.random.VariateVecTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="VariateVecTest"></a><a id="VariateVecTest:VariateVecTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="VariateVecTest$.html"><span class="name">VariateVecTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.random.package@VariateVecTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>VariateVecTest</code> object is used to test the Random Variate Vector (RVV)
+ generators from the classes derived from <code>VariateVec</code>.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>VariateVecTest</code> object is used to test the Random Variate Vector (RVV)
+ generators from the classes derived from <code>VariateVec</code>.
+ &gt; run-main scalation.random.VariateVecTest
+</p></div></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

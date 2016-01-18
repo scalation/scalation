@@ -1,0 +1,4 @@
+# jscar - Java Run script - must export SCALATION_CLASSES
+echo // java -cp $SCALATION_CLASSES $1
+java -cp $SCALATION_CLASSES $1
+

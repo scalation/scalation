@@ -1,0 +1,296 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>event - scalation.event</title>
+          <meta name="description" content="event - scalation.event" />
+          <meta name="keywords" content="event scalation.event" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'scalation.event.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../lib/package_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="scalation">scalation</a></p>
+        <h1>event</h1><span class="permalink">
+      <a href="../../index.html#scalation.event.package" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">event</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>The event package contains classes, traits and objects for event oriented
+ simulation models (for example, event scheduling or event graphs).
+</p></div><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div class="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalation.event"><span>event</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div class="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalation.event.CausalLink" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="CausalLinkextendsIdentifiablewithProductwithSerializable"></a><a id="CausalLink:CausalLink"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="CausalLink.html"><span class="name">CausalLink</span></a><span class="params">(<span name="label">label: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="director">director: <a href="Model.html" class="extype" name="scalation.event.Model">Model</a></span>, <span name="condition">condition: () ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>, <span name="causedEvent">causedEvent: <a href="Event.html" class="extype" name="scalation.event.Event">Event</a></span>)</span><span class="result"> extends <a href="../util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.event.package@CausalLinkextendsIdentifiablewithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>CausalLink</code> class provides casual links between events.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>CausalLink</code> class provides casual links between events.  A causal link
+ indicates that a &quot;causing event&quot; (from node) conditionally may triggers a
+ &quot;caused event&quot; (to node).</p></div><dl class="paramcmts block"><dt class="param">label</dt><dd class="cmt"><p>the name/label of the causal link</p></dd><dt class="param">director</dt><dd class="cmt"><p>the controller/scheduler that this causal link is a part of</p></dd><dt class="param">condition</dt><dd class="cmt"><p>the condition under which the link is triggered</p></dd><dt class="param">causedEvent</dt><dd class="cmt"><p>the event caused by this causal link</p></dd></dl></div>
+    </li><li name="scalation.event.Entity" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="EntityextendsProductwithSerializable"></a><a id="Entity:Entity"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Entity.html"><span class="name">Entity</span></a><span class="params">(<span name="iArrivalT">iArrivalT: <span class="extype" name="scala.Double">Double</span></span>, <span name="serviceT">serviceT: <span class="extype" name="scala.Double">Double</span></span>, <span name="director">director: <a href="Model.html" class="extype" name="scalation.event.Model">Model</a></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.event.package@EntityextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Entity</code> class represents a single simulation entity for event-scheduling
+ simulation.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Entity</code> class represents a single simulation entity for event-scheduling
+ simulation.</p></div><dl class="paramcmts block"><dt class="param">iArrivalT</dt><dd class="cmt"><p>the time from the last arrival</p></dd><dt class="param">serviceT</dt><dd class="cmt"><p>the amount of time required for the entity's next service</p></dd><dt class="param">director</dt><dd class="cmt"><p>the controller/scheduler that this event is a part of</p></dd></dl></div>
+    </li><li name="scalation.event.Event" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="EventextendsIdentifiablewithOrdered[scalation.event.Event]"></a><a id="Event:Event"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Event.html"><span class="name">Event</span></a><span class="result"> extends <a href="../util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a> with <span class="extype" name="scala.Ordered">Ordered</span>[<a href="Event.html" class="extype" name="scalation.event.Event">Event</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.event.package@EventextendsIdentifiablewithOrdered[scalation.event.Event]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Event</code> class provides facilities for defining simulation events.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Event</code> class provides facilities for defining simulation events.  Subclasses
+ of Event provide event-logic in their implementation of the 'occur' method.
+ Note: unique identification is mixed in via the <code>Identifiable</code> trait.</p></div></div>
+    </li><li name="scalation.event.EventNode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="EventNodeextendsEvent"></a><a id="EventNode:EventNode"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="EventNode.html"><span class="name">EventNode</span></a><span class="result"> extends <a href="Event.html" class="extype" name="scalation.event.Event">Event</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.event.package@EventNodeextendsEvent" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>EventNode</code> class provides facilities for representing simulation events
+ graphically.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>EventNode</code> class provides facilities for representing simulation events
+ graphically.  It extends the <code>Event</code> class with animation capabilities.
+ Note:  unique identification is mixed in via the <code>Identifiable</code> trait in
+ the <code>Event</code> superclass.</p></div></div>
+    </li><li name="scalation.event.Model" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ModelextendsModelablewithIdentifiable"></a><a id="Model:Model"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Model.html"><span class="name">Model</span></a><span class="result"> extends <a href="../model/Modelable.html" class="extype" name="scalation.model.Modelable">Modelable</a> with <a href="../util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.event.package@ModelextendsModelablewithIdentifiable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Model</code> class schedules events and implements the time advance mechanism
+ for simulation model following the event-scheduling world view.</p>
+    </li><li name="scalation.event.WaitQueue" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="WaitQueueextendsQueue[scalation.event.Entity]withProductwithSerializable"></a><a id="WaitQueue:WaitQueue"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="WaitQueue.html"><span class="name">WaitQueue</span></a><span class="params">(<span name="director">director: <a href="Model.html" class="extype" name="scalation.event.Model">Model</a></span>, <span name="ext">ext: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>, <span name="cap">cap: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">Int.MaxValue</span></span>)</span><span class="result"> extends <span class="extype" name="scala.collection.mutable.Queue">Queue</span>[<a href="Entity.html" class="extype" name="scalation.event.Entity">Entity</a>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.event.package@WaitQueueextendsQueue[scalation.event.Entity]withProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>WaitQueue</code> class is used to hold entities waiting for service and
+ collect statistics on waiting times.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>WaitQueue</code> class is used to hold entities waiting for service and
+ collect statistics on waiting times.  When the queue is full, entities
+ are 'barred' from entering the queue.</p></div><dl class="paramcmts block"><dt class="param">director</dt><dd class="cmt"><p>the controller/scheduler that this event is a part of</p></dd><dt class="param">ext</dt><dd class="cmt"><p>the extension to distinguish the wait queues</p></dd><dt class="param">cap</dt><dd class="cmt"><p>the capacity of the queue (defaults to unbounded)</p></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scalation.event.Entity" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Entity"></a><a id="Entity:Entity"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Entity$.html"><span class="name">Entity</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.event.package@Entity" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Entity</code> companion object provides a counter for generating entity ids.</p>
+    </li><li name="scalation.event.EventNode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="EventNode"></a><a id="EventNode:EventNode"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="EventNode$.html"><span class="name">EventNode</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.event.package@EventNode" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>EventNode</code> companion object provides a method for making a prototype
+ entity.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>EventNode</code> companion object provides a method for making a prototype
+ entity.  A prototype event or entity is thought to exist before the
+ simulation starts.
+</p></div></div>
+    </li><li name="scalation.event.ModelTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ModelTest"></a><a id="ModelTest:ModelTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ModelTest$.html"><span class="name">ModelTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.event.package@ModelTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>ModelTest</code> object is used to test the <code>Model</code> class.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>ModelTest</code> object is used to test the <code>Model</code> class.
+ &gt; run-main scalation.event.ModelTest
+</p></div></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

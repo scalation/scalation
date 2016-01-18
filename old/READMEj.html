@@ -1,0 +1,207 @@
+<html>
+<title> JalaTion </title>
+<body>
+
+U N D E R &nbsp;  D E V E L O P M E N T 
+
+<center>
+<h1> JAva SimuLATION - JalaTion </h1>
+<p>
+<a href = "#papers">Papers</a> | <a href = "#javadoc">Javadoc</a> | <a href = "#source-code"> Source Code</a>
+</center>
+
+<p>
+<b> Welcome to JalaTion, the Java-based system for Simulation, Optimization and Analytics. </b>
+
+<p>
+This system, coded in Java, will support multi-paradigm simulation modeling including
+'tableau', 'event', 'process', 'dynamics', 'dynamics_pde', 'activity' and 'state' oriented models.
+It is a subproject of the ScalaTion project.  Currently much of the funcationality of ScalaTion
+is missing.
+
+<p>
+<a href = "http://www.oracle.com/technetwork/java/index.html">Java</a> is a modern object-oriented language
+<!-- (see <a href = "feature_matrix.html"> feature matrix </a>) -->
+that is well-suited for developing simulation engines.
+JalaTion will also support optimization and analytics as they nowadays go hand-in-hand with simulation modeling.
+Some of the algorithms come in both sequential and parallel versions.
+
+<p>
+The <b>JalaTion 1.1</b> version works with Java 8 (some minor code changes may be required for Java 7).
+
+<p>
+Please read the <a href = LICENSE.html> LICENSE </a> file (an MIT style license).
+
+<p><hr><p>
+<h3> Installation Instructions </h3>
+
+Requires:
+<a href = "http://www.oracle.com/technetwork/java/javase/downloads">Java 8</a>
+<br>
+Recommended:
+<a href = "http://www.scala-sbt.org/">sbt</a> &nbsp; (see <a href = "INSTALL_SBT.html">INSTALL_SBT.html</a>)
+
+<h4>1. Download one of the following two files</h4>
+
+<a href = "../scalation_1.1.tar.gz"> scalation.tar_1.1.gz </a> <br> <b>OR</b> <br>
+<a href = "../scalation_1.1.zip"> scalation_1.1.zip </a>
+
+<p>
+<h4>2. Untar or unzip the file</h4>
+
+$ tar xvfz scalation_1.1.tar.gz <br> <b>OR</b> <br>
+$ unzip scalation_1.1.zip
+
+<p>
+<h4>3. Export the SCALATION_CLASSES environment variable to point at class files</h4>
+
+export SCALATION_CLASSES=$HOME/scalation_1.1/target/scala-2.11/classes
+
+<p>
+
+Ideally, put the export in one of your dot files (e.g., .profile or .bashrc).
+
+<h4>4. To re-build the JalaTion system, type the first command</h4>
+
+$ sbt compile
+
+<p>
+
+The Simple Build Tool <a href = "http://www.scala-sbt.org">sbt</a>
+is the easiest way to build JalaTion 1.1.
+
+<p>
+
+Source packages are in the <b>src/main/java</b> directory,
+class files are in the <b>target</b> directory, and
+documentation files are in the <b>docj</b> directory.
+
+<h4>5. Run apps (e.g., for process oriented simulation in Bank.java)</h4>
+
+$ <a href = "jscar">jscar</a> apps.process.Bank <br> <b>OR</b> <br>
+$ java -cp $SCALATION_CLASSES apps.process.Bank
+
+<p>
+
+The '<a href = "jscar">jscar</a>' shell script works for Linux, Unix and Mac.
+Use '<a href = "jscar.bat">jscar.bat</a>' for Windows.
+
+<h4>6. Run src test code (e.g., for Regression in scalation.analytics)</h4>
+
+$ jscar scalation.analytics.RegressionTest <br> <b>OR</b> <br>
+$ java -cp $SCALATION_CLASSES jalation.analytics.RegressionTest
+
+<p><hr><p>
+
+To develop using an IDE use for example Eclipse or NetBeans.
+
+<A name = "papers">
+
+<p><hr><p>
+<h3> Papers/Documentation </h3>
+<p>
+
+<ol>
+<li>
+John A. Miller, Jun Han and Maria Hybinette,
+<a href = "http://informs-sim.org/wsc10papers/067.pdf">
+"Using Domain Specific Languages for Modeling and Simulation: JalaTion as a Case Study,"</a>
+Proceedings of the 2010 ACM/IEEE Winter Simulation Conference (WSC'10),
+Baltimore, Maryland (December 2010) pp. 741-752.
+
+<p>
+<li>
+Michael E. Cotterell, John A. Miller, Tom Horton,
+<a href = "http://arxiv.org/abs/1112.1751">
+"Unicode in Domain-Specific Programming Languages for Modeling & Simulation:
+JalaTion as a Case Study,"</a>
+Arxiv preprint arXiv:1112.175
+(December 2011) pp. 1-10.
+
+<p>
+<li>
+Michael E. Cotterell, John A. Miller, Jun Han and Tom Horton,
+<a href = "../scalation_papers/alasim/alasim_extended_abstract.pdf">
+"Extending JalaTion, a Domain-Specific Language for Modeling & Simulation, for Simulation Optimization,"</a>
+Proceedings of the AlaSim International Modeling and Simulation Conference & Exhibition (AlaSim'12),
+Huntsville, Alabama (May 2012) pp. 1-1.
+
+<p>
+<li>
+Yung Long Li,
+<a href = "../home/theses/li_thesis/thesis/TR_Yung_Long_Li.pdf">
+"Evaluation of Parallel Implementations of Dense and Sparse
+Matrices for the JalaTion Library," </a>
+Technical Report,
+University of Georgia (December 2012) pp. 1-60.
+
+<p>
+<li>
+John A. Miller, Michael E. Cotterell and Stephen J. Buckley,
+<a href = "http://informs-sim.org/wsc13papers/includes/files/104.pdf">
+"Supporting a Modeling Continuum in JalaTion: From Predictive Analytics to Simulation Modeling,"</a>
+Proceedings of the 2013 ACM/IEEE Winter Simulation Conference (WSC'13),
+Washington, DC (December 2013) pp. 1191-1202. 
+
+<p>
+<li>
+Matthew Saltz, Ayushi Jain, Abhishek Kothari, Arash Fard, John A. Miller, and Lakshmish Ramaswamy,
+<a href = "http://www.thecloudcomputing.org/2014/AdvanceProgram-ICWS-SCC-CLOUD-MS-BigDataCongress-SERVICES-2014.pdf">
+"DualIso: An Algorithm for Subgraph Pattern Matching on Very Large Labeled Graphs,"</a>
+<I> Proceedings of the 3rd IEEE International Congress on Big Data </I>
+(<a href = "http://www.ieeebigdata.org/2014">BigData'14</a>),
+Anchorage, Alaska (June-July 2014) pp. 498-505.
+<br>
+Online <a href = "../home/theses/jain_thesis/bigdata_2014/BigDataCong2014_DualIso_Supplement.pdf">supplement</a>
+
+</ol>
+<A name = "javadoc">
+
+<p><hr><p>
+<h3> Source Packages (doc) </h3>
+<p>
+
+<p>
+Overall javadoc generated <a href = "docj"> API </a> for JalaTion
+<p>
+
+<blockquote>
+<table border = 3>
+<tr>
+<tr>
+<td> <b>Package</b>
+<td> <b>Description</b>
+<tr>
+<td> <a href = "docj/scalation/analytics/package.html"> scalation.analytics </a>
+<td> A package supporting analytics, including regression, time series analysis and clustering.
+<tr>
+<td> <a href = "docj/scalation/graphalytics/package.html"> scalation.graphalytics </a>
+<td> A package supporting graph analytics, including shortest path, etc.
+</table>
+</blockquote>
+
+<A name = "source-code">
+
+<p>
+<h3> Source Packages (src) </h3>
+<p>
+
+<blockquote>
+<table border = 3>
+<tr>
+<td> <b>Package</b>
+<td> <b>Description</b>
+<tr>
+<tr>
+<td> <a href = "src/main/java/jalation/analytics/"> scalation.analytics </a>
+<td> A package supporting analytics, including regression, time series analysis and clustering.
+<tr>
+<td> <a href = "src/main/java/jalation/graphalytics/"> scalation.graphalytics </a>
+<td> A package supporting graph analytics, including shotest path, etc.
+</table>
+</blockquote>
+
+<p>
+</body>
+</html>
+

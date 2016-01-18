@@ -1,0 +1,689 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>par - scalation.analytics.par</title>
+          <meta name="description" content="par - scalation.analytics.par" />
+          <meta name="keywords" content="par scalation.analytics.par" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../index.html';
+            var hash = 'scalation.analytics.par.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../../lib/package_big.png" />
+        <p id="owner"><a href="../../package.html" class="extype" name="scalation">scalation</a>.<a href="../package.html" class="extype" name="scalation.analytics">analytics</a></p>
+        <h1>par</h1><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">par</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>The par package contains classes, traits and objects for
+ analytics including classification, clustering and prediction
+ with parallel implemtations.
+</p></div><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div class="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalation.analytics.par"><span>par</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div class="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalation.analytics.par.ANCOVA" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ANCOVAextendsPredictorwithError"></a><a id="ANCOVA:ANCOVA"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ANCOVA.html"><span class="name">ANCOVA</span></a><span class="result"> extends <a href="../Predictor.html" class="extype" name="scalation.analytics.Predictor">Predictor</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@ANCOVAextendsPredictorwithError" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>ANCOVA</code> class supports ANalysis of COVAraiance (ANCOVA).</p><div class="fullcomment"><div class="comment cmt"><p>The <code>ANCOVA</code> class supports ANalysis of COVAraiance (ANCOVA).  It allows
+ the addition of a categorical treatment variable 't' into a multiple linear
+ regression.  This is done by introducing dummy variables 'dj' to distinguish
+ the treatment level.  The problem is again to fit the parameter vector 'b'
+ in the augmented regression equation</p><p>     y  =  b dot x + e  =  b0  +  b_1   * x_1  +  b_2   * x_2  +  ... b_k * x_k
+                                  +  b_k+1 * d_1  +  b_k+2 * d_2  +  ... b_k+l * d_l + e</p><p> where 'e' represents the residuals (the part not explained by the model).
+ Use Least-Squares (minimizing the residuals) to fit the parameter vector</p><p>     b  =  x_pinv * y</p><p> where 'x_pinv' is the pseudo-inverse.</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>see.stanford.edu/materials/lsoeldsee263/05-ls.pdf</p></span></dd></dl></div>
+    </li><li name="scalation.analytics.par.GLM" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="GLMextendsAnyRef"></a><a id="GLM:GLM"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="GLM.html"><span class="name">GLM</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@GLMextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A General Linear Model (GLM) can be developed using the <code>GLM</code> trait and object
+ (see below).</p><div class="fullcomment"><div class="comment cmt"><p>A General Linear Model (GLM) can be developed using the <code>GLM</code> trait and object
+ (see below).  The implementation currently supports univariate models with
+ multivariate models (where each response is a vector) planned for the future.
+ This version uses parallel processing to speed up execution.
+ It provides factory methods for the following special types of GLMs:
+ <code>Regression</code>       - multiple linear regression,
+ <code>RidgeRegression</code>  - robust multiple linear regression,
+ <code>TranRegression</code>   - transformed (e.g., log) multiple linear regression,
+ <code>PolyRegression</code>   - polynomial regression,
+ <code>TrigRegression</code>   - trigonometric regression
+ <code>ResponseSurface</code>  - response surface regression,
+ <code>ANCOVA</code>           - GLM form of ANalysis of COVAriance.
+ The following special types are excluded since they do not utilize large matrices.
+ <code>SimpleRegression</code> - simple linear regression,
+ <code>ANOVA</code>            - GLM form of ANalysis Of VAriance,
+</p></div></div>
+    </li><li name="scalation.analytics.par.NaiveBayes" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="NaiveBayesextendsClassifierInt"></a><a id="NaiveBayes:NaiveBayes"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="NaiveBayes.html"><span class="name">NaiveBayes</span></a><span class="result"> extends <a href="../ClassifierInt.html" class="extype" name="scalation.analytics.ClassifierInt">ClassifierInt</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@NaiveBayesextendsClassifierInt" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>NaiveBayes</code> class implements an Integer-Based Naive Bayes Classifier,
+ which is a commonly used such classifier for discrete input data.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>NaiveBayes</code> class implements an Integer-Based Naive Bayes Classifier,
+ which is a commonly used such classifier for discrete input data.  The
+ classifier is trained using a data matrix 'x' and a classification vector 'y'.
+ Each data vector in the matrix is classified into one of 'k' classes numbered
+ 0, ..., k-1.  Prior probabilities are calculated based on the population of
+ each class in the training-set.  Relative posterior probabilities are computed
+ by multiplying these by values computed using conditional probabilities.  The
+ classifier is naive, because it assumes feature independence and therefore
+ simply multiplies the conditional probabilities.
+ This version uses parallel matrix implemtations.
+-----------------------------------------------------------------------------</p></div></div>
+    </li><li name="scalation.analytics.par.NaiveBayesR" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="NaiveBayesRextendsClassifierReal"></a><a id="NaiveBayesR:NaiveBayesR"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="NaiveBayesR.html"><span class="name">NaiveBayesR</span></a><span class="result"> extends <a href="../ClassifierReal.html" class="extype" name="scalation.analytics.ClassifierReal">ClassifierReal</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@NaiveBayesRextendsClassifierReal" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>NaiveBayesR</code> class implements a Gaussian Naive Bayes Classifier, which
+ is the most commonly used such classifier for continuous input data.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>NaiveBayesR</code> class implements a Gaussian Naive Bayes Classifier, which
+ is the most commonly used such classifier for continuous input data.  The
+ classifier is trained using a data matrix 'x' and a classification vector 'y'.
+ Each data vector in the matrix is classified into one of 'k' classes numbered
+ 0, ..., k-1.  Prior probabilities are calculated based on the population of
+ each class in the training-set.  Relative posterior probabilities are computed
+ by multiplying these by values computed using conditional density functions
+ based on the Normal (Gaussian) distribution.  The classifier is naive, because
+ it assumes feature independence and therefore simply multiplies the conditional
+ densities.  This version uses parallel processing to speed up execution.
+-----------------------------------------------------------------------------</p></div></div>
+    </li><li name="scalation.analytics.par.PolyRegression" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="PolyRegressionextendsPredictorwithError"></a><a id="PolyRegression:PolyRegression"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="PolyRegression.html"><span class="name">PolyRegression</span></a><span class="result"> extends <a href="../Predictor.html" class="extype" name="scalation.analytics.Predictor">Predictor</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@PolyRegressionextendsPredictorwithError" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>PolyRegression</code> class supports polynomial regression.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>PolyRegression</code> class supports polynomial regression.  In this case,
+ 't' is expanded to [1, t, t<sup>2 ... t</sup>k].  Fit the parameter vector 'b' in the
+ regression equation</p><p>     y  =  b dot x + e  =  b_0 + b_1 * t +  b_2 * t<sup>2 ... b_k * t</sup>k + e</p><p> where 'e' represents the residuals (the part not explained by the model).
+ Use Least-Squares (minimizing the residuals) to fit the parameter vector</p><p>     b  =  x_pinv * y</p><p> where 'x_pinv' is the pseudo-inverse.</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>www.ams.sunysb.edu/~zhu/ams57213/Team3.pptx</p></span></dd></dl></div>
+    </li><li name="scalation.analytics.par.Regression" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RegressionextendsPredictorwithError"></a><a id="Regression:Regression"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Regression.html"><span class="name">Regression</span></a><span class="result"> extends <a href="../Predictor.html" class="extype" name="scalation.analytics.Predictor">Predictor</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@RegressionextendsPredictorwithError" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Regression</code> class supports multiple linear regression.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Regression</code> class supports multiple linear regression.  In this case,
+ 'x' is multi-dimensional [1, x_1, ... x_k].  Fit the parameter vector 'b' in
+ the regression equation</p><p>     y  =  b dot x + e  =  b_0 + b_1 * x_1 + ... b_k * x_k + e</p><p> where 'e' represents the residuals (the part not explained by the model).
+ Use Least-Squares (minimizing the residuals) to fit the parameter vector</p><p>     b  =  x_pinv * y   [ alternative: b  =  solve (y) ]</p><p> where 'x_pinv' is the pseudo-inverse.  Three techniques are provided:</p><p>     Fac_QR         // QR Factorization: slower, more stable (default)
+     Fac_Cholesky   // Cholesky Factorization: faster, less stable (reasonable choice)
+     Inverse        // Inverse/Gaussian Elimination, classical textbook technique (outdated)</p><p> This version uses parallel processing to speed up execution.</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>see.stanford.edu/materials/lsoeldsee263/05-ls.pdf</p></span></dd></dl></div>
+    </li><li name="scalation.analytics.par.ResponseSurface" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ResponseSurfaceextendsPredictorwithError"></a><a id="ResponseSurface:ResponseSurface"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ResponseSurface.html"><span class="name">ResponseSurface</span></a><span class="result"> extends <a href="../Predictor.html" class="extype" name="scalation.analytics.Predictor">Predictor</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@ResponseSurfaceextendsPredictorwithError" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>ResponseSurface</code> class uses multiple regression to fit a quadratic/cubic
+ surface to the data.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>ResponseSurface</code> class uses multiple regression to fit a quadratic/cubic
+ surface to the data.  For example in 2D, the quadratic regression equation is</p><p>     y  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_0, x_0<sup>2, x_1, x_0*x_1, x_1</sup>2] + e</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>scalation.metamodel.QuadraticFit</p></span></dd></dl></div>
+    </li><li name="scalation.analytics.par.RidgeRegression" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RidgeRegressionextendsPredictorwithError"></a><a id="RidgeRegression:RidgeRegression"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="RidgeRegression.html"><span class="name">RidgeRegression</span></a><span class="result"> extends <a href="../Predictor.html" class="extype" name="scalation.analytics.Predictor">Predictor</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@RidgeRegressionextendsPredictorwithError" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>RidgeRegression</code> class supports multiple linear regression.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>RidgeRegression</code> class supports multiple linear regression.  In this
+ case, 'x' is multi-dimensional [x_1, ... x_k].  Both the input matrix 'x' and
+ the response vector 'y' are centered (zero mean).  Fit the parameter vector
+ 'b' in the regression equation</p><p>     y  =  b dot x + e  =  b_1 * x_1 + ... b_k * x_k + e</p><p> where 'e' represents the residuals (the part not explained by the model).
+ Use Least-Squares (minimizing the residuals) to fit the parameter vector</p><p>     b  =  x_pinv * y   [ alternative: b  =  solve (y) ]</p><p> where 'x_pinv' is the pseudo-inverse.  Three techniques are provided:</p><p>     Fac_QR         // QR Factorization: slower, more stable (default)
+     Fac_Cholesky   // Cholesky Factorization: faster, less stable (reasonable choice)
+     Inverse        // Inverse/Gaussian Elimination, classical textbook technique (outdated)</p><p> This version uses parallel processing to speed up execution.
+ see http://statweb.stanford.edu/~tibs/ElemStatLearn/</p></div></div>
+    </li><li name="scalation.analytics.par.TranRegression" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="TranRegressionextendsPredictorwithError"></a><a id="TranRegression:TranRegression"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="TranRegression.html"><span class="name">TranRegression</span></a><span class="result"> extends <a href="../Predictor.html" class="extype" name="scalation.analytics.Predictor">Predictor</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@TranRegressionextendsPredictorwithError" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>TranRegression</code> class supports transformed multiple linear regression.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>TranRegression</code> class supports transformed multiple linear regression.
+ In this case, 'x' is multi-dimensional [1, x_1, ... x_k].  Fit the parameter
+ vector 'b' in the transformed regression equation</p><p>     transform (y)  =  b dot x + e  =  b_0 + b_1 * x_1 +  b_2 * x_2 ... b_k * x_k + e</p><p> where 'e' represents the residuals (the part not explained by the model) and
+ 'transform' is the function (defaults to log) used to transform the response vector 'y'.
+ Use Least-Squares (minimizing the residuals) to fit the parameter vector</p><p>     b  =  x_pinv * y</p><p> where 'x_pinv' is the pseudo-inverse.</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>www.ams.sunysb.edu/~zhu/ams57213/Team3.pptx</p></span></dd></dl></div>
+    </li><li name="scalation.analytics.par.TrigRegression" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="TrigRegressionextendsPredictorwithError"></a><a id="TrigRegression:TrigRegression"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="TrigRegression.html"><span class="name">TrigRegression</span></a><span class="result"> extends <a href="../Predictor.html" class="extype" name="scalation.analytics.Predictor">Predictor</a> with <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@TrigRegressionextendsPredictorwithError" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>TrigRegression</code> class supports trigonometric regression.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>TrigRegression</code> class supports trigonometric regression.  In this case,
+ 't' is expanded to [1, sin (wt), cos (wt), sin (2wt), cos (2wt), ...].
+ Fit the parameter vector 'b' in the regression equation</p><p>     y  =  b dot x + e  =  b_0 + b_1 sin (wt)  + b_2 cos (wt)  +
+                                 b_3 sin (2wt) + b_4 cos (2wt) + ... + e</p><p> where 'e' represents the residuals (the part not explained by the model).
+ Use Least-Squares (minimizing the residuals) to fit the parameter vector</p><p>     b  =  x_pinv * y</p><p> where 'x_pinv' is the pseudo-inverse.
+ http://link.springer.com/article/10.1023%2FA%3A1022436007242#page-1</p></div></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scalation.analytics.par.ANCOVATest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ANCOVATest"></a><a id="ANCOVATest:ANCOVATest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ANCOVATest$.html"><span class="name">ANCOVATest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@ANCOVATest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>ANCOVATest</code> object tests the <code>ANCOVA</code> class using the following
+ regression equation.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>ANCOVATest</code> object tests the <code>ANCOVA</code> class using the following
+ regression equation.</p><p>     y  =  b dot x  =  b_0 + b_1*x_1 + b_2*x_2 + b_3*d_1 + b_4*d_2</p></div></div>
+    </li><li name="scalation.analytics.par.GLM" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="GLM"></a><a id="GLM:GLM"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="GLM$.html"><span class="name">GLM</span></a><span class="result"> extends <a href="GLM.html" class="extype" name="scalation.analytics.par.GLM">GLM</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@GLM" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>GLM</code> object makes the <code>GLM</code> trait's methods directly available.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>GLM</code> object makes the <code>GLM</code> trait's methods directly available.
+ This approach (using traits and objects) allows the methods to also be inherited.
+</p></div></div>
+    </li><li name="scalation.analytics.par.GLMTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="GLMTest"></a><a id="GLMTest:GLMTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="GLMTest$.html"><span class="name">GLMTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@GLMTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>GLMTest</code> object tests the <code>GLM</code> object using the following regression
+ equation.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>GLMTest</code> object tests the <code>GLM</code> object using the following regression
+ equation.</p><p>     y  =  b dot x  =  b_0 + b_1*x_1 + b_2*x_2 + b_3*d_1 + b_4*d_2</p></div></div>
+    </li><li name="scalation.analytics.par.NaiveBayes" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="NaiveBayes"></a><a id="NaiveBayes:NaiveBayes"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="NaiveBayes$.html"><span class="name">NaiveBayes</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@NaiveBayes" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"><code>NaiveBayes</code> is the companion object for the <code>NaiveBayes</code> class.</p>
+    </li><li name="scalation.analytics.par.NaiveBayesRTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="NaiveBayesRTest"></a><a id="NaiveBayesRTest:NaiveBayesRTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="NaiveBayesRTest$.html"><span class="name">NaiveBayesRTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@NaiveBayesRTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>NaiveBayesRTest</code> object is used to test the 'NaiveBayesR' class.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>NaiveBayesRTest</code> object is used to test the 'NaiveBayesR' class.
+* Classify whether a person is male (M) or female (F) based on the measured features.</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://en.wikipedia.org/wiki/Naive_Bayes_classifier
+ &gt; run-main scalation.analytics.par.NaiveBayesRTest</p></span></dd></dl></div>
+    </li><li name="scalation.analytics.par.NaiveBayesTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="NaiveBayesTest"></a><a id="NaiveBayesTest:NaiveBayesTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="NaiveBayesTest$.html"><span class="name">NaiveBayesTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@NaiveBayesTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>NaiveBayesTestInt</code> object is used to test the 'NaiveBayes' class.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>NaiveBayesTestInt</code> object is used to test the 'NaiveBayes' class.
+* Classify whether a car is more likely to be stolen (1) or not (1).</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>www.inf.u-szeged.hu/~ormandi/ai2/06-naiveBayes-example.pdf
+ &gt; run-main scalation.analytics.par.NaiveBayesTest</p></span></dd></dl></div>
+    </li><li name="scalation.analytics.par.NaiveBayesTest2" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="NaiveBayesTest2"></a><a id="NaiveBayesTest2:NaiveBayesTest2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="NaiveBayesTest2$.html"><span class="name">NaiveBayesTest2</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@NaiveBayesTest2" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>NaiveBayesTest2</code> object is used to test the 'NaiveBayes' class.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>NaiveBayesTest2</code> object is used to test the 'NaiveBayes' class.
+ Given whether a person is Fast and/or Strong, classify them as making C = 1
+ or not making C = 0 the football team.
+ &gt; run-main scalation.analytics.par.NaiveBayesTest2
+</p></div></div>
+    </li><li name="scalation.analytics.par.PolyRegressionTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="PolyRegressionTest"></a><a id="PolyRegressionTest:PolyRegressionTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="PolyRegressionTest$.html"><span class="name">PolyRegressionTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@PolyRegressionTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>PolyRegressionTest</code> object tests <code>PolyRegression</code> class using the following
+ regression equation.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>PolyRegressionTest</code> object tests <code>PolyRegression</code> class using the following
+ regression equation.</p><p>     y  =  b dot x  =  b_0 + b_1*t + b_2*t^2.</p></div></div>
+    </li><li name="scalation.analytics.par.RegressionTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RegressionTest"></a><a id="RegressionTest:RegressionTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RegressionTest$.html"><span class="name">RegressionTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@RegressionTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>RegressionTest</code> object tests <code>Regression</code> class using the following
+ regression equation.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>RegressionTest</code> object tests <code>Regression</code> class using the following
+ regression equation.</p><p>     y  =  b dot x  =  b_0 + b_1*x_1 + b_2*x_2.</p><p> Test regression and backward elimination.</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://statmaster.sdu.dk/courses/st111/module03/index.html</p></span></dd></dl></div>
+    </li><li name="scalation.analytics.par.RegressionTest2" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RegressionTest2"></a><a id="RegressionTest2:RegressionTest2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RegressionTest2$.html"><span class="name">RegressionTest2</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@RegressionTest2" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>RegressionTest2</code> object tests <code>Regression</code> class using the following
+ regression equation.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>RegressionTest2</code> object tests <code>Regression</code> class using the following
+ regression equation.</p><p>     y = b dot x = b_0 + b_1*x1 + b_2*x_2.</p><p> Test regression using QR Decomposition and Gaussian Elimination for computing
+ the pseudo-inverse.
+</p></div></div>
+    </li><li name="scalation.analytics.par.RegressionTest3" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RegressionTest3"></a><a id="RegressionTest3:RegressionTest3"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RegressionTest3$.html"><span class="name">RegressionTest3</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@RegressionTest3" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>RegressionTest3</code> object tests the multi-colinearity method in the
+ <code>Regression</code> class using the following regression equation.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>RegressionTest3</code> object tests the multi-colinearity method in the
+ <code>Regression</code> class using the following regression equation.</p><p>     y = b dot x = b_0 + b_1*x_1 + b_2*x_2 + b_3*x_3 + b_4 * x_4</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>online.stat.psu.edu/online/development/stat501/data/bloodpress.txt</p></span><span class="cmt"><p>online.stat.psu.edu/online/development/stat501/12multicollinearity/05multico_vif.html</p></span></dd></dl></div>
+    </li><li name="scalation.analytics.par.ResponseSurfaceTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ResponseSurfaceTest"></a><a id="ResponseSurfaceTest:ResponseSurfaceTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ResponseSurfaceTest$.html"><span class="name">ResponseSurfaceTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@ResponseSurfaceTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>ResponseSurfaceTest</code> object is used to test the <code>ResponseSurface</code> class.</p>
+    </li><li name="scalation.analytics.par.RidgeRegression" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RidgeRegression"></a><a id="RidgeRegression:RidgeRegression"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RidgeRegression$.html"><span class="name">RidgeRegression</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@RidgeRegression" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>RidgeRegression</code> companion object is used to center the input matrix 'x'.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>RidgeRegression</code> companion object is used to center the input matrix 'x'.
+ This is done by subtracting the column means from each value.
+</p></div></div>
+    </li><li name="scalation.analytics.par.RidgeRegressionTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RidgeRegressionTest"></a><a id="RidgeRegressionTest:RidgeRegressionTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RidgeRegressionTest$.html"><span class="name">RidgeRegressionTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@RidgeRegressionTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>RidgeRegressionTest</code> object tests <code>RidgeRegression</code> class using the following
+ regression equation.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>RidgeRegressionTest</code> object tests <code>RidgeRegression</code> class using the following
+ regression equation.</p><p>     y  =  b dot x  =  b_1*x_1 + b_2*x_2.</p><p> Test regression and backward elimination.</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://statmaster.sdu.dk/courses/st111/module03/index.html</p></span></dd></dl></div>
+    </li><li name="scalation.analytics.par.RidgeRegressionTest2" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RidgeRegressionTest2"></a><a id="RidgeRegressionTest2:RidgeRegressionTest2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RidgeRegressionTest2$.html"><span class="name">RidgeRegressionTest2</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@RidgeRegressionTest2" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>RidgeRegressionTest2</code> object tests <code>RidgeRegression</code> class using the following
+ regression equation.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>RidgeRegressionTest2</code> object tests <code>RidgeRegression</code> class using the following
+ regression equation.</p><p>     y  =  b dot x  =  b_1*x1 + b_2*x_2.</p><p> Test regression using QR Decomposition and Gaussian Elimination for computing
+ the pseudo-inverse.
+</p></div></div>
+    </li><li name="scalation.analytics.par.RidgeRegressionTest3" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RidgeRegressionTest3"></a><a id="RidgeRegressionTest3:RidgeRegressionTest3"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RidgeRegressionTest3$.html"><span class="name">RidgeRegressionTest3</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@RidgeRegressionTest3" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>RidgeRegressionTest3</code> object tests the multi-colinearity method in the
+ <code>RidgeRegression</code> class using the following regression equation.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>RidgeRegressionTest3</code> object tests the multi-colinearity method in the
+ <code>RidgeRegression</code> class using the following regression equation.</p><p>     y  =  b dot x  =  b_1*x_1 + b_2*x_2 + b_3*x_3 + b_4 * x_4</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>online.stat.psu.edu/online/development/stat501/data/bloodpress.txt</p></span><span class="cmt"><p>online.stat.psu.edu/online/development/stat501/12multicollinearity/05multico_vif.html</p></span></dd></dl></div>
+    </li><li name="scalation.analytics.par.TranRegressionTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="TranRegressionTest"></a><a id="TranRegressionTest:TranRegressionTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="TranRegressionTest$.html"><span class="name">TranRegressionTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@TranRegressionTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>TranRegressionTest</code> object tests <code>TranRegression</code> class using the following
+ regression equation.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>TranRegressionTest</code> object tests <code>TranRegression</code> class using the following
+ regression equation.</p><p>     log (y)  =  b dot x  =  b_0 + b_1*x_1 + b_2*x_2.</p></div></div>
+    </li><li name="scalation.analytics.par.TrigRegressionTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="TrigRegressionTest"></a><a id="TrigRegressionTest:TrigRegressionTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="TrigRegressionTest$.html"><span class="name">TrigRegressionTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.analytics.par.package@TrigRegressionTest" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>TrigRegressionTest</code> object tests <code>TrigRegression</code> class using the following
+ regression equation.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>TrigRegressionTest</code> object tests <code>TrigRegression</code> class using the following
+ regression equation.</p><p>     y  =  b dot x  =  b_0 + b_1*t + b_2*t^2.</p></div></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

@@ -1,0 +1,967 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>Resource - scalation.process.Resource</title>
+          <meta name="description" content="Resource - scalation.process.Resource" />
+          <meta name="keywords" content="Resource scalation.process.Resource" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'scalation.process.Resource';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <a href="Resource$.html" title="See companion object"><img alt="Class/Object" src="../../lib/class_to_object_big.png" /></a>
+        <p id="owner"><a href="../package.html" class="extype" name="scalation">scalation</a>.<a href="package.html" class="extype" name="scalation.process">process</a></p>
+        <h1><a href="Resource$.html" title="See companion object">Resource</a></h1><h3><span class="morelinks"><div>
+            Related Docs:
+            <a href="Resource$.html" title="See companion object">object Resource</a>
+            | <a href="package.html" class="extype" name="scalation.process">package process</a>
+          </div></span></h3><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Resource</span><span class="result"> extends <a href="Component.html" class="extype" name="scalation.process.Component">Component</a></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>The <code>Resource</code> class provides services to entities (<code>SimActors</code>).
+ It may or may not have an associated waiting queue.</p></div><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="Component.html" class="extype" name="scalation.process.Component">Component</a>, <a href="../util/Locatable.html" class="extype" name="scalation.util.Locatable">Locatable</a>, <a href="../util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a>, <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div class="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalation.process.Resource"><span>Resource</span></li><li class="in" name="scalation.process.Component"><span>Component</span></li><li class="in" name="scalation.util.Locatable"><span>Locatable</span></li><li class="in" name="scalation.util.Identifiable"><span>Identifiable</span></li><li class="in" name="scalation.util.Error"><span>Error</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div class="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="scalation.process.Resource#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(name:String,line:scalation.process.WaitQueue,units:Int,serviceTime:scalation.random.Variate,xy:(Double,Double)):scalation.process.Resource"></a><a id="&lt;init&gt;:Resource"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Resource</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="line">line: <a href="WaitQueue.html" class="extype" name="scalation.process.WaitQueue">WaitQueue</a></span>, <span name="units">units: <span class="extype" name="scala.Int">Int</span></span>, <span name="serviceTime">serviceTime: <a href="../random/Variate.html" class="extype" name="scalation.random.Variate">Variate</a></span>, <span name="xy">xy: (<span class="extype" name="scala.Double">Double</span>, <span class="extype" name="scala.Double">Double</span>)</span>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@&lt;init&gt;(name:String,line:scalation.process.WaitQueue,units:Int,serviceTime:scalation.random.Variate,xy:(Double,Double)):scalation.process.Resource" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Auxiliary constructor that uses defaults for width (w) and height (h).</p><div class="fullcomment"><div class="comment cmt"><p>Auxiliary constructor that uses defaults for width (w) and height (h).</p></div><dl class="paramcmts block"><dt class="param">name</dt><dd class="cmt"><p>the name of the resource</p></dd><dt class="param">line</dt><dd class="cmt"><p>the line/queue where entities wait</p></dd><dt class="param">units</dt><dd class="cmt"><p>the number of service units (e.g., bank tellers)</p></dd><dt class="param">serviceTime</dt><dd class="cmt"><p>the service time distribution</p></dd><dt class="param">xy</dt><dd class="cmt"><p>the (x, y) coordinates for the top-left corner of the resourse.</p></dd></dl></div>
+    </li><li name="scalation.process.Resource#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(name:String,line:scalation.process.WaitQueue,units:Int,serviceTime:scalation.random.Variate,at:Array[Double]):scalation.process.Resource"></a><a id="&lt;init&gt;:Resource"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Resource</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="line">line: <a href="WaitQueue.html" class="extype" name="scalation.process.WaitQueue">WaitQueue</a></span>, <span name="units">units: <span class="extype" name="scala.Int">Int</span></span>, <span name="serviceTime">serviceTime: <a href="../random/Variate.html" class="extype" name="scalation.random.Variate">Variate</a></span>, <span name="at">at: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Double">Double</span>]</span>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@&lt;init&gt;(name:String,line:scalation.process.WaitQueue,units:Int,serviceTime:scalation.random.Variate,at:Array[Double]):scalation.process.Resource" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">name</dt><dd class="cmt"><p>the name of the resource</p></dd><dt class="param">line</dt><dd class="cmt"><p>the line/queue where entities wait</p></dd><dt class="param">units</dt><dd class="cmt"><p>the number of service units (e.g., bank tellers)</p></dd><dt class="param">serviceTime</dt><dd class="cmt"><p>the service time distribution</p></dd><dt class="param">at</dt><dd class="cmt"><p>the location of the resource (x, y, w, h)</p></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+
+        <div class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@##():Int" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalation.process.Component#DIAM" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DIAM:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">DIAM</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@DIAM:Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Diameter of a token (for animating entities)
+</p><div class="fullcomment"><div class="comment cmt"><p>Diameter of a token (for animating entities)
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Component.html" class="extype" name="scalation.process.Component">Component</a></dd></dl></div>
+    </li><li name="scalation.process.Component#RAD" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RAD:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">RAD</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@RAD:Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Radius of a token (for animating entities)
+</p><div class="fullcomment"><div class="comment cmt"><p>Radius of a token (for animating entities)
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Component.html" class="extype" name="scalation.process.Component">Component</a></dd></dl></div>
+    </li><li name="scalation.process.Component#accum" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="accum(value:Double):Unit"></a><a id="accum(Double):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">accum</span><span class="params">(<span name="value">value: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@accum(value:Double):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Accumulate the value (e.g., number in  queue) weighted by its time duration.</p><div class="fullcomment"><div class="comment cmt"><p>Accumulate the value (e.g., number in  queue) weighted by its time duration.</p></div><dl class="paramcmts block"><dt class="param">value</dt><dd class="cmt"><p>the value to accumulate</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Component.html" class="extype" name="scalation.process.Component">Component</a></dd></dl></div>
+    </li><li name="scalation.process.Component#aggregate" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="aggregate():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">aggregate</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@aggregate():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Aggregate the statistics of this component's subparts.</p><div class="fullcomment"><div class="comment cmt"><p>Aggregate the statistics of this component's subparts.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Component.html" class="extype" name="scalation.process.Component">Component</a></dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalation.util.Locatable#at" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="at:Array[Double]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">at</span><span class="result">: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Double">Double</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@at:Array[Double]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Get the location where this object is currently at.</p><div class="fullcomment"><div class="comment cmt"><p>Get the location where this object is currently at.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../util/Locatable.html" class="extype" name="scalation.util.Locatable">Locatable</a></dd></dl></div>
+    </li><li name="scalation.util.Locatable#at_=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="at_=(at:Array[Double]):Unit"></a><a id="at_=(Array[Double]):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: at_$eq" class="name">at_=</span><span class="params">(<span name="at">at: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Double">Double</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@at_=(at:Array[Double]):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Set the location of this object.</p><div class="fullcomment"><div class="comment cmt"><p>Set the location of this object.</p></div><dl class="paramcmts block"><dt class="param">at</dt><dd class="cmt"><p>the location of this object</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../util/Locatable.html" class="extype" name="scalation.util.Locatable">Locatable</a></dd></dl></div>
+    </li><li name="scalation.process.Resource#busy" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="busy:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">busy</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@busy:Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Determine whether the Resource is busy (no units available).</p>
+    </li><li name="scalation.process.Resource#changeUnits" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="changeUnits(dUnits:Int):Unit"></a><a id="changeUnits(Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">changeUnits</span><span class="params">(<span name="dUnits">dUnits: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@changeUnits(dUnits:Int):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Change the number of units in this resourse (e.g., add a teller).</p><div class="fullcomment"><div class="comment cmt"><p>Change the number of units in this resourse (e.g., add a teller).</p></div><dl class="paramcmts block"><dt class="param">dUnits</dt><dd class="cmt"><p>the number of units to add (+ve) or remove (-ve)</p></dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a><a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@clone():Object" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalation.process.Component#composite" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="composite:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">composite</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@composite:Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Indicate whether this component is composite, i.e., has subparts.</p><div class="fullcomment"><div class="comment cmt"><p>Indicate whether this component is composite, i.e., has subparts.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Component.html" class="extype" name="scalation.process.Component">Component</a></dd></dl></div>
+    </li><li name="scalation.process.Component#director" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="director:scalation.process.Model"></a><a id="director:Model"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">director</span><span class="result">: <a href="Model.html" class="extype" name="scalation.process.Model">Model</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@director:scalation.process.Model" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Get the director who controls the play/simulation this component is in.</p><div class="fullcomment"><div class="comment cmt"><p>Get the director who controls the play/simulation this component is in.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Component.html" class="extype" name="scalation.process.Component">Component</a></dd></dl></div>
+    </li><li name="scalation.process.Component#director_=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="director_=(director:scalation.process.Model):Unit"></a><a id="director_=(Model):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: director_$eq" class="name">director_=</span><span class="params">(<span name="director">director: <a href="Model.html" class="extype" name="scalation.process.Model">Model</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@director_=(director:scalation.process.Model):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Set this component's director (the controller of the simulation model).</p><div class="fullcomment"><div class="comment cmt"><p>Set this component's director (the controller of the simulation model).</p></div><dl class="paramcmts block"><dt class="param">director</dt><dd class="cmt"><p>the director of the play/simulation</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Component.html" class="extype" name="scalation.process.Component">Component</a></dd></dl></div>
+    </li><li name="scalation.process.Resource#display" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="display():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">display</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@display():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Tell the animation engine to display this Resource.</p><div class="fullcomment"><div class="comment cmt"><p>Tell the animation engine to display this Resource.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="scalation.process.Resource">Resource</a> → <a href="Component.html" class="extype" name="scalation.process.Component">Component</a></dd></dl></div>
+    </li><li name="scalation.process.Component#durationStat" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="durationStat:scalation.stat.Statistic"></a><a id="durationStat:Statistic"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">durationStat</span><span class="result">: <a href="../stat/Statistic.html" class="extype" name="scalation.stat.Statistic">Statistic</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@durationStat:scalation.stat.Statistic" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Return sample statistics for durations for this component (e.g., Time in queue).</p><div class="fullcomment"><div class="comment cmt"><p>Return sample statistics for durations for this component (e.g., Time in queue).
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Component.html" class="extype" name="scalation.process.Component">Component</a></dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalation.util.Identifiable#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(that:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="that">that: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@equals(that:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Determine whether Identifiable object 'this' equals Identifiable object 'that'.</p><div class="fullcomment"><div class="comment cmt"><p>Determine whether Identifiable object 'this' equals Identifiable object 'that'.
+ Works since 'id' is unique for all Identifiable objects.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a> → AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@finalize():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalation.util.Error#flaw" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="flaw(method:String,message:String):Unit"></a><a id="flaw(String,String):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">flaw</span><span class="params">(<span name="method">method: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="message">message: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@flaw(method:String,message:String):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Show the flaw by printing the error message.</p><div class="fullcomment"><div class="comment cmt"><p>Show the flaw by printing the error message.</p></div><dl class="paramcmts block"><dt class="param">method</dt><dd class="cmt"><p>the method where the error occurred</p></dd><dt class="param">message</dt><dd class="cmt"><p>the error message</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@getClass():Class[_]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalation.util.Identifiable#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@hashCode():Int" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Return the hashCode as the unique id.</p><div class="fullcomment"><div class="comment cmt"><p>Return the hashCode as the unique id.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a> → AnyRef → Any</dd></dl></div>
+    </li><li name="scalation.util.Identifiable#id" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="id:Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">id</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@id:Int" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The globally unique integer identifier
+</p><div class="fullcomment"><div class="comment cmt"><p>The globally unique integer identifier
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a></dd></dl></div>
+    </li><li name="scalation.process.Component#initComponent" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="initComponent(label:String,loc:Array[Double]):Unit"></a><a id="initComponent(String,Array[Double]):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">initComponent</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="loc">loc: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Double">Double</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@initComponent(label:String,loc:Array[Double]):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Initialize this component (all of its vars).</p><div class="fullcomment"><div class="comment cmt"><p>Initialize this component (all of its vars).</p></div><dl class="paramcmts block"><dt class="param">label</dt><dd class="cmt"><p>the name of this component</p></dd><dt class="param">loc</dt><dd class="cmt"><p>the location of this component</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Component.html" class="extype" name="scalation.process.Component">Component</a></dd></dl></div>
+    </li><li name="scalation.process.Component#initStats" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="initStats(label:String):Unit"></a><a id="initStats(String):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">initStats</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@initStats(label:String):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Initialize this component's statistical collectors.</p><div class="fullcomment"><div class="comment cmt"><p>Initialize this component's statistical collectors.
+ Sample statistics:  all <code>Component</code>s.
+ Time-persistent statistics:  all except <code>Gate</code>, <code>Source</code> and <code>Sink</code>.</p></div><dl class="paramcmts block"><dt class="param">label</dt><dd class="cmt"><p>the name of this component</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Component.html" class="extype" name="scalation.process.Component">Component</a></dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalation.util.Identifiable#me" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="me:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">me</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@me:String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Return the full identity.</p><div class="fullcomment"><div class="comment cmt"><p>Return the full identity.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a></dd></dl></div>
+    </li><li name="scalation.util.Identifiable#name" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="name:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">name</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@name:String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Get the name.</p><div class="fullcomment"><div class="comment cmt"><p>Get the name.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a></dd></dl></div>
+    </li><li name="scalation.util.Identifiable#name_=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="name_=(name:String):Unit"></a><a id="name_=(String):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: name_$eq" class="name">name_=</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@name_=(name:String):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Set the name.</p><div class="fullcomment"><div class="comment cmt"><p>Set the name.</p></div><dl class="paramcmts block"><dt class="param">name</dt><dd class="cmt"><p>the name to assign</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a></dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@notify():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@notifyAll():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalation.process.Component#persistentStat" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="persistentStat:scalation.stat.TimeStatistic"></a><a id="persistentStat:TimeStatistic"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">persistentStat</span><span class="result">: <a href="../stat/TimeStatistic.html" class="extype" name="scalation.stat.TimeStatistic">TimeStatistic</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@persistentStat:scalation.stat.TimeStatistic" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Return time persistent statistics for value for this component (e.g.</p><div class="fullcomment"><div class="comment cmt"><p>Return time persistent statistics for value for this component (e.g. Number in queue).
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Component.html" class="extype" name="scalation.process.Component">Component</a></dd></dl></div>
+    </li><li name="scalation.process.Resource#release" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="release():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">release</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@release():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Release the Resource after service is finished (also check waiting queue).</p>
+    </li><li name="scalation.util.Identifiable#simType" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="simType:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">simType</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@simType:String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Get the type of the simulation object.</p><div class="fullcomment"><div class="comment cmt"><p>Get the type of the simulation object.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a></dd></dl></div>
+    </li><li name="scalation.process.Component#subpart" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="subpart:scala.collection.mutable.ListBuffer[scalation.process.Component]"></a><a id="subpart:ListBuffer[Component]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">subpart</span><span class="result">: <span class="extype" name="scala.collection.mutable.ListBuffer">ListBuffer</span>[<a href="Component.html" class="extype" name="scalation.process.Component">Component</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@subpart:scala.collection.mutable.ListBuffer[scalation.process.Component]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">List of subparts of the Component (empty for atomics, nonempty for composites)
+</p><div class="fullcomment"><div class="comment cmt"><p>List of subparts of the Component (empty for atomics, nonempty for composites)
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Component.html" class="extype" name="scalation.process.Component">Component</a></dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalation.process.Component#tally" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="tally(duration:Double):Unit"></a><a id="tally(Double):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">tally</span><span class="params">(<span name="duration">duration: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@tally(duration:Double):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Tally the duration (e.g., waiting time) of an activity or delay.</p><div class="fullcomment"><div class="comment cmt"><p>Tally the duration (e.g., waiting time) of an activity or delay.</p></div><dl class="paramcmts block"><dt class="param">duration</dt><dd class="cmt"><p>the time duration</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Component.html" class="extype" name="scalation.process.Component">Component</a></dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@toString():String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalation.process.Resource#utilize" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="utilize(duration:Double):Unit"></a><a id="utilize(Double):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">utilize</span><span class="params">(<span name="duration">duration: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@utilize(duration:Double):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Utilize the Resource for a given period of time (models an activity).</p><div class="fullcomment"><div class="comment cmt"><p>Utilize the Resource for a given period of time (models an activity).</p></div><dl class="paramcmts block"><dt class="param">duration</dt><dd class="cmt"><p>the given service time</p></dd></dl></div>
+    </li><li name="scalation.process.Resource#utilize" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="utilize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">utilize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@utilize():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Utilize the Resource for a period of time (models an activity).</p><div class="fullcomment"><div class="comment cmt"><p>Utilize the Resource for a period of time (models an activity).
+ The duration (service time) is randomly generated according to the
+ Resource's service time distribution.
+</p></div></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@wait():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.Resource@wait(x$1:Long):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scalation.process.Component">
+              <h3>Inherited from <a href="Component.html" class="extype" name="scalation.process.Component">Component</a></h3>
+            </div><div class="parent" name="scalation.util.Locatable">
+              <h3>Inherited from <a href="../util/Locatable.html" class="extype" name="scalation.util.Locatable">Locatable</a></h3>
+            </div><div class="parent" name="scalation.util.Identifiable">
+              <h3>Inherited from <a href="../util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a></h3>
+            </div><div class="parent" name="scalation.util.Error">
+              <h3>Inherited from <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

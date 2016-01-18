@@ -1,0 +1,1205 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>minima - scalation.minima</title>
+          <meta name="description" content="minima - scalation.minima" />
+          <meta name="keywords" content="minima scalation.minima" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'scalation.minima.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../lib/package_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="scalation">scalation</a></p>
+        <h1>minima</h1><span class="permalink">
+      <a href="../../index.html#scalation.minima.package" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">minima</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>The minima package contains classes, traits and objects for
+ optimization to find minima.
+</p></div><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div class="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalation.minima"><span>minima</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div class="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalation.minima.CheckLP" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="CheckLPextendsError"></a><a id="CheckLP:CheckLP"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="CheckLP.html"><span class="name">CheckLP</span></a><span class="result"> extends <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@CheckLPextendsError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class checks the solution to Linear Programming (LP) problems.</p><div class="fullcomment"><div class="comment cmt"><p>This class checks the solution to Linear Programming (LP) problems.  Given
+ a constraint matrix 'a', limit/RHS vector 'b' and cost vector 'c', determine
+ if the values for the solution/decision vector 'x' minimizes the objective
+ function f(x), while satisfying all of the constraints, i.e.,</p><p> minimize    f(x) = c x
+ subject to  a x &lt;= b, x &gt;= 0</p><p> Check the feasibility and optimality of the solution.</p></div></div>
+    </li><li name="scalation.minima.ConjGradient" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ConjGradientextendsMinimizerwithError"></a><a id="ConjGradient:ConjGradient"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ConjGradient.html"><span class="name">ConjGradient</span></a><span class="result"> extends <a href="Minimizer.html" class="extype" name="scalation.minima.Minimizer">Minimizer</a> with <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@ConjGradientextendsMinimizerwithError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Polak-Ribiere Conjugate Gradient (PR-CG) Algorithm for solving Non-Linear
+ Programming (NLP) problems.</p><div class="fullcomment"><div class="comment cmt"><p>Polak-Ribiere Conjugate Gradient (PR-CG) Algorithm for solving Non-Linear
+ Programming (NLP) problems.  PR-CG determines a search direction as a
+ weighted combination of the steepest descent direction (-gradient) and the
+ previous direction.  The weighting is set by the beta function, which for
+ this implementation used the Polak-Ribiere technique.</p><p> dir_k = -gradient (x) + beta * dir_k-1</p><p> minimize    f(x)
+ subject to  g(x) &lt;= 0    [ optionally g(x) == 0 ]
+</p></div></div>
+    </li><li name="scalation.minima.DualSimplex" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DualSimplexextendsMinimizerLP"></a><a id="DualSimplex:DualSimplex"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="DualSimplex.html"><span class="name">DualSimplex</span></a><span class="result"> extends <a href="MinimizerLP.html" class="extype" name="scalation.minima.MinimizerLP">MinimizerLP</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@DualSimplexextendsMinimizerLP" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class solves Linear Programming (LP) problems using a tableau based
+ Dual Simplex Algorithm.</p><div class="fullcomment"><div class="comment cmt"><p>This class solves Linear Programming (LP) problems using a tableau based
+ Dual Simplex Algorithm.  It is particularly useful when re-optimizing
+ after a constraint has been added.  The algorithm starts with an infeasible
+ super-optimal solution and moves toward (primal) feasibility and optimality.</p><p> Given a constraint matrix 'a', limit/RHS vector 'b' and
+ cost vector 'c', find values for the solution/decision vector 'x' that minimize
+ the objective function f(x), while satisfying all of the constraints, i.e.,</p><p> minimize    f(x) = c x
+ subject to  a x &lt;= b, x &gt;= 0</p><p> Creates an MM-by-NN simplex tableau with
+ -- [0..M-1, 0..N-1]    = a (constraint matrix)
+ -- [0..M-1, N..M+N-1]  = s (slack/surplus variable matrix)
+ -- [0..M-1, NN-1]      = b (limit/RHS vector)
+ -- [M, 0..NN-2]        = c (cost vector)
+</p></div></div>
+    </li><li name="scalation.minima.GeneticAlgorithm" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="GeneticAlgorithmextendsAnyRef"></a><a id="GeneticAlgorithm:GeneticAlgorithm"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="GeneticAlgorithm.html"><span class="name">GeneticAlgorithm</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@GeneticAlgorithmextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class performs local search to find minima of functions defined on
+ integer vector domains (z^n).</p><div class="fullcomment"><div class="comment cmt"><p>This class performs local search to find minima of functions defined on
+ integer vector domains (z^n).</p><p> minimize    f(x)
+ subject to  g(x) &lt;= 0, x in Z^n
+</p></div></div>
+    </li><li name="scalation.minima.GoldenSectionLS" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="GoldenSectionLSextendsLineSearch"></a><a id="GoldenSectionLS:GoldenSectionLS"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="GoldenSectionLS.html"><span class="name">GoldenSectionLS</span></a><span class="result"> extends <a href="LineSearch.html" class="extype" name="scalation.minima.LineSearch">LineSearch</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@GoldenSectionLSextendsLineSearch" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class performs a line search on f(x) to find a minimal value for f.</p><div class="fullcomment"><div class="comment cmt"><p>This class performs a line search on f(x) to find a minimal value for f.
+ It requires no derivatives and only one functional evaluation per iteration.
+ A search is conducted from x1 (often 0) to xmax.  A guess for xmax must be
+ given, but can be made larger during the expansion phase, that occurs before
+ the recursive golden section search is called.  It works on scalar functions
+ (see GoldenSectionLSTest).  If starting with a vector function f(x), simply
+ define a new function g(y) = x0 + direction * y (see GoldenSectionLSTest2).</p></div></div>
+    </li><li name="scalation.minima.IntegerGoldenSectionLS" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="IntegerGoldenSectionLSextendsAnyRef"></a><a id="IntegerGoldenSectionLS:IntegerGoldenSectionLS"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="IntegerGoldenSectionLS.html"><span class="name">IntegerGoldenSectionLS</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@IntegerGoldenSectionLSextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class performs a line search on f(x) to find a minimal value for f.</p><div class="fullcomment"><div class="comment cmt"><p>This class performs a line search on f(x) to find a minimal value for f.
+ It requires no derivatives and only one functional evaluation per iteration.
+ A search is conducted from x1 (often 0) to xmax.  A guess for xmax must be
+ given, but can be made larger during the expansion phase, that occurs before
+ the recursive golden section search is called.  It works on scalar functions
+ (see IntegerGoldenSectionLSTest).  If starting with a vector function f(x), simply
+ define a new function g(y) = x0 + direction * y (see IntegerGoldenSectionLSTest2).</p></div></div>
+    </li><li name="scalation.minima.IntegerLP" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="IntegerLPextendsAnyRef"></a><a id="IntegerLP:IntegerLP"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="IntegerLP.html"><span class="name">IntegerLP</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@IntegerLPextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class solves Integer Linear Programming (ILP) and Mixed Integer
+ Linear Programming (MILP) problems recursively using the Simplex algorithm.</p><div class="fullcomment"><div class="comment cmt"><p>This class solves Integer Linear Programming (ILP) and Mixed Integer
+ Linear Programming (MILP) problems recursively using the Simplex algorithm.
+ First, an LP problem is solved.  If the optimal solution vector x is
+ entirely integer valued, the ILP is solved.  If not, pick the first x_j
+ that is not integer valued.  Define two new LP problems which bound x_j
+ to the integer below and above, respectively.  Branch by solving each of
+ these LP problems in turn.  Prune by not exploring branches less optimal
+ than the currently best integer solution.  This technique is referred to
+ as Branch and Bound.  An exclusion set may be optionally provided for
+ MILP problems.
+ TODO: Use the Dual Simplex Algorithm for better performance.</p><p> Given a constraint matrix 'a', limit/RHS vector 'b' and cost vector 'c',
+ find values for the solution/decision vector 'x' that minmize the
+ objective function f(x), while satisfying all of the constraints, i.e.,</p><p> minimize    f(x) = c x
+ subject to  a x &lt;= b, x &gt;= 0, some x_i must be integer valued</p><p> Make b_i negative to indicate a &quot;&gt;=&quot; constraint
+</p></div></div>
+    </li><li name="scalation.minima.IntegerLocalSearch" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="IntegerLocalSearchextendsAnyRef"></a><a id="IntegerLocalSearch:IntegerLocalSearch"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="IntegerLocalSearch.html"><span class="name">IntegerLocalSearch</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@IntegerLocalSearchextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class performs local search to find minima of functions defined on
+ integer vector domains (z^n).</p><div class="fullcomment"><div class="comment cmt"><p>This class performs local search to find minima of functions defined on
+ integer vector domains (z^n).</p><p> minimize    f(x)
+ subject to  g(x) &lt;= 0, x in Z^n
+</p></div></div>
+    </li><li name="scalation.minima.IntegerNLP" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="IntegerNLPextendsAnyRef"></a><a id="IntegerNLP:IntegerNLP"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="IntegerNLP.html"><span class="name">IntegerNLP</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@IntegerNLPextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class solves Integer Non-Linear Programming (INLP) and Mixed Integer
+ Linear Non-Programming (MINLP) problems recursively using the Simplex algorithm.</p><div class="fullcomment"><div class="comment cmt"><p>This class solves Integer Non-Linear Programming (INLP) and Mixed Integer
+ Linear Non-Programming (MINLP) problems recursively using the Simplex algorithm.
+ First, an NLP problem is solved.  If the optimal solution vector x is
+ entirely integer valued, the INLP is solved.  If not, pick the first x_j
+ that is not integer valued.  Define two new NLP problems which bound x_j
+ to the integer below and above, respectively.  Branch by solving each of
+ these NLP problems in turn.  Prune by not exploring branches less optimal
+ than the currently best integer solution.  This technique is referred to
+ as Branch and Bound.  An exclusion set may be optionally provided for
+ MINLP problems.</p><p> Given an objective function f(x) and a constraint function g(x),
+ find values for the solution/decision vector 'x' that minimize the
+ objective function f(x), while satisfying the constraint function, i.e.,</p><p> minimize    f(x)
+ subject to  g(x) &lt;= 0, some x_i must integer-valued</p><p> Make b_i negative to indicate a &quot;&gt;=&quot; constraint
+</p></div></div>
+    </li><li name="scalation.minima.IntegerTabuSearch" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="IntegerTabuSearchextendsAnyRef"></a><a id="IntegerTabuSearch:IntegerTabuSearch"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="IntegerTabuSearch.html"><span class="name">IntegerTabuSearch</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@IntegerTabuSearchextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class performs tabu search to find minima of functions defined on
+ integer vector domains (z^n).  Tabu search will not re-visit points already
+ deemed sub-optimal.</p><div class="fullcomment"><div class="comment cmt"><p>This class performs tabu search to find minima of functions defined on
+ integer vector domains (z^n).  Tabu search will not re-visit points already
+ deemed sub-optimal.</p><p> minimize    f(x)
+ subject to  g(x) &lt;= 0, x in Z^n
+</p></div></div>
+    </li><li name="scalation.minima.LineSearch" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="LineSearchextendsAnyRef"></a><a id="LineSearch:LineSearch"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="LineSearch.html"><span class="name">LineSearch</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@LineSearchextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This trait specifies the pattern for Line Search (LS) algorithms that perform
+ line search on f(x) to find an x-value that minimizes a function f.</p>
+    </li><li name="scalation.minima.Minimizer" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="MinimizerextendsAnyRef"></a><a id="Minimizer:Minimizer"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Minimizer.html"><span class="name">Minimizer</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@MinimizerextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This trait sets the pattern for optimization algorithms for solving Non-Linear
+ Programming (NLP) problems of the form:</p><div class="fullcomment"><div class="comment cmt"><p>This trait sets the pattern for optimization algorithms for solving Non-Linear
+ Programming (NLP) problems of the form:</p><p> minimize    f(x)
+ subject to  g(x) &lt;= 0    [ optionally g(x) == 0 ]</p><p> where f is the objective function to be minimized
+       g is the constraint function to be satisfied, if any</p><p> Classes mixing in this trait must implement a function (fg) that rolls the
+ constraints into the objective functions as penalties for constraint violation,
+ a one-dimensional Line Search (LS) algorithm (lineSearch) and an iterative
+ method (solve) that searches for improved solutions (x-vectors with lower
+ objective function values (f(x)).
+</p></div></div>
+    </li><li name="scalation.minima.MinimizerLP" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="MinimizerLPextendsError"></a><a id="MinimizerLP:MinimizerLP"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MinimizerLP.html"><span class="name">MinimizerLP</span></a><span class="result"> extends <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@MinimizerLPextendsError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This trait sets the pattern for optimization algorithms for solving Linear
+ Programming (NLP) problems of the form:</p><div class="fullcomment"><div class="comment cmt"><p>This trait sets the pattern for optimization algorithms for solving Linear
+ Programming (NLP) problems of the form:</p><p> minimize    c x
+ subject to  a x &lt;= b, x &gt;= 0</p><p> where a is the constraint matrix
+       b is the limit/RHS vector
+       c is the cost vector</p><p> Classes mixing in this trait must implement an objective function (objF)
+ an iterative method (solve) that searches for improved solutions (x-vectors
+ with lower objective function values.
+</p></div></div>
+    </li><li name="scalation.minima.NelderMeadSimplex" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="NelderMeadSimplexextendsMinimizerwithError"></a><a id="NelderMeadSimplex:NelderMeadSimplex"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="NelderMeadSimplex.html"><span class="name">NelderMeadSimplex</span></a><span class="result"> extends <a href="Minimizer.html" class="extype" name="scalation.minima.Minimizer">Minimizer</a> with <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@NelderMeadSimplexextendsMinimizerwithError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>NelderMeadSimplex</code> solves Non-Linear Programming (NLP) problems using
+ the Nelder-Mead Simplex algorithm.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>NelderMeadSimplex</code> solves Non-Linear Programming (NLP) problems using
+ the Nelder-Mead Simplex algorithm.  Given a function 'f' and its dimension
+ 'n',  the algorithm moves a simplex defined by n + 1 points in order to find
+ an optimal solution.  The algorithm is derivative-free.</p><p> minimize    f(x)
+</p></div></div>
+    </li><li name="scalation.minima.NewtonRaphson" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="NewtonRaphsonextendsAnyRef"></a><a id="NewtonRaphson:NewtonRaphson"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="NewtonRaphson.html"><span class="name">NewtonRaphson</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@NewtonRaphsonextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class is used to find roots (zeros) for a one-dimensional (scalar)
+ function f.</p><div class="fullcomment"><div class="comment cmt"><p>This class is used to find roots (zeros) for a one-dimensional (scalar)
+ function f.  If f is the derivative of some other function g, then this
+ technique can be used to find optima for g.
+ Caveat:  Use Conjugate Gradient or Quasi-Newton for complex optimizations.</p></div></div>
+    </li><li name="scalation.minima.QuadraticSimplex" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="QuadraticSimplexextendsError"></a><a id="QuadraticSimplex:QuadraticSimplex"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="QuadraticSimplex.html"><span class="name">QuadraticSimplex</span></a><span class="result"> extends <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@QuadraticSimplexextendsError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class solves Quadratic Programming (QP) problems using the Quadratic
+ Simplex Algorithm.</p><div class="fullcomment"><div class="comment cmt"><p>This class solves Quadratic Programming (QP) problems using the Quadratic
+ Simplex Algorithm.  Given a constraint matrix 'a', constant vector 'b',
+ cost matrix 'q' and cost vector 'c', find values for the solution/decision
+ vector x that minimize the objective function f(x), while satisfying all of
+ the constraints, i.e.,</p><p> minimize    f(x) = 1/2 x q x + c x
+ subject to  a x &lt;= b, x &gt;= 0</p><p> Creates an MM-by-NN simplex tableau.  This implementation is restricted to
+ linear constraints (a x &lt;= b) and q being a positive semi-definite matrix.
+ Pivoting must now also handle nonlinear complementary slackness</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.engineering.uiowa.edu/~dbricker/lp_stacks.html</p></span></dd></dl></div>
+    </li><li name="scalation.minima.QuasiNewton" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="QuasiNewtonextendsMinimizerwithError"></a><a id="QuasiNewton:QuasiNewton"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="QuasiNewton.html"><span class="name">QuasiNewton</span></a><span class="result"> extends <a href="Minimizer.html" class="extype" name="scalation.minima.Minimizer">Minimizer</a> with <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@QuasiNewtonextendsMinimizerwithError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Broyden–Fletcher–Goldfarb–Shanno (BFGS) Quasi-Newton Algorithm for solving
+ Non-Linear Programming (NLP) problems.</p><div class="fullcomment"><div class="comment cmt"><p>Broyden–Fletcher–Goldfarb–Shanno (BFGS) Quasi-Newton Algorithm for solving
+ Non-Linear Programming (NLP) problems.  BFGS determines a search direction by
+ deflecting the steepest descent direction vector (opposite the gradient) by
+ multiplying it by a matrix that approximates the inverse Hessian.  Note, this
+ implementation may be set up to work with the matrix 'b' (approximate Hessian)
+ or directly with the 'binv' matrix (the inverse of b).</p><p> minimize    f(x)
+ subject to  g(x) &lt;= 0   [ optionally g(x) == 0 ]
+</p></div></div>
+    </li><li name="scalation.minima.RevisedSimplex" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RevisedSimplexextendsMinimizerLP"></a><a id="RevisedSimplex:RevisedSimplex"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="RevisedSimplex.html"><span class="name">RevisedSimplex</span></a><span class="result"> extends <a href="MinimizerLP.html" class="extype" name="scalation.minima.MinimizerLP">MinimizerLP</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@RevisedSimplexextendsMinimizerLP" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class solves Linear Programming (LP) problems using the Revised Simplex
+ Algorithm.</p><div class="fullcomment"><div class="comment cmt"><p>This class solves Linear Programming (LP) problems using the Revised Simplex
+ Algorithm.  Given a constraint matrix 'a', constant vector 'b' and cost
+ vector 'c', find values for the solution/decision vector 'x' that minimize
+ the objective function 'f(x)', while satisfying all of the constraints, i.e.,</p><p> minimize    f(x) = c x
+ subject to  a x &lt;= b, x &gt;= 0</p><p> The Revised Simplex Algorithm operates on 'b_inv', which is the inverse of the
+ basis-matrix ('ba' = 'B').  It has benefits over the Simplex Algorithm (less memory
+ and reduced chance of round off errors).
+</p></div></div>
+    </li><li name="scalation.minima.Simplex" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SimplexextendsMinimizerLP"></a><a id="Simplex:Simplex"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Simplex.html"><span class="name">Simplex</span></a><span class="result"> extends <a href="MinimizerLP.html" class="extype" name="scalation.minima.MinimizerLP">MinimizerLP</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@SimplexextendsMinimizerLP" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class solves Linear Programming (LP) problems using a tableau based
+ Simplex Algorithm.</p><div class="fullcomment"><div class="comment cmt"><p>This class solves Linear Programming (LP) problems using a tableau based
+ Simplex Algorithm.  Given a constraint matrix 'a', limit/RHS vector 'b' and
+ cost vector 'c', find values for the solution/decision vector 'x' that minimize
+ the objective function f(x), while satisfying all of the constraints, i.e.,</p><p> minimize    f(x) = c x
+ subject to  a x &lt;= b, x &gt;= 0</p><p> In case of &quot;a_i x &gt;= b_i&quot;, use -b_i as an indicator of a &quot;&gt;=&quot; constraint.
+ The program will flip such negative b_i back to positive as well as use
+ a surplus variable instead of the usual slack variable, i.e.,
+ a_i x &lt;= b_i  =&gt;  a_i x + s_i = b_i    // use slack variable s_i with coeff 1
+ a_i x &gt;= b_i  =&gt;  a_i x + s_i = b_i    // use surplus variable s_i with coeff -1</p><p> Creates an MM-by-NN simplex tableau with
+ -- [0..M-1, 0..N-1]    = a (constraint matrix)
+ -- [0..M-1, N..M+N-1]  = s (slack/surplus variable matrix)
+ -- [0..M-1, NN-1]      = b (limit/RHS vector)
+ -- [M, 0..NN-2]        = c (cost vector)
+</p></div></div>
+    </li><li name="scalation.minima.Simplex2P" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Simplex2PextendsMinimizerLP"></a><a id="Simplex2P:Simplex2P"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Simplex2P.html"><span class="name">Simplex2P</span></a><span class="result"> extends <a href="MinimizerLP.html" class="extype" name="scalation.minima.MinimizerLP">MinimizerLP</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@Simplex2PextendsMinimizerLP" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class solves Linear Programming (LP) problems using a tableau based
+ Simplex Algorithm.</p><div class="fullcomment"><div class="comment cmt"><p>This class solves Linear Programming (LP) problems using a tableau based
+ Simplex Algorithm.  Given a constraint matrix 'a', limit/RHS vector 'b' and
+ cost vector 'c', find values for the solution/decision vector 'x' that minimize
+ the objective function f(x), while satisfying all of the constraints, i.e.,</p><p> minimize    f(x) = c x
+ subject to  a x &lt;= b, x &gt;= 0</p><p> In case of &quot;a_i x &gt;= b_i&quot;, use -b_i as an indicator of a &quot;&gt;=&quot; constraint.
+ The program will flip such negative b_i back to positive as well as use
+ a surplus and artificial variable instead of the usual slack variable, i.e.,
+ a_i x &lt;= b_i  =&gt;  a_i x + s_i = b_i    // use slack variable s_i with coeff 1
+ a_i x &gt;= b_i  =&gt;  a_i x + s_i = b_i    // use surplus variable s_i with coeff -1
+ For each &quot;&gt;=&quot; constraint, an artificial variable is introduced and put into
+ the initial basis.  These artificial variables must be removed from the basis
+ during Phase I of the Two-Phase Simplex Algorithm.  After this, or if there
+ are no artificial variables, Phase II is used to find an optimal value for x
+ and the optimum value for f.</p><p> Creates an MM-by-nn simplex tableau with
+ -- [0..M-1, 0..N-1]    = a (constraint matrix)
+ -- [0..M-1, N..M+N-1]  = s (slack/surplus variable matrix)
+ -- [0..M-1, M+N..nn-2] = r (artificial variable matrix)
+ -- [0..M-1, nn-1]      = b (limit/RHS vector)
+ -- [M, 0..nn-2]        = c (cost vector)
+</p></div></div>
+    </li><li name="scalation.minima.SimplexBG" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SimplexBGextendsMinimizerLP"></a><a id="SimplexBG:SimplexBG"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SimplexBG.html"><span class="name">SimplexBG</span></a><span class="result"> extends <a href="MinimizerLP.html" class="extype" name="scalation.minima.MinimizerLP">MinimizerLP</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@SimplexBGextendsMinimizerLP" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>SimplexBG</code> class solves Linear Programming (LP) problems using the Bartels-Golub
+ (BG) Simplex Algorithm.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>SimplexBG</code> class solves Linear Programming (LP) problems using the Bartels-Golub
+ (BG) Simplex Algorithm.  Given a constraint matrix 'a', constant vector 'b'
+ and cost vector 'c', find values for the solution/decision vector 'x' that
+ minimize the objective function 'f(x)', while satisfying all of the constraints,
+ i.e.,</p><p> minimize    f(x) = c x
+ subject to  a x &lt;= b, x &gt;= 0</p><p> The BG Simplex Algorithm performs LU Fractorization/Decomposition of the
+ basis-matrix ('ba' = 'B') rather than computing inverses ('b_inv').  It has
+ benefits over the (Revised) Simplex Algorithm (less runtime, less memory,
+ and much reduced chance of round off errors).
+</p></div></div>
+    </li><li name="scalation.minima.SimplexFT" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SimplexFTextendsMinimizerLP"></a><a id="SimplexFT:SimplexFT"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SimplexFT.html"><span class="name">SimplexFT</span></a><span class="result"> extends <a href="MinimizerLP.html" class="extype" name="scalation.minima.MinimizerLP">MinimizerLP</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@SimplexFTextendsMinimizerLP" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>SimplexFT</code> class solves Linear Programming (LP) problems using the Forrest-Tomlin
+ (FT) Simplex Algorithm.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>SimplexFT</code> class solves Linear Programming (LP) problems using the Forrest-Tomlin
+ (FT) Simplex Algorithm.  Given a constraint matrix 'a', constant vector 'b'
+ and cost vector 'c', find values for the solution/decision vector 'x' that
+ minimize the objective function 'f(x)', while satisfying all of the constraints,
+ i.e.,</p><p> minimize    f(x) = c x
+ subject to  a x &lt;= b, x &gt;= 0</p><p> The FT Simplex Algorithm performs LU Fractorization/Decomposition of the
+ basis-matrix ('ba' = 'B') rather than computing inverses ('b_inv').  It has
+ benefits over the (Revised) Simplex Algorithm (less runtime, less memory,
+ and much reduced chance of round off errors).
+</p></div></div>
+    </li><li name="scalation.minima.SteepestDescent" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SteepestDescentextendsMinimizerwithError"></a><a id="SteepestDescent:SteepestDescent"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SteepestDescent.html"><span class="name">SteepestDescent</span></a><span class="result"> extends <a href="Minimizer.html" class="extype" name="scalation.minima.Minimizer">Minimizer</a> with <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@SteepestDescentextendsMinimizerwithError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class solves unconstrained Non-Linear Programming (NLP) problems using
+ the Steepest Descent algorithm.</p><div class="fullcomment"><div class="comment cmt"><p>This class solves unconstrained Non-Linear Programming (NLP) problems using
+ the Steepest Descent algorithm.  Given a function 'f' and a starting point 'x',
+ the algorithm computes the gradient and takes steps in the opposite direction.
+ The algorithm iterates until it converges.  The class assumes that partial
+ derivative functions are not availble unless explicitly given via the
+ setDerivatives method.</p><p> dir_k = -gradient (x)</p><p> minimize    f(x)
+</p></div></div>
+    </li><li name="scalation.minima.WolfeLS" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="WolfeLSextendsLineSearch"></a><a id="WolfeLS:WolfeLS"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="WolfeLS.html"><span class="name">WolfeLS</span></a><span class="result"> extends <a href="LineSearch.html" class="extype" name="scalation.minima.LineSearch">LineSearch</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@WolfeLSextendsLineSearch" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This class performs an inexact line search on f to find a point x that exhibits
+ (1) sufficient decrease (f(x) enough less that f(0)) and
+ (2) the slope at x is less steep than the slope at 0.</p><div class="fullcomment"><div class="comment cmt"><p>This class performs an inexact line search on f to find a point x that exhibits
+ (1) sufficient decrease (f(x) enough less that f(0)) and
+ (2) the slope at x is less steep than the slope at 0.
+ That is, the line search looks for a value for x satisfying the two Wolfe conditions.</p><p>    f(x) &lt;= f(0) + c1 * f'(0) * x      Wolfe condition 1 (Armijo condition)
+ |f'(x)| &lt;= |c2 * f'(0)|               Wolfe condition 2 (Strong version)
+   f'(x) &gt;= c2 * f'(0)                 Wolfe condition 2 (Weak version, more robust)</p><p> It works on scalar functions (see WolfeLSTest).  If starting with a vector function
+ f(x), simply define a new function g(y) = x0 + direction * y (see WolfeLSTest2).
+</p></div></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scalation.minima.ConjGradientTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ConjGradientTest"></a><a id="ConjGradientTest:ConjGradientTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ConjGradientTest$.html"><span class="name">ConjGradientTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@ConjGradientTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the ConjGradient class.</p>
+    </li><li name="scalation.minima.DualSimplexTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DualSimplexTest"></a><a id="DualSimplexTest:DualSimplexTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="DualSimplexTest$.html"><span class="name">DualSimplexTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@DualSimplexTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the DualSimplex class.</p>
+    </li><li name="scalation.minima.Ftran" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Ftran"></a><a id="Ftran:Ftran"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Ftran$.html"><span class="name">Ftran</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@Ftran" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="scalation.minima.GeneticAlgorithmTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="GeneticAlgorithmTest"></a><a id="GeneticAlgorithmTest:GeneticAlgorithmTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="GeneticAlgorithmTest$.html"><span class="name">GeneticAlgorithmTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@GeneticAlgorithmTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the GeneticAlgorithm class (unconstrained).</p>
+    </li><li name="scalation.minima.GoldenSectionLSTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="GoldenSectionLSTest"></a><a id="GoldenSectionLSTest:GoldenSectionLSTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="GoldenSectionLSTest$.html"><span class="name">GoldenSectionLSTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@GoldenSectionLSTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the GoldenSectionLS class on scalar functions.</p>
+    </li><li name="scalation.minima.GoldenSectionLSTest2" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="GoldenSectionLSTest2"></a><a id="GoldenSectionLSTest2:GoldenSectionLSTest2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="GoldenSectionLSTest2$.html"><span class="name">GoldenSectionLSTest2</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@GoldenSectionLSTest2" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the GoldenSectionLS class on vector functions.</p>
+    </li><li name="scalation.minima.IntegerGoldenSectionLSTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="IntegerGoldenSectionLSTest"></a><a id="IntegerGoldenSectionLSTest:IntegerGoldenSectionLSTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="IntegerGoldenSectionLSTest$.html"><span class="name">IntegerGoldenSectionLSTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@IntegerGoldenSectionLSTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the IntegerGoldenSectionLS class on scalar functions.</p>
+    </li><li name="scalation.minima.IntegerLPTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="IntegerLPTest"></a><a id="IntegerLPTest:IntegerLPTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="IntegerLPTest$.html"><span class="name">IntegerLPTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@IntegerLPTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the IntegerLP class.</p><div class="fullcomment"><div class="comment cmt"><p>This object is used to test the IntegerLP class.
+ real solution    x = (.8, 1.6), f = 8.8
+ integer solution x = (2, 1),    f = 10</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>Linear Programming and Network Flows, Example 6.14</p></span></dd></dl></div>
+    </li><li name="scalation.minima.IntegerLocalSearchTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="IntegerLocalSearchTest"></a><a id="IntegerLocalSearchTest:IntegerLocalSearchTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="IntegerLocalSearchTest$.html"><span class="name">IntegerLocalSearchTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@IntegerLocalSearchTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the IntegerLocalSearch class (unconstrained).</p>
+    </li><li name="scalation.minima.IntegerLocalSearchTest2" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="IntegerLocalSearchTest2"></a><a id="IntegerLocalSearchTest2:IntegerLocalSearchTest2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="IntegerLocalSearchTest2$.html"><span class="name">IntegerLocalSearchTest2</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@IntegerLocalSearchTest2" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the IntegerLocalSearch class (constrained).</p>
+    </li><li name="scalation.minima.IntegerNLPTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="IntegerNLPTest"></a><a id="IntegerNLPTest:IntegerNLPTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="IntegerNLPTest$.html"><span class="name">IntegerNLPTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@IntegerNLPTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the IntegerNLP class.</p><div class="fullcomment"><div class="comment cmt"><p>This object is used to test the IntegerNLP class.
+ real solution    x = (.8, 1.6), f = 8.8
+ integer solution x = (2, 1),    f = 10</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>Linear Programming and Network Flows, Example 6.14</p></span></dd></dl></div>
+    </li><li name="scalation.minima.IntegerTabuSearchTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="IntegerTabuSearchTest"></a><a id="IntegerTabuSearchTest:IntegerTabuSearchTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="IntegerTabuSearchTest$.html"><span class="name">IntegerTabuSearchTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@IntegerTabuSearchTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the IntegerTabuSearch class (unconstrained).</p>
+    </li><li name="scalation.minima.IntegerTabuSearchTest2" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="IntegerTabuSearchTest2"></a><a id="IntegerTabuSearchTest2:IntegerTabuSearchTest2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="IntegerTabuSearchTest2$.html"><span class="name">IntegerTabuSearchTest2</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@IntegerTabuSearchTest2" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the IntegerTabuSearch class (constrained).</p>
+    </li><li name="scalation.minima.NLPTest1" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="NLPTest1"></a><a id="NLPTest1:NLPTest1"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="NLPTest1$.html"><span class="name">NLPTest1</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@NLPTest1" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>NLPTest1</code> object used to test several Non-Linear Programming (NLP) algorithms
+ on unconstrained problems.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>NLPTest1</code> object used to test several Non-Linear Programming (NLP) algorithms
+ on unconstrained problems.
+ Algorithms:
+     sdcs - Steepest Descent with Custom Line Search
+     sdgs - Steepest Descent with Golden Section Line Search
+     prcg - Polak-Ribiere Conjugate Gradient with Golden Section Line Search
+     sdws - Steepest Descent with Wolfe Line Search
+     bfgs - Broyden–Fletcher–Goldfarb–Shanno with Wolfe Line Search
+</p></div></div>
+    </li><li name="scalation.minima.NLPTest2" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="NLPTest2"></a><a id="NLPTest2:NLPTest2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="NLPTest2$.html"><span class="name">NLPTest2</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@NLPTest2" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>NLPTest2</code> object used to test several Non-Linear Programming (NLP) algorithms
+ on constrained problems.</p>
+    </li><li name="scalation.minima.NLPTestCases1" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="NLPTestCases1"></a><a id="NLPTestCases1:NLPTestCases1"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="NLPTestCases1$.html"><span class="name">NLPTestCases1</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@NLPTestCases1" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object used to test several Non-Linear Programming (NLP) algorithms on
+ unconstrained problems.</p><div class="fullcomment"><div class="comment cmt"><p>This object used to test several Non-Linear Programming (NLP) algorithms on
+ unconstrained problems.
+ Algorithms:
+     sdcs - Steepest Descent with Custom Line Search
+     sdgs - Steepest Descent with Golden Section Line Search
+     prcg - Polak-Ribiere Conjugate Gradient with Golden Section Line Search
+     sdws - Steepest Descent with Wolfe Line Search
+     bfgs - Broyden–Fletcher–Goldfarb–Shanno with Wolfe Line Search
+</p></div></div>
+    </li><li name="scalation.minima.NLPTestCases2" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="NLPTestCases2"></a><a id="NLPTestCases2:NLPTestCases2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="NLPTestCases2$.html"><span class="name">NLPTestCases2</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@NLPTestCases2" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object used to test several Non-Linear Programming (NLP) algorithms on
+ constrained problems.</p>
+    </li><li name="scalation.minima.NelderMeadSimplexTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="NelderMeadSimplexTest"></a><a id="NelderMeadSimplexTest:NelderMeadSimplexTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="NelderMeadSimplexTest$.html"><span class="name">NelderMeadSimplexTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@NelderMeadSimplexTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the NelderMeadSimplex class.</p>
+    </li><li name="scalation.minima.NewtonRaphsonTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="NewtonRaphsonTest"></a><a id="NewtonRaphsonTest:NewtonRaphsonTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="NewtonRaphsonTest$.html"><span class="name">NewtonRaphsonTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@NewtonRaphsonTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the NewtonRaphson class.</p>
+    </li><li name="scalation.minima.QuadraticSimplexTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="QuadraticSimplexTest"></a><a id="QuadraticSimplexTest:QuadraticSimplexTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="QuadraticSimplexTest$.html"><span class="name">QuadraticSimplexTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@QuadraticSimplexTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the QuadraticSimplex class.</p>
+    </li><li name="scalation.minima.QuasiNewtonTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="QuasiNewtonTest"></a><a id="QuasiNewtonTest:QuasiNewtonTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="QuasiNewtonTest$.html"><span class="name">QuasiNewtonTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@QuasiNewtonTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the QuasiNewton class.</p>
+    </li><li name="scalation.minima.RevisedSimplexTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RevisedSimplexTest"></a><a id="RevisedSimplexTest:RevisedSimplexTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RevisedSimplexTest$.html"><span class="name">RevisedSimplexTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@RevisedSimplexTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>RevisedSimplexTest</code> object is used to test the <code>RevisedSimplex</code> class.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>RevisedSimplexTest</code> object is used to test the <code>RevisedSimplex</code> class.
+ &gt; run-main scalation.minima.RevisedSimplexTest
+</p></div></div>
+    </li><li name="scalation.minima.Simplex2PTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Simplex2PTest"></a><a id="Simplex2PTest:Simplex2PTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Simplex2PTest$.html"><span class="name">Simplex2PTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@Simplex2PTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the Simplex2P class.</p>
+    </li><li name="scalation.minima.SimplexBGTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SimplexBGTest"></a><a id="SimplexBGTest:SimplexBGTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SimplexBGTest$.html"><span class="name">SimplexBGTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@SimplexBGTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the SimplexBG class.</p>
+    </li><li name="scalation.minima.SimplexFTTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SimplexFTTest"></a><a id="SimplexFTTest:SimplexFTTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SimplexFTTest$.html"><span class="name">SimplexFTTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@SimplexFTTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the SimplexFT class.</p>
+    </li><li name="scalation.minima.SimplexTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SimplexTest"></a><a id="SimplexTest:SimplexTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SimplexTest$.html"><span class="name">SimplexTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@SimplexTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the Simplex class.</p>
+    </li><li name="scalation.minima.SteepestDescentTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SteepestDescentTest"></a><a id="SteepestDescentTest:SteepestDescentTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SteepestDescentTest$.html"><span class="name">SteepestDescentTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@SteepestDescentTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the SteepestDescent class.</p>
+    </li><li name="scalation.minima.WolfeLSTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="WolfeLSTest"></a><a id="WolfeLSTest:WolfeLSTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="WolfeLSTest$.html"><span class="name">WolfeLSTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@WolfeLSTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the WolfeLS class on scalar functions.</p>
+    </li><li name="scalation.minima.WolfeLSTest2" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="WolfeLSTest2"></a><a id="WolfeLSTest2:WolfeLSTest2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="WolfeLSTest2$.html"><span class="name">WolfeLSTest2</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.minima.package@WolfeLSTest2" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This object is used to test the WolfeLS class on vector functions.</p>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

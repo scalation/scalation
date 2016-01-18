@@ -1,0 +1,295 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>animation - scalation.animation</title>
+          <meta name="description" content="animation - scalation.animation" />
+          <meta name="keywords" content="animation scalation.animation" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'scalation.animation.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../lib/package_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="scalation">scalation</a></p>
+        <h1>animation</h1><span class="permalink">
+      <a href="../../index.html#scalation.animation.package" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">animation</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>The animation package contains classes, traits and objects for
+ 2D animation of simulation objects.
+</p></div><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div class="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalation.animation"><span>animation</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div class="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalation.animation.AnimateCommand" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AnimateCommandextendsProductwithSerializable"></a><a id="AnimateCommand:AnimateCommand"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="AnimateCommand.html"><span class="name">AnimateCommand</span></a><span class="params">(<span name="action">action: <a href="CommandType$.html#ValueextendsOrdered[Enumeration.this.Value]withSerializable" class="extmbr" name="scalation.animation.CommandType.Value">CommandType.Value</a></span>, <span name="eid">eid: <span class="extype" name="scala.Int">Int</span></span>, <span name="shape">shape: <a href="../scala2d/Shapes$.html#Shape=java.awt.Shape" class="extmbr" name="scalation.scala2d.Shapes.Shape">Shape</a></span>, <span name="label">label: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="primary">primary: <span class="extype" name="scala.Boolean">Boolean</span></span>, <span name="color">color: <a href="../scala2d/Colors$.html#Color=java.awt.Color" class="extmbr" name="scalation.scala2d.Colors.Color">Color</a></span>, <span name="pts">pts: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Double">Double</span>]</span>, <span name="time">time: <span class="extype" name="scala.Double">Double</span></span>, <span name="from_eid">from_eid: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>, <span name="to_eid">to_eid: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.animation.package@AnimateCommandextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>AnimateCommand</code> class provides a template for animation commands.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>AnimateCommand</code> class provides a template for animation commands.</p></div><dl class="paramcmts block"><dt class="param">action</dt><dd class="cmt"><p>the animation action to perform</p></dd><dt class="param">eid</dt><dd class="cmt"><p>the external id for the component acted upon</p></dd><dt class="param">shape</dt><dd class="cmt"><p>the shape of graph component (node, edge or token)</p></dd><dt class="param">label</dt><dd class="cmt"><p>the display label for the component</p></dd><dt class="param">primary</dt><dd class="cmt"><p>whether the component is primary (true) or secondary (false)</p></dd><dt class="param">color</dt><dd class="cmt"><p>the color of the component</p></dd><dt class="param">pts</dt><dd class="cmt"><p>the set points/dimensions giving the shapes location and size</p></dd><dt class="param">time</dt><dd class="cmt"><p>simulation time when the command is to be performed</p></dd><dt class="param">from_eid</dt><dd class="cmt"><p>the eid of the orgination node (only for edges)</p></dd><dt class="param">to_eid</dt><dd class="cmt"><p>the eid of the destination node (only for edges)</p></dd></dl></div>
+    </li><li name="scalation.animation.Animator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="AnimatorextendsTransformwithError"></a><a id="Animator:Animator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Animator.html"><span class="name">Animator</span></a><span class="result"> extends <a href="../scala2d/Transform.html" class="extype" name="scalation.scala2d.Transform">Transform</a> with <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.animation.package@AnimatorextendsTransformwithError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Animator</code> class implements the commands to create, destroy, move and scale
+ components (nodes, edges or tokens) in an animated graph.</p>
+    </li><li name="scalation.animation.DgAnimator" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DgAnimatorextendsVizFramewithRunnablewithError"></a><a id="DgAnimator:DgAnimator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="DgAnimator.html"><span class="name">DgAnimator</span></a><span class="result"> extends <a href="../scala2d/VizFrame.html" class="extype" name="scalation.scala2d.VizFrame">VizFrame</a> with <span class="extype" name="java.lang.Runnable">Runnable</span> with <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.animation.package@DgAnimatorextendsVizFramewithRunnablewithError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>DgAnimator</code> class is an animation engine for animating graphs.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>DgAnimator</code> class is an animation engine for animating graphs.
+ For example, it can animate bipartite graphs to animate Petri Nets.</p></div></div>
+    </li><li name="scalation.animation.Dgraph" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DgraphextendsError"></a><a id="Dgraph:Dgraph"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Dgraph.html"><span class="name">Dgraph</span></a><span class="result"> extends <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.animation.package@DgraphextendsError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Dgraph</code> class is for defining graph structures suitable for animation.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Dgraph</code> class is for defining graph structures suitable for animation.
+ Graphs consist of nodes, edges and tokens.  Tokens can be positioned within
+ nodes or on edges.  A graph animation class that uses this class would typically
+ move the tokens by changing there location over time.  This class supports both
+ directed graphs and bipartite graphs.  Directed graphs contain only primary
+ nodes, while bipartite graphs have both primary and secondary nodes along with
+ the rule that edges must go from primaries to secondaries or secondaries to
+ primaries.  Bipartite graphs can be used to represent Petri Nets by letting
+ Transitions be primary nodes and Places be secondary nodes.  Everything can be
+ labeled (nodes, edges and tokens as well as the graph itself).  Nodes and edges
+ may be added to/removed from graphs, while tokens may be added to/removed from
+ either nodes or edges.  Tokens may also be free (not bound to nodes or edges).
+</p></div></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scalation.animation.CommandType" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="CommandType"></a><a id="CommandType:CommandType"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="CommandType$.html"><span class="name">CommandType</span></a><span class="result"> extends <span class="extype" name="scala.Enumeration">Enumeration</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.animation.package@CommandType" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>CommandType</code> object implements a message which is passed from a simulation
+ engine to the animation engine.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>CommandType</code> object implements a message which is passed from a simulation
+ engine to the animation engine.  A message specifies one of the commands defined
+ in the Animator interface.
+</p></div></div>
+    </li><li name="scalation.animation.Counter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Counter"></a><a id="Counter:Counter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Counter$.html"><span class="name">Counter</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.animation.package@Counter" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Counter</code> object maintains counters.</p>
+    </li><li name="scalation.animation.DgAnimatorTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DgAnimatorTest"></a><a id="DgAnimatorTest:DgAnimatorTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="DgAnimatorTest$.html"><span class="name">DgAnimatorTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.animation.package@DgAnimatorTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>DgAnimatorTest</code> object is used to test the <code>DgAnimator</code> class.</p>
+    </li><li name="scalation.animation.DgraphTest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DgraphTest"></a><a id="DgraphTest:DgraphTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="DgraphTest$.html"><span class="name">DgraphTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.animation.package@DgraphTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>DgraphTest</code> object to test the <code>Dgraph</code> class.</p>
+    </li><li name="scalation.animation.EidCounter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="EidCounter"></a><a id="EidCounter:EidCounter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="EidCounter$.html"><span class="name">EidCounter</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.animation.package@EidCounter" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>EidCounter</code> object is used to provide unique identifiers for internally
+ created tokens/fluids.</p>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

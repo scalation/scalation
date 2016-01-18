@@ -1,0 +1,998 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>CallCenterModel - apps.event.CallCenterModel</title>
+          <meta name="description" content="CallCenterModel - apps.event.CallCenterModel" />
+          <meta name="keywords" content="CallCenterModel apps.event.CallCenterModel" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'apps.event.CallCenterModel';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <img alt="Class" src="../../lib/class_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="apps">apps</a>.<a href="package.html" class="extype" name="apps.event">event</a></p>
+        <h1>CallCenterModel</h1><h3><span class="morelinks"><div>Related Doc:
+            <a href="package.html" class="extype" name="apps.event">package event</a>
+          </div></span></h3><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <span class="name">CallCenterModel</span><span class="result"> extends <a href="../../scalation/event/Model.html" class="extype" name="scalation.event.Model">Model</a></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>The <code>CallCenterModel</code> class defines a simple Event-Scheduling model of a
+ Call Center where service is provided by one tele-service representative and
+ models an M/M/1/1 queue.</p></div><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="../../scalation/event/Model.html" class="extype" name="scalation.event.Model">Model</a>, <a href="../../scalation/util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a>, <a href="../../scalation/util/Error.html" class="extype" name="scalation.util.Error">Error</a>, <a href="../../scalation/model/Modelable.html" class="extype" name="scalation.model.Modelable">Modelable</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div class="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="apps.event.CallCenterModel"><span>CallCenterModel</span></li><li class="in" name="scalation.event.Model"><span>Model</span></li><li class="in" name="scalation.util.Identifiable"><span>Identifiable</span></li><li class="in" name="scalation.util.Error"><span>Error</span></li><li class="in" name="scalation.model.Modelable"><span>Modelable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div class="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="apps.event.CallCenterModel#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(name:String,nArrivals:Int,iArrivalRV:scalation.random.Variate,serviceRV:scalation.random.Variate):apps.event.CallCenterModel"></a><a id="&lt;init&gt;:CallCenterModel"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">CallCenterModel</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="nArrivals">nArrivals: <span class="extype" name="scala.Int">Int</span></span>, <span name="iArrivalRV">iArrivalRV: <a href="../../scalation/random/Variate.html" class="extype" name="scalation.random.Variate">Variate</a></span>, <span name="serviceRV">serviceRV: <a href="../../scalation/random/Variate.html" class="extype" name="scalation.random.Variate">Variate</a></span>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@&lt;init&gt;(name:String,nArrivals:Int,iArrivalRV:scalation.random.Variate,serviceRV:scalation.random.Variate):apps.event.CallCenterModel" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">name</dt><dd class="cmt"><p>the name of the simulation model</p></dd><dt class="param">nArrivals</dt><dd class="cmt"><p>the number of arrivals to generate (stopping condition)</p></dd><dt class="param">iArrivalRV</dt><dd class="cmt"><p>the inter-arrival time distribution (Random Variate)</p></dd><dt class="param">serviceRV</dt><dd class="cmt"><p>the service time distribution (Random Variate)</p></dd></dl></div>
+    </li></ol>
+            </div>
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="apps.event.CallCenterModel.Arrival" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ArrivalextendsEventwithProductwithSerializable"></a><a id="Arrival:Arrival"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="CallCenterModel$Arrival.html"><span class="name">Arrival</span></a><span class="params">(<span name="call">call: <a href="../../scalation/event/Entity.html" class="extype" name="scalation.event.Entity">Entity</a></span>, <span name="delay">delay: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result"> extends <a href="../../scalation/event/Event.html" class="extype" name="scalation.event.Event">Event</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@ArrivalextendsEventwithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"><code>Arrival</code> is a subclass of <code>Event</code> for handling arrival events (MakeCall).</p><div class="fullcomment"><div class="comment cmt"><p><code>Arrival</code> is a subclass of <code>Event</code> for handling arrival events (MakeCall).</p></div><dl class="paramcmts block"><dt class="param">call</dt><dd class="cmt"><p>the entity that arrives, in this case a call</p></dd><dt class="param">delay</dt><dd class="cmt"><p>the time delay for this event's occurrence</p></dd></dl></div>
+    </li><li name="apps.event.CallCenterModel.Departure" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DepartureextendsEventwithProductwithSerializable"></a><a id="Departure:Departure"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="CallCenterModel$Departure.html"><span class="name">Departure</span></a><span class="params">(<span name="call">call: <a href="../../scalation/event/Entity.html" class="extype" name="scalation.event.Entity">Entity</a></span>, <span name="delay">delay: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result"> extends <a href="../../scalation/event/Event.html" class="extype" name="scalation.event.Event">Event</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@DepartureextendsEventwithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"><code>Departure</code> is a subclass of <code>Event</code> for handling departure events (HangUp).</p><div class="fullcomment"><div class="comment cmt"><p><code>Departure</code> is a subclass of <code>Event</code> for handling departure events (HangUp).</p></div><dl class="paramcmts block"><dt class="param">call</dt><dd class="cmt"><p>the entity that departs, in this case a call</p></dd><dt class="param">delay</dt><dd class="cmt"><p>the time delay for this event's occurrence</p></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@##():Int" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalation.model.Modelable#HOUR" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="HOUR:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">HOUR</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@HOUR:Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The number of seconds in one hour
+</p><div class="fullcomment"><div class="comment cmt"><p>The number of seconds in one hour
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="../../scalation/model/Modelable.html" class="extype" name="scalation.model.Modelable">Modelable</a></dd></dl></div>
+    </li><li name="scalation.model.Modelable#MINUTE" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MINUTE:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">MINUTE</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@MINUTE:Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The number of seconds in one minute
+</p><div class="fullcomment"><div class="comment cmt"><p>The number of seconds in one minute
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="../../scalation/model/Modelable.html" class="extype" name="scalation.model.Modelable">Modelable</a></dd></dl></div>
+    </li><li name="scalation.model.Modelable#_clock" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="_clock:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">_clock</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@_clock:Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The clock that keep track of the current simulation time
+</p><div class="fullcomment"><div class="comment cmt"><p>The clock that keep track of the current simulation time
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="../../scalation/model/Modelable.html" class="extype" name="scalation.model.Modelable">Modelable</a></dd></dl></div>
+    </li><li name="scalation.event.Model#addStats" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="addStats(stat:scalation.stat.Statistic*):Unit"></a><a id="addStats(Statistic*):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addStats</span><span class="params">(<span name="stat">stat: <a href="../../scalation/stat/Statistic.html" class="extype" name="scalation.stat.Statistic">Statistic</a>*</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@addStats(stat:scalation.stat.Statistic*):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Add statistical collector to the model.</p><div class="fullcomment"><div class="comment cmt"><p>Add statistical collector to the model.</p></div><dl class="paramcmts block"><dt class="param">stat</dt><dd class="cmt"><p>one or more statistical collectors</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../scalation/event/Model.html" class="extype" name="scalation.event.Model">Model</a></dd></dl></div>
+    </li><li name="scalation.event.Model#animate" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="animate(who:scalation.util.Identifiable,what:scalation.animation.CommandType.Value,color:scalation.scala2d.Colors.Color,shape:scalation.scala2d.Shapes.Shape,from:scalation.event.Event,to:scalation.event.Event,at:Array[Double]):Unit"></a><a id="animate(Identifiable,scalation.animation.CommandType.Value,Color,Shape,Event,Event,Array[Double]):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">animate</span><span class="params">(<span name="who">who: <a href="../../scalation/util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a></span>, <span name="what">what: <a href="../../scalation/animation/CommandType$.html#ValueextendsOrdered[Enumeration.this.Value]withSerializable" class="extmbr" name="scalation.animation.CommandType.Value">scalation.animation.CommandType.Value</a></span>, <span name="color">color: <a href="../../scalation/scala2d/Colors$.html#Color=java.awt.Color" class="extmbr" name="scalation.scala2d.Colors.Color">Color</a></span>, <span name="shape">shape: <a href="../../scalation/scala2d/Shapes$.html#Shape=java.awt.Shape" class="extmbr" name="scalation.scala2d.Shapes.Shape">Shape</a></span>, <span name="from">from: <a href="../../scalation/event/Event.html" class="extype" name="scalation.event.Event">Event</a></span>, <span name="to">to: <a href="../../scalation/event/Event.html" class="extype" name="scalation.event.Event">Event</a></span>, <span name="at">at: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Double">Double</span>] = <span class="symbol">Array ()</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@animate(who:scalation.util.Identifiable,what:scalation.animation.CommandType.Value,color:scalation.scala2d.Colors.Color,shape:scalation.scala2d.Shapes.Shape,from:scalation.event.Event,to:scalation.event.Event,at:Array[Double]):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Put a edge command on the animation queue.</p><div class="fullcomment"><div class="comment cmt"><p>Put a edge command on the animation queue.</p></div><dl class="paramcmts block"><dt class="param">who</dt><dd class="cmt"><p>who is being animated</p></dd><dt class="param">what</dt><dd class="cmt"><p>what animation command</p></dd><dt class="param">color</dt><dd class="cmt"><p>the color the edge</p></dd><dt class="param">shape</dt><dd class="cmt"><p>the shape of the edge</p></dd><dt class="param">from</dt><dd class="cmt"><p>the location of the origination node</p></dd><dt class="param">to</dt><dd class="cmt"><p>the location of the destination node</p></dd><dt class="param">at</dt><dd class="cmt"><p>the location of the edge (empty array =&gt; implicitly determined)</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../scalation/event/Model.html" class="extype" name="scalation.event.Model">Model</a></dd></dl></div>
+    </li><li name="scalation.event.Model#animate" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="animate(who:scalation.util.Identifiable,what:scalation.animation.CommandType.Value,color:scalation.scala2d.Colors.Color,shape:scalation.scala2d.Shapes.Shape,at:Array[Double]):Unit"></a><a id="animate(Identifiable,scalation.animation.CommandType.Value,Color,Shape,Array[Double]):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">animate</span><span class="params">(<span name="who">who: <a href="../../scalation/util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a></span>, <span name="what">what: <a href="../../scalation/animation/CommandType$.html#ValueextendsOrdered[Enumeration.this.Value]withSerializable" class="extmbr" name="scalation.animation.CommandType.Value">scalation.animation.CommandType.Value</a></span>, <span name="color">color: <a href="../../scalation/scala2d/Colors$.html#Color=java.awt.Color" class="extmbr" name="scalation.scala2d.Colors.Color">Color</a></span>, <span name="shape">shape: <a href="../../scalation/scala2d/Shapes$.html#Shape=java.awt.Shape" class="extmbr" name="scalation.scala2d.Shapes.Shape">Shape</a></span>, <span name="at">at: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Double">Double</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@animate(who:scalation.util.Identifiable,what:scalation.animation.CommandType.Value,color:scalation.scala2d.Colors.Color,shape:scalation.scala2d.Shapes.Shape,at:Array[Double]):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Put a node/token command on the animation queue.</p><div class="fullcomment"><div class="comment cmt"><p>Put a node/token command on the animation queue.</p></div><dl class="paramcmts block"><dt class="param">who</dt><dd class="cmt"><p>who is being animated</p></dd><dt class="param">what</dt><dd class="cmt"><p>what animation command</p></dd><dt class="param">color</dt><dd class="cmt"><p>the color the node/token</p></dd><dt class="param">shape</dt><dd class="cmt"><p>the shape of the node/token</p></dd><dt class="param">at</dt><dd class="cmt"><p>the location of the node/token</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../scalation/event/Model.html" class="extype" name="scalation.event.Model">Model</a></dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalation.event.Model#cancel" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="cancel(event:scalation.event.Event):Unit"></a><a id="cancel(Event):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">cancel</span><span class="params">(<span name="event">event: <a href="../../scalation/event/Event.html" class="extype" name="scalation.event.Event">Event</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@cancel(event:scalation.event.Event):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Cancel the specified 'event' so it will not occur.</p><div class="fullcomment"><div class="comment cmt"><p>Cancel the specified 'event' so it will not occur.</p></div><dl class="paramcmts block"><dt class="param">event</dt><dd class="cmt"><p>the event to cancel</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../scalation/event/Model.html" class="extype" name="scalation.event.Model">Model</a></dd></dl></div>
+    </li><li name="scalation.model.Modelable#clock" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clock:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clock</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@clock:Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Return the current value of the director's clock.</p><div class="fullcomment"><div class="comment cmt"><p>Return the current value of the director's clock.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../scalation/model/Modelable.html" class="extype" name="scalation.model.Modelable">Modelable</a></dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a><a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@clone():Object" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalation.util.Identifiable#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(that:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="that">that: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@equals(that:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Determine whether Identifiable object 'this' equals Identifiable object 'that'.</p><div class="fullcomment"><div class="comment cmt"><p>Determine whether Identifiable object 'this' equals Identifiable object 'that'.
+ Works since 'id' is unique for all Identifiable objects.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../scalation/util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a> → AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@finalize():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="apps.event.CallCenterModel#firstArrival" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="firstArrival:scalation.event.Entity"></a><a id="firstArrival:Entity"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">firstArrival</span><span class="result">: <a href="../../scalation/event/Entity.html" class="extype" name="scalation.event.Entity">Entity</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@firstArrival:scalation.event.Entity" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="scalation.util.Error#flaw" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="flaw(method:String,message:String):Unit"></a><a id="flaw(String,String):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">flaw</span><span class="params">(<span name="method">method: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="message">message: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@flaw(method:String,message:String):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Show the flaw by printing the error message.</p><div class="fullcomment"><div class="comment cmt"><p>Show the flaw by printing the error message.</p></div><dl class="paramcmts block"><dt class="param">method</dt><dd class="cmt"><p>the method where the error occurred</p></dd><dt class="param">message</dt><dd class="cmt"><p>the error message</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../scalation/util/Error.html" class="extype" name="scalation.util.Error">Error</a></dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@getClass():Class[_]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalation.event.Model#getStatistics" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getStatistics:scala.collection.mutable.ListBuffer[scalation.stat.Statistic]"></a><a id="getStatistics:ListBuffer[Statistic]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getStatistics</span><span class="result">: <span class="extype" name="scala.collection.mutable.ListBuffer">ListBuffer</span>[<a href="../../scalation/stat/Statistic.html" class="extype" name="scalation.stat.Statistic">Statistic</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@getStatistics:scala.collection.mutable.ListBuffer[scalation.stat.Statistic]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Return the statistical results of the simulation (statistics for each part).</p><div class="fullcomment"><div class="comment cmt"><p>Return the statistical results of the simulation (statistics for each part).
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../scalation/event/Model.html" class="extype" name="scalation.event.Model">Model</a></dd></dl></div>
+    </li><li name="scalation.util.Identifiable#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@hashCode():Int" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Return the hashCode as the unique id.</p><div class="fullcomment"><div class="comment cmt"><p>Return the hashCode as the unique id.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../scalation/util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a> → AnyRef → Any</dd></dl></div>
+    </li><li name="scalation.util.Identifiable#id" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="id:Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">id</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@id:Int" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The globally unique integer identifier
+</p><div class="fullcomment"><div class="comment cmt"><p>The globally unique integer identifier
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../scalation/util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a></dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalation.event.Model#leave" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="leave(entity:scalation.event.Entity):Unit"></a><a id="leave(Entity):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">leave</span><span class="params">(<span name="entity">entity: <a href="../../scalation/event/Entity.html" class="extype" name="scalation.event.Entity">Entity</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@leave(entity:scalation.event.Entity):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Leave the model recording the entity's time in the sYstem.</p><div class="fullcomment"><div class="comment cmt"><p>Leave the model recording the entity's time in the sYstem.</p></div><dl class="paramcmts block"><dt class="param">entity</dt><dd class="cmt"><p>the entity leaving the model</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../scalation/event/Model.html" class="extype" name="scalation.event.Model">Model</a></dd></dl></div>
+    </li><li name="scalation.util.Identifiable#me" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="me:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">me</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@me:String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Return the full identity.</p><div class="fullcomment"><div class="comment cmt"><p>Return the full identity.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../scalation/util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a></dd></dl></div>
+    </li><li name="apps.event.CallCenterModel#nArr" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="nArr:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">nArr</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@nArr:Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="apps.event.CallCenterModel#nIn" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="nIn:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">nIn</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@nIn:Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="apps.event.CallCenterModel#nLost" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="nLost:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">nLost</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@nLost:Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="apps.event.CallCenterModel#nOut" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="nOut:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">nOut</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@nOut:Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="scalation.util.Identifiable#name" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="name:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">name</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@name:String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Get the name.</p><div class="fullcomment"><div class="comment cmt"><p>Get the name.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../scalation/util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a></dd></dl></div>
+    </li><li name="scalation.util.Identifiable#name_=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="name_=(name:String):Unit"></a><a id="name_=(String):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: name_$eq" class="name">name_=</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@name_=(name:String):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Set the name.</p><div class="fullcomment"><div class="comment cmt"><p>Set the name.</p></div><dl class="paramcmts block"><dt class="param">name</dt><dd class="cmt"><p>the name to assign</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../scalation/util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a></dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@notify():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@notifyAll():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalation.event.Model#report" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="report(vars:(String,Double)*):Unit"></a><a id="report((String,Double)*):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">report</span><span class="params">(<span name="vars">vars: (<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Double">Double</span>)*</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@report(vars:(String,Double)*):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Report values of the specified model result/output variables.</p><div class="fullcomment"><div class="comment cmt"><p>Report values of the specified model result/output variables.</p></div><dl class="paramcmts block"><dt class="param">vars</dt><dd class="cmt"><p>the result/output variables for the simulation</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../scalation/event/Model.html" class="extype" name="scalation.event.Model">Model</a></dd></dl></div>
+    </li><li name="scalation.event.Model#reportStats" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="reportStats:Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">reportStats</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@reportStats:Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Report statistical results of the simulation for all the collectors.</p><div class="fullcomment"><div class="comment cmt"><p>Report statistical results of the simulation for all the collectors.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../scalation/event/Model.html" class="extype" name="scalation.event.Model">Model</a></dd></dl></div>
+    </li><li name="scalation.event.Model#schedule" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="schedule(event:scalation.event.Event):Unit"></a><a id="schedule(Event):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">schedule</span><span class="params">(<span name="event">event: <a href="../../scalation/event/Event.html" class="extype" name="scalation.event.Event">Event</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@schedule(event:scalation.event.Event):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Place an event on the Future Event List (FEL) for later execution, thus
+ scheduling the event to occur sometime in the future.</p><div class="fullcomment"><div class="comment cmt"><p>Place an event on the Future Event List (FEL) for later execution, thus
+ scheduling the event to occur sometime in the future.  Events are ordered
+ by their event/act time.</p></div><dl class="paramcmts block"><dt class="param">event</dt><dd class="cmt"><p>the event to schedule</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../scalation/event/Model.html" class="extype" name="scalation.event.Model">Model</a></dd></dl></div>
+    </li><li name="scalation.util.Identifiable#simType" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="simType:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">simType</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@simType:String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Get the type of the simulation object.</p><div class="fullcomment"><div class="comment cmt"><p>Get the type of the simulation object.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../scalation/util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a></dd></dl></div>
+    </li><li name="scalation.event.Model#simulate" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="simulate(startTime:Double):Unit"></a><a id="simulate(Double):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">simulate</span><span class="params">(<span name="startTime">startTime: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">0.0</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@simulate(startTime:Double):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Run the simulation by iteratively processing events in time order.</p><div class="fullcomment"><div class="comment cmt"><p>Run the simulation by iteratively processing events in time order.
+ Requires at least one to already be scheduled (see next method).</p></div><dl class="paramcmts block"><dt class="param">startTime</dt><dd class="cmt"><p>the time at which the simulation is to begin</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../scalation/event/Model.html" class="extype" name="scalation.event.Model">Model</a> → <a href="../../scalation/model/Modelable.html" class="extype" name="scalation.model.Modelable">Modelable</a></dd></dl></div>
+    </li><li name="scalation.model.Modelable#simulating" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="simulating:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">simulating</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@simulating:Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Simulation execution/termination flag
+</p><div class="fullcomment"><div class="comment cmt"><p>Simulation execution/termination flag
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="../../scalation/model/Modelable.html" class="extype" name="scalation.model.Modelable">Modelable</a></dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="apps.event.CallCenterModel#t_a_stat" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="t_a_stat:scalation.stat.Statistic"></a><a id="t_a_stat:Statistic"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">t_a_stat</span><span class="result">: <a href="../../scalation/stat/Statistic.html" class="extype" name="scalation.stat.Statistic">Statistic</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@t_a_stat:scalation.stat.Statistic" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="apps.event.CallCenterModel#t_s_stat" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="t_s_stat:scalation.stat.Statistic"></a><a id="t_s_stat:Statistic"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">t_s_stat</span><span class="result">: <a href="../../scalation/stat/Statistic.html" class="extype" name="scalation.stat.Statistic">Statistic</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@t_s_stat:scalation.stat.Statistic" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@toString():String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@wait():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#apps.event.CallCenterModel@wait(x$1:Long):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scalation.event.Model">
+              <h3>Inherited from <a href="../../scalation/event/Model.html" class="extype" name="scalation.event.Model">Model</a></h3>
+            </div><div class="parent" name="scalation.util.Identifiable">
+              <h3>Inherited from <a href="../../scalation/util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a></h3>
+            </div><div class="parent" name="scalation.util.Error">
+              <h3>Inherited from <a href="../../scalation/util/Error.html" class="extype" name="scalation.util.Error">Error</a></h3>
+            </div><div class="parent" name="scalation.model.Modelable">
+              <h3>Inherited from <a href="../../scalation/model/Modelable.html" class="extype" name="scalation.model.Modelable">Modelable</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

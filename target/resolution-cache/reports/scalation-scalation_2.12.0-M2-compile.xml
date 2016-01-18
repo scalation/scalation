@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="ivy-report.xsl"?>
+<ivy-report version="1.0">
+	<info
+		organisation="scalation"
+		module="scalation_2.12.0-M2"
+		revision="1.2"
+		conf="compile"
+		confs="compile, runtime, test, provided, optional, compile-internal, runtime-internal, test-internal, plugin, sources, docs, pom, scala-tool"
+		date="20160103212500"/>
+	<dependencies>
+		<module organisation="org.jsoup" name="jsoup">
+			<revision name="1.8.2" status="release" pubdate="20150414004421" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://jsoup.org/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="5">
+				<license name="The MIT License" url="http://jsoup.org/license"/>
+				<metadata-artifact status="no" details="" size="2926" time="0" location="/home/scalation/.ivy2/cache/org.jsoup/jsoup/ivy-1.8.2.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/jsoup/jsoup/1.8.2/jsoup-1.8.2.pom"/>
+				<caller organisation="scalation" name="scalation_2.12.0-M2" conf="compile" rev="1.8.2" rev-constraint-default="1.8.2" rev-constraint-dynamic="1.8.2" callerrev="1.2"/>
+				<artifacts>
+					<artifact name="jsoup" type="jar" ext="jar" status="no" details="" size="314978" time="0" location="/home/scalation/.ivy2/cache/org.jsoup/jsoup/jars/jsoup-1.8.2.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/jsoup/jsoup/1.8.2/jsoup-1.8.2.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scala-lang" name="scala-compiler">
+			<revision name="2.12.0-M2" status="release" pubdate="20150714103232" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="0">
+				<license name="BSD 3-Clause" url="http://www.scala-lang.org/license.html"/>
+				<metadata-artifact status="no" details="" size="3152" time="0" location="/home/scalation/.ivy2/cache/org.scala-lang/scala-compiler/ivy-2.12.0-M2.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.0-M2/scala-compiler-2.12.0-M2.pom"/>
+				<caller organisation="scalation" name="scalation_2.12.0-M2" conf="compile" rev="2.12.0-M2" rev-constraint-default="2.12.0-M2" rev-constraint-dynamic="2.12.0-M2" callerrev="1.2"/>
+				<artifacts>
+					<artifact name="scala-compiler" type="jar" ext="jar" status="no" details="" size="10093056" time="0" location="/home/scalation/.ivy2/cache/org.scala-lang/scala-compiler/jars/scala-compiler-2.12.0-M2.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.0-M2/scala-compiler-2.12.0-M2.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scala-lang.modules" name="scala-xml_2.12.0-M2">
+			<revision name="1.0.4" status="release" pubdate="20150714103447" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="3">
+				<license name="BSD 3-clause" url="http://opensource.org/licenses/BSD-3-Clause"/>
+				<metadata-artifact status="no" details="" size="3027" time="0" location="/home/scalation/.ivy2/cache/org.scala-lang.modules/scala-xml_2.12.0-M2/ivy-1.0.4.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.12.0-M2/1.0.4/scala-xml_2.12.0-M2-1.0.4.pom"/>
+				<caller organisation="org.scala-lang" name="scala-compiler" conf="default, compile, runtime, master" rev="1.0.4" rev-constraint-default="1.0.4" rev-constraint-dynamic="1.0.4" callerrev="2.12.0-M2"/>
+				<artifacts>
+					<artifact name="scala-xml_2.12.0-M2" type="bundle" ext="jar" status="no" details="" size="547527" time="0" location="/home/scalation/.ivy2/cache/org.scala-lang.modules/scala-xml_2.12.0-M2/bundles/scala-xml_2.12.0-M2-1.0.4.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.12.0-M2/1.0.4/scala-xml_2.12.0-M2-1.0.4.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scala-lang.modules" name="scala-parser-combinators_2.12.0-M2">
+			<revision name="1.0.4" status="release" pubdate="20150714103534" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="4">
+				<license name="BSD 3-clause" url="http://opensource.org/licenses/BSD-3-Clause"/>
+				<metadata-artifact status="no" details="" size="2816" time="0" location="/home/scalation/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.12.0-M2/ivy-1.0.4.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scala-lang/modules/scala-parser-combinators_2.12.0-M2/1.0.4/scala-parser-combinators_2.12.0-M2-1.0.4.pom"/>
+				<caller organisation="org.scala-lang" name="scala-compiler" conf="default, compile, runtime, master" rev="1.0.4" rev-constraint-default="1.0.4" rev-constraint-dynamic="1.0.4" callerrev="2.12.0-M2"/>
+				<artifacts>
+					<artifact name="scala-parser-combinators_2.12.0-M2" type="bundle" ext="jar" status="no" details="" size="209019" time="0" location="/home/scalation/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.12.0-M2/bundles/scala-parser-combinators_2.12.0-M2-1.0.4.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/modules/scala-parser-combinators_2.12.0-M2/1.0.4/scala-parser-combinators_2.12.0-M2-1.0.4.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scala-lang" name="scala-reflect">
+			<revision name="2.12.0-M2" status="release" pubdate="20150714103223" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" extra-info.apiURL="http://www.scala-lang.org/api/2.12.0-M2/" downloaded="false" searched="false" default="false" conf="default, compile, runtime(*), master(compile), runtime, default(compile), compile(*), master" position="2">
+				<license name="BSD 3-Clause" url="http://www.scala-lang.org/license.html"/>
+				<metadata-artifact status="no" details="" size="2837" time="0" location="/home/scalation/.ivy2/cache/org.scala-lang/scala-reflect/ivy-2.12.0-M2.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.0-M2/scala-reflect-2.12.0-M2.pom"/>
+				<caller organisation="scalation" name="scalation_2.12.0-M2" conf="compile" rev="2.12.0-M2" rev-constraint-default="2.12.0-M2" rev-constraint-dynamic="2.12.0-M2" callerrev="1.2"/>
+				<caller organisation="org.scala-lang" name="scala-compiler" conf="default, compile, runtime, master" rev="2.12.0-M2" rev-constraint-default="2.12.0-M2" rev-constraint-dynamic="2.12.0-M2" callerrev="2.12.0-M2"/>
+				<artifacts>
+					<artifact name="scala-reflect" type="jar" ext="jar" status="no" details="" size="3479886" time="0" location="/home/scalation/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.12.0-M2.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.0-M2/scala-reflect-2.12.0-M2.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scala-lang" name="scala-library">
+			<revision name="2.12.0-M2" status="release" pubdate="20150714103211" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" extra-info.apiURL="http://www.scala-lang.org/api/2.12.0-M2/" downloaded="false" searched="false" default="false" conf="default, compile, runtime(*), master(compile), runtime, default(compile), compile(*), master" position="1">
+				<license name="BSD 3-Clause" url="http://www.scala-lang.org/license.html"/>
+				<metadata-artifact status="no" details="" size="2662" time="0" location="/home/scalation/.ivy2/cache/org.scala-lang/scala-library/ivy-2.12.0-M2.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.0-M2/scala-library-2.12.0-M2.pom"/>
+				<caller organisation="org.scala-lang.modules" name="scala-parser-combinators_2.12.0-M2" conf="compile, runtime" rev="2.12.0-M2" rev-constraint-default="2.12.0-M2" rev-constraint-dynamic="2.12.0-M2" callerrev="1.0.4"/>
+				<caller organisation="org.scala-lang.modules" name="scala-xml_2.12.0-M2" conf="compile, runtime" rev="2.12.0-M2" rev-constraint-default="2.12.0-M2" rev-constraint-dynamic="2.12.0-M2" callerrev="1.0.4"/>
+				<caller organisation="scalation" name="scalation_2.12.0-M2" conf="compile" rev="2.12.0-M2" rev-constraint-default="2.12.0-M2" rev-constraint-dynamic="2.12.0-M2" callerrev="1.2"/>
+				<caller organisation="org.scala-lang" name="scala-compiler" conf="default, compile, runtime, master" rev="2.12.0-M2" rev-constraint-default="2.12.0-M2" rev-constraint-dynamic="2.12.0-M2" callerrev="2.12.0-M2"/>
+				<caller organisation="org.scala-lang" name="scala-reflect" conf="compile, runtime" rev="2.12.0-M2" rev-constraint-default="2.12.0-M2" rev-constraint-dynamic="2.12.0-M2" callerrev="2.12.0-M2"/>
+				<artifacts>
+					<artifact name="scala-library" type="jar" ext="jar" status="no" details="" size="5224371" time="0" location="/home/scalation/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.12.0-M2.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.0-M2/scala-library-2.12.0-M2.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+	</dependencies>
+</ivy-report>

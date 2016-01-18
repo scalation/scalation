@@ -1,0 +1,794 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>HMatrix3 - scalation.linalgebra.gen.HMatrix3</title>
+          <meta name="description" content="HMatrix3 - scalation.linalgebra.gen.HMatrix3" />
+          <meta name="keywords" content="HMatrix3 scalation.linalgebra.gen.HMatrix3" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../index.html';
+            var hash = 'scalation.linalgebra.gen.HMatrix3';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <img alt="Class" src="../../../lib/class_big.png" />
+        <p id="owner"><a href="../../package.html" class="extype" name="scalation">scalation</a>.<a href="../package.html" class="extype" name="scalation.linalgebra">linalgebra</a>.<a href="package.html" class="extype" name="scalation.linalgebra.gen">gen</a></p>
+        <h1>HMatrix3</h1><h3><span class="morelinks"><div>Related Doc:
+            <a href="package.html" class="extype" name="scalation.linalgebra.gen">package gen</a>
+          </div></span></h3><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <span class="name">HMatrix3</span><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>The <code>HMatrix3</code> class is a simple implementation of a 3-dimensional hypermatrix.
+ The first two dimensions must be fixed and known, while the third dimension
+ may be dynamically allocated by the user.  The third dimension should only
+ vary with the second dimension, not the first.
+ Caveat:  currently this is a very limited implementation of hypermatrices.
+-----------------------------------------------------------------------------</p></div><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div class="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalation.linalgebra.gen.HMatrix3"><span>HMatrix3</span></li><li class="in" name="scalation.util.Error"><span>Error</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div class="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="scalation.linalgebra.gen.HMatrix3#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(dim1:Int,dim2:Int,dims3:Array[Int])(implicitevidence$5:scala.reflect.ClassTag[T],implicitevidence$6:Numeric[T]):scalation.linalgebra.gen.HMatrix3[T]"></a><a id="&lt;init&gt;:HMatrix3[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">HMatrix3</span><span class="params">(<span name="dim1">dim1: <span class="extype" name="scala.Int">Int</span></span>, <span name="dim2">dim2: <span class="extype" name="scala.Int">Int</span></span>, <span name="dims3">dims3: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Int">Int</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.reflect.ClassTag">ClassTag</span>[<span class="extype" name="scalation.linalgebra.gen.HMatrix3.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="scala.Numeric">Numeric</span>[<span class="extype" name="scalation.linalgebra.gen.HMatrix3.T">T</span>]</span>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@&lt;init&gt;(dim1:Int,dim2:Int,dims3:Array[Int])(implicitevidence$5:scala.reflect.ClassTag[T],implicitevidence$6:Numeric[T]):scalation.linalgebra.gen.HMatrix3[T]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Construct a 3-dimensional hypermatrix, where the last dimension
+ varies only with the second dimension.</p><div class="fullcomment"><div class="comment cmt"><p>Construct a 3-dimensional hypermatrix, where the last dimension
+ varies only with the second dimension.</p></div><dl class="paramcmts block"><dt class="param">dim1</dt><dd class="cmt"><p>size of the 1st dimension of the hypermatrix</p></dd><dt class="param">dim2</dt><dd class="cmt"><p>size of the 2nd dimension of the hypermatrix</p></dd><dt class="param">dims3</dt><dd class="cmt"><p>array of sizes of the 3rd dimension of the hypermatrix</p></dd></dl></div>
+    </li><li name="scalation.linalgebra.gen.HMatrix3#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(dim1:Int,dim2:Int,dim3:Int)(implicitevidence$3:scala.reflect.ClassTag[T],implicitevidence$4:Numeric[T]):scalation.linalgebra.gen.HMatrix3[T]"></a><a id="&lt;init&gt;:HMatrix3[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">HMatrix3</span><span class="params">(<span name="dim1">dim1: <span class="extype" name="scala.Int">Int</span></span>, <span name="dim2">dim2: <span class="extype" name="scala.Int">Int</span></span>, <span name="dim3">dim3: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.reflect.ClassTag">ClassTag</span>[<span class="extype" name="scalation.linalgebra.gen.HMatrix3.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="scala.Numeric">Numeric</span>[<span class="extype" name="scalation.linalgebra.gen.HMatrix3.T">T</span>]</span>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@&lt;init&gt;(dim1:Int,dim2:Int,dim3:Int)(implicitevidence$3:scala.reflect.ClassTag[T],implicitevidence$4:Numeric[T]):scalation.linalgebra.gen.HMatrix3[T]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Construct a cuboidic 3-dimensional hypermatrix, where the last dimension
+ is fixed as well.</p><div class="fullcomment"><div class="comment cmt"><p>Construct a cuboidic 3-dimensional hypermatrix, where the last dimension
+ is fixed as well.</p></div><dl class="paramcmts block"><dt class="param">dim1</dt><dd class="cmt"><p>size of the 1st dimension of the hypermatrix</p></dd><dt class="param">dim2</dt><dd class="cmt"><p>size of the 2nd dimension of the hypermatrix</p></dd><dt class="param">dim3</dt><dd class="cmt"><p>size of the 3rd dimension of the hypermatrix</p></dd></dl></div>
+    </li><li name="scalation.linalgebra.gen.HMatrix3#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(dim1:Int,dim2:Int)(implicitevidence$1:scala.reflect.ClassTag[T],implicitevidence$2:Numeric[T]):scalation.linalgebra.gen.HMatrix3[T]"></a><a id="&lt;init&gt;:HMatrix3[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">HMatrix3</span><span class="params">(<span name="dim1">dim1: <span class="extype" name="scala.Int">Int</span></span>, <span name="dim2">dim2: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.reflect.ClassTag">ClassTag</span>[<span class="extype" name="scalation.linalgebra.gen.HMatrix3.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="scala.Numeric">Numeric</span>[<span class="extype" name="scalation.linalgebra.gen.HMatrix3.T">T</span>]</span>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@&lt;init&gt;(dim1:Int,dim2:Int)(implicitevidence$1:scala.reflect.ClassTag[T],implicitevidence$2:Numeric[T]):scalation.linalgebra.gen.HMatrix3[T]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">dim1</dt><dd class="cmt"><p>size of the 1st dimension of the hypermatrix</p></dd><dt class="param">dim2</dt><dd class="cmt"><p>size of the 2nd dimension of the hypermatrix</p></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+
+        <div class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@##():Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalation.linalgebra.gen.HMatrix3#+" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="+(b:scalation.linalgebra.gen.HMatrix3[T]):scalation.linalgebra.gen.HMatrix3[T]"></a><a id="+(HMatrix3[T]):HMatrix3[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $plus" class="name">+</span><span class="params">(<span name="b">b: <a href="" class="extype" name="scalation.linalgebra.gen.HMatrix3">HMatrix3</a>[<span class="extype" name="scalation.linalgebra.gen.HMatrix3.T">T</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalation.linalgebra.gen.HMatrix3">HMatrix3</a>[<span class="extype" name="scalation.linalgebra.gen.HMatrix3.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@+(b:scalation.linalgebra.gen.HMatrix3[T]):scalation.linalgebra.gen.HMatrix3[T]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Add 'this' hypermatrix and hypermatrix 'b'.</p><div class="fullcomment"><div class="comment cmt"><p>Add 'this' hypermatrix and hypermatrix 'b'.</p></div><dl class="paramcmts block"><dt class="param">b</dt><dd class="cmt"><p>the hypermatirx to add (requires leDimensions)</p></dd></dl></div>
+    </li><li name="scalation.linalgebra.gen.HMatrix3#-" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="-(b:scalation.linalgebra.gen.HMatrix3[T]):scalation.linalgebra.gen.HMatrix3[T]"></a><a id="-(HMatrix3[T]):HMatrix3[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $minus" class="name">-</span><span class="params">(<span name="b">b: <a href="" class="extype" name="scalation.linalgebra.gen.HMatrix3">HMatrix3</a>[<span class="extype" name="scalation.linalgebra.gen.HMatrix3.T">T</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalation.linalgebra.gen.HMatrix3">HMatrix3</a>[<span class="extype" name="scalation.linalgebra.gen.HMatrix3.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@-(b:scalation.linalgebra.gen.HMatrix3[T]):scalation.linalgebra.gen.HMatrix3[T]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">From 'this' hypermatrix subtract hypermatrix 'b'.</p><div class="fullcomment"><div class="comment cmt"><p>From 'this' hypermatrix subtract hypermatrix 'b'.</p></div><dl class="paramcmts block"><dt class="param">b</dt><dd class="cmt"><p>the hypermatirx to add (requires leDimensions)</p></dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalation.linalgebra.gen.HMatrix3#alloc" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="alloc(dims3:Array[Int]):Unit"></a><a id="alloc(Array[Int]):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">alloc</span><span class="params">(<span name="dims3">dims3: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Int">Int</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@alloc(dims3:Array[Int]):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Allocate all elements of the 3rd dimension of the hypermatrix, where
+ the last dimension only with the second dimension.</p><div class="fullcomment"><div class="comment cmt"><p>Allocate all elements of the 3rd dimension of the hypermatrix, where
+ the last dimension only with the second dimension.</p></div><dl class="paramcmts block"><dt class="param">dims3</dt><dd class="cmt"><p>array of sizes of the 3rd dimension of the hypermatrix</p></dd></dl></div>
+    </li><li name="scalation.linalgebra.gen.HMatrix3#alloc" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="alloc(i:Int,j:Int,dim3:Int):Unit"></a><a id="alloc(Int,Int,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">alloc</span><span class="params">(<span name="i">i: <span class="extype" name="scala.Int">Int</span></span>, <span name="j">j: <span class="extype" name="scala.Int">Int</span></span>, <span name="dim3">dim3: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@alloc(i:Int,j:Int,dim3:Int):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Allocate one element of the 3rd dimension of the hypermatrix for the
+ specified 'i' and 'j' indices.</p><div class="fullcomment"><div class="comment cmt"><p>Allocate one element of the 3rd dimension of the hypermatrix for the
+ specified 'i' and 'j' indices.  Although, this allows the 3rd dimension
+ to vary with both the first and second dimensions, it should only vary
+ with the second dimension.</p></div><dl class="paramcmts block"><dt class="param">i</dt><dd class="cmt"><p>1st dimension index of the hypermatrix</p></dd><dt class="param">j</dt><dd class="cmt"><p>2nd dimension index of the hypermatrix</p></dd><dt class="param">dim3</dt><dd class="cmt"><p>size of the array to be allocated in row i and column j</p></dd></dl></div>
+    </li><li name="scalation.linalgebra.gen.HMatrix3#apply" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="apply(i:Int,j:Int,k:Int):T"></a><a id="apply(Int,Int,Int):T"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">apply</span><span class="params">(<span name="i">i: <span class="extype" name="scala.Int">Int</span></span>, <span name="j">j: <span class="extype" name="scala.Int">Int</span></span>, <span name="k">k: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scalation.linalgebra.gen.HMatrix3.T">T</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@apply(i:Int,j:Int,k:Int):T" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Retrieve a single element of the hypermatrix.</p><div class="fullcomment"><div class="comment cmt"><p>Retrieve a single element of the hypermatrix.</p></div><dl class="paramcmts block"><dt class="param">i</dt><dd class="cmt"><p>1st dimension index of the hypermatrix</p></dd><dt class="param">j</dt><dd class="cmt"><p>2nd dimension index of the hypermatrix</p></dd><dt class="param">k</dt><dd class="cmt"><p>3rd dimension index of the hypermatrix</p></dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalation.linalgebra.gen.HMatrix3#clear" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="clear():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clear</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@clear():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Clear (make null) all contents in the 3rd dimension of the hypermatrix.</p>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a><a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@clone():Object" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalation.linalgebra.gen.HMatrix3#dim1" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="dim1:Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">dim1</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@dim1:Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">size of the 1st dimension of the hypermatrix</p>
+    </li><li name="scalation.linalgebra.gen.HMatrix3#dim2" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="dim2:Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">dim2</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@dim2:Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">size of the 2nd dimension of the hypermatrix</p>
+    </li><li name="scalation.linalgebra.gen.HMatrix3#dim_3" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="dim_3(j:Int):Int"></a><a id="dim_3(Int):Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">dim_3</span><span class="params">(<span name="j">j: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@dim_3(j:Int):Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Return the size of the 3rd dimension for the given 'j'.</p><div class="fullcomment"><div class="comment cmt"><p>Return the size of the 3rd dimension for the given 'j'.
+ The size of the 3rd dimension must be the same for all 'i'.</p></div><dl class="paramcmts block"><dt class="param">j</dt><dd class="cmt"><p>2nd dimension index of the hypermatrix</p></dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@equals(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalation.linalgebra.gen.HMatrix3#fString" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="fString:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">fString</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@fString:String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Format string used for printing vector values (change using setFormat)
+</p><div class="fullcomment"><div class="comment cmt"><p>Format string used for printing vector values (change using setFormat)
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@finalize():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalation.util.Error#flaw" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="flaw(method:String,message:String):Unit"></a><a id="flaw(String,String):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">flaw</span><span class="params">(<span name="method">method: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="message">message: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@flaw(method:String,message:String):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Show the flaw by printing the error message.</p><div class="fullcomment"><div class="comment cmt"><p>Show the flaw by printing the error message.</p></div><dl class="paramcmts block"><dt class="param">method</dt><dd class="cmt"><p>the method where the error occurred</p></dd><dt class="param">message</dt><dd class="cmt"><p>the error message</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a></dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@getClass():Class[_]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@hashCode():Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalation.linalgebra.gen.HMatrix3#leDimensions" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="leDimensions(b:scalation.linalgebra.gen.HMatrix3[T]):Boolean"></a><a id="leDimensions(HMatrix3[T]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">leDimensions</span><span class="params">(<span name="b">b: <a href="" class="extype" name="scalation.linalgebra.gen.HMatrix3">HMatrix3</a>[<span class="extype" name="scalation.linalgebra.gen.HMatrix3.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@leDimensions(b:scalation.linalgebra.gen.HMatrix3[T]):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Check whether the dimensions of 'this' hypermatrix are less than or equal to
+ (le) those of the other hypermatrix 'b'.</p><div class="fullcomment"><div class="comment cmt"><p>Check whether the dimensions of 'this' hypermatrix are less than or equal to
+ (le) those of the other hypermatrix 'b'.</p></div><dl class="paramcmts block"><dt class="param">b</dt><dd class="cmt"><p>the other matrix</p></dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@notify():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@notifyAll():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalation.linalgebra.gen.HMatrix3#nu" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="nu:Numeric[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">nu</span><span class="result">: <span class="extype" name="scala.Numeric">Numeric</span>[<span class="extype" name="scalation.linalgebra.gen.HMatrix3.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@nu:Numeric[T]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Import Numeric evidence (gets nu val from superclass)
+</p>
+    </li><li name="scalation.linalgebra.gen.HMatrix3#set" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="set(x:T):Unit"></a><a id="set(T):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">set</span><span class="params">(<span name="x">x: <span class="extype" name="scalation.linalgebra.gen.HMatrix3.T">T</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@set(x:T):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Set all the hypermatrix element values to 'x'.</p><div class="fullcomment"><div class="comment cmt"><p>Set all the hypermatrix element values to 'x'.</p></div><dl class="paramcmts block"><dt class="param">x</dt><dd class="cmt"><p>the value to set all elements to</p></dd></dl></div>
+    </li><li name="scalation.linalgebra.gen.HMatrix3#setFormat" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setFormat(newFormat:String):Unit"></a><a id="setFormat(String):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setFormat</span><span class="params">(<span name="newFormat">newFormat: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@setFormat(newFormat:String):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Set the format to the 'newFormat'.</p><div class="fullcomment"><div class="comment cmt"><p>Set the format to the 'newFormat'.</p></div><dl class="paramcmts block"><dt class="param">newFormat</dt><dd class="cmt"><p>the new format string</p></dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalation.linalgebra.gen.HMatrix3#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@toString():String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Convert 'this' hypermatrix to a string.</p><div class="fullcomment"><div class="comment cmt"><p>Convert 'this' hypermatrix to a string.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="scalation.linalgebra.gen.HMatrix3">HMatrix3</a> → AnyRef → Any</dd></dl></div>
+    </li><li name="scalation.linalgebra.gen.HMatrix3#update" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="update(i:Int,j:Int,k:Int,v:T):Unit"></a><a id="update(Int,Int,Int,T):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">update</span><span class="params">(<span name="i">i: <span class="extype" name="scala.Int">Int</span></span>, <span name="j">j: <span class="extype" name="scala.Int">Int</span></span>, <span name="k">k: <span class="extype" name="scala.Int">Int</span></span>, <span name="v">v: <span class="extype" name="scalation.linalgebra.gen.HMatrix3.T">T</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@update(i:Int,j:Int,k:Int,v:T):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Update a single element of the hypermatrix to the given value.</p><div class="fullcomment"><div class="comment cmt"><p>Update a single element of the hypermatrix to the given value.</p></div><dl class="paramcmts block"><dt class="param">i</dt><dd class="cmt"><p>1st dimension index of the hypermatrix</p></dd><dt class="param">j</dt><dd class="cmt"><p>2nd dimension index of the hypermatrix</p></dd><dt class="param">k</dt><dd class="cmt"><p>3rd dimension index of the hypermatrix</p></dd><dt class="param">v</dt><dd class="cmt"><p>the value to be updated at the above position in the hypermatrix</p></dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@wait():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#scalation.linalgebra.gen.HMatrix3@wait(x$1:Long):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scalation.util.Error">
+              <h3>Inherited from <a href="../../util/Error.html" class="extype" name="scalation.util.Error">Error</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

@@ -1,0 +1,1361 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>QCurve - scalation.scala2d.QCurve</title>
+          <meta name="description" content="QCurve - scalation.scala2d.QCurve" />
+          <meta name="keywords" content="QCurve scalation.scala2d.QCurve" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'scalation.scala2d.QCurve';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <a href="QCurve$.html" title="See companion object"><img alt="Class/Object" src="../../lib/class_to_object_big.png" /></a>
+        <p id="owner"><a href="../package.html" class="extype" name="scalation">scalation</a>.<a href="package.html" class="extype" name="scalation.scala2d">scala2d</a></p>
+        <h1><a href="QCurve$.html" title="See companion object">QCurve</a></h1><h3><span class="morelinks"><div>
+            Related Docs:
+            <a href="QCurve$.html" title="See companion object">object QCurve</a>
+            | <a href="package.html" class="extype" name="scalation.scala2d">package scala2d</a>
+          </div></span></h3><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <span class="name">QCurve</span><span class="params">(<span name="p1">p1: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a> = <span class="symbol">R2 (0.0, 0.0)</span></span>, <span name="pc">pc: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a> = <span class="symbol">R2 (0.0, 0.0)</span></span>, <span name="p2">p2: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a> = <span class="symbol">R2 (0.0, 0.0)</span></span>, <span name="straight">straight: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">true</span></span>)</span><span class="result"> extends <span class="extype" name="java.awt.geom.QuadCurve2D.Double">Double</span> with <a href="CurvilinearShape.html" class="extype" name="scalation.scala2d.CurvilinearShape">CurvilinearShape</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>The <code>QCurve</code> class enhances the <code>QuadCurve.Double</code> class (from the java.awt.geom
+ package) by allowing entities to move along such quadratic curves as well as
+ lines.  Although the curve could be developed as a quadratic function where
+ 'y = ax<sup>2 + bx + c'.  The following quadratic bezier formulation is used:
+ p(t) = (x(t), y(t)) = [(1-t)</sup>2 * p1] + [2 * (1-t) * t * pc] + [t^2 * p2].</p></div><dl class="paramcmts block"><dt class="param">p1</dt><dd class="cmt"><p>the starting point for the quad curve</p></dd><dt class="param">pc</dt><dd class="cmt"><p>the control point for the quad curve</p></dd><dt class="param">p2</dt><dd class="cmt"><p>the ending point for the quad curve</p></dd><dt class="param">straight</dt><dd class="cmt"><p>whether the quad curve is straight (i.e., a line)</p></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="CurvilinearShape.html" class="extype" name="scalation.scala2d.CurvilinearShape">CurvilinearShape</a>, <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a>, <span class="extype" name="java.awt.geom.QuadCurve2D.Double">Double</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="java.awt.geom.QuadCurve2D">QuadCurve2D</span>, <span class="extype" name="java.lang.Cloneable">Cloneable</span>, <span class="extype" name="java.awt.Shape">Shape</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div class="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalation.scala2d.QCurve"><span>QCurve</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="scalation.scala2d.CurvilinearShape"><span>CurvilinearShape</span></li><li class="in" name="scalation.util.Error"><span>Error</span></li><li class="in" name="java.awt.geom.QuadCurve2D.Double"><span>Double</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="java.awt.geom.QuadCurve2D"><span>QuadCurve2D</span></li><li class="in" name="java.lang.Cloneable"><span>Cloneable</span></li><li class="in" name="java.awt.Shape"><span>Shape</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div class="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="scalation.scala2d.QCurve#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(p1:scalation.scala2d.R2,pc:scalation.scala2d.R2,p2:scalation.scala2d.R2):scalation.scala2d.QCurve"></a><a id="&lt;init&gt;:QCurve"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">QCurve</span><span class="params">(<span name="p1">p1: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>, <span name="pc">pc: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>, <span name="p2">p2: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@&lt;init&gt;(p1:scalation.scala2d.R2,pc:scalation.scala2d.R2,p2:scalation.scala2d.R2):scalation.scala2d.QCurve" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Construct a quad curve using an explicitly given control point.</p><div class="fullcomment"><div class="comment cmt"><p>Construct a quad curve using an explicitly given control point.</p></div><dl class="paramcmts block"><dt class="param">p1</dt><dd class="cmt"><p>the starting point</p></dd><dt class="param">pc</dt><dd class="cmt"><p>the control point</p></dd><dt class="param">p2</dt><dd class="cmt"><p>the ending point</p></dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(p1:scalation.scala2d.R2,p2:scalation.scala2d.R2,bend:Double):scalation.scala2d.QCurve"></a><a id="&lt;init&gt;:QCurve"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">QCurve</span><span class="params">(<span name="p1">p1: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>, <span name="p2">p2: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>, <span name="bend">bend: <span class="extype" name="scala.Double">Double</span></span>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@&lt;init&gt;(p1:scalation.scala2d.R2,p2:scalation.scala2d.R2,bend:Double):scalation.scala2d.QCurve" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Construct a quad curve where bend indicates the distance to the control
+ point.</p><div class="fullcomment"><div class="comment cmt"><p>Construct a quad curve where bend indicates the distance to the control
+ point.</p></div><dl class="paramcmts block"><dt class="param">p1</dt><dd class="cmt"><p>the starting point</p></dd><dt class="param">p2</dt><dd class="cmt"><p>the ending point</p></dd><dt class="param">bend</dt><dd class="cmt"><p>the bend or curvature (1. =&gt; line length)</p></dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(p1:scalation.scala2d.R2,p2:scalation.scala2d.R2):scalation.scala2d.QCurve"></a><a id="&lt;init&gt;:QCurve"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">QCurve</span><span class="params">(<span name="p1">p1: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>, <span name="p2">p2: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@&lt;init&gt;(p1:scalation.scala2d.R2,p2:scalation.scala2d.R2):scalation.scala2d.QCurve" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Construct a straight line (degenerate quad curve).</p><div class="fullcomment"><div class="comment cmt"><p>Construct a straight line (degenerate quad curve).</p></div><dl class="paramcmts block"><dt class="param">p1</dt><dd class="cmt"><p>the starting point</p></dd><dt class="param">p2</dt><dd class="cmt"><p>the ending point</p></dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(p1:scalation.scala2d.R2,pc:scalation.scala2d.R2,p2:scalation.scala2d.R2,straight:Boolean):scalation.scala2d.QCurve"></a><a id="&lt;init&gt;:QCurve"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">QCurve</span><span class="params">(<span name="p1">p1: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a> = <span class="symbol">R2 (0.0, 0.0)</span></span>, <span name="pc">pc: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a> = <span class="symbol">R2 (0.0, 0.0)</span></span>, <span name="p2">p2: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a> = <span class="symbol">R2 (0.0, 0.0)</span></span>, <span name="straight">straight: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">true</span></span>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@&lt;init&gt;(p1:scalation.scala2d.R2,pc:scalation.scala2d.R2,p2:scalation.scala2d.R2,straight:Boolean):scalation.scala2d.QCurve" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">p1</dt><dd class="cmt"><p>the starting point for the quad curve</p></dd><dt class="param">pc</dt><dd class="cmt"><p>the control point for the quad curve</p></dd><dt class="param">p2</dt><dd class="cmt"><p>the ending point for the quad curve</p></dd><dt class="param">straight</dt><dd class="cmt"><p>whether the quad curve is straight (i.e., a line)</p></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+
+        <div class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@##():Int" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#_traj" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="_traj:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">_traj</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@_traj:Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Trajectory parameter t ranges from 0.</p><div class="fullcomment"><div class="comment cmt"><p>Trajectory parameter t ranges from 0. to 1. (indicates how far along the curve)
+</p></div></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D#clone" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a><a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@clone():Object" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>QuadCurve2D → AnyRef</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D#contains" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="contains(x$1:java.awt.geom.Rectangle2D):Boolean"></a><a id="contains(Rectangle2D):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">contains</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.awt.geom.Rectangle2D">Rectangle2D</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@contains(x$1:java.awt.geom.Rectangle2D):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>QuadCurve2D → Shape</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D#contains" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="contains(x$1:Double,x$2:Double,x$3:Double,x$4:Double):Boolean"></a><a id="contains(Double,Double,Double,Double):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">contains</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Double">Double</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Double">Double</span></span>, <span name="arg2">arg2: <span class="extype" name="scala.Double">Double</span></span>, <span name="arg3">arg3: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@contains(x$1:Double,x$2:Double,x$3:Double,x$4:Double):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>QuadCurve2D → Shape</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D#contains" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="contains(x$1:java.awt.geom.Point2D):Boolean"></a><a id="contains(Point2D):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">contains</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.awt.geom.Point2D">Point2D</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@contains(x$1:java.awt.geom.Point2D):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>QuadCurve2D → Shape</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D#contains" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="contains(x$1:Double,x$2:Double):Boolean"></a><a id="contains(Double,Double):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">contains</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Double">Double</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@contains(x$1:Double,x$2:Double):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>QuadCurve2D → Shape</dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#eval" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eval():scalation.scala2d.R2"></a><a id="eval():R2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eval</span><span class="params">()</span><span class="result">: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@eval():scalation.scala2d.R2" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Given a value for the trajectory parameter t (in [0., 1.]) calculate
+ the point on the curve using the Quadratic Bezier equation.</p><div class="fullcomment"><div class="comment cmt"><p>Given a value for the trajectory parameter t (in [0., 1.]) calculate
+ the point on the curve using the Quadratic Bezier equation.
+ See http://en.wikipedia.org/wiki/Bézier_curve#Quadratic_curves
+</p></div></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@finalize():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalation.util.Error#flaw" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="flaw(method:String,message:String):Unit"></a><a id="flaw(String,String):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">flaw</span><span class="params">(<span name="method">method: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="message">message: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@flaw(method:String,message:String):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Show the flaw by printing the error message.</p><div class="fullcomment"><div class="comment cmt"><p>Show the flaw by printing the error message.</p></div><dl class="paramcmts block"><dt class="param">method</dt><dd class="cmt"><p>the method where the error occurred</p></dd><dt class="param">message</dt><dd class="cmt"><p>the error message</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D#getBounds" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getBounds():java.awt.Rectangle"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getBounds</span><span class="params">()</span><span class="result">: <span class="extype" name="java.awt.Rectangle">java.awt.Rectangle</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getBounds():java.awt.Rectangle" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>QuadCurve2D → Shape</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D.Double#getBounds2D" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getBounds2D():java.awt.geom.Rectangle2D"></a><a id="getBounds2D():Rectangle2D"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getBounds2D</span><span class="params">()</span><span class="result">: <span class="extype" name="java.awt.geom.Rectangle2D">Rectangle2D</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getBounds2D():java.awt.geom.Rectangle2D" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Double → Shape</dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#getCenterX" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getCenterX():Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getCenterX</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getCenterX():Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Get the x-coordinate of the center of the line/curve.</p><div class="fullcomment"><div class="comment cmt"><p>Get the x-coordinate of the center of the line/curve.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="scalation.scala2d.QCurve">QCurve</a> → <a href="CurvilinearShape.html" class="extype" name="scalation.scala2d.CurvilinearShape">CurvilinearShape</a></dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#getCenterY" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getCenterY():Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getCenterY</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getCenterY():Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Get the y-coordinate of the center of the line/curve.</p><div class="fullcomment"><div class="comment cmt"><p>Get the y-coordinate of the center of the line/curve.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="scalation.scala2d.QCurve">QCurve</a> → <a href="CurvilinearShape.html" class="extype" name="scalation.scala2d.CurvilinearShape">CurvilinearShape</a></dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getClass():Class[_]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#getControl" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="getControl:scalation.scala2d.R2"></a><a id="getControl:R2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getControl</span><span class="result">: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getControl:scalation.scala2d.R2" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Get the control point of the quad curve.</p>
+    </li><li name="java.awt.geom.QuadCurve2D.Double#getCtrlPt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getCtrlPt():java.awt.geom.Point2D"></a><a id="getCtrlPt():Point2D"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getCtrlPt</span><span class="params">()</span><span class="result">: <span class="extype" name="java.awt.geom.Point2D">Point2D</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getCtrlPt():java.awt.geom.Point2D" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Double → QuadCurve2D</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D.Double#getCtrlX" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getCtrlX():Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getCtrlX</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getCtrlX():Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Double → QuadCurve2D</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D.Double#getCtrlY" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getCtrlY():Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getCtrlY</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getCtrlY():Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Double → QuadCurve2D</dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#getFirst" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getFirst(width:Double,height:Double):scalation.scala2d.R2"></a><a id="getFirst(Double,Double):R2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getFirst</span><span class="params">(<span name="width">width: <span class="extype" name="scala.Double">Double</span></span>, <span name="height">height: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getFirst(width:Double,height:Double):scalation.scala2d.R2" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Get the first/start point of the quad curve, adjusted from top-left to
+ center coordinates.</p><div class="fullcomment"><div class="comment cmt"><p>Get the first/start point of the quad curve, adjusted from top-left to
+ center coordinates.</p></div><dl class="paramcmts block"><dt class="param">width</dt><dd class="cmt"><p>the width of object traversing the curve</p></dd><dt class="param">height</dt><dd class="cmt"><p>the height of object traversing the curve</p></dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#getFirst" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="getFirst:scalation.scala2d.R2"></a><a id="getFirst:R2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getFirst</span><span class="result">: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getFirst:scalation.scala2d.R2" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Get the first/start point of the quad curve.</p>
+    </li><li name="java.awt.geom.QuadCurve2D#getFlatness" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getFlatness():Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getFlatness</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getFlatness():Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>QuadCurve2D</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D#getFlatnessSq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getFlatnessSq():Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getFlatnessSq</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getFlatnessSq():Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>QuadCurve2D</dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#getLast" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getLast(width:Double,height:Double):scalation.scala2d.R2"></a><a id="getLast(Double,Double):R2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getLast</span><span class="params">(<span name="width">width: <span class="extype" name="scala.Double">Double</span></span>, <span name="height">height: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getLast(width:Double,height:Double):scalation.scala2d.R2" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Get the last/end point of the quad curve, adjusted from top-left to
+ center coordinates.</p><div class="fullcomment"><div class="comment cmt"><p>Get the last/end point of the quad curve, adjusted from top-left to
+ center coordinates.</p></div><dl class="paramcmts block"><dt class="param">width</dt><dd class="cmt"><p>the width of object traversing the curve</p></dd><dt class="param">height</dt><dd class="cmt"><p>the height of object traversing the curve</p></dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#getLast" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="getLast:scalation.scala2d.R2"></a><a id="getLast:R2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getLast</span><span class="result">: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getLast:scalation.scala2d.R2" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Get the last/end point of the quad curve.</p>
+    </li><li name="java.awt.geom.QuadCurve2D.Double#getP1" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getP1():java.awt.geom.Point2D"></a><a id="getP1():Point2D"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getP1</span><span class="params">()</span><span class="result">: <span class="extype" name="java.awt.geom.Point2D">Point2D</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getP1():java.awt.geom.Point2D" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Double → QuadCurve2D</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D.Double#getP2" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getP2():java.awt.geom.Point2D"></a><a id="getP2():Point2D"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getP2</span><span class="params">()</span><span class="result">: <span class="extype" name="java.awt.geom.Point2D">Point2D</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getP2():java.awt.geom.Point2D" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Double → QuadCurve2D</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D#getPathIterator" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getPathIterator(x$1:java.awt.geom.AffineTransform,x$2:Double):java.awt.geom.PathIterator"></a><a id="getPathIterator(AffineTransform,Double):PathIterator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getPathIterator</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.awt.geom.AffineTransform">AffineTransform</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="java.awt.geom.PathIterator">PathIterator</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getPathIterator(x$1:java.awt.geom.AffineTransform,x$2:Double):java.awt.geom.PathIterator" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>QuadCurve2D → Shape</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D#getPathIterator" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getPathIterator(x$1:java.awt.geom.AffineTransform):java.awt.geom.PathIterator"></a><a id="getPathIterator(AffineTransform):PathIterator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getPathIterator</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.awt.geom.AffineTransform">AffineTransform</span></span>)</span><span class="result">: <span class="extype" name="java.awt.geom.PathIterator">PathIterator</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getPathIterator(x$1:java.awt.geom.AffineTransform):java.awt.geom.PathIterator" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>QuadCurve2D → Shape</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D.Double#getX1" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getX1():Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getX1</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getX1():Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Double → QuadCurve2D</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D.Double#getX2" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getX2():Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getX2</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getX2():Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Double → QuadCurve2D</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D.Double#getY1" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getY1():Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getY1</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getY1():Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Double → QuadCurve2D</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D.Double#getY2" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getY2():Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getY2</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@getY2():Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Double → QuadCurve2D</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D#intersects" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="intersects(x$1:java.awt.geom.Rectangle2D):Boolean"></a><a id="intersects(Rectangle2D):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">intersects</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.awt.geom.Rectangle2D">Rectangle2D</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@intersects(x$1:java.awt.geom.Rectangle2D):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>QuadCurve2D → Shape</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D#intersects" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="intersects(x$1:Double,x$2:Double,x$3:Double,x$4:Double):Boolean"></a><a id="intersects(Double,Double,Double,Double):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">intersects</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Double">Double</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Double">Double</span></span>, <span name="arg2">arg2: <span class="extype" name="scala.Double">Double</span></span>, <span name="arg3">arg3: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@intersects(x$1:Double,x$2:Double,x$3:Double,x$4:Double):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>QuadCurve2D → Shape</dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#isSame" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="isSame(x:Double,y:Double,xe:Double,ye:Double,step:Double):Boolean"></a><a id="isSame(Double,Double,Double,Double,Double):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isSame</span><span class="params">(<span name="x">x: <span class="extype" name="scala.Double">Double</span></span>, <span name="y">y: <span class="extype" name="scala.Double">Double</span></span>, <span name="xe">xe: <span class="extype" name="scala.Double">Double</span></span>, <span name="ye">ye: <span class="extype" name="scala.Double">Double</span></span>, <span name="step">step: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@isSame(x:Double,y:Double,xe:Double,ye:Double,step:Double):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Are (x, y) and (xe, ye) essentially the same?
+</p>
+    </li><li name="scalation.scala2d.QCurve#length" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="length:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">length</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@length:Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Return the length of this QCurve
+</p>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#next" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="next(width:Double,height:Double):scalation.scala2d.R2"></a><a id="next(Double,Double):R2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">next</span><span class="params">(<span name="width">width: <span class="extype" name="scala.Double">Double</span></span>, <span name="height">height: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@next(width:Double,height:Double):scalation.scala2d.R2" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Return the next point on the quad curve (one step beyond current point)
+ and adjust from top-left to center coordinates for the object traversing
+ the curve based on its width and height.</p><div class="fullcomment"><div class="comment cmt"><p>Return the next point on the quad curve (one step beyond current point)
+ and adjust from top-left to center coordinates for the object traversing
+ the curve based on its width and height.
+ Return null if t &gt; 1. (i.e., past end point).</p></div><dl class="paramcmts block"><dt class="param">width</dt><dd class="cmt"><p>the width of object traversing the curve</p></dd><dt class="param">height</dt><dd class="cmt"><p>the height of object traversing the curve</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="scalation.scala2d.QCurve">QCurve</a> → <a href="CurvilinearShape.html" class="extype" name="scalation.scala2d.CurvilinearShape">CurvilinearShape</a></dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#next" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="next():scalation.scala2d.R2"></a><a id="next():R2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">next</span><span class="params">()</span><span class="result">: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@next():scalation.scala2d.R2" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Return the next point on the quad curve (one step beyond current point).</p><div class="fullcomment"><div class="comment cmt"><p>Return the next point on the quad curve (one step beyond current point).
+ Return null if t &gt; 1. (i.e., past end point).
+</p></div></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@notify():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@notifyAll():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#p1" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="p1:scalation.scala2d.R2"></a><a id="p1:R2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">p1</span><span class="result">: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@p1:scalation.scala2d.R2" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">the starting point for the quad curve</p>
+    </li><li name="scalation.scala2d.QCurve#p2" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="p2:scalation.scala2d.R2"></a><a id="p2:R2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">p2</span><span class="result">: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@p2:scalation.scala2d.R2" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">the ending point for the quad curve</p>
+    </li><li name="scalation.scala2d.QCurve#pc" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="pc:scalation.scala2d.R2"></a><a id="pc:R2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">pc</span><span class="result">: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@pc:scalation.scala2d.R2" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">the control point for the quad curve</p>
+    </li><li name="java.awt.geom.QuadCurve2D.Double#setCurve" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setCurve(x$1:Double,x$2:Double,x$3:Double,x$4:Double,x$5:Double,x$6:Double):Unit"></a><a id="setCurve(Double,Double,Double,Double,Double,Double):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setCurve</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Double">Double</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Double">Double</span></span>, <span name="arg2">arg2: <span class="extype" name="scala.Double">Double</span></span>, <span name="arg3">arg3: <span class="extype" name="scala.Double">Double</span></span>, <span name="arg4">arg4: <span class="extype" name="scala.Double">Double</span></span>, <span name="arg5">arg5: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@setCurve(x$1:Double,x$2:Double,x$3:Double,x$4:Double,x$5:Double,x$6:Double):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Double → QuadCurve2D</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D#setCurve" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setCurve(x$1:java.awt.geom.QuadCurve2D):Unit"></a><a id="setCurve(QuadCurve2D):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setCurve</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.awt.geom.QuadCurve2D">QuadCurve2D</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@setCurve(x$1:java.awt.geom.QuadCurve2D):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>QuadCurve2D</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D#setCurve" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setCurve(x$1:Array[java.awt.geom.Point2D],x$2:Int):Unit"></a><a id="setCurve(Array[Point2D],Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setCurve</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="java.awt.geom.Point2D">Point2D</span>]</span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@setCurve(x$1:Array[java.awt.geom.Point2D],x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>QuadCurve2D</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D#setCurve" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setCurve(x$1:java.awt.geom.Point2D,x$2:java.awt.geom.Point2D,x$3:java.awt.geom.Point2D):Unit"></a><a id="setCurve(Point2D,Point2D,Point2D):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setCurve</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.awt.geom.Point2D">Point2D</span></span>, <span name="arg1">arg1: <span class="extype" name="java.awt.geom.Point2D">Point2D</span></span>, <span name="arg2">arg2: <span class="extype" name="java.awt.geom.Point2D">Point2D</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@setCurve(x$1:java.awt.geom.Point2D,x$2:java.awt.geom.Point2D,x$3:java.awt.geom.Point2D):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>QuadCurve2D</dd></dl></div>
+    </li><li name="java.awt.geom.QuadCurve2D#setCurve" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setCurve(x$1:Array[Double],x$2:Int):Unit"></a><a id="setCurve(Array[Double],Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setCurve</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Double">Double</span>]</span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@setCurve(x$1:Array[Double],x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>QuadCurve2D</dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#setLine" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setLine(_p1:scalation.scala2d.R2,_pc:scalation.scala2d.R2,_p2:scalation.scala2d.R2):Unit"></a><a id="setLine(R2,R2,R2):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setLine</span><span class="params">(<span name="_p1">_p1: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>, <span name="_pc">_pc: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>, <span name="_p2">_p2: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@setLine(_p1:scalation.scala2d.R2,_pc:scalation.scala2d.R2,_p2:scalation.scala2d.R2):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Set (or reset) the location for the QCurve as a curve using an explicitly
+ given control point.</p><div class="fullcomment"><div class="comment cmt"><p>Set (or reset) the location for the QCurve as a curve using an explicitly
+ given control point.</p></div><dl class="paramcmts block"><dt class="param">_p1</dt><dd class="cmt"><p>the starting point</p></dd><dt class="param">_pc</dt><dd class="cmt"><p>the control point</p></dd><dt class="param">_p2</dt><dd class="cmt"><p>the ending point</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="scalation.scala2d.QCurve">QCurve</a> → <a href="CurvilinearShape.html" class="extype" name="scalation.scala2d.CurvilinearShape">CurvilinearShape</a></dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#setLine" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setLine(_p1:scalation.scala2d.R2,_p2:scalation.scala2d.R2,bend:Double):Unit"></a><a id="setLine(R2,R2,Double):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setLine</span><span class="params">(<span name="_p1">_p1: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>, <span name="_p2">_p2: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>, <span name="bend">bend: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@setLine(_p1:scalation.scala2d.R2,_p2:scalation.scala2d.R2,bend:Double):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Set (or reset) the location for the QCurve as a curve using bend to
+ calculate the control point.</p><div class="fullcomment"><div class="comment cmt"><p>Set (or reset) the location for the QCurve as a curve using bend to
+ calculate the control point.</p></div><dl class="paramcmts block"><dt class="param">_p1</dt><dd class="cmt"><p>the starting point</p></dd><dt class="param">_p2</dt><dd class="cmt"><p>the ending point</p></dd><dt class="param">bend</dt><dd class="cmt"><p>the bend or curvature (1. =&gt; line-length)</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="scalation.scala2d.QCurve">QCurve</a> → <a href="CurvilinearShape.html" class="extype" name="scalation.scala2d.CurvilinearShape">CurvilinearShape</a></dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#setLine" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setLine(_p1:scalation.scala2d.R2,_p2:scalation.scala2d.R2):Unit"></a><a id="setLine(R2,R2):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setLine</span><span class="params">(<span name="_p1">_p1: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>, <span name="_p2">_p2: <a href="R2.html" class="extype" name="scalation.scala2d.R2">R2</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@setLine(_p1:scalation.scala2d.R2,_p2:scalation.scala2d.R2):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Set (or reset) the location for the QCurve as a line.</p><div class="fullcomment"><div class="comment cmt"><p>Set (or reset) the location for the QCurve as a line.</p></div><dl class="paramcmts block"><dt class="param">_p1</dt><dd class="cmt"><p>the starting point</p></dd><dt class="param">_p2</dt><dd class="cmt"><p>the ending point</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="scalation.scala2d.QCurve">QCurve</a> → <a href="CurvilinearShape.html" class="extype" name="scalation.scala2d.CurvilinearShape">CurvilinearShape</a></dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#setSteps" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="setSteps(_steps:Int):Unit"></a><a id="setSteps(Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setSteps</span><span class="params">(<span name="_steps">_steps: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@setSteps(_steps:Int):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Set the number of steps for tokens to take as move along the quad curve.</p>
+    </li><li name="scalation.scala2d.QCurve#straight" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="straight:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">straight</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@straight:Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">whether the quad curve is straight (i.e., a line)</p>
+    </li><li name="java.awt.geom.QuadCurve2D#subdivide" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="subdivide(x$1:java.awt.geom.QuadCurve2D,x$2:java.awt.geom.QuadCurve2D):Unit"></a><a id="subdivide(QuadCurve2D,QuadCurve2D):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">subdivide</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.awt.geom.QuadCurve2D">QuadCurve2D</span></span>, <span name="arg1">arg1: <span class="extype" name="java.awt.geom.QuadCurve2D">QuadCurve2D</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@subdivide(x$1:java.awt.geom.QuadCurve2D,x$2:java.awt.geom.QuadCurve2D):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>QuadCurve2D</dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@toString():String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Show the start, control and end points of the the QCurve.</p><div class="fullcomment"><div class="comment cmt"><p>Show the start, control and end points of the the QCurve.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="scalation.scala2d.QCurve">QCurve</a> → AnyRef → Any</dd></dl></div>
+    </li><li name="scalation.scala2d.QCurve#traj" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="traj:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">traj</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@traj:Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Get the current trajectory '_traj' of the curve.</p>
+    </li><li name="scalation.scala2d.QCurve#traj_=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="traj_=(traj:Double):Unit"></a><a id="traj_=(Double):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: traj_$eq" class="name">traj_=</span><span class="params">(<span name="traj">traj: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@traj_=(traj:Double):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Set the trajectory '_traj' to a new value.</p><div class="fullcomment"><div class="comment cmt"><p>Set the trajectory '_traj' to a new value.</p></div><dl class="paramcmts block"><dt class="param">traj</dt><dd class="cmt"><p>the new trajectory for the curve</p></dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@wait():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.scala2d.QCurve@wait(x$1:Long):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.Serializable">
+              <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="scala.Product">
+              <h3>Inherited from <span class="extype" name="scala.Product">Product</span></h3>
+            </div><div class="parent" name="scala.Equals">
+              <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
+            </div><div class="parent" name="scalation.scala2d.CurvilinearShape">
+              <h3>Inherited from <a href="CurvilinearShape.html" class="extype" name="scalation.scala2d.CurvilinearShape">CurvilinearShape</a></h3>
+            </div><div class="parent" name="scalation.util.Error">
+              <h3>Inherited from <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></h3>
+            </div><div class="parent" name="java.awt.geom.QuadCurve2D.Double">
+              <h3>Inherited from <span class="extype" name="java.awt.geom.QuadCurve2D.Double">Double</span></h3>
+            </div><div class="parent" name="java.io.Serializable">
+              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="java.awt.geom.QuadCurve2D">
+              <h3>Inherited from <span class="extype" name="java.awt.geom.QuadCurve2D">QuadCurve2D</span></h3>
+            </div><div class="parent" name="java.lang.Cloneable">
+              <h3>Inherited from <span class="extype" name="java.lang.Cloneable">Cloneable</span></h3>
+            </div><div class="parent" name="java.awt.Shape">
+              <h3>Inherited from <span class="extype" name="java.awt.Shape">Shape</span></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

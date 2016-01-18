@@ -1,0 +1,245 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>dynamics_pde - scalation.dynamics_pde</title>
+          <meta name="description" content="dynamics pde - scalation.dynamics pde" />
+          <meta name="keywords" content="dynamics pde scalation.dynamics pde" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'scalation.dynamics_pde.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../lib/package_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="scalation">scalation</a></p>
+        <h1>dynamics_pde</h1><span class="permalink">
+      <a href="../../index.html#scalation.dynamics_pde.package" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">dynamics_pde</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>The dynamics package contains classes, traits and objects for
+ system dynamics simulations using Partial Differential Equations (PDEs).
+</p></div><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div class="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalation.dynamics_pde"><span>dynamics_pde</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div class="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalation.dynamics_pde.FirstOrderPDE" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="FirstOrderPDEextendsError"></a><a id="FirstOrderPDE:FirstOrderPDE"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="FirstOrderPDE.html"><span class="name">FirstOrderPDE</span></a><span class="result"> extends <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics_pde.package@FirstOrderPDEextendsError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>FirstOrderPDE</code> class is used to solve first order partial differential
+ equations like the Advection Equation.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>FirstOrderPDE</code> class is used to solve first order partial differential
+ equations like the Advection Equation.  Let 'u(x, t)' = concentration in a fluid
+ with velocity 'v' at position '0 &lt;= x &lt;= xm' and time 't' &gt; 0.  Numerically solve the</p><p> Advection Equation:      u_t + v(x, t) * u_x = 0
+ with initial conditions  u(x, 0) = ic(x)
+     boundary conditions  (u(0, t), u(xm, t)) = bc</p></div></div>
+    </li><li name="scalation.dynamics_pde.ParabolicPDE" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ParabolicPDEextendsError"></a><a id="ParabolicPDE:ParabolicPDE"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ParabolicPDE.html"><span class="name">ParabolicPDE</span></a><span class="result"> extends <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics_pde.package@ParabolicPDEextendsError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>ParabolicPDE' class is used to solve parabolic partial differential
+ equations like the Heat Equation.  Let 'u(x, t)' = temperature of a rod at
+ position '0 &lt;= x &lt;= xm' and time 't' &gt; 0.  Numerically solve the</code></p><div class="fullcomment"><div class="comment cmt"><p>The <code>ParabolicPDE' class is used to solve parabolic partial differential
+ equations like the Heat Equation.  Let 'u(x, t)' = temperature of a rod at
+ position '0 &lt;= x &lt;= xm' and time 't' &gt; 0.  Numerically solve the</code></p><p> Heat Equation:           u_t = k * u_xx
+ with initial conditions  u(x, 0) = ic(x)
+     boundary conditions  (u(0, t), u(xm, t)) = bc</p></div></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scalation.dynamics_pde.FirstOrderPDETest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="FirstOrderPDETest"></a><a id="FirstOrderPDETest:FirstOrderPDETest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="FirstOrderPDETest$.html"><span class="name">FirstOrderPDETest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics_pde.package@FirstOrderPDETest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>FirstOrderPDETest</code> object is used to test the <code>FirstOrderPDE</code> class.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>FirstOrderPDETest</code> object is used to test the <code>FirstOrderPDE</code> class.
+ Numerically solve the Advection Equation:  du/dt + v(x, t) * du/dx = 0
+</p></div></div>
+    </li><li name="scalation.dynamics_pde.FirstOrderPDETest2" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="FirstOrderPDETest2"></a><a id="FirstOrderPDETest2:FirstOrderPDETest2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="FirstOrderPDETest2$.html"><span class="name">FirstOrderPDETest2</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics_pde.package@FirstOrderPDETest2" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>FirstOrderPDETest2</code> object is used to test the <code>FirstOrderPDE</code> class.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>FirstOrderPDETest2</code> object is used to test the <code>FirstOrderPDE</code> class.
+ Numerically solve the Advection Equation:  du/dt + v(x, t) * du/dx = 0
+</p></div></div>
+    </li><li name="scalation.dynamics_pde.FirstOrderPDETest3" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="FirstOrderPDETest3"></a><a id="FirstOrderPDETest3:FirstOrderPDETest3"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="FirstOrderPDETest3$.html"><span class="name">FirstOrderPDETest3</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics_pde.package@FirstOrderPDETest3" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>FirstOrderPDETest3</code> object is used to test the <code>FirstOrderPDE</code> class.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>FirstOrderPDETest3</code> object is used to test the <code>FirstOrderPDE</code> class.
+ Numerically solve the Advection Equation:  du/dt + v(x, t) * du/dx = 0</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>www.public.asu.edu/~hhuang38/pde_slides_numerical.pdf</p></span></dd></dl></div>
+    </li><li name="scalation.dynamics_pde.ParabolicPDETest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ParabolicPDETest"></a><a id="ParabolicPDETest:ParabolicPDETest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ParabolicPDETest$.html"><span class="name">ParabolicPDETest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.dynamics_pde.package@ParabolicPDETest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>ParabolicPDETest</code> object is used to test the <code>ParabolicPDE</code> class.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>ParabolicPDETest</code> object is used to test the <code>ParabolicPDE</code> class.
+ Numerically solve the Heat Equation:  du/dt = k * d<sup>2u/dx</sup>2.</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>personales.unican.es/gutierjm/cursos/cornell/9_PDEs.pdf</p></span></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

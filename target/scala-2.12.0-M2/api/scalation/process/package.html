@@ -1,0 +1,546 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>process - scalation.process</title>
+          <meta name="description" content="process - scalation.process" />
+          <meta name="keywords" content="process scalation.process" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'scalation.process.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../lib/package_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="scalation">scalation</a></p>
+        <h1>process</h1><span class="permalink">
+      <a href="../../index.html#scalation.process.package" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">process</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>The process package contains classes, traits and objects for process-oriented
+ simulation models (for example, process-interaction).
+</p></div><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div class="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalation.process"><span>process</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div class="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalation.process.Component" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="ComponentextendsIdentifiablewithLocatable"></a><a id="Component:Component"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Component.html"><span class="name">Component</span></a><span class="result"> extends <a href="../util/Identifiable.html" class="extype" name="scalation.util.Identifiable">Identifiable</a> with <a href="../util/Locatable.html" class="extype" name="scalation.util.Locatable">Locatable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@ComponentextendsIdentifiablewithLocatable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Component</code> trait provides basic common feature for simulation components.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Component</code> trait provides basic common feature for simulation components.
+ The list of subparts is empty for atomic components and nonempty for
+ composite components.
+</p></div></div>
+    </li><li name="scalation.process.Coroutine" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="CoroutineextendsRunnablewithError"></a><a id="Coroutine:Coroutine"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Coroutine.html"><span class="name">Coroutine</span></a><span class="result"> extends <span class="extype" name="java.lang.Runnable">Runnable</span> with <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@CoroutineextendsRunnablewithError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Coroutine</code> class supports (one-at-a-time) quasi-concurrent programming.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Coroutine</code> class supports (one-at-a-time) quasi-concurrent programming.
+ A coroutine runs/acts until it yields control from 'this' to 'that' coroutine.
+ When resumed, a coroutines continues its execution where it left off.
+</p></div></div>
+    </li><li name="scalation.process.Gate" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="GateextendsSimActorwithComponent"></a><a id="Gate:Gate"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Gate.html"><span class="name">Gate</span></a><span class="result"> extends <a href="SimActor.html" class="extype" name="scalation.process.SimActor">SimActor</a> with <a href="Component.html" class="extype" name="scalation.process.Component">Component</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@GateextendsSimActorwithComponent" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Gate</code> class models the operation of gate that can open and shut.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Gate</code> class models the operation of gate that can open and shut.
+ When the gate is open, entities can flow through and when shut, they
+ cannot.  They may wait in a queue or go elsewhere.  A gate can model
+ a traffic light (green =&gt; open, red =&gt; shut).</p></div></div>
+    </li><li name="scalation.process.Junction" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="JunctionextendsComponent"></a><a id="Junction:Junction"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Junction.html"><span class="name">Junction</span></a><span class="result"> extends <a href="Component.html" class="extype" name="scalation.process.Component">Component</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@JunctionextendsComponent" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Junction</code> class provides a connector between two <code>Transport</code>s/<code>Route</code>s.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Junction</code> class provides a connector between two <code>Transport</code>s/<code>Route</code>s.
+ Since <code>Lines</code> and <code>QCurves</code> have limitations (e.g., hard to make a loop back),
+ a junction may be needed.</p></div></div>
+    </li><li name="scalation.process.Model" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ModelextendsCoroutinewithModelablewithComponent"></a><a id="Model:Model"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Model.html"><span class="name">Model</span></a><span class="result"> extends <a href="Coroutine.html" class="extype" name="scalation.process.Coroutine">Coroutine</a> with <a href="../model/Modelable.html" class="extype" name="scalation.model.Modelable">Modelable</a> with <a href="Component.html" class="extype" name="scalation.process.Component">Component</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@ModelextendsCoroutinewithModelablewithComponent" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Model</code> class maintains a list of components making up the model and
+ controls the flow of entities (SimActors) through the model, following the
+ process-interaction world-view.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Model</code> class maintains a list of components making up the model and
+ controls the flow of entities (SimActors) through the model, following the
+ process-interaction world-view.  It maintains a time-ordered priority queue
+ to activate/re-activate each of the entities.  Each entity (SimActor) is
+ implemeneted as a Scala Actor and may be thought of as running in its own thread.</p></div></div>
+    </li><li name="scalation.process.Resource" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ResourceextendsComponent"></a><a id="Resource:Resource"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Resource.html"><span class="name">Resource</span></a><span class="result"> extends <a href="Component.html" class="extype" name="scalation.process.Component">Component</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@ResourceextendsComponent" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Resource</code> class provides services to entities (<code>SimActors</code>).</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Resource</code> class provides services to entities (<code>SimActors</code>).
+ It may or may not have an associated waiting queue.</p></div></div>
+    </li><li name="scalation.process.Route" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RouteextendsComponent"></a><a id="Route:Route"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Route.html"><span class="name">Route</span></a><span class="result"> extends <a href="Component.html" class="extype" name="scalation.process.Component">Component</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@RouteextendsComponent" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Route</code> class provides a multilane pathway between two other components.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Route</code> class provides a multilane pathway between two other components.
+ The components in a <code>Model</code> conceptually form a graph in which the edges
+ are <code>Transport</code>s and the nodes are other <code>Component</code>s.
+ A <code>Route</code> is a composite component that bundles several <code>Transport</code>s.</p></div></div>
+    </li><li name="scalation.process.SimActor" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="SimActorextendsCoroutinewithPQItemwithOrdered[scalation.process.SimActor]withLocatablewithError"></a><a id="SimActor:SimActor"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SimActor.html"><span class="name">SimActor</span></a><span class="result"> extends <a href="Coroutine.html" class="extype" name="scalation.process.Coroutine">Coroutine</a> with <a href="../util/PQItem.html" class="extype" name="scalation.util.PQItem">PQItem</a> with <span class="extype" name="scala.Ordered">Ordered</span>[<a href="SimActor.html" class="extype" name="scalation.process.SimActor">SimActor</a>] with <a href="../util/Locatable.html" class="extype" name="scalation.util.Locatable">Locatable</a> with <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@SimActorextendsCoroutinewithPQItemwithOrdered[scalation.process.SimActor]withLocatablewithError" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>SimActor</code> abstract class represents entities that are active in the model.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>SimActor</code> abstract class represents entities that are active in the model.
+ The 'act' abstract method, which specifies entity behavior, must be defined
+ for each subclass.  Each <code>SimActor</code> extends Scala's <code>Actor</code> class and may be
+ roughly thought of as running in its own thread.</p></div></div>
+    </li><li name="scalation.process.Sink" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SinkextendsComponent"></a><a id="Sink:Sink"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Sink.html"><span class="name">Sink</span></a><span class="result"> extends <a href="Component.html" class="extype" name="scalation.process.Component">Component</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@SinkextendsComponent" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Sink</code> class is used to terminate entities (SimActors) when they are finished.</p>
+    </li><li name="scalation.process.Source" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SourceextendsSimActorwithComponent"></a><a id="Source:Source"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Source.html"><span class="name">Source</span></a><span class="result"> extends <a href="SimActor.html" class="extype" name="scalation.process.SimActor">SimActor</a> with <a href="Component.html" class="extype" name="scalation.process.Component">Component</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@SourceextendsSimActorwithComponent" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Source</code> class is used to periodically inject entities (<code>SimActors</code>) into a
+ running simulation model.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Source</code> class is used to periodically inject entities (<code>SimActors</code>) into a
+ running simulation model.  May act as an arrival generator.  Source is both
+ a simulation <code>Component</code> and special <code>SimActor</code> and therefore runs in own thread.</p></div></div>
+    </li><li name="scalation.process.Transport" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="TransportextendsComponent"></a><a id="Transport:Transport"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Transport.html"><span class="name">Transport</span></a><span class="result"> extends <a href="Component.html" class="extype" name="scalation.process.Component">Component</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@TransportextendsComponent" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Transport</code> class provides a pathway between two other components.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>Transport</code> class provides a pathway between two other components.
+ The components in a <code>Model</code> conceptually form a 'graph' in which the 'edges'
+ are <code>Transport</code>s and the 'nodes' are other <code>Component</code>s.</p></div></div>
+    </li><li name="scalation.process.WaitQueue" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="WaitQueueextendsQueue[scalation.process.SimActor]withComponent"></a><a id="WaitQueue:WaitQueue"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="WaitQueue.html"><span class="name">WaitQueue</span></a><span class="result"> extends <span class="extype" name="scala.collection.mutable.Queue">Queue</span>[<a href="SimActor.html" class="extype" name="scalation.process.SimActor">SimActor</a>] with <a href="Component.html" class="extype" name="scalation.process.Component">Component</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@WaitQueueextendsQueue[scalation.process.SimActor]withComponent" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>WaitQueue</code> class is a wrapper for Scala's Queue class, which supports
+ FCSC Queues.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>WaitQueue</code> class is a wrapper for Scala's Queue class, which supports
+ FCSC Queues.  It adds monitoring capabilities and optional capacity restrictions.
+ If the queue is full, entities (<code>SimActor</code>s) attempting to enter the queue
+ are 'barred'.   At the model level, such entities may be (1) held in place,
+ (2) take an alternate route, or (3) be lost (e.g., dropped call/packet).</p></div></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scalation.process.Coroutine" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Coroutine"></a><a id="Coroutine:Coroutine"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Coroutine$.html"><span class="name">Coroutine</span></a><span class="result"> extends <a href="../util/Error.html" class="extype" name="scalation.util.Error">Error</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@Coroutine" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Coroutine</code> companion object provides functions to startup and shutdown
+ the coroutine system as well as counters for the <code>Coroutine</code> class.</p>
+    </li><li name="scalation.process.CoroutineTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="CoroutineTest"></a><a id="CoroutineTest:CoroutineTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="CoroutineTest$.html"><span class="name">CoroutineTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@CoroutineTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>CoroutineTest</code> object is used to test the <code>Coroutine</code> class.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>CoroutineTest</code> object is used to test the <code>Coroutine</code> class.
+ Should print:
+   Cor1: phase 1
+   Cor2: phase 1
+   Cor1: phase 2
+   Cor2: phase 2
+</p></div></div>
+    </li><li name="scalation.process.Gate" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Gate"></a><a id="Gate:Gate"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Gate$.html"><span class="name">Gate</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@Gate" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Gate</code> companion object provides a builder method for gates.</p>
+    </li><li name="scalation.process.Junction" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Junction"></a><a id="Junction:Junction"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Junction$.html"><span class="name">Junction</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@Junction" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Junction</code> companion object provides a builder method for sinks.</p>
+    </li><li name="scalation.process.Model" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Model"></a><a id="Model:Model"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Model$.html"><span class="name">Model</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@Model" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Model</code> companion object provides a shutdown method.</p>
+    </li><li name="scalation.process.ModelTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ModelTest"></a><a id="ModelTest:ModelTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ModelTest$.html"><span class="name">ModelTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@ModelTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>ModelTest</code> object is used to test the <code>Model</code> class.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>ModelTest</code> object is used to test the <code>Model</code> class.
+ Caveat: must add 'from' and 'to' components before transport!!
+</p></div></div>
+    </li><li name="scalation.process.Resource" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Resource"></a><a id="Resource:Resource"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Resource$.html"><span class="name">Resource</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@Resource" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Resource</code> companion object provides a builder method for resources.</p>
+    </li><li name="scalation.process.RouteTest" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RouteTest"></a><a id="RouteTest:RouteTest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RouteTest$.html"><span class="name">RouteTest</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@RouteTest" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>RouteTest</code> object is used to test the <code>Route</code> class, which is a composite
+ class.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>RouteTest</code> object is used to test the <code>Route</code> class, which is a composite
+ class.  It simulates a two-lane road in one direction.
+</p></div></div>
+    </li><li name="scalation.process.Sink" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Sink"></a><a id="Sink:Sink"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Sink$.html"><span class="name">Sink</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@Sink" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Sink</code> companion object provides a builder method for sinks.</p>
+    </li><li name="scalation.process.Source" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Source"></a><a id="Source:Source"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Source$.html"><span class="name">Source</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@Source" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>Source</code> companion object provides a builder method for sources.</p>
+    </li><li name="scalation.process.WaitQueue" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="WaitQueue"></a><a id="WaitQueue:WaitQueue"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="WaitQueue$.html"><span class="name">WaitQueue</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.process.package@WaitQueue" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The <code>WaitQueue</code> companion object provides a builder method for wait-queues.</p>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

@@ -1,0 +1,758 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>Calculus - scalation.calculus.Calculus</title>
+          <meta name="description" content="Calculus - scalation.calculus.Calculus" />
+          <meta name="keywords" content="Calculus scalation.calculus.Calculus" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'scalation.calculus.Calculus$';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Object" src="../../lib/object_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="scalation">scalation</a>.<a href="package.html" class="extype" name="scalation.calculus">calculus</a></p>
+        <h1>Calculus</h1><h3><span class="morelinks"><div>Related Doc:
+            <a href="package.html" class="extype" name="scalation.calculus">package calculus</a>
+          </div></span></h3><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Calculus</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>The <code>Calculus</code> object contains function for computing derivatives, gradients
+ and Jacobians.
+</p></div><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div class="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalation.calculus.Calculus"><span>Calculus</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div class="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalation.calculus.Calculus.FunctionS2S" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FunctionS2S=Double=&gt;Double"></a><a id="FunctionS2S:FunctionS2S"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">FunctionS2S</span><span class="result"> = (<span class="extype" name="scala.Double">Double</span>) ⇒ <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@FunctionS2S=Double=&gt;Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="scalation.calculus.Calculus.FunctionV2S" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FunctionV2S=scalation.linalgebra.VectorD=&gt;Double"></a><a id="FunctionV2S:FunctionV2S"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">FunctionV2S</span><span class="result"> = (<a href="../linalgebra/VectorD.html" class="extype" name="scalation.linalgebra.VectorD">VectorD</a>) ⇒ <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@FunctionV2S=scalation.linalgebra.VectorD=&gt;Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        <div class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@##():Int" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalation.calculus.Calculus#_0f" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="_0f(x:Double):Double"></a><a id="_0f(Double):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">_0f</span><span class="params">(<span name="x">x: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@_0f(x:Double):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Zero function.</p>
+    </li><li name="scalation.calculus.Calculus#_1f" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="_1f(x:Double):Double"></a><a id="_1f(Double):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">_1f</span><span class="params">(<span name="x">x: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@_1f(x:Double):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">One function.</p>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a><a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@clone():Object" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalation.calculus.Calculus#derivative" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="derivative(f:scalation.calculus.Calculus.FunctionS2S,x:Double):Double"></a><a id="derivative(FunctionS2S,Double):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">derivative</span><span class="params">(<span name="f">f: <a href="#FunctionS2S=Double=&gt;Double" class="extmbr" name="scalation.calculus.Calculus.FunctionS2S">FunctionS2S</a></span>, <span name="x">x: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@derivative(f:scalation.calculus.Calculus.FunctionS2S,x:Double):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Estimate the derivative of the scalar-to-scalar function f at x using
+ a 2-sided method (central difference).</p><div class="fullcomment"><div class="comment cmt"><p>Estimate the derivative of the scalar-to-scalar function f at x using
+ a 2-sided method (central difference).  Approximate the tangent line at
+ (x, f(x)) with the secant line through points (x-h, f(x-h)) and (x+h, f(x+h)).
+ Tends to be MORE ACCURATE than the 1-sided method.</p></div><dl class="paramcmts block"><dt class="param">f</dt><dd class="cmt"><p>the function whose derivative is sought</p></dd><dt class="param">x</dt><dd class="cmt"><p>the point (scalar) at which to estimate the derivative</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.math.montana.edu/frankw/ccp/modeling/continuous/heatflow2/firstder.htm</p></span></dd></dl></div>
+    </li><li name="scalation.calculus.Calculus#derivative1" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="derivative1(f:scalation.calculus.Calculus.FunctionS2S,x:Double):Double"></a><a id="derivative1(FunctionS2S,Double):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">derivative1</span><span class="params">(<span name="f">f: <a href="#FunctionS2S=Double=&gt;Double" class="extmbr" name="scalation.calculus.Calculus.FunctionS2S">FunctionS2S</a></span>, <span name="x">x: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@derivative1(f:scalation.calculus.Calculus.FunctionS2S,x:Double):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Estimate the derivative of the scalar-to-scalar function f at x using
+ a 1-sided method (forward difference).</p><div class="fullcomment"><div class="comment cmt"><p>Estimate the derivative of the scalar-to-scalar function f at x using
+ a 1-sided method (forward difference).  Approximate the tangent line at
+ (x, f(x)) with the secant line through points (x, f(x)) and (x+h, f(x+h)).</p></div><dl class="paramcmts block"><dt class="param">f</dt><dd class="cmt"><p>the function whose derivative is sought</p></dd><dt class="param">x</dt><dd class="cmt"><p>the point (scalar) at which to estimate the derivative</p></dd></dl></div>
+    </li><li name="scalation.calculus.Calculus#derivative2" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="derivative2(f:scalation.calculus.Calculus.FunctionS2S,x:Double):Double"></a><a id="derivative2(FunctionS2S,Double):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">derivative2</span><span class="params">(<span name="f">f: <a href="#FunctionS2S=Double=&gt;Double" class="extmbr" name="scalation.calculus.Calculus.FunctionS2S">FunctionS2S</a></span>, <span name="x">x: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@derivative2(f:scalation.calculus.Calculus.FunctionS2S,x:Double):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Estimate the second derivative of the scalar-to-scalar function f at x
+ using the central difference formula for second derivatives.</p><div class="fullcomment"><div class="comment cmt"><p>Estimate the second derivative of the scalar-to-scalar function f at x
+ using the central difference formula for second derivatives.</p></div><dl class="paramcmts block"><dt class="param">f</dt><dd class="cmt"><p>the function whose second derivative is sought</p></dd><dt class="param">x</dt><dd class="cmt"><p>the point (scalar) at which to estimate the derivative</p></dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@equals(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@finalize():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@getClass():Class[_]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalation.calculus.Calculus#gradient" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="gradient(f:scalation.calculus.Calculus.FunctionV2S,x:scalation.linalgebra.VectorD):scalation.linalgebra.VectorD"></a><a id="gradient(FunctionV2S,VectorD):VectorD"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">gradient</span><span class="params">(<span name="f">f: <a href="#FunctionV2S=scalation.linalgebra.VectorD=&gt;Double" class="extmbr" name="scalation.calculus.Calculus.FunctionV2S">FunctionV2S</a></span>, <span name="x">x: <a href="../linalgebra/VectorD.html" class="extype" name="scalation.linalgebra.VectorD">VectorD</a></span>)</span><span class="result">: <a href="../linalgebra/VectorD.html" class="extype" name="scalation.linalgebra.VectorD">VectorD</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@gradient(f:scalation.calculus.Calculus.FunctionV2S,x:scalation.linalgebra.VectorD):scalation.linalgebra.VectorD" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Estimate the gradient of the vector-to-scalar function f at point x
+ returning a value for the partial derivative for each dimension of x.</p><div class="fullcomment"><div class="comment cmt"><p>Estimate the gradient of the vector-to-scalar function f at point x
+ returning a value for the partial derivative for each dimension of x.</p></div><dl class="paramcmts block"><dt class="param">f</dt><dd class="cmt"><p>the function whose gradient is sought</p></dd><dt class="param">x</dt><dd class="cmt"><p>the point (vector) at which to estimate the gradient</p></dd></dl></div>
+    </li><li name="scalation.calculus.Calculus#gradientD" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="gradientD(d:Array[scalation.calculus.Calculus.FunctionV2S],x:scalation.linalgebra.VectorD):scalation.linalgebra.VectorD"></a><a id="gradientD(Array[FunctionV2S],VectorD):VectorD"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">gradientD</span><span class="params">(<span name="d">d: <span class="extype" name="scala.Array">Array</span>[<a href="#FunctionV2S=scalation.linalgebra.VectorD=&gt;Double" class="extmbr" name="scalation.calculus.Calculus.FunctionV2S">FunctionV2S</a>]</span>, <span name="x">x: <a href="../linalgebra/VectorD.html" class="extype" name="scalation.linalgebra.VectorD">VectorD</a></span>)</span><span class="result">: <a href="../linalgebra/VectorD.html" class="extype" name="scalation.linalgebra.VectorD">VectorD</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@gradientD(d:Array[scalation.calculus.Calculus.FunctionV2S],x:scalation.linalgebra.VectorD):scalation.linalgebra.VectorD" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute the gradient of the vector-to-scalar function f using partial
+ derivative functions evaluated at point x.</p><div class="fullcomment"><div class="comment cmt"><p>Compute the gradient of the vector-to-scalar function f using partial
+ derivative functions evaluated at point x.  Return a value for the
+ partial derivative for each dimension of the vector x.</p></div><dl class="paramcmts block"><dt class="param">d</dt><dd class="cmt"><p>the array of partial derivative functions</p></dd><dt class="param">x</dt><dd class="cmt"><p>the point (vector) at which to compute the gradient</p></dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@hashCode():Int" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalation.calculus.Calculus#hessian" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hessian(f:scalation.calculus.Calculus.FunctionV2S,x:scalation.linalgebra.VectorD):scalation.linalgebra.MatrixD"></a><a id="hessian(FunctionV2S,VectorD):MatrixD"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hessian</span><span class="params">(<span name="f">f: <a href="#FunctionV2S=scalation.linalgebra.VectorD=&gt;Double" class="extmbr" name="scalation.calculus.Calculus.FunctionV2S">FunctionV2S</a></span>, <span name="x">x: <a href="../linalgebra/VectorD.html" class="extype" name="scalation.linalgebra.VectorD">VectorD</a></span>)</span><span class="result">: <a href="../linalgebra/MatrixD.html" class="extype" name="scalation.linalgebra.MatrixD">MatrixD</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@hessian(f:scalation.calculus.Calculus.FunctionV2S,x:scalation.linalgebra.VectorD):scalation.linalgebra.MatrixD" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Estimate the Hessian of the vector-to-scalar function f at point x
+ returning a matrix of second partial derivative.</p><div class="fullcomment"><div class="comment cmt"><p>Estimate the Hessian of the vector-to-scalar function f at point x
+ returning a matrix of second partial derivative.</p></div><dl class="paramcmts block"><dt class="param">f</dt><dd class="cmt"><p>the function whose Hessian is sought</p></dd><dt class="param">x</dt><dd class="cmt"><p>the point (vector) at which to estimate the Hessian</p></dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalation.calculus.Calculus#jacobian" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="jacobian(f:Array[scalation.calculus.Calculus.FunctionV2S],x:scalation.linalgebra.VectorD):scalation.linalgebra.MatrixD"></a><a id="jacobian(Array[FunctionV2S],VectorD):MatrixD"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">jacobian</span><span class="params">(<span name="f">f: <span class="extype" name="scala.Array">Array</span>[<a href="#FunctionV2S=scalation.linalgebra.VectorD=&gt;Double" class="extmbr" name="scalation.calculus.Calculus.FunctionV2S">FunctionV2S</a>]</span>, <span name="x">x: <a href="../linalgebra/VectorD.html" class="extype" name="scalation.linalgebra.VectorD">VectorD</a></span>)</span><span class="result">: <a href="../linalgebra/MatrixD.html" class="extype" name="scalation.linalgebra.MatrixD">MatrixD</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@jacobian(f:Array[scalation.calculus.Calculus.FunctionV2S],x:scalation.linalgebra.VectorD):scalation.linalgebra.MatrixD" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute the Jacobian matrix for a vector-valued function represented as
+ an array of scalar-valued functions.</p><div class="fullcomment"><div class="comment cmt"><p>Compute the Jacobian matrix for a vector-valued function represented as
+ an array of scalar-valued functions.  The i-th row in the matrix is the
+ gradient of the i-th function.</p></div><dl class="paramcmts block"><dt class="param">f</dt><dd class="cmt"><p>the array of functions whose Jacobian is sought</p></dd><dt class="param">x</dt><dd class="cmt"><p>the point (vector) at which to estimate the Jacobian</p></dd></dl></div>
+    </li><li name="scalation.calculus.Calculus#laplacian" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="laplacian(f:scalation.calculus.Calculus.FunctionV2S,x:scalation.linalgebra.VectorD):Double"></a><a id="laplacian(FunctionV2S,VectorD):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">laplacian</span><span class="params">(<span name="f">f: <a href="#FunctionV2S=scalation.linalgebra.VectorD=&gt;Double" class="extmbr" name="scalation.calculus.Calculus.FunctionV2S">FunctionV2S</a></span>, <span name="x">x: <a href="../linalgebra/VectorD.html" class="extype" name="scalation.linalgebra.VectorD">VectorD</a></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@laplacian(f:scalation.calculus.Calculus.FunctionV2S,x:scalation.linalgebra.VectorD):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Estimate the Laplacian of the vector-to-scalar function f at point x
+ returning the sum of the pure second partial derivatives.</p><div class="fullcomment"><div class="comment cmt"><p>Estimate the Laplacian of the vector-to-scalar function f at point x
+ returning the sum of the pure second partial derivatives.</p></div><dl class="paramcmts block"><dt class="param">f</dt><dd class="cmt"><p>the function whose Hessian is sought</p></dd><dt class="param">x</dt><dd class="cmt"><p>the point (vector) at which to estimate the Hessian</p></dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@notify():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@notifyAll():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalation.calculus.Calculus#partial" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="partial(f:scalation.calculus.Calculus.FunctionV2S,x:scalation.linalgebra.VectorD,i:Int):Double"></a><a id="partial(FunctionV2S,VectorD,Int):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">partial</span><span class="params">(<span name="f">f: <a href="#FunctionV2S=scalation.linalgebra.VectorD=&gt;Double" class="extmbr" name="scalation.calculus.Calculus.FunctionV2S">FunctionV2S</a></span>, <span name="x">x: <a href="../linalgebra/VectorD.html" class="extype" name="scalation.linalgebra.VectorD">VectorD</a></span>, <span name="i">i: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@partial(f:scalation.calculus.Calculus.FunctionV2S,x:scalation.linalgebra.VectorD,i:Int):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Estimate the ith partial derivative of the vector-to-scalar function f at
+ point x returning the value for the partial derivative for dimension i.</p><div class="fullcomment"><div class="comment cmt"><p>Estimate the ith partial derivative of the vector-to-scalar function f at
+ point x returning the value for the partial derivative for dimension i.</p></div><dl class="paramcmts block"><dt class="param">f</dt><dd class="cmt"><p>the function whose partial derivative is sought</p></dd><dt class="param">x</dt><dd class="cmt"><p>the point (vector) at which to estimate the partial derivative</p></dd><dt class="param">i</dt><dd class="cmt"><p>the dimension to compute the partial derivative on</p></dd></dl></div>
+    </li><li name="scalation.calculus.Calculus#partial2" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="partial2(f:scalation.calculus.Calculus.FunctionV2S,x:scalation.linalgebra.VectorD,i:Int,j:Int):Double"></a><a id="partial2(FunctionV2S,VectorD,Int,Int):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">partial2</span><span class="params">(<span name="f">f: <a href="#FunctionV2S=scalation.linalgebra.VectorD=&gt;Double" class="extmbr" name="scalation.calculus.Calculus.FunctionV2S">FunctionV2S</a></span>, <span name="x">x: <a href="../linalgebra/VectorD.html" class="extype" name="scalation.linalgebra.VectorD">VectorD</a></span>, <span name="i">i: <span class="extype" name="scala.Int">Int</span></span>, <span name="j">j: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@partial2(f:scalation.calculus.Calculus.FunctionV2S,x:scalation.linalgebra.VectorD,i:Int,j:Int):Double" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Estimate the (i,j)th second partial derivative of the vector-to-scalar
+ function f at point x returning the value for the second partial derivative
+ for dimensions (i, j).</p><div class="fullcomment"><div class="comment cmt"><p>Estimate the (i,j)th second partial derivative of the vector-to-scalar
+ function f at point x returning the value for the second partial derivative
+ for dimensions (i, j).  If i = j, the second partial derivative is
+ called &quot;pure&quot;, otherwise it is a &quot;cross&quot; second partial derivative.</p></div><dl class="paramcmts block"><dt class="param">f</dt><dd class="cmt"><p>the function whose second partial derivative is sought</p></dd><dt class="param">x</dt><dd class="cmt"><p>the point (vector) at which to estimate the second partial derivative</p></dd><dt class="param">i</dt><dd class="cmt"><p>the first dimension to compute the second partial derivative on</p></dd><dt class="param">j</dt><dd class="cmt"><p>the second dimension to compute the second partial derivative on</p></dd></dl></div>
+    </li><li name="scalation.calculus.Calculus#resetH" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="resetH(step:Double):Unit"></a><a id="resetH(Double):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">resetH</span><span class="params">(<span name="step">step: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@resetH(step:Double):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Reset the step size from its default step size to one more suitable for
+ your function.</p><div class="fullcomment"><div class="comment cmt"><p>Reset the step size from its default step size to one more suitable for
+ your function.  A heuristic for the central difference method is to let
+ h = max (|x|,1) * (machine-epsilon)^(1/3)
+ For double precision, the machine-epsilon is about 1E-16.</p></div><dl class="paramcmts block"><dt class="param">step</dt><dd class="cmt"><p>the new step size to reset h to</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>http://www.karenkopecky.net/Teaching/eco613614/Notes_NumericalDifferentiation.pdf</p></span></dd></dl></div>
+    </li><li name="scalation.calculus.Calculus#slope" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="slope(f:scalation.calculus.Calculus.FunctionV2S,x:scalation.linalgebra.VectorD,n:Int):scalation.linalgebra.VectorD"></a><a id="slope(FunctionV2S,VectorD,Int):VectorD"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">slope</span><span class="params">(<span name="f">f: <a href="#FunctionV2S=scalation.linalgebra.VectorD=&gt;Double" class="extmbr" name="scalation.calculus.Calculus.FunctionV2S">FunctionV2S</a></span>, <span name="x">x: <a href="../linalgebra/VectorD.html" class="extype" name="scalation.linalgebra.VectorD">VectorD</a></span>, <span name="n">n: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result">: <a href="../linalgebra/VectorD.html" class="extype" name="scalation.linalgebra.VectorD">VectorD</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@slope(f:scalation.calculus.Calculus.FunctionV2S,x:scalation.linalgebra.VectorD,n:Int):scalation.linalgebra.VectorD" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compute the slope of the vector-to-scalar function f defined on mixed
+ real/integer vectors.</p><div class="fullcomment"><div class="comment cmt"><p>Compute the slope of the vector-to-scalar function f defined on mixed
+ real/integer vectors.</p></div><dl class="paramcmts block"><dt class="param">f</dt><dd class="cmt"><p>the function whose slope is sought</p></dd><dt class="param">x</dt><dd class="cmt"><p>the point (vector) at which to estimate the slope</p></dd><dt class="param">n</dt><dd class="cmt"><p>the number of dimensions that are real-valued (rest are integers)</p></dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@toString():String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@wait():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#scalation.calculus.Calculus$@wait(x$1:Long):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>
