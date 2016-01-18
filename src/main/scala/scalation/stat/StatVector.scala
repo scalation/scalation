@@ -22,7 +22,7 @@ import scalation.util.SortingD.imedian
  *  Ex:  It can be used to support the Method of Independent Replications (MIR).
  *  For efficiency, `StatVector` is a value class that enriches the `VectorD`.
  *  The corresponding implicit conversion in the `stat` package object.
- *  @see http://stackoverflow.com/questions/14861862/how-do-you-enrich-value-classes-without-overhead
+ *  @see stackoverflow.com/questions/14861862/how-do-you-enrich-value-classes-without-overhead
  *-----------------------------------------------------------------------------
  *  @param self  the underlying object to be accessed via the 'self' accessor
  */
@@ -82,7 +82,7 @@ class StatVector (val self: VectorD)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute Spearman's rank correlation of 'self' vector with vector 'y'.
-     *  @see  http://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient
+     *  @see  en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient
      *  @param y  the other vector
      */
     def scorr (y: VectorD): Double = 
@@ -125,7 +125,7 @@ class StatVector (val self: VectorD)
      *  <p>
      *      E(X - μ)^3 / σ^3
      *  <p>
-     *  @see http://www.mathworks.com/help/stats/skewness.html
+     *  @see www.mathworks.com/help/stats/skewness.html
      *  @param unbiased  whether to correct for bias
      */
     def skew (unbiased: Boolean = false): Double =
@@ -142,7 +142,7 @@ class StatVector (val self: VectorD)
      *  <p>
      *      E(X - μ)^4 / σ^4
      *  <p>
-     *  @see http://www.mathworks.com/help/stats/kurtosis.html
+     *  @see www.mathworks.com/help/stats/kurtosis.html
      *  @param unbiased  whether to shift the result so Normal is at 0 rather than 3
      */
     def kurtosis (unbiased: Boolean = false): Double =
@@ -192,17 +192,17 @@ class StatVector (val self: VectorD)
     /** Produce a standardized version of the vector by subtracting the mean and
      *  dividing by the standard deviation (e.g., Normal -> Standard Normal).
      */
-    def standardize: VectorD = (self - self.mean) / self.stddev
+    def standardize: VectorD = (self - self.mean) / stddev
 
 } // StatVector class
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StatVectorTest` object is used to test the `StatVector` class.
- *  @see http://www.mathworks.com/help/stats/skewness.html
+ *  @see www.mathworks.com/help/stats/skewness.html
  *  > run-main scalation.stat.StatVectorTest
  */
-object StatVectorTest extends App //with Stat
+object StatVectorTest extends App
 {
     val w = VectorD (1.1650, 0.6268, 0.0751, 0.3516, -0.6965)
     val x = VectorD (1.0, 2.0, 3.0, 4.0, 6.0, 5.0)

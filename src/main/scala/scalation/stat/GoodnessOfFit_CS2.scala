@@ -104,7 +104,7 @@ class GoodnessOfFit_CS2 (private var d: VectorD, dmin: Double, dmax: Double, iCD
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GoodnessOfFit_CS2Test` object is used to test the `GoodnessOfFit_CS` class.
- *  @see http://www.seattlecentral.edu/qelp/sets/057/057.html
+ *  @see www.seattlecentral.edu/qelp/sets/057/057.html
     > run-main scalation.stat.GoodnessOfFit_CS2Test
  */
 object GoodnessOfFit_CS2Test extends App
