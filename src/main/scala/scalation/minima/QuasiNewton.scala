@@ -21,7 +21,6 @@ import math.{abs, max, pow}
 import scalation.calculus.Calculus.{FunctionV2S, gradient, gradientD}
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.linalgebra.MatrixD.{eye, outer}
-import scalation.math.ExtremeD.MAX_VALUE
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -171,7 +170,6 @@ class QuasiNewton (f: FunctionV2S, g: FunctionV2S = null,
             } // if
             if (DEBUG) println ("solve: (k = " + k + ") move from " + x._1 + " to " + xx._1
                               + " where fg(xx._1) = " + fg(xx._1))
-            for (x_i <- xx._1 if abs (x_i) > MAX_VALUE) return x._1
             x = xx                                    // make the next point, the current point
         } // for
         x._1                                          // return the current point

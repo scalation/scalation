@@ -91,8 +91,7 @@ class Anova (x: MatrixD)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This object is used to test the Anova class.
- *  @see wiki.uiowa.edu/display/bstat/One-way+fixed+effects+ANOVA
- *  > run-main scalation.stat.AnovaTest
+ *  @see http://wiki.uiowa.edu/display/bstat/One-way+fixed+effects+ANOVA
  */
 object AnovaTest extends App
 {
