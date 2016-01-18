@@ -61,10 +61,9 @@ class LogisticRegression (x: MatrixD, y: VectorI, fn: Array [String], cn: Array 
         var sum = 0.0
         for (i <- 0 until x.dim1) {
             val bx = b dot x(i)
-//          sum += y(i) * bx - log (1.0 + exp (bx))
-            sum += y(i) * bx - bx - log (exp (-bx) + 1.0)   // less prone to overflow (infinity)
+            sum += y(i) * bx - log (1.0 + exp (bx))
         } // for
-        -2.0 * sum                                          // set up for minimization
+        -2.0 * sum                               // set up for minimization
     } // ll
    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -77,21 +76,17 @@ class LogisticRegression (x: MatrixD, y: VectorI, fn: Array [String], cn: Array 
     def ll_null (b: VectorD): Double =
     {
         var sum = 0.0
-        val bx = b(0)                                       // only use the intercept
         for (i <- 0 until x.dim1) {
-//          sum += y(i) * bx - log (1.0 + exp (bx))
-            sum += y(i) * bx - bx - log (exp (-bx) + 1.0)   // less prone to overflow (infinity)
+            val bx = b(0)                               // only use the intercept
+            sum += y(i) * bx - log (1.0 + exp (bx))
         } // for
-        -2.0 * sum                                          // set up for minimization
+        -2.0 * sum                               // set up for minimization
     } // ll_null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** For the full model, train the classifier by fitting the parameter vector
      *  (b-vector) in the logistic regression equation using maximum likelihood.
      *  Do this by minimizing -2LL.
-     *  FIX: Use improved BFGS implementation or IRWLS
-     *  @see stats.stackexchange.com/questions/81000/calculate-coefficients-in-a-logistic-regression-with-r
-     *  @see en.wikipedia.org/wiki/Iteratively_reweighted_least_squares
      *  @param testStart  starting index of test region (inclusive) used in cross-validation.
      *  @param testEnd    ending index of test region (exclusive) used in cross-validation.
      */
@@ -208,7 +203,6 @@ class LogisticRegression (x: MatrixD, y: VectorI, fn: Array [String], cn: Array 
  *  @see www.cookbook-r.com/Statistical_analysis/Logistic_regression/
  *  Answer: b = (-8.8331, 0.4304),
  *          n_dev = 43.860, r_dev = 25.533, aci = 29.533, pseudo_rSq = 0.4178
- *  > run-main scalation.analytics.LogisticRegressionTest
  */
 object LogisticRegressionTest extends App
 {
@@ -269,10 +263,10 @@ object LogisticRegressionTest extends App
     println ("aic        = " + res._4)
     println ("pseudo_rSq = " + res._5)
 
-    z = VectorD (1.0, 15.0)                             // classify point z
+    z = VectorD (1.0, 15.0)                            // classify point z
     println ("classify (" + z + ") = " + rg.classify (z))
 
-    z = VectorD (1.0, 30.0)                             // classify point z
+    z = VectorD (1.0, 30.0)                            // classify point z
     println ("classify (" + z + ") = " + rg.classify (z))
 
 } // LogisticRegressionTest object
@@ -282,7 +276,6 @@ object LogisticRegressionTest extends App
 /** The `LogisticRegressionTest` object tests the `LogisticRegression` class.
  *  @see statmaster.sdu.dk/courses/st111/module03/index.html
  *  @see www.stat.wisc.edu/~mchung/teaching/.../GLM.logistic.Rpackage.pdf
- *  > run-main scalation.analytics.LogisticRegressionTest2
  */
 object LogisticRegressionTest2 extends App
 {
@@ -341,17 +334,12 @@ object LogisticRegressionTest2 extends App
     val rg = new LogisticRegression (x, y, fn, cn)
     rg.train_null ()                                    // train based on null model
     rg.train ()                                         // train based on full model
-    val res = rg.fit                                    // obtain results
 
     println ("---------------------------------------------------------------")
     println ("Logistic Regression Results")
-    println ("b          = " + res._1)
-    println ("n_dev      = " + res._2)
-    println ("r_dev      = " + res._3)
-    println ("aic        = " + res._4)
-    println ("pseudo_rSq = " + res._5)
+    println ("fit = " + rg.fit)
 
-    val z  = VectorD (1.0, 100.0, 100.0, 100.0)         // classify point z
+    val z  = VectorD (1.0, 100.0, 100.0, 100.0)        // classify point z
     println ("classify (" + z + ") = " + rg.classify (z))
 
 //  new Plot (x.col(1), y, yyp)

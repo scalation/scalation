@@ -22,7 +22,7 @@ import scalation.util.MM_SortingD.imedian
  *  Ex:  It can be used to support the Method of Independent Replications (MIR).
  *  For efficiency, `MM_StatVector` is a value class that enriches the `VectorD`.
  *  The corresponding implicit conversion in the `stat` package object.
- *  @see stackoverflow.com/questions/14861862/how-do-you-enrich-value-classes-without-overhead
+ *  @see http://stackoverflow.com/questions/14861862/how-do-you-enrich-value-classes-without-overhead
  *-----------------------------------------------------------------------------
  *  @param self  the underlying object to be accessed via the 'self' accessor
  */
@@ -82,7 +82,7 @@ class MM_StatVector (val self: VectorD)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute Spearman's rank correlation of 'self' vector with vector 'y'.
-     *  @see  en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient
+     *  @see  http://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient
      *  @param y  the other vector
      */
     def scorr (y: VectorD): Double = 
@@ -102,12 +102,6 @@ class MM_StatVector (val self: VectorD)
     def stddev: Double = sqrt (self.variance)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the population standard deviation of 'self' vector.
-     *  @see VectorD for pvariance
-     */
-    def pstddev: Double = sqrt (self.pvariance)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the mean square (ms) of 'self' vector.
      */
     def ms: Double = self.normSq / self.nd
@@ -121,36 +115,13 @@ class MM_StatVector (val self: VectorD)
     /** Compute the skewness of 'self' vector.  Negative skewness indicates the
      *  distribution is elongated on the left, zero skewness indicates it is
      *  symmetric, and positive skewness indicates it is elongated on the right.
-     *  <p>
-     *      E(X - μ)^3 / σ^3
-     *  <p>
-     *  @see www.mathworks.com/help/stats/skewness.html
-     *  @param unbiased  whether to correct for bias
+     *  @see http://www.mathworks.com/help/stats/skewness.html
      */
-    def skew (unbiased: Boolean = false): Double =
+    def skew: Double =
     {
-        val n = self.nd
-        val s = (self - self.mean).map ((x: Double) => x~^3).sum / (n * pstddev~^3)
-        if (unbiased) s * sqrt (n * (n-1.0)) / (n-2.0)
-        else s
+        val s = (self - self.mean).sum~^3 / (self.nd * stddev~^3)
+        s * sqrt (self.nd * (self.nd-1.0)) / (self.nd-2.0)
     } // skew
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the kurtosis of 'self' vector.  High kurtosis (> 3) indicates a 
-     *  distribution with heavier tails than a Normal distribution.
-     *  <p>
-     *      E(X - μ)^4 / σ^4
-     *  <p>
-     *  @see www.mathworks.com/help/stats/kurtosis.html
-     *  @param unbiased  whether to shift the result so Normal is at 0 rather than 3
-     */
-    def kurtosis (unbiased: Boolean = false): Double =
-    {
-        val n = self.nd
-        val s = (self - self.mean).map ((x: Double) => x~^4).sum / (self.nd * self.pvariance~^2)
-        if (unbiased) (n-1.0) * ((n+1.0) * s - 3.0 * (n-1.0)) / ((n-2.0) * (n-3.0)) + 3.0
-        else s
-    } // kurtosis
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the product of the critical value from the t-distribution and the
@@ -187,12 +158,6 @@ class MM_StatVector (val self: VectorD)
      */
     def precise (threshold: Double = .2, p: Double = .95): Boolean = precision (p) <= threshold
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Produce a standardized version of the vector by subtracting the mean and
-     *  dividing by the standard deviation (e.g., Normal -> Standard Normal).
-     */
-    def standardize: VectorD = (self - self.mean) / stddev
-
 } // MM_StatVector class
 
 
@@ -200,11 +165,10 @@ class MM_StatVector (val self: VectorD)
 /** The `MM_StatVectorTest` object is used to test the `MM_StatVector` class.
  *  > run-main scalation.stat.MM_StatVectorTest
  */
-object MM_StatVectorTest extends App
+object MM_StatVectorTest extends App //with Stat
 {
     import Conversions._
 
-    val w = VectorD (1.1650, 0.6268, 0.0751, 0.3516, -0.6965)
     val x = VectorD (1.0, 2.0, 3.0, 4.0, 6.0, 5.0)
     val y = VectorD (2.0, 3.0, 4.0, 5.0, 6.0, 7.0)
 
@@ -216,29 +180,21 @@ object MM_StatVectorTest extends App
     println ("x.variance  = " + x.variance)       // variance (from VectorD)
     println ("x.pvariance = " + x.pvariance)      // population variance (from VectorD)
 
-    println ("x.median ()   = " + x.median ())      // median
-    println ("x.amedian     = " + x.amedian)        // averaged median
-    println ("x.cov (y)     = " + x.cov (y))        // covariance
-    println ("x.pcov (y)    = " + x.pcov (y))       // population covariance
-    println ("x.corr (y)    = " + x.corr (y))       // correlation (Pearson)
-    println ("x.pcorr (y)   = " + x.pcorr (y))      // population correlation (Pearson)
-    println ("x.rank        = " + x.rank)           // rank order
-    println ("x.scorr (y)   = " + x.scorr (y))      // correlation (Spearman)
-    println ("x.acorr (1)   = " + x.acorr (1))      // auto-correlation
-    println ("x.stddev      = " + x.stddev)         // standard deviation
-    println ("x.ms          = " + x.ms)             // mean square
-    println ("x.rms         = " + x.rms)            // root mean square
-    println ("x.skew ()     = " + x.skew ())        // skewness
-    println ("x.kurtosis () = " + x.kurtosis ())    // kurtosis
-    println ("x.interval    = " + x.interval ())    // confidence interval (half width)
-    println ("x.precision   = " + x.precision ())   // relative precision
-
-    println ("w.skew ()     = " + w.skew ())        // skewness
-    println ("w.kurtosis () = " + w.kurtosis ())    // kurtosis
-
-    val z = x.standardize                           // standardized version of vector
-    println ("z.mean   = " + z.mean)                // mean (should be 0)
-    println ("z.stddev = " + z.stddev)              // standard deviation (should be 1)
+    println ("x.median () = " + x.median ())      // median
+    println ("x.amedian   = " + x.amedian)        // averaged median
+    println ("x.cov (y)   = " + x.cov (y))        // covariance
+    println ("x.pcov (y)  = " + x.pcov (y))       // population covariance
+    println ("x.corr (y)  = " + x.corr (y))       // correlation (Pearson)
+    println ("x.pcorr (y) = " + x.pcorr (y))      // population correlation (Pearson)
+    println ("x.rank      = " + x.rank)           // rank order
+    println ("x.scorr (y) = " + x.scorr (y))      // correlation (Spearman)
+    println ("x.acorr (1) = " + x.acorr (1))      // auto-correlation
+    println ("x.stddev    = " + x.stddev)         // standard deviation
+    println ("x.ms        = " + x.ms)             // mean square
+    println ("x.rms       = " + x.rms)            // root mean square
+    println ("x.skew      = " + x.skew)           // skewness
+    println ("x.interval  = " + x.interval ())    // confidence interval (half width)
+    println ("x.precision = " + x.precision ())   // relative precision
 
 } // MM_StatVectorTest object
 

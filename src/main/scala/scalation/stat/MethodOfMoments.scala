@@ -16,7 +16,7 @@ import scalation.linalgebra.VectorD
 /** The `MethodOfMoments` object provides methods for estimating parameters
  *  for popular probability distributions using the Method of Moments (MOM).
  *  The main alternative is to use Maximum Likelihood Estimators (MLE).
- *  @see www.math.uah.edu/stat/point/Moments.html
+ *  @see http://www.math.uah.edu/stat/point/Moments.html
  */
 object MethodOfMoments
 {
