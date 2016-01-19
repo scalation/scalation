@@ -1,0 +1,47 @@
+*.class
+*.log
+
+# scalation specific
+*.bak*
+**/old/*
+*.scalaa
+
+
+# sbt specific
+.cache
+.history
+.lib/
+bin/*
+project/*
+store/*
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# Scala-IDE specific
+.scala_dependencies
+.worksheet
+build
+.classpath
+.project
+.settings
+.cache-main
+bin
+org.scala-ide.sdt.core/META-INF/MANIFEST.MF
+org.scala-ide.sdt.update-site/site.xml
+
+
+#VIM specific
+tags
+.*.swp
+.*.swo
+
+#MAC OS specific
+.DS_Store
+
+#Intellij IDEA specific
+.idea
+
