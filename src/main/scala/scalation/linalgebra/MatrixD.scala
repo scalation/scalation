@@ -1357,7 +1357,7 @@ object MatrixD extends Error
      *  @param u           the array of vectors to assign
      *  @param columnwise  whether the vectors are treated as column or row vectors
      */
-    def apply (u: Array [VectorD], columnwise: Boolean = true): MatrixD =
+    def apply (u: Seq [VectorD], columnwise: Boolean = true): MatrixD =
     {
         var x: MatrixD = null
         val u_dim = u(0).dim

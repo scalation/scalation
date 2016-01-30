@@ -8,9 +8,10 @@
 
 package scalation.stat
 
-import math.{ceil, sqrt}
+import scala.math.{ceil, sqrt}
 
-import scalation.linalgebra.{VectorD, VectorI}
+import scalation.linalgebra.{MatrixD, VectorD, VectorI}
+import scalation.linalgebra.MatrixD.eye
 import scalation.math.double_exp
 import scalation.random.Quantile.studentTInv
 import scalation.util.SortingD.imedian
@@ -76,6 +77,7 @@ class StatVector (val self: VectorD)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the population Pearson's correlation of 'self' vector with vector 'y'.
+     *  Should only difference from 'corr' due to round-off errors.
      *  @param y  the other vector
      */
     def pcorr (y: VectorD): Double = pcov (y) / sqrt (self.pvariance * y.pvariance)
@@ -198,6 +200,62 @@ class StatVector (val self: VectorD)
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `StatVector` companion object extends stat vector operations to matrices.
+ */
+object StatVector
+{
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the mean vector containing the means of each column of matrix 'x'.
+     *  @param x  the matrix whose column means are sought
+     */
+    def mean (x: MatrixD): VectorD =
+    {
+        VectorD (for (j <- 0 until x.dim2) yield x.col(j).mean)
+    } // mean
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the sample covariance matrix for the columns of matrix 'x'.
+     *  @param x  the matrix whose column columns covariances are sought
+     */
+    def cov (x: MatrixD): MatrixD =
+    {
+        val z = x - mean (x)
+        (z.t * z) / (x.dim1.toDouble - 1.0)
+    } // cov
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the population covariance matrix for the columns of matrix 'x'.
+     *  @param x  the matrix whose column columns covariances are sought
+     */
+    def pcov (x: MatrixD): MatrixD =
+    {
+        val z = x - mean (x)
+        (z.t * z) / x.dim1.toDouble
+    } // pcov
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the sample correlation matrix for the columns of matrix 'x'.
+     *  @param x  the matrix whose column columns correlations are sought
+     */
+    def corr (x: MatrixD): MatrixD =
+    {
+        val covv = cov (x)                               // sample covariance matrix
+        val cor  = eye (covv.dim1)                       // correlation matrix
+
+        for (i <- 0 until covv.dim1) {
+            val var_i = covv (i, i)                      // variance of column i
+            for (j <- 0 until i) {
+                cor(i, j) = covv (i, j) / sqrt (var_i *  covv (j, j))
+                cor(j, i) = cor (i, j)
+            } // for
+        } // for
+        cor
+    } // corr
+
+} // StatVector object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StatVectorTest` object is used to test the `StatVector` class.
  *  @see www.mathworks.com/help/stats/skewness.html
  *  > run-main scalation.stat.StatVectorTest
@@ -273,4 +331,64 @@ object StatVectorTest2 extends App
     } // if
 
 } // StatVectorTest2 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `StatVectorTest3` object is used to test the `StatVector` companion object.
+ *  @see www.itl.nist.gov/div898/handbook/pmc/section5/pmc541.htm
+ *  > run-main scalation.stat.StatVectorTest3
+ */
+object StatVectorTest3 extends App
+{
+    import StatVector._
+
+    val x = new MatrixD ((5, 3), 4.0, 2.0, 0.60,
+                                 4.2, 2.1, 0.59,
+                                 3.9, 2.0, 0.58,
+                                 4.3, 2.1, 0.62,
+                                 4.1, 2.2, 0.63)
+                                 
+    println ("-" * 60)
+    println (s"mean ($x) = ${mean (x)}")             // mean vector
+    println ("-" * 60)
+    println (s"cov ($x)  = ${cov (x)}")              // sample covariance matrix
+    println ("-" * 60)
+    println (s"pcov ($x) = ${pcov (x)}")             // population covariance matrix
+    println ("-" * 60)
+    println (s"corr ($x) = ${corr (x)}")             // correlation matrix
+    println ("-" * 60)
+                            
+} // StatVectorTest3 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `StatVectorTest4` object is used to test the `StatVector` companion object.
+ *  @see www.itl.nist.gov/div898/software/dataplot/refman2/auxillar/corrmatr.htm
+ *  > run-main scalation.stat.StatVectorTest4
+ */
+object StatVectorTest4 extends App
+{
+    import StatVector._
+
+    val x = new MatrixD ((9, 4), 42.2, 11.2, 31.9, 167.1,
+                                 48.6, 10.6, 13.2, 174.4,
+                                 42.6, 10.6, 28.7, 160.8,
+                                 39.0, 10.4, 26.1, 162.0,
+                                 34.7,  9.3, 30.1, 140.8,
+                                 44.5, 10.8,  8.5, 174.6,
+                                 39.1, 10.7, 24.3, 163.7,
+                                 40.1, 10.0, 18.6, 174.5,
+                                 45.9, 12.0, 20.4, 185.7)
+
+    println ("-" * 60)
+    println (s"mean ($x) = ${mean (x)}")             // mean vector
+    println ("-" * 60)
+    println (s"cov ($x)  = ${cov (x)}")              // sample covariance matrix
+    println ("-" * 60)
+    println (s"pcov ($x) = ${pcov (x)}")             // population covariance matrix
+    println ("-" * 60)
+    println (s"corr ($x) = ${corr (x)}")             // correlation matrix
+    println ("-" * 60)
+
+} // StatVectorTest4 object
 

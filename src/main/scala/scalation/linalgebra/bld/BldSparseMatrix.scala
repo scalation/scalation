@@ -1552,19 +1552,7 @@ object Sparse${MATRIX}Test extends App
 {
     import Sparse$MATRIX.RowMap
 
-    for (l <- 1 to 4) {
-        println ("\n\tTest Sparse$MATRIX on real matrices of dim " + l)
-        val x = new Sparse$MATRIX (l, l)
-        val y = new Sparse$MATRIX (l, l)
-        x.set (2)
-        y.set (3)
-        println ("x + y = " + (x + y))
-        println ("x - y = " + (x - y))
-        println ("x * y = " + (x * y))
-        println ("x * 4 = " + (x * 4))
-    } // for
-
-    println ("\n\tTest Sparse$MATRIX on additional operations")
+    println ("\n\tTest Sparse$MATRIX operations")
 
     val z  = new Sparse$MATRIX ((2, 2), 1, 2,
                                         3, 2)
@@ -1602,6 +1590,11 @@ object Sparse${MATRIX}Test extends App
                                              new RowMap ((0, 100), (2,   3)),
                                              new RowMap ((0,   4), (1, 100)) ))
     println ("sp = " + sp)
+
+    for (i <- 0 until 3) {
+        for (j <- 0 until 3) print (sp(i, j) + "\t")
+        println ()
+    } // for
      
 } // Sparse${MATRIX}Test object
 

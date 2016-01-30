@@ -1513,18 +1513,6 @@ object SparseMatrixDTest extends App
 {
     import SparseMatrixD.RowMap
 
-    for (l <- 1 to 4) {
-        println ("\n\tTest SparseMatrixD on real matrices of dim " + l)
-        val x = new SparseMatrixD (l, l)
-        val y = new SparseMatrixD (l, l)
-        x.set (2)
-        y.set (3)
-        println ("x + y = " + (x + y))
-        println ("x - y = " + (x - y))
-        println ("x * y = " + (x * y))
-        println ("x * 4 = " + (x * 4))
-    } // for
-
     println ("\n\tTest SparseMatrixD on additional operations")
 
     val z  = new SparseMatrixD ((2, 2), 1, 2,
@@ -1563,6 +1551,11 @@ object SparseMatrixDTest extends App
                                              new RowMap ((0, 100), (2,   3)),
                                              new RowMap ((0,   4), (1, 100)) ))
     println ("sp = " + sp)
+
+    for (i <- 0 until 3) {
+        for (j <- 0 until 3) print (sp(i, j) + "\t")
+        println ()
+    } // for
      
 } // SparseMatrixDTest object
 
