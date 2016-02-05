@@ -13,7 +13,7 @@ package scalation.analytics
 import math.exp
 import util.control.Breaks.{break, breakable}
 
-import scalation.linalgebra.{MatriD, MatrixD, VectorD}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.random.Random
 import scalation.util.Error
 
@@ -95,14 +95,14 @@ class Perceptron (x: MatrixD, y: VectorD, eta: Double = 1.0)
     /** Given a new input vector 'zi', predict the output/response value 'zo'.
      *  @param zi  the new input vector
      */
-    def predict (zi: VectorD): Double = sigmoid (w dot zi)
+    def predict (zi: VectoD): Double = sigmoid (w dot zi)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given several new input vectors stored as rows in a matrix 'zi',
      *  predict all output/response vector 'zo'
      *  @param zi  the matrix containing row vectors to use for prediction
      */
-    override def predict (zi: MatriD): VectorD = sigmoid (zi * w)
+    override def predict (zi: MatriD): VectoD = sigmoid (zi * w)
 
 } // Perceptron class
 

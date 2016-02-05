@@ -8,10 +8,10 @@
 
 package scalation.linalgebra.par
 
-import collection.mutable.LinkedEntry
-import math.abs
+import scala.collection.mutable.LinkedEntry
+import scala.math.abs
 
-import scalation.linalgebra.{MatriD, VectorD}
+import scalation.linalgebra.{MatriD, VectoD, VectorD}
 import scalation.math.{double_exp, oneIf}
 import scalation.util.{Error, SortedLinkedHashMap}
 
@@ -181,7 +181,7 @@ class SparseMatrixD (val d1: Int,
      *  @param i  the row index
      *  @param u  the vector value to assign
      */
-    def update (i: Int, u: VectorD)
+    def update (i: Int, u: VectoD)
     {
         for (j <- 0 until u.dim) {
             val x = u(j)
@@ -220,7 +220,7 @@ class SparseMatrixD (val d1: Int,
      *  @param j   the column index
      *  @param u   the vector to assign
      */
-    //def update (ir: Range, j: Int, u: VectorD) { col(j)(ir) = u }
+    //def update (ir: Range, j: Int, u: VectoD) { col(j)(ir) = u }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set a slice this matrix row-wise at index i and column-wise on range jr.
@@ -229,7 +229,7 @@ class SparseMatrixD (val d1: Int,
      *  @param jr  the column range
      *  @param u   the vector to assign
      */
-    //def update (i: Int, jr: Range, u: VectorD) { this(i)(jr) = u }
+    //def update (i: Int, jr: Range, u: VectoD) { this(i)(jr) = u }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set all the elements in this matrix to the scalar x.
@@ -255,7 +255,7 @@ class SparseMatrixD (val d1: Int,
      *  @param u  the vector value to assign
      *  @param j  the starting column index
      */
-    def set (i: Int, u: VectorD, j: Int = 0)
+    def set (i: Int, u: VectoD, j: Int = 0)
     {
         for (k <- 0 until u.dim) this(i, k+j) = u(k)
     } // set
@@ -342,7 +342,7 @@ class SparseMatrixD (val d1: Int,
      *  @param col  the column to set
      *  @param u    the vector to assign to the column
      */
-    def setCol (col: Int, u: VectorD) { for (i <- range1) this(i, col) = u(i) }
+    def setCol (col: Int, u: VectoD) { for (i <- range1) this(i, col) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select columns from this matrix according to the given index/basis.
@@ -370,7 +370,7 @@ class SparseMatrixD (val d1: Int,
     /** Concatenate (row) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
      *  @param u  the vector to be prepended as the new first row in new matrix
      */
-    def +: (u: VectorD): SparseMatrixD =
+    def +: (u: VectoD): SparseMatrixD =
     {
         if (u.dim != dim2) flaw ("+:", "vector does not match row dimension")
         val c = new SparseMatrixD (dim1 + 1, dim2)
@@ -382,7 +382,7 @@ class SparseMatrixD (val d1: Int,
     /** Concatenate (column) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
      *  @param u  the vector to be prepended as the new first column in new matrix
      */
-    def +^: (u: VectorD): SparseMatrixD =
+    def +^: (u: VectoD): SparseMatrixD =
     {
         if (u.dim != dim1) flaw ("+^:", "vector does not match column dimension")
         val c = new SparseMatrixD (dim1, dim2 + 1)
@@ -394,7 +394,7 @@ class SparseMatrixD (val d1: Int,
     /** Concatenate 'this' matrix and (row) vector 'u', i.e., append 'u' to 'this'.
      *  @param u  the vector to be appended as the new last row in new matrix
      */
-    def :+ (u: VectorD): SparseMatrixD =
+    def :+ (u: VectoD): SparseMatrixD =
     {
         if (u.dim != dim2) flaw (":+", "vector does not match row dimension")
         val c = new SparseMatrixD (dim1 + 1, dim2)
@@ -406,7 +406,7 @@ class SparseMatrixD (val d1: Int,
     /** Concatenate 'this' matrix and (column) vector 'u', i.e., append 'u' to 'this'.
      *  @param u  the vector to be appended as the new last column in new matrix
      */
-    def :^+ (u: VectorD): SparseMatrixD =
+    def :^+ (u: VectoD): SparseMatrixD =
     {
         if (u.dim != dim1) flaw (":^+", "vector does not match column dimension")
         val c = new SparseMatrixD (dim1, dim2 + 1)
@@ -453,7 +453,7 @@ class SparseMatrixD (val d1: Int,
     /** Add this matrix and (row) vector u.
      *  @param u  the vector to add
      */
-    def + (u: VectorD): SparseMatrixD =
+    def + (u: VectoD): SparseMatrixD =
     {
         val c = new SparseMatrixD (dim1, dim2)
         for (i <- range1; j <- range2) c(i, j) = this(i, j) + u(j)
@@ -518,7 +518,7 @@ class SparseMatrixD (val d1: Int,
     /** Add in-place this matrix and (row) vector u.
      *  @param u  the vector to add
      */
-    def += (u: VectorD): SparseMatrixD =
+    def += (u: VectoD): SparseMatrixD =
     {
         for (i <- range1; j <- range2) this(i, j) += u(j)
         this
@@ -560,7 +560,7 @@ class SparseMatrixD (val d1: Int,
     /** From this matrix subtract (row) vector u.
      *  @param u  the vector to subtract
      */
-    def - (u: VectorD): SparseMatrixD =
+    def - (u: VectoD): SparseMatrixD =
     {
         val c = new SparseMatrixD (dim1, dim2)
         for (i <- range1; j <- range2) c(i, j) = this(i, j) - u(j)
@@ -603,7 +603,7 @@ class SparseMatrixD (val d1: Int,
     /** From this matrix subtract in-place (row) vector u.
      *  @param u  the vector to subtract
      */
-    def -= (u: VectorD): SparseMatrixD =
+    def -= (u: VectoD): SparseMatrixD =
     {
         for (i <- range1; j <- range2) this(i, j) -= u(j)
         this
@@ -727,7 +727,7 @@ class SparseMatrixD (val d1: Int,
     /** Multiply this sparse matrix by vector u.
      *  @param u  the vector to multiply by
      */
-    def * (u: VectorD): VectorD =
+    def * (u: VectoD): VectorD =
     {
         if (dim2 != u.dim) flaw ("*", "matrix * vector - incompatible cross dimensions")
 
@@ -878,7 +878,7 @@ class SparseMatrixD (val d1: Int,
      *  'this' matrix and then multiplying by 'u' (ie., 'a dot u = a.t * u').
      *  @param u  the vector to multiply by (requires same first dimensions)
      */
-    def dot (u: VectorD): VectorD =
+    def dot (u: VectoD): VectorD =
     {
         if (dim1 != u.dim) flaw ("dot", "matrix dot vector - incompatible first dimensions")
 
@@ -942,7 +942,7 @@ class SparseMatrixD (val d1: Int,
     /** Multiply this sparse matrix by vector u to produce another matrix (a_ij * u_j)
      *  @param u  the vector to multiply by
      */
-    def ** (u: VectorD): SparseMatrixD =
+    def ** (u: VectoD): SparseMatrixD =
     {
         val c = new SparseMatrixD (dim1, dim2)
         for (i <- c.range1.par; e <- v(i)) this(i, e._1) = e._2 * u(e._1)
@@ -953,7 +953,7 @@ class SparseMatrixD (val d1: Int,
     /** Multiply in-place this sparse matrix by vector u to produce another matrix (a_ij * u_j)
      *  @param u  the vector to multiply by
      */
-    def **= (u: VectorD): SparseMatrixD =
+    def **= (u: VectoD): SparseMatrixD =
     {
         for (i <- range1.par; e <- v(i)) this(i, e._1) = e._2 * u(e._1)
         this
@@ -1145,7 +1145,7 @@ class SparseMatrixD (val d1: Int,
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
      */
-    def solve (l: MatriD, u: MatriD, b: VectorD): VectorD =
+    def solve (l: MatriD, u: MatriD, b: VectoD): VectorD =
     {
         val y = new VectorD (l.dim2)       
         for (k <- 0 until y.dim) {                   // solve for y in l*y = b
@@ -1163,10 +1163,17 @@ class SparseMatrixD (val d1: Int,
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve for 'x' in the equation 'l*u*x = b' (see lud above).
+     *  @param lu  the lower and upper triangular matrices
+     *  @param b   the constant vector
+     */
+    def solve (lu: Tuple2 [MatriD, MatriD], b: VectoD): VectorD = solve (lu._1, lu._2, b)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' matrix.
      *  @param b  the constant vector.
      */
-    def solve (b: VectorD): VectorD = solve (lud, b)
+    def solve (b: VectoD): VectorD = solve (lud, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Combine this sparse matrix with matrix b, placing them along the diagonal and
@@ -1222,7 +1229,7 @@ class SparseMatrixD (val d1: Int,
      *  @param u  the vector to set the diagonal to
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
-    def setDiag (u: VectorD, k: Int = 0)
+    def setDiag (u: VectoD, k: Int = 0)
     {
         val mm = dim1 - abs (k)
         for (i <- 0 until mm) this(i, i+k) = u(i)

@@ -10,10 +10,10 @@ package scalation.linalgebra.par
 
 import java.io.PrintWriter
 
-import math.{abs, max, pow}
-import io.Source.fromFile
+import scala.math.{abs, max, pow}
+import scala.io.Source.fromFile
 
-import scalation.linalgebra.{MatriD, VectorD}
+import scalation.linalgebra.{MatriD, VectoD, VectorD}
 import scalation.linalgebra.par.MatrixD.eye
 import scalation.math.{double_exp, oneIf}
 import scalation.util.Error
@@ -153,7 +153,7 @@ class MatrixD (val d1: Int,
      *  @param i  the row index
      *  @param u  the vector value to assign
      */
-    def update (i: Int, u: VectorD) { v(i) = u() }
+    def update (i: Int, u: VectoD) { v(i) = u() }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set a slice this matrix row-wise on range ir and column-wise on range jr.
@@ -211,7 +211,7 @@ class MatrixD (val d1: Int,
      *  @param u  the vector value to assign
      *  @param j  the starting column index
      */
-    def set (i: Int, u: VectorD, j: Int = 0)
+    def set (i: Int, u: VectoD, j: Int = 0)
     {
         for (k <- 0 until u.dim) v(i)(j + k) = u(k)
     } // set
@@ -295,7 +295,7 @@ class MatrixD (val d1: Int,
      *  @param col  the column to set
      *  @param u    the vector to assign to the column
      */
-    def setCol (col: Int, u: VectorD) { for (i <- range1) v(i)(col) = u(i) }
+    def setCol (col: Int, u: VectoD) { for (i <- range1) v(i)(col) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select columns from this matrix according to the given index/basis.
@@ -326,7 +326,7 @@ class MatrixD (val d1: Int,
     /** Concatenate (row) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
      *  @param u  the vector to be prepended as the new first row in new matrix
      */
-    def +: (u: VectorD): MatrixD =
+    def +: (u: VectoD): MatrixD =
     {
         if (u.dim != dim2) flaw ("+:", "vector does not match row dimension")
         val c = new MatrixD (dim1 + 1, dim2)
@@ -338,7 +338,7 @@ class MatrixD (val d1: Int,
     /** Concatenate (column) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
      *  @param u  the vector to be prepended as the new first column in new matrix
      */
-    def +^: (u: VectorD): MatrixD =
+    def +^: (u: VectoD): MatrixD =
     {
         if (u.dim != dim1) flaw ("+^:", "vector does not match column dimension")
         val c = new MatrixD (dim1, dim2 + 1)
@@ -350,7 +350,7 @@ class MatrixD (val d1: Int,
     /** Concatenate 'this' matrix and (row) vector 'u', i.e., append 'u' to 'this'.
      *  @param u  the vector to be appended as the new last row in new matrix
      */
-    def :+ (u: VectorD): MatrixD =
+    def :+ (u: VectoD): MatrixD =
     {
         if (u.dim != dim2) flaw (":+", "vector does not match row dimension")
         val c = new MatrixD (dim1 + 1, dim2)
@@ -362,7 +362,7 @@ class MatrixD (val d1: Int,
     /** Concatenate 'this' matrix and (column) vector 'u', i.e., append 'u' to 'this'.
      *  @param u  the vector to be appended as the new last column in new matrix
      */
-    def :^+ (u: VectorD): MatrixD =
+    def :^+ (u: VectoD): MatrixD =
     {
         if (u.dim != dim1) flaw (":^+", "vector does not match column dimension")
         val c = new MatrixD (dim1, dim2 + 1)
@@ -426,7 +426,7 @@ class MatrixD (val d1: Int,
     /** Add this matrix and (row) vector u.
      *  @param u  the vector to add
      */
-    def + (u: VectorD): MatrixD =
+    def + (u: VectoD): MatrixD =
     {
         val c = new MatrixD (dim1, dim2)
         for (i <- (0 until dim1 by granularity).par){
@@ -480,7 +480,7 @@ class MatrixD (val d1: Int,
     /** Add in-place this matrix and (row) vector u.
      *  @param u  the vector to add
      */
-    def += (u: VectorD): MatrixD =
+    def += (u: VectoD): MatrixD =
     {
         for (i <- (0 until dim1 by granularity).par) {
             var end = i + granularity; if (i + granularity >= dim1) end = dim1 
@@ -534,7 +534,7 @@ class MatrixD (val d1: Int,
     /** From this matrix subtract (row) vector u.
      *  @param u  the vector to add
      */
-    def - (u: VectorD): MatrixD =
+    def - (u: VectoD): MatrixD =
     {
         val c = new MatrixD (dim1, dim2)
         for (i <- (0 until dim1 by granularity).par) {
@@ -588,7 +588,7 @@ class MatrixD (val d1: Int,
     /** From this matrix subtract in-place (row) vector u.
      *  @param u  the vector to add
      */
-    def -= (u: VectorD): MatrixD =
+    def -= (u: VectoD): MatrixD =
     {
         for (i <- (0 until dim1 by granularity).par) {
             var end = i + granularity; if (i + granularity >= dim1) end = dim1
@@ -650,7 +650,7 @@ class MatrixD (val d1: Int,
     /** Multiply this matrix by vector u.
      *  @param u  the vector to multiply by
      */
-    def * (u: VectorD): VectorD =
+    def * (u: VectoD): VectorD =
     {
         val c = new VectorD (dim1)
         for (i <- (0 until dim1 by granularity).par) {
@@ -763,7 +763,7 @@ class MatrixD (val d1: Int,
      *  'this' matrix and then multiplying by 'u' (ie., 'a dot u = a.t * u').
      *  @param u  the vector to multiply by (requires same first dimensions)
      */
-    def dot (u: VectorD): VectorD =
+    def dot (u: VectoD): VectorD =
     {
         if (dim1 != u.dim) flaw ("dot", "matrix dot vector - incompatible first dimensions")
 
@@ -864,7 +864,7 @@ class MatrixD (val d1: Int,
     /** Multiply this matrix by vector u to produce another matrix (a_ij * u_j)
      *  @param u  the vector to multiply by
      */
-    def ** (u: VectorD): MatrixD =
+    def ** (u: VectoD): MatrixD =
     {
         val c = new MatrixD (dim1, dim2)
         for (i <- (0 until dim1 by granularity).par) {
@@ -878,7 +878,7 @@ class MatrixD (val d1: Int,
     /** Multiply in-place this matrix by vector u to produce another matrix (a_ij * u_j)
      *  @param u  the vector to multiply by
      */
-    def **= (u: VectorD): MatrixD =
+    def **= (u: VectoD): MatrixD =
     {
         for (i <- (0 until dim1 by granularity).par) {
             var end = i + granularity; if (i + granularity >= dim1) end = dim1 
@@ -1077,7 +1077,7 @@ class MatrixD (val d1: Int,
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
      */
-    def solve (l: MatriD, u: MatriD, b: VectorD): VectorD =
+    def solve (l: MatriD, u: MatriD, b: VectoD): VectorD =
     {
         val y  = new VectorD (l.dim2)
         for (k <- 0 until y.dim) {                   // solve for y in l*y = b
@@ -1092,10 +1092,17 @@ class MatrixD (val d1: Int,
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve for 'x' in the equation 'l*u*x = b' (see lud above).
+     *  @param lu  the lower and upper triangular matrices
+     *  @param b   the constant vector
+     */
+    def solve (lu: Tuple2 [MatriD, MatriD], b: VectoD): VectorD = solve (lu._1, lu._2, b)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' matrix.
      *  @param b  the constant vector.
      */
-    def solve (b: VectorD): VectorD = solve (lud, b)
+    def solve (b: VectoD): VectorD = solve (lud, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Combine this matrix with matrix b, placing them along the diagonal and
@@ -1169,7 +1176,7 @@ class MatrixD (val d1: Int,
      *  @param u  the vector to set the diagonal to
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
-    def setDiag (u: VectorD, k: Int = 0)
+    def setDiag (u: VectoD, k: Int = 0)
     {
         val mm = dim1 - abs (k)
         for (i <- 0 until mm) v(i)(i+k) = u(i)
@@ -1507,7 +1514,7 @@ object MatrixD extends Error
      *  @param u  the vector to be concatenated as the new first row in matrix
      *  @param w  the vector to be concatenated as the new second row in matrix
      */
-    def ++ (u: VectorD, w: VectorD): MatrixD =
+    def ++ (u: VectoD, w: VectoD): MatrixD =
     {
         if (u.dim != w.dim) flaw ("++", "vector dimensions do not match")
         val c = new MatrixD (2, u.dim)
@@ -1521,7 +1528,7 @@ object MatrixD extends Error
      *  @param u  the vector to be concatenated as the new first column in matrix
      *  @param w  the vector to be concatenated as the new second column in matrix
      */
-    def ++^ (u: VectorD, w: VectorD): MatrixD =
+    def ++^ (u: VectoD, w: VectoD): MatrixD =
     {
         if (u.dim != w.dim) flaw ("++^", "vector dimensions do not match")
         val c = new MatrixD (u.dim, 2)
@@ -1535,7 +1542,7 @@ object MatrixD extends Error
      *  @param u  the vector to multiply by
      *  @param a  the matrix to multiply by (requires sameCrossDimensions)
      */
-    def times (u: VectorD, a: MatrixD): VectorD =
+    def times (u: VectoD, a: MatrixD): VectorD =
     {
         if (u.dim != a.dim1) flaw ("times", "vector * matrix - incompatible cross dimensions")
 
@@ -1555,7 +1562,7 @@ object MatrixD extends Error
      *  @param x  the first vector
      *  @param y  the second vector
      */
-    def outer (x: VectorD, y: VectorD): MatrixD =
+    def outer (x: VectoD, y: VectoD): MatrixD =
     {
         val granularity = scala.math.pow(x.dim, 0.5).toInt
         val c = new MatrixD (x.dim, y.dim)
@@ -1571,7 +1578,7 @@ object MatrixD extends Error
      *  @param x  the first vector -> row 0
      *  @param y  the second vector -> row 1
      */
-    def form_rw (x: VectorD, y: VectorD): MatrixD =
+    def form_rw (x: VectoD, y: VectoD): MatrixD =
     {
         if (x.dim != y.dim) flaw ("form_rw", "dimensions of x and y must be the same")
 
@@ -1587,7 +1594,7 @@ object MatrixD extends Error
      *  @param x  the first scalar -> row 0 (repeat scalar)
      *  @param y  the second vector -> row 1
      */
-    def form_rw (x: Double, y: VectorD): MatrixD =
+    def form_rw (x: Double, y: VectoD): MatrixD =
     {
         val cols = y.dim
         val c = new MatrixD (2, cols)
@@ -1601,7 +1608,7 @@ object MatrixD extends Error
      *  @param x  the first vector -> row 0
      *  @param y  the second scalar -> row 1 (repeat scalar)
      */
-    def form_rw (x: VectorD, y: Double): MatrixD =
+    def form_rw (x: VectoD, y: Double): MatrixD =
     {
         val cols = x.dim
         val c = new MatrixD (2, cols)
@@ -1615,7 +1622,7 @@ object MatrixD extends Error
      *  @param x  the first vector -> column 0
      *  @param y  the second vector -> column 1
      */
-    def form_cw (x: VectorD, y: VectorD): MatrixD =
+    def form_cw (x: VectoD, y: VectoD): MatrixD =
     {
         if (x.dim != y.dim) flaw ("form_cw", "dimensions of x and y must be the same")
 
@@ -1631,7 +1638,7 @@ object MatrixD extends Error
      *  @param x  the first scalar -> column 0 (repeat scalar)
      *  @param y  the second vector -> column 1
      */
-    def form_cw (x: Double, y: VectorD): MatrixD =
+    def form_cw (x: Double, y: VectoD): MatrixD =
     {
         val rows = y.dim
         val c = new MatrixD (rows, 2)
@@ -1645,7 +1652,7 @@ object MatrixD extends Error
      *  @param x  the first vector -> column 0
      *  @param y  the second scalar -> column 1 (repeat scalar)
      */
-    def form_cw (x: VectorD, y: Double): MatrixD =
+    def form_cw (x: VectoD, y: Double): MatrixD =
     {
         val rows = x.dim
         val c = new MatrixD (rows, 2)

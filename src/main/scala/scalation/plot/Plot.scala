@@ -10,7 +10,7 @@ package scalation.plot
 
 import math.{ceil, floor, min, pow, round}
 
-import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.linalgebra.VectoD
 import scalation.scala2d.{Panel, VizFrame}
 import scalation.scala2d.{Ellipse, Line}
 import scalation.scala2d.Colors._
@@ -25,7 +25,7 @@ import scalation.scala2d.Shapes.{BasicStroke, Dimension, Graphics, Graphics2D}
  *  @param z       the z vector of data values (secondary vertical) to compare with y
  *  @param _title  the title of the plot
  */
-class Plot (x: VectorD, y: VectorD, z: VectorD = null, _title: String = "Plot y vs. x")
+class Plot (x: VectoD, y: VectoD, z: VectoD = null, _title: String = "Plot y vs. x")
       extends VizFrame (_title, null)
 {
     getContentPane ().add (new Canvas (x, y, z, getW, getH))
@@ -42,7 +42,7 @@ class Plot (x: VectorD, y: VectorD, z: VectorD = null, _title: String = "Plot y 
  *  @param width   the width
  *  @param height  the height
  */
-class FramelessPlot (x: VectorD, y: VectorD, z: VectorD = null, var width: Int = 640, var height: Int = 480)
+class FramelessPlot (x: VectoD, y: VectoD, z: VectoD = null, var width: Int = 640, var height: Int = 480)
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Dynamically create and return a drawing canvas.
@@ -60,7 +60,7 @@ class FramelessPlot (x: VectorD, y: VectorD, z: VectorD = null, var width: Int =
  *  @param width   the width
  *  @param height  the height
  */
-class Canvas (x: VectorD, y: VectorD, z: VectorD, width: Int, height: Int)
+class Canvas (x: VectoD, y: VectoD, z: VectoD, width: Int, height: Int)
       extends Panel
 {
     private val EPSILON   = 1E-9
@@ -172,6 +172,7 @@ class Canvas (x: VectorD, y: VectorD, z: VectorD, width: Int, height: Int)
  */
 object PlotTest extends App
 {
+    import scalation.linalgebra.VectorD
 /*
     val x = VectorD (0.0, 1.0, 2.0, 3.0,  4.0,  5.0,  6.0, 7.0, 8.0, 9.0, 10.0)
     val y = VectorD (0.0, 1.0, 4.0, 9.0, 16.0, 25.0, 16.0, 9.0, 4.0, 1.0,  0.0)

@@ -13,7 +13,7 @@ package scalation.analytics
 
 import math.{exp, log}
 
-import scalation.linalgebra.{MatrixD, VectorD, VectorI}
+import scalation.linalgebra.{MatrixD, VectorD, VectoD, VectorI}
 import scalation.minima.QuasiNewton
 import scalation.plot.Plot
 import scalation.util.Error
@@ -133,7 +133,7 @@ class LogisticRegression (x: MatrixD, y: VectorI, fn: Array [String], cn: Array 
     /** Classify the value of y = f(z) by evaluating the formula y = sigmoid (b dot z).
      *  @param z  the new vector to classify
      */
-    def classify (z: VectorD): Tuple2 [Int, String] =
+    def classify (z: VectoD): Tuple2 [Int, String] =
     {
         val c = if (sigmoid (b dot z) > 0.5) 1 else 0
         (c, cn(c))

@@ -16,7 +16,7 @@ package scalation.random
 import math.{ceil, exp, floor, log, Pi, round, sqrt, tan}
 
 import scalation.calculus.Calculus.FunctionS2S
-import scalation.linalgebra.VectorD
+import scalation.linalgebra.{VectoD, VectorD}
 import scalation.math.Combinatorics.{betaF, choose, fac, gammaF}
 import scalation.math.{double_exp, nexp}
 import scalation.math.ExtremeD.approx
@@ -286,7 +286,7 @@ case class Dice (cdf: Array [Double] = Array (.1, .3, .5, .7, .9, 1.0), stream: 
  *  @param cumulative  whether dist is cumulative (cdf) or not (pmf)
  *  @param stream      the random number stream
  */
-case class Discrete (dist: VectorD = VectorD (.2, .2, .2, .2, .2), x: VectorD = null,
+case class Discrete (dist: VectoD = VectorD (.2, .2, .2, .2, .2), x: VectorD = null,
                      cumulative: Boolean = false, stream: Int = 0)
      extends Variate (stream)
 {

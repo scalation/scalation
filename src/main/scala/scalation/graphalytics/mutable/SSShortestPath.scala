@@ -12,7 +12,7 @@ import scala.collection.mutable.{Map, PriorityQueue}
 import scala.collection.mutable.{Set => SET}
 //import scala.language.implicitConversions
 
-import scalation.linalgebra.{MatriD, MatrixD, SparseMatrixD, VectorD, VectorI}
+import scalation.linalgebra.{MatriD, MatrixD, SparseMatrixD, VectoD, VectorD, VectorI}
 import scalation.linalgebra.SparseMatrixD.RowMap
 
 import LabelType.TLabel
@@ -61,7 +61,7 @@ class SSShortestPath (c: MatriD, s: Int)
      *  the vector 'p' of predecessor vertices.  The path from 's' to each vertex
      *  can be deduced from the 'p' vector.
      */
-    def spath (): Tuple2 [VectorD, VectorI] =
+    def spath (): Tuple2 [VectoD, VectorI] =
     {
         val d = c(s)                                    // the distance from vertex s to each vertex j
         for (j <- rang if c(s, j) == 0) d(j) = MAX      // set distance to infinity if no direct edge from s

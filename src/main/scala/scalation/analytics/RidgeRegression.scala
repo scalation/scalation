@@ -12,7 +12,7 @@ package scalation.analytics
 
 import math.pow
 
-import scalation.linalgebra.{Fac_Cholesky, Fac_QR, MatriD, MatrixD, VectorD}
+import scalation.linalgebra.{Fac_Cholesky, Fac_QR, MatriD, MatrixD, VectoD, VectorD}
 import scalation.plot.Plot
 import scalation.util.{Error, time}
 
@@ -123,14 +123,14 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
     /** Predict the value of y = f(z) by evaluating the formula below.
      *  @param z  the new vector to predict
      */
-    def predict (z: VectorD): Double = b dot z
+    def predict (z: VectoD): Double = b dot z
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z for
      *  each row of matrix z.
      *  @param z  the new matrix to predict
      */
-    override def predict (z: MatriD): VectorD = z * b
+    override def predict (z: MatriD): VectoD = z * b
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable

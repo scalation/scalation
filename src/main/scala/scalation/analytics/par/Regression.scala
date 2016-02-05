@@ -10,7 +10,7 @@ package scalation.analytics.par
 
 import math.pow
 
-import scalation.linalgebra.{MatriD, VectorD}
+import scalation.linalgebra.{MatriD, VectoD, VectorD}
 import scalation.linalgebra.par.{Fac_Cholesky, Fac_QR, MatrixD}
 import scalation.plot.Plot
 import scalation.util.{Error, time}
@@ -117,14 +117,14 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
      *  e.g., (b_0, b_1, b_2) dot (1, z_1, z_2).
      *  @param z  the new vector to predict
      */
-    def predict (z: VectorD): Double = b dot z
+    def predict (z: VectoD): Double = b dot z
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z for
      *  each row of matrix z.
      *  @param z  the new matrix to predict
      */
-    override def predict (z: MatriD): VectorD = z * b
+    override def predict (z: MatriD): VectoD = z * b
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable

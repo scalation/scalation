@@ -8,7 +8,7 @@
 
 package scalation.analytics.par
 
-import scalation.linalgebra.{MatriD, VectorD}
+import scalation.linalgebra.{MatriD, VectoD, VectorD}
 import scalation.linalgebra.par.MatrixD
 import scalation.math.double_exp
 import scalation.plot.Plot
@@ -91,14 +91,14 @@ class PolyRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = 
      *  e.g., (b_0, b_1, b_2) dot (1, z_1, z_2).
      *  @param z  the new vector to predict
      */
-    def predict (z: VectorD): Double = rg.predict (z)
+    def predict (z: VectoD): Double = rg.predict (z)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot zi for
      *  each row zi of matrix z.
      *  @param z  the new matrix to predict
      */
-    override def predict (z: MatriD): VectorD = rg.predict (z)
+    override def predict (z: MatriD): VectoD = rg.predict (z)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable

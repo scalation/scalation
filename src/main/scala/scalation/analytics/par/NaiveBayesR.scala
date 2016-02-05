@@ -11,7 +11,7 @@ package scalation.analytics.par
 import math.{ceil, floor}
 
 import scalation.analytics.ClassifierReal
-import scalation.linalgebra.{MatriD, VectorD, VectorI}
+import scalation.linalgebra.{MatriD, VectoD, VectorD, VectorI}
 import scalation.linalgebra.par.MatrixD
 import scalation.random.Normal
 import scalation.stat.vectorD2StatVector
@@ -134,7 +134,7 @@ class NaiveBayesR (x: MatrixD, y: VectorI, fn: Array [String], k: Int, cn: Array
      *  (0, ..., k-1) with the highest relative posterior probability.
      *  @param z  the data vector to classify
      */
-    def classify (z: VectorD): Tuple2 [Int, String] =
+    def classify (z: VectoD): Tuple2 [Int, String] =
     {
         for (c <- 0 until k; j <- 0 until n) prob(c) *= cd(c)(j)(z(j))
         if (DEBUG) println ("prob = " + prob)

@@ -14,10 +14,10 @@
 
 package scalation.minima
 
-import math.abs
-import util.control.Breaks.{breakable, break}
+import scala.math.abs
+import scala.util.control.Breaks.{breakable, break}
 
-import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class solves Linear Programming (LP) problems using a tableau based
@@ -255,7 +255,7 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the value of the objective function f(x) = c x.
      */
-    def objF (x: VectorD): Double = t(M, jj)      // bottom, right cell in tableau
+    def objF (x: VectoD): Double = t(M, jj)      // bottom, right cell in tableau
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show the current tableau.

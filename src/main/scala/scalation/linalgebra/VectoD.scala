@@ -169,7 +169,7 @@ trait VectoD
      *  @param from  the start of the slice (included)
      *  @param till  the end of the slice (excluded)
      */
-//  def slice (from: Int, till: Int): VectoD
+    override def slice (from: Int, till: Int): VectoD = null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select a subset of elements of 'this' vector corresponding to a 'basis'.

@@ -8,7 +8,7 @@
 
 package scalation.analytics.par
 
-import scalation.linalgebra.{MatriD, VectorD}
+import scalation.linalgebra.{MatriD, VectoD, VectorD}
 import scalation.linalgebra.par.MatrixD
 import scalation.linalgebra.VectorD.one
 import scalation.util.{Error, time}
@@ -126,7 +126,7 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
      *  for 2D:  b_0 + b_1*z_0 + b_2*z_0^2 + b_3*z_1 + b_4*z_1*z_0 + b_5*z_1^2
      *  @param z  the point/vector whose functional value is to be predicted
      */
-    def predict (z: VectorD): Double =
+    def predict (z: VectoD): Double =
     {
         val q   = one(1) ++ z    // augmented vector: [ 1., x(0), ..., x(n-1) ]
         var l   = 0

@@ -176,7 +176,7 @@ class SymTriMatrixD (val d1: Int)
      *  @param i  the row index
      *  @param u  the vector value to assign
      */
-    def update (i: Int, u: VectorD)
+    def update (i: Int, u: VectoD)
     {
         _dg(i) = u(i)
         if (i > 0) _sd(i-1) = u(i-1)
@@ -237,7 +237,7 @@ class SymTriMatrixD (val d1: Int)
      *  @param u  the vector value to assign
      *  @param j  the starting column index
      */
-    def set (i: Int, u: VectorD, j: Int = 0)
+    def set (i: Int, u: VectoD, j: Int = 0)
     {
         if (i >= j)   _dg(i) = u(i)
         if (i-1 >= j) _sd(i-1) = u(i-1)
@@ -322,7 +322,7 @@ class SymTriMatrixD (val d1: Int)
      *  @param col  the column to set
      *  @param u    the vector to assign to the column
      */
-    def setCol (col: Int, u: VectorD)
+    def setCol (col: Int, u: VectoD)
     {
         _dg(col) = u(col)
         if (col > 0) _sd(col-1) = u(col-1)
@@ -348,7 +348,7 @@ class SymTriMatrixD (val d1: Int)
     /** Concatenate (row) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
      *  @param u  the vector to be prepended as the new first row in new matrix
      */
-    def +: (u: VectorD): SymTriMatrixD =
+    def +: (u: VectoD): SymTriMatrixD =
     {
         throw new NoSuchMethodException ("SymTriMatrixD does not support +:")
     } // +:
@@ -357,7 +357,7 @@ class SymTriMatrixD (val d1: Int)
     /** Concatenate (column) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
      *  @param u  the vector to be prepended as the new first column in new matrix
      */
-    def +^: (u: VectorD): SymTriMatrixD =
+    def +^: (u: VectoD): SymTriMatrixD =
     {
         throw new NoSuchMethodException ("SymTriMatrixD does not support +^:")
     } // +^:
@@ -366,7 +366,7 @@ class SymTriMatrixD (val d1: Int)
     /** Concatenate 'this' matrix and (row) vector 'u', i.e., append 'u' to 'this'.
      *  @param u  the vector to be appended as the new last row in new matrix
      */
-    def :+ (u: VectorD): SymTriMatrixD =
+    def :+ (u: VectoD): SymTriMatrixD =
     {
         throw new NoSuchMethodException ("SymTriMatrixD does not support :+")
     } // :+
@@ -375,7 +375,7 @@ class SymTriMatrixD (val d1: Int)
     /** Concatenate 'this' matrix and (column) vector 'u', i.e., append 'u' to 'this'.
      *  @param u  the vector to be appended as the new last column in new matrix
      */
-    def :^+ (u: VectorD): SymTriMatrixD =
+    def :^+ (u: VectoD): SymTriMatrixD =
     {
         throw new NoSuchMethodException ("SymTriMatrixD does not support :^+")
     } // :^+
@@ -417,9 +417,9 @@ class SymTriMatrixD (val d1: Int)
     /** Add 'this' tridiagonal matrix and (row) vector 'u'.
      *  @param u  the vector to add
      */
-    def + (u: VectorD): MatrixD =
+    def + (u: VectoD): MatrixD =
     {
-        throw new NoSuchMethodException ("SymTriMatrixD does not support + for VectorD")
+        throw new NoSuchMethodException ("SymTriMatrixD does not support + for VectoD")
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -451,9 +451,9 @@ class SymTriMatrixD (val d1: Int)
     /** Add in-place 'this' tridiagonal matrix and (row) vector 'u'.
      *  @param u  the vector to add
      */
-    def += (u: VectorD): MatrixD =
+    def += (u: VectoD): MatrixD =
     {
-        throw new NoSuchMethodException ("SymTriMatrixD does not support += for VectorD")
+        throw new NoSuchMethodException ("SymTriMatrixD does not support += for VectoD")
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -484,9 +484,9 @@ class SymTriMatrixD (val d1: Int)
     /** From 'this' tridiagonal matrix subtract (row) vector 'u'.
      *  @param u  the vector to subtract
      */
-    def - (u: VectorD): MatrixD =
+    def - (u: VectoD): MatrixD =
     {
-        throw new NoSuchMethodException ("SymTriMatrixD does not support - for VectorD")
+        throw new NoSuchMethodException ("SymTriMatrixD does not support - for VectoD")
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -518,9 +518,9 @@ class SymTriMatrixD (val d1: Int)
     /** From 'this' tridiagonal matrix subtract in-place (row) vector 'u'.
      *  @param u  the vector to subtract
      */
-    def -= (u: VectorD): MatrixD =
+    def -= (u: VectoD): MatrixD =
     {
-        throw new NoSuchMethodException ("SymTriMatrixD does not support -= for VectorD")
+        throw new NoSuchMethodException ("SymTriMatrixD does not support -= for VectoD")
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -563,7 +563,7 @@ class SymTriMatrixD (val d1: Int)
     /** Multiply 'this' triangular matrix by vector 'u'.
      *  @param u  the vector to multiply by
      */
-    def * (u: VectorD): VectorD = 
+    def * (u: VectoD): VectorD = 
     {
         val c = new VectorD (d1)
         c(0)  = _dg(0) * u(0) + _sd(0) * u(1)
@@ -608,14 +608,14 @@ class SymTriMatrixD (val d1: Int)
      *  Since 'this' is symmetric, the result is the same as 'a * u'.
      *  @param u  the vector to multiply by (requires same first dimensions)
      */
-    def dot (u: VectorD): VectorD = this * u
+    def dot (u: VectoD): VectorD = this * u
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' triangular matrix by vector 'u' to produce another matrix
      *  '(a_ij * u_j)'.
      *  @param u  the vector to multiply by
      */
-    def ** (u: VectorD): SymTriMatrixD = 
+    def ** (u: VectoD): SymTriMatrixD = 
     {
         throw new NoSuchMethodException ("matrix * vector -> matrix not implemented")
     } // **
@@ -625,7 +625,7 @@ class SymTriMatrixD (val d1: Int)
      *  matrix '(a_ij * u_j)'.
      *  @param u  the vector to multiply by
      */
-    def **= (u: VectorD): SymTriMatrixD =
+    def **= (u: VectoD): SymTriMatrixD =
     {
         throw new NoSuchMethodException ("inplace matrix * vector -> matrix not implemented")
     } // **=
@@ -701,7 +701,7 @@ class SymTriMatrixD (val d1: Int)
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
      */
-    def solve (l: MatriD, u: MatriD, b: VectorD): VectorD = 
+    def solve (l: MatriD, u: MatriD, b: VectoD): VectorD = 
     {
         if (! l.isInstanceOf [MatrixD] || ! u.isInstanceOf [MatrixD]) {
             throw new NoSuchMethodException ("'l.solve (u)' is only implemented for dense matrices")
@@ -712,6 +712,13 @@ class SymTriMatrixD (val d1: Int)
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve for 'x' in the equation 'l*u*x = b' (see lud above).
+     *  @param lu  the lower and upper triangular matrices
+     *  @param b   the constant vector
+     */
+    def solve (lu: Tuple2 [MatriD, MatriD], b: VectoD): VectorD = solve (lu._1, lu._2, b)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' tridiagonal matrix,
      *  using the Thomas Algorithm.
      *  Caveat:  Stability vs. diagonal dominance.
@@ -719,7 +726,7 @@ class SymTriMatrixD (val d1: Int)
      *  @see en.wikibooks.org/wiki/Algorithm_Implementation/Linear_Algebra/Tridiagonal_matrix_algorithm
      *  @param b  the constant vector
      */
-    def solve (b: VectorD): VectorD =
+    def solve (b: VectoD): VectorD =
     {
         val j = d1 - 2
         val x = new VectorD (b)               // solution vector, start with copy of b
@@ -804,10 +811,10 @@ class SymTriMatrixD (val d1: Int)
      *  @param u  the vector to set the diagonal to
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
-    def setDiag (u: VectorD, k: Int = 0)
+    def setDiag (u: VectoD, k: Int = 0)
     {
-        if (k == 0) _dg = u
-        else if (ABS (k) == 1) _sd = u
+        if (k == 0) _dg = u.asInstanceOf [VectorD]                     // FIX
+        else if (ABS (k) == 1) _sd = u.asInstanceOf [VectorD]
         else flaw ("setDiag", "nothing stored for diagonal " + k)
     } // setDiag
 
@@ -1023,7 +1030,7 @@ object SymTriMatrixD extends Error
      *  @param u           the array of vectors to assign
      *  @param columnwise  whether the vectors are treated as column or row vectors
      */
-    def apply (u: Array [VectorD], columnwise: Boolean = true): SymTriMatrixD =
+    def apply (u: Array [VectoD], columnwise: Boolean = true): SymTriMatrixD =
     {
         var x: SymTriMatrixD = null
         val u_dim = u(0).dim
@@ -1043,7 +1050,7 @@ object SymTriMatrixD extends Error
      *  Assumes vectors are columwise.
      *  @param u  the Vector of vectors to assign
      */
-    def apply (u: Vector [VectorD]): SymTriMatrixD =
+    def apply (u: Vector [VectoD]): SymTriMatrixD =
     {
         val u_dim = u(0).dim
         val x = new SymTriMatrixD (u_dim)

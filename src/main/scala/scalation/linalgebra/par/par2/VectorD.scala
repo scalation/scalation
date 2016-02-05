@@ -2,17 +2,24 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 1.2
- *  @date    Sun Sep 16 14:09:25 EDT 2012
+ *  @date    Tue Feb  2 15:55:24 EST 2016
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.linalgebra
+//  U N D E R   D E V E L O P M E N T
 
-import collection.Traversable
-import util.Sorting.quickSort
+// Issue 1 - thread-safety with minimal performance hit
+// Issue 2 - make all methods parallel
+// Issue 3 - move to .par package and integrate with the rest of code
+
+package scalation.linalgebra.par.par2
+
+import scala.collection.Traversable
+import scala.util.Sorting.quickSort
 
 import math.{abs => ABS, max => MAX, sqrt}
 
+import scalation.linalgebra.{MatriD, VectoD, VectorI, VectorL}
 import scalation.math.double_exp
 import scalation.util.Error
 import scalation.util.SortingD.{iqsort, qsort2}
@@ -20,6 +27,7 @@ import scalation.util.SortingD.{iqsort, qsort2}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VectorD` class stores and operates on Numeric Vectors of base type `Double`.
  *  It follows the framework of `gen.VectorN [T]` and is provided for performance.
+ *  This is the parallel version.
  *  @param dim  the dimension/size of the vector
  *  @param v    the 1D array used to store vector elements
  */
@@ -44,10 +52,10 @@ class VectorD (val dim: Int,
     /** Construct a vector and assign values from vector 'u'.
      *  @param u  the other vector
      */
-    def this (u: VectoD)
+    def this (u: VectorD)
     {
         this (u.dim)                               // invoke primary constructor
-        for (i <- range) v(i) = u(i)
+        for (i <- range.par) v(i) = u(i)
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -90,7 +98,7 @@ class VectorD (val dim: Int,
     def toInt: VectorI =
     {
         val c = new VectorI (dim)
-        for (i <- range) c(i) = v(i).toInt
+        for (i <- range.par) c(i) = v(i).toInt
         c
     } // toInt
 
@@ -100,7 +108,7 @@ class VectorD (val dim: Int,
     def toLong: VectorL =
     {
         val c = new VectorL (dim)
-        for (i <- range) c(i) = v(i).toLong
+        for (i <- range.par) c(i) = v(i).toLong
         c
     } // toLong
 
@@ -110,7 +118,7 @@ class VectorD (val dim: Int,
     def toDouble: VectorD =
     {
         val c = new VectorD (dim)
-        for (i <- range) c(i) = v(i).toDouble
+        for (i <- range.par) c(i) = v(i).toDouble
         c
     } // toDouble
 
@@ -156,13 +164,13 @@ class VectorD (val dim: Int,
     /** Set each value in 'this' vector to 'x'.
      *  @param x  the value to be assigned
      */
-    def set (x: Double) { for (i <- range) v(i) = x }
+    def set (x: Double) { for (i <- range.par) v(i) = x }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the values in 'this' vector to the values in array 'u'.
      *  @param u  the array of values to be assigned
      */
-    def setAll (u: Array [Double]) { for (i <- range) v(i) = u(i) }
+    def setAll (u: Array [Double]) { for (i <- range.par) v(i) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Iterate over 'this' vector element by element.
@@ -211,7 +219,7 @@ class VectorD (val dim: Int,
     def select (basis: Array [Int]): VectorD =
     {
         val c = new VectorD (basis.length)
-        for (i <- c.range) c.v(i) = v(basis(i))
+        for (i <- c.range.par) c.v(i) = v(basis(i))
         c
     } // select
 
@@ -222,7 +230,7 @@ class VectorD (val dim: Int,
     def ++ (b: VectoD): VectorD =
     {
         val c = new VectorD (dim + b.dim)
-        for (i <- c.range) c.v(i) = if (i < dim) v(i) else b(i - dim)
+        for (i <- c.range.par) c.v(i) = if (i < dim) v(i) else b(i - dim)
         c
     } // ++
 
@@ -233,7 +241,7 @@ class VectorD (val dim: Int,
     def ++ (s: Double): VectorD =
     {
         val c = new VectorD (dim + 1)
-        for (i <- c.range) c.v(i) = if (i < dim) v(i) else s
+        for (i <- c.range.par) c.v(i) = if (i < dim) v(i) else s
         c
     } // ++
 
@@ -244,7 +252,7 @@ class VectorD (val dim: Int,
     def + (b: VectoD): VectorD = 
     {
         val c = new VectorD (dim)
-        for (i <- range) c.v(i) = v(i) + b(i)
+        for (i <- range.par) c.v(i) = v(i) + b(i)
         c
     } // +
 
@@ -255,7 +263,7 @@ class VectorD (val dim: Int,
     def + (s: Double): VectorD =
     {
         val c = new VectorD (dim)
-        for (i <- range) c.v(i) = v(i) + s
+        for (i <- range.par) c.v(i) = v(i) + s
         c
     } // +
  
@@ -266,7 +274,7 @@ class VectorD (val dim: Int,
     def + (s: Tuple2 [Double, Int]): VectorD =
     {
         val c = new VectorD (dim)
-        for (i <- range) c.v(i) = if (i == s._2) v(i) + s._1 else v(i)
+        for (i <- range.par) c.v(i) = if (i == s._2) v(i) + s._1 else v(i)
         c
     } // +
 
@@ -274,13 +282,13 @@ class VectorD (val dim: Int,
     /** Add in-place 'this' vector and vector 'b'.
      *  @param b  the vector to add
      */
-    def += (b: VectoD): VectorD = { for (i <- range) v(i) += b(i); this }
+    def += (b: VectoD): VectorD = { for (i <- range.par) v(i) += b(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' vector and scalar 's'.
      *  @param s  the scalar to add
      */
-    def += (s: Double): VectorD = { for (i <- range) v(i) += s; this }
+    def += (s: Double): VectorD = { for (i <- range.par) v(i) += s; this }
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the negative of 'this' vector (unary minus).
@@ -288,7 +296,7 @@ class VectorD (val dim: Int,
     def unary_- (): VectorD =
     {
         val c = new VectorD (dim)
-        for (i <- range) c.v(i) = -v(i)
+        for (i <- range.par) c.v(i) = -v(i)
         c
     } // unary_-
  
@@ -299,7 +307,7 @@ class VectorD (val dim: Int,
     def - (b: VectoD): VectorD =
     {
         val c = new VectorD (dim)
-        for (i <- range) c.v(i) = v(i) - b(i)
+        for (i <- range.par) c.v(i) = v(i) - b(i)
         c
     } // -
  
@@ -310,7 +318,7 @@ class VectorD (val dim: Int,
     def - (s: Double): VectorD =
     {
         val c = new VectorD (dim)
-        for (i <- range) c.v(i) = v(i) - s
+        for (i <- range.par) c.v(i) = v(i) - s
         c
     } // -
 
@@ -321,7 +329,7 @@ class VectorD (val dim: Int,
     def - (s: Tuple2 [Double, Int]): VectorD =
     {
         val c = new VectorD (dim)
-        for (i <- range) c.v(i) = if (i == s._2) v(i) - s._1 else v(i)
+        for (i <- range.par) c.v(i) = if (i == s._2) v(i) - s._1 else v(i)
         c
     } // -
 
@@ -329,13 +337,13 @@ class VectorD (val dim: Int,
     /** From 'this' vector subtract in-place vector 'b'.
      *  @param b  the vector to add
      */
-    def -= (b: VectoD): VectorD = { for (i <- range) v(i) -= b(i); this }
+    def -= (b: VectoD): VectorD = { for (i <- range.par) v(i) -= b(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place scalar 's'.
      *  @param s  the scalar to add
      */
-    def -= (s: Double): VectorD = { for (i <- range) v(i) -= s; this }
+    def -= (s: Double): VectorD = { for (i <- range.par) v(i) -= s; this }
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' vector by vector 'b'.
@@ -344,7 +352,7 @@ class VectorD (val dim: Int,
     def * (b: VectoD): VectorD =
     {
         val c = new VectorD (dim)
-        for (i <- range) c.v(i) = v(i) * b(i)
+        for (i <- range.par) c.v(i) = v(i) * b(i)
         c
     } // *
 
@@ -355,7 +363,7 @@ class VectorD (val dim: Int,
     def * (s: Double): VectorD =
     {
         val c = new VectorD (dim)
-        for (i <- range) c.v(i) = v(i) * s
+        for (i <- range.par) c.v(i) = v(i) * s
         c
     } // *
 
@@ -363,19 +371,19 @@ class VectorD (val dim: Int,
     /** Multiply 'this' (row) vector by matrix 'm'.
      *  @param m  the matrix to multiply by
      */
-    def * (m: MatriD): VectoD = m.t * this
+    def * (m: MatriD): VectorD = null  // m.t * this        // FIX
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and vector 'b'.
      *  @param b  the vector to add
      */
-    def *= (b: VectoD): VectorD = { for (i <- range) v(i) *= b(i); this }
+    def *= (b: VectoD): VectorD = { for (i <- range.par) v(i) *= b(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and scalar 's'.
      *  @param s  the scalar to add
      */
-    def *= (s: Double): VectorD = { for (i <- range) v(i) *= s; this }
+    def *= (s: Double): VectorD = { for (i <- range.par) v(i) *= s; this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide 'this' vector by vector 'b' (element-by-element).
@@ -384,7 +392,7 @@ class VectorD (val dim: Int,
     def / (b: VectoD): VectorD =
     {
         val c = new VectorD (dim)
-        for (i <- range) c.v(i) = v(i) / b(i)
+        for (i <- range.par) c.v(i) = v(i) / b(i)
         c
     } // /
 
@@ -395,7 +403,7 @@ class VectorD (val dim: Int,
     def / (s: Double): VectorD =
     {
         val c = new VectorD (dim)
-        for (i <- range) c.v(i) = v(i) / s
+        for (i <- range.par) c.v(i) = v(i) / s
         c
     } // /
 
@@ -403,13 +411,13 @@ class VectorD (val dim: Int,
     /** Divide in-place 'this' vector and vector 'b'.
      *  @param b  the vector to add
      */
-    def /= (b: VectoD): VectorD = { for (i <- range) v(i) /= b(i); this }
+    def /= (b: VectoD): VectorD = { for (i <- range.par) v(i) /= b(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and scalar 's'.
      *  @param s  the scalar to add
      */
-    def /= (s: Double): VectorD = { for (i <- range) v(i) /= s; this }
+    def /= (s: Double): VectorD = { for (i <- range.par) v(i) /= s; this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector containing each element of 'this' vector raised to the
@@ -419,7 +427,7 @@ class VectorD (val dim: Int,
     def ~^ (s: Double): VectorD =
     {
         val c = new VectorD (dim)
-        for (i <- range) c.v(i) = v(i) ~^ s
+        for (i <- range.par) c.v(i) = v(i) ~^ s
         c
     } // ~^
 
@@ -427,7 +435,7 @@ class VectorD (val dim: Int,
     /** Raise each element of 'this' vector to the 's'-th power.
      *  @param s  the scalar exponent
      */
-    def ~^= (s: Double) { for (i <- range) v(i) = v(i) ~^ s }
+    def ~^= (s: Double) { for (i <- range.par) v(i) = v(i) ~^ s }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector containing the reciprocal of each element of 'this' vector.
@@ -435,7 +443,7 @@ class VectorD (val dim: Int,
     def recip: VectorD =
     {
         val c = new VectorD (dim)
-        for (i <- range) c.v(i) = 1.0 / v(i)
+        for (i <- range.par) c.v(i) = 1.0 / v(i)
         c
     } // recip
 
@@ -445,7 +453,7 @@ class VectorD (val dim: Int,
     def abs: VectorD =
     {
         val c = new VectorD (dim)
-        for (i <- range) c.v(i) = ABS (v(i))
+        for (i <- range.par) c.v(i) = ABS (v(i))
         c
     } // abs
 
@@ -483,8 +491,8 @@ class VectorD (val dim: Int,
     def cumulate: VectorD =
     {
         val c = new VectorD (dim)
-        var sum: Double = 0.0
-        for (i <- range) { sum += v(i); c.v(i) = sum }
+        var sum = 0.0
+        for (i <- range) { sum += v(i); c.v(i) = sum }         // FIX - make parallel
         c
     } // cumulate
 
@@ -509,18 +517,52 @@ class VectorD (val dim: Int,
      */
     def dot (b: VectoD): Double =
     {
-        var sum: Double = 0.0
+        var sum = 0.0
         for (i <- range) sum += v(i) * b(i)
         sum
     } // dot
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product (or inner product) of vector 'b' and vector 'c'.
+     *  It takes the dot product on a subrange from 'i' (inclusive) to 'j' exclusive.
+     *  @param b  the first vector
+     *  @param c  the second vector
+     *  @param i  the start of the subrange (inclusive)
+     *  @param j  the end of the subrange (exclusive)
+     */
+    def dot (b: VectorD, c: VectorD, i: Int, j: Int): Double =
+    {
+        var sum = 0.0
+        for (k <- i until j) sum += b.v(k) * c.v(k)
+        sum
+    } // dot
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
+     *  This is the parallel version.
+     *  @param b  the other vector
+     */
+    def dotp (b: VectorD): Double =
+    {
+        import VectorD._
+        val nn = dim / PAR_LEVEL
+        val dt = makeThreads ()
+        for (i <- dt.indices) {
+            dt(i) = new VecThread (this, b, i * nn, (i+1)*nn min dim, dot)
+            dt(i).start ()
+        } // for
+
+        await ()
+        dt.foldLeft (0.0)((s, x) => s + x.result)
+    } // dotp
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Manhattan norm (1-norm) of 'this' vector.
      */
-    def norm1: Double =
+    def norm1: Double = 
     {
-        var sum: Double = 0.0
-        for (i <- range) sum += ABS (v(i))
+        var sum = 0.0
+        for (i <- range) sum += ABS (v(i))           // FIX - make parallel
         sum
     } // norm1
 
@@ -542,7 +584,7 @@ class VectorD (val dim: Int,
     def max (b: VectoD): VectorD =
     {
         val c = new VectorD (dim)
-        for (i <- range) c.v(i) = if (b(i) > v(i)) b(i) else v(i)
+        for (i <- range.par) c.v(i) = if (b(i) > v(i)) b(i) else v(i)
         c
     } // max
 
@@ -564,7 +606,7 @@ class VectorD (val dim: Int,
     def min (b: VectoD): VectorD =
     {
         val c = new VectorD (dim)
-        for (i <- range) c.v(i) = if (b(i) < v(i)) b(i) else v(i)
+        for (i <- range.par) c.v(i) = if (b(i) < v(i)) b(i) else v(i)
         c
     } // min
 
@@ -732,7 +774,7 @@ class VectorD (val dim: Int,
         var le = true
         var ge = true
 
-        for (i <- range) {
+        for (i <- range.par) {
             val b_i = b.asInstanceOf [VectorD] (i)
             if      (ge && (v(i) compare b_i) < 0) ge = false
             else if (le && (v(i) compare b_i) > 0) le = false
@@ -776,6 +818,50 @@ class VectorD (val dim: Int,
  */
 object VectorD
 {
+    import java.util.concurrent.CountDownLatch
+
+    /** The number of parallel/concurrent tasks to be run.  Adjust as needed
+     */
+    private val PAR_LEVEL = 10
+
+    /** Count down latch main thread to wait for `VecThread`s to finish
+     */
+    private var latch: CountDownLatch = null
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Make several `VecThread`s to run tasks in parallel.
+     */
+    def makeThreads (): Array [VecThread] =
+    {
+        latch = new CountDownLatch (PAR_LEVEL)
+        Array.ofDim [VecThread] (PAR_LEVEL)
+    } // makeThreads
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Await the completion of all `VecThread`s.
+     */
+    def await () { latch.await () }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The `VecThread` inner class allows tasks to be run in parallel.
+     *  @param b     the first vector
+     *  @param c     the second vector
+     *  @param i     the start of the subrange (inclusive)
+     *  @param j     the end of the subrange (exclusive)
+     *  @param task  the task/function to be run in parallel
+     */
+    class VecThread (b: VectorD, c: VectorD, i: Int, j: Int, task: (VectorD, VectorD, Int, Int) => Double)
+          extends Thread
+    {
+        var result = 0.0
+        override def run ()
+        {
+            result = task (b, c, i, j)
+            latch.countDown ()
+        } // run
+
+    } // VecThread inner class
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a `VectorD` from one or more values (repeated values Double*).
      *  @param x   the first Double number
@@ -820,7 +906,7 @@ object VectorD
     def apply (xs: Array [String]): VectorD =
     {
         val c = new VectorD (xs.length)
-        for (i <- c.range) c.v(i) = xs(i).toDouble
+        for (i <- c.range.par) c.v(i) = xs(i).toDouble
         c
     } // apply
 
@@ -859,7 +945,7 @@ object VectorD
     def ++ (b: Double, u: VectorD): VectorD =
     {
         val c = new VectorD (u.dim + 1)
-        for (i <- c.range) c(i) = if (i == 0) b else u.v(i - 1)
+        for (i <- c.range.par) c(i) = if (i == 0) b else u.v(i - 1)
         c
     } // ++
 
@@ -871,7 +957,7 @@ object VectorD
     def range (start: Int, end: Int): VectorD =
     {
         val c = new VectorD (end - start)
-        for (i <- c.range) c.v(i) = (start + i).toDouble
+        for (i <- c.range.par) c.v(i) = (start + i).toDouble
         c
     } // range
 
@@ -880,51 +966,32 @@ object VectorD
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VectorDTest` object tests the operations provided by `VectorD`.
- *  > run-main scalation.linalgebra.VectorDTest
+ *  > run-main scalation.linalgebra.par.VectorDTest
  */
 object VectorDTest extends App
 {
-    var x: VectorD = null
-    var y: VectorD = null
+    import scalation.util.time
 
-    for (l <- 1 to 4) {
-        println ("\n\tTest VectorD on vectors of dim " + l)
-        x = new VectorD (l)
-        y = new VectorD (l)
-        x.set (2)
-        y.set (3)
+    val rng = new java.util.Random ()
+    val n = 40000000
+    val x = new VectorD (n)
+    val y = new VectorD (n)
 
-        // test vector op scalar
-        println ("x + 4    = " + (x + 4))
-        println ("x - 4    = " + (x - 4))
-        println ("x * 4    = " + (x * 4))
-        println ("x / 4    = " + (x / 4))
-        println ("x ~^ 4   = " + (x ~^ 4))
-
-        // test vector op vector
-        println ("x + y    = " + (x + y))
-        println ("x - y    = " + (x - y))
-        println ("x * y    = " + (x * y))
-        println ("x / y    = " + (x / y))
-
-        println ("x.min    = " + x.min ())
-        println ("x.max    = " + x.max ())
-        println ("x.sum    = " + x.sum)
-        println ("x.sumNE  = " + x.sumNE (0))
-        println ("x dot y  = " + (x dot y))
-        println ("x ∙ y    = " + (x ∙ y))
-        println ("x.normSq = " + x.normSq)
-        println ("x.norm   = " + x.norm)
-        println ("x < y    = " + (x < y))
+    for (i <- 0 until n) {
+        x(i) = rng.nextDouble ()
+        y(i) = rng.nextDouble ()
     } // for
 
-    println ("hashCode (" + x + ") = " + x.hashCode ())
-    println ("hashCode (" + y + ") = " + y.hashCode ())
+    var z = 0.0
+    for (k <- 0 until 6) {
+        time { z = x dot y }
+        println ("x dot y = " + z)
+    } // for
 
-    val z = VectorD ("1", "2", "3", "4")
-    println ("z = " + z)
-    println ("z.map (_ * 2)    = " + z.map ((e: Double) => e * 2))
-    println ("z.filter (_ > 2) = " + z.filter (_ > 2))
+    for (k <- 0 until 6) {
+        time { z = x dotp y }
+        println ("x dotp y = " + z)
+    } // for
 
 } // VectorDTest
 

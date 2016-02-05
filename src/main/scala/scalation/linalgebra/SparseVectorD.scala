@@ -491,7 +491,7 @@ class SparseVectorD (val dim_ : Int)
     /** Multiply 'this' (row) vector by matrix 'm'.
      *  @param m  the matrix to multiply by
      */
-    def * (m: MatriD): VectorD = m.t * toDouble
+    def * (m: MatriD): VectoD = m.t * toDouble
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and vector 'b'.

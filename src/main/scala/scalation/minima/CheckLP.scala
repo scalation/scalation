@@ -16,7 +16,7 @@ package scalation.minima
 
 import math.abs
 
-import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.linalgebra.{MatriD, VectoD}
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -33,7 +33,7 @@ import scalation.util.Error
  *  @param b  the M-length limit/RHS vector (make b_i negative for ">=" constaint => surplus)
  *  @param c  the N-length cost vector
  */
-class CheckLP (a: MatrixD, b: VectorD, c: VectorD)
+class CheckLP (a: MatriD, b: VectoD, c: VectoD)
       extends Error
 {
     private val DEBUG   = true           // debug flag
@@ -48,7 +48,7 @@ class CheckLP (a: MatrixD, b: VectorD, c: VectorD)
     /** Is the solution primal feasible (x >= 0 and a x [<= | >=] b)?
      *  @param x  the N-length primal solution vector
      */
-    def isPrimalFeasible (x: VectorD): Boolean =
+    def isPrimalFeasible (x: VectoD): Boolean =
     {
         if (x.dim != N) flaw ("constructor", "x.dim = " + x.dim + " != " + N)
 
@@ -76,7 +76,7 @@ class CheckLP (a: MatrixD, b: VectorD, c: VectorD)
     /** Is the solution dual feasible (y <= 0 and y a <= c)?
      *  @param y  the M-length dual solution vector
      */
-    def isDualFeasible (y: VectorD): Boolean =
+    def isDualFeasible (y: VectoD): Boolean =
     {
         if (y.dim != M) flaw ("constructor", "y.dim = " + y.dim + " != " + M)
 
@@ -106,7 +106,7 @@ class CheckLP (a: MatrixD, b: VectorD, c: VectorD)
      *  @param y  the M-length dual solution vector
      *  @param f  the optimum (minimum) value of the objective function
      */
-    def isOptimal (x: VectorD, y: VectorD, f: Double): Boolean =
+    def isOptimal (x: VectoD, y: VectoD, f: Double): Boolean =
     {
        val cx = c dot x            // c x
        val yb = y dot b            // y b
@@ -128,7 +128,7 @@ class CheckLP (a: MatrixD, b: VectorD, c: VectorD)
      *  @param y  the M-length dual solution vector
      *  @param f  the optimum (minimum) value of the objective function
      */
-    def isCorrect (x: VectorD, y: VectorD, f: Double): Boolean =
+    def isCorrect (x: VectoD, y: VectoD, f: Double): Boolean =
     {
         val pFeas = isPrimalFeasible (x)
         val dFeas = isDualFeasible (y)

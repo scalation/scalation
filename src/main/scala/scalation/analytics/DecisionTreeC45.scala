@@ -14,7 +14,7 @@ import math.{ceil, floor}
 import util.control.Breaks._
 import util.Sorting
 
-import scalation.linalgebra.{MatrixI, VectorD, VectorI}
+import scalation.linalgebra.{MatrixI, VectorD, VectoD, VectorI}
 import scalation.util.Error
 
 import Probability.entropy
@@ -335,7 +335,7 @@ class DecisionTreeC45 (val x: MatrixI, val y: VectorI, fn: Array [String], isCon
      *  by following a decision path from the root to a leaf.
      *  @param z  the data vector to classify (some continuous features)
      */
-    override def classify (z: VectorD): Tuple2 [Int, String] =
+    override def classify (z: VectoD): Tuple2 [Int, String] =
     {
         if(DEBUG) println ("classify: some continuous features\n")
 

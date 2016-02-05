@@ -16,7 +16,7 @@ package scalation.analytics
 
 import math.min
 
-import scalation.linalgebra.{MatriD, MatrixD, VectorD}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.math.double_exp
 import scalation.plot.Plot
 import scalation.random.Random
@@ -163,7 +163,7 @@ class ARMA (y: VectorD, t: VectorD)
     /** For all the time points in vector t, predict the value of y = f(t) by ...
      *  @param z  the time-vector indicating time points to forecast
      */
-    def predict (y: VectorD): Double = 
+    def predict (y: VectoD): Double = 
     {
         0.0    // FIX: not yet implemented
     } // predict

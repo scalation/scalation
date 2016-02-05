@@ -16,7 +16,7 @@ package scalation.dynamics
 
 import scalation.analytics.Predictor
 import scalation.calculus.Calculus.FunctionV2S
-import scalation.linalgebra.VectorD
+import scalation.linalgebra.{VectoD, VectorD}
 import scalation.linalgebra.VectorD.one
 import scalation.minima.QuasiNewton
 import scalation.util.Error
@@ -92,7 +92,7 @@ class NLS_ODE (z: VectorD, ts: VectorD, b_init: VectorD, private var w: VectorD 
 
     def fit: VectorD = VectorD (objectiveF (b))                // FIX - add more indicators of quality
 
-    def predict (zz: VectorD): Double = 0.0                    // FIX - meaning?
+    def predict (zz: VectoD): Double = 0.0                     // FIX - meaning?
 
 } // NLS_ODE class
 

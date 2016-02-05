@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import scalation.linalgebra.{MatriD, VectorD, VectorI}
+import scalation.linalgebra.{MatriD, VectoD, VectorD, VectorI}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Predictor` trait provides a common framework for several predictors.
@@ -56,7 +56,7 @@ trait Predictor
     /** Given a new continuous data vector z, predict the y-value of f(z).
      *  @param z  the vector to use for prediction
      */
-    def predict (z: VectorD): Double
+    def predict (z: VectoD): Double
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a new discrete data vector z, predict the y-value of f(z).
@@ -69,7 +69,7 @@ trait Predictor
      *  predict all the 'y'-values of 'predict (z_i)'.  May override for efficiency.
      *  @param z  the matrix containing row vectors to use for prediction
      */
-    def predict (z: MatriD): VectorD =
+    def predict (z: MatriD): VectoD =
     {
         VectorD (for (i <- 0 until z.dim1) yield predict (z(i)))
     } // predict

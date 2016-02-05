@@ -10,7 +10,7 @@ package scalation.plot
 
 import math.{ceil, floor, min, pow, round}
 
-import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.linalgebra.{MatriD, VectoD}
 import scalation.scala2d.{Panel, VizFrame}
 import scalation.scala2d.{Ellipse, Line}
 import scalation.scala2d.Colors._
@@ -23,7 +23,7 @@ import scalation.scala2d.Shapes.{BasicStroke, Dimension, Graphics, Graphics2D}
  *  @param y       the y matrix of data values where y(i) is the i-th vector (vertical)
  *  @param _title  the title of the plot
  */
-class PlotM (x: VectorD, y: MatrixD, var label: Array [String] = null,
+class PlotM (x: VectoD, y: MatriD, var label: Array [String] = null,
             _title: String = "PlotM y_i vs. x for each i")
       extends VizFrame (_title, null)
 {
@@ -49,18 +49,6 @@ class PlotM (x: VectorD, y: MatrixD, var label: Array [String] = null,
 
     println ("x-axis: minX = " + minX + " maxX = " + maxX)
     println ("y-axis: minY = " + minY + " maxY = " + maxY)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The PlotM class takes an x vector and a y array of vectors of data values
-     *  and plots the (x, y_i) data points for each row y_i of the matrix.
-     *  @param x       the x vector of data values (horizontal)
-     *  @param y-i     the y array of vectors of data values (vertical)
-     *  @param _title  the title of the plot
-    def this (x: VectorD, y: Array [VectorD])
-    {
-        this (x, new MatrixD (y))
-    } // constructor
-     */
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return default labels for y-vector.
@@ -173,12 +161,14 @@ class PlotM (x: VectorD, y: MatrixD, var label: Array [String] = null,
  */
 object PlotM 
 {
+    import scalation.linalgebra.{MatrixD, VectorD}
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a plot of several 'y' vectors versus an 'x' vector.
      *  @param x  the x vector of data values (horizontal)
      *  @param y  one or more vectors of values where y(i) is the i-th vector (vertical)
      */
-    def apply (x: VectorD, y: VectorD*)
+    def apply (x: VectoD, y: VectorD*)
     {
         val yy = new MatrixD (y.length, x.dim)
         for (i <- 0 until y.length) yy(i) = y(i)
@@ -193,8 +183,11 @@ object PlotM
  */
 object PlotMTest extends App
 {
+    import scalation.linalgebra.{MatrixD, VectorD}
+
     val x = new VectorD (200)
     val y = new MatrixD (5, 200)
+
     for (i <- 0 until 200) {
         x(i)    = (i - 100) / 10.0
         y(0, i) = 10.0 * x(i)

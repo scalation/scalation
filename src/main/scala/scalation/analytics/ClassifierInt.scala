@@ -10,7 +10,7 @@ package scalation.analytics
 
 import scala.math.round
 
-import scalation.linalgebra.{MatriD, MatrixD, MatrixI, VectorD, VectorI}
+import scalation.linalgebra.{MatriD, MatrixD, MatrixI, VectoD, VectorD, VectorI}
 import scalation.stat.vectorD2StatVector
 import scalation.util.{Error, getFromURL_File}
 
@@ -62,7 +62,7 @@ abstract class ClassifierInt (x: MatrixI, y: VectorI, fn: Array [String], k: Int
      *  to, by first rounding it to an integer-valued vector.
      *  @param z  the vector to classify
      */
-    def classify (z: VectorD): Tuple2 [Int, String] =
+    def classify (z: VectoD): Tuple2 [Int, String] =
     {
         val zi = new VectorI (z.dim)
         for (j <- 0 until z.dim) zi(j) = (round (z(j))).toInt

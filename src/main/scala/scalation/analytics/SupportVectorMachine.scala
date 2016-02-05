@@ -13,7 +13,7 @@ import scala.collection.mutable.Set
 import scala.math.abs
 import scala.util.control.Breaks
 
-import scalation.linalgebra.{MatrixD, VectorD, VectorI}
+import scalation.linalgebra.{MatrixD, VectorD, VectoD, VectorI}
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -108,7 +108,7 @@ class SupportVectorMachine (x: MatrixD, y: VectorI, fn: Array [String] = Array (
      *  -1 means it belongs to the negative class.
      *  @param z  the vector to classify
      */
-    def classify (z: VectorD): Tuple2 [Int, String] =
+    def classify (z: VectoD): Tuple2 [Int, String] =
     {
         if ((w dot z) >= b) (1, "+") else (-1, "-")
     } // classify

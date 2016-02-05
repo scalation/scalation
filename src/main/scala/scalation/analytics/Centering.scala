@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import scalation.linalgebra.{MatriD, MatrixD, VectorD}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Centering` object is used to center the input matrix 'x'.  This is done by
@@ -21,7 +21,7 @@ object Centering
      *  @param x     the input matrix to center
      *  @param mu_x  the vector of column means of matrix x
      */
-    def center (x: MatriD, mu_x: VectorD): MatrixD =
+    def center (x: MatriD, mu_x: VectoD): MatrixD =
     {
         val x_c = new MatrixD (x.dim1, x.dim2)
         for (j <- 0 until x.dim2) {

@@ -8,7 +8,7 @@
 
 package scalation.minima
 
-import scalation.linalgebra.VectorD
+import scalation.linalgebra.VectoD
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -36,7 +36,7 @@ trait MinimizerLP
     /** The objective function, e.g., c x. 
      *  @param x  the coordinate values of the current point
      */
-    def objF (x: VectorD): Double
+    def objF (x: VectoD): Double
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Run the simplex algorithm starting from an initial BFS and iteratively
@@ -44,7 +44,7 @@ trait MinimizerLP
      *  so long as the objective function improves.  Return the optimal solution
      *  vector.
      */
-    def solve (): VectorD
+    def solve (): VectoD
 
    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether the current solution is correct.
@@ -52,7 +52,7 @@ trait MinimizerLP
      *  @param y  the dual solution vector y
      *  @param f  the minimum value of the objective function
      */
-    def check (x: VectorD, y: VectorD, f: Double): Boolean =
+    def check (x: VectoD, y: VectoD, f: Double): Boolean =
     {
         val correct = checker.isCorrect (x, y, f)
         if (! correct ) flaw ("check", "the LP solution is NOT correct")

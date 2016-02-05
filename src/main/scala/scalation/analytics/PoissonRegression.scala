@@ -10,9 +10,9 @@
 
 package scalation.analytics
 
-import math.{exp, log, round}
+import scala.math.{exp, log, round}
 
-import scalation.linalgebra.{MatriD, MatrixD, VectorD, VectorI}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectorI}
 import scalation.math.Combinatorics.fac
 import scalation.minima.QuasiNewton
 import scalation.plot.Plot
@@ -121,7 +121,7 @@ class PoissonRegression (x: MatrixD, y: VectorI, fn: Array [String] = null)
     /** Classify the value of 'y = f(z)' by evaluating the formula 'y = exp (b dot z)'.
      *  @param z  the new vector to predict
      */
-    def predict (z: VectorD): Double = (round (exp (b dot z))).toDouble
+    def predict (z: VectoD): Double = (round (exp (b dot z))).toDouble
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Classify the value of 'y = f(z)' by evaluating the formula 'y = exp (b dot z)',

@@ -8,10 +8,10 @@
 
 package scalation.analytics
 
-import util.control.Breaks.{breakable, break}
-import collection.mutable.Set
+import scala.util.control.Breaks.{breakable, break}
+import scala.collection.mutable.Set
 
-import scalation.linalgebra.{MatrixD, VectorD, VectorI}
+import scalation.linalgebra.{MatrixD, VectorD, VectoD, VectorI}
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -44,7 +44,7 @@ class KNN_Classifier (x: MatrixD, y: VectorI, fn: Array [String], k: Int, cn: Ar
      *  @param u  the first vector/point
      *  @param v  the second vector/point
      */
-    def distance (u: VectorD, v: VectorD): Double =
+    def distance (u: VectoD, v: VectoD): Double =
     {
         (u - v).normSq       // squared Euclidean norm used for efficiency, may use other norms
     } // distance
@@ -54,7 +54,7 @@ class KNN_Classifier (x: MatrixD, y: VectorI, fn: Array [String], k: Int, cn: Ar
      *  topK array.
      *  @param z  the vector to be classified
      */
-    def kNearest (z: VectorD)
+    def kNearest (z: VectoD)
     {
         var dk = MAX_DOUBLE
         for (i <- 0 until x.dim1) {
@@ -81,7 +81,7 @@ class KNN_Classifier (x: MatrixD, y: VectorI, fn: Array [String], k: Int, cn: Ar
      *  the class getting the most votes from its 'knn' nearest neighbors.
      *  @param z  the vector to classify
      */
-    def classify (z: VectorD): Tuple2 [Int, String] =
+    def classify (z: VectoD): Tuple2 [Int, String] =
     {
         kNearest (z)                                         // set top-knn to knn nearest
         for (i <- 0 until knn) count(y(topK(i)._1)) += 1     // tally per class

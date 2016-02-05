@@ -10,7 +10,7 @@ package scalation.analytics
 
 import math.{cos, Pi, sin}
 
-import scalation.linalgebra.{MatriD, MatrixD, VectorD}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.plot.Plot
 import scalation.util.{Error, time}
 
@@ -103,14 +103,14 @@ class TrigRegression (t: VectorD, y: VectorD, k: Int, w: Double = Pi, technique:
      *  e.g., (b_0, b_1, b_2) dot (1, z_1, z_2).
      *  @param z  the new vector to predict
      */
-    def predict (z: VectorD): Double = rg.predict (z)
+    def predict (z: VectoD): Double = rg.predict (z)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot zi for
      *  each row zi of matrix z.
      *  @param z  the new matrix to predict
      */
-    override def predict (z: MatriD): VectorD = rg.predict (z)
+    override def predict (z: MatriD): VectoD = rg.predict (z)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable

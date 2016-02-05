@@ -10,7 +10,7 @@ package scalation.maxima
 
 import util.control.Breaks.{breakable, break}
 
-import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -46,8 +46,8 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     private var c_       = c.select (x_B) * b_inv       // adjusted cost
     private val b_       = b_inv * b                    // adjusted constants
 
-    private var u: VectorD = null                       // ?? FIX
-    private var z: VectorD = null                       // ?? FIX
+    private var u: VectoD = null                        // ?? FIX
+    private var z: VectoD = null                        // ?? FIX
 
     if (x_B == null) x_B = setBasis ()
 
@@ -113,7 +113,7 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     /** if u <= 0., the solution is unbounded.
      *  @param u  the ?? vector FIX
      */
-    def unbounded (u: VectorD): Boolean =
+    def unbounded (u: VectoD): Boolean =
     {
         for (i <- 0 until u.dim if u(i) > 0.0) return false
         println ("the solution is unbounded")
@@ -150,7 +150,7 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the dual solution vector (y).  FIX
      */
-    def dual: VectorD = null
+    def dual: VectoD = null
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the optimal objective function value (f(x) = c x).

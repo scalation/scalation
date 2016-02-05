@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import scalation.linalgebra.{MatriD, MatrixD, VectorD}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.math.double_exp
 import scalation.plot.Plot
 import scalation.util.Error
@@ -87,14 +87,14 @@ class SimpleRegression (x: MatrixD, y: VectorD)
      *  i.e.0, (b_0, b_1) dot (1, z_1).
      *  @param z  the new vector to predict
      */
-    def predict (z: VectorD): Double = b dot z
+    def predict (z: VectoD): Double = b dot z
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z for
      *  each row of matrix z.
      *  @param z  the new matrix to predict
      */
-    override def predict (z: MatriD): VectorD = z * b
+    override def predict (z: MatriD): VectoD = z * b
 
 } // SimpleRegression class
 

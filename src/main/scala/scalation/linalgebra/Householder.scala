@@ -25,7 +25,7 @@ object Householder
      *  @see Algorithm 5.1.1 in Matrix Computations.
      *  @param x  the vector to create the Householder vector from
      */
-    def house (x: VectorD): Tuple2 [VectorD, Double] =
+    def house (x: VectoD): Tuple2 [VectorD, Double] =
     {
         var b = 0.0                                   // Householder scalar
         val v = new VectorD (x)                       // Householder vector

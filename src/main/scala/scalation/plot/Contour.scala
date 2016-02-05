@@ -8,11 +8,10 @@
 
 package scalation.plot
 
-import collection.mutable.ArrayBuffer
-import math.{ceil, floor, min, pow, round}
+import scala.math.{ceil, floor, min, pow, round}
 
-import scalation.linalgebra.{MatrixD, VectorD}
-import scalation.calculus.Calculus.FunctionV2S
+import scalation.linalgebra.{VectoD, VectorD}
+import scalation.calculus.Calculus.FunctionV_2S
 import scalation.scala2d.{Panel, VizFrame}
 import scalation.scala2d.{Ellipse, Line, Rectangle}
 import scalation.scala2d.Colors._
@@ -31,7 +30,7 @@ import scalation.scala2d.Shapes.{BasicStroke, Dimension, Graphics, Graphics2D}
  *  @param lbF     the lower bound on the functional value
  *  @param _title  the title of the plot
  */
-class Contour (f: FunctionV2S, lb: VectorD, ub: VectorD, path: ArrayBuffer [VectorD] = null,
+class Contour (f: FunctionV_2S, lb: VectoD, ub: VectoD, path: List [VectoD] = null,
                private var deltaF: Double = -1.0, private var lbF: Double = 0.0,
                _title: String = "Contour plot of f(x, y)")
       extends VizFrame (_title, null)
@@ -195,11 +194,11 @@ class Contour (f: FunctionV2S, lb: VectorD, ub: VectorD, path: ArrayBuffer [Vect
  */
 object ContourTest extends App
 {
-    def f(x: VectorD): Double = (x(0)/2.0 - 3.0) * (x(0)/2.0 - 3.0) + (x(1)/3.0 - 2.0) * (x(1)/3.0 - 2.0)
+    def f(x: VectoD): Double = (x(0)/2.0 - 3.0) * (x(0)/2.0 - 3.0) + (x(1)/3.0 - 2.0) * (x(1)/3.0 - 2.0)
     val lb     = VectorD (0.0, 0.0)
     val ub     = VectorD (10.0, 10.0)
     val deltaF = 18.0
-    val path   = ArrayBuffer (VectorD (0.0, 0.0), VectorD (3.0, 2.0), VectorD (6.0, 6.0)) 
+    val path   = List (VectorD (0.0, 0.0), VectorD (3.0, 2.0), VectorD (6.0, 6.0)) 
     val plot   = new Contour (f, lb, ub, path)
     println ("plot = " + plot)
 

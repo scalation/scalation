@@ -18,12 +18,11 @@ package scalation.minima
 import scala.collection.mutable.{ArrayBuffer, Stack}
 import scala.util.control.Breaks.{breakable, break}
 
-import scalation.linalgebra.{MatrixD, VectorD, VectorI}
+import scalation.linalgebra.{MatriD, VectoD, VectorD, VectorI}
 import scalation.random.Randi
 
 object Ftran
 {
-
     val m      = 10
     val x      = new VectorD (m+1)
     val Xindex = new VectorI (m+1)
@@ -173,7 +172,7 @@ object Ftran
  *  @param c    the cost/revenue vector
  *  @param x_B  the initial basis (set of indices where x_i is in the basis)
  */
-class SimplexFT (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] = null)
+class SimplexFT (a: MatriD, b: VectoD, c: VectoD, var x_B: Array [Int] = null)
       extends MinimizerLP
 {
     private val DEBUG    = false                       // debug flag
@@ -186,19 +185,19 @@ class SimplexFT (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] = null
     if (c.dim != N) flaw ("constructor", "c.dim = " + c.dim + " != " + N)
 
     if (x_B == null) x_B = setBasis ()
-    private val ba       = a.selectCols (x_B)          // basis-matrix (selected columns from matrix-a)
+    private val ba: MatriD       = a.selectCols (x_B)          // basis-matrix (selected columns from matrix-a)
     private val lu       = ba.lud                      // perform an LU Decomposition on the basis-matrix
 //  private var l_inv    = lu._1.inverse               // L-inverted
 //  private var u_inv    = lu._2.inverse               // U-inverted  (b_inv = u_inv * l_inv)
 
     private val c_B      = c.select (x_B)              // cost for basic variables
 //  private val c_       = c_B * (u_inv * l_inv)       // adjusted cost via inverse
-    private val c_       = c_B                         // adjusted cost via back-substitution - FIX
+    private val c_ : VectoD      = c_B                         // adjusted cost via back-substitution - FIX
 //  private val b_       = (u_inv * l_inv) * b         // adjusted constants via inverse
     private val b_       = ba.solve (lu, b)            // adjusted constants via back-substitution
 
-    private var u: VectorD = null                      // vector used for leaving
-    private var z: VectorD = null                      // vector used for entering
+    private var u: VectoD = null                       // vector used for leaving
+    private var z: VectoD = null                       // vector used for entering
 
     val checker = new CheckLP (a, b, c)
 
@@ -236,7 +235,7 @@ class SimplexFT (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] = null
     def leaving (l: Int): Int =
     {
 //      u = (u_inv * l_inv) * a.col(l)
-        u = ba.solve (lu, a.col(l))
+        u = ba.solve (lu._1, lu._2, a.col(l))
         if (unbounded (u)) return -1
         var k = 0
         var r_min = Double.PositiveInfinity
@@ -251,7 +250,7 @@ class SimplexFT (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] = null
     /** Check if u <= 0., the solution is unbounded.
      *  @param u  the vector for leaving
      */
-    def unbounded (u: VectorD): Boolean =
+    def unbounded (u: VectoD): Boolean =
     {
         for (i <- 0 until u.dim if u(i) > 0.0) return false
         flaw ("unbounded", "the solution is UNBOUNDED")
@@ -282,7 +281,7 @@ class SimplexFT (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] = null
      *  Iteratively pivot until there an optimal solution is found or it is
      *  determined that the solution is unbounded.  Return the optimal vector x.
      */
-    def solve (): VectorD =
+    def solve (): VectoD =
     {
         if (DEBUG) showTableau (0)                   // for iter = 0
         var k    = -1                                // the leaving variable (row)
@@ -315,12 +314,12 @@ class SimplexFT (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] = null
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the primal (basis only) solution vector (x).
      */
-    def primal: VectorD = ba.solve (lu, b)            // (u_inv * l_inv)  * b
+    def primal: VectoD = ba.solve (lu, b)            // (u_inv * l_inv)  * b
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the full primal solution vector (xx).
      */
-    def primalFull (x: VectorD): VectorD = 
+    def primalFull (x: VectoD): VectorD = 
     {
         val xx = new VectorD (N)
         for (i <- 0 until x_B.length) xx(x_B(i)) = x(i)
@@ -330,13 +329,13 @@ class SimplexFT (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] = null
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the dual solution vector (y).
      */
-    def dual: VectorD = z.slice (N - M, N)
+    def dual: VectoD = z.slice (N - M, N).asInstanceOf [VectoD]   // FIX
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the optimal objective function value (f(x) = c x).
      *  @param x  the primal solution vector
      */
-    def objF (x: VectorD): Double = c.select (x_B) dot x
+    def objF (x: VectoD): Double = c.select (x_B) dot x
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show the current FT tableau.
@@ -378,7 +377,7 @@ object SimplexFTTest extends App
      *  @param c    the cost vector
      *  @param x_B  the indices of the intial basis
      */
-    def test (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int] = null)
+    def test (a: MatriD, b: VectoD, c: VectoD, x_B: Array [Int] = null)
     {
 //      val lp = new SimplexFT (a, b, c, x_B)    // test with user specified basis
         val lp = new SimplexFT (a, b, c)         // test with default basis
@@ -392,6 +391,8 @@ object SimplexFTTest extends App
         println ("objF   f = " + f)
         println ("optimal? = " + lp.check (xx, y, f))
     } // test
+
+    import scalation.linalgebra.MatrixD
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test case 1:  Initialize matrix 'a', vectors 'b' and 'c', and optionally

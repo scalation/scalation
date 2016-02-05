@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import scalation.linalgebra.{MatriD, MatrixD, VectorD, VectorI}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectorI}
 import scalation.util.{Error, time}
 
 import RegTechnique._
@@ -99,14 +99,14 @@ class ANCOVA (x_ : MatrixD, t: VectorI, y: VectorD, levels: Int, technique: RegT
      *  e.g., (b0, b1, b2) dot (1, z1, z2).
      *  @param z  the new vector to predict
      */
-    def predict (z: VectorD): Double = rg.predict (z)
+    def predict (z: VectoD): Double = rg.predict (z)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot zi for
      *  each row zi of matrix z.
      *  @param z  the new matrix to predict
      */
-    override def predict (z: MatriD): VectorD = rg.predict (z)
+    override def predict (z: MatriD): VectoD = rg.predict (z)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable

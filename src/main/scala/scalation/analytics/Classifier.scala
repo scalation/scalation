@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import scalation.linalgebra.{VectorD, VectorI}
+import scalation.linalgebra.{VectoD, VectorI}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Classifier` trait provides a common framework for several classifiers.
@@ -42,7 +42,7 @@ trait Classifier
     /** Given a new continuous data vector z, determine which class it belongs to.
      *  @param z  the vector to classify
      */
-    def classify (z: VectorD): Tuple2 [Int, String]
+    def classify (z: VectoD): Tuple2 [Int, String]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the quality of the training with a test-set and return the fraction

@@ -12,7 +12,7 @@ import math.{abs, cos, Pi, sin}
 
 import scalation.animation.{AnimateCommand, DgAnimator}
 import scalation.animation.CommandType._
-import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.linalgebra.{MatriD, VectoD, VectorD}
 import scalation.linalgebra.MatrixD.eye
 import scalation.math.double_exp
 import scalation.random.Discrete
@@ -27,7 +27,7 @@ import scalation.util.Error
  * Equilibrium solution (steady-state): solve for p in p = p * tr.
  * @param tr  the transition probability matrix
  */
-class Markov (tr: MatrixD) extends Error
+class Markov (tr: MatriD) extends Error
 {
     {
         if ( ! isStochastic) flaw ("constructor", "transition matrices must be stochastic")
@@ -74,9 +74,9 @@ class Markov (tr: MatrixD) extends Error
      *  @param p  the current state probability vector
      *  @param k  compute for the kth step/epoch
      */
-    def next (p: VectorD, k: Int = 1): VectorD =
+    def next (p: VectoD, k: Int = 1): VectoD =
     {
-        var p2 = new VectorD (p)
+        var p2: VectoD = new VectorD (p)
         for (i <- 1 to k) p2 = p2 * tr
         p2
     } // next
@@ -87,7 +87,7 @@ class Markov (tr: MatrixD) extends Error
      *  eigenvalue is 1.  Solve for p by computing the left nullspace of the tr - I
      *  matrix (appropriately sliced) and then normalize p so ||p|| = 1.
      */
-    def limit: VectorD =
+    def limit: VectoD =
     {
         val ident = eye (tr.dim1)
         (tr - ident).t.slice (0, tr.dim1 - 1).nullspace.normalize
@@ -203,13 +203,15 @@ class Markov (tr: MatrixD) extends Error
  */
 object MarkovTest extends App
 {
+    import scalation.linalgebra.MatrixD
+
     val endTime = 20   // number of epochs (milliseconds), but may represent any time unit
 
     val mc = new Markov (new MatrixD ((4, 4), .4, .6, .0, .0,    // 4-by-4 matrix
                                               .0, .2, .8, .0,
                                               .3, .0, .5, .2,
                                               .1, .0, .7, .2))
-    var p = VectorD (1.0, 0.0, 0.0, 0.0)
+    var p: VectoD = VectorD (1.0, 0.0, 0.0, 0.0)
 
     println ("\nDiscrete-Time Markov Chain mc = " + mc + "\n")
     println ("\nDiscrete-Time Markov Chain: transient solution:")

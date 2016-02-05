@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import scalation.linalgebra.{MatriD, MatrixD, VectorD}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.math.double_exp
 import scalation.minima.QuasiNewton
 import scalation.plot.Plot
@@ -31,7 +31,7 @@ import scalation.util.Error
  *  @param b_init  the initial guess for the parameter vector b
  */
 class NonLinRegression (x: MatrixD, y: VectorD,
-                        f: (VectorD, VectorD) => Double,
+                        f: (VectoD, VectoD) => Double,
                         b_init: VectorD)
       extends Predictor with Error
 {
@@ -100,7 +100,7 @@ class NonLinRegression (x: MatrixD, y: VectorD,
      *  i.e.0, (b0, b1) dot (1.0, z1).
      *  @param z  the new vector to predict
      */
-    def predict (z: VectorD): Double = f(z, b)
+    def predict (z: VectoD): Double = f(z, b)
 
 } // NonLinRegression class
 
@@ -125,7 +125,7 @@ object NonLinRegressionTest extends App
     println ("x = " + x)
     println ("y = " + y)
 
-    def f (x: VectorD, b: VectorD): Double = b(0) * exp (b(1) * x(0))   // non-linear regression function
+    def f (x: VectoD, b: VectoD): Double = b(0) * exp (b(1) * x(0))   // non-linear regression function
     val b_init = VectorD (4.04, .038)                                   // initial guess for parameter vector b
 
     val rg = new NonLinRegression (x, y, f, b_init)

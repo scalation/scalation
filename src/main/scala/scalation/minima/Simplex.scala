@@ -14,10 +14,10 @@
 
 package scalation.minima
 
-import math.abs
-import util.control.Breaks.{breakable, break}
+import scala.math.abs
+import scala.util.control.Breaks.{breakable, break}
 
-import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.random.Randi
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -189,7 +189,7 @@ class Simplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int], n_eq: Int =
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the value of the objective function f(x) = c x.
      */
-    def objF (x: VectorD): Double = t(M, JJ)    // bottom, right cell in tableau
+    def objF (x: VectoD): Double = t(M, JJ)    // bottom, right cell in tableau
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show the current tableau.

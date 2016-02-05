@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import scalation.linalgebra.{MatrixD, VectorD, VectorI}
+import scalation.linalgebra.{MatrixD, VectorD, VectoD, VectorI}
 import scalation.stat.StatVector.{cov, mean}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -70,7 +70,7 @@ class LDA (x: MatrixD, y: VectorI, fn: Array [String])
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /**
      */
-    def classify (z: VectorD): (Int, String) = if ((w dot z) > c) (1, "yes") else (0, "no")
+    def classify (z: VectoD): (Int, String) = if ((w dot z) > c) (1, "yes") else (0, "no")
 
 } // LDA class
 

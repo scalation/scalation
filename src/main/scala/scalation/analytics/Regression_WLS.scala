@@ -12,7 +12,7 @@ package scalation.analytics
 
 import math.{abs, pow, sqrt}
 
-import scalation.linalgebra.{Fac_Cholesky, Fac_QR, Factorization, MatriD, MatrixD, VectorD}
+import scalation.linalgebra.{Fac_Cholesky, Fac_QR, Factorization, MatriD, MatrixD, VectoD, VectorD}
 import scalation.plot.Plot
 import scalation.util.{Error, time}
 
@@ -42,7 +42,7 @@ import RegTechnique._
  *  @param w          the weight vector
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class Regression_WLS (x: MatrixD, y: VectorD, private var w: VectorD = null, technique: RegTechnique = Fac_QR)
+class Regression_WLS (x: MatrixD, y: VectorD, private var w: VectoD = null, technique: RegTechnique = Fac_QR)
       extends Predictor with Error
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
@@ -65,7 +65,7 @@ class Regression_WLS (x: MatrixD, y: VectorD, private var w: VectorD = null, tec
         val ols_r = new Regression (x, r, technique)           // run OLS on rad
         ols_r.train ()
         val rp = ols_r.predict (x)                             // predicted rad
-        w      = rp.map ((a: Double) => 1.0 / a)               // set weight vector for WLS to reciporcal of rp
+        w      = rp.recip                                      // set weight vector for WLS to reciporcal of rp
 
         if (DEBUG) {
             println ("b_OLS      = " + ols_y.fit)             // Ordinary Least Squares (OLS)
@@ -131,14 +131,14 @@ class Regression_WLS (x: MatrixD, y: VectorD, private var w: VectorD = null, tec
      *  e.g., (b_0, b_1, b_2) dot (1, z_1, z_2).
      *  @param z  the new vector to predict
      */
-    def predict (z: VectorD): Double = b dot z
+    def predict (z: VectoD): Double = b dot z
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z for
      *  each row of matrix z.
      *  @param z  the new matrix to predict
      */
-    override def predict (z: MatriD): VectorD = z * b
+    override def predict (z: MatriD): VectoD = z * b
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable

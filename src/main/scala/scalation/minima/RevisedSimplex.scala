@@ -12,7 +12,7 @@ package scalation.minima
 
 import util.control.Breaks.{breakable, break}
 
-import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.random.Randi
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -54,8 +54,8 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     private val c_       = c_B * b_inv                 // adjusted cost
     private val b_       = b_inv * b                   // adjusted constants
 
-    private var u: VectorD = null                      // vector used for leaving
-    private var z: VectorD = null                      // vector used for entering
+    private var u: VectoD = null                       // vector used for leaving
+    private var z: VectoD = null                       // vector used for entering
 
     val checker = new CheckLP (a, b, c)                    // LP checker
 
@@ -107,7 +107,7 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     /** Check if u <= 0., the solution is unbounded.
      *  @param u  the vector for leaving
      */
-    def unbounded (u: VectorD): Boolean =
+    def unbounded (u: VectoD): Boolean =
     {
         for (i <- 0 until u.dim if u(i) > 0.0) return false
         flaw ("unbounded", "the solution is UNBOUNDED")
@@ -182,13 +182,13 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the dual solution vector (y).
      */
-    def dual: VectorD = z.slice (N - M, N)
+    def dual: VectoD = z.slice (N - M, N)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the optimal objective function value (f(x) = c x).
      *  @param x  the primal solution vector
      */
-    def objF (x: VectorD): Double = c.select (x_B) dot x
+    def objF (x: VectoD): Double = c.select (x_B) dot x
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show the current revised tableau.

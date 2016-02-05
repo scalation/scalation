@@ -8,9 +8,9 @@
 
 package scalation.analytics
 
-import math.{exp, log}
+import scala.math.{exp, log}
 
-import scalation.linalgebra.VectorD
+import scalation.linalgebra.VectoD
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `LogisticFunction` object contains Activation functions.
@@ -32,7 +32,7 @@ object LogisticFunction
      *  @param a  the shift parameter
      *  @param b  the spread parameter
      */
-    def logistic (t: VectorD, a: Double, b: Double): VectorD = 
+    def logistic (t: VectoD, a: Double, b: Double): VectoD = 
     {
         for (i <- 0 until t.dim) t(i) = 1.0 / (1.0 + exp (-(a + b*t(i))))
         t
@@ -59,7 +59,7 @@ object LogisticFunction
      *  The values are computed in-place.
      *  @param t  the sigmoid function vector argument
      */
-    def sigmoid (t: VectorD): VectorD =
+    def sigmoid (t: VectoD): VectoD =
     {
         for (i <- 0 until t.dim) t(i) = 1.0 / (1.0 + exp (-t(i)))
         t

@@ -14,7 +14,7 @@ package scalation.analytics
 import math.exp
 import util.control.Breaks.{break, breakable}
 
-import scalation.linalgebra.{MatriD, MatrixD, VectorD}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.linalgebra.MatrixD.outer
 import scalation.random.Random
 import scalation.util.Error
@@ -141,7 +141,7 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int, eta: Double = 1.0)
      *  For the hidden to output layer bias, prepend the hidden values with a one (_11).
      *  @param zi  the new input vector
      */
-    def predictAll (zi: VectorD): VectorD = 
+    def predictAll (zi: VectoD): VectoD = 
     {
         val zh = _11 ++ sigmoid (w * zi)    // augmented hidden values
         sigmoid (v * zh)                    // predicted output values
@@ -152,7 +152,7 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int, eta: Double = 1.0)
      *  May use this method if the output is one dimensional or interested in 1st value.
      *  @param zi  the new input vector
      */
-    def predict (zi: VectorD): Double = predictAll (zi)(0)
+    def predict (zi: VectoD): Double = predictAll (zi)(0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given several input vectors 'zi', predict the output/response vectors 'zo'.
