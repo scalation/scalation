@@ -8,7 +8,7 @@
 
 package scalation.linalgebra.par
 
-import scalation.linalgebra.{Factorization, VectorD}
+import scalation.linalgebra.{Factorization, VectoD}
 import scalation.math.double_exp
 import scalation.util.Error
 
@@ -73,7 +73,7 @@ class Fac_QR (a: MatrixD)
      *  'r*x = q.t * b'.
      *  @param  b the constant vector
      */
-    def solve (b: VectorD): VectorD = backSub (r, q.t * b)
+    def solve (b: VectoD): VectoD = backSub (r, q.t * b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward substitution to solve for 'x' in 'r*x = b'.

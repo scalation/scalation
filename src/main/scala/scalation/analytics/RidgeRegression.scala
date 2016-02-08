@@ -83,7 +83,7 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
      */
     def train ()
     {
-        b        = if (x_pinv == null) fac.solve (y)
+        b        = if (x_pinv == null) fac.solve (y).asInstanceOf [VectorD]   // FIX
                    else x_pinv * y                              // x parameter vector [b_1, ... b_k]
         val e    = y - x * b                                    // residual/error vector
         val sse  = e dot e                                      // residual/error sum of squares
@@ -103,7 +103,7 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
      */
     def train (yy: VectorD)
     {
-        b        = if (x_pinv == null) fac.solve (yy)
+        b        = if (x_pinv == null) fac.solve (yy).asInstanceOf [VectorD]   // FIX
                    else x_pinv * yy                             // x parameter vector [b_1, ... b_k]
         val e    = yy - x * b                                   // residual/error vector
         val sse  = e dot e                                      // residual/error sum of squares
@@ -137,10 +137,10 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new quality of fit.
      */
-    def backElim (): Tuple3 [Int, VectorD, VectorD] =
+    def backElim (): Tuple3 [Int, VectoD, VectorD] =
     {
         var j_max   = -1                              // index of variable to eliminate
-        var b_max: VectorD = null                     // parameter values for best solution
+        var b_max: VectoD = null                      // parameter values for best solution
         var ft_max = VectorD (3); ft_max.set (-1.0)   // optimize on quality of fit (ft(0) is rSquared)
 
         for (j <- 1 to k) {

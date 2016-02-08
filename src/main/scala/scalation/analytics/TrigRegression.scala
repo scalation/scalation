@@ -89,7 +89,7 @@ class TrigRegression (t: VectorD, y: VectorD, k: Int, w: Double = Pi, technique:
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector of residuals/errors.
      */
-    override def residual: VectorD = rg.residual
+    override def residual: VectoD = rg.residual
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot expand (z),
@@ -117,7 +117,7 @@ class TrigRegression (t: VectorD, y: VectorD, k: Int, w: Double = Pi, technique:
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new R-squared value and the new F statistic.
      */
-    def backElim (): Tuple3 [Int, VectorD, VectorD] = rg.backElim ()
+    def backElim (): Tuple3 [Int, VectoD, VectorD] = rg.backElim ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor (VIF) for each variable to test

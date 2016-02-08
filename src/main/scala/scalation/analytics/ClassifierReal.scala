@@ -9,6 +9,7 @@
 package scalation.analytics
 
 import scalation.linalgebra.{MatriD, MatrixD, VectorD, VectorI}
+import scalation.stat.vectorD2StatVector
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -88,6 +89,19 @@ abstract class ClassifierReal (x: MatriD, y: VectorI, fn: Array [String], k: Int
         for (i <- 0 until mm if classify (xx(i))._1 == yy(i)) correct += 1
         correct / mm.toDouble
     } // test
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Calculate the correlation matrix for the feature vectors 'fea'.
+     *  If the correlations are too high, the independence assumption may be dubious.
+     *  FIX: generalize StatVector to work with all types of vectors.
+     */
+    def calcCorrelation: MatriD =
+    {
+        val fea = for (j <- 0 until n) yield x.col(j)
+        val cor = new MatrixD (n, n)
+        for (j1 <- 0 until n; j2 <- 0 until j1) cor(j1, j2) = fea(j1).asInstanceOf [VectorD] corr fea(j2).asInstanceOf [VectorD]
+        cor
+    } // calcCorrelation
 
 } // ClassifierReal abstract class
 

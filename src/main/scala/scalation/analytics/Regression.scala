@@ -52,7 +52,7 @@ import RegTechnique._
  *  @param y          the response vector
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
+class Regression (x: MatrixD, y: VectoD, technique: RegTechnique = Fac_QR)
       extends Predictor with Error
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
@@ -70,8 +70,8 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
     private var bic        = -1.0                              // Bayesian Information Criterion (BIC)
 
     private var stdErr: VectorD = null                         // standard error of coefficients for each x_j
-    private var t: VectorD      = null                         // t statistics for each x_j
-    private var p: VectorD      = null                         // p values for each x_j
+    private var t: VectoD       = null                         // t statistics for each x_j
+    private var p: VectoD       = null                         // p values for each x_j
 
     private val fac = technique match {                        // select the factorization technique
         case Fac_QR       => new Fac_QR (x)                    // QR Factorization
@@ -93,7 +93,7 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
      */
     def train ()
     {
-        b = if (x_pinv == null) fac.solve (x.t * y)
+        b = if (x_pinv == null) fac.solve (x.t * y).asInstanceOf [VectorD]   // FIX
             else x_pinv * y                                     // parameter vector [b_0, b_1, ... b_k]
         e = y - x * b                                           // residual/error vector
         diagnose (y, e)
@@ -108,7 +108,7 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
      */
     def train (yy: VectorD)
     {
-        b = if (x_pinv == null) fac.solve (yy)
+        b = if (x_pinv == null) fac.solve (yy).asInstanceOf [VectorD]   // FIX
             else x_pinv * yy                                    // parameter vector [b_0, b_1, ... b_k]
         e  = yy - x * b                                         // residual/error vector
         diagnose (yy, e)
@@ -119,7 +119,7 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
      *  @param yy  the response vector
      *  @param e   the residual/error vector
      */
-    def diagnose (yy: VectorD, e: VectorD)
+    def diagnose (yy: VectoD, e: VectoD)
     {
         sse      = e dot e                                       // residual/error sum of squares
         val sst  = (yy dot yy) - yy.sum~^2.0 / m                 // total sum of squares
@@ -165,10 +165,10 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector and the new quality of fit.
      */
-    def backElim (): Tuple3 [Int, VectorD, VectorD] =
+    def backElim (): Tuple3 [Int, VectoD, VectorD] =
     {
         var j_max = -1                                // index of variable to eliminate
-        var b_max: VectorD = null                     // parameter values for best solution
+        var b_max: VectoD = null                      // parameter values for best solution
         var ft_max = VectorD (3); ft_max.set (-1.0)   // optimize on quality of fit (ft(0) is rSquared)
 
         for (j <- 1 to k) {

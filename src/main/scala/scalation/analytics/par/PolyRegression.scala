@@ -8,8 +8,8 @@
 
 package scalation.analytics.par
 
-import scalation.linalgebra.{MatriD, VectoD, VectorD}
-import scalation.linalgebra.par.MatrixD
+import scalation.linalgebra.{MatriD, VectoD}
+import scalation.linalgebra.par.{MatrixD, VectorD}
 import scalation.math.double_exp
 import scalation.plot.Plot
 import scalation.util.{Error, time}
@@ -105,7 +105,7 @@ class PolyRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = 
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new R-squared value and the new F statistic.
      */
-    def backElim (): Tuple3 [Int, VectorD, VectorD] = rg.backElim ()
+    def backElim (): Tuple3 [Int, VectoD, VectorD] = rg.backElim ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor (VIF) for each variable to test

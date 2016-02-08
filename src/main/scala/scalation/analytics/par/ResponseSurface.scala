@@ -8,9 +8,9 @@
 
 package scalation.analytics.par
 
-import scalation.linalgebra.{MatriD, VectoD, VectorD}
-import scalation.linalgebra.par.MatrixD
-import scalation.linalgebra.VectorD.one
+import scalation.linalgebra.{MatriD, VectoD}
+import scalation.linalgebra.par.{MatrixD, VectorD}
+import scalation.linalgebra.par.VectorD.one
 import scalation.util.{Error, time}
 
 import scalation.analytics.Predictor
@@ -143,7 +143,7 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new quality of fit.
      */
-    def backElim (): Tuple3 [Int, VectorD, VectorD] = rsm.backElim ()
+    def backElim (): Tuple3 [Int, VectoD, VectorD] = rsm.backElim ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor (VIF) for each variable to test

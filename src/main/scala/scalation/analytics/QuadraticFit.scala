@@ -6,13 +6,12 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.metamodel
+package scalation.analytics
 
-import math.pow
+import scala.math.pow
 
-import scalation.analytics.Regression
 import scalation.calculus.Calculus.FunctionV2S
-import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.math.double_exp
 import scalation.minima.QuasiNewton
 
@@ -54,7 +53,7 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
 
     /** Regression coefficients to be determined using multiple regression
      */
-    private var b: VectorD = null
+    private var b: VectoD = null
 
     /** Regression class for performing multiple regression
      */

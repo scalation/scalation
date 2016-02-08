@@ -10,7 +10,7 @@ package scalation.linalgebra.par
 
 import math.sqrt
 
-import scalation.linalgebra.{Factorization, VectorD}
+import scalation.linalgebra.{Factorization, VectoD}
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -65,7 +65,7 @@ class Fac_Cholesky (a: MatrixD)
      *  forward and backward substitution.
      *  @param b  the constant vector
      */
-    def solve (b: VectorD): VectorD =
+    def solve (b: VectoD): VectoD =
     {
         val y = new VectorD (n)
         for (k <- 0 until n) {                        // solve for y in l*y = b

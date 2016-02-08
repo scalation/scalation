@@ -12,7 +12,7 @@
 // Issue 2 - make all methods parallel
 // Issue 3 - move to .par package and integrate with the rest of code
 
-package scalation.linalgebra.par.par2
+package scalation.linalgebra.par
 
 import scala.collection.Traversable
 import scala.util.Sorting.quickSort

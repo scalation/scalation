@@ -158,7 +158,7 @@ object ExpRegressionTest2 extends App
      *  @param k  number of regressors
      *  @return   (actual, estimated, r^2)
      */
-    def test(n: Int = 10000, k: Int = 5): Tuple5 [Int, Int, VectorD, VectorD, Double] =
+    def test (n: Int = 10000, k: Int = 5): Tuple5 [Int, Int, VectorD, VectoD, Double] =
     {
         val u = new Uniform (0, 1)     // uniform random
         val e = new Exponential (1)    // exponential error
@@ -180,7 +180,7 @@ object ExpRegressionTest2 extends App
         (n, k, b, erg.coefficient, erg.fit(0))
     } // test
 
-    val tests = Array.ofDim [Tuple5 [Int, Int, VectorD, VectorD, Double]] (10)
+    val tests = Array.ofDim [Tuple5 [Int, Int, VectorD, VectoD, Double]] (10)
 
     for (k <- 0 until tests.size) tests(k) = test(1000, k + 1)
 

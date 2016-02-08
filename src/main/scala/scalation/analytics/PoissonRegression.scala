@@ -52,7 +52,7 @@ class PoissonRegression (x: MatrixD, y: VectorI, fn: Array [String] = null)
      *  @see dept.stat.lsa.umich.edu/~kshedden/Courses/Stat600/Notes/glm.pdf
      *  @param b  the parameters to fit
      */
-    def ll (b: VectorD): Double =
+    def ll (b: VectoD): Double =
     {
         var sum = 0.0
         for (i <- 0 until x.dim1) {

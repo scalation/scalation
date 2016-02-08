@@ -48,7 +48,7 @@ class NonLinRegression (x: MatrixD, y: VectorD,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Function to compute the Sum of Squares Error (SSE) for given values for
      *  the parameter vector b.
-     *  @param b  the parameter vector
+     *  @param b  the parameter vector - FIX - to VectoD
      */
     def sseF (b: VectorD): Double =
     {
@@ -81,7 +81,7 @@ class NonLinRegression (x: MatrixD, y: VectorD,
      */
     def diagnose (yy: VectorD, e: VectorD)
     {
-        val sse    = sseF (b)                                   // residual/error sum of squares
+        val sse    = sseF (b.asInstanceOf [VectorD])            // residual/error sum of squares - FIX
         val sst    = (yy dot yy) - yy.sum~^2.0 / m.toDouble     // total sum of squares
         val ssr    = sst - sse                                  // regression sum of squares
         rSquared   = ssr / sst                                  // coefficient of determination

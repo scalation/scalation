@@ -11,7 +11,7 @@ package scalation.linalgebra.par
 import scala.collection.mutable.LinkedEntry
 import scala.math.abs
 
-import scalation.linalgebra.{MatriD, VectoD, VectorD}
+import scalation.linalgebra.{MatriD, VectoD}
 import scalation.math.{double_exp, oneIf}
 import scalation.util.{Error, SortedLinkedHashMap}
 

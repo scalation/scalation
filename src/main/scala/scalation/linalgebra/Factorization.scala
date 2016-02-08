@@ -39,7 +39,7 @@ trait Factorization
      *  matrices, by first performing forward substitution and then backward substitution.
      *  @param b  the constant vector
      */
-    def solve (b: VectorD): VectorD
+    def solve (b: VectoD): VectoD
 
 } // Factorization trait
 

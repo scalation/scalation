@@ -13,7 +13,7 @@ import java.io.PrintWriter
 import scala.math.{abs, max, pow}
 import scala.io.Source.fromFile
 
-import scalation.linalgebra.{MatriD, VectoD, VectorD}
+import scalation.linalgebra.{MatriD, VectoD}
 import scalation.linalgebra.par.MatrixD.eye
 import scalation.math.{double_exp, oneIf}
 import scalation.util.Error

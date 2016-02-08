@@ -20,11 +20,11 @@ trait Predictor
 {
     /** Coefficient/parameter vector [b_0, b_1, ... b_k]
      */
-    protected var b: VectorD = null
+    protected var b: VectoD = null
 
     /** Residual/error vector [e_0, e_1, ... e_m-1]
      */
-    protected var e: VectorD = null
+    protected var e: VectoD = null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a set of data vectors 'x's and their corresponding responses 'y's,
@@ -35,17 +35,17 @@ trait Predictor
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector of coefficient/parameter values.
      */
-    def coefficient: VectorD = b
+    def coefficient: VectoD = b
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector of residuals/errors.
      */
-    def residual: VectorD = e
+    def residual: VectoD = e
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit including rSquared.
      */
-    def fit: VectorD
+    def fit: VectoD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the fit.  Override when necessary.

@@ -15,7 +15,7 @@
 package scalation.dynamics
 
 import scalation.analytics.Predictor
-import scalation.calculus.Calculus.FunctionV2S
+import scalation.calculus.Calculus.FunctionV_2S
 import scalation.linalgebra.{VectoD, VectorD}
 import scalation.linalgebra.VectorD.one
 import scalation.minima.QuasiNewton
@@ -47,7 +47,7 @@ class NLS_ODE (z: VectorD, ts: VectorD, b_init: VectorD, private var w: VectorD 
 
     /** The objective function to be minimized (measures quality of fit)
      */
-    private var objectiveF: FunctionV2S = null
+    private var objectiveF: FunctionV_2S = null
 
     /** The initial value/condition y(0) = y0
      */
@@ -58,7 +58,7 @@ class NLS_ODE (z: VectorD, ts: VectorD, b_init: VectorD, private var w: VectorD 
      *  @param _objectiveF  the objective function indicating departure from observation
      *  @param _y           the initial value/condition y(0) = y0
      */
-    def init (_objectiveF: FunctionV2S, _y0: Double)
+    def init (_objectiveF: FunctionV_2S, _y0: Double)
     {
         objectiveF = _objectiveF
         y0         = _y0
@@ -109,7 +109,7 @@ object NLS_ODETest extends App
 
     val nls = new NLS_ODE (z, ts, b_init)
 
-    def objectiveF (b: VectorD): Double =
+    def objectiveF (b: VectoD): Double =
     {
         def dy_dt (t: Double, y: Double) = b(0)*t + b(1)*y
         nls.wsseF (dy_dt)

@@ -11,8 +11,8 @@ package scalation.analytics.par
 import math.log
 
 import scalation.calculus.Calculus.FunctionS2S
-import scalation.linalgebra.{MatriD, VectoD, VectorD}
-import scalation.linalgebra.par.MatrixD
+import scalation.linalgebra.{MatriD, VectoD}
+import scalation.linalgebra.par.{MatrixD, VectorD}
 import scalation.plot.Plot
 import scalation.util.{Error, time}
 
@@ -88,7 +88,7 @@ class TranRegression (x: MatrixD, y: VectorD, transform: FunctionS2S = log, tech
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new quality of fit.
      */
-    def backElim (): Tuple3 [Int, VectorD, VectorD] = rg.backElim ()
+    def backElim (): Tuple3 [Int, VectoD, VectorD] = rg.backElim ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor (VIF) for each variable to test

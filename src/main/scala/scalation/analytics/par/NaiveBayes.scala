@@ -9,9 +9,9 @@
 package scalation.analytics.par
 
 import scalation.analytics.ClassifierInt
-import scalation.linalgebra.{MatriD, MatrixI, VectorD, VectorI}
+import scalation.linalgebra.{MatriD, MatrixI, VectorI}
 import scalation.linalgebra.gen.HMatrix3
-import scalation.linalgebra.par.MatrixD
+import scalation.linalgebra.par.{MatrixD, VectorD}
 import scalation.stat.vectorD2StatVector
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

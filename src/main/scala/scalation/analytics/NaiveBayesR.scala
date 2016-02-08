@@ -35,27 +35,18 @@ import scalation.stat.vectorD2StatVector
 class NaiveBayesR (x: MatrixD, y: VectorI, fn: Array [String], k: Int, cn: Array [String])
       extends ClassifierReal (x, y, fn, k, cn)
 {
-    private val DEBUG   = false                 // debug flag
-    private val EPSILON = 1E-9                  // number close to zero
+    private val DEBUG   = false                   // debug flag
+    private val EPSILON = 1E-9                    // number close to zero
+    private val cor     = calcCorrelation         // feature correlation matrix
 
-    private val pop  = new VectorD (k)          // numbers in class 0, ..., k-1
-    private val mean = new MatrixD (k, n)       // mean for each class, feature
-    private val varc = new MatrixD (k, n)       // variance for each class, feature
+    private val pop  = new VectorD (k)            // numbers in class 0, ..., k-1
+    private val mean = new MatrixD (k, n)         // mean for each class, feature
+    private val varc = new MatrixD (k, n)         // variance for each class, feature
 
     private val cd   = Array.ofDim [Double => Double] (k, n)  // conditional density functions
     private var prob: VectorD = null
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Calculate the correlation matrix for the feature vectors 'fea'.
-     *  If the correlations are too high, the independence assumption may be dubious.
-     */
-    def calcCorrelation: MatriD =
-    {
-        val fea = for (j <- 0 until n) yield x.col(j)
-        val cor = new MatrixD (n, n)
-        for (j1 <- 0 until n; j2 <- 0 until j1) cor(j1, j2) = fea(j1) corr fea(j2)
-        cor
-    } // calcCorrelation
+    if (DEBUG) println ("correlation matrix = " + cor)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Calculate statistics (sample mean and sample variance) for each class
