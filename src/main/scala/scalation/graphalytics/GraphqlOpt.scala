@@ -8,10 +8,10 @@
 
 package scalation.graphalytics
 
-import collection.immutable.{Set => SET}
-import collection.mutable.Set
-import collection.mutable.{HashMap, MutableList}
-import util.control.Breaks._
+import scala.collection.immutable.{Set => SET}
+import scala.collection.mutable.Set
+import scala.collection.mutable.{HashMap, MutableList}
+import scala.util.control.Breaks._
 
 import scalation.util.time
 

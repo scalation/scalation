@@ -258,7 +258,7 @@ case class Dice (cdf: Array [Double] = Array (.1, .3, .5, .7, .9, 1.0), stream: 
     _discrete = true
     private val n = cdf.length
 
-    val mean = { var sum = 0.0; for (i <- 1 until n) sum += i * (cdf(i) - cdf(i)); sum }
+    val mean = { var sum = 0.0; for (i <- 1 until n) sum += i * (cdf(i) - cdf(i-1)); sum }
 
     def pf (z: Double): Double =
     {

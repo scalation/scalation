@@ -77,7 +77,7 @@ object Calculus
      *  @param x  the point (vector) at which to estimate the partial derivative
      *  @param i  the dimension to compute the partial derivative on
      */
-    def partial (f: FunctionV2S, x: VectorD, i: Int): Double = (f(x + (h, i)) - f(x - (h, i))) / h2
+    def partial (f: FunctionV2S, x: VectorD, i: Int): Double = (f(x + (i, h)) - f(x - (i, h))) / h2
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Estimate the gradient of the vector-to-scalar function f at point x
@@ -88,7 +88,7 @@ object Calculus
     def gradient (f: FunctionV2S, x: VectorD): VectorD =
     {
         val c = new VectorD (x.dim)
-        for (i <- 0 until x.dim) c(i) = (f(x + (h, i)) - f(x - (h, i))) / h2
+        for (i <- 0 until x.dim) c(i) = (f(x + (i, h)) - f(x - (i, h))) / h2
         c
     } // gradient
 
@@ -117,8 +117,8 @@ object Calculus
     {
         val c = new VectorD (x.dim)
         for (i <- 0 until x.dim) {
-            c(i) = if (i < n) (f(x + (h, i)) - f(x - (h, i))) / h2   // derivative
-                   else       (f(x + (1, i)) - f(x - (1, i))) / 2.0  // difference
+            c(i) = if (i < n) (f(x + (i, h)) - f(x - (i, h))) / h2   // derivative
+                   else       (f(x + (i, 1)) - f(x - (i, 1))) / 2.0  // difference
         } // for
         c
     } // slope
@@ -161,7 +161,7 @@ object Calculus
      */
     def partial2 (f: FunctionV2S, x: VectorD, i: Int, j: Int): Double = 
     {
-        if (i == j) (f(x + (h, i)) - 2.0*f(x) + f(x - (h, i))) / hh              // pure partial
+        if (i == j) (f(x + (i, h)) - 2.0*f(x) + f(x - (i, h))) / hh              // pure partial
         else 0.0 // FIX: (f(x + (h, i, j)) - 2.0*f(x) + f(x - (h, i, j))) / hh   // cross partial
     } // partial2
 
@@ -186,7 +186,7 @@ object Calculus
     def laplacian (f: FunctionV2S, x: VectorD): Double =
     {
         var sum = 0.0
-        for (i <- 0 until x.dim) sum += (f(x + (h, i)) - 2.0*f(x) + f(x - (h, i))) / hh
+        for (i <- 0 until x.dim) sum += (f(x + (i, h)) - 2.0*f(x) + f(x - (i, h))) / hh
         sum
     } // laplacian
 

@@ -146,7 +146,7 @@ object Vec
      *  @param x  the vector to filter
      *  @param p  the predicate (Boolean function) to apply
      */
-    def filterPos [T: ClassTag: Numeric] (x: Vec, p: T => Boolean): Array [Int] =
+    def filterPos [T: ClassTag: Numeric] (x: Vec, p: T => Boolean): Seq [Int] =
     {
         x match {
         case _: VectorC => x.asInstanceOf [VectorC].filterPos (p.asInstanceOf [Complex => Boolean])

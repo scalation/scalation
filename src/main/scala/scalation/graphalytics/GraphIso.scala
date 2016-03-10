@@ -10,12 +10,11 @@
 
 package scalation.graphalytics
 
-import collection.immutable.{Set => SET}
+import scala.collection.immutable.{Set => SET}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphIso` class determines whether two labelled directed graphs are
  *  Graph Isomorphic.  
- *
  *  @param g  the data graph G(V, E, l)
  *  @param q  the query graph Q(U, D, k)
  */

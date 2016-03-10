@@ -10,8 +10,8 @@ package scalation.graphalytics
 
 import java.io.PrintWriter
 
-import collection.immutable.{Set => SET}
-import io.Source.fromFile
+import scala.collection.immutable.{Set => SET}
+import scala.io.Source.fromFile
 
 import LabelType.{TLabel, toTLabel}
 

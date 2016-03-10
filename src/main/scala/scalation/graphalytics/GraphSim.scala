@@ -10,7 +10,7 @@
 
 package scalation.graphalytics
 
-import collection.immutable.{Set => SET}
+import scala.collection.immutable.{Set => SET}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSim` class provides an implementation for Simple Graph Simulation.

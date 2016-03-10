@@ -15,7 +15,6 @@ import scala.util.control.Breaks.{break, breakable}
 import scala.util.Random
 
 import scalation.stat.Statistic
-import scalation.util.{time, timer}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The 'TightSim' class provides an implementation for tight simulation

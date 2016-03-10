@@ -8,10 +8,10 @@
 
 package scalation.graphalytics
 
-import collection.immutable.{Set => SET}
-import collection.mutable.Queue
-import math.pow
-import util.Random
+import scala.collection.immutable.{Set => SET}
+import scala.collection.mutable.Queue
+import scala.math.pow
+import scala.util.Random
 
 import LabelType.{TLabel, toTLabel}
 

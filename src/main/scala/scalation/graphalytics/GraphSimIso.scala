@@ -8,7 +8,7 @@
 
 package scalation.graphalytics
 
-import collection.immutable.{Set => SET}
+import scala.collection.immutable.{Set => SET}
 
 import scalation.util.time
 

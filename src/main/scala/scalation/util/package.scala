@@ -46,7 +46,8 @@ package object util
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print the elapsed time in milliseconds (ms) for the execution of an
-     *  arbitrary block of code:  'time { block }'.
+     *  arbitrary block of code:  'time { block }'.  Return any result produced
+     *  by the block of code.
      *  @see http://stackoverflow.com/questions/9160001/how-to-profile-methods-in-scala
      *  @param block  the block of code to be executed
      */
@@ -61,17 +62,33 @@ package object util
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Calculate the elapsed time in milliseconds (ms) for the execution of an
-     *  arbitrary block of code:  'time { block }'.
+     *  arbitrary block of code:  'timed { block }'.  Return any result produced
+     *  by the block of code and its elapsed time.
      *  @see http://stackoverflow.com/questions/9160001/how-to-profile-methods-in-scala
      *  @param block  the block of code to be executed
      */
-    def timer [R] (block: => R): (R, Double) = 
+    def timed [R] (block: => R): Tuple2 [R, Double] = 
     {
         val t0 = nanoTime ()
         val result = block                       // call-by-name
         val t1 = nanoTime ()
         (result, (t1 - t0) * NS_PER_MS)
-    } // time
+    } // timed
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Calculate the elapsed time in milliseconds (ms) for the execution of an
+     *  arbitrary block of code:  'guage { block }'.  Return the block of code's
+     *  elapsed time.
+     *  @see http://stackoverflow.com/questions/9160001/how-to-profile-methods-in-scala
+     *  @param block  the block of code to be executed
+     */
+    def guage [R] (block: => R): Double = 
+    {
+        val t0 = nanoTime ()
+        val result = block                       // call-by-name
+        val t1 = nanoTime ()
+        (t1 - t0) * NS_PER_MS
+    } // guage
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return a line iterator for a line-oriented data source (e.g., CSV file).

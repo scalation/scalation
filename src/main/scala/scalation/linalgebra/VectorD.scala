@@ -15,6 +15,7 @@ import math.{abs => ABS, max => MAX, sqrt}
 
 import scalation.math.double_exp
 import scalation.util.Error
+import scalation.util.SortingD
 import scalation.util.SortingD.{iqsort, qsort2}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -35,84 +36,17 @@ class VectorD (val dim: Int,
     } // if
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a vector from an array of values.
-     *  @param u  the array of values
-     */
-    def this (u: Array [Double]) { this (u.length, u) }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a vector and assign values from vector 'u'.
      *  @param u  the other vector
      */
-    def this (u: VectoD)
-    {
-        this (u.dim)                               // invoke primary constructor
-        for (i <- range) v(i) = u(i)
-    } // constructor
+    def this (u: VectoD) { this (u.dim); for (i <- range) v(i) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Expand the size (dim) of 'this' vector by 'more' elements.
-     *  @param more  the number of new elements to add
+    /** Construct a vector and assign values from vector 'u'.
+     *  @param iv  the tuple containing (index, value)
+     *  @param dm  the dimension for the new vector
      */
-    def expand (more: Int = dim): VectorD =
-    {
-        if (more < 1) this       // no change
-        else          new VectorD (dim + more, Array.concat (v, new Array [Double] (more)))
-    } // expand
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a vector of the form (0, ... 1, ... 0) where the 1 is at position j.
-     *  @param j     the position to place the 1
-     *  @param size  the size of the vector (upper bound = size - 1)
-     */
-    def oneAt (j: Int, size: Int = dim): VectorD =
-    {
-        val c = new VectorD (size)
-        c.v(j) = 1.0
-        c
-    } // oneAt
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a vector of the form (0, ... -1, ... 0) where the -1 is at position j.
-     *  @param j     the position to place the -1
-     *  @param size  the size of the vector (upper bound = size - 1)
-     */
-    def _oneAt (j: Int, size: Int = dim): VectorD =
-    {
-        val c = new VectorD (size)
-        c.v(j) = -1.0
-        c
-    } // _oneAt
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `VectorD` into a `VectorI`.
-     */
-    def toInt: VectorI =
-    {
-        val c = new VectorI (dim)
-        for (i <- range) c(i) = v(i).toInt
-        c
-    } // toInt
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `VectorD` into a `VectorL`.
-      */
-    def toLong: VectorL =
-    {
-        val c = new VectorL (dim)
-        for (i <- range) c(i) = v(i).toLong
-        c
-    } // toLong
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `VectorD` into a `VectorD`.
-     */
-    def toDouble: VectorD =
-    {
-        val c = new VectorD (dim)
-        for (i <- range) c(i) = v(i).toDouble
-        c
-    } // toDouble
+    def this (iv: Tuple2 [Int, Double], dm: Int) { this (dm); v(iv._1) = iv._2 }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's element at the 'i'-th index position. 
@@ -153,26 +87,61 @@ class VectorD (val dim: Int,
     def update (r: Range, u: VectoD) { for (i <- r) v(i) = u(i - r.start) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Iterate over 'this' vector element by element.
+     *  @param f  the function to apply
+     */
+    def foreach [U] (f: Double => U) { var i = 0; while (i < dim) { f (v(i)); i += 1 } }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set each value in 'this' vector to 'x'.
      *  @param x  the value to be assigned
      */
     def set (x: Double) { for (i <- range) v(i) = x }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the values in 'this' vector to the values in array 'u'.
-     *  @param u  the array of values to be assigned
+    /** Set the values in 'this' vector to the values in sequence 'u'.
+     *  @param u  the sequence of values to be assigned
      */
-    def setAll (u: Array [Double]) { for (i <- range) v(i) = u(i) }
+    def set (u: Seq [Double]) { for (i <- range) v(i) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Iterate over 'this' vector element by element.
-     *  @param f  the function to apply
+    /** Convert 'this' `VectorD` into a `VectorI`.
      */
-    def foreach [U] (f: Double => U)
+    def toInt: VectorI = VectorI (v.map (_.toInt))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `VectorD` into a `VectorL`.
+      */
+    def toLong: VectorL = VectorL (v.map (_.toLong))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `VectorD` into a `VectorD`.
+     */
+    def toDouble: VectorD = VectorD (v.map (_.toDouble))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Expand the size (dim) of 'this' vector by 'more' elements.
+     *  @param more  the number of new elements to add
+     */
+    def expand (more: Int = dim): VectorD =
     {
-        var i = 0    
-        while (i < dim) { f (v(i)); i += 1 }
-    } // foreach
+        if (more < 1) this       // no change
+        else          new VectorD (dim + more, Array.concat (v, new Array [Double] (more)))
+    } // expand
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a vector of the form (0, ... 1, ... 0) where the 1 is at position j.
+     *  @param j     the position to place the 1
+     *  @param size  the size of the vector (upper bound = size - 1)
+     */
+    def oneAt (j: Int, size: Int = dim): VectorD = new VectorD ((j, 1.0), size)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a vector of the form (0, ... -1, ... 0) where the -1 is at position j.
+     *  @param j     the position to place the -1
+     *  @param size  the size of the vector (upper bound = size - 1)
+     */
+    def _oneAt (j: Int, size: Int = dim): VectorD = new VectorD ((j, -1.0), size)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
@@ -186,16 +155,13 @@ class VectorD (val dim: Int,
      *  the index positions.
      *  @param p  the predicate (Boolean function) to apply
      */
-    def filterPos (p: Double => Boolean): Array [Int] =
-    {
-        (for (i <- range if p (v(i))) yield i).toArray
-    } // filterPos
+    def filterPos (p: Double => Boolean): Seq [Int] = for (i <- range if p (v(i))) yield i
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Map the elements of 'this' vector by applying the mapping function 'f'.
      *  @param f  the function to apply
      */
-    def map (f: Double => Double): VectorD = new VectorD (this ().map (f))
+    def map (f: Double => Double): VectorD = VectorD (v.map (f))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice 'this' vector 'from' to 'end'.
@@ -260,13 +226,13 @@ class VectorD (val dim: Int,
     } // +
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add 'this' vector and scalar 's._1' only at position 's._2'.
-     *  @param s  the (scalar, position) to add
+    /** Add 'this' vector and scalar 's._2' only at position 's._1'.
+     *  @param s  the (position, scalar) to add
      */
-    def + (s: Tuple2 [Double, Int]): VectorD =
+    def + (s: Tuple2 [Int, Double]): VectorD =
     {
         val c = new VectorD (dim)
-        for (i <- range) c.v(i) = if (i == s._2) v(i) + s._1 else v(i)
+        for (i <- range) c.v(i) = if (i == s._1) v(i) + s._2 else v(i)
         c
     } // +
 
@@ -315,13 +281,13 @@ class VectorD (val dim: Int,
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' vector subtract scalar 's._1' only at position 's._2'.
-     *  @param s  the (scalar, position) to subtract
+    /** From 'this' vector subtract scalar 's._2' only at position 's._1'.
+     *  @param s  the (position, scalar) to subtract
      */
-    def - (s: Tuple2 [Double, Int]): VectorD =
+    def - (s: Tuple2 [Int, Double]): VectorD =
     {
         val c = new VectorD (dim)
-        for (i <- range) c.v(i) = if (i == s._2) v(i) - s._1 else v(i)
+        for (i <- range) c.v(i) = if (i == s._1) v(i) - s._2 else v(i)
         c
     } // -
 
@@ -363,7 +329,7 @@ class VectorD (val dim: Int,
     /** Multiply 'this' (row) vector by matrix 'm'.
      *  @param m  the matrix to multiply by
      */
-    def * (m: MatriD): VectoD = m.t * this
+    def * (m: MatriD): VectoD = m.t * this         // FIX - move to matrix level
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and vector 'b'.
@@ -665,27 +631,30 @@ class VectorD (val dim: Int,
     } // countPos
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return a new vector consisteing of the distinct elements from 'this' vector.
+     */
+    def distinct: VectorD = VectorD (v.distinct)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of distinct elements in 'this' vector.
      */
-    def distinct: Int =
-    {
-        var count = 1
-        val us = new VectorD (this); us.sort ()                // sorted vector
-        for (i <- 1 until dim if us(i) != us(i-1)) count += 1
-        count
-    } // distinct
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine whether the predicate 'pred' holds for some element in 'this' vector.
-     *  @param pred  the predicate to test (e.g., "_ == 5.")
-     */
-//  def exists (pred: (Double) => Boolean): Boolean = v.exists (pred)
+    def countinct: Int = v.distinct.length
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether 'x' is contained in 'this' vector.
      *  @param x  the element to be checked
      */
     def contains (x: Double): Boolean = v contains x
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reverse the order of the elemnets in 'this' vector.
+     */
+    def reverse (): VectorD = new VectorD (dim, v.reverse)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether 'this' vector is in sorted (accending) order.
+     */
+    def isSorted: Boolean = (new SortingD (v)).isSorted
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sort 'this' vector in-place in ascending (non-decreasing) order.
@@ -702,10 +671,7 @@ class VectorD (val dim: Int,
      *  @param i  the first element in the swap
      *  @param j  the second element in the swap
      */
-    def swap (i: Int, j: Int)
-    {
-        val t = v(j); v(j) = v(i); v(i) = t
-    } // swap
+    def swap (i: Int, j: Int) { val t = v(j); v(j) = v(i); v(i) = t }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check whether the other vector 'b' is at least as long as 'this' vector.
@@ -716,11 +682,7 @@ class VectorD (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check whether 'this' vector is nonnegative (has no negative elements).
      */
-    def isNonnegative: Boolean =
-    {
-        for (i <- range if v(i) < 0.0) return false
-        true
-    } // isNonnegative
+    def isNonnegative: Boolean = { for (i <- range if v(i) < 0.0) return false; true }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compare 'this' vector with vector 'b'.
@@ -842,14 +804,9 @@ object VectorD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a one vector (all elements are one) of length 'size'.
-     *  @param size  the size of the vector
+     *  @param size  the size of the new vector
      */
-    def one (size: Int): VectorD =
-    {
-        val c = new VectorD (size)
-        c.set (1.0)
-        c
-    } // one
+    def one (size: Int): VectorD = new VectorD (size, Array.fill (size)(1.0))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate scalar 'b' and vector 'u'.

@@ -7,8 +7,8 @@
 
 package scalation.graphalytics
 
-import collection.mutable.{Map, Queue, Set => SET}
-import math.max
+import scala.collection.mutable.{Map, Queue, Set => SET}
+import scala.math.max
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Ball` class provides an implementation for ball construction.

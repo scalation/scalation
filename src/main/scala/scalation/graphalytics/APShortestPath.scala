@@ -8,7 +8,7 @@
 
 package scalation.graphalytics
 
-import math.min
+import scala.math.min
 
 import scalation.linalgebra.{MatriD, MatrixD, SparseMatrixD}
 import scalation.linalgebra.SparseMatrixD.RowMap

@@ -102,7 +102,7 @@ class MatrixD (val d1: Int,
     /** Get 'this' matrix's vector at the 'i'-th index position ('i'-th row).
      *  @param i  the row index
      */
-    def apply (i: Int): VectorD = new VectorD (v(i))
+    def apply (i: Int): VectorD = VectorD (v(i))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get a slice 'this' matrix row-wise on range 'ir' and column-wise on range 'jr'.

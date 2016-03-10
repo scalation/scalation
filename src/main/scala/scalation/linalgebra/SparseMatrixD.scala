@@ -217,7 +217,7 @@ class SparseMatrixD (val d1: Int,
     {
         val a = Array.ofDim [Double] (dim2)
         for (j <- 0 until dim2) a(j) = this(i, j)
-        new VectorD (a)
+        VectorD (a)
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

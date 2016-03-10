@@ -127,22 +127,22 @@ trait VectoD
     def update (r: Range, u: VectoD)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Iterate over 'this' vector element by element.
+     *  @param f  the function to apply
+     */
+    def foreach [U] (f: Double => U)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set each value in 'this' vector to 'x'.
      *  @param x  the value to be assigned
      */
     def set (x: Double)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the values in 'this' vector to the values in array 'u'.
-     *  @param u  the array of values to be assigned
+    /** Set the values in 'this' vector to the values in sequence 'u'.
+     *  @param u  the sequence of values to be assigned
      */
-    def setAll (u: Array [Double])
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Iterate over 'this' vector element by element.
-     *  @param f  the function to apply
-     */
-    def foreach [U] (f: Double => U)
+    def set (u: Seq [Double])
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
@@ -156,7 +156,7 @@ trait VectoD
      *  the index positions.
      *  @param p  the predicate (Boolean function) to apply
      */
-    def filterPos (p: Double => Boolean): Array [Int]
+    def filterPos (p: Double => Boolean): Seq [Int]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Map the elements of 'this' vector by applying the mapping function 'f'.
@@ -202,10 +202,10 @@ trait VectoD
     def + (s: Double): VectoD
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add 'this' vector and scalar 's._1' only at position 's._2'.
-     *  @param s  the (scalar, position) to add
+    /** Add 'this' vector and scalar 's._2' only at position 's._1'.
+     *  @param s  the (position, scalar) to add
      */
-    def + (s: Tuple2 [Double, Int]): VectoD
+    def + (s: Tuple2 [Int, Double]): VectoD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' vector and vector 'b'.
@@ -237,10 +237,10 @@ trait VectoD
     def - (s: Double): VectoD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' vector subtract scalar 's._1' only at position 's._2'.
-     *  @param s  the (scalar, position) to subtract
+    /** From 'this' vector subtract scalar 's._2' only at position 's._1'.
+     *  @param s  the (position, scalar) to subtract
      */
-    def - (s: Tuple2 [Double, Int]): VectoD
+    def - (s: Tuple2 [Int, Double]): VectoD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place vector 'b'.
@@ -270,7 +270,7 @@ trait VectoD
     /** Multiply 'this' (row) vector by matrix 'm'.
      *  @param m  the matrix to multiply by
      */
-    def * (m: MatriD): VectoD
+    def * (m: MatriD): VectoD                       // FIX: move to matrix level
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and vector 'b'.
@@ -536,15 +536,14 @@ trait VectoD
     def countPos: Int
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a vector consisting of the distinct elements in 'this' vector.
+     */
+//  def distinct: VectorD
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of distinct elements in 'this' vector.
      */
-    def distinct: Int
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine whether the predicate 'pred' holds for some element in 'this' vector.
-     *  @param pred  the predicate to test (e.g., "_ == 5.")
-     */
-//  def exists (pred: (Double) => Boolean): Boolean = v.exists (pred)
+//  def countinct: Int
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether 'x' is contained in 'this' vector.
@@ -583,9 +582,10 @@ trait VectoD
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compare 'this' vector with vector 'b'.
      *  @param b  the other vector
-     */
-    def tryCompareTo [B >: VectoD] (b: B)
+     *
+    private def tryCompareTo [B >: VectoD] (b: B)
         (implicit view_1: (B) => PartiallyOrdered [B]): Option [Int]
+     */
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Override equals to determine whether 'this' vector equals vector 'b..

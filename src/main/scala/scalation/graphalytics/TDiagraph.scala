@@ -10,8 +10,8 @@
 
 package scalation.graphalytics
 
-import collection.mutable.Map
-import collection.mutable.{Set => SET}
+import scala.collection.mutable.Map
+import scala.collection.mutable.{Set => SET}
 //import collection.mutable.{HashSet => SET}
 
 import LabelType.TLabel

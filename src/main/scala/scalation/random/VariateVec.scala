@@ -11,7 +11,7 @@ package scalation.random
 import math.{abs, exp, Pi, round, sqrt}
 
 import scalation.linalgebra.{Fac_Cholesky, MatrixD, VectorD, VectorI}
-import scalation.math.Combinatorics.fac
+import scalation.math.Combinatorics.{choose, fac}
 import scalation.math.double_exp
 import scalation.util.Error
 
@@ -95,7 +95,7 @@ case class ProbabilityVec (n: Int, d: Double = 0.5, stream: Int = 0)
         z / z.sum
      } // gen
     
-    def igen: VectorI = throw new NoSuchMethodException ("'igen' not implemented, use 'gen' instead")
+    def igen: VectorI = gen.toInt
      
 } // ProbabilityVec class
 
@@ -132,7 +132,7 @@ case class NormalVec (mu: VectorD, cov: MatrixD, stream: Int = 0)
         c_cov * z + mu                                   // Cholesky covariance * standard Normal + mean
     } // gen
 
-    def igen: VectorI = throw new NoSuchMethodException ("'igen' not implemented, use 'gen' instead")
+    def igen: VectorI = gen.toInt
 
 } // NormalVec class
 
@@ -163,7 +163,7 @@ case class PermutedVecD (x: VectorD, stream: Int = 0)
         y
     } // igen
 
-    def igen: VectorI = throw new NoSuchMethodException ("'igen' not implemented, use 'gen' instead")
+    def igen: VectorI = gen.toInt
 
 } // PermutedVecD class
 
@@ -186,7 +186,7 @@ case class PermutedVecI (x: VectorI, stream: Int = 0)
 
     def pf (z: VectorD): Double = 1.0 / fac (x.dim)
 
-    def gen: VectorD = throw new NoSuchMethodException ("'gen' not implemented, use 'igen' instead")
+    def gen: VectorD = igen.toDouble
 
     def igen: VectorI =
     {
@@ -202,8 +202,38 @@ case class PermutedVecI (x: VectorI, stream: Int = 0)
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RandomVecD` class generates a random vector of doubles.
+ *  Ex: (3.0, 2.0, 0.0, 4.0, 1.0) has 'count' = 5 and 'max' = 4.
+ *  @param count    the size of the vector (number of integer elements)
+ *  @param max      generate integers in the range 0 (inclusive) to max (inclusive)
+ *  @param density  sparsity basis = 1 - density
+ *  @param stream   the random number stream
+ */
+case class RandomVecD (count: Int = 10, max: Double = 20.0, density: Double = 0.1, stream: Int = 0)
+     extends VariateVec (stream)
+{
+
+    private val mu  = max / 2.0                         // mean
+    private val rng = Uniform (0.0, max, stream)        // random Double generator
+    private val rn  = Random (stream)                   // random number generator
+    
+    def mean: VectorD =  { val mv = new VectorD (count); mv.set (mu); mv }
+
+    def pf (z: VectorD): Double = 1.0 / max ~^ count    // FIX pf?
+
+    def igen: VectorI = gen.toInt
+
+    def gen: VectorD =
+    {
+        VectorD (for (i <- 0 until count) yield if (rn.gen < density) rng.gen else 0.0)
+    } // gen
+
+} // RandomVecD class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RandomVecI` class generates a random vector of integers.
- *  Ex: (3, 2, 0, 4, 1) has count = 5 and max = 4.
+ *  Ex: (3, 2, 0, 4, 1) has 'count' = 5 and 'max' = 4.
  *  @param count   the size of the vector (number of integer elements)
  *  @param max     generate integers in the range 0 (inclusive) to max (inclusive)
  *  @param skip    skip this number, i.e, do not use it
@@ -224,7 +254,7 @@ case class RandomVecI (count: Int = 10, max: Int = 20, skip: Int = -1, unique: B
 
     def pf (z: VectorD): Double = 1.0 / max ~^ count
 
-    def gen: VectorD = throw new NoSuchMethodException ("'gen' not implemented, use 'igen' instead")
+    def gen: VectorD = igen.toDouble
 
     def igen: VectorI =
     {
@@ -241,32 +271,37 @@ case class RandomVecI (count: Int = 10, max: Int = 20, skip: Int = -1, unique: B
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class generates `Multinomial` random variates vectors.
- *  This discrete RV models the ...?
+/** The `Multinomial` class generates random variate vectors following the 
+ *  multinomial distribution.  This discrete RV models the multinomial trials,
+ *  which generalize Bernoulli trials ({0, 1} to the case where the outcome is
+ *  in {0, 1, ..., k-1}.
  *  @see http://www.math.uah.edu/stat/bernoulli/Multinomial.html
- *  @param p       array of probabilities
+ *  @param p       array of cummulative probabilities as CDF values
  *  @param n       the number of independent trials
  *  @param stream  the random number stream
  */
-case class Multinomial (p: Array [Double] = Array (.4, .3, .3), n: Int = 5, stream: Int = 0)
-     extends Variate (stream)
+case class Multinomial (p: Array [Double] = Array (.4, .7, 1.0), n: Int = 5, stream: Int = 0)
+     extends VariateVec (stream)
 {
     for (pi <- p if pi < 0 || pi > 1) flaw ("constructor", "parameter pi must be in [0, 1]*")
     if (n <= 0) flaw ("constructor", "parameter n must be positive")
     _discrete = true
 
-    val mean: Double = 0.0   // FIX
+    private val dice = Dice (p, stream)
 
-    def pf (z: Double): Double =
+    val mean: VectorD = { val mn = new VectorD (p.length); mn.set (dice.mean); mn }
+
+    def pf (z: VectorD): Double =
     {
-        // var coeff = choose (n, j(0), j(1))
-        0.0   // FIX
+        val x = z.toInt
+        var prob = choose (n, x(0), x(1)).toDouble
+        for (j <- 2 until p.length) prob /= fac (x(j))
+        prob
     } // pf
 
-    def gen: Double =
-    {
-        0.0   // FIX
-    } // gen
+    def gen: VectorD = igen.toDouble
+
+    def igen: VectorI = VectorI (for (i <- p.indices) yield dice.igen)
 
 } // Multinomial class
 
@@ -305,8 +340,18 @@ object VariateVecTest extends App
      println ("mean = " + vv.mean)
      for (k <- 0 until 30) println (vv.igen)
 
+     println ("Test: RandomVecD random vector generation --------------------")
+     vv = RandomVecD ()                              // random vector generator
+     println ("mean = " + vv.mean)
+     for (k <- 0 until 30) println (vv.gen)
+
      println ("Test: RandomVecI random vector generation --------------------")
      vv = RandomVecI ()                              // random vector generator
+     println ("mean = " + vv.mean)
+     for (k <- 0 until 30) println (vv.igen)
+
+     println ("Test: Multinomial random vector generation --------------------")
+     vv = Multinomial ()                              // random vector generator
      println ("mean = " + vv.mean)
      for (k <- 0 until 30) println (vv.igen)
 

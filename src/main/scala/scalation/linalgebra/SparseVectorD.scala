@@ -281,10 +281,10 @@ class SparseVectorD (val dim_ : Int)
     def set (x: Double) { for (i <- range) v(i) = x }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the values in 'this' vector to the values in array 'u'.
-     *  @param u  the array of values to be assigned
+    /** Set the values in 'this' vector to the values in sequence 'u'.
+     *  @param u  the sequence of values to be assigned
      */
-    def setAll (u: Array [Double]) { for (i <- range) v(i) = u(i) }
+    def set (u: Seq [Double]) { for (i <- range) v(i) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Iterate over 'this' vector element by element.
@@ -311,9 +311,9 @@ class SparseVectorD (val dim_ : Int)
      *  the index positions.
      *  @param p  the predicate (Boolean function) to apply
      */
-    def filterPos (p: Double => Boolean): Array [Int] =
+    def filterPos (p: Double => Boolean): Seq [Int] =
     {
-        (for (i <- range if p (v(i))) yield i).toArray
+        for (i <- range if p (v(i))) yield i
     } // filterPos
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -388,13 +388,13 @@ class SparseVectorD (val dim_ : Int)
     } // +
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add 'this' vector and scalar 's._1' only at position 's._2'.
-     *  @param s  the (scalar, position) to add
+    /** Add 'this' vector and scalar 's._2' only at position 's._1'.
+     *  @param s  the (position, scalar) to add
      */
-    def + (s: Tuple2 [Double, Int]): SparseVectorD =
+    def + (s: Tuple2 [Int, Double]): SparseVectorD =
     {
         val c = new SparseVectorD (dim)
-        for (i <- range) c.v(i) = if (i == s._2) v(i) + s._1 else v(i)
+        for (i <- range) c.v(i) = if (i == s._1) v(i) + s._2 else v(i)
         c
     } // +
 
@@ -443,13 +443,13 @@ class SparseVectorD (val dim_ : Int)
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' vector subtract scalar 's._1' only at position 's._2'.
-     *  @param s  the (scalar, position) to subtract
+    /** From 'this' vector subtract scalar 's._2' only at position 's._1'.
+     *  @param s  the (position, scalar) to subtract
      */
-    def - (s: Tuple2 [Double, Int]): SparseVectorD =
+    def - (s: Tuple2 [Int, Double]): SparseVectorD =
     {
         val c = new SparseVectorD (dim)
-        for (i <- range) c.v(i) = if (i == s._2) v(i) - s._1 else v(i)
+        for (i <- range) c.v(i) = if (i == s._1) v(i) - s._2 else v(i)
         c
     } // -
 

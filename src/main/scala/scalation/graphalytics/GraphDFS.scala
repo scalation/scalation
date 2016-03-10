@@ -11,8 +11,8 @@
 
 package scalation.graphalytics
 
-import collection.immutable.{Set => SET}
-import collection.mutable.{ArrayStack, Queue}
+import scala.collection.immutable.{Set => SET}
+import scala.collection.mutable.{ArrayStack, Queue}
 
 import LabelType.{TLabel, TLabel_DEFAULT}
 

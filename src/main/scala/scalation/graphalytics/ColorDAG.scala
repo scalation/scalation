@@ -8,7 +8,7 @@
 
 package scalation.graphalytics
 
-import collection.mutable.ListBuffer
+import scala.collection.mutable.ListBuffer
 
 import scalation.animation.{AnimateCommand, DgAnimator}
 import scalation.animation.CommandType._

@@ -15,7 +15,6 @@ import scala.util.control.Breaks.{break, breakable}
 import scala.util.Random
 
 import scalation.stat.Statistic
-import scalation.util.{time, timer}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The 'MStrictSim' class provides an implementation for strict simulation

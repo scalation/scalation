@@ -8,9 +8,9 @@
 
 package scalation.graphalytics
 
-import collection.immutable.{Set => SET}
-//import collection.mutable.{Set => SET}
-//import collection.mutable.{HashSet => SET}
+import scala.collection.immutable.{Set => SET}
+//import scala.collection.mutable.{Set => SET}
+//import scala.collection.mutable.{HashSet => SET}
 
 import scalation.util.time
 

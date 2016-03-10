@@ -8,15 +8,14 @@
 
 package scalation.graphalytics
 
-import collection._
-import collection.immutable.{Set => SET}
-import collection.mutable.{ListBuffer, Map, HashMap, MutableList, Set, Stack}
-import math.pow
-import util.control.Breaks.{break, breakable}
-import util.Random
+import scala.collection._
+import scala.collection.immutable.{Set => SET}
+import scala.collection.mutable.{ListBuffer, Map, HashMap, MutableList, Set, Stack}
+import scala.math.pow
+import scala.util.control.Breaks.{break, breakable}
+import scala.util.Random
 
 import scalation.stat.Statistic
-import scalation.util.{time, timer}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The 'StrictSim2' class provides an implementation for strict simulation
