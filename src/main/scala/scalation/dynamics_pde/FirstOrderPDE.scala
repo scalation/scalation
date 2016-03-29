@@ -10,10 +10,10 @@
 
 package scalation.dynamics_pde
 
-import math.{abs, ceil, exp}
+import scala.math.{abs, ceil, exp}
 
-import scalation.calculus.Calculus.FunctionS2S
 import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.math.FunctionS2S
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

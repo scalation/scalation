@@ -13,12 +13,11 @@
 
 package scalation.random
 
-import math.{ceil, exp, floor, log, Pi, round, sqrt, tan}
+import scala.math.{ceil, exp, floor, log, Pi, round, sqrt, tan}
 
-import scalation.calculus.Calculus.FunctionS2S
 import scalation.linalgebra.{VectoD, VectorD}
 import scalation.math.Combinatorics.{betaF, choose, fac, gammaF}
-import scalation.math.{double_exp, nexp}
+import scalation.math.{double_exp, FunctionS2S, nexp}
 import scalation.math.ExtremeD.approx
 import scalation.util.Error
 

@@ -639,7 +639,7 @@ class MatrixD (val d1: Int,
      */
     def dot (u: VectoD): VectorD =
     {
-        if (dim1 != u.dim) flaw ("dot", "matrix dot matrix - incompatible first dimensions")
+        if (dim1 != u.dim) flaw ("dot", "matrix dot vector - incompatible first dimensions")
 
         val c = new VectorD (dim2)
         val at = this.t                         // transpose the 'this' matrix
@@ -658,7 +658,7 @@ class MatrixD (val d1: Int,
      */
     def dot (b: MatrixD): MatrixD =
     {
-        if (dim1 != b.dim1) flaw ("dot", "matrix dot vector - incompatible first dimensions")
+        if (dim1 != b.dim1) flaw ("dot", "matrix dot matrix - incompatible first dimensions")
 
         val c = new MatrixD (dim2, b.dim2)
         val at = this.t                         // transpose the 'this' matrix

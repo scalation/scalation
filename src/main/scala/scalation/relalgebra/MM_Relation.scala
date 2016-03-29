@@ -776,7 +776,7 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show 'this' relation row by row.
      */
-    def show
+    def show ()
     {
         val wid = 18                                             // column width
         val rep = wid * colName.length                           // repetition = width * # columns
@@ -1110,7 +1110,7 @@ object MM_RelationTest3 extends App
 
     val costVprice = productSales.π ("ProductActualCost", "SalesTotalCost")
 
-    productSales.show
+    productSales.show ()
 
     println ("productSales = " + productSales)
     println ("productSales.π (\"ProductActualCost\", \"SalesTotalCost\") = " + costVprice)

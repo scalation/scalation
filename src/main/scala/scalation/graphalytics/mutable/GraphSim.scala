@@ -81,9 +81,9 @@ object GraphSimTest extends App
     val q = Graph.q1
 
     println (s"g.checkEdges = ${g.checkEdges}")
-    g.print ()
+    g.printG ()
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     (new GraphSim (g, q)).test ("GraphSim")    // Graph Simulation Pattern Matcher
 
@@ -100,9 +100,9 @@ object GraphSimTest2 extends App
     val q = Graph.q2
 
     println (s"g.checkEdges = ${g.checkEdges}")
-    g.print ()
+    g.printG ()
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     (new GraphSim (g, q)).test ("GraphSim")    // Graph Simulation Pattern Matcher
 
@@ -126,7 +126,7 @@ object GraphSimTest3 extends App
     val q = genBFSQuery (qSize, qAvDegree, g, false, "q")
 
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     (new GraphSim (g, q)).test ("GraphSim")    // Graph Simulation Pattern Matcher
 

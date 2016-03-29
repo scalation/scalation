@@ -27,6 +27,8 @@ import scalation.math.Complex._0
  */
 class MM_SortingC (a: MM_ArrayC)
 {
+    private val SHOW_REVERSALS = false            // flag for 'isSorted' method
+
     private val n = a.length                      // length of array a
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -136,8 +138,10 @@ class MM_SortingC (a: MM_ArrayC)
     def isSorted: Boolean =
     {
         for (i <- 1 until n if a(i-1) > a(i)) {
-            println ("isSorted: failed @ (i-1, a) = " + (i-1, a(i-1)))
-            println ("isSorted: failed @ (i, a)   = " + (i, a(i)))
+            if (SHOW_REVERSALS) {
+                println ("isSorted: failed @ (i-1, a) = " + (i-1, a(i-1)))
+                println ("isSorted: failed @ (i, a)   = " + (i, a(i)))
+            } // if
             return false
         } // for
         true

@@ -73,7 +73,7 @@ class LinearDiffEq (a: MatrixD, y0: VectorD)
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      /** Print the solution to the differential equation.
       */
-     def print
+     def printSol ()
      {
          println ("---------------------------------------")
          println ("System of Linear Differential Equations")
@@ -85,7 +85,7 @@ class LinearDiffEq (a: MatrixD, y0: VectorD)
          println ("constant vector       c  = " + c)
          println ("constant matrix       k  = " + k)
          println ("---------------------------------------")
-     } // print
+     } // printSol
 
 } // LinearDiffEq class
 
@@ -102,7 +102,7 @@ object LinearDiffEqTest extends App
                                    2.0, -2.0)
     val y0 = VectorD (1.0, 0.5)
     val de = new LinearDiffEq (a, y0)
-    de.print
+    de.printSol ()
 
     val n = 60                     // number of iterations
     val p = new MatrixD (n, 2)     // n 2D vectors (x, y)

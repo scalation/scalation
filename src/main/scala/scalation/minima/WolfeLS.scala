@@ -13,8 +13,9 @@ package scalation.minima
 
 import math.{abs, pow}
 
-import scalation.calculus.Calculus.{FunctionS2S, derivative}
+import scalation.calculus.Calculus.derivative
 import scalation.linalgebra.VectorD
+import scalation.math.FunctionS2S
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class performs an inexact line search on f to find a point x that exhibits

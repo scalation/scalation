@@ -10,8 +10,8 @@ package scalation.analytics
 
 import math.{exp, log}
 
-import scalation.calculus.Calculus.FunctionS2S
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
+import scalation.math.FunctionS2S
 import scalation.plot.Plot
 import scalation.util.{Error, time}
 

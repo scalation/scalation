@@ -362,19 +362,19 @@ object GraphGen2Test extends App
     println ("GraphGen2Test: test genRandomGraph")
     (0 until 10).foreach { _ =>
         val g = genRandomGraph (4, 100, 1)
-        g.print ()
+        g.printG ()
         println ("CONNECTED?  " + g.isConnected)
     } // foreach
 
     println ("GraphGen2Test: test genRandomConnectedGraph")
     (0 until 10).foreach { _ =>
         val g = genRandomConnectedGraph (4, 100, 1)
-        g.print ()
+        g.printG ()
     } // foreach
 
     println ("GraphGen2Test: test geneRandomGraph_PowLabels")
     val g1 = genRandomGraph_PowLabels (200, 50, 2)
-    g1.print ()
+    g1.printG ()
     println (s"g1.labelMap = ${g1.labelMap}")
  
 } // GraphGen2Test
@@ -390,12 +390,12 @@ object GraphGen2Test2 extends App
 
     println ("GraphGen2Test2: test genPowerLawGraph")
     val g2 = genPowerLawGraph (50, 10, 10, 2.1)
-    g2.print ()
+    g2.printG ()
     g2.ch.sortBy (_.size).foreach { println(_) }
 
     println ("GraphGen2Test2: test genPowerLawGraph_PowLabels")
     val g3 = genPowerLawGraph_PowLabels (50, 10, 10, 2.1)
-    g3.print ()
+    g3.printG ()
     g3.ch.sortBy (_.size).foreach { println(_) }
     println (s"g3.labelMap = ${g3.labelMap}")
 
@@ -416,7 +416,7 @@ object GraphGen2Test3 extends App
     println ("GraphGen2Test3: test genBFSQuery")
     (2 until 10).foreach { i =>
         var q = genBFSQuery (25, 3, g)
-        q.print ()
+        q.printG ()
         println (q.size)
         println (q.nEdges)
         println (q.nEdges / q.size.toDouble)

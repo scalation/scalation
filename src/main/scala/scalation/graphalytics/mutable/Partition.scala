@@ -195,7 +195,7 @@ object PartitionTest extends App
 
     var edgeSum = 0
     for (gi <- dp.formGraphs ()) {
-        gi.print ()
+        gi.printG ()
         val ne   = gi.nEdges
         edgeSum = edgeSum + ne
         println (s"nEdges = $ne")
@@ -203,7 +203,7 @@ object PartitionTest extends App
 
     println (s"edgeSum  = $edgeSum")
     println (s"g.nEdges = ${g.nEdges}")
-    g.print ()
+    g.printG ()
 
 } // PartitionTest object
 
@@ -223,7 +223,7 @@ object PartitionTest2 extends App
 
     var edgeSum = 0
     for (gi <- dp.formGraphs ()) {
-        gi.print ()
+        gi.printG ()
         val ne   = gi.nEdges
         edgeSum = edgeSum + ne
         println (s"nEdges = $ne")
@@ -231,7 +231,7 @@ object PartitionTest2 extends App
 
     println (s"edgeSum  = $edgeSum")
     println (s"g.nEdges = ${g.nEdges}")
-    g.print ()
+    g.printG ()
 
 } // PartitionTest2 object
 
@@ -251,7 +251,7 @@ object PartitionTest3 extends App
 
     var edgeSum = 0
     for (gi <- dp.formGraphs ()) {
-        gi.print ()
+        gi.printG ()
         val ne   = gi.nEdges
         edgeSum = edgeSum + ne
         println (s"nEdges = $ne")
@@ -259,7 +259,7 @@ object PartitionTest3 extends App
 
     println (s"edgeSum  = $edgeSum")
     println (s"g.nEdges = ${g.nEdges}")
-    g.print ()
+    g.printG ()
 
 } // PartitionTest3 object
 

@@ -106,8 +106,8 @@ object MDualSimTest extends App
                         Map ((0, 1) -> -1,
                              (0, 2) -> -1,
                              (2, 1) -> -1))
-    g.print ()
-    q.print ()
+    g.printG ()
+    q.printG ()
 
     val matcher = new MDualSim (g, q)                   // Graph Simulation Pattern Matcher
     val phi     = time { matcher.mappings () }             // time the matcher
@@ -129,7 +129,7 @@ object MDualSimTest2 extends App
     val gAvDegree =    5         // average vertex out degree for data graph
     val qAvDegree =    2         // average vertex out degree for query graph
 
-    q.print ()
+    q.printG ()
 
     val g = genRandomGraph (gSize, nLabels, gAvDegree, false, "g")
     val q = genBFSQuery (qSize, qAvDegree, g, false, "q")

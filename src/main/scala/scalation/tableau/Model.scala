@@ -58,7 +58,7 @@ class Model (name: String, m: Int, rv: Array [Variate], label: Array [String])
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Report the simulation results.
      */
-    def report
+    def report ()
     {
         for (j <- 0 until n) table(m+1, j) = table.col(j).sum / mm
         for (j <- label.indices) { print ("\t" + label(j)); if (label(j).length < 8) print ("\t") }

@@ -205,7 +205,7 @@ class Regression (x: MatrixD, y: VectoD, technique: RegTechnique = Fac_QR)
     /** Print results and diagnostics for each predictor 'x_j' and the overall
      *  quality of fit.
      */
-    def report
+    def report ()
     {
         println ("Coefficients:")
         println ("        | Estimate   |   StdErr   |  t value | Pr(>|t|)")
@@ -253,7 +253,7 @@ object RegressionTest extends App
     val rg = new Regression (x, y)
     rg.train ()
     println ("b = " + rg.coefficient)
-    rg.report
+    rg.report ()
 
     println ("fit = " + rg.fit)
     val yp = rg.predict (z)                              // predict y for one point
@@ -301,7 +301,7 @@ object RegressionTest2 extends App
     rg = new Regression (x, y)                       // use QR Factorization
     rg.train ()
     println ("b = " + rg.coefficient)
-    rg.report
+    rg.report ()
 
     val yp = rg.predict (z)                          // predict y for on3 point
     println ("predict (" + z + ") = " + yp)
@@ -375,7 +375,7 @@ object RegressionTest3 extends App
     val rg = new Regression (x, y)
     time { rg.train () }
     println ("b = " + rg.coefficient)
-    rg.report
+    rg.report ()
 
     println ("vif      = " + rg.vif)        // test multi-colinearity (VIF)
 

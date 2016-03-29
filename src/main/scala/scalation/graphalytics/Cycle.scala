@@ -65,7 +65,7 @@ object CycleTest extends App
                                 SET (2),           // edges from 1:  1 -> 2
                                 SET [Int] ()))     // edges from 2:  no such edges
     println ("Precedence Graph pg1: ----------------------------------------------")
-    pg1.print ()
+    pg1.printG ()
     println ("pg1 has cycle? = " + hasCycle (pg1))
     
     /** Test precedence graph 2 (has a cycle)
@@ -74,7 +74,7 @@ object CycleTest extends App
                                 SET (2),           // edges from 1:  1 -> 2
                                 SET (0)))          // edges form 2:  2 -> 0
     println ("Precedence Graph pg2: ----------------------------------------------")
-    pg2.print ()
+    pg2.printG ()
     println ("pg2 has cycle? = " + hasCycle (pg2))
     
 } // CycleTest object

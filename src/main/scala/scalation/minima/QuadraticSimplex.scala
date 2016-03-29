@@ -69,7 +69,7 @@ class QuadraticSimplex (a: MatrixD, b: VectorD, q: MatrixD, c: VectorD, var x_B:
 
     if (x_B == null) x_B = setBasis (MM, MM)
 
-    showTableau                            // before pivoting the artificial variable in
+    showTableau ()                         // before pivoting the artificial variable in
     val l = NN - 2                         // entering column/variable (artificial variable)
     val k = t.col (NN - 1).argminNeg ()    // leaving row/variable
     pivot (k, l)                           // special pivot puts artificial variable in basis
@@ -153,7 +153,7 @@ class QuadraticSimplex (a: MatrixD, b: VectorD, q: MatrixD, c: VectorD, var x_B:
         for (j <- 0 until NN if j != l) t(k, j) /= t(k, l)    // scale row k
         t(k, l) = 1.0
         x_B(k) = l                                  // update basis (l replaces k)
-        if (DEBUG) showTableau
+        if (DEBUG) showTableau ()
     } // pivot
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -165,7 +165,7 @@ class QuadraticSimplex (a: MatrixD, b: VectorD, q: MatrixD, c: VectorD, var x_B:
     {
         var k = -1       // the leaving variable (row)
         var l = -1       // the entering variable (column)
-        showTableau
+        showTableau ()
 
         breakable { for (it <- 1 to MAX_ITER) {
             l = entering (); if (l == -1) break      // optimal solution found
@@ -173,7 +173,7 @@ class QuadraticSimplex (a: MatrixD, b: VectorD, q: MatrixD, c: VectorD, var x_B:
             pivot (k, l)                       // pivot: k leaves and l enters
         }} // for
 
-        showTableau
+        showTableau ()
         val x = primal
         (x, objValue (x))    // return the primal solution and the optimal value
     } // solve
@@ -207,7 +207,7 @@ class QuadraticSimplex (a: MatrixD, b: VectorD, q: MatrixD, c: VectorD, var x_B:
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show the current basis and tableau.
      */
-    def showTableau
+    def showTableau ()
     {
         println ("basis x_B = " + x_B.deep)
         println ("tableau t = " + t)

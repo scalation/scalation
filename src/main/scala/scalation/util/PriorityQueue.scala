@@ -282,7 +282,8 @@ class PriorityQueue [A] (implicit val ord: Ordering [A])
   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
   /** Print the priority queue in order.
    */
-  def printInOrder: Unit =
+//def printInOrder: Unit =
+  def printInOrder ()
   {
       print ("PriorityQueue( ")
       for (e <- clone ().dequeueAll.iterator) print (e + " ")

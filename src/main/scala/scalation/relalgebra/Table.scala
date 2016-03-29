@@ -388,7 +388,7 @@ trait Table
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show 'this' relation row by row.
      */
-    def show
+    def show ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' relation into a matrix of doubles, e.g., 

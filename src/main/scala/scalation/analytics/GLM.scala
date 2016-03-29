@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import scalation.calculus.Calculus.FunctionS2S
+import scalation.math.FunctionS2S
 import scalation.linalgebra.{MatrixD, VectorD, VectorI}
 import scalation.linalgebra.MatrixD.++
 import scalation.linalgebra.VectorD.one

@@ -53,7 +53,7 @@ object GraphIsoTest extends App
                                   SET (1)),
                            Array (2, 1, 2, 1),
                            false, "g")
-        g.print ()
+        g.printG ()
         
 //      val adj_q = Array (SET (1, 2),
 //                         SET (2, 3),
@@ -67,7 +67,7 @@ object GraphIsoTest extends App
                                   SET [Int] ()),
                            Array (2, 1, 2),
                            false, "q")
-        q.print ()
+        q.printG ()
 
         val matcher = new GraphIso (g, q)
         println ("Are g and q graph isomorphic: " + matcher.graphIsomorphic ())

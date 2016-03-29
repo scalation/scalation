@@ -75,7 +75,7 @@ object TopSortTest extends App
                                 SET (2),           // edges from 1:  1 -> 2
                                 SET [Int] ()))     // edges from 2:  no such edges
     println ("Precedence Graph pg1: --------------------------------------------")
-    pg1.print ()
+    pg1.printG ()
     println ("pg1 order = " + topSort (pg1).deep)
     
     /** Test graph 2
@@ -84,7 +84,7 @@ object TopSortTest extends App
                                 SET (2),           // edges from 1:  1 -> 2
                                 SET (0)))          // edges form 2:  2 -> 0
     println ("Precedence Diraph pg2: --------------------------------------------")
-    pg2.print ()
+    pg2.printG ()
     println ("pg2 order = " + topSort (pg2).deep)
     
 } // TopSortTest object

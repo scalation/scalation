@@ -8,10 +8,11 @@
 
 package scalation.minima
 
-import math.abs
-import util.control.Breaks.{breakable, break}
+import scala.math.abs
+import scala.util.control.Breaks.{breakable, break}
 
-import scalation.calculus.Calculus.{derivative, FunctionS2S}
+import scalation.calculus.Calculus.derivative
+import scalation.math.FunctionS2S
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class is used to find roots (zeros) for a one-dimensional (scalar)

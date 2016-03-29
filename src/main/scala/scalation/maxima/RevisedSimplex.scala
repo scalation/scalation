@@ -129,13 +129,13 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     {
         var k = -1       // the leaving variable
         var l = -1       // the entering variable
-        showTableau
+        showTableau ()
 
         breakable { for (it <- 1 to MAX_ITER) {
             l = entering (); if (l == -1) break    // optimal solution found
             k = leaving (l); if (k == -1) break    // solution is unbounded
             pivot (k, l)                           // pivot: k leaves and l enters
-            showTableau
+            showTableau ()
         }} // for
 
         val x = primal
@@ -161,7 +161,7 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show the current revised tableau displaying the basis, b_inv, b_, c_.
      */
-    def showTableau
+    def showTableau ()
     {
         println ("Revised Tableau")
         println ("---------------------------------------------------")

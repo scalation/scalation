@@ -176,7 +176,7 @@ class BpTreeMap [K <% Ordered [K]: ClassTag, V: ClassTag] (order: Int = 5)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print the keys in 'this' B+Tree map.
      */
-    def printTree { println ("BpTreeMap"); printT (root, 0); println ("-" * 50) }
+    def printTree () { println ("BpTreeMap"); printT (root, 0); println ("-" * 50) }
 
     //  P R I V A T E   M E T H O D S  -----------------------------------------
 
@@ -311,7 +311,7 @@ object BpTreeMapTest extends App
 
     val totKeys = 50
     for (i <- 1 until totKeys by 2) tree.put (i, i * i)
-    tree.printTree
+    tree.printTree ()
     for (i <- 0 until totKeys) println ("key = " + i + " value = " + tree.get(i))
     println ("-" * 50)
     for (it <- tree.iterator) println (it)
@@ -351,7 +351,7 @@ object BpTreeMapTest2 extends App
     val rng  = new Random (seed)
     for (i <- 1 until totKeys) tree.put (rng.nextInt (max), i * i)
 
-    tree.printTree
+    tree.printTree ()
     println ("-" * 50)
     println ("size = " + tree.size)
     println ("Average number of nodes accessed = " + tree.count / totKeys.toDouble)

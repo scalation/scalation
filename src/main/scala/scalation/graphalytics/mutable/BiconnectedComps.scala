@@ -53,7 +53,7 @@ case class BiconnectedComp (g_ : Graph)
 
     private var bcount = 0                              // counter for assigning id's to blocks
 
-    if (DEBUG) g.print ()
+    if (DEBUG) g.printG ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find all the cut points in undirected graph 'g_'.  Translated from Jave code.
@@ -200,7 +200,7 @@ object BiconnectedCompTest extends App
                               SET (9),           // edges from 8
                               SET ()),           // edges from 9
                       Array.fill (10)(0))        // vertex labels
-    g.print ()
+    g.printG ()
     println ("-" * 60)
 
     val bcc = BiconnectedComp (g)
@@ -258,7 +258,7 @@ object BiconnectedCompTest2 extends App
                       "mg1")
 ***/
 
-    g1.print ()
+    g1.printG ()
     println ("-" * 60)
 
     val bcc = BiconnectedComp (g1)

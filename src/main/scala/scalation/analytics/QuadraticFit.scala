@@ -86,7 +86,7 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print all the vectors/points in the grid.
      */
-    def printGrid
+    def printGrid ()
     {
         println ("grid with " + nxt + " points")
         for (i <- 0 until grid.length) println (i + ":\t " + grid(i))
@@ -183,7 +183,7 @@ object QuadraticFitTest extends App
     val xs = VectorD (1.0, 1.0)                      // scaling - none
     val qf = new QuadraticFit (f, 2)                 // construct a quadratic fit object
     qf.formGrid (xc, xs)                             // form a grid around point xc
-    qf.printGrid
+    qf.printGrid ()
 
     // create the data/design matrix
     val (xx, yy) = qf.response ()                    // compute the response surface for the grid
@@ -224,7 +224,7 @@ object QuadraticFitTest2 extends App
     val xs = VectorD (1.0, 2.0, 1.0)                 // scaling to [-m, m]
     val qf = new QuadraticFit (f)                    // construct a quadratic fit object
     qf.formGrid (xc, xs)                             // form a grid around point xc
-    qf.printGrid
+    qf.printGrid ()
 
     // create the data/design matrix
     val (xx, yy) = qf.response ()                    // compute the response surface for the grid
@@ -262,7 +262,7 @@ object QuadraticFitTest3 extends App
     val xs = VectorD (1.0, 2.0, 1.0)                 // scaling to [-m, m]
     val qf = new QuadraticFit (f)                    // construct a quadratic fit object
     qf.formGrid (xc, xs)                             // form a grid around point xc
-    qf.printGrid
+    qf.printGrid ()
 
     // create the data/design matrix
     val (xx, yy) = qf.response ()                    // compute the response surface for the grid

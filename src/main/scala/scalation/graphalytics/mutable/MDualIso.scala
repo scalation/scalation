@@ -139,9 +139,9 @@ object MDualIsoTest extends App
     val q = MGraph.q1
 
     println (s"g.checkEdges = ${g.checkEdges}")
-    g.print ()
+    g.printG ()
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     val matcher = new MDualIso (g, q)                  // Dual Subgraph Isomorphism Pattern Matcher
     val psi = time { matcher.bijections () }              // time the matcher
@@ -161,9 +161,9 @@ object MDualIsoTest2 extends App
     val q = MGraph.q2
 
     println (s"g.checkEdges = ${g.checkEdges}")
-    g.print ()
+    g.printG ()
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     val matcher = new MDualIso (g, q)                  // Dual Subgraph Isomorphism Pattern Matcher
     val psi = time { matcher.bijections () }              // time the matcher
@@ -191,7 +191,7 @@ object MDualIsoTest3 extends App
     val q = genBFSQuery (qSize, qAvDegree, g, false, "q")
 
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     val matcher = new MDualIso (g, q)                  // Dual Subgraph Isomorphism Pattern Matcher
     val psi = time { matcher.bijections () }              // time the matcher

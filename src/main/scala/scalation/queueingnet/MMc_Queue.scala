@@ -78,9 +78,9 @@ class MMc_Queue (lambda: Double, mu: Double, c: Int = 1)
      val t_y = t_q + t_s
 
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-     /** Check intermediate results.
+     /** View/check intermediate results.
       */
-     def check
+     def view ()
      {
          println ("Check queueing parameters:")
          println ("lambda = %g".format (lambda))                   // arrival rate
@@ -88,12 +88,12 @@ class MMc_Queue (lambda: Double, mu: Double, c: Int = 1)
          println ("c      = %d".format (c))                        // number of servers
          println ("rho    = %g".format (rho))                      // traffic intensity
          println ("a      = %g".format (a))                        // server utilization factor
-     } // check
+     } // view
 
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      /** Report the results.
       */
-     def report
+     def report ()
      {
          println ("Results for queue:")
          println ("---------------------------------------------------")
@@ -117,13 +117,13 @@ object MMc_QueueTest extends App
 
     println("\nM/M/1 Queue Results:")
     val mm1 = new MMc_Queue (lambda, mu, 1)           // M/M/c Queue
-    mm1.check
-    mm1.report
+    mm1.view ()
+    mm1.report ()
 
     println("\nM/M/2 Queue Results:")
     val mm2 = new MMc_Queue (lambda, mu, 2)           // M/M/c Queue
-    mm2.check
-    mm2.report
+    mm2.view ()
+    mm2.report ()
 
 } // MMc_QueueTest object
 

@@ -65,7 +65,7 @@ object ConvertTest extends App
     val m2 = graph2Matrix (g)
 
     println ("m1 = " + m1)
-    g.print ()
+    g.printG ()
     println ("m2 = " + m2)
 
 } // ConvertTest

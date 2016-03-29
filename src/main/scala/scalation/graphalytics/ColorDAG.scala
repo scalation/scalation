@@ -211,7 +211,7 @@ class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print the nodes and edges in the color DAG.
      */
-    def printDAG
+    def printDAG ()
     {
         println ("-------------------------------------------------------------------------")
         println ("print ColorDAG")
@@ -241,7 +241,7 @@ class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print the in (for inputs) and out (for outputs) colors for each node in the DAG.
      */
-    def printColors
+    def printColors ()
     {
         println ("nodes(i): [in colors], [out colors]")
         for (s <- nodes; n <- s) {                                  // node n in stage s
@@ -257,7 +257,7 @@ class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
     /** Print the in (for inputs) and out (for outputs) node list buffers for each used node
      *  in the DAG.
      */
-    def printInOut
+    def printInOut ()
     {
         for (s <- nodes; n <- s if n.used) {                        // used node n in stage s
             print ("nodes(" + n.id + "): [")
@@ -272,7 +272,7 @@ class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
     /** Print the ColorTree used by the DAG for node and edge colors/type and animate its
      *  construction.
      */ 
-    def printColorTree
+    def printColorTree ()
     {
         colors.printTree                     // print the ColorTree
         colors.showAnimation                 // show the animation of the ColorTree hierarchy
@@ -281,7 +281,7 @@ class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Animate the color DAG.
      */
-    def animateDAG
+    def animateDAG ()
     {
         println ("Run DAGAnimation")
         val nSize = 20
@@ -340,10 +340,10 @@ object ColorDAGTest extends App
     dag.connect ()                                     // connect the remaining node via edges
     dag.popInOut ()                                    // populated the input/ouput lists from edges
 
-    dag.printDAG                                       // print the nodes and edges
-    dag.printColors                                    // print inputs and output colors for each node
-//  dag.printInOut                                     // print the input and ouput lists for each node
-    dag.animateDAG                                     // animate the color DAG
+    dag.printDAG ()                                    // print the nodes and edges
+    dag.printColors ()                                 // print inputs and output colors for each node
+//  dag.printInOut ()                                  // print the input and ouput lists for each node
+    dag.animateDAG ()                                  // animate the color DAG
 
 } // ColorDAGTest
 

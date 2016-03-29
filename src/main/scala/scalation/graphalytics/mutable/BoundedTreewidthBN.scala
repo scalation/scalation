@@ -156,11 +156,11 @@ object BoundedTreeWidthBNTest extends App
                                 (2, 5) -> 5.0,
                                 (3, 4) -> 4.0,
                                 (3, 5) -> 1.0))
-    g_in.print ()
+    g_in.printG ()
 
     val bbn = new BoundedTreeWidthBN (g_in, 2)
     val g_out = bbn.learnBN ()
-    g_out.print ()
+    g_out.printG ()
 
 } // BoundedTreeWidthBNTest object
 

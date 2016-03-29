@@ -10,15 +10,15 @@ package scalation.minima
 
 // U N D E R   D E V E L O P M E N T
 
-import math.max
-import util.control.Breaks.{breakable, break}
+import scala.math.max
+import scala.util.control.Breaks.{breakable, break}
 
 import scalation.linalgebra.VectorI
 import scalation.random.Randi
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class performs local search to find minima of functions defined on
- *  integer vector domains (z^n).
+/** The `GeneticAlgorithm` class performs local search to find minima of functions
+ *  defined on integer vector domains (z^n).
  *
  *  minimize    f(x)
  *  subject to  g(x) <= 0, x in Z^n
@@ -95,7 +95,7 @@ class GeneticAlgorithm (f:       VectorI => Double,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print the current population
      */
-    def printPopulation 
+    def printPopulation ()
     {
         for (i <- 0 until POP_SIZE) println (pop(i))
     } // printPopulation
@@ -103,7 +103,7 @@ class GeneticAlgorithm (f:       VectorI => Double,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Generate an initial population of individuals.
      */
-    def genPopulation
+    def genPopulation ()
     {
         for (i <- 0 until POP_SIZE) {
             val pop_i = new VectorI (x0.dim)
@@ -130,7 +130,7 @@ class GeneticAlgorithm (f:       VectorI => Double,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** For each individual in the population, cross it with some other individual.
      */
-    def crossOver
+    def crossOver ()
     {
         pop(0) = best._1                  // keep the fittest individual
         for (i <- 1 until POP_SIZE) {
@@ -146,7 +146,7 @@ class GeneticAlgorithm (f:       VectorI => Double,
     /** For each individual in the population, cross it with some other individual.
      *  Let the crossover be dependent of the fitness of the individual.
      */
-    def fitnessCrossOver
+    def fitnessCrossOver ()
     {
         // FIX - implement
     } // fitnessCrossOver
@@ -154,7 +154,7 @@ class GeneticAlgorithm (f:       VectorI => Double,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Randomly select individuals for mutation (change a value at one position).
      */
-    def mutate
+    def mutate ()
     {
         for (i <- 0 until POP_SIZE / 2) {
             var j = rIndiv.igen              // random individual to mutate
@@ -167,15 +167,15 @@ class GeneticAlgorithm (f:       VectorI => Double,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve the minimization problem using a genetic algorithm.
      */
-    def solve: Vec_Func =
+    def solve (): Vec_Func =
     {
         var noImprovement = 0
-        genPopulation
+        genPopulation ()
         var best = fittest
         breakable { for (g <- 1 to MAX_GEN) {
             println ("solve: starting generation " + g)
-            crossOver
-            mutate
+            crossOver ()
+            mutate ()
             printPopulation
             val cand = fittest
             if (cand._2 + TOLERANCE < best._2) {
@@ -193,7 +193,8 @@ class GeneticAlgorithm (f:       VectorI => Double,
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the GeneticAlgorithm class (unconstrained).
+/** The `GeneticAlgorithmTest` object is used to test the `GeneticAlgorithm` class
+ *  (unconstrained).
  */
 object GeneticAlgorithmTest extends App
 {
@@ -206,7 +207,8 @@ object GeneticAlgorithmTest extends App
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the GeneticAlgorithm class (constrained).
+/** The `GeneticAlgorithmTest2` object is used to test the `GeneticAlgorithm` class
+ *  (constrained).
  *
 object GeneticAlgorithmTest2 extends App
 {

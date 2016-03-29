@@ -28,12 +28,12 @@ class SpanningTree (g: Graph)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print the spanning tree.
      */
-    def printSTree { stree.printTree }
+    def printSTree () { stree.printTree () }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print the spanning tree.
      */
-    def aniSTree { stree.aniTree }
+    def aniSTree () { stree.aniTree () }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a spanning tree for the given graph, returning true if a complete
@@ -82,14 +82,14 @@ class SpanningTree (g: Graph)
 object SpanningTreeTest extends App
 {
     val g = Graph.g2
-    g.print ()
+    g.printG ()
 
     val st = new SpanningTree (g)
     if (! st.span ()) print ("un")
     println ("able to complete a spanning tree for graph " + g.name)
     println ("-" * 60)
-    st.printSTree
-    st.aniSTree
+    st.printSTree ()
+    st.aniSTree ()
 
 } // SpanningTreeTest object
 

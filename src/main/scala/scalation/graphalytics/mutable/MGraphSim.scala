@@ -112,10 +112,10 @@ object MGraphSimTest extends App
 
     println (s"g.checkEdges   = ${g.checkEdges}")
     println (s"g.checkElabels = ${g.checkElabels}")
-    g.print ()
+    g.printG ()
     println (s"q.checkEdges   = ${q.checkEdges}")
     println (s"q.checkElabels = ${q.checkElabels}")
-    q.print ()
+    q.printG ()
 
     val matcher = new MGraphSim (g, q)                       // Graph Simulation Pattern Matcher
     val phi     = time { matcher.mappings () }             // time the matcher
@@ -141,7 +141,7 @@ object MGraphSimTest2 extends App
 
     println (s"q.checkEdges   = " + q.checkEdges)
     println (s"q.checkElabels = " + q.checkElabels)
-    q.print ()
+    q.printG ()
 
     val matcher = new MGraphSim (g, q)                     // Graph Simulation Pattern Matcher
     val phi     = time { matcher.mappings () }           // time the matcher

@@ -13,9 +13,9 @@ package scalation
 
 import java.lang.Math.{abs, cos, log, max, sin, tan, ulp}
 
-import language.implicitConversions
+import scala.language.implicitConversions
 
-import math.ExtremeD.{MIN_NORMAL, EPSILON}             // smallest full precision, machine epsilon
+import math.ExtremeD.{MIN_NORMAL, EPSILON, TOL}    // smallest full precision, machine epsilon, tolerance
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `math` package contains classes, traits and objects for common mathematical
@@ -24,6 +24,10 @@ import math.ExtremeD.{MIN_NORMAL, EPSILON}             // smallest full precisio
  */
 package object math
 {
+    /** type definition for a function of a scalar (f: Double => Double) 
+     */
+    type FunctionS2S = Double => Double
+
     /** The natural log of 2
      */
     val log_2  = log (2.0)
@@ -122,11 +126,11 @@ package object math
         val del = abs (x - y)
 
         if (x == y) {
-            true                                           // they are equal
+            true                                            // they are equal
         } else if (x == 0.0 || y == 0.0 || del <= THRES) {
-            del <= THRES                                   // small absolute error
+            del <= THRES                                    // small absolute error
         } else {                   
-            del / (abs (x) + abs (y)) <= 1.5 * EPSILON     // small relative error
+            del / (abs (x) + abs (y)) <= 1.5 * TOL          // small relative error (TOL or EPSILON)
         } // if
     } // near_eq
 

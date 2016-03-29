@@ -11,6 +11,7 @@
 package scalation.calculus
 
 import scalation.linalgebra.{MatrixD, VectoD, VectorD}
+import scalation.math.FunctionS2S
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Calculus` object contains function for computing derivatives, gradients
@@ -18,7 +19,6 @@ import scalation.linalgebra.{MatrixD, VectoD, VectorD}
  */
 object Calculus
 {
-    type FunctionS2S  = Double  => Double      // function of a scalar
     type FunctionV2S  = VectorD => Double      // function of a vector - VectorD
     type FunctionV_2S = VectoD  => Double      // function of a vector - VectoD  - base trait
 

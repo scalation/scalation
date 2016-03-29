@@ -244,7 +244,7 @@ class Tree (val root: TreeNode, depth: Double, val name: String = "tree")
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print the tree.
      */
-    def printTree { printPre (root, 0) }
+    def printTree () { printPre (root, 0) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Recursive helper method for printing the tree using a pre-order traversal.
@@ -319,7 +319,7 @@ object TreeTest extends App
     println ("--------------------------------------------------------------")
 
     val ct = Tree (3, 2, 3)
-    ct.printTree
+    ct.printTree ()
     ct.showAnimation ()
 
     println ("--------------------------------------------------------------")
@@ -347,7 +347,7 @@ object TreeTest2 extends App
             ct.aniStep (m, n, j, FANOUT) 
         } // for
     } // for
-    ct.printTree
+    ct.printTree ()
     ct.showAnimation ()
 
     println ("--------------------------------------------------------------")
@@ -373,7 +373,7 @@ object TreeTest3 extends App
             val m = tree.add (n)
         } // for
     } // for
-    tree.printTree
+    tree.printTree ()
     tree.aniTree ()
 
     println ("--------------------------------------------------------------")
@@ -393,7 +393,7 @@ object TreeTest4 extends App
     val pred = Array (-1, 0, 0, 1, 1, 2, 2)
     val labl = Array (10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0)
     val tree = Tree (pred, labl, 3.0, "t")
-    tree.printTree
+    tree.printTree ()
     tree.aniTree ()
 
     println ("--------------------------------------------------------------")

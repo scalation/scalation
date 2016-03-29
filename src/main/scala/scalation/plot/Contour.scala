@@ -11,7 +11,6 @@ package scalation.plot
 import scala.math.{ceil, floor, min, pow, round}
 
 import scalation.linalgebra.{VectoD, VectorD}
-import scalation.calculus.Calculus.FunctionV_2S
 import scalation.scala2d.{Panel, VizFrame}
 import scalation.scala2d.{Ellipse, Line, Rectangle}
 import scalation.scala2d.Colors._
@@ -30,7 +29,7 @@ import scalation.scala2d.Shapes.{BasicStroke, Dimension, Graphics, Graphics2D}
  *  @param lbF     the lower bound on the functional value
  *  @param _title  the title of the plot
  */
-class Contour (f: FunctionV_2S, lb: VectoD, ub: VectoD, path: List [VectoD] = null,
+class Contour (f: VectoD => Double, lb: VectoD, ub: VectoD, path: List [VectoD] = null,
                private var deltaF: Double = -1.0, private var lbF: Double = 0.0,
                _title: String = "Contour plot of f(x, y)")
       extends VizFrame (_title, null)

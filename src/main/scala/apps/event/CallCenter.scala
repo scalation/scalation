@@ -44,8 +44,8 @@ object CallCenter extends App with Modelable
 
     println ("\nVerification ...")
     val mm11 = new MMck_Queue (lambda/HOUR, mu/HOUR)
-    mm11.check
-    mm11.report
+    mm11.view ()
+    mm11.report ()
 
 } // CallCenter object
 

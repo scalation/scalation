@@ -66,23 +66,23 @@ object MGc_QueueTest extends App
 
     println("\nM/G/1 Queue Results (cv2 = 1):")
     val mg1 = new MGc_Queue (lambda, mu, 1)            // M/M/c Queue, Exponential
-    mg1.check
-    mg1.report
+    mg1.view ()
+    mg1.report ()
 
     println("\nM/G/2 Queue Results (cv2 = 1):")
     val mg2 = new MGc_Queue (lambda, mu, 2)            // M/M/c Queue, Exponential
-    mg2.check
-    mg2.report
+    mg2.view ()
+    mg2.report ()
 
     println("\nM/G/1 Queue Results (cv2 = 0):")
     val mg3 = new MGc_Queue (lambda, mu, 1, 0.0)       // M/M/c Queue, Deterministic
-    mg3.check
+    mg3.view ()
     mg3.report
 
     println("\nM/G/2 Queue Results (cv2 = 0):")
     val mg4 = new MGc_Queue (lambda, mu, 2, 0.0)       // M/M/c Queue, Deterministic
-    mg4.check
-    mg4.report
+    mg4.view ()
+    mg4.report ()
 
 } // MGc_QueueTest object
 

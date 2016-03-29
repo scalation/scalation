@@ -271,9 +271,9 @@ object MStrictSimTest extends App
     val q = MGraph.q1p
 
     println (s"g.checkEdges = ${g.checkEdges}")
-    g.print ()
+    g.printG ()
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     (new MStrictSim (g, q)).test ("MStrictSim")   // Strict Graph Simulation Pattern Matcher
 
@@ -290,9 +290,9 @@ object MStrictSimTest2 extends App
     val q = MGraph.q2p
 
     println (s"g.checkEdges = ${g.checkEdges}")
-    g.print ()
+    g.printG ()
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     (new MStrictSim (g, q)).test ("MStrictSim")   // Strict Graph Simulation Pattern Matcher
 
@@ -310,7 +310,7 @@ object MStrictSimTest3 extends App
     val q = MGraphIO ("qfile")
 
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     (new MStrictSim (g, q)).test ("MStrictSim")   // Strict Graph Simulation Pattern Matcher
 

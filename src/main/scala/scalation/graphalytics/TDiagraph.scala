@@ -78,13 +78,13 @@ class TDigraph (edge:  Array [Triple],
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print 'this' multi-digraph in a deep sense with all the information.
      */
-    def print ()
+    def printG ()
     {
         println (s"TDigraph ($name, $size")
         for (e <- edge) println (e)
         for (l <- label) println (l)
         println (")")
-    } // print
+    } // printG
 
 } // TDigraph class
 
@@ -193,10 +193,10 @@ object TDigraph
 object TDigraphTest extends App
 {
     import TDigraph._
-    g1.print ()
-    q1.print ()
-    g2.print ()
-    q2.print ()
+    g1.printG ()
+    q1.printG ()
+    g2.printG ()
+    q2.printG ()
 
 } // TDigraphTest
 
@@ -215,7 +215,7 @@ object TDigraphTest2 extends App
     private val inverse   = false      // whether inverse adjacency is used (parents)
     private val name      = "gr"       // name of the graph
 
-    MDigGen.genRandomGraph (nVertices, nLabels, eLabels, outDegree, inverse, name).print ()
+    MDigGen.genRandomGraph (nVertices, nLabels, eLabels, outDegree, inverse, name).printG ()
 
 } // TDigraphTest2
  */

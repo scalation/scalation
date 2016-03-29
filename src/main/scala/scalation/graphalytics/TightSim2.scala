@@ -272,9 +272,9 @@ object TightSim2Test extends App
     val q = Graph.q1p
 
     println (s"g.checkEdges = ${g.checkEdges}")
-    g.print ()
+    g.printG ()
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     (new TightSim2 (g, q)).test ("TightSim2")   // Tight Graph Simulation Pattern Matcher
 
@@ -291,9 +291,9 @@ object TightSim2Test2 extends App
     val q = Graph.q2p
 
     println (s"g.checkEdges = ${g.checkEdges}")
-    g.print ()
+    g.printG ()
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     (new TightSim2 (g, q)).test ("TightSim2")   // Tight Graph Simulation Pattern Matcher
 
@@ -311,7 +311,7 @@ object TightSim2Test3 extends App
     val q = GraphIO ("qfile")
 
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     (new TightSim2 (g, q)).test ("TightSim2")   // Tight Graph Simulation Pattern Matcher
 

@@ -132,7 +132,7 @@ object Primes
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Make an array of prime numbers for storing within a program.
      */
-    def makePrimeList
+    def makePrimeList ()
     {
         val prime = genPrimesSoA ()
         shuffle (prime)
@@ -266,7 +266,7 @@ object PrimesTest extends App
     
     for (s <- timeGenSoA) println (s)
     for (s <- timeGenSoE) println (s)
-    makePrimeList
+    makePrimeList ()
 
 } // PrimesTest
 

@@ -87,9 +87,9 @@ object DualSimTest extends App
     val q = Graph.q1
 
     println (s"g.checkEdges = ${g.checkEdges}")
-    g.print ()
+    g.printG ()
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     (new DualSim (g, q)).test ("DualSim")    // Dual Graph Simulation Pattern Matcher
 
@@ -106,9 +106,9 @@ object DualSimTest2 extends App
     val q = Graph.q2
 
     println (s"g.checkEdges = ${g.checkEdges}")
-    g.print ()
+    g.printG ()
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     (new DualSim (g, q)).test ("DualSim")    // Dual Graph Simulation Pattern Matcher
 
@@ -132,7 +132,7 @@ object DualSimTest3 extends App
     val q = genBFSQuery (qSize, qAvDegree, g, false, "q")
 
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     (new DualSim (g, q)).test ("DualSim")    // Dual Graph Simulation Pattern Matcher
 

@@ -132,7 +132,7 @@ object GraphMetricsTest extends App
                               SET ()),                   // 3
                        Array (1, 0, 0, 0))                
 
-    g.print ()
+    g.printG ()
     val bfs = new GraphMetrics (g)
 
     // Compute the diameter of graph g

@@ -27,6 +27,8 @@ import scalation.math.Rational._0
  */
 class SortingQ (a: Array [Rational])
 {
+    private val SHOW_REVERSALS = false            // flag for 'isSorted' method
+
     private val n = a.length                      // length of array a
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -136,8 +138,10 @@ class SortingQ (a: Array [Rational])
     def isSorted: Boolean =
     {
         for (i <- 1 until n if a(i-1) > a(i)) {
-            println ("isSorted: failed @ (i-1, a) = " + (i-1, a(i-1)))
-            println ("isSorted: failed @ (i, a)   = " + (i, a(i)))
+            if (SHOW_REVERSALS) {
+                println ("isSorted: failed @ (i-1, a) = " + (i-1, a(i-1)))
+                println ("isSorted: failed @ (i, a)   = " + (i, a(i)))
+            } // if
             return false
         } // for
         true
@@ -586,7 +590,7 @@ object SortingQTest2 extends App
     println ("Performance Test direct: aa.length = " + aa.length)
     for (k <- 0 until 20) {
 //      for (i <- 0 until n) aa(i) = rn.nextLong ()
-//      print ("quicksort:   "); time { quickSort (aa) }    // Scala's QuickSort
+//      print ("quicksort:   "); time { quickSort (aa) }    // Scala's QuickSort, not for Rational
         for (i <- 0 until n) aa(i) = rn.nextLong ()
         val srt = new SortingQ (aa)
         print ("qsort:       "); time { srt.qsort () }
@@ -706,7 +710,7 @@ object SortingQTest4 extends App
     println ("Performance Test direct: aa.length = " + aa.length)
     for (k <- 0 until 20) {
 //      for (i <- 0 until n) aa(i) = rn.nextLong ()
-//      print ("quicksort:   "); time { quickSort (aa) }    // Scala's QuickSort
+//      print ("quicksort:   "); time { quickSort (aa) }    // Scala's QuickSort, not for Rational
         for (i <- 0 until n) aa(i) = rn.nextLong ()
         val srt = new SortingQ (aa)
         print ("qsort2:       "); time { srt.qsort2 () }

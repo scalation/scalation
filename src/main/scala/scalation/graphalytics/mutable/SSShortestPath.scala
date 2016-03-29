@@ -186,7 +186,7 @@ object SSShortestPathTest2 extends App
 
     g.checkEdges
     g.checkElabels
-    g.print ()
+    g.printG ()
 
     val s  = 0
     val sp = SSShortestPath (g, s)
@@ -222,7 +222,7 @@ object SSShortestPathTest3 extends App
 
     g.checkEdges
     g.checkElabels
-    g.print ()
+    g.printG ()
 
     val s  = 0
     val sp = SSShortestPath (g, s)

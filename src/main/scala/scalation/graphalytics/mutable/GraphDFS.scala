@@ -176,7 +176,7 @@ object GraphDFSTest extends App
 //                            SET (8)),                          // 12
                        Array (1, 2, 3, 4 , 5, 6, 13, 12, 11, 10, 9, 8, 7))   // labels
 
-    g.print ()
+    g.printG ()
     println ("Test DFS -----------------------------------------------------")
     test (new GraphDFS (g))                                          // test DFS
     println ("Test BFS -----------------------------------------------------")

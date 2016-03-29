@@ -133,7 +133,7 @@ class Model (name: String, animating: Boolean = false)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Report statistical results of the simulation for all the collectors.
      */
-    def reportStats
+    def reportStats ()
     {
         println ("Statistical results for " + name)
         println (Statistic.line)
@@ -251,7 +251,7 @@ object ModelTest extends App
 
         Thread.sleep (20000)                                      // wait on animation trace
         report (("nArr", nArr))
-        reportStats
+        reportStats ()
 
     } // PoissonModel
 

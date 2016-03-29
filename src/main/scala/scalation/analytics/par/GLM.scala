@@ -8,10 +8,10 @@
 
 package scalation.analytics.par
 
-import scalation.calculus.Calculus.FunctionS2S
 import scalation.linalgebra.VectorI
 import scalation.linalgebra.par.{MatrixD, VectorD}
 import scalation.linalgebra.par.VectorD.one
+import scalation.math.FunctionS2S
 
 import scalation.analytics.RegTechnique._
 

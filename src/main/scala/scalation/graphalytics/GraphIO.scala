@@ -197,7 +197,7 @@ object GraphIOTest extends App
 
     val ran_graph = GraphGen.genRandomGraph (size, nLabels, avDegree, inverse, "ran_graph")
     println (s"ran_graph = $ran_graph")
-    ran_graph.print ()
+    ran_graph.printG ()
 
     // Write the graph to a file
 
@@ -209,7 +209,7 @@ object GraphIOTest extends App
 
     val g = GraphIO (name)
     println (s"g = $g")
-    g.print ()
+    g.printG ()
 
 } // GraphIOTest object
 

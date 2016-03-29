@@ -48,18 +48,18 @@ class JacksonNet (p: MatrixD, r: VectorD, mu: VectorD, private var k: Array [Int
      for (i <- 0 until m) rho(i) = lambda(i) / (mu(i) * k(i).toDouble)
 
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-     /** Check intermediate results.
+     /** View/check intermediate results.
       */
-     def check
+     def view ()
      {
-         println ("check queueing network parameters:")
+         println ("view queueing network parameters:")
          println ("p      = " + p)                      // routing probability matrix
          println ("r      = " + r)                      // external rate vector
          println ("lambda = " + lambda)                 // effective arrival rate vector
          println ("mu     = " + mu)                     // service rate vector
          println ("k      = " + k.deep)                 // number of servers vector
          println ("rho    = " + rho)                    // utilization factor vector
-     } // check
+     } // view
 
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      /** Calculate the probability of a node being empty, based on its utilization
@@ -100,7 +100,7 @@ class JacksonNet (p: MatrixD, r: VectorD, mu: VectorD, private var k: Array [Int
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      /** Report the results.
       */
-     def report
+     def report ()
      {
          for (j <- 0 until m) {
              val lQ = nQueue (j)         // expected number waiting in the queue at node j
@@ -129,8 +129,8 @@ object JacksonNetTest extends App
     val mu = VectorD (8.0, 10.0)
 
     val jqn = new JacksonNet (p, r, mu)
-    jqn.check
-    jqn.report
+    jqn.view ()
+    jqn.report ()
 
 } // JacksonNetTest object
 

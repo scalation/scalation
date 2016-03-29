@@ -347,9 +347,9 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
      */
     private def fini (rep: Int)
     {
-        report                      // report in terminal
+        report ()                                        // report in terminal
         if (animating) {
-            reportf                                      // report in new window
+            reportf ()                                   // report in new window
             if (rep == 1) dgAni.animate (0, 100000)      // only animate first rep
         } // if
     } // fini
@@ -357,7 +357,7 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Report on the statistical results of the simulation.
      */
-    private def report
+    private def report ()
     {
         println (Statistic.line)
         println (Statistic.labels)
@@ -369,7 +369,7 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Report on the statistical results of the simulation in a new frame.
      */
-    private def reportf { new StatTable (name + " statistics", getStatistics) }
+    private def reportf () { new StatTable (name + " statistics", getStatistics) }
 
 } // Model class
 

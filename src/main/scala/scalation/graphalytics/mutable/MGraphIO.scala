@@ -222,8 +222,8 @@ object MGraphIOTest extends App
 
     val ran_graph = genRandomGraph (size, nLabels, eLabels, avDegree, inverse, "ran_graph")
     println (s"ran_graph = $ran_graph")
-    ran_graph.print (false)
-    ran_graph.print ()
+    ran_graph.printG (false)
+    ran_graph.printG ()
 
     // Write the graph to a file
 
@@ -235,7 +235,7 @@ object MGraphIOTest extends App
 
     val g = MGraphIO (name)
     println (s"g = $g")
-    g.print ()
+    g.printG ()
 
 } // MGraphIOTest object
 

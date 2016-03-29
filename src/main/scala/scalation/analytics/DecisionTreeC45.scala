@@ -285,7 +285,7 @@ class DecisionTreeC45 (val x: MatrixI, val y: VectorI, fn: Array [String], isCon
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print out the decision tree using Breadth First Search (BFS).
      */
-    def printTree
+    def printTree ()
     {
         println("\n*********************")
         println("  DecisionTree:\n")
@@ -447,7 +447,7 @@ object DecisionTreeC45Test extends App
     // train the classifier ---------------------------------------------------
     val cl = new DecisionTreeC45 (x, y, fn, flag, 2, null, vc)      // create the classifier            
     cl.train ()
-    cl.printTree
+    cl.printTree ()
     
 //  test sample ------------------------------------------------------------
 //  val z = VectorD (2, 100, 77.5, 0)                               // new data vector to classify

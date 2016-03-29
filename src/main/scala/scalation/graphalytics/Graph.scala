@@ -157,12 +157,12 @@ class Graph (val ch:      Array [SET [Int]],
     /** Print 'this' graph in a deep sense with all the information.
      *  @param clip  whether to clip out "Set(" and ")"
      */
-    def print (clip: Boolean = true)
+    def printG (clip: Boolean = true)
     {
         println (s"Graph ($name, $inverse, $size")
         for (i <- ch.indices) println (toLine (i, clip))
         println (")")
-    } // print
+    } // printG
 
 } // Graph class
 
@@ -264,10 +264,10 @@ object Graph
 object GraphTest extends App
 {
     import Graph._
-    g1.print ()
-    q1.print ()
-    g2.print ()
-    q2.print ()
+    g1.printG ()
+    q1.printG ()
+    g2.printG ()
+    q2.printG ()
 
 } // GraphTest object
 
@@ -285,7 +285,7 @@ object GraphTest2 extends App
     private val inverse   = false      // whether inverse adjacency is used (parents)
     private val name      = "gr"       // name of the graph
 
-    GraphGen.genRandomGraph (nVertices, nLabels, outDegree, inverse, name).print ()
+    GraphGen.genRandomGraph (nVertices, nLabels, outDegree, inverse, name).printG ()
 
 } // GraphTest2 object
 

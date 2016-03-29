@@ -45,8 +45,8 @@ object Bank extends App with Modelable
 
     println ("\nVerification ...")
     val mm1 = new MMc_Queue (lambda/HOUR, mu/HOUR)
-    mm1.check
-    mm1.report
+    mm1.view ()
+    mm1.report ()
 
 } // Bank object
 

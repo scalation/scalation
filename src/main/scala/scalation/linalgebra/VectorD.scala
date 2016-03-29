@@ -168,7 +168,7 @@ class VectorD (val dim: Int,
      *  @param from  the start of the slice (included)
      *  @param till  the end of the slice (excluded)
      */
-    override def slice (from: Int, till: Int): VectorD = new VectorD (till - from, v.slice (from, till))
+    override def slice (from: Int, till: Int = dim): VectorD = new VectorD (till - from, v.slice (from, till))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select a subset of elements of 'this' vector corresponding to a 'basis'.
@@ -708,7 +708,12 @@ class VectorD (val dim: Int,
      */
     override def equals (b: Any): Boolean =
     {
-        b.isInstanceOf [VectorD] && (v.deep equals b.asInstanceOf [VectorD].v.deep)
+//      b.isInstanceOf [VectorD] && (v.deep equals b.asInstanceOf [VectorD].v.deep)  // exact
+
+        if (! b.isInstanceOf [VectorD]) return false 
+        val bb = b.asInstanceOf [VectorD]
+        for (i <- range if v(i) !=~ bb(i)) return false                              // within TOL
+        true
     } // equals
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -102,13 +102,13 @@ class MGraph (ch:      Array [SET [Int]],
     /** Print 'this' multi-digraph in a deep sense with all the information.
      *  @param clip  whether to clip out "Set(" and ")"
      */
-    override def print (clip: Boolean = true)
+    override def printG (clip: Boolean = true)
     {
         println (s"MGraph ($name, $inverse, $size")
         for (i <- ch.indices) println (toLine (i))
         for ((k, v) <- elabel) println (s"$k -> $v")
         println (")")
-    } // print
+    } // printG
 
 } // MGraph class
 
@@ -243,10 +243,10 @@ object MGraph
 object MGraphTest extends App
 {
     import MGraph._
-    g1.print ()
-    q1.print ()
-    g2.print ()
-    q2.print ()
+    g1.printG ()
+    q1.printG ()
+    g2.printG ()
+    q2.printG ()
 
 } // MGraphTest
 
@@ -266,7 +266,7 @@ object MGraphTest2 extends App
     private val inverse   = false      // whether inverse adjacency is used (parents)
     private val name      = "gr"       // name of the graph
 
-    genRandomGraph (nVertices, nLabels, eLabels, outDegree, inverse, name).print ()
+    genRandomGraph (nVertices, nLabels, eLabels, outDegree, inverse, name).printG ()
 
 } // MGraphTest2
 

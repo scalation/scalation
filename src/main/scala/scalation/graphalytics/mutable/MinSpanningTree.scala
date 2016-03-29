@@ -38,12 +38,12 @@ class MinSpanningTree (g: MGraph, min: Boolean = true, undirected: Boolean = tru
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print the spanning tree.
      */
-    def printSTree { stree.printTree }
+    def printSTree () { stree.printTree () }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Animate the display of the spanning tree.
      */
-    def aniSTree { stree.aniTree }
+    def aniSTree () { stree.aniTree () }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a minimum cost spanning tree for the given graph, returning true
@@ -127,7 +127,7 @@ class MinSpanningTree (g: MGraph, min: Boolean = true, undirected: Boolean = tru
 object MinSpanningTreeTest extends App
 {
     val g = MGraph.g2
-    g.print ()
+    g.printG ()
 
     val st = new MinSpanningTree (g)
     st.span ()
@@ -162,7 +162,7 @@ object MinSpanningTreeTest2 extends App
                              (2, 5) -> 5.0,
                              (3, 4) -> 4.0,
                              (3, 5) -> 1.0))
-    g.print ()
+    g.printG ()
 
     val st = new MinSpanningTree (g)
     st.span ()
@@ -198,7 +198,7 @@ object MinSpanningTreeTest3 extends App
                              (2, 5) -> 5.0,
                              (3, 4) -> 4.0,
                              (3, 5) -> 1.0))
-    g.print ()
+    g.printG ()
 
     val st = new MinSpanningTree (g, false)
     st.span ()

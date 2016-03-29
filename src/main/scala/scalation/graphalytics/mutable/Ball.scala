@@ -87,7 +87,7 @@ class Ball (srcGraph: Graph, val center: Int, radius: Int)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print the ball.
      */
-    def printBall
+    def printBall ()
     {
         println ("Center: " + center)
         println ("Nodes in ball: " + nodesInBall)

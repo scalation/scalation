@@ -247,8 +247,8 @@ object GraphqlOptTest extends App
     val g = GraphGen.genRandomGraph (gSize, nLabels, gAvDegree, true, "g")
     val q = GraphGen.genBFSQuery (qSize, qAvDegree, g, true, "q")
 
-    g.print ()                                                // print data graph
-    q.print ()                                                // print query graph
+    g.printG ()                                                // print data graph
+    q.printG ()                                                // print query graph
 
     val matcher = new GraphqlOpt (g, q)                       // GraphqlOpt Subgraph Isomorphism Pattern Matcher
     
@@ -279,8 +279,8 @@ object GraphqlOptTest2 extends App
                               SET [Int] ()),
                        Array (2, 0),
                        true, "q")
-    g.print ()                                                // print data graph
-    q.print ()                                                // print query graph
+    g.printG ()                                               // print data graph
+    q.printG ()                                               // print query graph
 
     val matcher = new GraphqlOpt (g, q)                       // GraphqlOpt Subgraph Isomorphism Pattern Matcher
 
@@ -302,8 +302,8 @@ object GraphqlOptTest3 extends App
     val g = GraphIO ("gFile")                                 // read data graph
     val q = GraphIO ("qFile")                                 // read query graph
 
-    g.print ()                                                // print data graph
-    q.print ()                                                // print query graph
+    g.printG ()                                               // print data graph
+    q.printG ()                                               // print query graph
 
     val matcher = new GraphqlOpt (g, q)                       // GraphqlOpt Subgraph Isomorphism Pattern Matcher
 

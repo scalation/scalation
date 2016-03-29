@@ -65,9 +65,9 @@ object GraphSimTest extends App
     val q = Graph.q1p
 
     println (s"g.checkEdges = ${g.checkEdges}")
-    q.print ()
+    q.printG ()
     println (s"q.checkEdges = ${q.checkEdges}")
-    g.print ()
+    g.printG ()
 
     (new GraphSim (g, q)).test ("GraphSim")    // Graph Simulation Pattern Matcher
 
@@ -84,9 +84,9 @@ object GraphSimTest2 extends App
     val q = Graph.q2p
 
     println (s"g.checkEdges = ${g.checkEdges}")
-    q.print ()
+    q.printG ()
     println (s"q.checkEdges = ${q.checkEdges}")
-    g.print ()
+    g.printG ()
 
     (new GraphSim (g, q)).test ("GraphSim")    // Graph Simulation Pattern Matcher
 
@@ -104,7 +104,7 @@ object GraphSimTest3 extends App
     val q = GraphIO ("qfile")
 
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     (new GraphSim (g, q)).test ("GraphSim")    // Graph Simulation Pattern Matcher
 

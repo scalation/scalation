@@ -11,8 +11,9 @@ package scalation.minima
 import math.{abs, max, pow, sqrt}
 import util.control.Breaks.{breakable, break}
 
-import scalation.calculus.Calculus.{FunctionS2S, gradient, gradientD}
+import scalation.calculus.Calculus.{gradient, gradientD}
 import scalation.linalgebra.VectorD
+import scalation.math.FunctionS2S
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class performs a line search on f(x) to find a minimal value for f.
@@ -110,7 +111,7 @@ class GoldenSectionLS (f: FunctionS2S)
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print the golden ratio and the golden section.
      */
-    def printGolden
+    def printGolden ()
     {
         println ("GOLDEN_RATIO   = " + G_RATIO)
         println ("GOLDEN_SECTION = " + G_SECTION)

@@ -198,15 +198,15 @@ object GraphIOTest extends App
     val name     = "ran_graph"    // the name of the graph
     val size     = 50             // size of the graph
     val nLabels  = 10             // number of distinct vertex labels
-    val avDegree =   5            // average vertex out degree for the graph
+    val avDegree =  5             // average vertex out degree for the graph
     val inverse  = false
 
     // Create a random graph and print it out
 
     val ran_graph = genRandomGraph (size, nLabels, avDegree, inverse, "ran_graph")
     println (s"ran_graph = $ran_graph")
-    ran_graph.print (false)
-    ran_graph.print ()
+    ran_graph.printG (false)
+    ran_graph.printG ()
 
     // Write the graph to a file
 
@@ -218,7 +218,7 @@ object GraphIOTest extends App
 
     val g = GraphIO (name)
     println (s"g = $g")
-    g.print ()
+    g.printG ()
 
 } // GraphIOTest object
 

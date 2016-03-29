@@ -275,9 +275,9 @@ object MTightSimTest extends App
     val q = MGraph.q1p
 
     println (s"g.checkEdges = ${g.checkEdges}")
-    g.print ()
+    g.printG ()
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     (new MTightSim (g, q)).test ("MTightSim")   // Tight Graph Simulation Pattern Matcher
 
@@ -294,9 +294,9 @@ object MTightSimTest2 extends App
     val q = MGraph.q2p
 
     println (s"g.checkEdges = ${g.checkEdges}")
-    g.print ()
+    g.printG ()
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     (new MTightSim (g, q)).test ("MTightSim")   // Tight Graph Simulation Pattern Matcher
 
@@ -314,7 +314,7 @@ object MTightSimTest3 extends App
     val q = MGraphIO ("qfile")
 
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     (new MTightSim (g, q)).test ("MTightSim")   // Tight Graph Simulation Pattern Matcher
 

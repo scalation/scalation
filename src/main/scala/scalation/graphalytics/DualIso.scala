@@ -138,9 +138,9 @@ object DualIsoTest extends App
     val q = Graph.q1
 
     println (s"g.checkEdges = ${g.checkEdges}")
-    g.print ()
+    g.printG ()
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     val matcher = new DualIso (g, q)                      // Dual Subgraph Isomorphism Pattern Matcher
     val psi = time { matcher.bijections () }              // time the matcher
@@ -160,9 +160,9 @@ object DualIsoTest2 extends App
     val q = Graph.q2
 
     println (s"g.checkEdges = ${g.checkEdges}")
-    g.print ()
+    g.printG ()
     println (s"q.checkEdges = ${q.checkEdges}")
-    q.print ()
+    q.printG ()
 
     val matcher = new DualIso (g, q)                      // Dual Subgraph Isomorphism Pattern Matcher
     val psi = time { matcher.bijections () }              // time the matcher

@@ -101,7 +101,7 @@ class IntegerGoldenSectionLS (f: Int => Double)
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print the golden ratio and the golden section.
      */
-    def printGolden
+    def printGolden ()
     {
         println ("GOLDEN_RATIO   = " + G_RATIO)
         println ("GOLDEN_SECTION = " + G_SECTION)
