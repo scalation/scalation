@@ -10,7 +10,6 @@ package testing
 
 import java.io.{File, PrintWriter}
 
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TestBuilder` object builds unit tests for a given class.
  *  > test:runMain testing.TestBuilder
