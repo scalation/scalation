@@ -547,7 +547,7 @@ class MatrixD (val d1: Int,
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply 'this' matrix by vector 'u' (vector elements beyond 'dim2' ignored).
+    /** Multiply 'this' matrix by (column) vector 'u' (vector elements beyond 'dim2' ignored).
      *  @param u  the vector to multiply by
      */
     def * (u: VectoD): VectorD =
@@ -639,7 +639,7 @@ class MatrixD (val d1: Int,
      */
     def dot (u: VectoD): VectorD =
     {
-        if (dim1 != u.dim) flaw ("dot", "matrix dot matrix - incompatible first dimensions")
+        if (dim1 != u.dim) flaw ("dot", "matrix dot vector - incompatible first dimensions")
 
         val c = new VectorD (dim2)
         val at = this.t                         // transpose the 'this' matrix
@@ -658,7 +658,7 @@ class MatrixD (val d1: Int,
      */
     def dot (b: MatrixD): MatrixD =
     {
-        if (dim1 != b.dim1) flaw ("dot", "matrix dot vector - incompatible first dimensions")
+        if (dim1 != b.dim1) flaw ("dot", "matrix dot matrix - incompatible first dimensions")
 
         val c = new MatrixD (dim2, b.dim2)
         val at = this.t                         // transpose the 'this' matrix
@@ -857,11 +857,31 @@ class MatrixD (val d1: Int,
     } // min
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the lower triangular of 'this' matrix (rest are zero).
+     */ 
+    def lowerT: MatriD =
+    {
+        val lo = new MatrixD (dim1, dim2)
+        for (i <- range1; j <- 0 to i) lo.v(i)(j) = v(i)(j)
+        lo
+    } // lowerT  
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the upper triangular of 'this' matrix (rest are zero).
+     */ 
+    def upperT: MatriD =
+    {
+        val up = new MatrixD (dim1, dim2)
+        for (i <- range1; j <- i until dim2) up.v(i)(j) = v(i)(j)
+        up
+    } // upperT
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor 'this' matrix into the product of upper and lower triangular
      *  matrices '(l, u)' using the LU Factorization algorithm.  This version uses
      *  no partial pivoting.
      */
-    def lud_npp: Tuple2 [MatriD, MatriD] =
+    def lud_npp: Tuple2 [MatrixD, MatrixD] =
     {
         val l = new MatrixD (dim1, dim2)    // lower triangular matrix
         val u = new MatrixD (this)          // upper triangular matrix (a copy of this)
@@ -885,7 +905,7 @@ class MatrixD (val d1: Int,
      *  matrices '(l, u)' using the LU Factorization algorithm.  This version uses
      *  partial pivoting.
      */
-    def lud: Tuple2 [MatriD, MatriD] =
+    def lud: Tuple2 [MatrixD, MatrixD] =
     {
         val l = new MatrixD (dim1, dim2)         // lower triangular matrix
         val u = new MatrixD (this)               // upper triangular matrix (a copy of this)
@@ -913,7 +933,7 @@ class MatrixD (val d1: Int,
      *  matrices '(l, u)' using the LU Factorization algorithm.  This version uses
      *  partial pivoting.
      */
-    def lud_ip: Tuple2 [MatrixD, MatrixD] =
+    def lud_ip (): Tuple2 [MatrixD, MatrixD] =
     {
         val l = new MatrixD (dim1, dim2)         // lower triangular matrix
         val u = this                             // upper triangular matrix (this)
@@ -1129,7 +1149,7 @@ class MatrixD (val d1: Int,
      *  Note: this method turns the orginal matrix into the identity matrix.
      *  The inverse is returned and is captured by assignment.
      */
-    def inverse_ip: MatrixD =
+    def inverse_ip (): MatrixD =
     {
         var b = this                            // use 'this' matrix for b
         val c = eye (dim1)                      // let c represent the augmentation
@@ -1191,7 +1211,7 @@ class MatrixD (val d1: Int,
      *  It can be used to solve 'a * x = b': augment 'a' with 'b' and call reduce.
      *  Takes '[a | b]' to '[I | x]'.
      */
-    def reduce_ip
+    def reduce_ip ()
     {
         if (dim2 < dim1) flaw ("reduce", "requires n (columns) >= m (rows)")
 
@@ -1259,11 +1279,11 @@ class MatrixD (val d1: Int,
      *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
      *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
-    def nullspace_ip: VectorD =
+    def nullspace_ip (): VectorD =
     {
         if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
 
-        reduce_ip
+        reduce_ip ()
         col(dim2 - 1) * -1.0 ++ 1.0
     } // nullspace_ip
 
@@ -1383,10 +1403,10 @@ object MatrixD extends Error
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a matrix and assign values from the array of vectors 'u'.
-     *  @param u           the array of vectors to assign
+     *  @param u           the sequence/array of vectors to assign
      *  @param columnwise  whether the vectors are treated as column or row vectors
      */
-    def apply (u: Seq [VectorD], columnwise: Boolean = true): MatrixD =
+    def apply (u: Seq [VectoD], columnwise: Boolean = true): MatrixD =
     {
         var x: MatrixD = null
         val u_dim = u(0).dim
@@ -1405,7 +1425,7 @@ object MatrixD extends Error
      *  Assumes vectors are columwise.
      *  @param u  the Vector of vectors to assign
      */
-    def apply (u: Vector [VectorD]): MatrixD =
+    def apply (u: Vector [VectoD]): MatrixD =
     {
         val u_dim = u(0).dim
         val x = new MatrixD (u_dim, u.length)
@@ -1635,9 +1655,9 @@ object MatrixDTest extends App with PackageInfo
     println ("z.solve      = " + z.solve (lu._1, lu._2, b))
     println ("zz.solve     = " + zz.solve (zz.lud, bz))
     println ("z.inverse    = " + z.inverse)
-    println ("z.inverse_ip = " + z.inverse_ip)
+    println ("z.inverse_ip = " + z.inverse_ip ())
     println ("t.inverse    = " + t.inverse)
-    println ("t.inverse_ip = " + t.inverse_ip)
+    println ("t.inverse_ip = " + t.inverse_ip ())
     println ("z.inv * b    = " + z.inverse * b)
     println ("z.det        = " + z.det)
     println ("z            = " + z)
@@ -1680,7 +1700,7 @@ object MatrixDTest extends App with PackageInfo
     println ("aa.t * cc   = " + aa.t * cc)
 
     aa *= bb
-    println ("aa *= bb  = " + aa) 
+    println ("aa *= bb  = " + aa)
 
     val filename = getDataPath + "bb_matrix.csv"
     bb.write (filename)

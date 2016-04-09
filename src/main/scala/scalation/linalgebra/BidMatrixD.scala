@@ -826,10 +826,10 @@ class BidMatrixD (val d1: Int)
      *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
      *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
-    def nullspace_ip: VectorD =
+    def nullspace_ip (): VectorD =
     {
         if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
-        reduce_ip
+        reduce_ip ()
         col(dim2 - 1) * -1.0 ++ 1.0
     } // nullspace_ip
 
@@ -919,7 +919,7 @@ class BidMatrixD (val d1: Int)
         throw new NoSuchMethodException ("lud not implemented since it's already an upper matrix")
     } // lud
 
-    def lud_ip: Tuple2 [MatriD, MatriD] = 
+    def lud_ip (): Tuple2 [MatriD, MatriD] = 
     {
         throw new NoSuchMethodException ("lud_ip not implemented since it's already an upper matrix")
     } // lud_ip
@@ -929,7 +929,7 @@ class BidMatrixD (val d1: Int)
         throw new NoSuchMethodException ("solve lu not implemented, since lud not needed")
     } // solve
 
-    def inverse_ip: BidMatrixD = 
+    def inverse_ip (): BidMatrixD = 
     {
         throw new NoSuchMethodException ("inverse_ip not implemented since result may not be BidMatrix")
     } // inverse_ip
@@ -939,7 +939,7 @@ class BidMatrixD (val d1: Int)
         throw new NoSuchMethodException ("reduce not yet implemented")
     } // reduce
 
-    def reduce_ip
+    def reduce_ip ()
     {
         throw new NoSuchMethodException ("reduce_ip not implemented since result may not be BidMatrix")
     } // reduce_ip

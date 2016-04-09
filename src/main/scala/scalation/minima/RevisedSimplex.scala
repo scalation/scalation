@@ -51,7 +51,7 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     private var b_inv    = ba.inverse                  // basis of matrix-a inverted
 
     private val c_B      = c.select (x_B)              // cost for basic variables
-    private val c_       = c_B * b_inv                 // adjusted cost
+    private val c_       = c_B *: b_inv                // adjusted cost
     private val b_       = b_inv * b                   // adjusted constants
 
     private var u: VectoD = null                       // vector used for leaving
@@ -80,7 +80,7 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
      */
     def entering (): Int = 
     {
-        z = c_ * a - c
+        z = c_ *: a - c
         z.argmaxPos ()
     } // entering 
 

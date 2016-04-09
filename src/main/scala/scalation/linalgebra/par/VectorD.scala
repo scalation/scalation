@@ -187,7 +187,7 @@ class VectorD (val dim: Int,
      *  a new vector.
      *  @param p  the predicate (Boolean function) to apply
      */
-    override def filter (p: Double => Boolean): VectoD = VectorD (v.filter (p))
+    override def filter (p: Double => Boolean): VectorD = VectorD (v.filter (p))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
@@ -435,7 +435,7 @@ class VectorD (val dim: Int,
     /** Raise each element of 'this' vector to the 's'-th power.
      *  @param s  the scalar exponent
      */
-    def ~^= (s: Double) { for (i <- range.par) v(i) = v(i) ~^ s }
+    def ~^= (s: Double): VectorD = { for (i <- range.par) v(i) = v(i) ~^ s; this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector containing the reciprocal of each element of 'this' vector.
@@ -707,15 +707,14 @@ class VectorD (val dim: Int,
     } // countPos
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return a new vector consisteing of the distinct elements from 'this' vector.
+     */
+    def distinct: VectorD = VectorD (v.distinct)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of distinct elements in 'this' vector.
      */
-    def distinct: Int =
-    {
-        var count = 1
-        val us = new VectorD (this); us.sort ()                // sorted vector
-        for (i <- 1 until dim if us(i) != us(i-1)) count += 1
-        count
-    } // distinct
+    def countinct: Int = v.distinct.length
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether the predicate 'pred' holds for some element in 'this' vector.

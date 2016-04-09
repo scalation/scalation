@@ -37,7 +37,7 @@ class JacksonNet (p: MatrixD, r: VectorD, mu: VectorD, private var k: Array [Int
 
      /** Effective arrival rates at each node
       */
-     private val lambda = r * (ident - p).inverse       // with routing
+     private val lambda = r *: (ident - p).inverse      // with routing
 //   private val lambda = r                             // no routing
 
      if (k == null) k = Array.fill [Int] (m)(1)         // default to M/M/1 queues

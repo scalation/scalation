@@ -77,7 +77,7 @@ class Markov (tr: MatriD) extends Error
     def next (p: VectoD, k: Int = 1): VectoD =
     {
         var p2: VectoD = new VectorD (p)
-        for (i <- 1 to k) p2 = p2 * tr
+        for (i <- 1 to k) p2 = p2 *: tr
         p2
     } // next
 

@@ -8,10 +8,10 @@
 
 package scalation.linalgebra
 
-import collection.Traversable
-import util.Sorting.quickSort
+import scala.collection.Traversable
+import scala.util.Sorting.quickSort
 
-import math.{abs => ABS, max => MAX, sqrt}
+import scala.math.{abs => ABS, max => MAX, sqrt}
 
 import scalation.math.double_exp
 import scalation.util.Error
@@ -42,7 +42,7 @@ class VectorD (val dim: Int,
     def this (u: VectoD) { this (u.dim); for (i <- range) v(i) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a vector and assign values from vector 'u'.
+    /** Construct a vector and assign 'value' at 'index' position.
      *  @param iv  the tuple containing (index, value)
      *  @param dm  the dimension for the new vector
      */
@@ -87,22 +87,22 @@ class VectorD (val dim: Int,
     def update (r: Range, u: VectoD) { for (i <- r) v(i) = u(i - r.start) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Iterate over 'this' vector element by element.
-     *  @param f  the function to apply
-     */
-    def foreach [U] (f: Double => U) { var i = 0; while (i < dim) { f (v(i)); i += 1 } }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set each value in 'this' vector to 'x'.
      *  @param x  the value to be assigned
      */
     def set (x: Double) { for (i <- range) v(i) = x }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the values in 'this' vector to the values in sequence 'u'.
-     *  @param u  the sequence of values to be assigned
+    /** Set the values in 'this' vector to the values in sequence/array 'u'.
+     *  @param u  the sequence/array of values to be assigned
      */
     def set (u: Seq [Double]) { for (i <- range) v(i) = u(i) }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Iterate over 'this' vector element by element.
+     *  @param f  the function to apply
+     */
+    def foreach [U] (f: Double => U) { var i = 0; while (i < dim) { f (v(i)); i += 1 } }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' `VectorD` into a `VectorI`.
@@ -148,7 +148,7 @@ class VectorD (val dim: Int,
      *  a new vector.
      *  @param p  the predicate (Boolean function) to apply
      */
-    override def filter (p: Double => Boolean): VectoD = VectorD (v.filter (p))
+    override def filter (p: Double => Boolean): VectorD = VectorD (v.filter (p))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
@@ -183,12 +183,23 @@ class VectorD (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate 'this' vector and vector' b'.
-     *  @param b  the vector to be concatenated
+     *  @param b  the vector to be concatenated (any kind)
      */
     def ++ (b: VectoD): VectorD =
     {
         val c = new VectorD (dim + b.dim)
         for (i <- c.range) c.v(i) = if (i < dim) v(i) else b(i - dim)
+        c
+    } // ++
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate 'this' vector and vector' b'.
+     *  @param b  the vector to be concatenated (same kind, more efficient)
+     */
+    def ++ (b: VectorD): VectorD =
+    {
+        val c = new VectorD (dim + b.dim)
+        for (i <- c.range) c.v(i) = if (i < dim) v(i) else b.v(i - dim)
         c
     } // ++
 
@@ -205,12 +216,23 @@ class VectorD (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to add (any kind)
      */
     def + (b: VectoD): VectorD = 
     {
         val c = new VectorD (dim)
         for (i <- range) c.v(i) = v(i) + b(i)
+        c
+    } // +
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add 'this' vector and vector 'b'.
+     *  @param b  the vector to add (same kind, more efficient)
+     */
+    def + (b: VectorD): VectorD = 
+    {
+        val c = new VectorD (dim)
+        for (i <- range) c.v(i) = v(i) + b.v(i)
         c
     } // +
 
@@ -238,9 +260,15 @@ class VectorD (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to add (any kind)
      */
     def += (b: VectoD): VectorD = { for (i <- range) v(i) += b(i); this }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add in-place 'this' vector and vector 'b'.
+     *  @param b  the vector to add (same kind, more efficient)
+     */
+    def += (b: VectorD): VectorD = { for (i <- range) v(i) += b.v(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' vector and scalar 's'.
@@ -260,12 +288,23 @@ class VectorD (val dim: Int,
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract vector 'b'.
-     *  @param b  the vector to subtract
+     *  @param b  the vector to subtract (any kind)
      */
     def - (b: VectoD): VectorD =
     {
         val c = new VectorD (dim)
         for (i <- range) c.v(i) = v(i) - b(i)
+        c
+    } // -
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** From 'this' vector subtract vector 'b'.
+     *  @param b  the vector to subtract (same kind, more efficient)
+     */
+    def - (b: VectorD): VectorD =
+    {
+        val c = new VectorD (dim)
+        for (i <- range) c.v(i) = v(i) - b.v(i)
         c
     } // -
  
@@ -293,9 +332,15 @@ class VectorD (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to add (any kind)
      */
     def -= (b: VectoD): VectorD = { for (i <- range) v(i) -= b(i); this }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** From 'this' vector subtract in-place vector 'b'.
+     *  @param b  the vector to add (same kind, more efficient)
+     */
+    def -= (b: VectorD): VectorD = { for (i <- range) v(i) -= b.v(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place scalar 's'.
@@ -305,12 +350,23 @@ class VectorD (val dim: Int,
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' vector by vector 'b'.
-     *  @param b  the vector to multiply by
+     *  @param b  the vector to multiply by (any kind)
      */
     def * (b: VectoD): VectorD =
     {
         val c = new VectorD (dim)
         for (i <- range) c.v(i) = v(i) * b(i)
+        c
+    } // *
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply 'this' vector by vector 'b'.
+     *  @param b  the vector to multiply by (same kind, more efficient)
+     */
+    def * (b: VectorD): VectorD =
+    {
+        val c = new VectorD (dim)
+        for (i <- range) c.v(i) = v(i) * b.v(i)
         c
     } // *
 
@@ -326,16 +382,16 @@ class VectorD (val dim: Int,
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply 'this' (row) vector by matrix 'm'.
-     *  @param m  the matrix to multiply by
+    /** Multiply in-place 'this' vector and vector 'b'.
+     *  @param b  the vector to add (any kind)
      */
-    def * (m: MatriD): VectoD = m.t * this         // FIX - move to matrix level
+    def *= (b: VectoD): VectorD = { for (i <- range) v(i) *= b(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to add (same kind, more efficient)
      */
-    def *= (b: VectoD): VectorD = { for (i <- range) v(i) *= b(i); this }
+    def *= (b: VectorD): VectorD = { for (i <- range) v(i) *= b.v(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and scalar 's'.
@@ -345,12 +401,23 @@ class VectorD (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide 'this' vector by vector 'b' (element-by-element).
-     *  @param b  the vector to divide by
+     *  @param b  the vector to divide by (any kind)
      */
     def / (b: VectoD): VectorD =
     {
         val c = new VectorD (dim)
         for (i <- range) c.v(i) = v(i) / b(i)
+        c
+    } // /
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide 'this' vector by vector 'b' (element-by-element).
+     *  @param b  the vector to divide by (same kind, more efficient)
+     */
+    def / (b: VectorD): VectorD =
+    {
+        val c = new VectorD (dim)
+        for (i <- range) c.v(i) = v(i) / b.v(i)
         c
     } // /
 
@@ -367,9 +434,15 @@ class VectorD (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to add (any kind)
      */
     def /= (b: VectoD): VectorD = { for (i <- range) v(i) /= b(i); this }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide in-place 'this' vector and vector 'b'.
+     *  @param b  the vector to add (same kind, more efficient)
+     */
+    def /= (b: VectorD): VectorD = { for (i <- range) v(i) /= b.v(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and scalar 's'.
@@ -390,10 +463,10 @@ class VectorD (val dim: Int,
     } // ~^
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Raise each element of 'this' vector to the 's'-th power.
+    /** Raise in-place each element of 'this' vector to the 's'-th power.
      *  @param s  the scalar exponent
      */
-    def ~^= (s: Double) { for (i <- range) v(i) = v(i) ~^ s }
+    def ~^= (s: Double): VectorD = { for (i <- range) v(i) = v(i) ~^ s; this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector containing the reciprocal of each element of 'this' vector.
@@ -449,7 +522,7 @@ class VectorD (val dim: Int,
     def cumulate: VectorD =
     {
         val c = new VectorD (dim)
-        var sum: Double = 0.0
+        var sum = 0.0
         for (i <- range) { sum += v(i); c.v(i) = sum }
         c
     } // cumulate
@@ -471,12 +544,23 @@ class VectorD (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
-     *  @param b  the other vector
+     *  @param b  the other vector (any kind)
      */
     def dot (b: VectoD): Double =
     {
-        var sum: Double = 0.0
+        var sum = 0.0
         for (i <- range) sum += v(i) * b(i)
+        sum
+    } // dot
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
+     *  @param b  the other vector (same kind, more efficient)
+     */
+    def dot (b: VectorD): Double =
+    {
+        var sum = 0.0
+        for (i <- range) sum += v(i) * b.v(i)
         sum
     } // dot
 
@@ -485,7 +569,7 @@ class VectorD (val dim: Int,
      */
     def norm1: Double =
     {
-        var sum: Double = 0.0
+        var sum = 0.0
         for (i <- range) sum += ABS (v(i))
         sum
     } // norm1
@@ -503,12 +587,23 @@ class VectorD (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Take the maximum of 'this' vector with vector 'b' (element-by element).
-     *  @param b  the other vector
+     *  @param b  the other vector (any kind)
      */
     def max (b: VectoD): VectorD =
     {
         val c = new VectorD (dim)
         for (i <- range) c.v(i) = if (b(i) > v(i)) b(i) else v(i)
+        c
+    } // max
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Take the maximum of 'this' vector with vector 'b' (element-by element).
+     *  @param b  the other vector (same kind, more efficient)
+     */
+    def max (b: VectorD): VectorD =
+    {
+        val c = new VectorD (dim)
+        for (i <- range) c.v(i) = if (b.v(i) > v(i)) b.v(i) else v(i)
         c
     } // max
 
@@ -525,12 +620,23 @@ class VectorD (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Take the minimum of 'this' vector with vector 'b' (element-by element).
-     *  @param b  the other vector
+     *  @param b  the other vector (any kind)
      */
     def min (b: VectoD): VectorD =
     {
         val c = new VectorD (dim)
         for (i <- range) c.v(i) = if (b(i) < v(i)) b(i) else v(i)
+        c
+    } // min
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Take the minimum of 'this' vector with vector 'b' (element-by element).
+     *  @param b  the other vector (same kind, more efficient)
+     */
+    def min (b: VectorD): VectorD =
+    {
+        val c = new VectorD (dim)
+        for (i <- range) c.v(i) = if (b.v(i) < v(i)) b.v(i) else v(i)
         c
     } // min
 
@@ -631,7 +737,19 @@ class VectorD (val dim: Int,
     } // countPos
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return a new vector consisteing of the distinct elements from 'this' vector.
+    /** Count the number of distinct elements in 'this' vector.
+     *
+    def distinct: Int =
+    {
+        var count = 1
+        val us = new VectorD (this); us.sort ()                // sorted vector
+        for (i <- 1 until dim if us(i) != us(i-1)) count += 1
+        count
+    } // distinct
+     */
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return a new vector consisting of the distinct elements from 'this' vector.
      */
     def distinct: VectorD = VectorD (v.distinct)
 
@@ -652,7 +770,7 @@ class VectorD (val dim: Int,
     def reverse (): VectorD = new VectorD (dim, v.reverse)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine whether 'this' vector is in sorted (accending) order.
+    /** Determine whether 'this' vector is in sorted (ascending) order.
      */
     def isSorted: Boolean = (new SortingD (v)).isSorted
 
@@ -672,12 +790,6 @@ class VectorD (val dim: Int,
      *  @param j  the second element in the swap
      */
     def swap (i: Int, j: Int) { val t = v(j); v(j) = v(i); v(i) = t }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check whether the other vector 'b' is at least as long as 'this' vector.
-     *  @param b  the other vector
-     */
-    def sameDimensions (b: VectorD): Boolean = dim <= b.dim
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check whether 'this' vector is nonnegative (has no negative elements).
@@ -708,11 +820,11 @@ class VectorD (val dim: Int,
      */
     override def equals (b: Any): Boolean =
     {
-//      b.isInstanceOf [VectorD] && (v.deep equals b.asInstanceOf [VectorD].v.deep)  // exact
+//      b.isInstanceOf [VectorD] && (v.deep equals b.asInstanceOf [VectorD].v.deep)
 
-        if (! b.isInstanceOf [VectorD]) return false 
-        val bb = b.asInstanceOf [VectorD]
-        for (i <- range if v(i) !=~ bb(i)) return false                              // within TOL
+        if (! b.isInstanceOf [VectoD]) return false
+        val bb = b.asInstanceOf [VectoD]
+        for (i <- range if v(i) !=~ bb(i)) return false               // within TOL
         true
     } // equals
 
@@ -757,8 +869,8 @@ object VectorD
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `VectorD` from a sequence of Doubles.
-     *  @param xs  the sequence of the Double numbers
+    /** Create a `VectorD` from a sequence/array of Doubles.
+     *  @param xs  the sequence/array of the Double numbers
      */
     def apply (xs: Seq [Double]): VectorD =
     {
@@ -816,12 +928,24 @@ object VectorD
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate scalar 'b' and vector 'u'.
      *  @param b  the scalar to be concatenated - first part
-     *  @param u  the vector to be concatenated - second part
+     *  @param u  the vector to be concatenated - second part (any kind)
+     */
+    def ++ (b: Double, u: VectoD): VectorD =
+    {
+        val c = new VectorD (u.dim + 1)
+        for (i <- c.range) c(i) = if (i == 0) b else u(i-1)
+        c
+    } // ++
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate scalar 'b' and vector 'u'.
+     *  @param b  the scalar to be concatenated - first part
+     *  @param u  the vector to be concatenated - second part (same kind, more efficient)
      */
     def ++ (b: Double, u: VectorD): VectorD =
     {
         val c = new VectorD (u.dim + 1)
-        for (i <- c.range) c(i) = if (i == 0) b else u.v(i - 1)
+        for (i <- c.range) c(i) = if (i == 0) b else u.v(i-1)
         c
     } // ++
 

@@ -267,12 +267,6 @@ trait VectoD
     def * (s: Double): VectoD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply 'this' (row) vector by matrix 'm'.
-     *  @param m  the matrix to multiply by
-     */
-    def * (m: MatriD): VectoD                       // FIX: move to matrix level
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and vector 'b'.
      *  @param b  the vector to add
      */
@@ -315,6 +309,12 @@ trait VectoD
      */
     def ~^ (s: Double): VectoD
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Raise in-place each element of 'this' vector to the 's'-th power.
+     *  @param s  the scalar exponent
+     */
+    def ~^= (s: Double): VectoD
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compare 'this' vector with that vector 'b' for inequality.
      *  @param b  that vector
@@ -332,12 +332,6 @@ trait VectoD
      *  @param b  that vector
      */
     def ≥ (b: VectoD) = this >= b
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Raise each element of 'this' vector to the 's'-th power.
-     *  @param s  the scalar exponent
-     */
-    def ~^= (s: Double)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector containing the square of each element of 'this' vector.
@@ -538,12 +532,12 @@ trait VectoD
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a vector consisting of the distinct elements in 'this' vector.
      */
-//  def distinct: VectorD
+    def distinct: VectoD
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of distinct elements in 'this' vector.
      */
-//  def countinct: Int
+    def countinct: Int
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether 'x' is contained in 'this' vector.

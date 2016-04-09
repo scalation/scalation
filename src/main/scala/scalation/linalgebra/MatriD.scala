@@ -365,6 +365,13 @@ trait MatriD
     def * (u: VectoD): VectoD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply (row) vector 'u' by 'this' matrix.  Note '*:' is right associative.
+     *  vector = vector *: matrix
+     *  @param u  the vector to multiply by
+     */
+    def *: (u: VectoD): VectoD = this.t * u
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' matrix by scalar 'x'.
      *  @param x  the scalar to multiply by
      */

@@ -1025,7 +1025,7 @@ class SparseMatrixD (val d1: Int,
      *  triangular matrices '(l, u)' using the LU Decomposition algorithm.
      *  This version uses partial pivoting.
      */
-    def lud_ip: Tuple2 [SparseMatrixD, SparseMatrixD] =
+    def lud_ip (): Tuple2 [SparseMatrixD, SparseMatrixD] =
     {
         val l = new SparseMatrixD (dim1, dim2)   // lower triangular matrix
         val u = this                             // upper triangular matrix (this)
@@ -1251,7 +1251,7 @@ class SparseMatrixD (val d1: Int,
     /** Invert in-place 'this' sparse matrix (requires a squareMatrix).  This version uses
      *  partial pivoting.
      */
-    def inverse_ip: SparseMatrixD =
+    def inverse_ip (): SparseMatrixD =
     {
         val b = this                               // use this matrix for b
         val c = eye (dim1)                         // let c represent the augmentation
@@ -1315,7 +1315,7 @@ class SparseMatrixD (val d1: Int,
      *  It can be used to solve 'a * x = b': augment 'a' with 'b' and call reduce.
      *  Takes '[a | b]' to '[I | x]'.
      */
-    def reduce_ip 
+    def reduce_ip () 
     {
         if (dim2 < dim1) flaw ("reduce", "requires n (columns) >= m (rows)")
 
@@ -1387,11 +1387,11 @@ class SparseMatrixD (val d1: Int,
      *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
      *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
-    def nullspace_ip: VectorD =
+    def nullspace_ip (): VectorD =
     {
         if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
 
-        reduce_ip
+        reduce_ip ()
         var c = col(dim2 - 1) 
         c = c * -1.0 
         c ++ 1.0
@@ -1489,7 +1489,7 @@ class SparseMatrixD (val d1: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show all elements in 'this' sparse matrix.
      */
-    def showAll
+    def showAll ()
     {
         print ("SparseMatrixD(")
         for (i <- range1) {
@@ -1550,7 +1550,7 @@ object SparseMatrixDTest extends App
     println ("check right nullspace = " + w * w.nullspace)
 
     println ("left:   v.t.nullspace = " + v.t.nullspace)
-    println ("check left  nullspace = " + v.t.nullspace * v)
+    println ("check left  nullspace = " + v.t.nullspace *: v)
 
     for (row <- z) println ("row = " + row.deep)
 

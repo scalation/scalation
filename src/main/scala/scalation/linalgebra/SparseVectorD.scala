@@ -555,7 +555,7 @@ class SparseVectorD (val dim_ : Int)
     /** Raise each element of 'this' vector to the 's'-th power.
      *  @param s  the scalar exponent
      */
-    def ~^= (s: Double) { for (i <- range) v(i) = v(i) ~^ s }
+    def ~^= (s: Double): SparseVectorD = { for (i <- range) v(i) = v(i) ~^ s; this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector containing the reciprocal of each element of 'this' vector.
@@ -793,9 +793,17 @@ class SparseVectorD (val dim_ : Int)
     } // countPos
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return a new vector consisteing of the distinct elements from 'this' vector.
+     */
+    def distinct: SparseVectorD =
+    {
+        throw new NoSuchMethodException ("SparseVectorD does not support distinct yet")
+    } // distinct
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of distinct elements in 'this' vector.
      */
-    def distinct: Int =
+    def countinct: Int = 
     {
         var count = 1
         val us = new SparseVectorD (this); us.sort ()                // sorted vector

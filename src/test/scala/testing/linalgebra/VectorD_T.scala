@@ -6,16 +6,29 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-package linalgebra
+package testing.linalgebra
+
+import org.junit.Test
 
 import scala.math.{abs, max, min, sqrt}
-
-import util.Tester
 
 import scalation.linalgebra.{VectorD, VectorI, VectorL}
 import scalation.linalgebra.VectorD.one
 import scalation.math.double_exp
 import scalation.random.{Randi0, RandomVecD, Uniform}
+
+import testing.Tester
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `VectorD_T` driver class conducts unit testing on the `VectorD` class
+ *  by invoking the StatVector_T testing object.  Run 'test-only' to test `VectorD`
+ *  or 'test' to run all unit tests.
+ *------------------------------------------------------------------------------
+ *  > test-only testing.stat.VectorD_T
+ *  > test
+ */
+class VectorD_T { @Test def testAll () { VectorD_T } }
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VectorD_T` object conducts unit testing on the `VectorD` class using the
@@ -29,10 +42,10 @@ import scalation.random.{Randi0, RandomVecD, Uniform}
  *  Note, if the code for the 'contender' or even the 'oracle' is significantly faster,
  *  the method/operator may need be to re-coded.
  *------------------------------------------------------------------------------
- *  > test:runMain linalgebra.VectorD_T
+ *  To run directly, uncomment "// with App" and run 'test:runMain'.
+ *  > test:runMain testing.linalgebra.VectorD_T
  */
-object VectorD_T
-       extends Tester with App
+object VectorD_T extends Tester // with App
 {
     // Reassign parameters from `Tester` trait as needed
 
@@ -71,6 +84,8 @@ object VectorD_T
         j = rj.igen
         k = rj.igen
     } // randomize
+
+    testClass ()
 
     println ("\nTest no argument methods/unary operators")
  

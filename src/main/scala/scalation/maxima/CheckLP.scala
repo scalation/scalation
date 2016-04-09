@@ -91,7 +91,7 @@ class CheckLP (a: MatrixD, b: VectorD, c: VectorD)
             return false
         } // for
 
-        val ya = y * a
+        val ya = y *: a
         // dual constraints: check that ya_j >= c_j
         for (j <- 0 until N) {
             val ya_j = ya(j)

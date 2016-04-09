@@ -89,7 +89,7 @@ class SimplexBG (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] = null
      */
     def entering (): Int = 
     {
-        z = c_ * a - c
+        z = c_ *: a - c
         z.argmaxPos ()
     } // entering 
 

@@ -222,7 +222,7 @@ class SimplexFT (a: MatriD, b: VectoD, c: VectoD, var x_B: Array [Int] = null)
      */
     def entering (): Int = 
     {
-        z = c_ * a - c
+        z = c_ *: a - c
         z.argmaxPos ()
     } // entering 
 
