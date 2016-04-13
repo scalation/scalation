@@ -566,7 +566,7 @@ trait MatriL
     /** Use Gauss-Jordan reduction in-place on 'this' matrix to make the left part
      *  embed an identity matrix.  A constraint on 'this' m by n matrix is that n >= m.
      */ 
-    def reduce_ip
+    def reduce_ip ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Clean values in 'this' matrix at or below the threshold 'thres' by setting

@@ -1005,7 +1005,7 @@ class SymTriMatrixL (val d1: Int)
         throw new NoSuchMethodException ("reduce not yet implemented")
     } // reduce
 
-    def reduce_ip
+    def reduce_ip ()
     {
         throw new NoSuchMethodException ("reduce_ip not implemented since results may not be SymTriMatrix")
     } // reduce_ip

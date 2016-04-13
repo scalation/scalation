@@ -52,7 +52,7 @@ class BayesNetwork2 (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arr
     private val vcp2 = new VectorI (n)                        // value count for parent2
 
     private val maxRandomRestarts = 27                        // maximum number of random restarts
-    var featureOrder = RandomVecI (n, n-1, -1, true, ranStream).igen
+    var featureOrder = RandomVecI (n, n-1, 0, -1, true, ranStream).igen
     if (DEBUG) println("Feature Order = "+featureOrder)
 
     val tabu = new mutable.Queue [Tuple2 [Int, Int]] ()       // the tabu list used in feature swapping

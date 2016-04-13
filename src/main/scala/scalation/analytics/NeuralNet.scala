@@ -163,13 +163,6 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int, eta: Double = 1.0)
         null            // FIX: to be implemented
     } // predictAll
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given several input vectors 'zi', predict the output/response vector 'zo(0)'.
-     *  May use this method if the output is one dimensional or interested in 1st value.
-     *  @param zi  the new input vectors (stored as rows in a matrix)
-     */
-    override def predict (zi: MatriD): VectorD = predictAll (zi)(0)
-
 } // NeuralNet class
 
 

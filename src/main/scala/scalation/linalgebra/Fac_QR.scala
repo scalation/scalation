@@ -26,24 +26,24 @@ import MatrixD.eye
  *  @see http://www.stat.wisc.edu/~larget/math496/qr.html
  *  @param a  the matrix to be factor into q and r
  */
-class Fac_QR (a: MatrixD)
+class Fac_QR [MatT <: MatriD] (a: MatT)
       extends Factorization with Error
 {
     private val m  = a.dim1                   // the number of rows in matrix a
     private val n  = a.dim2                   // the number of columns in matrix a
-    private val aa = new MatrixD (a)          // a copy of matrix a
-    private val q  = eye(m, n)                // the orthogonal q matrix
-    private val r  = new MatrixD (n, n)       // the right upper triangular r matrix
+    private val aa = a.copy ()                // a copy of matrix a
+    private val q  = eye (m, n)               // the orthogonal q matrix
+    private val r  = a.zero (n, n)            // for right upper triangular r matrix
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the first factor, i.e., orthogonal 'q' matrix.
      */
-    def factor1 (): MatrixD = { if (raw) factor (); q }
+    def factor1 (): MatriD = { if (raw) factor (); q }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the second factor, i.e., the right upper triangular 'r' matrix.
      */
-    def factor2 (): MatrixD = { if (raw) factor (); r }
+    def factor2 (): MatriD = { if (raw) factor (); r }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor matrix 'a' into the product of two matrices, 'a = q * r', returning
@@ -52,7 +52,7 @@ class Fac_QR (a: MatrixD)
      *  @see 5.1 and 5.2 in Matrix Computations
      *  @see QRDecomposition.java in Jama
      */
-    def factor (): Tuple2 [MatrixD, MatrixD] = 
+    def factor (): Tuple2 [MatriD, MatriD] = 
     {
         for (k <- 0 until n) {                                  // for each column k
             var _norm = aa.col(k, k).norm                       // norm of the kth column
@@ -96,9 +96,9 @@ class Fac_QR (a: MatrixD)
      *  @param  r  the right upper triangular matrix
      *  @param  b  the constant vector
      */
-    def backSub (r: MatrixD, b: VectorD): VectorD =
+    def backSub (r: MatriD, b: VectoD): VectoD =
     {
-        val x = new VectorD (n)                   // vector to solve for
+        val x = b.zero (n)                        // vector to solve for
         for (k <- n-1 to 0 by -1) {               // solve for x in r*x = b
             x(k) = (b(k) - (r(k) dot x)) / r(k, k)
         } // for
@@ -111,7 +111,7 @@ class Fac_QR (a: MatrixD)
      *  @param rank  the rank of the matrix (number of linearly independent row vectors)
      *  FIX: should work, but it does not
      */
-    def nullspace (rank: Int): MatrixD = 
+    def nullspace (rank: Int): MatriD = 
     {
         flaw ("nullspace", "method has bugs - so do not use")
         (new Fac_QR (a.t)).factor1 ().slice (0, n, rank, n)       // last n - rank columns
@@ -120,11 +120,12 @@ class Fac_QR (a: MatrixD)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the nullspace of matrix 'a: { x | a*x = 0 }' using QR Factorization
      *  'q*r*x = 0'.  Gives only one vector in the nullspace.
+     *  @param x  a vector with the correct dimension
      */
-    def nullspaceV: VectorD =
+    def nullspaceV (x: VectoD): VectoD =
     {
-        val x = new VectorD (n); x(n-1) = 1.0        // vector to solve for
-        val b = new VectorD (n)                      // new rhs as -r_i,n-1          
+        x(n-1) = 1.0                                 // vector to solve for
+        val b = x.zero (n)                           // new rhs as -r_i,n-1          
         for (i <- 0 until n) b(i) = -r(i, n-1)
         val rr = r.slice (0, n, 0, n-1)              // drop last column
         for (k <- n-2 to 0 by -1) {                  // solve for x in rr*x = b
@@ -147,7 +148,8 @@ object Fac_QRTest extends App
     {
         val qr = new Fac_QR (a)               // for factoring a into q * r
         val (q, r) = qr.factor ()             // (q orthogonal, r upper triangular)
-        val ns = qr.nullspaceV                // ns is a point in the nullscpace
+        val xn = new VectorD (a.dim2)
+        val ns = qr.nullspaceV (xn)           // ns is a point in the nullspace
     
         println ("--------------------------------------------------------")
         println ("a    = " + a)

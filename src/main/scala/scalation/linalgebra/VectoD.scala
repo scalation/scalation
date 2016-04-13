@@ -145,6 +145,12 @@ trait VectoD
     def set (u: Seq [Double])
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a size dimensiional vector with all elements intialized to zero.
+     *  @param size  the number of elements in the vector
+     */
+    def zero (size: Int): VectoD
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  a new vector.
      *  @param p  the predicate (Boolean function) to apply

@@ -52,26 +52,26 @@ import RegTechnique._
  *  @param y          the response vector
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class Regression (x: MatrixD, y: VectoD, technique: RegTechnique = Fac_QR)
+class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: RegTechnique = Fac_QR)
       extends Predictor with Error
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
     if (x.dim1 <= x.dim2) flaw ("constructor", "not enough data rows in matrix to use regression")
 
-    private val DEBUG      = false                             // debug flag
-    private val k          = x.dim2 - 1                        // number of variables (k = n-1)
-    private val m          = x.dim1.toDouble                   // number of data points (rows)
-    private val r_df       = (m-1.0) / (m-k-1.0)               // ratio of degrees of freedom
-    private var sse        = 0.0                               // sum of squared errors
-    private var rSquared   = -1.0                              // coefficient of determination (quality of fit)
-    private var rBarSq     = -1.0                              // Adjusted R-squared
-    private var fStat      = -1.0                              // F statistic (quality of fit)
-    private var aic        = -1.0                              // Akaike Information Criterion (AIC)
-    private var bic        = -1.0                              // Bayesian Information Criterion (BIC)
+    private val DEBUG    = false                               // debug flag
+    private val k        = x.dim2 - 1                          // number of variables (k = n-1)
+    private val m        = x.dim1.toDouble                     // number of data points (rows)
+    private val r_df     = (m-1.0) / (m-k-1.0)                 // ratio of degrees of freedom
+    private var sse      = 0.0                                 // sum of squared errors
+    private var rSquared = -1.0                                // coefficient of determination (quality of fit)
+    private var rBarSq   = -1.0                                // Adjusted R-squared
+    private var fStat    = -1.0                                // F statistic (quality of fit)
+    private var aic      = -1.0                                // Akaike Information Criterion (AIC)
+    private var bic      = -1.0                                // Bayesian Information Criterion (BIC)
 
-    private var stdErr: VectorD = null                         // standard error of coefficients for each x_j
-    private var t: VectoD       = null                         // t statistics for each x_j
-    private var p: VectoD       = null                         // p values for each x_j
+    private var stdErr: VectoD = _                             // standard error of coefficients for each x_j
+    private var t: VectoD      = _                             // t statistics for each x_j
+    private var p: VectoD      = _                             // p values for each x_j
 
     private val fac = technique match {                        // select the factorization technique
         case Fac_QR       => new Fac_QR (x)                    // QR Factorization
@@ -79,10 +79,10 @@ class Regression (x: MatrixD, y: VectoD, technique: RegTechnique = Fac_QR)
         case _            => null                              // don't factor, use inverse
     } // match
 
-    private val x_pinv = technique match {                      // pseudo-inverse of x
+    private val x_pinv = technique match {                     // pseudo-inverse of x
         case Fac_QR       => val (q, r) = fac.factor (); r.inverse * q.t
-        case Fac_Cholesky => fac.factor (); null                // don't compute it directly
-        case _            => (x.t * x).inverse * x.t            // classic textbook technique
+        case Fac_Cholesky => fac.factor (); null               // don't compute it directly
+        case _            => (x.t * x).inverse * x.t           // classic textbook technique
     } // match
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -93,7 +93,7 @@ class Regression (x: MatrixD, y: VectoD, technique: RegTechnique = Fac_QR)
      */
     def train ()
     {
-        b = if (x_pinv == null) fac.solve (x.t * y).asInstanceOf [VectorD]   // FIX
+        b = if (x_pinv == null) fac.solve (x.t * y).asInstanceOf [VecT]   // FIX
             else x_pinv * y                                     // parameter vector [b_0, b_1, ... b_k]
         e = y - x * b                                           // residual/error vector
         diagnose (y, e)
@@ -106,9 +106,9 @@ class Regression (x: MatrixD, y: VectoD, technique: RegTechnique = Fac_QR)
      *  using the ordinary least squares (OLS) method.
      *  @param yy  the new response vector
      */
-    def train (yy: VectorD)
+    def train (yy: VectoD)
     {
-        b = if (x_pinv == null) fac.solve (yy).asInstanceOf [VectorD]   // FIX
+        b = if (x_pinv == null) fac.solve (yy).asInstanceOf [VecT]   // FIX
             else x_pinv * yy                                    // parameter vector [b_0, b_1, ... b_k]
         e  = yy - x * b                                         // residual/error vector
         diagnose (yy, e)
@@ -158,7 +158,7 @@ class Regression (x: MatrixD, y: VectoD, technique: RegTechnique = Fac_QR)
      *  each row of matrix z.
      *  @param z  the new matrix to predict
      */
-    override def predict (z: MatriD): VectoD = z * b
+    def predict (z: MatT): VectoD = z * b
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable
@@ -168,16 +168,16 @@ class Regression (x: MatrixD, y: VectoD, technique: RegTechnique = Fac_QR)
     def backElim (): Tuple3 [Int, VectoD, VectorD] =
     {
         var j_max = -1                                // index of variable to eliminate
-        var b_max: VectoD = null                      // parameter values for best solution
+        var b_max =  b                                // parameter values for best solution
         var ft_max = VectorD (3); ft_max.set (-1.0)   // optimize on quality of fit (ft(0) is rSquared)
 
         for (j <- 1 to k) {
             val keep = m.toInt                        // i-value large enough to not exclude any rows in slice
             val rg_j = new Regression (x.sliceExclude (keep, j), y)       // regress with x_j removed
             rg_j.train ()
-            val b  = rg_j.coefficient
+            val bb  = rg_j.coefficient
             val ft = rg_j.fit
-            if (ft(0) > ft_max(0)) { j_max = j; b_max = b; ft_max = ft }
+            if (ft(0) > ft_max(0)) { j_max = j; b_max = bb; ft_max = ft }
         } // for
         (j_max, b_max, ft_max)
     } // backElim
@@ -289,7 +289,7 @@ object RegressionTest2 extends App
                                  1.0, 2.0, 2.0)
     val y = VectorD (6.0, 8.0, 7.0, 9.0)
     val z = VectorD (1.0, 2.0, 3.0)
-    var rg: Regression = null
+    var rg: Regression [MatrixD, VectorD] = _
 
 //  println ("model: y = b_0 + b_1*x1 + b_2*x_2")
     println ("model: y = b₀ + b₁*x₁ + b₂*x₂")

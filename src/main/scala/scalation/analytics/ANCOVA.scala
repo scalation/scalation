@@ -37,7 +37,7 @@ import RegTechnique._
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
 class ANCOVA (x_ : MatrixD, t: VectorI, y: VectorD, levels: Int, technique: RegTechnique = Fac_QR)
-      extends Predictor with Error
+      extends Predictor  with Error
 {
     if (x_.dim1 != y.dim) flaw ("constructor", "dimensions of x_ and y are incompatible")
     if (t.dim   != y.dim) flaw ("constructor", "dimensions of t and y are incompatible")
@@ -100,13 +100,6 @@ class ANCOVA (x_ : MatrixD, t: VectorI, y: VectorD, levels: Int, technique: RegT
      *  @param z  the new vector to predict
      */
     def predict (z: VectoD): Double = rg.predict (z)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula y = b dot zi for
-     *  each row zi of matrix z.
-     *  @param z  the new matrix to predict
-     */
-    override def predict (z: MatriD): VectoD = rg.predict (z)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable

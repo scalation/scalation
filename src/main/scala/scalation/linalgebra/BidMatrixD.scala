@@ -235,6 +235,18 @@ class BidMatrixD (val d1: Int)
     } // set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a clone of 'this' m-by-n matrix.
+     */
+    def copy (): BidMatrixD = new BidMatrixD (dim1)         // FIX - copy diagonals
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an m-by-n matrix with all elements intialized to zero.
+     *  @param m  the number of rows
+     *  @param n  the number of columns
+     */
+    def zero (m: Int = dim1, n: Int = dim2): BidMatrixD = new BidMatrixD (m)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice 'this' bidiagonal matrix row-wise 'from' to 'end'.
      *  @param from  the start row of the slice (inclusive)
      *  @param end   the end row of the slice (exclusive)

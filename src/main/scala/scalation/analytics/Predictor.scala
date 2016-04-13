@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import scalation.linalgebra.{MatriD, VectoD, VectorD, VectorI}
+import scalation.linalgebra.{VectoD, VectorI}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Predictor` trait provides a common framework for several predictors.
@@ -20,11 +20,11 @@ trait Predictor
 {
     /** Coefficient/parameter vector [b_0, b_1, ... b_k]
      */
-    protected var b: VectoD = null
+    protected var b: VectoD = _
 
     /** Residual/error vector [e_0, e_1, ... e_m-1]
      */
-    protected var e: VectoD = null
+    protected var e: VectoD = _
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a set of data vectors 'x's and their corresponding responses 'y's,
@@ -63,16 +63,6 @@ trait Predictor
      *  @param z  the vector to use for prediction
      */
     def predict (z: VectorI): Double = predict (z.toDouble)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given several new continuous data vectors stored as rows in a matrix,
-     *  predict all the 'y'-values of 'predict (z_i)'.  May override for efficiency.
-     *  @param z  the matrix containing row vectors to use for prediction
-     */
-    def predict (z: MatriD): VectoD =
-    {
-        VectorD (for (i <- 0 until z.dim1) yield predict (z(i)))
-    } // predict
 
 } // Predictor trait
 

@@ -134,13 +134,6 @@ class Regression_WLS (x: MatrixD, y: VectorD, private var w: VectoD = null, tech
     def predict (z: VectoD): Double = b dot z
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula y = b dot z for
-     *  each row of matrix z.
-     *  @param z  the new matrix to predict
-     */
-    override def predict (z: MatriD): VectoD = z * b
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new R-squared value and the new F statistic.
@@ -213,12 +206,6 @@ object Regression_WLSTest extends App
     println ("fit = " + rg.fit)
     val yp = rg.predict (z)                              // predict y for one point
     println ("predict (" + z + ") = " + yp)
-
-    val yyp = rg.predict (x)                             // predict y for several points
-    println ("predict (" + x + ") = " + yyp)
-
-    new Plot (x.col(1), y, yyp)
-    new Plot (x.col(2), y, yyp)
 
     println ("reduced model: fit = " + rg.backElim ())   // eliminate least predictive variable
 

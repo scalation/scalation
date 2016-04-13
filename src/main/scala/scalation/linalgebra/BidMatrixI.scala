@@ -932,7 +932,7 @@ class BidMatrixI (val d1: Int)
         throw new NoSuchMethodException ("reduce not yet implemented")
     } // reduce
 
-    def reduce_ip
+    def reduce_ip ()
     {
         throw new NoSuchMethodException ("reduce_ip not implemented since result may not be BidMatrix")
     } // reduce_ip

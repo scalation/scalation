@@ -21,10 +21,10 @@ import testing.Tester
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VectorD_T` driver class conducts unit testing on the `VectorD` class
- *  by invoking the StatVector_T testing object.  Run 'test-only' to test `VectorD`
+ *  by invoking the `VectorD_T` testing object.  Run 'test-only' to test `VectorD`
  *  or 'test' to run all unit tests.
  *------------------------------------------------------------------------------
- *  > test-only testing.stat.VectorD_T
+ *  > test-only testing.linalgebra.VectorD_T
  *  > test
  */
 class VectorD_T { @Test def testAll () { VectorD_T } }
@@ -57,32 +57,33 @@ object VectorD_T extends Tester // with App
 
     // Size parameter(s) used for variables in 'test' (customize per class)
 
-    private val dim = 10                                           // vector size
+    private val dim = 10                                           // vector dimension/size
 
     // Random variate generators (customize per class)
 
-    private val rv  = RandomVecD (count = dim, density = 1.0)      // random vector generator
-    private val rn  = Uniform (0.0, 100.0)                         // random double generator
-    private val rj  = Randi0 (0, dim)                              // random integer/index generator
+//  private val rvg = RandomVecD (dim)                             // random vector generator
+    private val rvg = RandomVecD (dim = dim, density = 0.5)        // random vector generator
+    private val rsg = Uniform (0.0, 100.0)                         // random scalar/double generator
+    private val rig = Randi0 (0, dim - 1)                          // random integer/index generator
 
     // Variables used in 'test' (customize per class)
 
-    private val x   = new VectorD (dim)                            // first vector
-    private val y   = new VectorD (dim)                            // second vector
-    private var s   = 0.0                                          // scalar value
-    private var j   = 0                                            // first integer/index value
-    private var k   = 0                                            // second integer/index value
+    private val x = new VectorD (dim)                              // first vector
+    private val y = new VectorD (dim)                              // second vector
+    private var s = 0.0                                            // scalar value
+    private var j = 0                                              // first integer/index value
+    private var k = 0                                              // second integer/index value
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Randomize all variables used in `Tester`s 'test' method.
      */
     def randomize ()
     {
-        x set rv.gen ()                                            // randomly reset variables
-        y set rv.gen ()
-        s = rn.gen
-        j = rj.igen
-        k = rj.igen
+        x set rvg.gen ()                                            // randomly reset variables
+        y set rvg.gen ()
+        s = rsg.gen
+        j = rig.igen
+        k = rig.igen
     } // randomize
 
     testClass ()
@@ -96,11 +97,11 @@ object VectorD_T extends Tester // with App
     test ("argmax",         x.argmax (),
                             x().indexOf (x().max))
     test ("argmaxPos",      x.argmaxPos (),
-                            x().filter (_ >= 0.0).indexOf (x().max))
+                            { val j = x().indexOf (x().max); if (x()(j) > 0.0) j else -1 })
     test ("argmin",         x.argmin (),
                             x().indexOf (x().min))
     test ("argminNeg",      x.argminNeg (),
-                            x().filter (_ <= 0.0).indexOf (x().min))
+                            { val j = x().indexOf (x().min); if (x()(j) < 0.0) j else -1 })
     test ("countNeg",       x.countNeg, 
                             x().filter (_ < 0.0).size)
     test ("countPos",       x.countPos,

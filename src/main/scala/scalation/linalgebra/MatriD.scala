@@ -163,6 +163,18 @@ trait MatriD
     def set (i: Int, u: VectoD, j: Int = 0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a clone of 'this' m-by-n matrix.
+     */
+    def copy (): MatriD
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an m-by-n matrix with all elements intialized to zero.
+     *  @param m  the number of rows
+     *  @param n  the number of columns
+     */
+    def zero (m: Int = dim1, n: Int = dim2): MatriD
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Iterate over 'this' matrix row by row applying method 'f'.
      *  @param f  the function to apply
      */
@@ -574,7 +586,7 @@ trait MatriD
     /** Use Gauss-Jordan reduction in-place on 'this' matrix to make the left part
      *  embed an identity matrix.  A constraint on 'this' m by n matrix is that n >= m.
      */ 
-    def reduce_ip
+    def reduce_ip ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Clean values in 'this' matrix at or below the threshold 'thres' by setting

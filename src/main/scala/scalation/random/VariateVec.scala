@@ -99,6 +99,7 @@ case class ProbabilityVec (n: Int, d: Double = 0.5, stream: Int = 0)
      
 } // ProbabilityVec class
 
+
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NormalVec` class generates Normal (Gaussian) random variate vectors according
  *  to the Multivariate Normal distribution with mean 'mu' and covariance 'cov'.
@@ -114,6 +115,7 @@ case class NormalVec (mu: VectorD, cov: MatrixD, stream: Int = 0)
 {
     private val normal = Normal (0.0, 1.0, stream)           // generator for standard normals
     private val c_cov  = new Fac_Cholesky (cov).factor1 ()   // compute Cholesky Factorization of cov
+                             .asInstanceOf [VectorD]
 
     def mean: VectorD = mu
 
@@ -203,29 +205,30 @@ case class PermutedVecI (x: VectorI, stream: Int = 0)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RandomVecD` class generates a random vector of doubles.
- *  Ex: (3.0, 2.0, 0.0, 4.0, 1.0) has 'count' = 5 and 'max' = 4.
- *  @param count    the size of the vector (number of integer elements)
- *  @param max      generate integers in the range 0 (inclusive) to max (inclusive)
+ *  Ex: (3.0, 2.0, 0.0, 4.0, 1.0) has 'dim' = 5 and 'max' = 4.
+ *  @param dim      the dimesnion/size of the vector (number of elements)
+ *  @param max      generate integers in the range min (inclusive) to max (inclusive)
+ *  @param min      generate integers in the range min (inclusive) to max (inclusive)
  *  @param density  sparsity basis = 1 - density
  *  @param stream   the random number stream
  */
-case class RandomVecD (count: Int = 10, max: Double = 20.0, density: Double = 0.1, stream: Int = 0)
+case class RandomVecD (dim: Int = 10, max: Double = 20.0, min: Double = 0.0, density: Double = 1.0,
+                       stream: Int = 0)
      extends VariateVec (stream)
 {
-
-    private val mu  = max / 2.0                         // mean
+    private val mu  = (max - min) / 2.0                 // mean
     private val rng = Uniform (0.0, max, stream)        // random Double generator
     private val rn  = Random (stream)                   // random number generator
     
-    def mean: VectorD =  { val mv = new VectorD (count); mv.set (mu); mv }
+    def mean: VectorD = { val mv = new VectorD (dim); mv.set (mu); mv }
 
-    def pf (z: VectorD): Double = 1.0 / max ~^ count    // FIX pf?
+    def pf (z: VectorD): Double = 1.0 / (max - min) ~^ dim
 
     def igen: VectorI = gen.toInt
 
     def gen: VectorD =
     {
-        VectorD (for (i <- 0 until count) yield if (rn.gen < density) rng.gen else 0.0)
+        VectorD (for (i <- 0 until dim) yield if (rn.gen < density) rng.gen else 0.0)
     } // gen
 
 } // RandomVecD class
@@ -233,34 +236,36 @@ case class RandomVecD (count: Int = 10, max: Double = 20.0, density: Double = 0.
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RandomVecI` class generates a random vector of integers.
- *  Ex: (3, 2, 0, 4, 1) has 'count' = 5 and 'max' = 4.
- *  @param count   the size of the vector (number of integer elements)
- *  @param max     generate integers in the range 0 (inclusive) to max (inclusive)
+ *  Ex: (3, 2, 0, 4, 1) has 'dim' = 5 and 'max' = 4.
+ *  @param dim     the dimension/size of the vector (number of elements)
+ *  @param max     generate integers in the range min (inclusive) to max (inclusive)
+ *  @param min     generate integers in the range min (inclusive) to max (inclusive)
  *  @param skip    skip this number, i.e, do not use it
  *  @param unique  whether the integers must be unique
  *  @param stream  the random number stream
  */
-case class RandomVecI (count: Int = 10, max: Int = 20, skip: Int = -1, unique: Boolean = true, stream: Int = 0)
+case class RandomVecI (dim: Int = 10, max: Int = 20, min: Int = 10, skip: Int = -1,
+                       unique: Boolean = true, stream: Int = 0)
      extends VariateVec (stream)
 {
     _discrete = true
 
-    if (unique && max < count-1) flaw ("constructor", "requires max >= count-1")
+    if (unique && max < dim-1) flaw ("constructor", "requires max >= dim-1")
 
-    private val mu  = max / 2.0                         // mean
+    private val mu  = (max - min) / 2.0                 // mean
     private val rng = Randi0 (max, stream)              // random integer generator
 
-    def mean: VectorD =  { val mv = new VectorD (count); mv.set (mu); mv }
+    def mean: VectorD =  { val mv = new VectorD (dim); mv.set (mu); mv }
 
-    def pf (z: VectorD): Double = 1.0 / max ~^ count
+    def pf (z: VectorD): Double = 1.0 / (max - min) ~^ dim
 
     def gen: VectorD = igen.toDouble
 
     def igen: VectorI =
     {
-        val y   = new VectorI (count)
+        val y   = new VectorI (dim)
         var num = 0
-        for (i <- 0 until count) {
+        for (i <- 0 until dim) {
             do num = rng.igen while (unique && (num == skip || i > 0 && (y.slice (0, i) contains num)))
             y(i) = num
         } // for
@@ -313,47 +318,47 @@ case class Multinomial (p: Array [Double] = Array (.4, .7, 1.0), n: Int = 5, str
  */
 object VariateVecTest extends App
 {
-     var vv: VariateVec = null                                // variate vector
+     var rvv: VariateVec = null                               // variate vector
 
      println ("Test: ProbabilityVec random vector generation ----------------")
-     vv = ProbabilityVec (10)
-     println ("mean = " + vv.mean)              // probability vector generator
-     for (k <- 0 until 30) println (vv.gen)
+     rvv = ProbabilityVec (10)
+     println ("mean = " + rvv.mean)             // probability vector generator
+     for (k <- 0 until 30) println (rvv.gen)
 
      println ("Test: NormalVec random vector generation ---------------------")
      val mu  = VectorD (5.0, 5.0)
      val cov = new MatrixD ((2, 2), 2.0, 1.0,
                                     1.0, 2.0)
-     vv = NormalVec (mu, cov)                  // multivariate normal generator
-     println ("mean = " + vv.mean)
-     for (k <- 0 until 30) println (vv.gen)
+     rvv = NormalVec (mu, cov)                 // multivariate normal generator
+     println ("mean = " + rvv.mean)
+     for (k <- 0 until 30) println (rvv.gen)
 
      println ("Test: PermutedVecD random vector generation ------------------")
      val x = VectorD (1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0)
-     vv = PermutedVecD (x)                      // random permutation generator
-     println ("mean = " + vv.mean)
-     for (k <- 0 until 30) println (vv.gen)
+     rvv = PermutedVecD (x)                     // random permutation generator
+     println ("mean = " + rvv.mean)
+     for (k <- 0 until 30) println (rvv.gen)
 
      println ("Test: PermutedVecI random vector generation ------------------")
      val y = VectorI (1, 2, 3, 4, 5, 6, 7, 8, 9)
-     vv = PermutedVecI (y)                      // random permutation generator
-     println ("mean = " + vv.mean)
-     for (k <- 0 until 30) println (vv.igen)
+     rvv = PermutedVecI (y)                     // random permutation generator
+     println ("mean = " + rvv.mean)
+     for (k <- 0 until 30) println (rvv.igen)
 
      println ("Test: RandomVecD random vector generation --------------------")
-     vv = RandomVecD ()                              // random vector generator
-     println ("mean = " + vv.mean)
-     for (k <- 0 until 30) println (vv.gen)
+     rvv = RandomVecD ()                             // random vector generator
+     println ("mean = " + rvv.mean)
+     for (k <- 0 until 30) println (rvv.gen)
 
      println ("Test: RandomVecI random vector generation --------------------")
-     vv = RandomVecI ()                              // random vector generator
-     println ("mean = " + vv.mean)
-     for (k <- 0 until 30) println (vv.igen)
+     rvv = RandomVecI ()                             // random vector generator
+     println ("mean = " + rvv.mean)
+     for (k <- 0 until 30) println (rvv.igen)
 
      println ("Test: Multinomial random vector generation --------------------")
-     vv = Multinomial ()                              // random vector generator
-     println ("mean = " + vv.mean)
-     for (k <- 0 until 30) println (vv.igen)
+     rvv = Multinomial ()                             // random vector generator
+     println ("mean = " + rvv.mean)
+     for (k <- 0 until 30) println (rvv.igen)
 
 } // VariateVecTest object
 

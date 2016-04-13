@@ -97,13 +97,6 @@ class Perceptron (x: MatrixD, y: VectorD, eta: Double = 1.0)
      */
     def predict (zi: VectoD): Double = sigmoid (w dot zi)
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given several new input vectors stored as rows in a matrix 'zi',
-     *  predict all output/response vector 'zo'
-     *  @param zi  the matrix containing row vectors to use for prediction
-     */
-    override def predict (zi: MatriD): VectoD = sigmoid (zi * w)
-
 } // Perceptron class
 
 

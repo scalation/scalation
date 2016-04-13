@@ -27,9 +27,9 @@ import MatrixI.eye
  *  @param d2  the second/column dimension
  *  @param v   the 2D array used to store matrix elements
  */
-class MatrixI (val d1: Int,
-               val d2: Int,
-       private var v:  Array [Array [Int]] = null)
+class MatrixI (d1: Int,
+               d2: Int,
+               private [linalgebra] var v: Array [Array [Int]] = null)
       extends MatriI with Error with Serializable
 {
     /** Dimension 1
@@ -87,7 +87,7 @@ class MatrixI (val d1: Int,
      */
     def this (b: MatrixI)
     {
-        this (b.d1, b.d2)
+        this (b.dim1, b.dim2)
         for (i <- range1; j <- range2) v(i)(j) = b.v(i)(j)
     } // constructor
 
@@ -1162,7 +1162,7 @@ class MatrixI (val d1: Int,
      *  It can be used to solve 'a * x = b': augment 'a' with 'b' and call reduce.
      *  Takes '[a | b]' to '[I | x]'.
      */
-    def reduce_ip
+    def reduce_ip ()
     {
         if (dim2 < dim1) flaw ("reduce", "requires n (columns) >= m (rows)")
 

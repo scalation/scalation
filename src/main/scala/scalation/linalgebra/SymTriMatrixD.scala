@@ -243,6 +243,18 @@ class SymTriMatrixD (val d1: Int)
         if (i-1 >= j) _sd(i-1) = u(i-1)
     } // set
 
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a clone of 'this' m-by-n symmetric triangular matrix.
+     */
+    def copy (): SymTriMatrixD = new SymTriMatrixD (dim1)             // FIX - copy the diagonals
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an m-by-n symmetric triangular matrix with all elements intialized to zero.
+     *  @param m  the number of rows
+     *  @param n  the number of columns
+     */
+    def zero (m: Int = dim1, n: Int = dim2): SymTriMatrixD = new SymTriMatrixD (m)
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice 'this' triangular matrix row-wise 'from' to 'end'.
      *  @param from  the start row of the slice (inclusive)

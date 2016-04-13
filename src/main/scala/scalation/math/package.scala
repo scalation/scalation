@@ -11,6 +11,7 @@
 
 package scalation
 
+import java.lang.Double.isNaN
 import java.lang.Math.{abs, cos, log, max, sin, tan, ulp}
 
 import scala.language.implicitConversions
@@ -110,19 +111,25 @@ package object math
     val THRES = 4.0 * MIN_NORMAL
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine whether two double precision floating point numbers are nearly equal.
-     *  Two numbers are considered to be nearly equal, if within '2 EPSILON'.
-     *  A number is considered to be nearly zero, if within '2 MIN_NORMAL'.
+    /** Determine whether two double precision floating point numbers 'x' and 'y'
+     *  are nearly equal.  Two numbers are considered to be nearly equal, if within
+     *  '2 EPSILON'.  A number is considered to be nearly zero, if within '2 MIN_NORMAL'.
+     *  To accomadate round-off errors, may use 'TOL' instead of 'EPSILON'.
      *--------------------------------------------------------------------------
      *  @see `BasicTest`
      *  @see stackoverflow.com/questions/4915462/how-should-i-do-floating-point-comparison
      *--------------------------------------------------------------------------
+     *  If both 'x' and 'y' are NaN (Not-a-Number), the IEEE standard indicates that should
+     *  be considered always not equal.  For 'near_eq', they are considered nearly equal.
+     *  Comment out the first line below to conform more closely to the IEEE standard.
+     *  @see http://stackoverflow.com/questions/10034149/why-is-nan-not-equal-to-nan
+     *--------------------------------------------------------------------------
      *  @param x  the first double precision floating point number
      *  @param y  the second double precision floating point number
-     *
      */
     def near_eq (x: Double, y: Double): Boolean =
     {
+        if (isNaN (x) && isNaN (y)) return true             // comment out to follow IEEE standard
         val del = abs (x - y)
 
         if (x == y) {

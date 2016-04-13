@@ -1305,7 +1305,7 @@ class SparseMatrixN [T: ClassTag: Numeric] (d1: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show all elements in this sparse matrix.
      */
-    def showAll
+    def showAll ()
     {
         print ("SparseMatrixN(")
         for (i <- range1) {

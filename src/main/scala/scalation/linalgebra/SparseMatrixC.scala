@@ -1308,7 +1308,7 @@ class SparseMatrixC (val d1: Int,
      *  It can be used to solve 'a * x = b': augment 'a' with 'b' and call reduce.
      *  Takes '[a | b]' to '[I | x]'.
      */
-    def reduce_ip 
+    def reduce_ip ()
     {
         if (dim2 < dim1) flaw ("reduce", "requires n (columns) >= m (rows)")
 
@@ -1482,7 +1482,7 @@ class SparseMatrixC (val d1: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show all elements in 'this' sparse matrix.
      */
-    def showAll
+    def showAll ()
     {
         print ("SparseMatrixC(")
         for (i <- range1) {

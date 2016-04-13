@@ -53,25 +53,25 @@ trait GLM
      *  @param x  the input/design m-by-n matrix
      *  @param y  the response m-vector
      */
-    def apply (x: MatrixD, y: VectorD): Regression =
+    def apply (x: MatrixD, y: VectorD): Regression [MatrixD, VectorD] =
     {
         if (add_1)
-            new Regression (one (x.dim1) +^: x, y, technique)
+            new Regression [MatrixD, VectorD] (one (x.dim1) +^: x, y, technique)
         else
-            new Regression (x, y, technique)
+            new Regression [MatrixD, VectorD] (x, y, technique)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Multiple Linear Regression model using Ordinary Least Squares (OLS).
      *  @param xy  the combined input/design m-by-n matrix and response m-vector
      */
-    def apply (xy: MatrixD): Regression =
+    def apply (xy: MatrixD): Regression [MatrixD, VectorD] =
     {
         if (add_1)
-            new Regression (one (xy.dim1) +^: xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1),
+            new Regression [MatrixD, VectorD] (one (xy.dim1) +^: xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1),
                             technique)
         else
-            new Regression (xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1), technique)
+            new Regression [MatrixD, VectorD] (xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1), technique)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

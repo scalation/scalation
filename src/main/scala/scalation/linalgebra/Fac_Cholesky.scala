@@ -8,7 +8,7 @@
 
 package scalation.linalgebra
 
-import math.sqrt
+import scala.math.sqrt
 
 import scalation.util.Error
 
@@ -22,11 +22,11 @@ import scalation.util.Error
  *  such that 'a = l * l.t'.
  *  @param a  the symmetric, positive definite matrix to be factor
  */
-class Fac_Cholesky (a: MatrixD)
+class Fac_Cholesky [MatT <: MatriD] (a: MatT)
       extends Factorization with Error
 {
-    private val n = a.dim1                  // the matrix is n-by-n
-    private val l = new MatrixD (n, n)      // the factored lower triangular matrix
+    private val n = a.dim1                    // the matrix is n-by-n
+    private val l = a.zero (n, n)             // for factored lower triangular matrix
 
     if (! a.isSquare)    flaw ("constructor", "matrix a must be square")
     if (! a.isSymmetric) flaw ("constructor", "matrix a must be symmetric")
@@ -37,25 +37,25 @@ class Fac_Cholesky (a: MatrixD)
      *  where 'l.t' is the transpose.  It uses the Cholesky–Banachiewicz algorithm.
      *  @see introcs.cs.princeton.edu/java/95linear
      */
-    def factor1 (): MatrixD =
+    def factor1 (): MatriD =
     {
         for (i <- 0 until n; j <- 0 to i) {
             val diff = a(i, j) - (l(i) dot l(j))
             l(i, j)  = if (i == j) sqrt (diff) else  diff / l(j, j)
         } // for
-        raw = false                   // factoring completed
+        raw = false                                      // factoring completed
         l
     } // factor1
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor matrix 'a' into the product of 'l' and 'l.t', returning both.
      */
-    def factor (): Tuple2 [MatrixD, MatrixD] = { if (raw) factor1 (); (l, l.t) }
+    def factor (): Tuple2 [MatriD, MatriD] = { if (raw) factor1 (); (l, l.t) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor matrix 'a' into the product of 'l' and 'l.t', returning l.t.
      */
-    def factor2 (): MatrixD =  { if (raw) factor1 (); l.t }
+    def factor2 (): MatriD =  { if (raw) factor1 (); l.t }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Use the lower triangular matrix 'l' from the Cholesky Fractorization to

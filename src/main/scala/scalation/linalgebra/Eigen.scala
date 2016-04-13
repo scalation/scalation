@@ -91,7 +91,7 @@ class Eigenvalue (a: MatrixD)
             val s     = g(n - 1, n - 1)                // the shift parameter
             val eye_g = eye (g.dim1)
             val (qq, rr) = (new Fac_QR (g - eye_g * s)).factor ()
-            g = rr * qq + eye_g * s
+            g = rr.asInstanceOf [MatrixD] * qq.asInstanceOf [MatrixD] + eye_g * s      // FIX
         } // for
 
         for (i <- 0 until n) e(i) = g(i, i)            // extract eigenvalues from diagonal
@@ -271,7 +271,7 @@ class Eigenvector (a: MatrixD, _e: VectorD = null)
         println ("c_a_Ie = " + c_a_Ie)
         val qr = new Fac_QR (c_a_Ie)
         qr.factor ()
-        val eVec = qr.nullspaceV
+        val eVec = qr.nullspaceV (e.zero (m))
         println ("+++ eigenvector for eigenvalue " + e(i) + " = " + eVec)
         val mat = a_Ie.slice (1, m)
         println ("mat = " + mat)

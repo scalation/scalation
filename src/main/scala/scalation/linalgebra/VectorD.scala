@@ -130,6 +130,12 @@ class VectorD (val dim: Int,
     } // expand
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a size dimensional vector with all elements initialized to zero.
+     *  @param size  the number of elements in the vector
+     */
+    def zero (size: Int = dim): VectorD = new VectorD (size)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a vector of the form (0, ... 1, ... 0) where the 1 is at position j.
      *  @param j     the position to place the 1
      *  @param size  the size of the vector (upper bound = size - 1)
@@ -663,7 +669,7 @@ class VectorD (val dim: Int,
     } // argmin
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the argument minimum of 'this' vector (-1 if its not negative).
+    /** Return the argument minimum of 'this' vector (-1 if it's not negative).
      *  @param e  the ending index (exclusive) for the search
      */
     def argminNeg (e: Int = dim): Int =
@@ -672,7 +678,7 @@ class VectorD (val dim: Int,
     } // argmaxNeg
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the argument maximum of 'this' vector (-1 if its not positive).
+    /** Return the argument maximum of 'this' vector (-1 if it's not positive).
      *  @param e  the ending index (exclusive) for the search
      */
     def argmaxPos (e: Int = dim): Int =
@@ -815,7 +821,7 @@ class VectorD (val dim: Int,
     } // tryCompareTo
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Override equals to determine whether 'this' vector equals vector 'b..
+    /** Override equals to determine whether 'this' vector equals vector 'b'.
      *  @param b  the vector to compare with this
      */
     override def equals (b: Any): Boolean =

@@ -27,9 +27,9 @@ import MatrixD.eye
  *  @param d2  the second/column dimension
  *  @param v   the 2D array used to store matrix elements
  */
-class MatrixD (val d1: Int,
-               val d2: Int,
-       private var v:  Array [Array [Double]] = null)
+class MatrixD (d1: Int,
+               d2: Int,
+               private [linalgebra] var v: Array [Array [Double]] = null)
       extends MatriD with Error with Serializable
 {
     /** Dimension 1
@@ -87,7 +87,7 @@ class MatrixD (val d1: Int,
      */
     def this (b: MatrixD)
     {
-        this (b.d1, b.d2)
+        this (b.dim1, b.dim2)
         for (i <- range1; j <- range2) v(i)(j) = b.v(i)(j)
     } // constructor
 
@@ -111,6 +111,11 @@ class MatrixD (val d1: Int,
      *  @param jr  the column range
      */
     def apply (ir: Range, jr: Range): MatrixD = slice (ir.start, ir.end, jr.start, jr.end)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get the underlying 2D array for 'this' matrix.
+     */
+    def apply (): Array [Array [Double]] = v
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' matrix's element at the 'i,j'-th index position to the scalar 'x'.
@@ -163,6 +168,28 @@ class MatrixD (val d1: Int,
      *  @param j  the starting column index
      */
     def set (i: Int, u: VectoD, j: Int = 0) { for (k <- 0 until u.dim) v(i)(k+j) = u(k) }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a clone of 'this' m-by-n matrix.
+     */
+    def copy (): MatrixD = { val c = new MatrixD (dim1, dim2); Array.copy (v, 0, c.v, 0, dim1 * dim2); c }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an m-by-n matrix with all elements intialized to zero.
+     *  @param m  the number of rows
+     *  @param n  the number of columns
+     */
+    def zero (m: Int = dim1, n: Int = dim2): MatrixD = new MatrixD (m, n)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `MatrixD` into a `MatrixI`.
+     */
+    def toInt: MatrixI = 
+    {
+        val c = new MatrixI (dim1, dim2)
+        for (i <- range1) c.v(i) = v(i).map (_.toInt)
+        c
+    } // toInt
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice 'this' matrix row-wise 'from' to 'end'.
@@ -257,14 +284,25 @@ class MatrixD (val d1: Int,
     } // selectCols
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Transpose 'this' matrix (rows => columns).
+    /** Transpose 'this' matrix (columns => rows).
      */
     def t: MatrixD =
     {
-        val b = new MatrixD (dim2, dim1)
-        for (i <- b.range1; j <- b.range2) b.v(i)(j) = v(j)(i)
-        b
+        val c = new MatrixD (dim2, dim1)
+        for (j <- range1) {
+            val v_j = v(j)
+            for (i <- range2) c.v(i)(j) = v_j(i)
+        } // for
+        c
     } // t
+/***
+    def t: MatrixD =
+    {
+        val c = new MatrixD (dim2, dim1)
+        for (i <- c.range1; j <- c.range2) c.v(i)(j) = v(j)(i)
+        c
+    } // t
+***/
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate (row) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
@@ -1360,6 +1398,23 @@ class MatrixD (val d1: Int,
         for (i <- range1 if v(i).length != dim2) return false
         true
     } // isRectangular
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Override equals to determine whether 'this' matrix equals matrix 'b'.
+     *  @param b  the matrix to compare with this
+     */
+    override def equals (b: Any): Boolean =
+    {
+        if (! b.isInstanceOf [MatriD]) return false
+        val bb = b.asInstanceOf [MatriD]
+        for (i <- range1 if this(i) != bb(i)) return false         // within TOL
+        true
+    } // equals
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Must also override hashCode for 'this' matrix to be compatible with equals.
+     */
+    override def hashCode: Int = v.deep.hashCode
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' real (double precision) matrix to a string.

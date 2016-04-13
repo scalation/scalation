@@ -97,13 +97,6 @@ class PolyRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = 
     def predict (z: VectoD): Double = rg.predict (z)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula y = b dot zi for
-     *  each row zi of matrix z.
-     *  @param z  the new matrix to predict
-     */
-    override def predict (z: MatriD): VectoD = rg.predict (z)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new R-squared value and the new F statistic.
@@ -148,11 +141,6 @@ object PolyRegressionTest extends App
     val z = 10.5                                  // predict y for one point
     val yp = prg.predict (z)
     println ("predict (" + z + ") = " + yp)
-
-    val yyp = prg.predict (prg.x)                 // predict y for several points
-    println ("predict ( ) = " + yyp)
-
-    new Plot (t, y, yyp)
 
 } // PolyRegressionTest object
 

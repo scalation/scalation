@@ -91,13 +91,6 @@ class ANOVA (t: VectorI, y: VectorD, levels: Int, technique: RegTechnique = Fac_
     def predict (z: VectoD): Double = rg.predict (z)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula y = b dot zi for
-     *  each row zi of matrix z.
-     *  @param z  the new matrix to predict
-     */
-    override def predict (z: MatriD): VectoD = rg.predict (z)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new R-squared value and the new F statistic.

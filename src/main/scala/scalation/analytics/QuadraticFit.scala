@@ -57,7 +57,7 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
 
     /** Regression class for performing multiple regression
      */
-    private var reg: Regression = null
+    private var reg: Regression [MatrixD, VectorD] = _
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a center point x, form a square grid around it.  This can be used

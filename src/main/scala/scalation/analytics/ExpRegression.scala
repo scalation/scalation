@@ -108,13 +108,6 @@ class ExpRegression (x: MatrixD, nonneg: Boolean, y: VectorD)
      */
     def predict (z: VectoD): Double = b dot z
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula y = b dot zi for
-     *  each row zi of matrix z.
-     *  @param z  the new matrix to predict
-     */
-    override def predict (z: MatriD): VectoD = z * b
-
 } // ExpRegression class
 
 

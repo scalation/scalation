@@ -126,13 +126,6 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
     def predict (z: VectoD): Double = b dot z
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula y = b dot z for
-     *  each row of matrix z.
-     *  @param z  the new matrix to predict
-     */
-    override def predict (z: MatriD): VectoD = z * b
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new quality of fit.
@@ -215,12 +208,6 @@ object RidgeRegressionTest extends App
     val yp = rrg.predict (z_c) + mu_y                     // predict y for one point
     println ("predict (" + z + ") = " + yp)
 
-    val yyp = rrg.predict (x_c) + mu_y                    // predict y for several points
-    println ("predict (" + x + ") = " + yyp)
-
-    new Plot (x.col(0), y, yyp)
-    new Plot (x.col(1), y, yyp)
-
     println ("reduced model: fit = " + rrg.backElim ())   // eliminate least predictive variable
 
 } // RidgeRegressionTest object
@@ -256,12 +243,6 @@ object RidgeRegressionTest2 extends App
     println ("fit = " + rrg.fit)
     val yp = rrg.predict (z)                         // predict y for on3 point
     println ("predict (" + z + ") = " + yp)
-
-    val yyp = rrg.predict (x)                        // predict y for several points
-    println ("predict (" + x + ") = " + yyp)
-
-    new Plot (x.col(1), y, yyp)
-    new Plot (x.col(2), y, yyp)
 
 } // RidgeRegressionTest2 object
 

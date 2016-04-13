@@ -306,6 +306,18 @@ class SparseMatrixD (val d1: Int,
     } // set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a clone of 'this' m-by-n sparse matrix.
+     */
+    def copy (): SparseMatrixD = new SparseMatrixD (dim1, dim2, v.clone ())
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an m-by-n sparse matrix with all elements intialized to zero.
+     *  @param m  the number of rows
+     *  @param n  the number of columns
+     */
+    def zero (m: Int = dim1, n: Int = dim2): SparseMatrixD = new SparseMatrixD (m, n)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice 'this' sparse matrix row-wise 'from' to 'end'.
      *  @param from  the start row of the slice
      *  @param end   the end row of the slice

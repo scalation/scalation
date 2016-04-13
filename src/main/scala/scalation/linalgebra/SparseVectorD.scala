@@ -287,6 +287,12 @@ class SparseVectorD (val dim_ : Int)
     def set (u: Seq [Double]) { for (i <- range) v(i) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a size dimensional vector with all elements initialized to zero.
+     *  @param size  the number of elements in the vector
+     */
+    def zero (size: Int = dim): SparseVectorD = new SparseVectorD (size)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Iterate over 'this' vector element by element.
      *  @param f  the function to apply
      */

@@ -89,13 +89,6 @@ class SimpleRegression (x: MatrixD, y: VectorD)
      */
     def predict (z: VectoD): Double = b dot z
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula y = b dot z for
-     *  each row of matrix z.
-     *  @param z  the new matrix to predict
-     */
-    override def predict (z: MatriD): VectoD = z * b
-
 } // SimpleRegression class
 
 
@@ -124,7 +117,7 @@ object SimpleRegressionTest extends App
     val yp = rg.predict (z)
     println ("predict (" + z + ") = " + yp)
 
-    val yyp = rg.predict (x)                  // predict y for several points
+    val yyp = VectorD (for (i <- x.range1) yield rg.predict (x(i)))    // predict y for several points
     println ("predict (" + x + ") = " + yyp)
 
     new Plot (x.col(1), y, yyp)
@@ -159,7 +152,7 @@ object SimpleRegressionTest2 extends App
     val yp = rg.predict (z)
     println ("predict (" + z + ") = " + yp)
 
-    val yyp = rg.predict (x)                 // predict y for several points
+    val yyp = VectorD (for (i <- x.range1) yield rg.predict (x(i)))    // predict y for several points
     println ("predict (" + x + ") = " + yyp)
     
     new Plot (x1, y, yyp)
