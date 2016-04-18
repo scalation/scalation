@@ -78,12 +78,12 @@ class Partition (g: Graph)
     {
         var nDistnct = 0
         for (it <- 1 to MAX_ITER) {
-            for (i <- ilabel.indices) getPopularLabel (i)        // re-determine the popoular labels
+            for (i <- ilabel.indices) getPopularLabel (i)         // re-determine the popoular labels
             if (DEBUG) println (s"group_lp: ilabel2 = $ilabel2")
             for (i <- ilabel.indices) {
-                reassign (i)                                     // reassign vertex labels
-                nDistnct = ilabel.distinct
-                if (ilabel.distinct <= k) return                 // quit when only k parts
+                reassign (i)                                      // reassign vertex labels
+                nDistnct = ilabel.countinct
+                if (ilabel.countinct <= k) return                 // quit when only k parts
             } // for
             if (DEBUG) println (s"group_lp: after iteration $it nDistnct = $nDistnct")
         } // for
@@ -96,7 +96,7 @@ class Partition (g: Graph)
     {
         if (DEBUG) println (s"partition: ilabel = $ilabel")
         var part = 0
-        for (i <- ilabel.indices) {                              // put vertex into map based on ilabel
+        for (i <- ilabel.indices) {                               // put vertex into map based on ilabel
             val iset = partMap.getOrElse (ilabel(i), null)
             if (iset == null) partMap += ilabel(i) -> SET (i)
             else              iset += i

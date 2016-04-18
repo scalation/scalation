@@ -35,7 +35,7 @@ class StatVector (val self: VectorD)
      *  'k = (dim+1)/2' gives the regular median.
      *  @param k  the type of median (k-th smallest value)
      */
-    def median (k: Int = (self.dim+1)/2): Double = imedian (self(), k)
+    def median (k: Int = (self.dim+1)/2): Double = imedian (self().toArray, k)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the averaged median, which is the median when 'dim' is odd and

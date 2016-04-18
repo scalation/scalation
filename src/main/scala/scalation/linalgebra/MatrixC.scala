@@ -11,7 +11,7 @@ package scalation.linalgebra
 
 import java.io.PrintWriter
 
-import io.Source.fromFile
+import scala.io.Source.fromFile
 
 import scalation.math.Complex.{abs => ABS, _}
 
@@ -27,9 +27,9 @@ import MatrixC.eye
  *  @param d2  the second/column dimension
  *  @param v   the 2D array used to store matrix elements
  */
-class MatrixC (val d1: Int,
-               val d2: Int,
-       private var v:  Array [Array [Complex]] = null)
+class MatrixC (d1: Int,
+               d2: Int,
+               private [linalgebra] var v: Array [Array [Complex]] = null)
       extends MatriC with Error with Serializable
 {
     /** Dimension 1
@@ -87,9 +87,21 @@ class MatrixC (val d1: Int,
      */
     def this (b: MatrixC)
     {
-        this (b.d1, b.d2)
+        this (b.dim1, b.dim2)
         for (i <- range1; j <- range2) v(i)(j) = b.v(i)(j)
     } // constructor
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an exact copy of 'this' m-by-n matrix.
+     */
+    def copy (): MatrixC = new MatrixC (dim1, dim2, (for (i <- range1) yield v(i).clone ()).toArray)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an m-by-n matrix with all elements intialized to zero.
+     *  @param m  the number of rows
+     *  @param n  the number of columns
+     */
+    def zero (m: Int = dim1, n: Int = dim2): MatrixC = new MatrixC (m, n)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' matrix's element at the 'i,j'-th index position. 
@@ -102,7 +114,7 @@ class MatrixC (val d1: Int,
     /** Get 'this' matrix's vector at the 'i'-th index position ('i'-th row).
      *  @param i  the row index
      */
-    def apply (i: Int): VectorC = new VectorC (v(i))
+    def apply (i: Int): VectorC = VectorC (v(i))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get a slice 'this' matrix row-wise on range 'ir' and column-wise on range 'jr'.
@@ -111,6 +123,11 @@ class MatrixC (val d1: Int,
      *  @param jr  the column range
      */
     def apply (ir: Range, jr: Range): MatrixC = slice (ir.start, ir.end, jr.start, jr.end)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get the underlying 2D array for 'this' matrix.
+     */
+    def apply (): Array [Array [Complex]] = v
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' matrix's element at the 'i,j'-th index position to the scalar 'x'.
@@ -125,7 +142,7 @@ class MatrixC (val d1: Int,
      *  @param i  the row index
      *  @param u  the vector value to assign
      */
-    def update (i: Int, u: VectorC) { v(i) = u() }
+    def update (i: Int, u: VectoC) { v(i) = u().toArray }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set a slice 'this' matrix row-wise on range ir and column-wise on range 'jr'.
@@ -162,7 +179,22 @@ class MatrixC (val d1: Int,
      *  @param u  the vector value to assign
      *  @param j  the starting column index
      */
-    def set (i: Int, u: VectorC, j: Int = 0) { for (k <- 0 until u.dim) v(i)(k+j) = u(k) }
+    def set (i: Int, u: VectoC, j: Int = 0) { for (k <- 0 until u.dim) v(i)(k+j) = u(k) }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `MatrixC` into a `MatrixI`.
+     */
+    def toInt: MatrixI =
+    {
+        val c = new MatrixI (dim1, dim2)
+        for (i <- range1) c.v(i) = v(i).map (_.toInt)
+        c
+    } // toInt
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' matrix to a dense matrix.
+     */
+    def toDense: MatrixC = this
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice 'this' matrix row-wise 'from' to 'end'.
@@ -242,7 +274,7 @@ class MatrixC (val d1: Int,
      *  @param col  the column to set
      *  @param u    the vector to assign to the column
      */
-    def setCol (col: Int, u: VectorC) { for (i <- range1) v(i)(col) = u(i) }
+    def setCol (col: Int, u: VectoC) { for (i <- range1) v(i)(col) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select columns from 'this' matrix according to the given index/basis.
@@ -257,20 +289,31 @@ class MatrixC (val d1: Int,
     } // selectCols
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Transpose 'this' matrix (rows => columns).
+    /** Transpose 'this' matrix (columns => rows).
      */
     def t: MatrixC =
     {
-        val b = new MatrixC (dim2, dim1)
-        for (i <- b.range1; j <- b.range2) b.v(i)(j) = v(j)(i)
-        b
+        val c = new MatrixC (dim2, dim1)
+        for (j <- range1) {
+            val v_j = v(j)
+            for (i <- range2) c.v(i)(j) = v_j(i)
+        } // for
+        c
     } // t
+/***
+    def t: MatrixC =
+    {
+        val c = new MatrixC (dim2, dim1)
+        for (i <- c.range1; j <- c.range2) c.v(i)(j) = v(j)(i)
+        c
+    } // t
+***/
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate (row) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
      *  @param u  the vector to be prepended as the new first row in new matrix
      */
-    def +: (u: VectorC): MatrixC =
+    def +: (u: VectoC): MatrixC =
     {
         if (u.dim != dim2) flaw ("+:", "vector does not match row dimension")
         val c = new MatrixC (dim1 + 1, dim2)
@@ -282,7 +325,7 @@ class MatrixC (val d1: Int,
     /** Concatenate (column) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
      *  @param u  the vector to be prepended as the new first column in new matrix
      */
-    def +^: (u: VectorC): MatrixC =
+    def +^: (u: VectoC): MatrixC =
     {
         if (u.dim != dim1) flaw ("+^:", "vector does not match column dimension")
         val c = new MatrixC (dim1, dim2 + 1)
@@ -294,7 +337,7 @@ class MatrixC (val d1: Int,
     /** Concatenate 'this' matrix and (row) vector 'u', i.e., append 'u' to 'this'.
      *  @param u  the vector to be appended as the new last row in new matrix
      */
-    def :+ (u: VectorC): MatrixC =
+    def :+ (u: VectoC): MatrixC =
     {
         if (u.dim != dim2) flaw (":+", "vector does not match row dimension")
         val c = new MatrixC (dim1 + 1, dim2)
@@ -306,7 +349,7 @@ class MatrixC (val d1: Int,
     /** Concatenate 'this' matrix and (column) vector 'u', i.e., append 'u' to 'this'.
      *  @param u  the vector to be appended as the new last column in new matrix
      */
-    def :^+ (u: VectorC): MatrixC =
+    def :^+ (u: VectoC): MatrixC =
     {
         if (u.dim != dim1) flaw (":^+", "vector does not match column dimension")
         val c = new MatrixC (dim1, dim2 + 1)
@@ -364,7 +407,7 @@ class MatrixC (val d1: Int,
     /** Add 'this' matrix and (row) vector 'u'.
      *  @param u  the vector to add
      */
-    def + (u: VectorC): MatrixC =
+    def + (u: VectoC): MatrixC =
     {
         val c = new MatrixC (dim1, dim2)
         for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) + u(j)
@@ -406,7 +449,7 @@ class MatrixC (val d1: Int,
     /** Add in-place 'this' matrix and (row) vector 'u'.
      *  @param u  the vector to add
      */
-    def += (u: VectorC): MatrixC =
+    def += (u: VectoC): MatrixC =
     {
         for (i <- range1; j <- range2) v(i)(j) += u(j)
         this
@@ -448,7 +491,7 @@ class MatrixC (val d1: Int,
     /** From 'this' matrix subtract (row) vector 'u'.
      *  @param b  the vector to subtract
      */
-    def - (u: VectorC): MatrixC =
+    def - (u: VectoC): MatrixC =
     {
         val c = new MatrixC (dim1, dim2)
         for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) - u(j)
@@ -490,7 +533,7 @@ class MatrixC (val d1: Int,
     /** From 'this' matrix subtract in-place (row) vector 'u'.
      *  @param b  the vector to subtract
      */
-    def -= (u: VectorC): MatrixC =
+    def -= (u: VectoC): MatrixC =
     {
         for (i <- range1; j <- range2) v(i)(j) -= u(j)
         this
@@ -547,10 +590,10 @@ class MatrixC (val d1: Int,
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply 'this' matrix by vector 'u' (vector elements beyond 'dim2' ignored).
+    /** Multiply 'this' matrix by (column) vector 'u' (vector elements beyond 'dim2' ignored).
      *  @param u  the vector to multiply by
      */
-    def * (u: VectorC): VectorC =
+    def * (u: VectoC): VectorC =
     {
         if (dim2 > u.dim) flaw ("*", "matrix * vector - vector dimension too small")
 
@@ -637,7 +680,7 @@ class MatrixC (val d1: Int,
      *  'this' matrix and then multiplying by 'u' (ie., 'a dot u = a.t * u').
      *  @param u  the vector to multiply by (requires same first dimensions)
      */
-    def dot (u: VectorC): VectorC =
+    def dot (u: VectoC): VectorC =
     {
         if (dim1 != u.dim) flaw ("dot", "matrix dot vector - incompatible first dimensions")
 
@@ -647,6 +690,28 @@ class MatrixC (val d1: Int,
             var sum = _0
             for (k <- range1) sum += at.v(i)(k) * u(k)
             c(i) = sum
+        } // for
+        c
+    } // dot
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product of 'this' matrix and matrix 'b', by first transposing
+     *  'this' matrix and then multiplying by 'b' (ie., 'a dot b = a.t * b').
+     *  @param b  the matrix to multiply by (requires same first dimensions)
+     */
+    def dot (b: MatrixC): MatrixC =
+    {
+        if (dim1 != b.dim1) flaw ("dot", "matrix dot matrix - incompatible first dimensions")
+
+        val c = new MatrixC (dim2, b.dim2)
+        val at = this.t                         // transpose the 'this' matrix
+        for (i <- range2) {
+            val at_i = at.v(i)                  // ith row of 'at' (column of 'a')
+            for (j <- b.range2) {
+                var sum = _0
+                for (k <- range1) sum += at_i(k) * b.v(k)(j)
+                c.v(i)(j) = sum
+            } // for
         } // for
         c
     } // dot
@@ -755,7 +820,7 @@ class MatrixC (val d1: Int,
      *  E.g., multiply a matrix by a diagonal matrix represented as a vector.
      *  @param u  the vector to multiply by
      */
-    def ** (u: VectorC): MatrixC =
+    def ** (u: VectoC): MatrixC =
     {
         val c = new MatrixC (dim1, dim2)
         for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) * u(j)
@@ -766,7 +831,7 @@ class MatrixC (val d1: Int,
     /** Multiply in-place 'this' matrix by vector 'u' to produce another matrix '(a_ij * u_j)'.
      *  @param u  the vector to multiply by
      */
-    def **= (u: VectorC): MatrixC =
+    def **= (u: VectoC): MatrixC =
     {
         for (i <- range1; j <- range2) v(i)(j) = v(i)(j) * u(j)
         this
@@ -835,6 +900,26 @@ class MatrixC (val d1: Int,
     } // min
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the lower triangular of 'this' matrix (rest are zero).
+     */ 
+    def lowerT: MatrixC =
+    {
+        val lo = new MatrixC (dim1, dim2)
+        for (i <- range1; j <- 0 to i) lo.v(i)(j) = v(i)(j)
+        lo
+    } // lowerT  
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the upper triangular of 'this' matrix (rest are zero).
+     */ 
+    def upperT: MatrixC =
+    {
+        val up = new MatrixC (dim1, dim2)
+        for (i <- range1; j <- i until dim2) up.v(i)(j) = v(i)(j)
+        up
+    } // upperT
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor 'this' matrix into the product of upper and lower triangular
      *  matrices '(l, u)' using the LU Factorization algorithm.  This version uses
      *  no partial pivoting.
@@ -891,7 +976,7 @@ class MatrixC (val d1: Int,
      *  matrices '(l, u)' using the LU Factorization algorithm.  This version uses
      *  partial pivoting.
      */
-    def lud_ip: Tuple2 [MatrixC, MatrixC] =
+    def lud_ip (): Tuple2 [MatrixC, MatrixC] =
     {
         val l = new MatrixC (dim1, dim2)         // lower triangular matrix
         val u = this                             // upper triangular matrix (this)
@@ -942,7 +1027,7 @@ class MatrixC (val d1: Int,
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
      */
-    def solve (l: MatriC, u: MatriC, b: VectorC): VectorC =
+    def solve (l: MatriC, u: MatriC, b: VectoC): VectorC =
     {
         val y  = new VectorC (l.dim2)
         for (k <- 0 until y.dim) {                   // solve for y in l*y = b
@@ -957,18 +1042,25 @@ class MatrixC (val d1: Int,
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve for 'x' in the equation 'l*u*x = b' (see lud above).
+     *  @param lu  the lower and upper triangular matrices
+     *  @param b   the constant vector
+     */
+    def solve (lu: Tuple2 [MatriC, MatriC], b: VectoC): VectorC = solve (lu._1, lu._2, b)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'l*u*x = b' where 'l = this'.  Requires
      *  'l' to be lower triangular.
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
      */
-    def solve (u: MatriC, b: VectorC): VectorC = solve (this, u, b)
+    def solve (u: MatriC, b: VectoC): VectorC = solve (this, u, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' matrix.
      *  @param b  the constant vector.
      */
-    def solve (b: VectorC): VectorC = solve (lud, b)
+    def solve (b: VectoC): VectorC = solve (lud, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Combine 'this' matrix with matrix 'b', placing them along the diagonal and
@@ -1026,7 +1118,7 @@ class MatrixC (val d1: Int,
      *  @param u  the vector to set the diagonal to
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
-    def setDiag (u: VectorC, k: Int = 0)
+    def setDiag (u: VectoC, k: Int = 0)
     { 
         val (j, l) = (math.max (-k, 0), math.min (dim1-k, dim1))
         for (i <- j until l) v(i)(i+k) = u(i-j)
@@ -1100,7 +1192,7 @@ class MatrixC (val d1: Int,
      *  Note: this method turns the orginal matrix into the identity matrix.
      *  The inverse is returned and is captured by assignment.
      */
-    def inverse_ip: MatrixC =
+    def inverse_ip (): MatrixC =
     {
         var b = this                            // use 'this' matrix for b
         val c = eye (dim1)                      // let c represent the augmentation
@@ -1230,11 +1322,11 @@ class MatrixC (val d1: Int,
      *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
      *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
-    def nullspace_ip: VectorC =
+    def nullspace_ip (): VectorC =
     {
         if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
 
-        reduce_ip
+        reduce_ip ()
         col(dim2 - 1) * -_1 ++ _1
     } // nullspace_ip
 
@@ -1313,6 +1405,23 @@ class MatrixC (val d1: Int,
     } // isRectangular
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Override equals to determine whether 'this' matrix equals matrix 'b'.
+     *  @param b  the matrix to compare with this
+     */
+    override def equals (b: Any): Boolean =
+    {
+        if (! b.isInstanceOf [MatriC]) return false
+        val bb = b.asInstanceOf [MatriC]
+        for (i <- range1 if this(i) != bb(i)) return false         // within TOL
+        true
+    } // equals
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Must also override hashCode for 'this' matrix to be compatible with equals.
+     */
+    override def hashCode: Int = v.deep.hashCode
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' real (double precision) matrix to a string.
      */
     override def toString: String = 
@@ -1354,10 +1463,10 @@ object MatrixC extends Error
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a matrix and assign values from the array of vectors 'u'.
-     *  @param u           the array of vectors to assign
+     *  @param u           the sequence/array of vectors to assign
      *  @param columnwise  whether the vectors are treated as column or row vectors
      */
-    def apply (u: Array [VectorC], columnwise: Boolean = true): MatrixC =
+    def apply (u: Seq [VectoC], columnwise: Boolean = true): MatrixC =
     {
         var x: MatrixC = null
         val u_dim = u(0).dim
@@ -1376,7 +1485,7 @@ object MatrixC extends Error
      *  Assumes vectors are columwise.
      *  @param u  the Vector of vectors to assign
      */
-    def apply (u: Vector [VectorC]): MatrixC =
+    def apply (u: Vector [VectoC]): MatrixC =
     {
         val u_dim = u(0).dim
         val x = new MatrixC (u_dim, u.length)
@@ -1418,7 +1527,7 @@ object MatrixC extends Error
      *  @param u  the vector to be concatenated as the new first row in matrix
      *  @param w  the vector to be concatenated as the new second row in matrix
      */
-    def ++ (u: VectorC, w: VectorC): MatrixC =
+    def ++ (u: VectoC, w: VectoC): MatrixC =
     {
         if (u.dim != w.dim) flaw ("++", "vector dimensions do not match")
 
@@ -1433,7 +1542,7 @@ object MatrixC extends Error
      *  @param u  the vector to be concatenated as the new first column in matrix
      *  @param w  the vector to be concatenated as the new second column in matrix
      */
-    def ++^ (u: VectorC, w: VectorC): MatrixC =
+    def ++^ (u: VectoC, w: VectoC): MatrixC =
     {
         if (u.dim != w.dim) flaw ("++^", "vector dimensions do not match")
 
@@ -1448,7 +1557,7 @@ object MatrixC extends Error
      *  @param u  the vector to multiply by
      *  @param a  the matrix to multiply by (requires sameCrossDimensions)
      */
-    def times (u: VectorC, a: MatrixC): VectorC =
+    def times (u: VectoC, a: MatrixC): VectorC =
     {
         if (u.dim != a.dim1) flaw ("times", "vector * matrix - incompatible cross dimensions")
 
@@ -1468,7 +1577,7 @@ object MatrixC extends Error
      *  @param x  the first vector
      *  @param y  the second vector
      */
-    def outer (x: VectorC, y: VectorC): MatrixC =
+    def outer (x: VectoC, y: VectoC): MatrixC =
     {
         val c = new MatrixC (x.dim, y.dim)
         for (i <- 0 until x.dim; j <- 0 until y.dim) c(i, j) = x(i) * y(j)
@@ -1480,7 +1589,7 @@ object MatrixC extends Error
      *  @param x  the first vector -> row 0
      *  @param y  the second vector -> row 1
      */
-    def form_rw (x: VectorC, y: VectorC): MatrixC =
+    def form_rw (x: VectoC, y: VectoC): MatrixC =
     {
         if (x.dim != y.dim) flaw ("form_rw", "dimensions of x and y must be the same")
 
@@ -1496,7 +1605,7 @@ object MatrixC extends Error
      *  @param x  the first scalar -> row 0 (repeat scalar)
      *  @param y  the second vector -> row 1
      */
-    def form_rw (x: Complex, y: VectorC): MatrixC =
+    def form_rw (x: Complex, y: VectoC): MatrixC =
     {
         val cols = y.dim
         val c = new MatrixC (2, cols)
@@ -1510,7 +1619,7 @@ object MatrixC extends Error
      *  @param x  the first vector -> row 0
      *  @param y  the second scalar -> row 1 (repeat scalar)
      */
-    def form_rw (x: VectorC, y: Complex): MatrixC =
+    def form_rw (x: VectoC, y: Complex): MatrixC =
     {
         val cols = x.dim
         val c = new MatrixC (2, cols)
@@ -1524,7 +1633,7 @@ object MatrixC extends Error
      *  @param x  the first vector -> column 0
      *  @param y  the second vector -> column 1
      */
-    def form_cw (x: VectorC, y: VectorC): MatrixC =
+    def form_cw (x: VectoC, y: VectoC): MatrixC =
     {
         if (x.dim != y.dim) flaw ("form_cw", "dimensions of x and y must be the same")
 
@@ -1540,7 +1649,7 @@ object MatrixC extends Error
      *  @param x  the first scalar -> column 0 (repeat scalar)
      *  @param y  the second vector -> column 1
      */
-    def form_cw (x: Complex, y: VectorC): MatrixC =
+    def form_cw (x: Complex, y: VectoC): MatrixC =
     {
         val rows = y.dim
         val c = new MatrixC (rows, 2)
@@ -1554,7 +1663,7 @@ object MatrixC extends Error
      *  @param x  the first vector -> column 0
      *  @param y  the second scalar -> column 1 (repeat scalar)
      */
-    def form_cw (x: VectorC, y: Complex): MatrixC =
+    def form_cw (x: VectoC, y: Complex): MatrixC =
     {
         val rows = x.dim
         val c = new MatrixC (rows, 2)
@@ -1606,9 +1715,9 @@ object MatrixCTest extends App with PackageInfo
     println ("z.solve      = " + z.solve (lu._1, lu._2, b))
     println ("zz.solve     = " + zz.solve (zz.lud, bz))
     println ("z.inverse    = " + z.inverse)
-    println ("z.inverse_ip = " + z.inverse_ip)
+    println ("z.inverse_ip = " + z.inverse_ip ())
     println ("t.inverse    = " + t.inverse)
-    println ("t.inverse_ip = " + t.inverse_ip)
+    println ("t.inverse_ip = " + t.inverse_ip ())
     println ("z.inv * b    = " + z.inverse * b)
     println ("z.det        = " + z.det)
     println ("z            = " + z)
@@ -1637,14 +1746,21 @@ object MatrixCTest extends App with PackageInfo
                                   5, 6)
     val bb = new MatrixC ((2, 2), 1, 2,
                                   3, 4)
+    val cc = new MatrixC ((3, 2), 3, 4,
+                                  5, 6,
+                                  7, 8)
 
     println ("aa        = " + aa)
     println ("bb        = " + bb)
     println ("aa * bb   = " + aa * bb)
-    aa *= bb
-    println ("aa *= bb  = " + aa) 
     println ("aa dot bz = " + (aa dot bz))
     println ("aa.t * bz = " + aa.t * bz)
+
+    println ("aa dot cc   = " + (aa dot cc))
+    println ("aa.t * cc   = " + aa.t * cc)
+
+    aa *= bb
+    println ("aa *= bb  = " + aa)
 
     val filename = getDataPath + "bb_matrix.csv"
     bb.write (filename)

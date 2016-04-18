@@ -9,10 +9,10 @@
 
 package scalation.linalgebra
 
-import collection.mutable.LinkedEntry
-import io.Source.fromFile
+import scala.collection.mutable.LinkedEntry
+import scala.io.Source.fromFile
 
-import math.{abs => ABS}
+import scala.math.{abs => ABS}
 
 import scalation.math.{int_exp, oneIf}
 import scalation.util.{Error, SortedLinkedHashMap}
@@ -31,7 +31,7 @@ object SparseMatrixI
      *  @param u           the array of vectors to assign
      *  @param columnwise  whether the vectors are treated as column or row vectors
      */
-    def apply (u: Array [VectorI], columnwise: Boolean = true): SparseMatrixI =
+    def apply (u: Array [VectoI], columnwise: Boolean = true): SparseMatrixI =
     {
         var x: SparseMatrixI = null
         val u_dim = u(0).dim
@@ -50,7 +50,7 @@ object SparseMatrixI
      *  Assumes vectors are columwise.
      *  @param u  the Vector of vectors to assign
      */
-    def apply (u: Vector [VectorI]): SparseMatrixI =
+    def apply (u: Vector [VectoI]): SparseMatrixI =
     {
         val u_dim = u(0).dim
         val x = new SparseMatrixI (u_dim, u.length)
@@ -203,6 +203,18 @@ class SparseMatrixI (val d1: Int,
      */
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a clone of 'this' m-by-n sparse matrix.
+     */
+    def copy (): SparseMatrixI = new SparseMatrixI (dim1, dim2, v.clone ())
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an m-by-n sparse matrix with all elements intialized to zero.
+     *  @param m  the number of rows
+     *  @param n  the number of columns
+     */
+    def zero (m: Int = dim1, n: Int = dim2): SparseMatrixI = new SparseMatrixI (m, n)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' sparse matrix's element at the 'i,j'-th index position.
      *  @param i  the row index
      *  @param j  the column index
@@ -217,7 +229,7 @@ class SparseMatrixI (val d1: Int,
     {
         val a = Array.ofDim [Int] (dim2)
         for (j <- 0 until dim2) a(j) = this(i, j)
-        new VectorI (a)
+        VectorI (a)
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -242,7 +254,7 @@ class SparseMatrixI (val d1: Int,
      *  @param i  the row index
      *  @param u  the vector value to assign
      */
-    def update (i: Int, u: VectorI)
+    def update (i: Int, u: VectoI)
     {
         for (j <- 0 until u.dim) {
             val x = u(j)
@@ -300,10 +312,26 @@ class SparseMatrixI (val d1: Int,
      *  @param u  the vector value to assign
      *  @param j  the starting column index
      */
-    def set (i: Int, u: VectorI, j: Int = 0)
+    def set (i: Int, u: VectoI, j: Int = 0)
     {
         for (k <- 0 until u.dim) this(i, k+j) = u(k)
     } // set
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' Sparse`MatrixI` into a `MatrixI`.
+     */
+    def toInt: MatrixI =
+    {
+        val c = new MatrixI (dim1, dim2)
+        for (i <- range1) c(i) = this(i).toInt
+        c
+    } // toInt
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert this sparse matrix to a dense matrix.
+     *  FIX - new builder
+     */
+    def toDense: MatrixI = new MatrixI (dim1, dim2, (for (i <- range1) yield this(i).toDense ().toArray).toArray)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice 'this' sparse matrix row-wise 'from' to 'end'.
@@ -388,7 +416,7 @@ class SparseMatrixI (val d1: Int,
      *  @param col  the column to set
      *  @param u    the vector to assign to the column
      */
-    def setCol (col: Int, u: VectorI) { for (i <- range1) this(i, col) = u(i) }
+    def setCol (col: Int, u: VectoI) { for (i <- range1) this(i, col) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select columns from this matrix according to the given index/basis.
@@ -416,7 +444,7 @@ class SparseMatrixI (val d1: Int,
     /** Concatenate (row) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
      *  @param u  the vector to be prepended as the new first row in new matrix
      */
-    def +: (u: VectorI): SparseMatrixI =
+    def +: (u: VectoI): SparseMatrixI =
     {
         if (u.dim != dim2) flaw ("+:", "vector does not match row dimension")
         val c = new SparseMatrixI (dim1 + 1, dim2)
@@ -428,7 +456,7 @@ class SparseMatrixI (val d1: Int,
     /** Concatenate (column) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
      *  @param u  the vector to be prepended as the new first column in new matrix
      */
-    def +^: (u: VectorI): SparseMatrixI =
+    def +^: (u: VectoI): SparseMatrixI =
     {
         if (u.dim != dim1) flaw ("+^:", "vector does not match column dimension")
         val c = new SparseMatrixI (dim1, dim2 + 1)
@@ -440,7 +468,7 @@ class SparseMatrixI (val d1: Int,
     /** Concatenate 'this' matrix and (row) vector 'u', i.e., append 'u' to 'this'.
      *  @param u  the vector to be appended as the new last row in new matrix
      */
-    def :+ (u: VectorI): SparseMatrixI =
+    def :+ (u: VectoI): SparseMatrixI =
     {
         if (u.dim != dim2) flaw (":+", "vector does not match row dimension")
         val c = new SparseMatrixI (dim1 + 1, dim2)
@@ -452,7 +480,7 @@ class SparseMatrixI (val d1: Int,
     /** Concatenate 'this' matrix and (column) vector 'u', i.e., append 'u' to 'this'.
      *  @param u  the vector to be appended as the new last column in new matrix
      */
-    def :^+ (u: VectorI): SparseMatrixI =
+    def :^+ (u: VectoI): SparseMatrixI =
     {
         if (u.dim != dim1) flaw (":^+", "vector does not match column dimension")
         val c = new SparseMatrixI (dim1, dim2 + 1)
@@ -512,7 +540,7 @@ class SparseMatrixI (val d1: Int,
     /** Add 'this' sparse matrix and (row) vector 'u'.
      *  @param u  the vector to add
      */
-    def + (u: VectorI): SparseMatrixI =
+    def + (u: VectoI): SparseMatrixI =
     {
         val c = new SparseMatrixI (dim1, dim2)
         for (i <- range1; j <- range2) c(i, j) = this(i, j) + u(j)
@@ -555,7 +583,7 @@ class SparseMatrixI (val d1: Int,
     /** Add in-place this matrix and (row) vector 'u'.
      *  @param u  the vector to add
      */
-    def += (u: VectorI): SparseMatrixI =
+    def += (u: VectoI): SparseMatrixI =
     {
         for (i <- range1; j <- range2) this(i, j) += u(j)
         this
@@ -597,7 +625,7 @@ class SparseMatrixI (val d1: Int,
     /** From `this` sparse matrix subtract (row) vector 'u'.
      *  @param u  the vector to subtract
      */
-    def - (u: VectorI): SparseMatrixI =
+    def - (u: VectoI): SparseMatrixI =
     {
         val c = new SparseMatrixI (dim1, dim2)
         for (i <- range1; j <- range2) c(i, j) = this(i, j) - u(j)
@@ -640,7 +668,7 @@ class SparseMatrixI (val d1: Int,
     /** From `this` sparse matrix subtract in-place (row) vector 'u'.
      *  @param u  the vector to subtract
      */
-    def -= (u: VectorI): SparseMatrixI =
+    def -= (u: VectoI): SparseMatrixI =
     {
         for (i <- range1; j <- range2) this(i, j) -= u(j)
         this
@@ -720,7 +748,7 @@ class SparseMatrixI (val d1: Int,
     /** Multiply 'this' sparse matrix by vector 'u' (vector elements beyond 'dim2' ignored).
      *  @param u  the vector to multiply by
      */
-    def * (u: VectorI): VectorI =
+    def * (u: VectoI): VectorI =
     {
         if (dim2 > u.dim) flaw ("*", "matrix * vector - vector dimension too small")
 
@@ -825,7 +853,7 @@ class SparseMatrixI (val d1: Int,
      *  'this' matrix and then multiplying by 'u' (ie., 'a dot u = a.t * u').
      *  @param u  the vector to multiply by (requires same first dimensions)
      */
-    def dot (u: VectorI): VectorI =
+    def dot (u: VectoI): VectorI =
     {
         if (dim1 != u.dim) flaw ("dot", "matrix dot vector - incompatible first dimensions")
 
@@ -835,6 +863,28 @@ class SparseMatrixI (val d1: Int,
             var sum: Int = 0
             for (k <- range1) sum += at(i)(k) * u(k)
             c(i) = sum
+        } // for
+        c
+    } // dot
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product of 'this' matrix and matrix 'b', by first transposing
+     *  'this' matrix and then multiplying by 'b' (ie., 'a dot b = a.t * b').
+     *  @param b  the matrix to multiply by (requires same first dimensions)
+     */
+    def dot (b: MatriI): SparseMatrixI =
+    {
+        if (dim1 != b.dim1) flaw ("dot", "matrix dot matrix - incompatible first dimensions")
+
+        val c = new SparseMatrixI (dim2, b.dim2)
+        val at = this.t                         // transpose the 'this' matrix
+        for (i <- range2) {
+            val at_i = at(i)                    // ith row of 'at' (column of 'a')
+            for (j <- b.range2) {
+                var sum = 0
+                for (k <- range1) sum += at_i(k) * b(k, j)
+                c(i, j) = sum
+            } // for
         } // for
         c
     } // dot
@@ -889,7 +939,7 @@ class SparseMatrixI (val d1: Int,
     /** Multiply 'this' sparse matrix by vector 'u' to produce another matrix '(a_ij * u_j)'.
      *  @param u  the vector to multiply by
      */
-    def ** (u: VectorI): SparseMatrixI =
+    def ** (u: VectoI): SparseMatrixI =
     {
         val c = new SparseMatrixI (dim1, dim2)
         for (i <- c.range1; e <- v(i)) c(i, e._1) = e._2 * u(e._1)
@@ -901,7 +951,7 @@ class SparseMatrixI (val d1: Int,
      *  (a_ij * u_j)
      *  @param u  the vector to multiply by
      */
-    def **= (u: VectorI): SparseMatrixI =
+    def **= (u: VectoI): SparseMatrixI =
     {
         for (i <- range1; e <- v(i)) this(i, e._1) = e._2 * u(e._1)
         this
@@ -994,6 +1044,26 @@ class SparseMatrixI (val d1: Int,
     } // getMinVal
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the lower triangular of 'this' matrix (rest are zero).
+     */
+    def lowerT: SparseMatrixI =
+    {
+        val lo = new SparseMatrixI (dim1, dim2)
+        for (i <- range1; j <- 0 to i) lo(i, j) = this(i, j)
+        lo
+    } // lowerT
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the upper triangular of 'this' matrix (rest are zero).
+     */
+    def upperT: SparseMatrixI =
+    {
+        val up = new SparseMatrixI (dim1, dim2)
+        for (i <- range1; j <- i until dim2) up(i, j) = this(i, j)
+        up
+    } // upperT
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Decompose 'this' sparse matrix into the product of lower and upper triangular
      *  matrices '(l, u)' using the LU Decomposition algorithm.  This version uses
      *  partial pivoting.
@@ -1005,7 +1075,7 @@ class SparseMatrixI (val d1: Int,
         for (i <- u.range1) {
             var pivot = u(i, i)
             if (pivot =~ 0) {
-                val k = partialPivoting (u, i)   // find the maxiumum element below pivot
+                val k = partialPivoting (u, i)   // find the maximum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u(i, i)                  // reset the pivot
             } // if
@@ -1025,14 +1095,14 @@ class SparseMatrixI (val d1: Int,
      *  triangular matrices '(l, u)' using the LU Decomposition algorithm.
      *  This version uses partial pivoting.
      */
-    def lud_ip: Tuple2 [SparseMatrixI, SparseMatrixI] =
+    def lud_ip (): Tuple2 [SparseMatrixI, SparseMatrixI] =
     {
         val l = new SparseMatrixI (dim1, dim2)   // lower triangular matrix
         val u = this                             // upper triangular matrix (this)
         for (i <- u.range1) {
             var pivot = u(i, i)
             if (pivot =~ 0) {
-                val k = partialPivoting (u, i)   // find the maxiumum element below pivot
+                val k = partialPivoting (u, i)   // find the maximum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u(i, i)                  // reset the pivot
             } // if
@@ -1085,7 +1155,7 @@ class SparseMatrixI (val d1: Int,
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
      */
-    def solve (l: MatriI, u: MatriI, b: VectorI): VectorI =
+    def solve (l: MatriI, u: MatriI, b: VectoI): VectorI =
     {
         val y = new VectorI (l.dim2)       
         for (k <- 0 until y.dim) {                   // solve for y in l*y = b
@@ -1103,10 +1173,17 @@ class SparseMatrixI (val d1: Int,
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve for 'x' in the equation 'l*u*x = b' (see lud above).
+     *  @param lu  the lower and upper triangular matrices
+     *  @param b   the constant vector
+     */
+    def solve (lu: Tuple2 [MatriI, MatriI], b: VectoI): VectorI = solve (lu._1, lu._2, b)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' matrix.
      *  @param b  the constant vector.
      */
-    def solve (b: VectorI): VectorI = solve (lud, b)
+    def solve (b: VectoI): VectorI = solve (lud, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Combine 'this' sparse matrix with matrix 'b', placing them along the diagonal and
@@ -1162,7 +1239,7 @@ class SparseMatrixI (val d1: Int,
      *  @param u  the vector to set the diagonal to
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
-    def setDiag (u: VectorI, k: Int = 0)
+    def setDiag (u: VectoI, k: Int = 0)
     {
         val (j, l) = (math.max (-k, 0), math.min (dim1-k, dim1))
         for (i <- j until l) this(i, i+k) = u(i-j)
@@ -1216,7 +1293,7 @@ class SparseMatrixI (val d1: Int,
         for (i <- b.range1) {
             var pivot = b(i, i)
             if (pivot =~ 0) {
-                val k = partialPivoting (b, i)     // find the maxiumum element below pivot
+                val k = partialPivoting (b, i)     // find the maximum element below pivot
                 swap (b, i, k, i)                  // in b, swap rows i and k from column i
                 swap (c, i, k, 0)                  // in c, swap rows i and k from column 0
                 pivot = b(i, i)                    // reset the pivot
@@ -1244,14 +1321,14 @@ class SparseMatrixI (val d1: Int,
     /** Invert in-place 'this' sparse matrix (requires a squareMatrix).  This version uses
      *  partial pivoting.
      */
-    def inverse_ip: SparseMatrixI =
+    def inverse_ip (): SparseMatrixI =
     {
         val b = this                               // use this matrix for b
         val c = eye (dim1)                         // let c represent the augmentation
         for (i <- b.range1) {
             var pivot = b(i, i)
             if (pivot =~ 0) {
-                val k = partialPivoting (b, i)     // find the maxiumum element below pivot
+                val k = partialPivoting (b, i)     // find the maximum element below pivot
                 swap (b, i, k, i)                  // in b, swap rows i and k from column i
                 swap (c, i, k, 0)                  // in c, swap rows i and k from column 0
                 pivot = b(i, i)                    // reset the pivot
@@ -1287,7 +1364,7 @@ class SparseMatrixI (val d1: Int,
         for (i <- b.range1) {
             var pivot = b(i, i)
             if (pivot =~ 0) {
-                val k = partialPivoting (b, i)  // find the maxiumum element below pivot
+                val k = partialPivoting (b, i)  // find the maximum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b(i, i)                 // reset the pivot
             } // if
@@ -1316,7 +1393,7 @@ class SparseMatrixI (val d1: Int,
         for (i <- b.range1) {
             var pivot = b(i, i)
             if (pivot =~ 0) {
-                val k = partialPivoting (b, i)  // find the maxiumum element below pivot
+                val k = partialPivoting (b, i)  // find the maximum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b(i, i)                 // reset the pivot
             } // if
@@ -1380,11 +1457,11 @@ class SparseMatrixI (val d1: Int,
      *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
      *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
-    def nullspace_ip: VectorI =
+    def nullspace_ip (): VectorI =
     {
         if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
 
-        reduce_ip
+        reduce_ip ()
         var c = col(dim2 - 1) 
         c = c * -1 
         c ++ 1
@@ -1513,19 +1590,7 @@ object SparseMatrixITest extends App
 {
     import SparseMatrixI.RowMap
 
-    for (l <- 1 to 4) {
-        println ("\n\tTest SparseMatrixI on real matrices of dim " + l)
-        val x = new SparseMatrixI (l, l)
-        val y = new SparseMatrixI (l, l)
-        x.set (2)
-        y.set (3)
-        println ("x + y = " + (x + y))
-        println ("x - y = " + (x - y))
-        println ("x * y = " + (x * y))
-        println ("x * 4 = " + (x * 4))
-    } // for
-
-    println ("\n\tTest SparseMatrixI on additional operations")
+    println ("\n\tTest SparseMatrixI operations")
 
     val z  = new SparseMatrixI ((2, 2), 1, 2,
                                         3, 2)
@@ -1555,7 +1620,7 @@ object SparseMatrixITest extends App
     println ("check right nullspace = " + w * w.nullspace)
 
     println ("left:   v.t.nullspace = " + v.t.nullspace)
-    println ("check left  nullspace = " + v.t.nullspace * v)
+    println ("check left  nullspace = " + v.t.nullspace *: v)
 
     for (row <- z) println ("row = " + row.deep)
 
@@ -1563,6 +1628,11 @@ object SparseMatrixITest extends App
                                              new RowMap ((0, 100), (2,   3)),
                                              new RowMap ((0,   4), (1, 100)) ))
     println ("sp = " + sp)
+
+    for (i <- 0 until 3) {
+        for (j <- 0 until 3) print (sp(i, j) + "\t")
+        println ()
+    } // for
      
 } // SparseMatrixITest object
 

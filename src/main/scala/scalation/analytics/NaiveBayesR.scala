@@ -10,7 +10,7 @@ package scalation.analytics
 
 import math.{ceil, floor}
 
-import scalation.linalgebra.{MatriD, MatrixD, VectorD, VectoD, VectorI}
+import scalation.linalgebra.{MatrixD, VectorD, VectoD, VectorI}
 import scalation.random.Normal
 import scalation.stat.vectorD2StatVector
 

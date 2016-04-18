@@ -10,10 +10,10 @@
 
 package scalation.analytics
 
-import math.exp
-import util.control.Breaks.{break, breakable}
+import scala.math.exp
+import scala.util.control.Breaks.{break, breakable}
 
-import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
+import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.random.Random
 import scalation.util.Error
 

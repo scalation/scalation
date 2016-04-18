@@ -77,7 +77,7 @@ class DecisionTreeID3 (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: A
     def dataset (f: Int, path: Path): Array [Tuple2 [Int, Int]] =
     {
         val col = x.col(f).apply.zipWithIndex 
-        col.filter (t => path.forall (tt => x(t._2,tt._1) == tt._2)).map (t => (t._1, y(t._2)))
+        col.filter (t => path.forall (tt => x(t._2, tt._1) == tt._2)).map (t => (t._1, y(t._2))).toArray
     } // dataset
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

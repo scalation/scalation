@@ -61,6 +61,18 @@ trait MatriD
     def setFormat (newFormat: String) { fString = newFormat }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an exact copy of 'this' m-by-n matrix.
+     */
+    def copy (): MatriD
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an m-by-n matrix with all elements intialized to zero.
+     *  @param m  the number of rows
+     *  @param n  the number of columns
+     */
+    def zero (m: Int = dim1, n: Int = dim2): MatriD
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' matrix's element at the 'i,j'-th index position.
      *  @param i  the row index
      *  @param j  the column index
@@ -163,16 +175,9 @@ trait MatriD
     def set (i: Int, u: VectoD, j: Int = 0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a clone of 'this' m-by-n matrix.
+    /** Convert this matrix to a dense matrix.
      */
-    def copy (): MatriD
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create an m-by-n matrix with all elements intialized to zero.
-     *  @param m  the number of rows
-     *  @param n  the number of columns
-     */
-    def zero (m: Int = dim1, n: Int = dim2): MatriD
+    def toDense: MatriD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Iterate over 'this' matrix row by row applying method 'f'.
@@ -181,7 +186,7 @@ trait MatriD
     def foreach [U] (f: Array [Double] => U)
     {
         var i = 0
-        while (i < dim1) { f (this(i)()); i += 1 }
+        while (i < dim1) { f (this(i)().toArray); i += 1 }
     } // foreach
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -377,13 +382,6 @@ trait MatriD
     def * (u: VectoD): VectoD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply (row) vector 'u' by 'this' matrix.  Note '*:' is right associative.
-     *  vector = vector *: matrix
-     *  @param u  the vector to multiply by
-     */
-    def *: (u: VectoD): VectoD = this.t * u
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' matrix by scalar 'x'.
      *  @param x  the scalar to multiply by
      */
@@ -404,11 +402,11 @@ trait MatriD
     def *= (x: Double): MatriD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the dot product of 'this' matrix and vector 'u', by first transposing
-     *  'this' matrix and then multiplying by 'u' (ie., 'a dot u = a.t * u').
-     *  @param u  the vector to multiply by (requires same first dimensions)
+    /** Multiply (row) vector 'u' by 'this' matrix.  Note '*:' is right associative.
+     *  vector = vector *: matrix
+     *  @param u  the vector to multiply by
      */
-    def dot (u: VectoD): VectoD
+    def *: (u: VectoD): VectoD = this.t * u
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' matrix by vector 'u' to produce another matrix (a_ij * u_j)
@@ -439,6 +437,13 @@ trait MatriD
      *  @param p  the power to raise 'this' matrix to
      */
     def ~^ (p: Int): MatriD
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product of 'this' matrix and vector 'u', by first transposing
+     *  'this' matrix and then multiplying by 'u' (ie., 'a dot u = a.t * u').
+     *  @param u  the vector to multiply by (requires same first dimensions)
+     */
+    def dot (u: VectoD): VectoD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the maximum element in 'this' matrix.
@@ -482,6 +487,16 @@ trait MatriD
     } // swapCol
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the lower triangular of 'this' matrix (rest are zero).
+     */ 
+    def lowerT: MatriD 
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the upper triangular of 'this' matrix (rest are zero).
+     */ 
+    def upperT: MatriD 
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Decompose 'this' matrix into the product of lower and upper triangular
      *  matrices '(l, u)' using the LU Decomposition algorithm.  This version uses
      *  partial pivoting.
@@ -493,7 +508,7 @@ trait MatriD
      *  matrices '(l, u)' using the LU Decomposition algorithm.  This version uses
      *  partial pivoting.
      */
-    def lud_ip: Tuple2 [MatriD, MatriD]
+    def lud_ip (): Tuple2 [MatriD, MatriD]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'l*u*x = b' (see lud above).
@@ -574,7 +589,7 @@ trait MatriD
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Invert in-place 'this' matrix (requires a squareMatrix) and use partial pivoting.
      */
-    def inverse_ip: MatriD
+    def inverse_ip (): MatriD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Use Gauss-Jordan reduction on 'this' matrix to make the left part embed an
@@ -625,7 +640,7 @@ trait MatriD
      *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
      *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
-    def nullspace_ip: VectoD
+    def nullspace_ip (): VectoD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the trace of 'this' matrix, i.e., the sum of the elements on the
@@ -655,7 +670,7 @@ trait MatriD
      */
     def mean: VectoD =
     {
-        var cm = new VectorD (dim2)                              // FIX - replace VectorD
+        var cm = this(0).zero (dim2)
         for (j <- range2) cm(j) = col (j).sum / dim1.toDouble
         cm
     } // mean
@@ -664,10 +679,7 @@ trait MatriD
     /** Compute the 1-norm of 'this' matrix, i.e., the maximum 1-norm of the
      *  column vectors.  This is useful for comparing matrices '(a - b).norm1'.
      */
-    def norm1: Double =
-    {
-        (for (j <- range2) yield col(j).norm1).max
-    } // norm1
+    def norm1: Double = (for (j <- range2) yield col(j).norm1).max
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the determinant of 'this' matrix.

@@ -39,6 +39,12 @@ class MatrixD (val d1: Int,
      */
     lazy val dim2 = d2
 
+  def copy(): scalation.linalgebra.MatriD = ???
+  def zero(m: Int,n: Int): scalation.linalgebra.MatriD = ???
+  def toDense: scalation.linalgebra.MatriD = ???
+  def lowerT: scalation.linalgebra.MatriD = ???
+  def upperT: scalation.linalgebra.MatriD = ???
+
 //  val processors  = Runtime.getRuntime ().availableProcessors ()
     val granularity = (pow ((dim1 max dim2), 0.5)).toInt
     
@@ -153,7 +159,7 @@ class MatrixD (val d1: Int,
      *  @param i  the row index
      *  @param u  the vector value to assign
      */
-    def update (i: Int, u: VectoD) { v(i) = u() }
+    def update (i: Int, u: VectoD) { v(i) = u().toArray }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set a slice this matrix row-wise on range ir and column-wise on range jr.
@@ -1096,7 +1102,7 @@ class MatrixD (val d1: Int,
      *  @param lu  the lower and upper triangular matrices
      *  @param b   the constant vector
      */
-    def solve (lu: Tuple2 [MatriD, MatriD], b: VectoD): VectorD = solve (lu._1, lu._2, b)
+    override def solve (lu: Tuple2 [MatriD, MatriD], b: VectoD): VectorD = solve (lu._1, lu._2, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' matrix.

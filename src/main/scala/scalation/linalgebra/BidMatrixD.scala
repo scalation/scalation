@@ -58,7 +58,7 @@ class BidMatrixD (val d1: Int)
      *  @param v1  the diagonal vector
      *  @param v2  the sup-diagonal vector
      */
-    def this (v1: VectorD, v2: VectorD)
+    def this (v1: VectoD, v2: VectoD)
     {
         this (v1.dim)
         for (i <- range_d) _dg(i) = v1(i)
@@ -75,6 +75,18 @@ class BidMatrixD (val d1: Int)
         for (i <- range_d) _dg(i) = b(i, i)
         for (i <- range_s) _sd(i) = b(i, i+1)
     } // constructor
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a clone of 'this' m-by-n matrix.
+     */
+    def copy (): BidMatrixD = new BidMatrixD (_dg, _sd)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an m-by-n matrix with all elements intialized to zero.
+     *  @param m  the number of rows
+     *  @param n  the number of columns
+     */
+    def zero (m: Int = dim1, n: Int = dim2): BidMatrixD = new BidMatrixD (m)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the diagonal of 'this' bidiagonal matrix.
@@ -235,16 +247,17 @@ class BidMatrixD (val d1: Int)
     } // set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a clone of 'this' m-by-n matrix.
+    /** Convert 'this' tridiagonal matrix to a dense matrix.
      */
-    def copy (): BidMatrixD = new BidMatrixD (dim1)         // FIX - copy diagonals
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create an m-by-n matrix with all elements intialized to zero.
-     *  @param m  the number of rows
-     *  @param n  the number of columns
-     */
-    def zero (m: Int = dim1, n: Int = dim2): BidMatrixD = new BidMatrixD (m)
+    def toDense: MatrixD =
+    {
+        val c = new MatrixD (dim1, dim1)
+        for (i <- range1) {
+            c(i, i) = _dg(i)
+            if (i > 0) c(i, i-1) = _sd(i-1)
+        } // for
+        c
+    } // for
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice 'this' bidiagonal matrix row-wise 'from' to 'end'.
@@ -750,8 +763,8 @@ class BidMatrixD (val d1: Int)
      */
     def getDiag (k: Int = 0): VectorD =
     {
-        if (k == 0) _dg
-        else if (k == 1) _sd
+        if (k == 0) _dg.toDense
+        else if (k == 1) _sd.toDense
         else { flaw ("getDiag", "nothing stored for diagonal " + k); null }
     } // getDiag
 
@@ -763,8 +776,8 @@ class BidMatrixD (val d1: Int)
      */
     def setDiag (u: VectoD, k: Int = 0)
     {
-        if (k == 0) _dg = u.asInstanceOf [VectorD]               // FIX
-        else if (k == 1) _sd = u.asInstanceOf [VectorD]
+        if (k == 0) _dg = u.toDense
+        else if (k == 1) _sd = u.toDense
         else flaw ("setDiag", "nothing stored for diagonal " + k)
     } // setDiag
 
@@ -883,6 +896,16 @@ class BidMatrixD (val d1: Int)
         else if (nn == 1) _dg(0) * _dg(1) - _sd(0) * _sd(0)
 	else              _dg(n) * detHelper (nn-1) - _sd(nn-1) * _sd(nn-1) * detHelper (nn-2)
     } // detHelper
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the lower triangular of 'this' matrix (rest are zero).
+     */
+    def lowerT: MatrixD = { val c = new MatrixD (dim1, dim1); c.setDiag (_dg); c }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the upper triangular of 'this' matrix (rest are zero).
+     */
+    def upperT: MatrixD = { val c = new MatrixD (dim1, dim1); c.setDiag (_dg); c.setDiag (_sd, 1); c }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check whether 'this' matrix is bidiagonal (has non-zreo elements only in

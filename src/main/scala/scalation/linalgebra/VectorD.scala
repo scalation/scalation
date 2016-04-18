@@ -49,6 +49,37 @@ class VectorD (val dim: Int,
     def this (iv: Tuple2 [Int, Double], dm: Int) { this (dm); v(iv._1) = iv._2 }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an exact copy of 'this' vector.
+     */
+    def copy: VectorD = new VectorD (this)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a zero vector (all elements are zero) of length 'size'.
+     *  @param size  the number of elements in the vector
+     */
+    def zero (size: Int = dim): VectorD = new VectorD (size)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a one vector (all elements are one) of length 'size'.
+     *  @param size  the number of elements in the vector
+     */
+    def one (size: Int = dim): VectorD = new VectorD (size, Array.fill (size)(1.0))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a vector of the form (0, ... 1, ... 0) where the 1 is at position j.
+     *  @param j     the position to place the 1
+     *  @param size  the size of the vector (upper bound = size - 1)
+     */
+    def oneAt (j: Int, size: Int = dim): VectorD = new VectorD ((j, 1.0), size)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a vector of the form (0, ... -1, ... 0) where the -1 is at position j.
+     *  @param j     the position to place the -1
+     *  @param size  the size of the vector (upper bound = size - 1)
+     */
+    def _oneAt (j: Int, size: Int = dim): VectorD = new VectorD ((j, -1.0), size)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's element at the 'i'-th index position. 
      *  @param i  the given index
      */
@@ -63,7 +94,7 @@ class VectorD (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's entire array.
      */
-    def apply (): Array [Double] = v
+    def apply (): Seq [Double] = v
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' vector's element at the 'i'-th index position. 
@@ -120,6 +151,11 @@ class VectorD (val dim: Int,
     def toDouble: VectorD = VectorD (v.map (_.toDouble))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `VectorD` into a dense `VectorD`.
+     */
+    def toDense: VectorD = this
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Expand the size (dim) of 'this' vector by 'more' elements.
      *  @param more  the number of new elements to add
      */
@@ -128,26 +164,6 @@ class VectorD (val dim: Int,
         if (more < 1) this       // no change
         else          new VectorD (dim + more, Array.concat (v, new Array [Double] (more)))
     } // expand
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a size dimensional vector with all elements initialized to zero.
-     *  @param size  the number of elements in the vector
-     */
-    def zero (size: Int = dim): VectorD = new VectorD (size)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a vector of the form (0, ... 1, ... 0) where the 1 is at position j.
-     *  @param j     the position to place the 1
-     *  @param size  the size of the vector (upper bound = size - 1)
-     */
-    def oneAt (j: Int, size: Int = dim): VectorD = new VectorD ((j, 1.0), size)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a vector of the form (0, ... -1, ... 0) where the -1 is at position j.
-     *  @param j     the position to place the -1
-     *  @param size  the size of the vector (upper bound = size - 1)
-     */
-    def _oneAt (j: Int, size: Int = dim): VectorD = new VectorD ((j, -1.0), size)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
@@ -519,7 +535,7 @@ class VectorD (val dim: Int,
     /** Establish the rank order of the elements in 'self' vector, e.g.,
      *  (8.0, 2.0, 4.0, 6.0) is (3, 0, 1, 2).
      */
-    def rank: VectorI = new VectorI (iqsort (v))
+    def rank: VectorI = VectorI (iqsort (v))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Cumulate the values of 'this' vector from left to right (e.g., create a

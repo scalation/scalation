@@ -11,7 +11,7 @@ package scalation.analytics.par
 import math.{ceil, floor}
 
 import scalation.analytics.ClassifierReal
-import scalation.linalgebra.{MatriD, VectoD, VectorI}
+import scalation.linalgebra.{VectoD, VectorI}
 import scalation.linalgebra.par.{MatrixD, VectorD}
 import scalation.random.Normal
 import scalation.stat.vectorD2StatVector

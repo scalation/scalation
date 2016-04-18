@@ -12,7 +12,7 @@ package scalation.analytics.par
 
 import math.pow
 
-import scalation.linalgebra.{MatriD, VectoD}
+import scalation.linalgebra.VectoD
 import scalation.linalgebra.par.{Fac_Cholesky, Fac_QR, MatrixD, VectorD}
 import scalation.plot.Plot
 import scalation.util.{Error, time}
@@ -128,13 +128,6 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
     def predict (z: VectoD): Double = b dot z
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula y = b dot z for
-     *  each row of matrix z.
-     *  @param z  the new matrix to predict
-     */
-    override def predict (z: MatriD): VectoD = z * b
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new R-squared value and the new F statistic.
@@ -242,11 +235,13 @@ object RidgeRegressionTest extends App
     val yp = rrg.predict (z_c) + mu_y                     // predict y for one point
     println ("predict (" + z + ") = " + yp)
 
+/***
     val yyp = rrg.predict (x_c) + mu_y                    // predict y for several points
     println ("predict (" + x + ") = " + yyp)
 
     new Plot (x.col(0), y, yyp)
     new Plot (x.col(1), y, yyp)
+***/
 
     println ("reduced model: fit = " + rrg.backElim ())   // eliminate least predictive variable
 
@@ -284,11 +279,13 @@ object RidgeRegressionTest2 extends App
     val yp = rrg.predict (z)                         // predict y for on3 point
     println ("predict (" + z + ") = " + yp)
 
+/***
     val yyp = rrg.predict (x)                        // predict y for several points
     println ("predict (" + x + ") = " + yyp)
 
     new Plot (x.col(1), y, yyp)
     new Plot (x.col(2), y, yyp)
+***/
 
 } // RidgeRegressionTest2 object
 

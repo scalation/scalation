@@ -8,9 +8,9 @@
 
 package scalation.analytics
 
-import math.{cos, Pi, sin}
+import scala.math.{cos, Pi, sin}
 
-import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
+import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.plot.Plot
 import scalation.util.{Error, time}
 

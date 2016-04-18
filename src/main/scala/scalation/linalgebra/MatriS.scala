@@ -61,6 +61,18 @@ trait MatriS
     def setFormat (newFormat: String) { fString = newFormat }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an exact copy of 'this' m-by-n matrix.
+     */
+    def copy (): MatriS
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an m-by-n matrix with all elements intialized to zero.
+     *  @param m  the number of rows
+     *  @param n  the number of columns
+     */
+    def zero (m: Int = dim1, n: Int = dim2): MatriS
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' matrix's element at the 'i,j'-th index position.
      *  @param i  the row index
      *  @param j  the column index
@@ -71,7 +83,7 @@ trait MatriS
     /** Get 'this' matrix's vector at the 'i'-th index position (i-th row).
      *  @param i  the row index
      */
-    def apply (i: Int): VectorS
+    def apply (i: Int): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get a slice 'this' matrix row-wise on range 'ir' and column-wise on range 'jr'.
@@ -87,7 +99,7 @@ trait MatriS
      *  @param ir  the row range
      *  @param j   the column index
      */
-    def apply (ir: Range, j: Int): VectorS = col(j)(ir)
+    def apply (ir: Range, j: Int): VectoS = col(j)(ir)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get a slice 'this' matrix row-wise at index 'i' and column-wise on range 'jr'.
@@ -95,7 +107,7 @@ trait MatriS
      *  @param i   the row index
      *  @param jr  the column range
      */
-    def apply (i: Int, jr: Range): VectorS = this(i)(jr)
+    def apply (i: Int, jr: Range): VectoS = this(i)(jr)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' matrix's element at the 'i,j'-th index position to the scalar 'x'.
@@ -110,7 +122,7 @@ trait MatriS
      *  @param i  the row index
      *  @param u  the vector value to assign
      */
-    def update (i: Int, u: VectorS)
+    def update (i: Int, u: VectoS)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set a slice of 'this' matrix row-wise on range 'ir' and column-wise on
@@ -130,7 +142,7 @@ trait MatriS
      *  @param j   the column index
      *  @param u   the vector to assign
      */
-    def update (ir: Range, j: Int, u: VectorS) { col(j)(ir) = u }
+    def update (ir: Range, j: Int, u: VectoS) { col(j)(ir) = u }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set a slice of 'this' matrix row-wise at index 'i' and column-wise on range
@@ -140,7 +152,7 @@ trait MatriS
      *  @param jr  the column range
      *  @param u   the vector to assign
      */
-    def update (i: Int, jr: Range, u: VectorS) { this(i)(jr) = u }
+    def update (i: Int, jr: Range, u: VectoS) { this(i)(jr) = u }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set all the elements in 'this' matrix to the scalar 'x'.
@@ -160,7 +172,12 @@ trait MatriS
      *  @param u  the vector value to assign
      *  @param j  the starting column index
      */
-    def set (i: Int, u: VectorS, j: Int = 0)
+    def set (i: Int, u: VectoS, j: Int = 0)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert this matrix to a dense matrix.
+     */
+    def toDense: MatriS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Iterate over 'this' matrix row by row applying method 'f'.
@@ -169,7 +186,7 @@ trait MatriS
     def foreach [U] (f: Array [StrNum] => U)
     {
         var i = 0
-        while (i < dim1) { f (this(i)()); i += 1 }
+        while (i < dim1) { f (this(i)().toArray); i += 1 }
     } // foreach
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -213,14 +230,14 @@ trait MatriS
      *  @param col   the column to extract from the matrix
      *  @param from  the position to start extracting from
      */
-    def col (col: Int, from: Int = 0): VectorS
+    def col (col: Int, from: Int = 0): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set column 'col' of 'this' matrix to vector 'u'.
      *  @param col  the column to set
      *  @param u    the vector to assign to the column
      */
-    def setCol (col: Int, u: VectorS)
+    def setCol (col: Int, u: VectoS)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select columns from 'this' matrix according to the given index/basis colIndex.
@@ -238,25 +255,25 @@ trait MatriS
     /** Concatenate (row) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
      *  @param u  the vector to be prepended as the new first row in new matrix
      */
-    def +: (u: VectorS): MatriS
+    def +: (u: VectoS): MatriS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate (column) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
      *  @param u  the vector to be prepended as the new first column in new matrix
      */
-    def +^: (u: VectorS): MatriS
+    def +^: (u: VectoS): MatriS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate 'this' matrix and (row) vector 'u', i.e., append 'u' to 'this'.
      *  @param u  the vector to be appended as the new last row in new matrix
      */
-    def :+ (u: VectorS): MatriS
+    def :+ (u: VectoS): MatriS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate 'this' matrix and (column) vector 'u', i.e., append 'u' to 'this'.
      *  @param u  the vector to be appended as the new last column in new matrix
      */
-    def :^+ (u: VectorS): MatriS
+    def :^+ (u: VectoS): MatriS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate (row-wise) 'this' matrix and matrix 'b'.
@@ -282,7 +299,7 @@ trait MatriS
     /** Add 'this' matrix and (row) vector 'u'.
      *  @param u  the vector to add
      */
-    def + (u: VectorS): MatriS
+    def + (u: VectoS): MatriS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' matrix and scalar 'x'.
@@ -302,7 +319,7 @@ trait MatriS
     /** Add in-place 'this' matrix and (row) vector 'u'.
      *  @param u  the vector to add
      */
-    def += (u: VectorS): MatriS
+    def += (u: VectoS): MatriS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' matrix and scalar 'x'.
@@ -322,7 +339,7 @@ trait MatriS
     /** From 'this' matrix subtract (row) vector 'u'.
      *  @param u  the vector to subtract
      */
-    def - (u: VectorS): MatriS
+    def - (u: VectoS): MatriS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' matrix subtract scalar 'x'.
@@ -342,7 +359,7 @@ trait MatriS
     /** From 'this' matrix subtract in-place (row) vector 'u'.
      *  @param u  the vector to subtract
      */
-    def -= (u: VectorS): MatriS
+    def -= (u: VectoS): MatriS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' matrix subtract in-place scalar 'x'.
@@ -362,7 +379,7 @@ trait MatriS
     /** Multiply 'this' matrix by vector 'u'.
      *  @param u  the vector to multiply by
      */
-    def * (u: VectorS): VectorS
+    def * (u: VectoS): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' matrix by scalar 'x'.
@@ -385,23 +402,23 @@ trait MatriS
     def *= (x: StrNum): MatriS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the dot product of 'this' matrix and vector 'u', by first transposing
-     *  'this' matrix and then multiplying by 'u' (ie., 'a dot u = a.t * u').
-     *  @param u  the vector to multiply by (requires same first dimensions)
+    /** Multiply (row) vector 'u' by 'this' matrix.  Note '*:' is right associative.
+     *  vector = vector *: matrix
+     *  @param u  the vector to multiply by
      */
-    def dot (u: VectorS): VectorS
+    def *: (u: VectoS): VectoS = this.t * u
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' matrix by vector 'u' to produce another matrix (a_ij * u_j)
      *  @param u  the vector to multiply by
      */
-    def ** (u: VectorS): MatriS
+    def ** (u: VectoS): MatriS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' matrix by vector 'u' to produce another matrix (a_ij * u_j)
      *  @param u  the vector to multiply by
      */
-    def **= (u: VectorS): MatriS
+    def **= (u: VectoS): MatriS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide 'this' matrix by scalar 'x'.
@@ -420,6 +437,13 @@ trait MatriS
      *  @param p  the power to raise 'this' matrix to
      */
     def ~^ (p: Int): MatriS
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product of 'this' matrix and vector 'u', by first transposing
+     *  'this' matrix and then multiplying by 'u' (ie., 'a dot u = a.t * u').
+     *  @param u  the vector to multiply by (requires same first dimensions)
+     */
+    def dot (u: VectoS): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the maximum element in 'this' matrix.
@@ -463,6 +487,16 @@ trait MatriS
     } // swapCol
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the lower triangular of 'this' matrix (rest are zero).
+     */ 
+    def lowerT: MatriS 
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the upper triangular of 'this' matrix (rest are zero).
+     */ 
+    def upperT: MatriS 
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Decompose 'this' matrix into the product of lower and upper triangular
      *  matrices '(l, u)' using the LU Decomposition algorithm.  This version uses
      *  partial pivoting.
@@ -474,7 +508,7 @@ trait MatriS
      *  matrices '(l, u)' using the LU Decomposition algorithm.  This version uses
      *  partial pivoting.
      */
-    def lud_ip: Tuple2 [MatriS, MatriS]
+    def lud_ip (): Tuple2 [MatriS, MatriS]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'l*u*x = b' (see lud above).
@@ -482,20 +516,20 @@ trait MatriS
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
      */
-    def solve (l: MatriS, u: MatriS, b: VectorS): VectorS
+    def solve (l: MatriS, u: MatriS, b: VectoS): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'l*u*x = b' (see lud above).
      *  @param lu  the lower and upper triangular matrices
      *  @param b   the constant vector
      */
-    def solve (lu: Tuple2 [MatriS, MatriS], b: VectorS): VectorS = solve (lu._1, lu._2, b)
+    def solve (lu: Tuple2 [MatriS, MatriS], b: VectoS): VectoS = solve (lu._1, lu._2, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' matrix.
      *  @param b  the constant vector.
      */
-    def solve (b: VectorS): VectorS
+    def solve (b: VectoS): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine the rank of 'this' m-by-n matrix by taking the upper triangular
@@ -532,14 +566,14 @@ trait MatriS
     /** Get the 'k'th diagonal of 'this' matrix.  Assumes dim2 >= dim1.
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
-    def getDiag (k: Int = 0): VectorS
+    def getDiag (k: Int = 0): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the 'k'th diagonal of 'this' matrix to the vector 'u'.  Assumes dim2 >= dim1.
      *  @param u  the vector to set the diagonal to
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
-    def setDiag (u: VectorS, k: Int = 0)
+    def setDiag (u: VectoS, k: Int = 0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the main diagonal of 'this' matrix to the scalar 'x'.  Assumes dim2 >= dim1.
@@ -555,7 +589,7 @@ trait MatriS
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Invert in-place 'this' matrix (requires a squareMatrix) and use partial pivoting.
      */
-    def inverse_ip: MatriS
+    def inverse_ip (): MatriS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Use Gauss-Jordan reduction on 'this' matrix to make the left part embed an
@@ -591,7 +625,7 @@ trait MatriS
      *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
      *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
-    def nullspace: VectorS
+    def nullspace: VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute in-place the (right) nullspace of 'this' 'm-by-n' matrix (requires 'n = m+1')
@@ -606,7 +640,7 @@ trait MatriS
      *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
      *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
-    def nullspace_ip: VectorS
+    def nullspace_ip (): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the trace of 'this' matrix, i.e., the sum of the elements on the
@@ -634,9 +668,9 @@ trait MatriS
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the column means of this matrix.
      */
-    def mean: VectorS =
+    def mean: VectoS =
     {
-        var cm = new VectorS (dim2)
+        var cm = this(0).zero (dim2)
         for (j <- range2) cm(j) = col (j).sum / dim1.toStrNum
         cm
     } // mean
@@ -645,12 +679,7 @@ trait MatriS
     /** Compute the 1-norm of 'this' matrix, i.e., the maximum 1-norm of the
      *  column vectors.  This is useful for comparing matrices '(a - b).norm1'.
      */
-    def norm1: StrNum =
-    {
-        val c = new VectorS (dim2)
-        for (j <- range2) c(j) = col(j).norm1
-        c.max ()
-    } // norm1
+    def norm1: StrNum = (for (j <- range2) yield col(j).norm1).max
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the determinant of 'this' matrix.

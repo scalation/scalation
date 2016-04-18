@@ -10,7 +10,7 @@ package scalation.analytics.par
 
 import math.log
 
-import scalation.linalgebra.{MatriD, VectoD}
+import scalation.linalgebra.VectoD
 import scalation.linalgebra.par.{MatrixD, VectorD}
 import scalation.math.FunctionS2S
 import scalation.plot.Plot
@@ -77,13 +77,6 @@ class TranRegression (x: MatrixD, y: VectorD, transform: FunctionS2S = log, tech
     def predict (z: VectoD): Double = rg.predict (z)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula y = b dot zi for
-     *  each row zi of matrix z.
-     *  @param z  the new matrix to predict
-     */
-    override def predict (z: MatriD): VectoD = rg.predict (z)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new quality of fit.
@@ -128,11 +121,13 @@ object TranRegressionTest extends App
     val yp = trg.predict (z)
     println ("predict (" + z + ") = " + yp)
 
+/***
     val yyp = trg.predict (x)                             // predict y for several points
     println ("predict (" + x + ") = " + yyp)
 
     new Plot (x.col(1), y, yyp)
     new Plot (x.col(2), y, yyp)
+***/
 
 } // TranRegressionTest object
 

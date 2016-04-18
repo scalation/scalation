@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
+import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.linalgebra.VectorD.one
 import scalation.util.{Error, time}
 

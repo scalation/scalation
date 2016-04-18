@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
+import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.math.double_exp
 import scalation.plot.Plot
 import scalation.util.Error

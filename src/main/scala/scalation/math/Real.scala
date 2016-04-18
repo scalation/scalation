@@ -714,8 +714,8 @@ object Real
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Ordering for real numbers.
      */
-    val ord = new Ordering [Real]
-            { def compare (x: Real, y: Real) = x compare y }
+    implicit val ord = new Ordering [Real]
+               { def compare (x: Real, y: Real) = x compare y }
 
 } // Real object
 

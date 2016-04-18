@@ -36,6 +36,12 @@ class SparseMatrixD (val d1: Int,
     /** Dimension 2
      */
     lazy val dim2 = d2
+
+  def copy(): scalation.linalgebra.MatriD = ???
+  def zero(m: Int,n: Int): scalation.linalgebra.MatriD = ???
+  def toDense: scalation.linalgebra.MatriD = ???
+  def lowerT: scalation.linalgebra.MatriD = ???
+  def upperT: scalation.linalgebra.MatriD = ???
     
     /** Store the matrix as an array of sorted-linked-maps {(j, v)}
      *  where j is the second index and v is value to store
@@ -1167,7 +1173,7 @@ class SparseMatrixD (val d1: Int,
      *  @param lu  the lower and upper triangular matrices
      *  @param b   the constant vector
      */
-    def solve (lu: Tuple2 [MatriD, MatriD], b: VectoD): VectorD = solve (lu._1, lu._2, b)
+    override def solve (lu: Tuple2 [MatriD, MatriD], b: VectoD): VectorD = solve (lu._1, lu._2, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' matrix.
@@ -1530,7 +1536,7 @@ class SparseMatrixD (val d1: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show all elements in this sparse matrix.
      */
-    def showAll
+    def showAll ()
     {
         print ("SparseMatrixD(")
         for (i <- range1) {

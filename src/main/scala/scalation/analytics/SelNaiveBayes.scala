@@ -133,8 +133,8 @@ class SelNaiveBayes (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arr
         probX = new HMatrix3 [Double] (k, nn)                      // conditional probabilities for variable/feature j
         println ("fset = " + fset)
         println ("vc = " + vc)
-        popX.alloc (vc.select (fset.toArray)())                    // allocate 3rd dimension
-        probX.alloc (vc.select (fset.toArray)())                   // allocate 3rd dimension
+        popX.alloc (vc.select (fset.toArray)().toArray)            // allocate 3rd dimension
+        probX.alloc (vc.select (fset.toArray)().toArray)           // allocate 3rd dimension
 
         frequencies (testStart, testEnd)                           // compute frequencies skipping test region
 

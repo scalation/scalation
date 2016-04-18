@@ -12,7 +12,7 @@ package scalation.analytics
 
 import math.pow
 
-import scalation.linalgebra.{Fac_Cholesky, Fac_QR, MatriD, MatrixD, VectoD, VectorD}
+import scalation.linalgebra.{Fac_Cholesky, Fac_QR, MatrixD, VectoD, VectorD}
 import scalation.plot.Plot
 import scalation.util.{Error, time}
 

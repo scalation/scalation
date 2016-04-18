@@ -13,7 +13,7 @@ package scalation.analytics
 
 import math.{exp, pow}
 
-import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
+import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.minima.QuasiNewton
 import scalation.plot.Plot
 import scalation.util.Error

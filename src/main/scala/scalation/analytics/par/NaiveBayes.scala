@@ -9,7 +9,7 @@
 package scalation.analytics.par
 
 import scalation.analytics.ClassifierInt
-import scalation.linalgebra.{MatriD, MatrixI, VectorI}
+import scalation.linalgebra.{MatrixI, VectorI}
 import scalation.linalgebra.gen.HMatrix3
 import scalation.linalgebra.par.{MatrixD, VectorD}
 import scalation.stat.vectorD2StatVector
@@ -47,8 +47,8 @@ class NaiveBayes (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Array 
     private val probX = new HMatrix3 [Double] (k, n)   // conditional probabilities for variable/feature j
 
     if (vc == null) vc = vc_default                    // set to default for binary data (2)
-    popX.alloc (vc())
-    probX.alloc (vc())
+    popX.alloc (vc().toArray)
+    probX.alloc (vc().toArray)
 
     if (DEBUG) {
         println ("value count vc     = " + vc)
@@ -60,7 +60,7 @@ class NaiveBayes (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Array 
      *  If the correlations are too high, the independence assumption may be dubious.
      *  This version uses a parallel matrix implementation.
      */
-    override def calcCorrelation: MatriD =
+    override def calcCorrelation: MatrixD =
     {
         val fea = for (j <- 0 until n) yield x.col(j).toDouble
         val cor = new MatrixD (n, n)

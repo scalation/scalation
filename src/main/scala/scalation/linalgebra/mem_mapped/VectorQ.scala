@@ -537,7 +537,7 @@ class VectorQ (val dim: Int,
     /** Establish the rank order of the elements in 'self' vector, e.g.,
      *  (8.0, 2.0, 4.0, 6.0) is (3, 0, 1, 2).
      */
-    def rank: VectorII = new VectorII (iqsort (v))
+    def rank: VectorII = VectorII (iqsort (v))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Cumulate the values of 'this' vector from left to right (e.g., create a

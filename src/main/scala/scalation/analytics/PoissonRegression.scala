@@ -12,7 +12,7 @@ package scalation.analytics
 
 import scala.math.{exp, log, round}
 
-import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectorI}
+import scalation.linalgebra.{MatrixD, VectoD, VectorD, VectorI}
 import scalation.math.Combinatorics.fac
 import scalation.minima.QuasiNewton
 import scalation.plot.Plot

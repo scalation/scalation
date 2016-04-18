@@ -10,7 +10,7 @@ package scalation.analytics.par
 
 import math.{cos, Pi, sin}
 
-import scalation.linalgebra.{MatriD, VectoD}
+import scalation.linalgebra.VectoD
 import scalation.linalgebra.par.{MatrixD, VectorD}
 import scalation.plot.Plot
 import scalation.util.{Error, time}
@@ -103,13 +103,6 @@ class TrigRegression (t: VectorD, y: VectorD, k: Int, w: Double = Pi, technique:
     def predict (z: VectoD): Double = rg.predict (z)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula y = b dot zi for
-     *  each row zi of matrix z.
-     *  @param z  the new matrix to predict
-     */
-    override def predict (z: MatriD): VectoD = rg.predict (z)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new qaulity of fit
@@ -155,10 +148,12 @@ object TrigRegressionTest extends App
     val yp = prg.predict (z)
     println ("predict (" + z + ") = " + yp)
 
+/***
     val yyp = prg.predict (prg.x)                 // predict y for several points
     println ("predict ( ) = " + yyp)
 
     new Plot (t, y, yyp)
+***/
 
 } // TrigRegressionTest object
 

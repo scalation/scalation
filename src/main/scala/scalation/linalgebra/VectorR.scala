@@ -8,13 +8,14 @@
 
 package scalation.linalgebra
 
-import collection.Traversable
-import util.Sorting.quickSort
+import scala.collection.Traversable
+import scala.util.Sorting.quickSort
 
 import scalation.math.Real.{abs => ABS, max => MAX, _}
 
 import scalation.math.Real
 import scalation.util.Error
+import scalation.util.SortingR
 import scalation.util.SortingR.{iqsort, qsort2}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -25,7 +26,8 @@ import scalation.util.SortingR.{iqsort, qsort2}
  */
 class VectorR (val dim: Int,
      protected var v:   Array [Real] = null)
-      extends Traversable [Real] with PartiallyOrdered [VectorR] with Vec with Error with Serializable
+      extends VectoR
+//    extends Traversable [Real] with PartiallyOrdered [VectorR] with Vec with Error with Serializable
 {
     if (v == null) {
         v = Array.ofDim [Real] (dim)
@@ -33,108 +35,49 @@ class VectorR (val dim: Int,
         flaw ("constructor", "dimension is wrong")
     } // if
 
-    /** Number of elements in the vector as a Double
-     */
-    val nd = dim.toDouble
-
-    /** Range for the storage array
-     */
-    private val range = 0 until dim
-
-    /** Format String used for printing vector values (change using setFormat)
-     *  Ex: "%d,\t", "%.6g,\t" or "%12.6g,\t"
-     */
-    private var fString = "%s,\t"
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a vector from an array of values.
-     *  @param u  the array of values
-     */
-    def this (u: Array [Real]) { this (u.length, u) }
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a vector and assign values from vector 'u'.
      *  @param u  the other vector
      */
-    def this (u: VectorR)
-    {
-        this (u.dim)                               // invoke primary constructor
-        for (i <- range) v(i) = u(i)
-    } // constructor
+    def this (u: VectoR) { this (u.dim); for (i <- range) v(i) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the size (number of elements) of 'this' vector.
+    /** Construct a vector and assign 'value' at 'index' position.
+     *  @param iv  the tuple containing (index, value)
+     *  @param dm  the dimension for the new vector
      */
-    override def size: Int = dim
+    def this (iv: Tuple2 [Int, Real], dm: Int) { this (dm); v(iv._1) = iv._2 }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Produce the range of all indices (0 to one less than dim).
+    /** Create an exact copy of 'this' vector.
      */
-    def indices: Range = 0 until dim
+    def copy: VectorR = new VectorR (this)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Expand the size (dim) of 'this' vector by 'more' elements.
-     *  @param more  the number of new elements to add
+    /** Create a zero vector (all elements are zero) of length 'size'.
+     *  @param size  the number of elements in the vector
      */
-    def expand (more: Int = dim): VectorR =
-    {
-        if (more < 1) this       // no change
-        else          new VectorR (dim + more, Array.concat (v, new Array [Real] (more)))
-    } // expand
+    def zero (size: Int = dim): VectorR = new VectorR (size)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a one vector (all elements are one) of length 'size'.
+     *  @param size  the number of elements in the vector
+     */
+    def one (size: Int = dim): VectorR = new VectorR (size, Array.fill (size)(_1))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a vector of the form (0, ... 1, ... 0) where the 1 is at position j.
      *  @param j     the position to place the 1
      *  @param size  the size of the vector (upper bound = size - 1)
      */
-    def oneAt (j: Int, size: Int = dim): VectorR =
-    {
-        val c = new VectorR (size)
-        c.v(j) = _1
-        c
-    } // oneAt
+    def oneAt (j: Int, size: Int = dim): VectorR = new VectorR ((j, _1), size)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a vector of the form (0, ... -1, ... 0) where the -1 is at position j.
      *  @param j     the position to place the -1
      *  @param size  the size of the vector (upper bound = size - 1)
      */
-    def _oneAt (j: Int, size: Int = dim): VectorR =
-    {
-        val c = new VectorR (size)
-        c.v(j) = -_1
-        c
-    } // _oneAt
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `VectorR` into a `VectorI`.
-     */
-    def toInt: VectorI =
-    {
-        val c = new VectorI (dim)
-        for (i <- range) c(i) = v(i).toInt
-        c
-    } // toInt
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `VectorR` into a `VectorL`.
-      */
-    def toLong: VectorL =
-    {
-        val c = new VectorL (dim)
-        for (i <- range) c(i) = v(i).toLong
-        c
-    } // toLong
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `VectorR` into a `VectorD`.
-     */
-    def toDouble: VectorD =
-    {
-        val c = new VectorD (dim)
-        for (i <- range) c(i) = v(i).toDouble
-        c
-    } // toDouble
+    def _oneAt (j: Int, size: Int = dim): VectorR = new VectorR ((j, -_1), size)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's element at the 'i'-th index position. 
@@ -151,7 +94,7 @@ class VectorR (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's entire array.
      */
-    def apply (): Array [Real] = v
+    def apply (): Seq [Real] = v
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' vector's element at the 'i'-th index position. 
@@ -172,7 +115,7 @@ class VectorR (val dim: Int,
      *  @param r  the given range
      *  @param u  the vector to assign
      */
-    def update (r: Range, u: VectorR) { for (i <- r) v(i) = u(i - r.start) }
+    def update (r: Range, u: VectoR) { for (i <- r) v(i) = u(i - r.start) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set each value in 'this' vector to 'x'.
@@ -181,20 +124,46 @@ class VectorR (val dim: Int,
     def set (x: Real) { for (i <- range) v(i) = x }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the values in 'this' vector to the values in array 'u'.
-     *  @param u  the array of values to be assigned
+    /** Set the values in 'this' vector to the values in sequence/array 'u'.
+     *  @param u  the sequence/array of values to be assigned
      */
-    def setAll (u: Array [Real]) { for (i <- range) v(i) = u(i) }
+    def set (u: Seq [Real]) { for (i <- range) v(i) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Iterate over 'this' vector element by element.
      *  @param f  the function to apply
      */
-    def foreach [U] (f: Real => U)
+    def foreach [U] (f: Real => U) { var i = 0; while (i < dim) { f (v(i)); i += 1 } }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `VectorR` into a `VectorI`.
+     */
+    def toInt: VectorI = VectorI (v.map (_.toInt))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `VectorR` into a `VectorL`.
+      */
+    def toLong: VectorL = VectorL (v.map (_.toLong))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `VectorR` into a `VectorD`.
+     */
+    def toDouble: VectorD = VectorD (v.map (_.toDouble))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `VectorR` into a dense `VectorR`.
+     */
+    def toDense: VectorR = this
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Expand the size (dim) of 'this' vector by 'more' elements.
+     *  @param more  the number of new elements to add
+     */
+    def expand (more: Int = dim): VectorR =
     {
-        var i = 0    
-        while (i < dim) { f (v(i)); i += 1 }
-    } // foreach
+        if (more < 1) this       // no change
+        else          new VectorR (dim + more, Array.concat (v, new Array [Real] (more)))
+    } // expand
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
@@ -208,23 +177,20 @@ class VectorR (val dim: Int,
      *  the index positions.
      *  @param p  the predicate (Boolean function) to apply
      */
-    def filterPos (p: Real => Boolean): Array [Int] =
-    {
-        (for (i <- range if p (v(i))) yield i).toArray
-    } // filterPos
+    def filterPos (p: Real => Boolean): Seq [Int] = for (i <- range if p (v(i))) yield i
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Map the elements of 'this' vector by applying the mapping function 'f'.
      *  @param f  the function to apply
      */
-    def map (f: Real => Real): VectorR = new VectorR (this ().map (f))
+    def map (f: Real => Real): VectorR = VectorR (v.map (f))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice 'this' vector 'from' to 'end'.
      *  @param from  the start of the slice (included)
      *  @param till  the end of the slice (excluded)
      */
-    override def slice (from: Int, till: Int): VectorR = new VectorR (till - from, v.slice (from, till))
+    override def slice (from: Int, till: Int = dim): VectorR = new VectorR (till - from, v.slice (from, till))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select a subset of elements of 'this' vector corresponding to a 'basis'.
@@ -239,7 +205,18 @@ class VectorR (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate 'this' vector and vector' b'.
-     *  @param b  the vector to be concatenated
+     *  @param b  the vector to be concatenated (any kind)
+     */
+    def ++ (b: VectoR): VectorR =
+    {
+        val c = new VectorR (dim + b.dim)
+        for (i <- c.range) c.v(i) = if (i < dim) v(i) else b(i - dim)
+        c
+    } // ++
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate 'this' vector and vector' b'.
+     *  @param b  the vector to be concatenated (same kind, more efficient)
      */
     def ++ (b: VectorR): VectorR =
     {
@@ -261,7 +238,18 @@ class VectorR (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to add (any kind)
+     */
+    def + (b: VectoR): VectorR = 
+    {
+        val c = new VectorR (dim)
+        for (i <- range) c.v(i) = v(i) + b(i)
+        c
+    } // +
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add 'this' vector and vector 'b'.
+     *  @param b  the vector to add (same kind, more efficient)
      */
     def + (b: VectorR): VectorR = 
     {
@@ -282,19 +270,25 @@ class VectorR (val dim: Int,
     } // +
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add 'this' vector and scalar 's._1' only at position 's._2'.
-     *  @param s  the (scalar, position) to add
+    /** Add 'this' vector and scalar 's._2' only at position 's._1'.
+     *  @param s  the (position, scalar) to add
      */
-    def + (s: Tuple2 [Real, Int]): VectorR =
+    def + (s: Tuple2 [Int, Real]): VectorR =
     {
         val c = new VectorR (dim)
-        for (i <- range) c.v(i) = if (i == s._2) v(i) + s._1 else v(i)
+        for (i <- range) c.v(i) = if (i == s._1) v(i) + s._2 else v(i)
         c
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to add (any kind)
+     */
+    def += (b: VectoR): VectorR = { for (i <- range) v(i) += b(i); this }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add in-place 'this' vector and vector 'b'.
+     *  @param b  the vector to add (same kind, more efficient)
      */
     def += (b: VectorR): VectorR = { for (i <- range) v(i) += b.v(i); this }
 
@@ -316,7 +310,18 @@ class VectorR (val dim: Int,
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract vector 'b'.
-     *  @param b  the vector to subtract
+     *  @param b  the vector to subtract (any kind)
+     */
+    def - (b: VectoR): VectorR =
+    {
+        val c = new VectorR (dim)
+        for (i <- range) c.v(i) = v(i) - b(i)
+        c
+    } // -
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** From 'this' vector subtract vector 'b'.
+     *  @param b  the vector to subtract (same kind, more efficient)
      */
     def - (b: VectorR): VectorR =
     {
@@ -337,19 +342,25 @@ class VectorR (val dim: Int,
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' vector subtract scalar 's._1' only at position 's._2'.
-     *  @param s  the (scalar, position) to subtract
+    /** From 'this' vector subtract scalar 's._2' only at position 's._1'.
+     *  @param s  the (position, scalar) to subtract
      */
-    def - (s: Tuple2 [Real, Int]): VectorR =
+    def - (s: Tuple2 [Int, Real]): VectorR =
     {
         val c = new VectorR (dim)
-        for (i <- range) c.v(i) = if (i == s._2) v(i) - s._1 else v(i)
+        for (i <- range) c.v(i) = if (i == s._1) v(i) - s._2 else v(i)
         c
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to add (any kind)
+     */
+    def -= (b: VectoR): VectorR = { for (i <- range) v(i) -= b(i); this }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** From 'this' vector subtract in-place vector 'b'.
+     *  @param b  the vector to add (same kind, more efficient)
      */
     def -= (b: VectorR): VectorR = { for (i <- range) v(i) -= b.v(i); this }
 
@@ -361,7 +372,18 @@ class VectorR (val dim: Int,
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' vector by vector 'b'.
-     *  @param b  the vector to multiply by
+     *  @param b  the vector to multiply by (any kind)
+     */
+    def * (b: VectoR): VectorR =
+    {
+        val c = new VectorR (dim)
+        for (i <- range) c.v(i) = v(i) * b(i)
+        c
+    } // *
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply 'this' vector by vector 'b'.
+     *  @param b  the vector to multiply by (same kind, more efficient)
      */
     def * (b: VectorR): VectorR =
     {
@@ -382,14 +404,14 @@ class VectorR (val dim: Int,
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply 'this' (row) vector by matrix 'm'.
-     *  @param m  the matrix to multiply by
+    /** Multiply in-place 'this' vector and vector 'b'.
+     *  @param b  the vector to add (any kind)
      */
-    def * (m: MatriR): VectorR = m.t * this
+    def *= (b: VectoR): VectorR = { for (i <- range) v(i) *= b(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to add (same kind, more efficient)
      */
     def *= (b: VectorR): VectorR = { for (i <- range) v(i) *= b.v(i); this }
 
@@ -401,7 +423,18 @@ class VectorR (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide 'this' vector by vector 'b' (element-by-element).
-     *  @param b  the vector to divide by
+     *  @param b  the vector to divide by (any kind)
+     */
+    def / (b: VectoR): VectorR =
+    {
+        val c = new VectorR (dim)
+        for (i <- range) c.v(i) = v(i) / b(i)
+        c
+    } // /
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide 'this' vector by vector 'b' (element-by-element).
+     *  @param b  the vector to divide by (same kind, more efficient)
      */
     def / (b: VectorR): VectorR =
     {
@@ -423,7 +456,13 @@ class VectorR (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to add (any kind)
+     */
+    def /= (b: VectoR): VectorR = { for (i <- range) v(i) /= b(i); this }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide in-place 'this' vector and vector 'b'.
+     *  @param b  the vector to add (same kind, more efficient)
      */
     def /= (b: VectorR): VectorR = { for (i <- range) v(i) /= b.v(i); this }
 
@@ -445,34 +484,11 @@ class VectorR (val dim: Int,
         c
     } // ~^
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare 'this' vector with that vector 'b' for inequality.
-     *  @param b  that vector
-     */
-    def ≠ (b: VectorR) = this != b
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare 'this' vector with that vector 'b' for less than or equal to.
-     *  @param b  that vector
-     */
-    def ≤ (b: VectorR) = this <= b
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare 'this' vector with that vector 'b' for greater than or equal to.
-     *  @param b  that vector
-     */
-    def ≥ (b: VectorR) = this >= b
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Raise each element of 'this' vector to the 's'-th power.
+    /** Raise in-place each element of 'this' vector to the 's'-th power.
      *  @param s  the scalar exponent
      */
-    def ~^= (s: Double) { for (i <- range) v(i) = v(i) ~^ s }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the vector containing the square of each element of 'this' vector.
-     */
-    def sq: VectorR = this * this
+    def ~^= (s: Double): VectorR = { for (i <- range) v(i) = v(i) ~^ s; this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector containing the reciprocal of each element of 'this' vector.
@@ -482,7 +498,7 @@ class VectorR (val dim: Int,
         val c = new VectorR (dim)
         for (i <- range) c.v(i) = _1 / v(i)
         c
-    } // inverse
+    } // recip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector that is the element-wise absolute value of 'this' vector.
@@ -516,26 +532,10 @@ class VectorR (val dim: Int,
     def sumPos: Real = v.foldLeft (_0)((s, x) => s + MAX (x, _0))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the mean of the elements of 'this' vector.
-     */
-    def mean = sum / nd
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the (unbiased) sample variance of the elements of 'this' vector.
-     */
-    def variance = (normSq - sum * sum / nd) / (nd-1.0)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the population variance of the elements of 'this' vector.
-     *  This is also the (biased) MLE estimator for sample variance.
-     */
-    def pvariance = (normSq - sum * sum / nd) / nd
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Establish the rank order of the elements in 'self' vector, e.g.,
      *  (8.0, 2.0, 4.0, 6.0) is (3, 0, 1, 2).
      */
-    def rank: VectorI = new VectorI (iqsort (v))
+    def rank: VectorI = VectorI (iqsort (v))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Cumulate the values of 'this' vector from left to right (e.g., create a
@@ -544,7 +544,7 @@ class VectorR (val dim: Int,
     def cumulate: VectorR =
     {
         val c = new VectorR (dim)
-        var sum: Real = _0
+        var sum = _0
         for (i <- range) { sum += v(i); c.v(i) = sum }
         c
     } // cumulate
@@ -566,42 +566,32 @@ class VectorR (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
-     *  @param b  the other vector
+     *  @param b  the other vector (any kind)
      */
-    def dot (b: VectorR): Real =
+    def dot (b: VectoR): Real =
     {
-        var sum: Real = _0
-        for (i <- range) sum += v(i) * b.v(i)
+        var sum = _0
+        for (i <- range) sum += v(i) * b(i)
         sum
     } // dot
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
-     *  @param b  the other vector
+     *  @param b  the other vector (same kind, more efficient)
      */
-    def ∙ (b: VectorR): Real =
+    def dot (b: VectorR): Real =
     {
-        var sum: Real = _0
+        var sum = _0
         for (i <- range) sum += v(i) * b.v(i)
         sum
-    } // ∙
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Euclidean norm (2-norm) squared of 'this' vector.
-     */
-    def normSq: Real = this dot this
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Euclidean norm (2-norm) of 'this' vector.
-     */
-    def norm: Real = sqrt (normSq).toReal
+    } // dot
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Manhattan norm (1-norm) of 'this' vector.
      */
     def norm1: Real =
     {
-        var sum: Real = _0
+        var sum = _0
         for (i <- range) sum += ABS (v(i))
         sum
     } // norm1
@@ -619,7 +609,18 @@ class VectorR (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Take the maximum of 'this' vector with vector 'b' (element-by element).
-     *  @param b  the other vector
+     *  @param b  the other vector (any kind)
+     */
+    def max (b: VectoR): VectorR =
+    {
+        val c = new VectorR (dim)
+        for (i <- range) c.v(i) = if (b(i) > v(i)) b(i) else v(i)
+        c
+    } // max
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Take the maximum of 'this' vector with vector 'b' (element-by element).
+     *  @param b  the other vector (same kind, more efficient)
      */
     def max (b: VectorR): VectorR =
     {
@@ -641,7 +642,18 @@ class VectorR (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Take the minimum of 'this' vector with vector 'b' (element-by element).
-     *  @param b  the other vector
+     *  @param b  the other vector (any kind)
+     */
+    def min (b: VectoR): VectorR =
+    {
+        val c = new VectorR (dim)
+        for (i <- range) c.v(i) = if (b(i) < v(i)) b(i) else v(i)
+        c
+    } // min
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Take the minimum of 'this' vector with vector 'b' (element-by element).
+     *  @param b  the other vector (same kind, more efficient)
      */
     def min (b: VectorR): VectorR =
     {
@@ -649,11 +661,6 @@ class VectorR (val dim: Int,
         for (i <- range) c.v(i) = if (b.v(i) < v(i)) b.v(i) else v(i)
         c
     } // min
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Find the element with the greatest magnitude in 'this' vector.
-     */
-    def mag: Real = ABS (max ()) max ABS (min ())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the argument maximum of 'this' vector (index of maximum element).
@@ -678,7 +685,7 @@ class VectorR (val dim: Int,
     } // argmin
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the argument minimum of 'this' vector (-1 if its not negative).
+    /** Return the argument minimum of 'this' vector (-1 if it's not negative).
      *  @param e  the ending index (exclusive) for the search
      */
     def argminNeg (e: Int = dim): Int =
@@ -687,7 +694,7 @@ class VectorR (val dim: Int,
     } // argmaxNeg
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the argument maximum of 'this' vector (-1 if its not positive).
+    /** Return the argument maximum of 'this' vector (-1 if it's not positive).
      *  @param e  the ending index (exclusive) for the search
      */
     def argmaxPos (e: Int = dim): Int =
@@ -741,7 +748,7 @@ class VectorR (val dim: Int,
         count
     } // countNeg
 
-   //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of strictly positive elements in 'this' vector.
      */
     def countPos: Int =
@@ -753,7 +760,7 @@ class VectorR (val dim: Int,
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of distinct elements in 'this' vector.
-     */
+     *
     def distinct: Int =
     {
         var count = 1
@@ -761,12 +768,17 @@ class VectorR (val dim: Int,
         for (i <- 1 until dim if us(i) != us(i-1)) count += 1
         count
     } // distinct
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine whether the predicate 'pred' holds for some element in 'this' vector.
-     *  @param pred  the predicate to test (e.g., "_ == 5.")
      */
-//  def exists (pred: (Real) => Boolean): Boolean = v.exists (pred)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return a new vector consisting of the distinct elements from 'this' vector.
+     */
+    def distinct: VectorR = VectorR (v.distinct)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Count the number of distinct elements in 'this' vector.
+     */
+    def countinct: Int = v.distinct.length
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether 'x' is contained in 'this' vector.
@@ -775,9 +787,19 @@ class VectorR (val dim: Int,
     def contains (x: Real): Boolean = v contains x
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reverse the order of the elemnets in 'this' vector.
+     */
+    def reverse (): VectorR = new VectorR (dim, v.reverse)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether 'this' vector is in sorted (ascending) order.
+     */
+    def isSorted: Boolean = (new SortingR (v)).isSorted
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sort 'this' vector in-place in ascending (non-decreasing) order.
      */
-    def sort () { quickSort (v)(Real.ord) }
+    def sort () { quickSort (v) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sort 'this' vector in-place in descending (non-increasing) order.
@@ -789,25 +811,12 @@ class VectorR (val dim: Int,
      *  @param i  the first element in the swap
      *  @param j  the second element in the swap
      */
-    def swap (i: Int, j: Int)
-    {
-        val t = v(j); v(j) = v(i); v(i) = t
-    } // swap
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check whether the other vector 'b' is at least as long as 'this' vector.
-     *  @param b  the other vector
-     */
-    def sameDimensions (b: VectorR): Boolean = dim <= b.dim
+    def swap (i: Int, j: Int) { val t = v(j); v(j) = v(i); v(i) = t }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check whether 'this' vector is nonnegative (has no negative elements).
      */
-    def isNonnegative: Boolean =
-    {
-        for (i <- range if v(i) < _0) return false
-        true
-    } // isNonnegative
+    def isNonnegative: Boolean = { for (i <- range if v(i) < _0) return false; true }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compare 'this' vector with vector 'b'.
@@ -828,24 +837,23 @@ class VectorR (val dim: Int,
     } // tryCompareTo
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Override equals to determine whether 'this' vector equals vector 'b..
+    /** Override equals to determine whether 'this' vector equals vector 'b'.
      *  @param b  the vector to compare with this
      */
     override def equals (b: Any): Boolean =
     {
-        b.isInstanceOf [VectorR] && (v.deep equals b.asInstanceOf [VectorR].v.deep)
+//      b.isInstanceOf [VectorR] && (v.deep equals b.asInstanceOf [VectorR].v.deep)
+
+        if (! b.isInstanceOf [VectoR]) return false
+        val bb = b.asInstanceOf [VectoR]
+        for (i <- range if v(i) !=~ bb(i)) return false               // within TOL
+        true
     } // equals
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Must also override hashCode for 'this' vector to be compatible with equals.
      */
     override def hashCode: Int = v.deep.hashCode
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the format to the 'newFormat' (e.g., "%.6g,\t" or "%12.6g,\t").
-     *  @param  newFormat  the new format String
-     */
-    def setFormat (newFormat: String) { fString = newFormat }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' vector to a String.
@@ -883,8 +891,8 @@ object VectorR
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `VectorR` from a sequence of Reals.
-     *  @param xs  the sequence of the Real numbers
+    /** Create a `VectorR` from a sequence/array of Reals.
+     *  @param xs  the sequence/array of the Real numbers
      */
     def apply (xs: Seq [Real]): VectorR =
     {
@@ -935,24 +943,31 @@ object VectorR
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a one vector (all elements are one) of length 'size'.
-     *  @param size  the size of the vector
+     *  @param size  the size of the new vector
      */
-    def one (size: Int): VectorR =
-    {
-        val c = new VectorR (size)
-        c.set (_1)
-        c
-    } // one
+    def one (size: Int): VectorR = new VectorR (size, Array.fill (size)(_1))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate scalar 'b' and vector 'u'.
      *  @param b  the scalar to be concatenated - first part
-     *  @param u  the vector to be concatenated - second part
+     *  @param u  the vector to be concatenated - second part (any kind)
+     */
+    def ++ (b: Real, u: VectoR): VectorR =
+    {
+        val c = new VectorR (u.dim + 1)
+        for (i <- c.range) c(i) = if (i == 0) b else u(i-1)
+        c
+    } // ++
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate scalar 'b' and vector 'u'.
+     *  @param b  the scalar to be concatenated - first part
+     *  @param u  the vector to be concatenated - second part (same kind, more efficient)
      */
     def ++ (b: Real, u: VectorR): VectorR =
     {
         val c = new VectorR (u.dim + 1)
-        for (i <- c.range) c(i) = if (i == 0) b else u.v(i - 1)
+        for (i <- c.range) c(i) = if (i == 0) b else u.v(i-1)
         c
     } // ++
 

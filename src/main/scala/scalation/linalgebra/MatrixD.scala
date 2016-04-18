@@ -11,9 +11,9 @@ package scalation.linalgebra
 
 import java.io.PrintWriter
 
-import io.Source.fromFile
+import scala.io.Source.fromFile
 
-import math.{abs => ABS}
+import scala.math.{abs => ABS}
 
 import scalation.math.{double_exp, oneIf}
 import scalation.util.{Error, PackageInfo}
@@ -92,6 +92,18 @@ class MatrixD (d1: Int,
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an exact copy of 'this' m-by-n matrix.
+     */
+    def copy (): MatrixD = new MatrixD (dim1, dim2, (for (i <- range1) yield v(i).clone ()).toArray)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an m-by-n matrix with all elements intialized to zero.
+     *  @param m  the number of rows
+     *  @param n  the number of columns
+     */
+    def zero (m: Int = dim1, n: Int = dim2): MatrixD = new MatrixD (m, n)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' matrix's element at the 'i,j'-th index position. 
      *  @param i  the row index
      *  @param j  the column index
@@ -130,7 +142,7 @@ class MatrixD (d1: Int,
      *  @param i  the row index
      *  @param u  the vector value to assign
      */
-    def update (i: Int, u: VectoD) { v(i) = u() }
+    def update (i: Int, u: VectoD) { v(i) = u().toArray }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set a slice 'this' matrix row-wise on range ir and column-wise on range 'jr'.
@@ -170,26 +182,19 @@ class MatrixD (d1: Int,
     def set (i: Int, u: VectoD, j: Int = 0) { for (k <- 0 until u.dim) v(i)(k+j) = u(k) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a clone of 'this' m-by-n matrix.
-     */
-    def copy (): MatrixD = { val c = new MatrixD (dim1, dim2); Array.copy (v, 0, c.v, 0, dim1 * dim2); c }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create an m-by-n matrix with all elements intialized to zero.
-     *  @param m  the number of rows
-     *  @param n  the number of columns
-     */
-    def zero (m: Int = dim1, n: Int = dim2): MatrixD = new MatrixD (m, n)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' `MatrixD` into a `MatrixI`.
      */
-    def toInt: MatrixI = 
+    def toInt: MatrixI =
     {
         val c = new MatrixI (dim1, dim2)
         for (i <- range1) c.v(i) = v(i).map (_.toInt)
         c
     } // toInt
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' matrix to a dense matrix.
+     */
+    def toDense: MatrixD = this
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice 'this' matrix row-wise 'from' to 'end'.
@@ -897,7 +902,7 @@ class MatrixD (d1: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the lower triangular of 'this' matrix (rest are zero).
      */ 
-    def lowerT: MatriD =
+    def lowerT: MatrixD =
     {
         val lo = new MatrixD (dim1, dim2)
         for (i <- range1; j <- 0 to i) lo.v(i)(j) = v(i)(j)
@@ -907,7 +912,7 @@ class MatrixD (d1: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the upper triangular of 'this' matrix (rest are zero).
      */ 
-    def upperT: MatriD =
+    def upperT: MatrixD =
     {
         val up = new MatrixD (dim1, dim2)
         for (i <- range1; j <- i until dim2) up.v(i)(j) = v(i)(j)

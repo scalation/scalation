@@ -414,8 +414,8 @@ object Complex
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Ordering for complex numbers.
      */
-    val ord = new Ordering [Complex]
-            { def compare (c: Complex, d: Complex) = c compare d }
+    implicit val ord = new Ordering [Complex]
+               { def compare (c: Complex, d: Complex) = c compare d }
 
 } // Complex object
 

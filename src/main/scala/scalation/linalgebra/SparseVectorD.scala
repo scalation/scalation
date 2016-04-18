@@ -1,6 +1,6 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  John Miller
+/** @author  John Miller, Vishnu Gowda  Harish
  *  @version 1.2
  *  @date    Fri Jan 29 15:43:08 EST 2016
  *  @see     LICENSE (MIT style license file).
@@ -9,131 +9,24 @@
 package scalation.linalgebra
 
 import scala.collection.Traversable
+import scala.collection.mutable.ArrayBuffer
 import scala.util.Sorting.quickSort
 
 import scala.math.{abs => ABS, max => MAX, sqrt}
 
 import scalation.math.double_exp
 import scalation.util.{Error, SortedLinkedHashMap}
+import scalation.util.SortingD
 import scalation.util.SortingD.{iqsort, qsort2}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `SparseVectorD` object is the companion object for the `SparseVectorD` class.
- */
-object SparseVectorD
-{
-    /** Shorthand type definition for sparse vector
-     */
-    type RowMap = SortedLinkedHashMap [Int, Double]
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `SparseVectorD` from one or more values (repeated values Double*).
-     *  @param x   the first Double number
-     *  @param xs  the rest of the Double numbers
-     */
-    def apply (x: Double, xs: Double*): SparseVectorD =
-    {
-        val c = new SparseVectorD (1 + xs.length)
-        c(0)  = x
-        for (i <- 0 until c.dim-1) c.v(i+1) = xs(i)
-        c
-    } // apply
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `SparseVectorD` from a sequence of Doubles.
-     *  @param xs  the sequence of the Double numbers
-     */
-    def apply (xs: Seq [Double]): SparseVectorD =
-    {
-        val c = new SparseVectorD (xs.length)
-        for (i <- 0 until c.dim) c.v(i) = xs(i)
-        c
-    } // apply
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `SparseVectorD` from one or more values (repeated values String*).
-     *  @param x   the first String
-     *  @param xs  the rest of the Strings
-     */
-    def apply (x: String, xs: String*): SparseVectorD =
-    {
-        val c = new SparseVectorD (1 + xs.length)
-        c(0)  = x.toDouble
-        for (i <- 0 until c.dim-1) c.v(i+1) = xs(i).toDouble
-        c
-    } // apply
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `SparseVectorD` from an array of Strings.
-     *  @param xs  the array of the Strings
-     */
-    def apply (xs: Array [String]): SparseVectorD =
-    {
-        val c = new SparseVectorD (xs.length)
-        for (i <- c.range) c.v(i) = xs(i).toDouble
-        c
-    } // apply
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `SparseVectorD` from an array of Strings, skipping the first 'skip'
-     *  elements.  If an element is non-numeric, use its hashcode.
-     *  FIX:  Might be better to map non-numeric Strings to ordinal values.
-     *  @param xs    the array of the Strings
-     *  @param skip  the number of elements at the beginning to skip (e.g., id column)
-     */
-    def apply (xs: Array [String], skip: Int): SparseVectorD =
-    {
-        val c = new SparseVectorD (xs.length - skip)
-        for (i <- skip until xs.length) {
-            c.v(i - skip) = if (xs(i) matches "[\\-\\+]?\\d*(\\.\\d+)?") xs(i).toDouble else xs(i).hashCode ()
-        } // for
-        c
-    } // apply
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a one vector (all elements are one) of length 'size'.
-     *  @param size  the size of the vector
-     */
-    def one (size: Int): SparseVectorD =
-    {
-        val c = new SparseVectorD (size)
-        c.set (1.0)
-        c
-    } // one
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate scalar 'b' and vector 'u'.
-     *  @param b  the scalar to be concatenated - first part
-     *  @param u  the vector to be concatenated - second part
-     */
-    def ++ (b: Double, u: SparseVectorD): SparseVectorD =
-    {
-        val c = new SparseVectorD (u.dim + 1)
-        for (i <- c.range) c(i) = if (i == 0) b else u.v(i - 1)
-        c
-    } // ++
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return a `SparseVectorD` containing a sequence of increasing integers in a range.
-     *  @param start  the start value of the vector, inclusive
-     *  @param end    the end value of the vector, exclusive (i.e., the first value not returned)
-     */
-    def range (start: Int, end: Int): SparseVectorD =
-    {
-        val c = new SparseVectorD (end - start)
-        for (i <- c.range) c.v(i) = (start + i).toDouble
-        c
-    } // range
-
-} // SparseVectorD object
-
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SparseVectorD` class stores and operates on Numeric Vectors of base type `Double`.
  *  It follows the framework of `gen.VectorN [T]` and is provided for performance.
  *  @param dim_  the dimension/size of the vector
+ *  @param v     the SortedLinkedHashMap used to store vector elements
  */
-class SparseVectorD (val dim_ : Int)
+class SparseVectorD (val dim_ : Int,
+           protected var v:     SparseVectorD.RowMap = null)
       extends VectoD
 //    extends Traversable [Double] with PartiallyOrdered [SparseVectorD] with Vec with Error with Serializable
 {
@@ -141,32 +34,141 @@ class SparseVectorD (val dim_ : Int)
      */
     lazy val dim = dim_
     
-    import SparseVectorD.RowMap
-
-    /** Store the vector as a sorted-linked-maps {(i, v)}
-     *  where i is the index and v is value to store
-     */
-    private val v = new RowMap ()
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a vector from an array of values.
-     *  @param u  the array of values
-     */
-    def this (u: Array [Double])
-    {
-        this (u.length)                            // invoke primary constructor
-        for (i <- range) v(i) = u(i)
-    } // constructor
-
+    if (v == null) v = new SparseVectorD.RowMap ()
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a vector and assign values from vector 'u'.
      *  @param u  the other vector
      */
-    def this (u: SparseVectorD)
+    def this (u: VectoD) { this (u.dim); for (i <- range) this(i) = u(i) } 
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Construct a vector and assign values from vector 'u'.
+     *  @param iv  the tuple containing (index, value)
+     *  @param dm  the dimension for the new vector
+     */
+    def this (iv: Tuple2 [Int, Double], dm: Int) { this (dm); this(iv._1) = iv._2 }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an exact copy of 'this' vector.
+     */
+    def copy: SparseVectorD = new SparseVectorD (dim, v.clone.asInstanceOf [SparseVectorD.RowMap])
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a zero vector (all elements are zero) of length 'size'.
+     *  @param size  the number of elements in the vector
+     */
+    def zero (size: Int = dim): SparseVectorD = new SparseVectorD (size)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a one vector (all elements are one) of length 'size'.
+     *  @param size  the number of elements in the vector
+     */
+    def one (size: Int = dim): SparseVectorD = { val sv = new SparseVectorD (size); sv.set (1.0); sv }
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a vector of the form (0, ... 1, ... 0) where the 1 is at position j.
+     *  @param j     the position to place the 1
+     *  @param size  the size of the vector (upper bound = size - 1)
+     */
+    def oneAt (j: Int, size: Int = dim): SparseVectorD = new SparseVectorD ((j, 1.0), size)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a vector of the form (0, ... -1, ... 0) where the -1 is at position j.
+     *  @param j     the position to place the -1
+     *  @param size  the size of the vector (upper bound = size - 1)
+     */
+    def _oneAt (j: Int, size: Int = dim): SparseVectorD = new SparseVectorD ((j, -1.0), size) 
+      
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get 'this' vector's element at the 'i'-th index position. 
+     *  @param i  the given index
+     */
+    def apply (i: Int): Double = if (i >= dim) throw new IndexOutOfBoundsException else v.getOrElse (i, 0.0)
+                                   
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get 'this' vector's elements within the given range (vector slicing).
+     *  @param r  the given range
+     */
+    def apply (r: Range): SparseVectorD = slice (r.start, r.end)
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get 'this' vector's entire array.
+     */
+    def apply (): Seq [Double] = for (i <- range) yield v.getOrElse (i, 0.0)
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set 'this' vector's element at the 'i'-th index position. 
+     *  @param i  the given index
+     *  @param x  the value to assign
+     */
+    def update (i: Int, x: Double) 
+    { 
+        if (i >= dim) throw new IndexOutOfBoundsException
+        if (x =~ 0.0) v.remove(i) else v(i) = x        
+    } // update
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set 'this' vector's elements over the given range (vector slicing).
+     *  @param r  the given range
+     *  @param x  the value to assign
+     */
+    def update (r: Range, x: Double)  { for (i <- r) this(i) = x } 
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set 'this' vector's elements over the given range (vector slicing).
+     *  @param r  the given range
+     *  @param u  the vector to assign
+     */
+    def update (r: Range, u: VectoD) { for (i <- r) this(i) = u(i - r.start) }
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Iterate over 'this' vector element by element.
+     *  @param f  the function to apply
+     */
+    def foreach [U] (f: Double => U) { var i = 0; while (i < dim) { f (this(i)); i += 1 } } 
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set each value in 'this' vector to 'x'.
+     *  @param x  the value to be assigned
+     */
+    def set (x: Double) { for (i <- range) this(i) = x }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the values in 'this' vector to the values in array 'u'.
+     *  @param u  the array of values to be assigned
+     */
+    def set (u: Seq [Double]) { for (i <- range) this(i) = u(i) }
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `SparseVectorD` into a `VectorI`.
+     */
+    def toInt: VectorI = 
     {
-        this (u.dim)                               // invoke primary constructor
-        for (i <- range) v(i) = u(i)
-    } // constructor
+        val c = new VectorI (dim)
+        for (i <- range) c(i) = this(i).toInt
+        c
+    } // toInt
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `SparseVectorD` into a `VectorL`.
+      */
+    def toLong: VectorL =
+    { 
+        val c = new VectorL (dim)
+        for (i <- range) c(i) = this(i).toLong
+        c
+    } // toLong
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `SparseVectorD` into a `VectorD`.
+     */
+    def toDouble: VectorD =
+    {    
+        val c = new VectorD (dim)
+        for (i <- range) c(i) = this(i).toDouble
+        c
+    } // toDouble
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Expand the size (dim) of 'this' vector by 'more' elements.
@@ -183,150 +185,42 @@ class SparseVectorD (val dim_ : Int)
     } // expand
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a vector of the form (0, ... 1, ... 0) where the 1 is at position j.
-     *  @param j     the position to place the 1
-     *  @param size  the size of the vector (upper bound = size - 1)
+    /** Return 'this' vector's entire array of stored (i.e., non-zero) elements.
      */
-    def oneAt (j: Int, size: Int = dim): SparseVectorD =
-    {
-        val c = new SparseVectorD (size)
-        c.v(j) = 1.0
-        c
-    } // oneAt
-
+    private def nonZero: Array [Double] = v.values.toArray
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a vector of the form (0, ... -1, ... 0) where the -1 is at position j.
-     *  @param j     the position to place the -1
-     *  @param size  the size of the vector (upper bound = size - 1)
+    /** Return 'this' vector's positive elements as an array.
      */
-    def _oneAt (j: Int, size: Int = dim): SparseVectorD =
-    {
-        val c = new SparseVectorD (size)
-        c.v(j) = -1.0
-        c
-    } // _oneAt
-
+    private def positive: Array [Double] = v.values.filter (_ > 0.0).toArray
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `SparseVectorD` into a `VectorI`.
+    /** Return 'this' vector's negatives elements as an array.
      */
-    def toInt: VectorI =
-    {
-        val c = new VectorI (dim)
-        for (i <- range) c(i) = v(i).toInt
-        c
-    } // toInt
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `SparseVectorD` into a `VectorL`.
-      */
-    def toLong: VectorL =
-    {
-        val c = new VectorL (dim)
-        for (i <- range) c(i) = v(i).toLong
-        c
-    } // toLong
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `SparseVectorD` into a `VectorD`.
-     */
-    def toDouble: VectorD =
-    {
-        val c = new VectorD (dim)
-        for (i <- range) c(i) = v(i).toDouble
-        c
-    } // toDouble
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get 'this' vector's element at the 'i'-th index position. 
-     *  @param i  the given index
-     */
-    def apply (i: Int): Double = v(i)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get 'this' vector's elements within the given range (vector slicing).
-     *  @param r  the given range
-     */
-    def apply (r: Range): SparseVectorD = slice (r.start, r.end)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get 'this' vector's entire array.
-     */
-    def apply (): Array [Double] = null  // FIX: v.toArray
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set 'this' vector's element at the 'i'-th index position. 
-     *  @param i  the given index
-     *  @param x  the value to assign
-     */
-    def update (i: Int, x: Double) { v(i) = x }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set 'this' vector's elements over the given range (vector slicing).
-     *  @param r  the given range
-     *  @param x  the value to assign
-     */
-    def update (r: Range, x: Double) { for (i <- r) v(i) = x }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set 'this' vector's elements over the given range (vector slicing).
-     *  @param r  the given range
-     *  @param u  the vector to assign
-     */
-    def update (r: Range, u: VectoD) { for (i <- r) v(i) = u(i - r.start) }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set each value in 'this' vector to 'x'.
-     *  @param x  the value to be assigned
-     */
-    def set (x: Double) { for (i <- range) v(i) = x }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the values in 'this' vector to the values in sequence 'u'.
-     *  @param u  the sequence of values to be assigned
-     */
-    def set (u: Seq [Double]) { for (i <- range) v(i) = u(i) }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a size dimensional vector with all elements initialized to zero.
-     *  @param size  the number of elements in the vector
-     */
-    def zero (size: Int = dim): SparseVectorD = new SparseVectorD (size)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Iterate over 'this' vector element by element.
-     *  @param f  the function to apply
-     */
-    def foreach [U] (f: Double => U)
-    {
-        var i = 0    
-        while (i < dim) { f (v(i)); i += 1 }
-    } // foreach
-
+    private def negative: Array [Double] = v.values.filter (_ < 0.0).toArray
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  a new vector.
      *  @param p  the predicate (Boolean function) to apply
      */
-    override def filter (p: Double => Boolean): VectoD =
-    {
-        null // FIX: SparseVectorD (v.filter (p (_.2)))
+    override def filter (p: Double => Boolean): SparseVectorD =
+    { 
+        SparseVectorD (for (i <- range if p (this(i)) ) yield v(i))
     } // filter
-
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  the index positions.
      *  @param p  the predicate (Boolean function) to apply
      */
-    def filterPos (p: Double => Boolean): Seq [Int] =
-    {
-        for (i <- range if p (v(i))) yield i
-    } // filterPos
+    def filterPos (p: Double => Boolean): Seq [Int] = for (i <- range if p (this(i))) yield i
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Map the elements of 'this' vector by applying the mapping function 'f'.
      *  @param f  the function to apply
      */
-    def map (f: Double => Double): SparseVectorD = new SparseVectorD (this ().map (f))
+    def map (f: Double => Double): SparseVectorD = SparseVectorD (this ().map (f))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice 'this' vector 'from' to 'end'.
@@ -335,18 +229,16 @@ class SparseVectorD (val dim_ : Int)
      */
     override def slice (from: Int, till: Int): SparseVectorD =
     {
-        null // FIX: new SparseVectorD (till - from, v.slice (from, till))
+        null    // FIX: new SparseVectorD (till - from, v.slice (from, till))
     } // slice
-
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select a subset of elements of 'this' vector corresponding to a 'basis'.
      *  @param basis  the set of index positions (e.g., 0, 2, 5)
      */
     def select (basis: Array [Int]): SparseVectorD =
     {
-        val c = new SparseVectorD (basis.length)
-        for (i <- c.range) c.v(i) = v(basis(i))
-        c
+        SparseVectorD (for (i <- 0 until basis.length) yield this(basis(i)))
     } // select
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -356,7 +248,7 @@ class SparseVectorD (val dim_ : Int)
     def ++ (b: VectoD): SparseVectorD =
     {
         val c = new SparseVectorD (dim + b.dim)
-        for (i <- c.range) c.v(i) = if (i < dim) v(i) else b(i - dim)
+        for (i <- c.range) c(i) = if (i < dim) this(i) else b(i - dim)
         c
     } // ++
 
@@ -367,7 +259,7 @@ class SparseVectorD (val dim_ : Int)
     def ++ (s: Double): SparseVectorD =
     {
         val c = new SparseVectorD (dim + 1)
-        for (i <- c.range) c.v(i) = if (i < dim) v(i) else s
+        for (i <- c.range) c(i) = if (i < dim) this(i) else s
         c
     } // ++
 
@@ -375,12 +267,7 @@ class SparseVectorD (val dim_ : Int)
     /** Add 'this' vector and vector 'b'.
      *  @param b  the vector to add
      */
-    def + (b: VectoD): SparseVectorD = 
-    {
-        val c = new SparseVectorD (dim)
-        for (i <- range) c.v(i) = v(i) + b(i)
-        c
-    } // +
+    def + (b: VectoD): SparseVectorD = { SparseVectorD (for ( i <- range) yield this(i) + b(i)) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' vector and scalar 's'.
@@ -388,33 +275,35 @@ class SparseVectorD (val dim_ : Int)
      */
     def + (s: Double): SparseVectorD =
     {
-        val c = new SparseVectorD (dim)
-        for (i <- range) c.v(i) = v(i) + s
-        c
+        if (s =~ 0.0) this 
+        else SparseVectorD (for (i <- range) yield this(i) + s)       
     } // +
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' vector and scalar 's._2' only at position 's._1'.
-     *  @param s  the (position, scalar) to add
+     *  @param s  the (scalar, position) to add
      */
     def + (s: Tuple2 [Int, Double]): SparseVectorD =
     {
-        val c = new SparseVectorD (dim)
-        for (i <- range) c.v(i) = if (i == s._1) v(i) + s._2 else v(i)
-        c
+        if (s._1 =~ 0.0) this
+        else {
+            val c = new SparseVectorD (this)
+            c(s._1) += s._2
+            c
+        } // if    
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' vector and vector 'b'.
      *  @param b  the vector to add
      */
-    def += (b: VectoD): SparseVectorD = { for (i <- range) v(i) += b(i); this }
+    def += (b: VectoD): SparseVectorD = { for (i <- range) this(i) += b(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' vector and scalar 's'.
      *  @param s  the scalar to add
      */
-    def += (s: Double): SparseVectorD = { for (i <- range) v(i) += s; this }
+    def += (s: Double): SparseVectorD = { for (i <- range) this(i) += s; this } 
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the negative of 'this' vector (unary minus).
@@ -422,7 +311,7 @@ class SparseVectorD (val dim_ : Int)
     def unary_- (): SparseVectorD =
     {
         val c = new SparseVectorD (dim)
-        for (i <- range) c.v(i) = -v(i)
+        for (x <- v) c(x._1) = -x._2 
         c
     } // unary_-
  
@@ -430,12 +319,7 @@ class SparseVectorD (val dim_ : Int)
     /** From 'this' vector subtract vector 'b'.
      *  @param b  the vector to subtract
      */
-    def - (b: VectoD): SparseVectorD =
-    {
-        val c = new SparseVectorD (dim)
-        for (i <- range) c.v(i) = v(i) - b(i)
-        c
-    } // -
+    def - (b: VectoD): SparseVectorD = { SparseVectorD (for ( i <- range) yield this(i) - b(i)) }
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract scalar 's'.
@@ -443,43 +327,45 @@ class SparseVectorD (val dim_ : Int)
      */
     def - (s: Double): SparseVectorD =
     {
-        val c = new SparseVectorD (dim)
-        for (i <- range) c.v(i) = v(i) - s
-        c
+        if (s =~ 0.0) this 
+        else SparseVectorD (for (i <- range) yield this(i) - s)       
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract scalar 's._2' only at position 's._1'.
-     *  @param s  the (position, scalar) to subtract
+     *  @param s  the (scalar, position) to subtract
      */
     def - (s: Tuple2 [Int, Double]): SparseVectorD =
     {
-        val c = new SparseVectorD (dim)
-        for (i <- range) c.v(i) = if (i == s._1) v(i) - s._2 else v(i)
-        c
+        if (s._1 =~ 0.0) this
+        else {
+            val c = new SparseVectorD (this)
+            c(s._1) -= s._2
+            c
+        } // if    
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place vector 'b'.
      *  @param b  the vector to add
      */
-    def -= (b: VectoD): SparseVectorD = { for (i <- range) v(i) -= b(i); this }
+    def -= (b: VectoD): SparseVectorD = { for (i <- range) this(i) -= b(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place scalar 's'.
      *  @param s  the scalar to add
      */
-    def -= (s: Double): SparseVectorD = { for (i <- range) v(i) -= s; this }
+    def -= (s: Double): SparseVectorD = { for (i <- range) this(i) -= s; this }
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' vector by vector 'b'.
      *  @param b  the vector to multiply by
      */
-    def * (b: VectoD): SparseVectorD =
-    {
+    def * (b: VectoD): SparseVectorD = 
+    {     
         val c = new SparseVectorD (dim)
-        for (i <- range) c.v(i) = v(i) * b(i)
-        c
+        for (x <- v) c(x._1) = x._2 * b(x._1) 
+        c    
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -489,27 +375,21 @@ class SparseVectorD (val dim_ : Int)
     def * (s: Double): SparseVectorD =
     {
         val c = new SparseVectorD (dim)
-        for (i <- range) c.v(i) = v(i) * s
+        if( s !=~ 0.0 ) for (x <- v) c(x._1) = x._2 * s  
         c
     } // *
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply 'this' (row) vector by matrix 'm'.
-     *  @param m  the matrix to multiply by
-     */
-    def * (m: MatriD): VectoD = m.t * toDouble
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and vector 'b'.
      *  @param b  the vector to add
      */
-    def *= (b: VectoD): SparseVectorD = { for (i <- range) v(i) *= b(i); this }
+    def *= (b: VectoD): SparseVectorD = { for (x <- v) this(x._1) = x._2 * b(x._1); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and scalar 's'.
      *  @param s  the scalar to add
      */
-    def *= (s: Double): SparseVectorD = { for (i <- range) v(i) *= s; this }
+    def *= (s: Double): SparseVectorD = { for (x <- v) this(x._1) = x._2 * s; this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide 'this' vector by vector 'b' (element-by-element).
@@ -518,10 +398,10 @@ class SparseVectorD (val dim_ : Int)
     def / (b: VectoD): SparseVectorD =
     {
         val c = new SparseVectorD (dim)
-        for (i <- range) c.v(i) = v(i) / b(i)
-        c
+        for (x <- v) c(x._1) = x._2 / b(x._1) 
+        c    
     } // /
-
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide 'this' vector by scalar 's'.
      *  @param s  the scalar to divide by
@@ -529,7 +409,7 @@ class SparseVectorD (val dim_ : Int)
     def / (s: Double): SparseVectorD =
     {
         val c = new SparseVectorD (dim)
-        for (i <- range) c.v(i) = v(i) / s
+        for (x <- v) c(x._1) = x._2 / s  
         c
     } // /
 
@@ -537,14 +417,14 @@ class SparseVectorD (val dim_ : Int)
     /** Divide in-place 'this' vector and vector 'b'.
      *  @param b  the vector to add
      */
-    def /= (b: VectoD): SparseVectorD = { for (i <- range) v(i) /= b(i); this }
+    def /= (b: VectoD): SparseVectorD = { for (x <- v) this(x._1) = x._2 / b(x._1); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and scalar 's'.
      *  @param s  the scalar to add
      */
-    def /= (s: Double): SparseVectorD = { for (i <- range) v(i) /= s; this }
-
+    def /= (s: Double): SparseVectorD = { for (x <- v) this(x._1) = x._2 / s; this }
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector containing each element of 'this' vector raised to the
      *  s-th power.
@@ -553,7 +433,8 @@ class SparseVectorD (val dim_ : Int)
     def ~^ (s: Double): SparseVectorD =
     {
         val c = new SparseVectorD (dim)
-        for (i <- range) c.v(i) = v(i) ~^ s
+        if (s =~ 0.0) c.set(1.0)
+        else for (x <- v) c(x._1) = x._2 ~^ s
         c
     } // ~^
 
@@ -561,7 +442,11 @@ class SparseVectorD (val dim_ : Int)
     /** Raise each element of 'this' vector to the 's'-th power.
      *  @param s  the scalar exponent
      */
-    def ~^= (s: Double): SparseVectorD = { for (i <- range) v(i) = v(i) ~^ s; this }
+    def ~^= (s: Double): SparseVectorD = 
+    {
+        if (s =~ 0.0) set (1.0) else for (x <- v) this(x._1) = x._2 ~^ s
+        this
+    } // ~^= 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector containing the reciprocal of each element of 'this' vector.
@@ -569,7 +454,7 @@ class SparseVectorD (val dim_ : Int)
     def recip: SparseVectorD =
     {
         val c = new SparseVectorD (dim)
-        for (i <- range) c.v(i) = 1.0 / v(i)
+        for (x <- v) c(x._1) = 1.0 / x._2
         c
     } // recip
 
@@ -579,36 +464,51 @@ class SparseVectorD (val dim_ : Int)
     def abs: SparseVectorD =
     {
         val c = new SparseVectorD (dim)
-        for (i <- range) c.v(i) = ABS (v(i))
-        c
+        for (x <- v) c(x._1) = ABS (x._2)
+        c        
     } // abs
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of 'this' vector.
-     */
-    def sum: Double = v.foldLeft (0.0)((s, x) => s + x._2)
+     */ 
+    def sum: Double = 
+    {
+        var sum = 0.0
+        for (x <- v) sum += x._2
+        sum
+    } // sum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the absolute value of the elements of 'this' vector.
      */
-    def sumAbs: Double = v.foldLeft (0.0)((s, x) => s + ABS (x._2))
+    def sumAbs: Double = 
+    {
+        var sum = 0.0
+        for (x <- v) sum += ABS (x._2)
+        sum
+    } // sumAbs
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of 'this' vector skipping the 'i'-th element (Not Equal 'i').
      *  @param i  the index of the element to skip
      */
-    def sumNE (i: Int): Double = sum - v(i)
+    def sumNE (i: Int): Double = sum - this(i)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the positive (> 0) elements of 'this' vector.
      */
-    def sumPos: Double = v.foldLeft (0.0)((s, x) => s + MAX (x._2, 0.0))
+    def sumPos: Double = 
+    {    
+        var sum = 0.0
+        for (x <- v) sum += MAX (x._2, 0.0)
+        sum  
+    } // sumPos
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Establish the rank order of the elements in 'self' vector, e.g.,
      *  (8.0, 2.0, 4.0, 6.0) is (3, 0, 1, 2).
      */
-    def rank: VectorI = null // FIX: new VectorI (iqsort (v))
+    def rank: VectorI = VectorI (iqsort (this().toArray))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Cumulate the values of 'this' vector from left to right (e.g., create a
@@ -617,8 +517,8 @@ class SparseVectorD (val dim_ : Int)
     def cumulate: SparseVectorD =
     {
         val c = new SparseVectorD (dim)
-        var sum: Double = 0.0
-        for (i <- range) { sum += v(i); c.v(i) = sum }
+        var sum = 0.0
+        for (x <- v) { sum += x._2; c(x._1) = sum }
         c
     } // cumulate
 
@@ -641,20 +541,53 @@ class SparseVectorD (val dim_ : Int)
     /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
      *  @param b  the other vector
      */
-    def dot (b: VectoD): Double =
+    def dot (b: VectoD): Double = 
     {
-        var sum: Double = 0.0
-        for (i <- range) sum += v(i) * b(i)
+        var sum = 0.0
+        for (x <- v) sum += x._2 * b(x._1) 
         sum
     } // dot
-
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
+     *  @param b  the other vector
+     */
+    def dot (b: SparseVectorD): Double = 
+    {
+        var sum = 0.0
+        for (x <- v) sum += x._2 * b.v.getOrElse (x._1, 0.0)
+        sum
+    } // dot
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
+     *  @param b  the other vector
+     */
+    def ⦁ (b: VectoD): Double = 
+    {
+        var sum = 0.0
+        for (x <- v) sum += x._2 * b(x._1) 
+        sum
+    } // ⦁
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
+     *  @param b  the other vector
+     */
+    def ⦁ (b: SparseVectorD): Double = 
+    {
+        var sum = 0.0
+        for (x <- v) sum += x._2 * b.v.getOrElse(x._1, 0.0)
+        sum
+    } // ⦁
+     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Manhattan norm (1-norm) of 'this' vector.
      */
     def norm1: Double =
-    {
-        var sum: Double = 0.0
-        for (i <- range) sum += ABS (v(i))
+    {  
+        var sum = 0.0
+        for ( x <- v ) sum += ABS (x._2)
         sum
     } // norm1
 
@@ -664,20 +597,24 @@ class SparseVectorD (val dim_ : Int)
      */
     def max (e: Int = dim): Double =
     {
-        var x = v(0)
-        for (i <- 1 until e if v(i) > x) x = v(i)
-        x
+        var c = this(0)
+        for (x <- v if (x._1 < e && x._2 > c)) c = x._2
+        c
     } // max
-
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Take the maximum of 'this' vector with vector 'b' (element-by element).
      *  @param b  the other vector
      */
     def max (b: VectoD): SparseVectorD =
-    {
+    { 
         val c = new SparseVectorD (dim)
-        for (i <- range) c.v(i) = if (b(i) > v(i)) b(i) else v(i)
-        c
+        for (i <- range) { 
+            val x = this(i)
+            val y = b(i)
+            c(i) = if (y > x) y else x 
+        } // for
+        c 
     } // max
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -685,10 +622,10 @@ class SparseVectorD (val dim_ : Int)
      *  @param e  the ending index (exclusive) for the search
      */
     def min (e: Int = dim): Double =
-    {
-        var x = v(0)
-        for (i <- 1 until e if v(i) < x) x = v(i)
-        x
+    {     
+        var c = this(0)
+        for (x <- v if (x._1 < e && x._2 < c)) c = x._2
+        c
     } // max
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -698,7 +635,11 @@ class SparseVectorD (val dim_ : Int)
     def min (b: VectoD): SparseVectorD =
     {
         val c = new SparseVectorD (dim)
-        for (i <- range) c.v(i) = if (b(i) < v(i)) b(i) else v(i)
+        for (i <- range) { 
+            val x = this(i) 
+            val y = b(i)
+            c(i) = if (y < x) y else x 
+        } // for
         c
     } // min
 
@@ -708,9 +649,9 @@ class SparseVectorD (val dim_ : Int)
      */
     def argmax (e: Int = dim): Int =
     {
-        var j = 0
-        for (i <- 1 until e if v(i) > v(j)) j = i
-        j
+        var i = 0
+        for (x <- v if (x._1 < e && x._2 > this(i))) i = x._1
+        i
     } // argmax
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -719,11 +660,11 @@ class SparseVectorD (val dim_ : Int)
      */
     def argmin (e: Int = dim): Int =
     {
-        var j = 0
-        for (i <- 1 until e if v(i) < v(j)) j = i
-        j
+        var i = 0
+        for (x <- v if (x._1 < e && x._2 < this(i))) i = x._1
+        i
     } // argmin
-
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the argument minimum of 'this' vector (-1 if its not negative).
      *  @param e  the ending index (exclusive) for the search
@@ -746,19 +687,13 @@ class SparseVectorD (val dim_ : Int)
     /** Return the index of the first negative element in 'this' vector (-1 otherwise).
      *  @param e  the ending index (exclusive) for the search
      */
-    def firstNeg (e: Int = dim): Int =
-    {
-        for (i <- 0 until e if v(i) < 0.0) return i; -1
-    } // firstNeg
+    def firstNeg (e: Int = dim): Int = { for (x <- v if x._2 < 0.0) return x._1; -1 }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the index of the first positive element in 'this' vector (-1 otherwise).
      *  @param e  the ending index (exclusive) for the search
      */
-    def firstPos (e: Int = dim): Int =
-    {
-        for (i <- 0 until e if v(i) > 0.0) return i; -1
-    } // firstPos
+    def firstPos (e: Int = dim): Int = { for (x <- v if x._2 > 0.0) return x._1; -1 }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the index of the first occurrence of element 'x' in 'this' vector,
@@ -767,8 +702,9 @@ class SparseVectorD (val dim_ : Int)
      *  @param e  the ending index (exclusive) for the search
      */
     def indexOf (x: Int, e: Int = dim): Int =
-    {
-        for (i <- 0 until e if v(i) == x) return i; -1
+    {        
+        if (x =~ 0.0) { for (i <- range if this(i) =~ 0.0) return i; -1 }
+        for (x <- v if (x._1 < e && x._2 == x)) return x._1; -1 
     } // indexOf
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -776,7 +712,10 @@ class SparseVectorD (val dim_ : Int)
      *  -1 if not found.
      *  @param p  the predicate to check
      */
-    def indexWhere (p: (Double) => Boolean): Int = -1 // FIX: v.indexWhere (p)
+    def indexWhere (p: (Double) => Boolean): Int =
+    {
+        for (i <- range if p(this(i))) return i; -1
+    } // indexWhere
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of strictly negative elements in 'this' vector.
@@ -784,7 +723,7 @@ class SparseVectorD (val dim_ : Int)
     def countNeg: Int =
     {
         var count = 0
-        for (i <- 0 until dim if v(i) < 0.0) count += 1
+        for (x <- v if x._2 < 0.0) count += 1
         count
     } // countNeg
 
@@ -794,22 +733,26 @@ class SparseVectorD (val dim_ : Int)
     def countPos: Int =
     {
         var count = 0
-        for (i <- 0 until dim if v(i) > 0.0) count += 1
+        for (x <- v if x._2 > 0.0) count += 1
         count
     } // countPos
-
+    
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return a new vector consisteing of the distinct elements from 'this' vector.
+    /** Return a new vector consisting of the distinct elements from 'this' vector.
      */
-    def distinct: SparseVectorD =
+    def distinct: SparseVectorD = 
     {
-        throw new NoSuchMethodException ("SparseVectorD does not support distinct yet")
+        val us = new SparseVectorD (this); us.sort ()
+        var c1 = ArrayBuffer [Double]()     
+        c1 += us(0)  
+        for (i <- 1 until dim) { val x = us(i); if (x != us(i-1)) c1 += x }
+        SparseVectorD(c1)       
     } // distinct
-
+    
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of distinct elements in 'this' vector.
      */
-    def countinct: Int = 
+    def countinct: Int =
     {
         var count = 1
         val us = new SparseVectorD (this); us.sort ()                // sorted vector
@@ -827,17 +770,40 @@ class SparseVectorD (val dim_ : Int)
     /** Determine whether 'x' is contained in 'this' vector.
      *  @param x  the element to be checked
      */
-    def contains (x: Double): Boolean = false // FIX: v contains x
+    def contains (x: Double): Boolean = v.values.exists (_ == x)
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reverse the order of the elemnets in 'this' vector.
+     */
+    def reverse (): SparseVectorD = 
+    {        
+         SparseVectorD (for (i <- (0 until dim).reverse) yield this(i))
+    } // reverse
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether 'this' vector is in sorted (accending) order.
+     */
+    def isSorted: Boolean = (new SortingD (this().toArray)).isSorted
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sort 'this' vector in-place in ascending (non-decreasing) order.
      */
-    def sort () { /* FIX: quickSort (v) */ }
+    def sort () 
+    {                  
+        val neg = negative; quickSort(neg)
+        val pos = positive; quickSort(pos)  
+        v =  SparseVectorD (neg ++ Array.fill(dim - (neg.length + pos.length))(0.0) ++ pos).v          
+    } // sort
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sort 'this' vector in-place in descending (non-increasing) order.
      */
-    def sort2 () { /* FIX: qsort2 (v) */ }
+    def sort2 ()
+    {                  
+        val neg = negative; qsort2 (neg)
+        val pos = positive; qsort2 (pos)  
+        v =  SparseVectorD (pos ++ Array.fill (dim - (neg.length + pos.length))(0.0) ++ neg).v          
+    } // sort2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Swap elements 'i' and 'j' in 'this' vector.
@@ -845,8 +811,10 @@ class SparseVectorD (val dim_ : Int)
      *  @param j  the second element in the swap
      */
     def swap (i: Int, j: Int)
-    {
-        val t = v(j); v(j) = v(i); v(i) = t
+    {      
+         val (x, y) = (this(i), this(j))
+         if (x =~ 0.0 && y =~ 0.0) return      
+         this(i) = y; this(j) = x           
     } // swap
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -859,8 +827,8 @@ class SparseVectorD (val dim_ : Int)
     /** Check whether 'this' vector is nonnegative (has no negative elements).
      */
     def isNonnegative: Boolean =
-    {
-        for (i <- range if v(i) < 0.0) return false
+    {   
+        for ( x <- v if x._2 < 0.0) return false
         true
     } // isNonnegative
 
@@ -895,7 +863,12 @@ class SparseVectorD (val dim_ : Int)
     /** Must also override hashCode for 'this' vector to be compatible with equals.
      */
     override def hashCode: Int = v.hashCode
-
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' sparse vector to a dense vector.
+     */
+    def toDense: VectorD = VectorD (for (i <- range) yield this(i))
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' vector to a String.
      */
@@ -904,13 +877,205 @@ class SparseVectorD (val dim_ : Int)
         var sb = new StringBuilder ("SparseVectorD(")
         if (dim == 0) return sb.append (")").mkString
         for (i <- range) {
-            sb.append (fString.format (v(i)))
+            if (v contains i) sb.append (fString.format (v(i)))
             if (i == dim-1) sb = sb.dropRight (1)
         } // for
         sb.replace (sb.length-1, sb.length, ")").mkString
     } // toString
   
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' vector to a String, showing the zero elements as well,
+     */ 
+    def toString2: String = 
+    {
+        var sb = new StringBuilder ("SparseVectorD(")
+        if (dim == 0) return sb.append (")").mkString
+        for (i <- range) {
+            sb.append (fString.format (this(i)))
+            if (i == dim-1) sb = sb.dropRight (1)
+        } // for
+        sb.replace (sb.length-1, sb.length, ")").mkString
+    } // toString2
+    
 } // SparseVectorD class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SparseVectorD` object is the companion object for the `SparseVectorD` class.
+ */
+object SparseVectorD
+{
+    /** Shorthand type definition for sparse vector
+     */
+    type RowMap = SortedLinkedHashMap [Int, Double]
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a `SparseVectorD` from one or more values (repeated values Double*).
+     *  @param x   the first Double number
+     *  @param xs  the rest of the Double numbers
+     */
+    def apply (x: Double, xs: Double*): SparseVectorD =
+    {
+        val c = new SparseVectorD (1 + xs.length)
+        c(0) = x
+        for (i <- 1 until c.dim) c(i) = xs(i-1)
+        c
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a `SparseVectorD` from a sequence of Doubles.
+     *  @param xs  the sequence of the Double numbers
+     */
+    def apply (xs: Seq [Double]): SparseVectorD =
+    {
+        val c = new SparseVectorD (xs.length)
+        for (i <- 0 until c.dim) c(i) = xs(i)
+        c
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a `SparseVectorD` from one or more values (repeated values String*).
+     *  @param x   the first String
+     *  @param xs  the rest of the Strings
+     */
+    def apply (x: String, xs: String*): SparseVectorD =
+    {
+        val c = new SparseVectorD (1 + xs.length)
+        c(0)  = x.toDouble
+        for (i <- 1 until c.dim) c(i) = xs(i-1).toDouble
+        c
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a `SparseVectorD` from an array of Strings.
+     *  @param xs  the array of the Strings
+     */
+    def apply (xs: Array [String]): SparseVectorD =
+    {
+        val c = new SparseVectorD (xs.length)
+        for (i <- c.range) c(i) = xs(i).toDouble
+        c
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a `SparseVectorD` from an array of Strings, skipping the first 'skip'
+     *  elements.  If an element is non-numeric, use its hashcode.
+     *  FIX:  Might be better to map non-numeric Strings to ordinal values.
+     *  @param xs    the array of the Strings
+     *  @param skip  the number of elements at the beginning to skip (e.g., id column)
+     */
+    def apply (xs: Array [String], skip: Int): SparseVectorD =
+    {
+        val c = new SparseVectorD (xs.length - skip)
+        for (i <- skip until xs.length) {
+            c.v(i - skip) = if (xs(i) matches "[\\-\\+]?\\d*(\\.\\d+)?") xs(i).toDouble else xs(i).hashCode ()
+        } // for
+        c
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate scalar 'b' and vector 'u'.
+     *  @param b  the scalar to be concatenated - first part
+     *  @param u  the vector to be concatenated - second part
+     */
+    def ++ (b: Double, u: SparseVectorD): SparseVectorD =
+    {
+        val c = new SparseVectorD (u.dim + 1)
+        for (i <- c.range) c(i) = if (i == 0) b else u.v(i - 1)
+        c
+    } // ++
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return a `SparseVectorD` containing a sequence of increasing integers in a range.
+     *  @param start  the start value of the vector, inclusive
+     *  @param end    the end value of the vector, exclusive (i.e., the first value not returned)
+     */
+    def range (start: Int, end: Int): SparseVectorD =
+    {
+        val c = new SparseVectorD (end - start)
+        for (i <- c.range) c.v(i) = (start + i).toDouble
+        c
+    } // range
+
+} // SparseVectorD object
+
+
+object SparseVectorDTest1 extends App
+{
+  println(1/0)
+  /*  
+    val v = VectorD(0,1,2,0,0,0,0,4,0,0,0,0,0,0,0,0,2,0,0,0)
+    val z = SparseVectorD(v())
+    
+    println(s"Dense Vector is : \t \t\t${v}")
+    println(s"Sparse Vector z : \t \t \t${z}")
+    println(s"Sparse Vector z : \t \t \t${z.toString2}")
+    
+    var x = 0.0
+    println(x += 2.0)
+    println(x)
+    //println(s"z += 2.0 : \t \t \t \t${z += 2.0}")
+    
+    
+    //z(0) = 0.0
+   // println(s"z(0) : \t \t \t${z(0)}")
+
+    println(s"Dense Vector is : \t \t\t${v}")
+    println(s"Sparse Vector z : \t \t \t${z}")
+    println(s"RowMap values v :  \t \t \t${z.nonZero().deep}")
+    println(s"RowMap indexes of values  v :  \t \t${z.v.keys}")
+    println(s"z.filter((x: Double) => x > 1.00) : \t${z.filter((x: Double) => x > 1.00)}")  
+    println(s"z.filterPos((x: Double) => x > 1.00) : \t${z.filterPos((x: Double) => x > 1.00)}")
+    println(s"Selected Dense Vector is : \t \t${v.select(Array(0,1,3,4,5,16))}")
+    println(s"z.select(Array(0,1,3,4,5,16)) : \t${z.select(Array(0,1,3,4,5,16))().deep}")
+   
+     //Scalar Operations 
+    println(s"z.+(2) : \t \t \t \t${z.+(2)}")
+    println(s"z.-(2) : \t \t \t \t${z.-(2)}")
+    println(s"z.+((2.0,1)) : \t \t${z.+((0,2.0))}")
+    println(s"z.-((2.0,1)) : \t \t${z.-((0,2.0))}")
+    println(s"z.-=(2) : \t \t \t \t${z.-=(2.0)}")
+    println(s"z.+=(2) : \t \t \t \t${z.+=(2.0)}")
+    
+    
+   
+*/}
+
+
+
+
+object SparseVectorDTest2 extends App
+{
+  val r = scala.util.Random  
+  val v1 = new VectorD(1000000)  
+  val v2 = new VectorD(1000000)
+
+  for ( x <- 0 until 10 ) {    
+     var cnt = 0   
+     while(cnt < 1000000) {
+     val x = r.nextInt(50).toDouble + 1
+     val x1 = r.nextInt(90)
+     if( x1 == 1 ) v1(cnt) =  x
+     else v1(cnt) = 0.0
+     
+     val z = r.nextInt(50).toDouble + 1
+     val z1 = r.nextInt(90)
+     if( z1 == 1 ) v2(cnt) =  z
+     else v2(cnt) = 0.0
+     cnt += 1
+   }
+     
+     var z1 = SparseVectorD(v1())
+     var z2 = SparseVectorD(v2())
+     
+     
+     //println(s"z1.size is ${z1.getTable().size}")
+     //println(s"z2.size is ${z2.getTable().size}")
+     println(v1.dot(v2))
+     println(z1.⦁(z2))
+}
+}
+
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -919,6 +1084,43 @@ class SparseVectorD (val dim_ : Int)
  */
 object SparseVectorDTest extends App
 {
+    
+  
+  var x      = SparseVectorD(7.36864,	4.28984,	4.67949,	19.9497,	17.6045,	11.3151,	11.1607,	2.90098,	12.4075,	9.60246)
+  x.distinct
+  //var x  = SparseVectorD(10,1,2,0,0,4,3,4,5,6,7,0,8)
+  
+  /*x.sort()
+  println(x)
+  x.sort2()
+  println(x)*/
+  
+  
+  var z = VectorD(10,1,2,0,0,4,3,4,5,6,7,0,8)
+  println(z.rank)
+//  println(x.rank)
+  
+  println(x.contains(11.0))
+  
+  
+  /*var z = x.filter((x: Double) => x < 5.00)
+  var z1 = x.filter((x: Double) => x > 5.00)
+  var z2 = x.filter((x: Double) => x == 5.00)
+ 
+  z1.sort()
+  
+  println(x().deep)
+  println("*******")
+  println(z)
+   println(z().deep)
+   println("*******")
+   println(z1)
+   println(z1().deep)
+   println("*******")
+   println(z2)
+   println(z2().deep)*/
+  
+  /*
     var x: SparseVectorD = null
     var y: SparseVectorD = null
 
@@ -961,5 +1163,5 @@ object SparseVectorDTest extends App
     println ("z.map (_ * 2)    = " + z.map ((e: Double) => e * 2))
     println ("z.filter (_ > 2) = " + z.filter (_ > 2))
 
-} // SparseVectorDTest
+*/} // SparseVectorDTest
 

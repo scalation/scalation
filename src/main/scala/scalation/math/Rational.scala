@@ -428,8 +428,8 @@ object Rational
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Ordering for rational numbers.
      */
-    val ord = new Ordering [Rational]
-            { def compare (x: Rational, y: Rational) = x compare y }
+    implicit val ord = new Ordering [Rational]
+               { def compare (x: Rational, y: Rational) = x compare y }
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a rational number from a BigDecimal number.

@@ -11,26 +11,26 @@ package scalation.linalgebra
 import scala.collection.Traversable
 import scala.util.Sorting.quickSort
 
-import scala.math.{abs => ABS, max => MAX, sqrt}
-import scalation.math.double_exp
+import scalation.math.StrO.{abs => ABS, max => MAX, _}
+import scalation.math.StrO
 
 import scalation.util.Error
 import scalation.util.SortingD.{iqsort, qsort2}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `VectoD` class stores and operates on Numeric Vectors of base type `Double`.
+/** The `VectoS` class stores and operates on Numeric Vectors of base type `StrNum`.
  *  It follows the framework of `gen.VectorN [T]` and is provided for performance.
  *  @param dim  the dimension/size of the vector
  *  @param v    the 1D array used to store vector elements
  */
-trait VectoD
-      extends Traversable [Double] with PartiallyOrdered [VectoD] with Vec with Error with Serializable
+trait VectoS
+      extends Traversable [StrNum] with PartiallyOrdered [VectoS] with Vec with Error with Serializable
 {
     /** Vector dimension
      */
     val dim: Int
 
-    /** Number of elements in the vector as a Double
+    /** Number of elements in the vector as a StrNum
      */
     val nd = dim.toDouble
 
@@ -57,339 +57,339 @@ trait VectoD
     /** Expand the size (dim) of 'this' vector by 'more' elements.
      *  @param more  the number of new elements to add
      */
-    def expand (more: Int = dim): VectoD
+    def expand (more: Int = dim): VectoS
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a zero vector (all elements are zero) of length 'size'.
      *  @param size  the size of the new vector
      */
-    def zero (size: Int): VectoD 
+    def zero (size: Int): VectoS 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a one vector (all elements are one) of length 'size'.
      *  @param size  the size of the new vector
      */
-    def one (size: Int): VectoD
+    def one (size: Int): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a vector of the form (0, ... 1, ... 0) where the 1 is at position j.
      *  @param j     the position to place the 1
      *  @param size  the size of the vector (upper bound = size - 1)
      */
-    def oneAt (j: Int, size: Int = dim): VectoD 
+    def oneAt (j: Int, size: Int = dim): VectoS 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a vector of the form (0, ... -1, ... 0) where the -1 is at position j.
      *  @param j     the position to place the -1
      *  @param size  the size of the vector (upper bound = size - 1)
      */
-    def _oneAt (j: Int, size: Int = dim): VectoD
+    def _oneAt (j: Int, size: Int = dim): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `VectoD` into a `VectoI`.
+    /** Convert 'this' `VectoS` into a `VectoI`.
      */
     def toInt: VectoI
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `VectoD` into a `VectoL`.
+    /** Convert 'this' `VectoS` into a `VectoL`.
       */
     def toLong: VectoL
    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `VectoD` into a `VectoD`.
+    /** Convert 'this' `VectoS` into a `VectoD`.
      */
     def toDouble: VectoD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `VectoD` into a dense version.
+    /** Convert 'this' `VectoS` into a dense version.
      */
-    def toDense: VectorD
+    def toDense: VectorS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's element at the 'i'-th index position. 
      *  @param i  the given index
      */
-    def apply (i: Int): Double
+    def apply (i: Int): StrNum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's elements within the given range (vector slicing).
      *  @param r  the given range
      */
-    def apply (r: Range): VectoD
+    def apply (r: Range): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's entire sequence/array.
      */
-    def apply (): Seq [Double]
+    def apply (): Seq [StrNum]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' vector's element at the 'i'-th index position. 
      *  @param i  the given index
      *  @param x  the value to assign
      */
-    def update (i: Int, x: Double)
+    def update (i: Int, x: StrNum)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' vector's elements over the given range (vector slicing).
      *  @param r  the given range
      *  @param x  the value to assign
      */
-    def update (r: Range, x: Double)
+    def update (r: Range, x: StrNum)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' vector's elements over the given range (vector slicing).
      *  @param r  the given range
      *  @param u  the vector to assign
      */
-    def update (r: Range, u: VectoD)
+    def update (r: Range, u: VectoS)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Iterate over 'this' vector element by element.
      *  @param f  the function to apply
      */
-    def foreach [U] (f: Double => U)
+    def foreach [U] (f: StrNum => U)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set each value in 'this' vector to 'x'.
      *  @param x  the value to be assigned
      */
-    def set (x: Double)
+    def set (x: StrNum)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the values in 'this' vector to the values in sequence 'u'.
      *  @param u  the sequence of values to be assigned
      */
-    def set (u: Seq [Double])
+    def set (u: Seq [StrNum])
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a copy of this Vector.
      */
-    def copy: VectoD
+    def copy: VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  a new vector.
      *  @param p  the predicate (Boolean function) to apply
      */
-//  def filter (p: Double => Boolean): VectoD
+//  def filter (p: StrNum => Boolean): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  the index positions.
      *  @param p  the predicate (Boolean function) to apply
      */
-    def filterPos (p: Double => Boolean): Seq [Int]
+    def filterPos (p: StrNum => Boolean): Seq [Int]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Map the elements of 'this' vector by applying the mapping function 'f'.
      *  @param f  the function to apply
      */
-    def map (f: Double => Double): VectoD
+    def map (f: StrNum => StrNum): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice 'this' vector 'from' to 'end'.
      *  @param from  the start of the slice (included)
      *  @param till  the end of the slice (excluded)
      */
-    override def slice (from: Int, till: Int = dim): VectoD = null
+    override def slice (from: Int, till: Int = dim): VectoS = null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select a subset of elements of 'this' vector corresponding to a 'basis'.
      *  @param basis  the set of index positions (e.g., 0, 2, 5)
      */
-    def select (basis: Array [Int]): VectoD
+    def select (basis: Array [Int]): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate 'this' vector and vector' b'.
      *  @param b  the vector to be concatenated
      */
-    def ++ (b: VectoD): VectoD
+    def ++ (b: VectoS): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate 'this' vector and scalar 's'.
      *  @param s  the scalar to be concatenated
      */
-    def ++ (s: Double): VectoD
+    def ++ (s: StrNum): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' vector and vector 'b'.
      *  @param b  the vector to add
      */
-    def + (b: VectoD): VectoD 
+    def + (b: VectoS): VectoS 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' vector and scalar 's'.
      *  @param s  the scalar to add
      */
-    def + (s: Double): VectoD
+    def + (s: StrNum): VectoS
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' vector and scalar 's._2' only at position 's._1'.
      *  @param s  the (position, scalar) to add
      */
-    def + (s: Tuple2 [Int, Double]): VectoD
+    def + (s: Tuple2 [Int, StrNum]): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' vector and vector 'b'.
      *  @param b  the vector to add
      */
-    def += (b: VectoD): VectoD
+    def += (b: VectoS): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' vector and scalar 's'.
      *  @param s  the scalar to add
      */
-    def += (s: Double): VectoD
+    def += (s: StrNum): VectoS
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the negative of 'this' vector (unary minus).
      */
-    def unary_- (): VectoD
+    def unary_- (): VectoS
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract vector 'b'.
      *  @param b  the vector to subtract
      */
-    def - (b: VectoD): VectoD
+    def - (b: VectoS): VectoS
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract scalar 's'.
      *  @param s  the scalar to subtract
      */
-    def - (s: Double): VectoD
+    def - (s: StrNum): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract scalar 's._2' only at position 's._1'.
      *  @param s  the (position, scalar) to subtract
      */
-    def - (s: Tuple2 [Int, Double]): VectoD
+    def - (s: Tuple2 [Int, StrNum]): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place vector 'b'.
      *  @param b  the vector to add
      */
-    def -= (b: VectoD): VectoD
+    def -= (b: VectoS): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place scalar 's'.
      *  @param s  the scalar to add
      */
-    def -= (s: Double): VectoD
+    def -= (s: StrNum): VectoS
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' vector by vector 'b'.
      *  @param b  the vector to multiply by
      */
-    def * (b: VectoD): VectoD
+    def * (b: VectoS): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' vector by scalar 's'.
      *  @param s  the scalar to multiply by
      */
-    def * (s: Double): VectoD
+    def * (s: StrNum): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and vector 'b'.
      *  @param b  the vector to add
      */
-    def *= (b: VectoD): VectoD
+    def *= (b: VectoS): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and scalar 's'.
      *  @param s  the scalar to add
      */
-    def *= (s: Double): VectoD
+    def *= (s: StrNum): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide 'this' vector by vector 'b' (element-by-element).
      *  @param b  the vector to divide by
      */
-    def / (b: VectoD): VectoD
+    def / (b: VectoS): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide 'this' vector by scalar 's'.
      *  @param s  the scalar to divide by
      */
-    def / (s: Double): VectoD
+    def / (s: StrNum): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and vector 'b'.
      *  @param b  the vector to add
      */
-    def /= (b: VectoD): VectoD
+    def /= (b: VectoS): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and scalar 's'.
      *  @param s  the scalar to add
      */
-    def /= (s: Double): VectoD
+    def /= (s: StrNum): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector containing each element of 'this' vector raised to the
      *  s-th power.
      *  @param s  the scalar exponent
      */
-    def ~^ (s: Double): VectoD
+    def ~^ (s: StrNum): VectoS
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Raise in-place each element of 'this' vector to the 's'-th power.
      *  @param s  the scalar exponent
      */
-    def ~^= (s: Double): VectoD
+    def ~^= (s: StrNum): VectoS
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compare 'this' vector with that vector 'b' for inequality.
      *  @param b  that vector
      */
-    def ≠ (b: VectoD) = this != b
+    def ≠ (b: VectoS) = this != b
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compare 'this' vector with that vector 'b' for less than or equal to.
      *  @param b  that vector
      */
-    def ≤ (b: VectoD) = this <= b
+    def ≤ (b: VectoS) = this <= b
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compare 'this' vector with that vector 'b' for greater than or equal to.
      *  @param b  that vector
      */
-    def ≥ (b: VectoD) = this >= b
+    def ≥ (b: VectoS) = this >= b
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector containing the square of each element of 'this' vector.
      */
-    def sq: VectoD = this * this
+    def sq: VectoS = this * this
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector containing the reciprocal of each element of 'this' vector.
      */
-    def recip: VectoD
+    def recip: VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector that is the element-wise absolute value of 'this' vector.
      */
-    def abs: VectoD
+    def abs: VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of 'this' vector.
      */
-    def sum: Double
+    def sum: StrNum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the absolute value of the elements of 'this' vector.
      */
-    def sumAbs: Double
+    def sumAbs: StrNum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of 'this' vector skipping the 'i'-th element (Not Equal 'i').
      *  @param i  the index of the element to skip
      */
-    def sumNE (i: Int): Double
+    def sumNE (i: Int): StrNum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the positive (> 0) elements of 'this' vector.
      */
-    def sumPos: Double
+    def sumPos: StrNum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the mean of the elements of 'this' vector.
@@ -417,78 +417,78 @@ trait VectoD
     /** Cumulate the values of 'this' vector from left to right (e.g., create a
      *  CDF from a pmf).  Example: (4, 2, 3, 1) --> (4, 6, 9, 10)
      */
-    def cumulate: VectoD
+    def cumulate: VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize 'this' vector so that it sums to one (like a probability vector).
      */
-    def normalize: VectoD
+    def normalize: VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize 'this' vector so its length is one (unit vector).
      */
-    def normalizeU: VectoD
+    def normalizeU: VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize 'this' vector to have a maximum of one.
      */
-    def normalize1: VectoD
+    def normalize1: VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
      *  @param b  the other vector
      */
-    def dot (b: VectoD): Double
+    def dot (b: VectoS): StrNum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
      *  @param b  the other vector
      */
-    def ∙ (b: VectoD): Double = this dot b
+    def ∙ (b: VectoS): StrNum = this dot b
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Euclidean norm (2-norm) squared of 'this' vector.
      */
-    def normSq: Double = this dot this
+    def normSq: StrNum = this dot this
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Euclidean norm (2-norm) of 'this' vector.
      */
-    def norm: Double = sqrt (normSq).toDouble
+    def norm: StrNum = sqrt (normSq).toStrNum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Manhattan norm (1-norm) of 'this' vector.
      */
-    def norm1: Double
+    def norm1: StrNum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the maximum element in 'this' vector.
      *  @param e  the ending index (exclusive) for the search
      */
-    def max (e: Int = dim): Double
+    def max (e: Int = dim): StrNum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Take the maximum of 'this' vector with vector 'b' (element-by element).
      *  @param b  the other vector
      */
-    def max (b: VectoD): VectoD
+    def max (b: VectoS): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the minimum element in 'this' vector.
      *  @param e  the ending index (exclusive) for the search
      */
-    def min (e: Int = dim): Double
+    def min (e: Int = dim): StrNum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Take the minimum of 'this' vector with vector 'b' (element-by element).
      *  @param b  the other vector
      */
-    def min (b: VectoD): VectoD
+    def min (b: VectoS): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the element with the greatest magnitude in 'this' vector.
      */
-    def mag: Double = ABS (max ()) max ABS (min ())
+    def mag: StrNum = ABS (max ()) max ABS (min ())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the argument maximum of 'this' vector (index of maximum element).
@@ -539,7 +539,7 @@ trait VectoD
      *  -1 if not found.
      *  @param p  the predicate to check
      */
-    def indexWhere (p: (Double) => Boolean): Int
+    def indexWhere (p: (StrNum) => Boolean): Int
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of strictly negative elements in 'this' vector.
@@ -554,7 +554,7 @@ trait VectoD
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a vector consisting of the distinct elements in 'this' vector.
      */
-    def distinct: VectoD
+    def distinct: VectoS
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of distinct elements in 'this' vector.
@@ -565,7 +565,7 @@ trait VectoD
     /** Determine whether 'x' is contained in 'this' vector.
      *  @param x  the element to be checked
      */
-    def contains (x: Double): Boolean
+    def contains (x: StrNum): Boolean
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sort 'this' vector in-place in ascending (non-decreasing) order.
@@ -588,7 +588,7 @@ trait VectoD
     /** Check whether the other vector 'b' is at least as long as 'this' vector.
      *  @param b  the other vector
      */
-    def sameDimensions (b: VectoD): Boolean = dim <= b.dim
+    def sameDimensions (b: VectoS): Boolean = dim <= b.dim
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check whether 'this' vector is nonnegative (has no negative elements).
@@ -599,7 +599,7 @@ trait VectoD
     /** Compare 'this' vector with vector 'b'.
      *  @param b  the other vector
      *
-    private def tryCompareTo [B >: VectoD] (b: B)
+    private def tryCompareTo [B >: VectoS] (b: B)
         (implicit view_1: (B) => PartiallyOrdered [B]): Option [Int]
      */
 
@@ -625,6 +625,6 @@ trait VectoD
      */
     override def toString: String
   
-} // VectoD trait
+} // VectoS trait
 
 

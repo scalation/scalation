@@ -31,7 +31,7 @@ object SparseMatrixD
      *  @param u           the array of vectors to assign
      *  @param columnwise  whether the vectors are treated as column or row vectors
      */
-    def apply (u: Array [VectorD], columnwise: Boolean = true): SparseMatrixD =
+    def apply (u: Array [VectoD], columnwise: Boolean = true): SparseMatrixD =
     {
         var x: SparseMatrixD = null
         val u_dim = u(0).dim
@@ -50,7 +50,7 @@ object SparseMatrixD
      *  Assumes vectors are columwise.
      *  @param u  the Vector of vectors to assign
      */
-    def apply (u: Vector [VectorD]): SparseMatrixD =
+    def apply (u: Vector [VectoD]): SparseMatrixD =
     {
         val u_dim = u(0).dim
         val x = new SparseMatrixD (u_dim, u.length)
@@ -120,7 +120,7 @@ class SparseMatrixD (val d1: Int,
      */
     private val v = new Array [RowMap] (d1)
     for (i <- 0 until d1) v(i) = new RowMap ()
-    
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a 'dim1' by 'dim2' sparse matrix from an array of sorted-linked-maps.
      *  @param dim1  the row dimension
@@ -201,6 +201,18 @@ class SparseMatrixD (val d1: Int,
         v(dim1-1)(dim1-1) = b.dg(dim1-1)
     } // constructor
      */
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a clone of 'this' m-by-n sparse matrix.
+     */
+    def copy (): SparseMatrixD = new SparseMatrixD (dim1, dim2, v.clone ())
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an m-by-n sparse matrix with all elements intialized to zero.
+     *  @param m  the number of rows
+     *  @param n  the number of columns
+     */
+    def zero (m: Int = dim1, n: Int = dim2): SparseMatrixD = new SparseMatrixD (m, n)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' sparse matrix's element at the 'i,j'-th index position.
@@ -306,16 +318,20 @@ class SparseMatrixD (val d1: Int,
     } // set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a clone of 'this' m-by-n sparse matrix.
+    /** Convert 'this' Sparse`MatrixD` into a `MatrixI`.
      */
-    def copy (): SparseMatrixD = new SparseMatrixD (dim1, dim2, v.clone ())
+    def toInt: MatrixI =
+    {
+        val c = new MatrixI (dim1, dim2)
+        for (i <- range1) c(i) = this(i).toInt
+        c
+    } // toInt
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create an m-by-n sparse matrix with all elements intialized to zero.
-     *  @param m  the number of rows
-     *  @param n  the number of columns
+    /** Convert this sparse matrix to a dense matrix.
+     *  FIX - new builder
      */
-    def zero (m: Int = dim1, n: Int = dim2): SparseMatrixD = new SparseMatrixD (m, n)
+    def toDense: MatrixD = new MatrixD (dim1, dim2, (for (i <- range1) yield this(i).toDense ().toArray).toArray)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice 'this' sparse matrix row-wise 'from' to 'end'.
@@ -850,6 +866,28 @@ class SparseMatrixD (val d1: Int,
         } // for
         c
     } // dot
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product of 'this' matrix and matrix 'b', by first transposing
+     *  'this' matrix and then multiplying by 'b' (ie., 'a dot b = a.t * b').
+     *  @param b  the matrix to multiply by (requires same first dimensions)
+     */
+    def dot (b: MatriD): SparseMatrixD =
+    {
+        if (dim1 != b.dim1) flaw ("dot", "matrix dot matrix - incompatible first dimensions")
+
+        val c = new SparseMatrixD (dim2, b.dim2)
+        val at = this.t                         // transpose the 'this' matrix
+        for (i <- range2) {
+            val at_i = at(i)                    // ith row of 'at' (column of 'a')
+            for (j <- b.range2) {
+                var sum = 0.0
+                for (k <- range1) sum += at_i(k) * b(k, j)
+                c(i, j) = sum
+            } // for
+        } // for
+        c
+    } // dot
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' sparse matrix by sparse matrix 'b' using the Strassen matrix
@@ -1006,6 +1044,26 @@ class SparseMatrixD (val d1: Int,
     } // getMinVal
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the lower triangular of 'this' matrix (rest are zero).
+     */
+    def lowerT: SparseMatrixD =
+    {
+        val lo = new SparseMatrixD (dim1, dim2)
+        for (i <- range1; j <- 0 to i) lo(i, j) = this(i, j)
+        lo
+    } // lowerT
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the upper triangular of 'this' matrix (rest are zero).
+     */
+    def upperT: SparseMatrixD =
+    {
+        val up = new SparseMatrixD (dim1, dim2)
+        for (i <- range1; j <- i until dim2) up(i, j) = this(i, j)
+        up
+    } // upperT
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Decompose 'this' sparse matrix into the product of lower and upper triangular
      *  matrices '(l, u)' using the LU Decomposition algorithm.  This version uses
      *  partial pivoting.
@@ -1017,7 +1075,7 @@ class SparseMatrixD (val d1: Int,
         for (i <- u.range1) {
             var pivot = u(i, i)
             if (pivot =~ 0.0) {
-                val k = partialPivoting (u, i)   // find the maxiumum element below pivot
+                val k = partialPivoting (u, i)   // find the maximum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u(i, i)                  // reset the pivot
             } // if
@@ -1044,7 +1102,7 @@ class SparseMatrixD (val d1: Int,
         for (i <- u.range1) {
             var pivot = u(i, i)
             if (pivot =~ 0.0) {
-                val k = partialPivoting (u, i)   // find the maxiumum element below pivot
+                val k = partialPivoting (u, i)   // find the maximum element below pivot
                 swap (u, i, k, i)                // swap rows i and k from column k
                 pivot = u(i, i)                  // reset the pivot
             } // if
@@ -1235,7 +1293,7 @@ class SparseMatrixD (val d1: Int,
         for (i <- b.range1) {
             var pivot = b(i, i)
             if (pivot =~ 0.0) {
-                val k = partialPivoting (b, i)     // find the maxiumum element below pivot
+                val k = partialPivoting (b, i)     // find the maximum element below pivot
                 swap (b, i, k, i)                  // in b, swap rows i and k from column i
                 swap (c, i, k, 0)                  // in c, swap rows i and k from column 0
                 pivot = b(i, i)                    // reset the pivot
@@ -1270,7 +1328,7 @@ class SparseMatrixD (val d1: Int,
         for (i <- b.range1) {
             var pivot = b(i, i)
             if (pivot =~ 0.0) {
-                val k = partialPivoting (b, i)     // find the maxiumum element below pivot
+                val k = partialPivoting (b, i)     // find the maximum element below pivot
                 swap (b, i, k, i)                  // in b, swap rows i and k from column i
                 swap (c, i, k, 0)                  // in c, swap rows i and k from column 0
                 pivot = b(i, i)                    // reset the pivot
@@ -1306,7 +1364,7 @@ class SparseMatrixD (val d1: Int,
         for (i <- b.range1) {
             var pivot = b(i, i)
             if (pivot =~ 0.0) {
-                val k = partialPivoting (b, i)  // find the maxiumum element below pivot
+                val k = partialPivoting (b, i)  // find the maximum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b(i, i)                 // reset the pivot
             } // if
@@ -1327,7 +1385,7 @@ class SparseMatrixD (val d1: Int,
      *  It can be used to solve 'a * x = b': augment 'a' with 'b' and call reduce.
      *  Takes '[a | b]' to '[I | x]'.
      */
-    def reduce_ip () 
+    def reduce_ip ()
     {
         if (dim2 < dim1) flaw ("reduce", "requires n (columns) >= m (rows)")
 
@@ -1335,7 +1393,7 @@ class SparseMatrixD (val d1: Int,
         for (i <- b.range1) {
             var pivot = b(i, i)
             if (pivot =~ 0.0) {
-                val k = partialPivoting (b, i)  // find the maxiumum element below pivot
+                val k = partialPivoting (b, i)  // find the maximum element below pivot
                 swap (b, i, k, i)               // in b, swap rows i and k from column i
                 pivot = b(i, i)                 // reset the pivot
             } // if
@@ -1532,7 +1590,7 @@ object SparseMatrixDTest extends App
 {
     import SparseMatrixD.RowMap
 
-    println ("\n\tTest SparseMatrixD on additional operations")
+    println ("\n\tTest SparseMatrixD operations")
 
     val z  = new SparseMatrixD ((2, 2), 1, 2,
                                         3, 2)

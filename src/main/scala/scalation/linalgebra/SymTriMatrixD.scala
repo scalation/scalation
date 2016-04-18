@@ -60,7 +60,7 @@ class SymTriMatrixD (val d1: Int)
      *  @param v1  the diagonal vector
      *  @param v2  the sub-diagonal vector
      */
-    def this (v1: VectorD, v2: VectorD)
+    def this (v1: VectoD, v2: VectoD)
     {
         this (v1.dim)
         for (i <- range_d) _dg(i) = v1(i)
@@ -77,6 +77,18 @@ class SymTriMatrixD (val d1: Int)
         for (i <- range_d) _dg(i) = b(i, i)
         for (i <- range_s) _sd(i) = b(i, i+1)
     } // constructor
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an exact copy of 'this' m-by-n symmetric tridiagonal matrix.
+     */
+    def copy (): SymTriMatrixD = new SymTriMatrixD (dim1)             // FIX - copy the diagonals
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an m-by-n symmetric tridiagonal matrix with all elements intialized to zero.
+     *  @param m  the number of rows
+     *  @param n  the number of columns
+     */
+    def zero (m: Int = dim1, n: Int = dim2): SymTriMatrixD = new SymTriMatrixD (m)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the diagonal of 'this' tridiagonal matrix.
@@ -143,7 +155,7 @@ class SymTriMatrixD (val d1: Int)
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get a slice 'this' triangular matrix row-wise on range 'ir' and column-wise
+    /** Get a slice 'this' tridiagonal matrix row-wise on range 'ir' and column-wise
      *  on range 'jr'.
      *  Ex: b = a(2..4, 3..5)
      *  @param ir  the row range
@@ -184,7 +196,7 @@ class SymTriMatrixD (val d1: Int)
     } // update
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set a slice 'this' triangular matrix row-wise on range 'ir' and column-wise
+    /** Set a slice 'this' tridiagonal matrix row-wise on range 'ir' and column-wise
      *  on range 'jr'.
      *  Ex: a(2..4, 3..5) = b
      *  @param ir  the row range
@@ -206,7 +218,7 @@ class SymTriMatrixD (val d1: Int)
     } // update
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set all the elements in 'this' triangular matrix to the scalar 'x'.
+    /** Set all the elements in 'this' tridiagonal matrix to the scalar 'x'.
      *  @param x  the scalar value to assign
      */
     def set (x: Double)
@@ -218,7 +230,7 @@ class SymTriMatrixD (val d1: Int)
     } // set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set all the values in 'this' triangular matrix as copies of the values in
+    /** Set all the values in 'this' tridiagonal matrix as copies of the values in
      *  2D array 'u'.  Ignore parts of array not corresponding to tridiagonal.
      *  @param u  the 2D array of values to assign
      */
@@ -243,20 +255,27 @@ class SymTriMatrixD (val d1: Int)
         if (i-1 >= j) _sd(i-1) = u(i-1)
     } // set
 
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a clone of 'this' m-by-n symmetric triangular matrix.
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `SymTriMatrixD` into a SymTriMatrixI`.
      */
-    def copy (): SymTriMatrixD = new SymTriMatrixD (dim1)             // FIX - copy the diagonals
+    def toInt: SymTriMatrixI = new SymTriMatrixI (_dg.toInt, _sd.toInt)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create an m-by-n symmetric triangular matrix with all elements intialized to zero.
-     *  @param m  the number of rows
-     *  @param n  the number of columns
+    /** Convert 'this' tridiagonal matrix to a dense matrix.
      */
-    def zero (m: Int = dim1, n: Int = dim2): SymTriMatrixD = new SymTriMatrixD (m)
+    def toDense: MatrixD =
+    {
+        val c = new MatrixD (dim1, dim1)
+        for (i <- range1) {
+            c(i, i) = _dg(i) 
+            if (i > 0)      c(i-1, i) = _sd(i)
+            if (i < dim1-1) c(i, i+1) = _sd(i)
+        } // for
+        c
+    } // for
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Slice 'this' triangular matrix row-wise 'from' to 'end'.
+    /** Slice 'this' tridiagonal matrix row-wise 'from' to 'end'.
      *  @param from  the start row of the slice (inclusive)
      *  @param end   the end row of the slice (exclusive)
      */
@@ -271,7 +290,7 @@ class SymTriMatrixD (val d1: Int)
     } // slice
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Slice 'this' triangular matrix column-wise 'from' to 'end'.
+    /** Slice 'this' tridiagonal matrix column-wise 'from' to 'end'.
      *  @param from  the start column of the slice (inclusive)
      *  @param end   the end column of the slice (exclusive)
      */
@@ -286,7 +305,7 @@ class SymTriMatrixD (val d1: Int)
     } // sliceCol
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Slice 'this' triangular matrix row-wise 'r_from' to 'r_end' and column-wise
+    /** Slice 'this' tridiagonal matrix row-wise 'r_from' to 'r_end' and column-wise
      *  'c_from' to 'c_end'.
      *  @param r_from  the start of the row slice
      *  @param r_end   the end of the row slice
@@ -299,7 +318,7 @@ class SymTriMatrixD (val d1: Int)
     } // slice
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Slice 'this' triangular matrix excluding the given 'row' and 'col'umn.
+    /** Slice 'this' tridiagonal matrix excluding the given 'row' and 'col'umn.
      *  @param row  the row to exclude
      *  @param col  the column to exclude
      */
@@ -309,7 +328,7 @@ class SymTriMatrixD (val d1: Int)
     } // sliceExclude
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Select rows from 'this' triangular matrix according to the given index/basis.
+    /** Select rows from 'this' tridiagonal matrix according to the given index/basis.
      *  @param rowIndex  the row index positions (e.g., (0, 2, 5))
      */
     def selectRows (rowIndex: Array [Int]): SymTriMatrixD =
@@ -318,7 +337,7 @@ class SymTriMatrixD (val d1: Int)
     } // selectRows
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get column 'col' from 'this' triangular matrix, returning it as a vector.
+    /** Get column 'col' from 'this' tridiagonal matrix, returning it as a vector.
      *  @param col   the column to extract from the matrix
      *  @param from  the position to start extracting from
      */
@@ -330,7 +349,7 @@ class SymTriMatrixD (val d1: Int)
     } // col
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set column 'col' of 'this' triangular matrix to a vector.
+    /** Set column 'col' of 'this' tridiagonal matrix to a vector.
      *  @param col  the column to set
      *  @param u    the vector to assign to the column
      */
@@ -341,7 +360,7 @@ class SymTriMatrixD (val d1: Int)
     } // setCol
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Select columns from 'this' triangular matrix according to the given index/basis.
+    /** Select columns from 'this' tridiagonal matrix according to the given index/basis.
      *  Ex: Can be used to divide a matrix into a basis and a non-basis.
      *  @param colIndex  the column index positions (e.g., (0, 2, 5))
      */
@@ -351,7 +370,7 @@ class SymTriMatrixD (val d1: Int)
     } // selectCols
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Transpose 'this' triangular matrix (rows => columns).  Note, since the
+    /** Transpose 'this' tridiagonal matrix (rows => columns).  Note, since the
      *  matrix is symmetric, it returns itself.
      */
     def t: SymTriMatrixD = this
@@ -411,7 +430,7 @@ class SymTriMatrixD (val d1: Int)
     } // ++^
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add 'this' triangular matrix and matrix 'b'.
+    /** Add 'this' tridiagonal matrix and matrix 'b'.
      *  @param b  the matrix to add (requires leDimensions)
      */
     def + (b: MatriD): SymTriMatrixD = 
@@ -435,7 +454,7 @@ class SymTriMatrixD (val d1: Int)
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add 'this' triangular matrix and scalar 'x'.
+    /** Add 'this' tridiagonal matrix and scalar 'x'.
      *  @param x  the scalar to add
      */
     def + (x: Double): SymTriMatrixD =
@@ -444,7 +463,7 @@ class SymTriMatrixD (val d1: Int)
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add in-place 'this' triangular matrix and matrix 'b'.
+    /** Add in-place 'this' tridiagonal matrix and matrix 'b'.
      *  @param b  the matrix to add (requires leDimensions)
      */
     def += (b: MatriD): SymTriMatrixD =
@@ -469,7 +488,7 @@ class SymTriMatrixD (val d1: Int)
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add in-place 'this' triangular matrix and scalar 'x'.
+    /** Add in-place 'this' tridiagonal matrix and scalar 'x'.
      *  @param x  the scalar to add
      */
     def += (x: Double): SymTriMatrixD =
@@ -478,7 +497,7 @@ class SymTriMatrixD (val d1: Int)
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' triangular matrix subtract matrix 'b'.
+    /** From 'this' tridiagonal matrix subtract matrix 'b'.
      *  @param b  the matrix to subtract (requires leDimensions)
      */
     def - (b: MatriD): SymTriMatrixD = 
@@ -502,7 +521,7 @@ class SymTriMatrixD (val d1: Int)
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' triangular matrix subtract scalar 'x'.
+    /** From 'this' tridiagonal matrix subtract scalar 'x'.
      *  @param x  the scalar to subtract
      */
     def - (x: Double): SymTriMatrixD =
@@ -511,7 +530,7 @@ class SymTriMatrixD (val d1: Int)
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' triangular matrix subtract in-place matrix 'b'.
+    /** From 'this' tridiagonal matrix subtract in-place matrix 'b'.
      *  @param b  the matrix to subtract (requires leDimensions)
      */
     def -= (b: MatriD): SymTriMatrixD =
@@ -536,7 +555,7 @@ class SymTriMatrixD (val d1: Int)
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' triangular matrix subtract in-place scalar 'x'.
+    /** From 'this' tridiagonal matrix subtract in-place scalar 'x'.
      *  @param x  the scalar to subtract
      */
     def -= (x: Double): SymTriMatrixD =
@@ -545,7 +564,7 @@ class SymTriMatrixD (val d1: Int)
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply 'this' triangular matrix by matrix 'b'.
+    /** Multiply 'this' tridiagonal matrix by matrix 'b'.
      *  @param b  the matrix to multiply by
      */
     def * (b: MatriD): SymTriMatrixD = 
@@ -554,7 +573,7 @@ class SymTriMatrixD (val d1: Int)
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply 'this' triangular matrix by matrix 'b'.  Requires 'b' to have
+    /** Multiply 'this' tridiagonal matrix by matrix 'b'.  Requires 'b' to have
      *  type SymTriMatrixD, but returns a more general type of matrix.
      *  @param b  the matrix to multiply by
      */
@@ -572,7 +591,7 @@ class SymTriMatrixD (val d1: Int)
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply 'this' triangular matrix by vector 'u'.
+    /** Multiply 'this' tridiagonal matrix by vector 'u'.
      *  @param u  the vector to multiply by
      */
     def * (u: VectoD): VectorD = 
@@ -587,7 +606,7 @@ class SymTriMatrixD (val d1: Int)
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply 'this' triangular matrix by scalar 'x'.
+    /** Multiply 'this' tridiagonal matrix by scalar 'x'.
      *  @param x  the scalar to multiply by
      */
     def * (x: Double): SymTriMatrixD =
@@ -596,7 +615,7 @@ class SymTriMatrixD (val d1: Int)
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place 'this' triangular matrix by matrix 'b'.
+    /** Multiply in-place 'this' tridiagonal matrix by matrix 'b'.
      *  @param b  the matrix to multiply by
      */
     def *= (b: MatriD): SymTriMatrixD =
@@ -605,7 +624,7 @@ class SymTriMatrixD (val d1: Int)
     } // *=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place 'this' triangular matrix by scalar 'x'.
+    /** Multiply in-place 'this' tridiagonal matrix by scalar 'x'.
      *  @param x  the scalar to multiply by
      */
     def *= (x: Double): SymTriMatrixD =
@@ -623,7 +642,7 @@ class SymTriMatrixD (val d1: Int)
     def dot (u: VectoD): VectorD = this * u
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply 'this' triangular matrix by vector 'u' to produce another matrix
+    /** Multiply 'this' tridiagonal matrix by vector 'u' to produce another matrix
      *  '(a_ij * u_j)'.
      *  @param u  the vector to multiply by
      */
@@ -633,7 +652,7 @@ class SymTriMatrixD (val d1: Int)
     } // **
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place 'this' triangular matrix by vector 'u' to produce another
+    /** Multiply in-place 'this' tridiagonal matrix by vector 'u' to produce another
      *  matrix '(a_ij * u_j)'.
      *  @param u  the vector to multiply by
      */
@@ -643,7 +662,7 @@ class SymTriMatrixD (val d1: Int)
     } // **=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide 'this' triangular matrix by scalar 'x'.
+    /** Divide 'this' tridiagonal matrix by scalar 'x'.
      *  @param x  the scalar to divide by
      */
     def / (x: Double): SymTriMatrixD =
@@ -652,7 +671,7 @@ class SymTriMatrixD (val d1: Int)
     } // /
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide in-place 'this' triangular matrix by scalar 'x'.
+    /** Divide in-place 'this' tridiagonal matrix by scalar 'x'.
      *  @param x  the scalar to divide by
      */
     def /= (x: Double): SymTriMatrixD =
@@ -661,8 +680,8 @@ class SymTriMatrixD (val d1: Int)
     } // /=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Raise 'this' triangular matrix to the 'p'th power (for some integer 'p' >= 2).
-     *  @param p  the power to raise this triangular matrix to
+    /** Raise 'this' tridiagonal matrix to the 'p'th power (for some integer 'p' >= 2).
+     *  @param p  the power to raise this tridiagonal matrix to
      */
     def ~^ (p: Int): SymTriMatrixD =
     {
@@ -744,7 +763,7 @@ class SymTriMatrixD (val d1: Int)
         val x = new VectorD (b)               // solution vector, start with copy of b
         val c = _sd                           // subdiagonal
         val d = _dg                           // diagonal
-        val e = new VectorD (_sd  ++ 0.0)     // augmented superdiagonal
+        val e = new VectorD (_sd ++ 0.0)      // augmented superdiagonal
  
         e(0) /= d(0)
         x(0) /= d(0)
@@ -818,27 +837,27 @@ class SymTriMatrixD (val d1: Int)
     } // getDiag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the kth diagonal of 'this' triangular matrix to the vector 'u'.
+    /** Set the kth diagonal of 'this' tridiagonal matrix to the vector 'u'.
      *  Assumes 'dim2 >= dim1'.
      *  @param u  the vector to set the diagonal to
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
     def setDiag (u: VectoD, k: Int = 0)
     {
-        if (k == 0) _dg = u.asInstanceOf [VectorD]                     // FIX
-        else if (ABS (k) == 1) _sd = u.asInstanceOf [VectorD]
+        if (k == 0) _dg = u.toDense
+        else if (ABS (k) == 1) _sd = u.toDense
         else flaw ("setDiag", "nothing stored for diagonal " + k)
     } // setDiag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the main diagonal of 'this' triangular matrix to the scalar 'x'.
+    /** Set the main diagonal of 'this' tridiagonal matrix to the scalar 'x'.
      *  Assumes 'dim2 >= dim1'.
      *  @param x  the scalar to set the diagonal to
      */
     def setDiag (x: Double) { _dg.set (x) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Invert 'this' triangular matrix.
+    /** Invert 'this' tridiagonal matrix.
      *  @see www.amm.shu.edu.cn/EN/article/downloadArticleFile.do?attachType=PDF&id=4339
      */
     def inverse: MatriD =
@@ -874,7 +893,7 @@ class SymTriMatrixD (val d1: Int)
     } // inverse
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Clean values in 'this' triangular matrix at or below the threshold by setting
+    /** Clean values in 'this' tridiagonal matrix at or below the threshold by setting
      *  them to zero.  Iterative algorithms give approximate values and if very close
      *  to zero,  may throw off other calculations, e.g., in computing eigenvectors.
      *  @param thres     the cutoff threshold (a small value)
@@ -967,12 +986,12 @@ class SymTriMatrixD (val d1: Int)
     } // detHelper
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check whether 'this' triangular matrix is nonnegative (has no negative elements).
+    /** Check whether 'this' tridiagonal matrix is nonnegative (has no negative elements).
      */
     override def isNonnegative: Boolean = _dg.isNonnegative && _sd.isNonnegative
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check whether 'this' triangular matrix is rectangular (all rows have the same
+    /** Check whether 'this' tridiagonal matrix is rectangular (all rows have the same
      *  number of columns).
      */
     def isRectangular: Boolean = true
@@ -1008,6 +1027,16 @@ class SymTriMatrixD (val d1: Int)
     //--------------------------------------------------------------------------
     // The following methods are currently not implemented for Symmetric Tridiagonal matrices:
     //--------------------------------------------------------------------------
+
+    def lowerT: SymTriMatrixD =
+    {
+        throw new NoSuchMethodException ("lowerT not implemented since result may not be SymTriMatrix")
+    } // lowerT
+
+    def upperT: SymTriMatrixD =
+    {
+        throw new NoSuchMethodException ("lowerT not implemented since result may not be SymTriMatrix")
+    } // upperT
 
     def lud_ip (): Tuple2 [MatriD, MatriD] = 
     {

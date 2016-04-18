@@ -8,13 +8,14 @@
 
 package scalation.linalgebra
 
-import collection.Traversable
-import util.Sorting.quickSort
+import scala.collection.Traversable
+import scala.util.Sorting.quickSort
 
 import scalation.math.Complex.{abs => ABS, max => MAX, _}
 
 import scalation.math.Complex
 import scalation.util.Error
+import scalation.util.SortingC
 import scalation.util.SortingC.{iqsort, qsort2}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -25,7 +26,8 @@ import scalation.util.SortingC.{iqsort, qsort2}
  */
 class VectorC (val dim: Int,
      protected var v:   Array [Complex] = null)
-      extends Traversable [Complex] with PartiallyOrdered [VectorC] with Vec with Error with Serializable
+      extends VectoC
+//    extends Traversable [Complex] with PartiallyOrdered [VectorC] with Vec with Error with Serializable
 {
     if (v == null) {
         v = Array.ofDim [Complex] (dim)
@@ -33,108 +35,49 @@ class VectorC (val dim: Int,
         flaw ("constructor", "dimension is wrong")
     } // if
 
-    /** Number of elements in the vector as a Double
-     */
-    val nd = dim.toDouble
-
-    /** Range for the storage array
-     */
-    private val range = 0 until dim
-
-    /** Format String used for printing vector values (change using setFormat)
-     *  Ex: "%d,\t", "%.6g,\t" or "%12.6g,\t"
-     */
-    private var fString = "%s,\t"
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a vector from an array of values.
-     *  @param u  the array of values
-     */
-    def this (u: Array [Complex]) { this (u.length, u) }
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a vector and assign values from vector 'u'.
      *  @param u  the other vector
      */
-    def this (u: VectorC)
-    {
-        this (u.dim)                               // invoke primary constructor
-        for (i <- range) v(i) = u(i)
-    } // constructor
+    def this (u: VectoC) { this (u.dim); for (i <- range) v(i) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the size (number of elements) of 'this' vector.
+    /** Construct a vector and assign 'value' at 'index' position.
+     *  @param iv  the tuple containing (index, value)
+     *  @param dm  the dimension for the new vector
      */
-    override def size: Int = dim
+    def this (iv: Tuple2 [Int, Complex], dm: Int) { this (dm); v(iv._1) = iv._2 }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Produce the range of all indices (0 to one less than dim).
+    /** Create an exact copy of 'this' vector.
      */
-    def indices: Range = 0 until dim
+    def copy: VectorC = new VectorC (this)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Expand the size (dim) of 'this' vector by 'more' elements.
-     *  @param more  the number of new elements to add
+    /** Create a zero vector (all elements are zero) of length 'size'.
+     *  @param size  the number of elements in the vector
      */
-    def expand (more: Int = dim): VectorC =
-    {
-        if (more < 1) this       // no change
-        else          new VectorC (dim + more, Array.concat (v, new Array [Complex] (more)))
-    } // expand
+    def zero (size: Int = dim): VectorC = new VectorC (size)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a one vector (all elements are one) of length 'size'.
+     *  @param size  the number of elements in the vector
+     */
+    def one (size: Int = dim): VectorC = new VectorC (size, Array.fill (size)(_1))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a vector of the form (0, ... 1, ... 0) where the 1 is at position j.
      *  @param j     the position to place the 1
      *  @param size  the size of the vector (upper bound = size - 1)
      */
-    def oneAt (j: Int, size: Int = dim): VectorC =
-    {
-        val c = new VectorC (size)
-        c.v(j) = _1
-        c
-    } // oneAt
+    def oneAt (j: Int, size: Int = dim): VectorC = new VectorC ((j, _1), size)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a vector of the form (0, ... -1, ... 0) where the -1 is at position j.
      *  @param j     the position to place the -1
      *  @param size  the size of the vector (upper bound = size - 1)
      */
-    def _oneAt (j: Int, size: Int = dim): VectorC =
-    {
-        val c = new VectorC (size)
-        c.v(j) = -_1
-        c
-    } // _oneAt
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `VectorC` into a `VectorI`.
-     */
-    def toInt: VectorI =
-    {
-        val c = new VectorI (dim)
-        for (i <- range) c(i) = v(i).toInt
-        c
-    } // toInt
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `VectorC` into a `VectorL`.
-      */
-    def toLong: VectorL =
-    {
-        val c = new VectorL (dim)
-        for (i <- range) c(i) = v(i).toLong
-        c
-    } // toLong
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `VectorC` into a `VectorD`.
-     */
-    def toDouble: VectorD =
-    {
-        val c = new VectorD (dim)
-        for (i <- range) c(i) = v(i).toDouble
-        c
-    } // toDouble
+    def _oneAt (j: Int, size: Int = dim): VectorC = new VectorC ((j, -_1), size)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's element at the 'i'-th index position. 
@@ -151,7 +94,7 @@ class VectorC (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's entire array.
      */
-    def apply (): Array [Complex] = v
+    def apply (): Seq [Complex] = v
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' vector's element at the 'i'-th index position. 
@@ -172,7 +115,7 @@ class VectorC (val dim: Int,
      *  @param r  the given range
      *  @param u  the vector to assign
      */
-    def update (r: Range, u: VectorC) { for (i <- r) v(i) = u(i - r.start) }
+    def update (r: Range, u: VectoC) { for (i <- r) v(i) = u(i - r.start) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set each value in 'this' vector to 'x'.
@@ -181,20 +124,46 @@ class VectorC (val dim: Int,
     def set (x: Complex) { for (i <- range) v(i) = x }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the values in 'this' vector to the values in array 'u'.
-     *  @param u  the array of values to be assigned
+    /** Set the values in 'this' vector to the values in sequence/array 'u'.
+     *  @param u  the sequence/array of values to be assigned
      */
-    def setAll (u: Array [Complex]) { for (i <- range) v(i) = u(i) }
+    def set (u: Seq [Complex]) { for (i <- range) v(i) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Iterate over 'this' vector element by element.
      *  @param f  the function to apply
      */
-    def foreach [U] (f: Complex => U)
+    def foreach [U] (f: Complex => U) { var i = 0; while (i < dim) { f (v(i)); i += 1 } }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `VectorC` into a `VectorI`.
+     */
+    def toInt: VectorI = VectorI (v.map (_.toInt))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `VectorC` into a `VectorL`.
+      */
+    def toLong: VectorL = VectorL (v.map (_.toLong))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `VectorC` into a `VectorD`.
+     */
+    def toDouble: VectorD = VectorD (v.map (_.toDouble))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `VectorC` into a dense `VectorC`.
+     */
+    def toDense: VectorC = this
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Expand the size (dim) of 'this' vector by 'more' elements.
+     *  @param more  the number of new elements to add
+     */
+    def expand (more: Int = dim): VectorC =
     {
-        var i = 0    
-        while (i < dim) { f (v(i)); i += 1 }
-    } // foreach
+        if (more < 1) this       // no change
+        else          new VectorC (dim + more, Array.concat (v, new Array [Complex] (more)))
+    } // expand
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
@@ -208,23 +177,20 @@ class VectorC (val dim: Int,
      *  the index positions.
      *  @param p  the predicate (Boolean function) to apply
      */
-    def filterPos (p: Complex => Boolean): Array [Int] =
-    {
-        (for (i <- range if p (v(i))) yield i).toArray
-    } // filterPos
+    def filterPos (p: Complex => Boolean): Seq [Int] = for (i <- range if p (v(i))) yield i
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Map the elements of 'this' vector by applying the mapping function 'f'.
      *  @param f  the function to apply
      */
-    def map (f: Complex => Complex): VectorC = new VectorC (this ().map (f))
+    def map (f: Complex => Complex): VectorC = VectorC (v.map (f))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice 'this' vector 'from' to 'end'.
      *  @param from  the start of the slice (included)
      *  @param till  the end of the slice (excluded)
      */
-    override def slice (from: Int, till: Int): VectorC = new VectorC (till - from, v.slice (from, till))
+    override def slice (from: Int, till: Int = dim): VectorC = new VectorC (till - from, v.slice (from, till))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select a subset of elements of 'this' vector corresponding to a 'basis'.
@@ -239,7 +205,18 @@ class VectorC (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate 'this' vector and vector' b'.
-     *  @param b  the vector to be concatenated
+     *  @param b  the vector to be concatenated (any kind)
+     */
+    def ++ (b: VectoC): VectorC =
+    {
+        val c = new VectorC (dim + b.dim)
+        for (i <- c.range) c.v(i) = if (i < dim) v(i) else b(i - dim)
+        c
+    } // ++
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate 'this' vector and vector' b'.
+     *  @param b  the vector to be concatenated (same kind, more efficient)
      */
     def ++ (b: VectorC): VectorC =
     {
@@ -261,7 +238,18 @@ class VectorC (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to add (any kind)
+     */
+    def + (b: VectoC): VectorC = 
+    {
+        val c = new VectorC (dim)
+        for (i <- range) c.v(i) = v(i) + b(i)
+        c
+    } // +
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add 'this' vector and vector 'b'.
+     *  @param b  the vector to add (same kind, more efficient)
      */
     def + (b: VectorC): VectorC = 
     {
@@ -282,19 +270,25 @@ class VectorC (val dim: Int,
     } // +
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add 'this' vector and scalar 's._1' only at position 's._2'.
-     *  @param s  the (scalar, position) to add
+    /** Add 'this' vector and scalar 's._2' only at position 's._1'.
+     *  @param s  the (position, scalar) to add
      */
-    def + (s: Tuple2 [Complex, Int]): VectorC =
+    def + (s: Tuple2 [Int, Complex]): VectorC =
     {
         val c = new VectorC (dim)
-        for (i <- range) c.v(i) = if (i == s._2) v(i) + s._1 else v(i)
+        for (i <- range) c.v(i) = if (i == s._1) v(i) + s._2 else v(i)
         c
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to add (any kind)
+     */
+    def += (b: VectoC): VectorC = { for (i <- range) v(i) += b(i); this }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add in-place 'this' vector and vector 'b'.
+     *  @param b  the vector to add (same kind, more efficient)
      */
     def += (b: VectorC): VectorC = { for (i <- range) v(i) += b.v(i); this }
 
@@ -316,7 +310,18 @@ class VectorC (val dim: Int,
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract vector 'b'.
-     *  @param b  the vector to subtract
+     *  @param b  the vector to subtract (any kind)
+     */
+    def - (b: VectoC): VectorC =
+    {
+        val c = new VectorC (dim)
+        for (i <- range) c.v(i) = v(i) - b(i)
+        c
+    } // -
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** From 'this' vector subtract vector 'b'.
+     *  @param b  the vector to subtract (same kind, more efficient)
      */
     def - (b: VectorC): VectorC =
     {
@@ -337,19 +342,25 @@ class VectorC (val dim: Int,
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' vector subtract scalar 's._1' only at position 's._2'.
-     *  @param s  the (scalar, position) to subtract
+    /** From 'this' vector subtract scalar 's._2' only at position 's._1'.
+     *  @param s  the (position, scalar) to subtract
      */
-    def - (s: Tuple2 [Complex, Int]): VectorC =
+    def - (s: Tuple2 [Int, Complex]): VectorC =
     {
         val c = new VectorC (dim)
-        for (i <- range) c.v(i) = if (i == s._2) v(i) - s._1 else v(i)
+        for (i <- range) c.v(i) = if (i == s._1) v(i) - s._2 else v(i)
         c
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to add (any kind)
+     */
+    def -= (b: VectoC): VectorC = { for (i <- range) v(i) -= b(i); this }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** From 'this' vector subtract in-place vector 'b'.
+     *  @param b  the vector to add (same kind, more efficient)
      */
     def -= (b: VectorC): VectorC = { for (i <- range) v(i) -= b.v(i); this }
 
@@ -361,7 +372,18 @@ class VectorC (val dim: Int,
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' vector by vector 'b'.
-     *  @param b  the vector to multiply by
+     *  @param b  the vector to multiply by (any kind)
+     */
+    def * (b: VectoC): VectorC =
+    {
+        val c = new VectorC (dim)
+        for (i <- range) c.v(i) = v(i) * b(i)
+        c
+    } // *
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply 'this' vector by vector 'b'.
+     *  @param b  the vector to multiply by (same kind, more efficient)
      */
     def * (b: VectorC): VectorC =
     {
@@ -382,14 +404,14 @@ class VectorC (val dim: Int,
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply 'this' (row) vector by matrix 'm'.
-     *  @param m  the matrix to multiply by
+    /** Multiply in-place 'this' vector and vector 'b'.
+     *  @param b  the vector to add (any kind)
      */
-    def * (m: MatriC): VectorC = m.t * this
+    def *= (b: VectoC): VectorC = { for (i <- range) v(i) *= b(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to add (same kind, more efficient)
      */
     def *= (b: VectorC): VectorC = { for (i <- range) v(i) *= b.v(i); this }
 
@@ -401,7 +423,18 @@ class VectorC (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide 'this' vector by vector 'b' (element-by-element).
-     *  @param b  the vector to divide by
+     *  @param b  the vector to divide by (any kind)
+     */
+    def / (b: VectoC): VectorC =
+    {
+        val c = new VectorC (dim)
+        for (i <- range) c.v(i) = v(i) / b(i)
+        c
+    } // /
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide 'this' vector by vector 'b' (element-by-element).
+     *  @param b  the vector to divide by (same kind, more efficient)
      */
     def / (b: VectorC): VectorC =
     {
@@ -423,7 +456,13 @@ class VectorC (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to add (any kind)
+     */
+    def /= (b: VectoC): VectorC = { for (i <- range) v(i) /= b(i); this }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide in-place 'this' vector and vector 'b'.
+     *  @param b  the vector to add (same kind, more efficient)
      */
     def /= (b: VectorC): VectorC = { for (i <- range) v(i) /= b.v(i); this }
 
@@ -445,34 +484,11 @@ class VectorC (val dim: Int,
         c
     } // ~^
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare 'this' vector with that vector 'b' for inequality.
-     *  @param b  that vector
-     */
-    def ≠ (b: VectorC) = this != b
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare 'this' vector with that vector 'b' for less than or equal to.
-     *  @param b  that vector
-     */
-    def ≤ (b: VectorC) = this <= b
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare 'this' vector with that vector 'b' for greater than or equal to.
-     *  @param b  that vector
-     */
-    def ≥ (b: VectorC) = this >= b
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Raise each element of 'this' vector to the 's'-th power.
+    /** Raise in-place each element of 'this' vector to the 's'-th power.
      *  @param s  the scalar exponent
      */
-    def ~^= (s: Double) { for (i <- range) v(i) = v(i) ~^ s }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the vector containing the square of each element of 'this' vector.
-     */
-    def sq: VectorC = this * this
+    def ~^= (s: Double): VectorC = { for (i <- range) v(i) = v(i) ~^ s; this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector containing the reciprocal of each element of 'this' vector.
@@ -482,7 +498,7 @@ class VectorC (val dim: Int,
         val c = new VectorC (dim)
         for (i <- range) c.v(i) = _1 / v(i)
         c
-    } // inverse
+    } // recip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector that is the element-wise absolute value of 'this' vector.
@@ -516,26 +532,10 @@ class VectorC (val dim: Int,
     def sumPos: Complex = v.foldLeft (_0)((s, x) => s + MAX (x, _0))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the mean of the elements of 'this' vector.
-     */
-    def mean = sum / nd
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the (unbiased) sample variance of the elements of 'this' vector.
-     */
-    def variance = (normSq - sum * sum / nd) / (nd-1.0)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the population variance of the elements of 'this' vector.
-     *  This is also the (biased) MLE estimator for sample variance.
-     */
-    def pvariance = (normSq - sum * sum / nd) / nd
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Establish the rank order of the elements in 'self' vector, e.g.,
      *  (8.0, 2.0, 4.0, 6.0) is (3, 0, 1, 2).
      */
-    def rank: VectorI = new VectorI (iqsort (v))
+    def rank: VectorI = VectorI (iqsort (v))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Cumulate the values of 'this' vector from left to right (e.g., create a
@@ -544,7 +544,7 @@ class VectorC (val dim: Int,
     def cumulate: VectorC =
     {
         val c = new VectorC (dim)
-        var sum: Complex = _0
+        var sum = _0
         for (i <- range) { sum += v(i); c.v(i) = sum }
         c
     } // cumulate
@@ -566,42 +566,32 @@ class VectorC (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
-     *  @param b  the other vector
+     *  @param b  the other vector (any kind)
      */
-    def dot (b: VectorC): Complex =
+    def dot (b: VectoC): Complex =
     {
-        var sum: Complex = _0
-        for (i <- range) sum += v(i) * b.v(i)
+        var sum = _0
+        for (i <- range) sum += v(i) * b(i)
         sum
     } // dot
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
-     *  @param b  the other vector
+     *  @param b  the other vector (same kind, more efficient)
      */
-    def ∙ (b: VectorC): Complex =
+    def dot (b: VectorC): Complex =
     {
-        var sum: Complex = _0
+        var sum = _0
         for (i <- range) sum += v(i) * b.v(i)
         sum
-    } // ∙
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Euclidean norm (2-norm) squared of 'this' vector.
-     */
-    def normSq: Complex = this dot this
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Euclidean norm (2-norm) of 'this' vector.
-     */
-    def norm: Complex = sqrt (normSq).toComplex
+    } // dot
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Manhattan norm (1-norm) of 'this' vector.
      */
     def norm1: Complex =
     {
-        var sum: Complex = _0
+        var sum = _0
         for (i <- range) sum += ABS (v(i))
         sum
     } // norm1
@@ -619,7 +609,18 @@ class VectorC (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Take the maximum of 'this' vector with vector 'b' (element-by element).
-     *  @param b  the other vector
+     *  @param b  the other vector (any kind)
+     */
+    def max (b: VectoC): VectorC =
+    {
+        val c = new VectorC (dim)
+        for (i <- range) c.v(i) = if (b(i) > v(i)) b(i) else v(i)
+        c
+    } // max
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Take the maximum of 'this' vector with vector 'b' (element-by element).
+     *  @param b  the other vector (same kind, more efficient)
      */
     def max (b: VectorC): VectorC =
     {
@@ -641,7 +642,18 @@ class VectorC (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Take the minimum of 'this' vector with vector 'b' (element-by element).
-     *  @param b  the other vector
+     *  @param b  the other vector (any kind)
+     */
+    def min (b: VectoC): VectorC =
+    {
+        val c = new VectorC (dim)
+        for (i <- range) c.v(i) = if (b(i) < v(i)) b(i) else v(i)
+        c
+    } // min
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Take the minimum of 'this' vector with vector 'b' (element-by element).
+     *  @param b  the other vector (same kind, more efficient)
      */
     def min (b: VectorC): VectorC =
     {
@@ -649,11 +661,6 @@ class VectorC (val dim: Int,
         for (i <- range) c.v(i) = if (b.v(i) < v(i)) b.v(i) else v(i)
         c
     } // min
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Find the element with the greatest magnitude in 'this' vector.
-     */
-    def mag: Complex = ABS (max ()) max ABS (min ())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the argument maximum of 'this' vector (index of maximum element).
@@ -678,7 +685,7 @@ class VectorC (val dim: Int,
     } // argmin
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the argument minimum of 'this' vector (-1 if its not negative).
+    /** Return the argument minimum of 'this' vector (-1 if it's not negative).
      *  @param e  the ending index (exclusive) for the search
      */
     def argminNeg (e: Int = dim): Int =
@@ -687,7 +694,7 @@ class VectorC (val dim: Int,
     } // argmaxNeg
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the argument maximum of 'this' vector (-1 if its not positive).
+    /** Return the argument maximum of 'this' vector (-1 if it's not positive).
      *  @param e  the ending index (exclusive) for the search
      */
     def argmaxPos (e: Int = dim): Int =
@@ -741,7 +748,7 @@ class VectorC (val dim: Int,
         count
     } // countNeg
 
-   //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of strictly positive elements in 'this' vector.
      */
     def countPos: Int =
@@ -753,7 +760,7 @@ class VectorC (val dim: Int,
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of distinct elements in 'this' vector.
-     */
+     *
     def distinct: Int =
     {
         var count = 1
@@ -761,12 +768,17 @@ class VectorC (val dim: Int,
         for (i <- 1 until dim if us(i) != us(i-1)) count += 1
         count
     } // distinct
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine whether the predicate 'pred' holds for some element in 'this' vector.
-     *  @param pred  the predicate to test (e.g., "_ == 5.")
      */
-//  def exists (pred: (Complex) => Boolean): Boolean = v.exists (pred)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return a new vector consisting of the distinct elements from 'this' vector.
+     */
+    def distinct: VectorC = VectorC (v.distinct)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Count the number of distinct elements in 'this' vector.
+     */
+    def countinct: Int = v.distinct.length
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether 'x' is contained in 'this' vector.
@@ -775,9 +787,19 @@ class VectorC (val dim: Int,
     def contains (x: Complex): Boolean = v contains x
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reverse the order of the elemnets in 'this' vector.
+     */
+    def reverse (): VectorC = new VectorC (dim, v.reverse)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether 'this' vector is in sorted (ascending) order.
+     */
+    def isSorted: Boolean = (new SortingC (v)).isSorted
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sort 'this' vector in-place in ascending (non-decreasing) order.
      */
-    def sort () { quickSort (v)(Complex.ord) }
+    def sort () { quickSort (v) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sort 'this' vector in-place in descending (non-increasing) order.
@@ -789,25 +811,12 @@ class VectorC (val dim: Int,
      *  @param i  the first element in the swap
      *  @param j  the second element in the swap
      */
-    def swap (i: Int, j: Int)
-    {
-        val t = v(j); v(j) = v(i); v(i) = t
-    } // swap
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check whether the other vector 'b' is at least as long as 'this' vector.
-     *  @param b  the other vector
-     */
-    def sameDimensions (b: VectorC): Boolean = dim <= b.dim
+    def swap (i: Int, j: Int) { val t = v(j); v(j) = v(i); v(i) = t }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check whether 'this' vector is nonnegative (has no negative elements).
      */
-    def isNonnegative: Boolean =
-    {
-        for (i <- range if v(i) < _0) return false
-        true
-    } // isNonnegative
+    def isNonnegative: Boolean = { for (i <- range if v(i) < _0) return false; true }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compare 'this' vector with vector 'b'.
@@ -828,24 +837,23 @@ class VectorC (val dim: Int,
     } // tryCompareTo
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Override equals to determine whether 'this' vector equals vector 'b..
+    /** Override equals to determine whether 'this' vector equals vector 'b'.
      *  @param b  the vector to compare with this
      */
     override def equals (b: Any): Boolean =
     {
-        b.isInstanceOf [VectorC] && (v.deep equals b.asInstanceOf [VectorC].v.deep)
+//      b.isInstanceOf [VectorC] && (v.deep equals b.asInstanceOf [VectorC].v.deep)
+
+        if (! b.isInstanceOf [VectoC]) return false
+        val bb = b.asInstanceOf [VectoC]
+        for (i <- range if v(i) !=~ bb(i)) return false               // within TOL
+        true
     } // equals
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Must also override hashCode for 'this' vector to be compatible with equals.
      */
     override def hashCode: Int = v.deep.hashCode
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the format to the 'newFormat' (e.g., "%.6g,\t" or "%12.6g,\t").
-     *  @param  newFormat  the new format String
-     */
-    def setFormat (newFormat: String) { fString = newFormat }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' vector to a String.
@@ -883,8 +891,8 @@ object VectorC
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `VectorC` from a sequence of Complexs.
-     *  @param xs  the sequence of the Complex numbers
+    /** Create a `VectorC` from a sequence/array of Complexs.
+     *  @param xs  the sequence/array of the Complex numbers
      */
     def apply (xs: Seq [Complex]): VectorC =
     {
@@ -935,24 +943,31 @@ object VectorC
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a one vector (all elements are one) of length 'size'.
-     *  @param size  the size of the vector
+     *  @param size  the size of the new vector
      */
-    def one (size: Int): VectorC =
-    {
-        val c = new VectorC (size)
-        c.set (_1)
-        c
-    } // one
+    def one (size: Int): VectorC = new VectorC (size, Array.fill (size)(_1))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate scalar 'b' and vector 'u'.
      *  @param b  the scalar to be concatenated - first part
-     *  @param u  the vector to be concatenated - second part
+     *  @param u  the vector to be concatenated - second part (any kind)
+     */
+    def ++ (b: Complex, u: VectoC): VectorC =
+    {
+        val c = new VectorC (u.dim + 1)
+        for (i <- c.range) c(i) = if (i == 0) b else u(i-1)
+        c
+    } // ++
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Concatenate scalar 'b' and vector 'u'.
+     *  @param b  the scalar to be concatenated - first part
+     *  @param u  the vector to be concatenated - second part (same kind, more efficient)
      */
     def ++ (b: Complex, u: VectorC): VectorC =
     {
         val c = new VectorC (u.dim + 1)
-        for (i <- c.range) c(i) = if (i == 0) b else u.v(i - 1)
+        for (i <- c.range) c(i) = if (i == 0) b else u.v(i-1)
         c
     } // ++
 

@@ -43,8 +43,8 @@ class NaiveBayes (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Array 
     private val probX = new HMatrix3 [Double] (k, n)   // conditional probabilities for variable/feature j
 
     if (vc == null) vc = vc_default                    // set to default for binary data (2)
-    popX.alloc (vc())
-    probX.alloc (vc())
+    popX.alloc (vc().toArray)
+    probX.alloc (vc().toArray)
 
     if (DEBUG) {
         println ("value count vc     = " + vc)

@@ -30,8 +30,8 @@ object StrO
 
     /** Ordering for string numbers
      */
-    val ord = new Ordering [StrNum]
-            { def compare (s: StrNum, t: StrNum) = s compare t }
+    implicit val ord = new Ordering [StrNum]
+               { def compare (s: StrNum, t: StrNum) = s compare t }
 
     /** Default element separator (e.g., in a CSV file)
      */

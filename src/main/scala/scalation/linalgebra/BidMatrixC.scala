@@ -58,7 +58,7 @@ class BidMatrixC (val d1: Int)
      *  @param v1  the diagonal vector
      *  @param v2  the sup-diagonal vector
      */
-    def this (v1: VectorC, v2: VectorC)
+    def this (v1: VectoC, v2: VectoC)
     {
         this (v1.dim)
         for (i <- range_d) _dg(i) = v1(i)
@@ -75,6 +75,18 @@ class BidMatrixC (val d1: Int)
         for (i <- range_d) _dg(i) = b(i, i)
         for (i <- range_s) _sd(i) = b(i, i+1)
     } // constructor
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a clone of 'this' m-by-n matrix.
+     */
+    def copy (): BidMatrixC = new BidMatrixC (_dg, _sd)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an m-by-n matrix with all elements intialized to zero.
+     *  @param m  the number of rows
+     *  @param n  the number of columns
+     */
+    def zero (m: Int = dim1, n: Int = dim2): BidMatrixC = new BidMatrixC (m)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the diagonal of 'this' bidiagonal matrix.
@@ -171,7 +183,7 @@ class BidMatrixC (val d1: Int)
      *  @param i  the row index
      *  @param u  the vector value to assign
      */
-    def update (i: Int, u: VectorC)
+    def update (i: Int, u: VectoC)
     {
         _dg(i) = u(i)
         if (i > 0) _sd(i-1) = u(i-1)
@@ -228,11 +240,24 @@ class BidMatrixC (val d1: Int)
      *  @param u  the vector value to assign
      *  @param j  the starting column index
      */
-    def set (i: Int, u: VectorC, j: Int = 0)
+    def set (i: Int, u: VectoC, j: Int = 0)
     {
         if (i >= j)   _dg(i) = u(i)
         if (i-1 >= j) _sd(i-1) = u(i+1)
     } // set
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' tridiagonal matrix to a dense matrix.
+     */
+    def toDense: MatrixC =
+    {
+        val c = new MatrixC (dim1, dim1)
+        for (i <- range1) {
+            c(i, i) = _dg(i)
+            if (i > 0) c(i, i-1) = _sd(i-1)
+        } // for
+        c
+    } // for
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice 'this' bidiagonal matrix row-wise 'from' to 'end'.
@@ -313,7 +338,7 @@ class BidMatrixC (val d1: Int)
      *  @param col  the column to set
      *  @param u    the vector to assign to the column
      */
-    def setCol (col: Int, u: VectorC)
+    def setCol (col: Int, u: VectoC)
     {
         _dg(col) = u(col)
         if (col > 0) _sd(col-1) = u(col-1)
@@ -341,7 +366,7 @@ class BidMatrixC (val d1: Int)
     /** Concatenate (row) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
      *  @param u  the vector to be prepended as the new first row in new matrix
      */
-    def +: (u: VectorC): BidMatrixC =
+    def +: (u: VectoC): BidMatrixC =
     {
         throw new NoSuchMethodException ("BidMatrixC does not support +:")
     } // +:
@@ -350,7 +375,7 @@ class BidMatrixC (val d1: Int)
     /** Concatenate (column) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
      *  @param u  the vector to be prepended as the new first column in new matrix
      */
-    def +^: (u: VectorC): BidMatrixC =
+    def +^: (u: VectoC): BidMatrixC =
     {
         throw new NoSuchMethodException ("BidMatrixC does not support +^:")
     } // +^:
@@ -359,7 +384,7 @@ class BidMatrixC (val d1: Int)
     /** Concatenate 'this' matrix and (row) vector 'u', i.e., append 'u' to 'this'.
      *  @param u  the vector to be appended as the new last row in new matrix
      */
-    def :+ (u: VectorC): BidMatrixC =
+    def :+ (u: VectoC): BidMatrixC =
     {
         throw new NoSuchMethodException ("BidMatrixC does not support :+")
     } // :+
@@ -368,7 +393,7 @@ class BidMatrixC (val d1: Int)
     /** Concatenate 'this' matrix and (column) vector 'u', i.e., append 'u' to 'this'.
      *  @param u  the vector to be appended as the new last column in new matrix
      */
-    def :^+ (u: VectorC): BidMatrixC =
+    def :^+ (u: VectoC): BidMatrixC =
     {
         throw new NoSuchMethodException ("BidMatrixC does not support :^+")
     } // :^+
@@ -410,9 +435,9 @@ class BidMatrixC (val d1: Int)
     /** Add 'this' bidiagonal matrix and (row) vector u.
      *  @param u  the vector to add
      */
-    def + (u: VectorC): BidMatrixC =
+    def + (u: VectoC): BidMatrixC =
     {
-        throw new NoSuchMethodException ("BidMatrixC does not support + with VectorC")
+        throw new NoSuchMethodException ("BidMatrixC does not support + with VectoC")
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -444,9 +469,9 @@ class BidMatrixC (val d1: Int)
     /** Add in-place 'this' bidiagonal matrix and (row) vector 'u'.
      *  @param u  the vector to add
      */
-    def += (u: VectorC): MatrixC =
+    def += (u: VectoC): MatrixC =
     {
-        throw new NoSuchMethodException ("BidMatrixC does not support += with VectorC")
+        throw new NoSuchMethodException ("BidMatrixC does not support += with VectoC")
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -477,9 +502,9 @@ class BidMatrixC (val d1: Int)
     /** From 'this' bidiagonal matrix subtract (row) vector 'u'.
      *  @param u  the vector to subtract
      */
-    def - (u: VectorC): BidMatrixC =
+    def - (u: VectoC): BidMatrixC =
     {
-        throw new NoSuchMethodException ("BidMatrixC does not support - with VectorC")
+        throw new NoSuchMethodException ("BidMatrixC does not support - with VectoC")
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -511,9 +536,9 @@ class BidMatrixC (val d1: Int)
     /** From 'this' bidiagonal matrix subtract in-place (row) vector 'u'.
      *  @param u  the vector to subtract
      */
-    def -= (u: VectorC): BidMatrixC =
+    def -= (u: VectoC): BidMatrixC =
     {
-        throw new NoSuchMethodException ("BidMatrixC does not support -= with VectorC")
+        throw new NoSuchMethodException ("BidMatrixC does not support -= with VectoC")
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -556,7 +581,7 @@ class BidMatrixC (val d1: Int)
     /** Multiply 'this' bidiagonal matrix by vector 'u'.
      *  @param u  the vector to multiply by
      */
-    def * (u: VectorC): VectorC = 
+    def * (u: VectoC): VectorC = 
     {
         val c = new VectorC (d1)
         for (i <- 0 until n) c(i) = _dg(i) * u(i) + _sd(i) * u(i+1)
@@ -596,7 +621,7 @@ class BidMatrixC (val d1: Int)
      *  transposing 'this' matrix and then multiplying by 'u' (ie., 'a dot u = a.t * u').
      *  @param u  the vector to multiply by (requires same first dimensions)
      */
-    def dot (u: VectorC): VectorC =
+    def dot (u: VectoC): VectorC =
     {
         if (dim1 != u.dim) flaw ("dot", "matrix dot vector - incompatible first dimensions")
 
@@ -611,7 +636,7 @@ class BidMatrixC (val d1: Int)
      *  '(a_ij * u_j)'.
      *  @param u  the vector to multiply by
      */
-    def ** (u: VectorC): BidMatrixC = 
+    def ** (u: VectoC): BidMatrixC = 
     {
         throw new NoSuchMethodException ("matrix * vector -> matrix not implemented")
     } // **
@@ -621,7 +646,7 @@ class BidMatrixC (val d1: Int)
      *  matrix '(a_ij * u_j)'.
      *  @param u  the vector to multiply by
      */
-    def **= (u: VectorC): BidMatrixC =
+    def **= (u: VectoC): BidMatrixC =
     {
         throw new NoSuchMethodException ("inplace matrix * vector -> matrix not implemented")
     } // **=
@@ -669,7 +694,7 @@ class BidMatrixC (val d1: Int)
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' bidiagonal matrix.
      *  @param b  the constant vector
      */
-    def solve (b: VectorC): VectorC =
+    def solve (b: VectoC): VectorC =
     {
         val d = _dg                           // diagonal
         val e = _sd                           // superdiagonal
@@ -679,6 +704,13 @@ class BidMatrixC (val d1: Int)
         for (i <- n-1 to 0 by -1) x(i) = (b(i) - e(i) * x(i+1)) / d(i)
         x
     } // solve
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve for 'x' in the equation 'l*u*x = b' (see lud above).
+     *  @param lu  the lower and upper triangular matrices
+     *  @param b   the constant vector
+     */
+    def solve (lu: Tuple2 [MatriC, MatriC], b: VectoC): VectorC = solve (lu._1, lu._2, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Combine 'this' bidiagonal matrix with matrix 'b', placing them along the
@@ -731,8 +763,8 @@ class BidMatrixC (val d1: Int)
      */
     def getDiag (k: Int = 0): VectorC =
     {
-        if (k == 0) _dg
-        else if (k == 1) _sd
+        if (k == 0) _dg.toDense
+        else if (k == 1) _sd.toDense
         else { flaw ("getDiag", "nothing stored for diagonal " + k); null }
     } // getDiag
 
@@ -742,10 +774,10 @@ class BidMatrixC (val d1: Int)
      *  @param u  the vector to set the diagonal to
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
-    def setDiag (u: VectorC, k: Int = 0)
+    def setDiag (u: VectoC, k: Int = 0)
     {
-        if (k == 0) _dg = u
-        else if (k == 1) _sd = u
+        if (k == 0) _dg = u.toDense
+        else if (k == 1) _sd = u.toDense
         else flaw ("setDiag", "nothing stored for diagonal " + k)
     } // setDiag
 
@@ -819,10 +851,10 @@ class BidMatrixC (val d1: Int)
      *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
      *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
-    def nullspace_ip: VectorC =
+    def nullspace_ip (): VectorC =
     {
         if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
-        reduce_ip
+        reduce_ip ()
         col(dim2 - 1) * -_1 ++ _1
     } // nullspace_ip
 
@@ -864,6 +896,16 @@ class BidMatrixC (val d1: Int)
         else if (nn == 1) _dg(0) * _dg(1) - _sd(0) * _sd(0)
 	else              _dg(n) * detHelper (nn-1) - _sd(nn-1) * _sd(nn-1) * detHelper (nn-2)
     } // detHelper
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the lower triangular of 'this' matrix (rest are zero).
+     */
+    def lowerT: MatrixC = { val c = new MatrixC (dim1, dim1); c.setDiag (_dg); c }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the upper triangular of 'this' matrix (rest are zero).
+     */
+    def upperT: MatrixC = { val c = new MatrixC (dim1, dim1); c.setDiag (_dg); c.setDiag (_sd, 1); c }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check whether 'this' matrix is bidiagonal (has non-zreo elements only in
@@ -912,17 +954,17 @@ class BidMatrixC (val d1: Int)
         throw new NoSuchMethodException ("lud not implemented since it's already an upper matrix")
     } // lud
 
-    def lud_ip: Tuple2 [MatriC, MatriC] = 
+    def lud_ip (): Tuple2 [MatriC, MatriC] = 
     {
         throw new NoSuchMethodException ("lud_ip not implemented since it's already an upper matrix")
     } // lud_ip
 
-    def solve (l: MatriC, u: MatriC, b: VectorC): VectorC = 
+    def solve (l: MatriC, u: MatriC, b: VectoC): VectorC = 
     {
         throw new NoSuchMethodException ("solve lu not implemented, since lud not needed")
     } // solve
 
-    def inverse_ip: BidMatrixC = 
+    def inverse_ip (): BidMatrixC = 
     {
         throw new NoSuchMethodException ("inverse_ip not implemented since result may not be BidMatrix")
     } // inverse_ip
@@ -950,7 +992,7 @@ object BidMatrixC extends Error
      *  @param u           the array of vectors to assign
      *  @param columnwise  whether the vectors are treated as column or row vectors
      */
-    def apply (u: Array [VectorC], columnwise: Boolean = true): BidMatrixC =
+    def apply (u: Array [VectoC], columnwise: Boolean = true): BidMatrixC =
     {
         var x: BidMatrixC = null
         val u_dim = u(0).dim
@@ -970,7 +1012,7 @@ object BidMatrixC extends Error
      *  Assumes vectors are columwise.
      *  @param u  the Vector of vectors to assign
      */
-    def apply (u: Vector [VectorC]): BidMatrixC =
+    def apply (u: Vector [VectoC]): BidMatrixC =
     {
         val u_dim = u(0).dim
         val x = new BidMatrixC (u_dim)
