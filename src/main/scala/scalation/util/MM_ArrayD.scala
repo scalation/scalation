@@ -26,7 +26,7 @@ import collection.mutable.{AbstractSeq, IndexedSeq}
  *  2GB (2^31), since indices are signed 32-bit integers.
  *  FIX: use Long for indices and multiple files to remove 2GB limitation
  *  @see https://github.com/xerial/larray/blob/develop/README.md
- *  @param _length  the number of elements in the mem_mapped array
+ *  @param _length  the number of elements in the `mem_mapped` array
  */
 final class MM_ArrayD (_length: Int)
       extends AbstractSeq [Double] with IndexedSeq [Double] with Serializable with Cloneable
@@ -45,7 +45,7 @@ final class MM_ArrayD (_length: Int)
      */
     private val raf = new RandomAccessFile (MEM_MAPPED_DIR + fname, "rw");
 
-    /** The raf file mapped into memory
+    /** The random access file mapped into memory
      */
     private val mraf = raf.getChannel ().map (FileChannel.MapMode.READ_WRITE, 0, nBytes);
 
@@ -101,7 +101,7 @@ final class MM_ArrayD (_length: Int)
     } // map
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Slice 'this' starting at 'from' and continueing until 'till'
+    /** Slice 'this' starting at 'from' and continuing until 'till'
      *  @param from  the starting index for the slice (inclusive)
      *  @param till  the ending index for the slice (exclusive)
      */
@@ -148,9 +148,9 @@ object MM_ArrayD
     var _count = 0
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a memory mapped array from one or more values (repeated values Double*).
-     *  @param x   the first Double number
-     *  @param xs  the rest of the Double numbers
+    /** Create a memory mapped array from one or more values (repeated values `Double*`).
+     *  @param x   the first `Double` number
+     *  @param xs  the rest of the `Double` numbers
      */
     def apply (x: Double, xs: Double*): MM_ArrayD =
     {

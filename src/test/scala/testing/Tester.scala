@@ -59,13 +59,13 @@ trait Tester
     {
         if (FOCUS != "" && name != FOCUS) return                   // FOCUS == "" => test all
         println (s"testing $KLASS.$name")
-        randomize ()                                               // randomize the variables used
 
         var t_call      = 0.0                                      // time accumulator for call (e.g., method to test)
         var t_oracle    = 0.0                                      // time accumulator for oracle (correctness)
         var t_contender = 0.0                                      // time accumulator for competitor (performance)
 
         for (it <- 0 until ITER) {
+            randomize ()                                           // randomize the variables used
             if (DEBUG) {
                 println (s"test case $it for $KLASS.$name")
                 println (s"call      = $call")

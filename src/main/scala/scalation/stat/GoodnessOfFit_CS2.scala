@@ -21,7 +21,7 @@ import scalation.util.Error
 import GoodnessOfFit_CS._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `GoodnessOfFit_CS2` class is used to fit data to probability distibutions.
+/** The `GoodnessOfFit_CS2` class is used to fit data to probability distributions.
  *  Suggestions: each interval should have 'E_i = n*p_i >= 5' and intervals >= sqrt (n).
  *  It uses the Chi-square goodness of fit test with equal probability intervals.
  *  @see www.eg.bucknell.edu/~xmeng/Course/CS6337/Note/master/node66.html
@@ -33,7 +33,7 @@ import GoodnessOfFit_CS._
  *  @param d             the sample data points
  *  @param dmin          the minimum value for d
  *  @param dmax          the maximum value for d
- *  @param iCDF          the inverse Cummulative Distribution Function
+ *  @param iCDF          the inverse Cumulative Distribution Function
  *  @param parms         the parameters for the ICDF
  *  @param intervals     the number of intervals for the data's histogram
  *  @param makeStandard  whether to transform the data to zero mean and unit standard deviation
@@ -91,7 +91,7 @@ class GoodnessOfFit_CS2 (private var d: VectorD, dmin: Double, dmax: Double, iCD
     } // fit
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine the interval endpoint values for the "equal probability" interval case.
+    /** Determine the interval end-point values for the "equal probability" interval case.
      *  @param intervals  the number of intervals
      */
     def equalProbabilityInterval (intervals: Int): VectorD =

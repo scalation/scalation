@@ -151,10 +151,10 @@ object Primes
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Generate, based on the Sieve of Atkin (SoA), prime numbers between
-     *  integers lb and ub.
+     *  integers 'lb' and 'ub'.
      *  @see http://en.wikipedia.org/wiki/Sieve_of_Atkin
      *  @param lb  the lower bound
-     *  @param ub  the uppper bound 
+     *  @param ub  the upper bound 
      */
     def genPrimesSoA (lb: Int = 1000, ub: Int = 10000): ArrayBuffer [Int] =
     {
@@ -200,7 +200,7 @@ object Primes
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Generate, based on the Sieve of Eratosthenes (SoE), prime numbers between
-     *  integers lb and ub.  This generator is simpler, but less efficient.
+     *  integers 'lb' and 'ub".  This generator is simpler, but less efficient.
      *  @see http://en.wikipedia.org/wiki/Formula_for_primes
      *  @param lb  the lower bound
      *  @param ub  the upper bound

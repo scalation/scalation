@@ -21,14 +21,14 @@ import scalation.util.Error
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CDF` object contains methods for computing 'F(x)', the Cumulative
  *  Distribution Functions (CDF's) for popular distributions:
- *  Uniform
- *  Exponential
- *  Weibel 
- *  Empirical
- *  StandardNormal
- *  StudentT
- *  ChiSquare
- *  Fisher
+ *  `Uniform`
+ *  `Exponential`
+ *  `Weibel`
+ *  `Empirical`
+ *  `StandardNormal`
+ *  `StudentT`
+ *  `ChiSquare`
+ *  `Fisher`
  *  For a given CDF 'F' with argument 'x', compute 'p = F(x)'.
  */
 object CDF
@@ -38,8 +38,8 @@ object CDF
     /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
      *  Uniform distribution.
      *  @param x  the x coordinate, argument to F(x)
-     *  @param b  the upper endpoint of the uniform distribution 
-     *  @param a  the lower endpoint of the uniform distribution 
+     *  @param b  the upper end-point of the uniform distribution 
+     *  @param a  the lower end-point of the uniform distribution 
      */
     def uniformCDF (x: Double, a: Double, b: Double): Double =
     {
@@ -53,7 +53,7 @@ object CDF
     /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
      *  Uniform distribution.
      *  @param x   the x coordinate, argument to F(x)
-     *  @param pr  parameters giving the endpoints of the uniform distribution 
+     *  @param pr  parameters giving the end-points of the uniform distribution 
      */
     def uniformCDF (x: Double, pr: Parameters = null): Double =
     {
@@ -63,7 +63,7 @@ object CDF
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
-     *  Exponentail distribution.
+     *  `Exponential` distribution.
      *  @param x  the x coordinate, argument to F(x)
      *  @param λ  the rate parameter
      */
@@ -75,7 +75,7 @@ object CDF
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
-     *  Exponentail distribution.
+     *  `Exponential` distribution.
      *  @param x     the x coordinate, argument to F(x)
      *  @param parm  parameter giving the rate 
      */
@@ -87,7 +87,7 @@ object CDF
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
-     *  weibullCDF distribution.
+     *  `Weibull` distribution.
      *  @param x  the x coordinate, argument to F(x)
      *  @param α  the shape parameter
      *  @param β  the scale parameter
@@ -100,7 +100,7 @@ object CDF
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
-     *  weibullCDF distribution.
+     *  `Weibull` distribution.
      *  @param x     the x coordinate, argument to F(x)
      *  @param parm  parameters giving the shape and scale
      */
@@ -379,29 +379,27 @@ object CDF
      *  distribution using a composite fifth-order Gauss-Legendre quadrature.
      *  @author John D. Cook (Adapted to Scala by Michael E. Cotterell)
      *  @see www.johndcook.com/blog/cpp_phi
-     *  @see [AS 1965] Abramowitz & Stegun. "Handbook of Mathematical Functions"
-     *       (June) (1965) 
+     *  @see [AS 1965] Abramowitz & Stegun. "Handbook of Mathematical Functions" (June) (1965) 
      *  @param x   the x coordinate, argument to F(x)
-     *
-    def normalCDF (x: Double): Double =
-    {
-        val a1 =  0.254829592
-        val a2 = -0.284496736
-        val a3 =  1.421413741
-        val a4 = -1.453152027
-        val a5 =  1.061405429
-        val p  =  0.3275911
-
-        val sign = if (x < 0) -1 else 1
-        val y = abs (x) / sqrt (2.0)
-
-        // A&S formula 7.1.26
-        val t = 1.0 / (1.0 + p * y)
-        val z = 1.0 - (((((a5*t + a4) * t) + a3) * t + a2) * t + a1) * t * exp (-y*y)
-
-        0.5 * (1.0 + sign * z)
-    } // normalCDF
      */  
+//  def normalCDF (x: Double): Double =
+//  {
+//      val a1 =  0.254829592
+//      val a2 = -0.284496736
+//      val a3 =  1.421413741
+//      val a4 = -1.453152027
+//      val a5 =  1.061405429
+//      val p  =  0.3275911
+//
+//      val sign = if (x < 0) -1 else 1
+//      val y = abs (x) / sqrt (2.0)
+//
+//      // A&S formula 7.1.26
+//      val t = 1.0 / (1.0 + p * y)
+//      val z = 1.0 - (((((a5*t + a4) * t) + a3) * t + a2) * t + a1) * t * exp (-y*y)
+//
+//      0.5 * (1.0 + sign * z)
+//  } // normalCDF
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Cumulative Distribution Function (CDF) for the Normal
@@ -542,7 +540,7 @@ object CDF
     /** Compute the Cumulative Distribution Function (CDF) for the Fisher (F)
      *  distribution using beta functions.
      *  @param x   the x coordinate, argument to F(x)
-     *  @param df  the pair of degrees of freedom (df1, df2)
+     *  @param df  the pair of degrees of freedom ('df1', 'df2')
      */
     def fisherCDF (x: Double, df: Tuple2 [Int, Int]): Double =
     {
@@ -572,7 +570,7 @@ trait CDFTest
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the given CDF 'ff' over a range of 'x' values for the given parameters,
-     *  e.g., degrees of freedom (df).
+     *  e.g., degrees of freedom 'df'.
      *  @param ff     the CDF F(.)
      *  @param name   the name of CDF F(.)
      *  @param x_min  the minimum of value of x to test
@@ -596,8 +594,8 @@ trait CDFTest
     } // test_df
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Test the differenc2 CDF 'ff1' and 'ff2' over a range of 'x' values for
-     *  the given parameters. e.g., degrees of freedom (df).
+    /** Test the difference CDF 'ff1' and 'ff2' over a range of 'x' values for
+     *  the given parameters. e.g., degrees of freedom 'df'.
      *  @param ff     the CDF F(.)
      *  @param name   the name of CDF F(.)
      *  @param x_min  the minimum of value of x to test

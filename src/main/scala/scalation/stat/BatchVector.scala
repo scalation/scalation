@@ -58,7 +58,7 @@ class BatchVector (name: String, private var _bSize: Int = 10, private var _nBat
     def allocBatches (more: Int = 1) { y.expand (more * _bSize); _nBatches += more }
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute means for each batch and store them in the 'yb' stat vector.
+    /** Compute means for each batch and store them in the 'yb' statistics vector.
      */
     def computeMeans ()
     {
@@ -77,7 +77,7 @@ class BatchVector (name: String, private var _bSize: Int = 10, private var _nBat
     } // tally
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the lag 1 autocorrelation of the batch means.  Be sure to run
+    /** Compute the lag 1 auto-correlation of the batch means.  Be sure to run
      *  'computeMeans' first.
      */
     def acorr: Double = yb.acorr ()

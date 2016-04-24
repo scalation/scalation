@@ -12,7 +12,7 @@ import collection.mutable.ResizableArray
 import math.random
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `PQItem` trait should be mixed in for items going on a PQueue.
+/** The `PQItem` trait should be mixed in for items going on a `PQueue`.
  */
 trait PQItem extends Identifiable
 {
@@ -21,13 +21,13 @@ trait PQItem extends Identifiable
     var actTime: Double = 0.0
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare two items (PQItems) based on their actTime.
+    /** Compare two items `PQItems` based on their 'actTime'.
      *  @param other  the other item to compare with this item
      */
     def compare (other: PQItem) = { actTime compare other.actTime }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert the item (PQItem) to a string.
+    /** Convert the item `PQItem` to a string.
      */
     override def toString = "PQItem (" + me + ", " + actTime + ")"
 
@@ -37,14 +37,14 @@ trait PQItem extends Identifiable
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PQueue` class provides a simple linear implementation for priority queues.
  *  Once bug in scala 2.8 if fixed, may wish to switch to logarithmic implementation
- *  in scala.collection.mutable.PriorityQueue.
+ *  in `scala.collection.mutable.PriorityQueue`.
  */
 class PQueue [T <: PQItem]
       extends ResizableArray [T] with Serializable
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add an item to the priority queue ordered by actTime.
-     * @param item  the item to add
+    /** Add an item to the priority queue ordered by 'actTime'.
+     *  @param item  the item to add
      */
     def += (item: T)
     {
@@ -80,7 +80,7 @@ class PQueue [T <: PQItem]
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Remove and return the first item (least actTime) from the priority queue.
+    /** Remove and return the first item (least 'actTime') from the priority queue.
      */
     def dequeue (): T =
     {

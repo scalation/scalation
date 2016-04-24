@@ -90,7 +90,7 @@ class Canvas (frameW: Int, frameH: Int, value: VectorD, numIntervals: Int)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Paint the canvas by drawing the rectangles (vertical bars) making up
      *  the histogram.
-     *  @param gr  low-res graphics environment
+     *  @param gr  low-resolution graphics environment
      */
     override def paintComponent (gr: Graphics)
     {
@@ -211,11 +211,9 @@ object HistogramTest extends App
     val h2 = new Histogram (normalDist, intervals, "Histogram for Normal")
     println ("histogram = " + h2)
 
-/***
-    val h3 = new Histogram (VectorD (0.0, 2.0, 3.0, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 8.0, 9.0),
-                            5, "Simple Histogram")
-    println ("histogram = " + h3)
-***/
+//  val h3 = new Histogram (VectorD (0.0, 2.0, 3.0, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 8.0, 9.0),
+//                          5, "Simple Histogram")
+//  println ("histogram = " + h3)
 
 } // HistogramTest object
 

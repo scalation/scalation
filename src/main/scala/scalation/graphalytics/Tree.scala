@@ -4,6 +4,8 @@
  *  @version 1.2
  *  @date    Tue Apr  9 13:31:26 EDT 2013
  *  @see     LICENSE (MIT style license file).
+ *
+ *  Toggle 'ANIMATE' flag in `Tree` object to turn animation of tree on/off.
  */
 
 package scalation.graphalytics
@@ -33,14 +35,15 @@ class TreeNode (val nid: Int,
                 var colr: Color = null,
                 var ord: Int = 0)
 {
-     val DEBUG = true
-     if (colr == null) colr = randomColor (nid)
-     val loc   = R2 (0.0, 0.0)
-     val child = new ArrayBuffer [TreeNode] ()
-     var parent: TreeNode = null
+    private val DEBUG = true                                   // debug flag 
+
+    if (colr == null) colr = randomColor (nid)
+    val loc   = R2 (0.0, 0.0)
+    val child = new ArrayBuffer [TreeNode] ()
+    var parent: TreeNode = null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check if this node is an ancestor of node 'n'.
+    /** Check if 'this' node is an ancestor of node 'n'.
      *  @param n  target node 
      */           
     def isAncestor (n: TreeNode): Boolean =
@@ -85,10 +88,12 @@ class TreeNode (val nid: Int,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Tree` companion object provides methods for building trees.
+ *  Toggle 'ANIMATE' flag to turn animation on/off.
  */
 object Tree
 {
     private val DEBUG        = true                     // debug flag
+    private val ANIMATE      = false                    // animation flag
     private var rng: Variate = null                     // random generator for # children
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -119,7 +124,7 @@ object Tree
         def genPre (depth: Double, p: TreeNode, lev: Int, ord: Int, sibs: Int)
         {
             val n = tree.add (p)                                             // add node n to tree
-            tree.aniStep (n, p, ord, sibs)
+            if (ANIMATE) tree.aniStep (n, p, ord, sibs)
             if (lev < depth) {
                 val imax = rng.igen
                 for (i <- 0 until imax) genPre (depth, n, lev+1, i, imax)    // add n's children
@@ -133,13 +138,15 @@ object Tree
     /** Create a tree from an inverted tree, i.e., a predecessor/parent list.
      *  @see `TreeTest4` for an example.
      *  @param pred   the predecessor/parent list
+     *  @param labl   the node labels
      *  @param depth  the estimated average depth of the tree (used by animation)
      *  @param name   the name of tree
      */
     def apply (pred: Array [Int], labl: Array [TLabel], depth: Double, name: String): Tree =
     {
         if (DEBUG) println ("apply: pred = " + pred.deep + ", name = " + name)
-        val lab = if (labl == null) Array.fill (pred.length)(TLabel_DEFAULT) else labl
+
+        val lab   = if (labl == null) Array.fill (pred.length)(TLabel_DEFAULT) else labl
         val root  = new TreeNode (0, 0, lab(0))       // for vertex 0 in g, create a root node
         val tree  = new Tree (root, depth, name)      // make a tree based on this root, est. depth
         val n_map = Map [Int, TreeNode] ()            // node map from node id to tree node
@@ -174,16 +181,21 @@ class Tree (val root: TreeNode, depth: Double, val name: String = "tree")
     private val MID   = 600.0                         // x coordinate for root
     private val TOP   = 100.0                         // y coordinate for root
     private val DIA   = 15.0                          // diameter for circles
-
-    private val ani    = new DgAnimator ("Tree")      // tree animator
-    private val cq     = ani.getCommandQueue          // tree animator command queue
     private val nodes  = ArrayBuffer (root)           // list of all nodes
     private var nCount = 0                            // node counter for nid auto-increment
 
+    /** Tree animator
+     */
+    private val ani = if (ANIMATE) new DgAnimator ("Tree") else null
+
+    /** Tree command queue
+     */
+    private val cq = if (ANIMATE) ani.getCommandQueue else null
+
     root.loc.x = MID
     root.loc.y = TOP
-    cq.add (AnimateCommand (CreateNode, 0, Ellipse (), " n-0", true, root.colr,
-                            Array (root.loc.x, root.loc.y, DIA, DIA), 0.0))
+    if (ANIMATE) cq.add (AnimateCommand (CreateNode, 0, Ellipse (), " n-0", true, root.colr,
+                                  Array (root.loc.x, root.loc.y, DIA, DIA), 0.0))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the 'i'th node.
@@ -269,14 +281,16 @@ class Tree (val root: TreeNode, depth: Double, val name: String = "tree")
      */
     def aniStep (n: TreeNode, p: TreeNode, ord: Int, sibs: Int)
     {
-        val k   = n.nid                                                       // node's id
-        val f   = depth + 1 - n.lev                                           // width factor
-        n.loc.x = p.loc.x + pow (3.0, f) * (1 + 2 * ord - sibs) * DIA / 2.0   // node's x coordinate
-        n.loc.y = TOP + 4 * n.lev * DIA                                       // node's y coordinate
-        t  += 500.0                                                           // node's display time
-        cq.add (AnimateCommand (CreateNode, k, Ellipse (), " n-" + k, true, n.colr,
-                                Array (n.loc.x, n.loc.y, DIA, DIA), t))
-        cq.add (AnimateCommand (CreateEdge, -k, QCurve (), "", true, black, null, t+100.0, p.nid, k))
+        if (ANIMATE) {
+            val k   = n.nid                                                       // node's id
+            val f   = depth + 1 - n.lev                                           // width factor
+            n.loc.x = p.loc.x + pow (3.0, f) * (1 + 2 * ord - sibs) * DIA / 2.0   // node's x coordinate
+            n.loc.y = TOP + 4 * n.lev * DIA                                       // node's y coordinate
+            t  += 500.0                                                           // node's display time
+            cq.add (AnimateCommand (CreateNode, k, Ellipse (), " n-" + k, true, n.colr,
+                                    Array (n.loc.x, n.loc.y, DIA, DIA), t))
+            cq.add (AnimateCommand (CreateEdge, -k, QCurve (), "", true, black, null, t+100.0, p.nid, k))
+        } // if
     } // aniStep
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -284,8 +298,10 @@ class Tree (val root: TreeNode, depth: Double, val name: String = "tree")
      */
     def aniTree ()
     {
-        for (j <- root.child.indices) aniPre (root.child(j), root, j, root.child.length)
-        showAnimation ()
+        if (ANIMATE) {
+            for (j <- root.child.indices) aniPre (root.child(j), root, j, root.child.length)
+            showAnimation ()
+        } // if
     } // aniTree
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -304,7 +320,7 @@ class Tree (val root: TreeNode, depth: Double, val name: String = "tree")
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Animate the generation of the tree.
      */
-    def showAnimation () { ani.animate (0, 100000) }
+    def showAnimation () { if (ANIMATE) ani.animate (0, 100000) }
 
 } // Tree class
 
@@ -383,7 +399,7 @@ object TreeTest3 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TreeTest4` object is used to test the `Tree` class by manually building
- *  a tree.
+ *  a tree.  No animation.
  *  > run-main scalation.graphalytics.TreeTest4
  */
 object TreeTest4 extends App
@@ -394,7 +410,6 @@ object TreeTest4 extends App
     val labl = Array (10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0)
     val tree = Tree (pred, labl, 3.0, "t")
     tree.printTree ()
-    tree.aniTree ()
 
     println ("--------------------------------------------------------------")
 

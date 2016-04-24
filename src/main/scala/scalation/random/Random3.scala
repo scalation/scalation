@@ -43,7 +43,7 @@ case class Random3 (stream: Int = 0)
     def getM: Double = M
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the next random number as a Double in the interval (0, 1).
+    /** Return the next random number as a `Double` in the interval (0, 1).
      *  Compute x_i = a x_i-1 % m using x = a * x % m
      */
     def gen: Double =
@@ -53,7 +53,7 @@ case class Random3 (stream: Int = 0)
     } // gen
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the next stream value as a Int in the set {1, 2, ... , m-1}.
+    /** Return the next stream value as a `Int` in the set {1, 2, ... , m-1}.
      *  Compute x_i = a x_i-1 % m using x = a * x % m
      */
     def igen: Int =

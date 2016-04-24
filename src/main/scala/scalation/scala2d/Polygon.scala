@@ -15,7 +15,7 @@ import scalation.scala2d.Constants._
 import scalation.scala2d.Shapes.{Dimension, Graphics, Graphics2D}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Polygon` class enhances the `Path2D.Double` class (from the java.awt.geom
+/** The `Polygon` class enhances the `Path2D.Double` class (from the `java.awt.geom`
  *  package) by adding a constructor for building a polygon given its vertices.
  *  @param vertex  the n >= 3 corner points of the polygon
  */
@@ -31,7 +31,7 @@ case class Polygon (vertex: Array [R2])
     } // primary constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the topLeft coordinates of the polygons bounding box.
+    /** Get the top-left coordinates of the polygons bounding box.
      */
     def getTopLeft: R2 =
     {
@@ -43,7 +43,7 @@ case class Polygon (vertex: Array [R2])
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The Triangle class enhances the Path2D.Double class (from the java.awt.geom
+/** The Triangle class enhances the Path2D.Double class (from the `java.awt.geom`
  *  package) by adding a constructor for building a triangle given its vertices.
  *  @param vertex  the three corner points of the triangle
  */
@@ -61,7 +61,7 @@ case class Triangle (vertex: Array [R2])
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a Right Isosceles Triangle.
      *  @param topLeft  the top left point for the triangle (min x and y coordinates)
-     *  @param side     the length of the two sides emanating from topLeft
+     *  @param side     the length of the two sides emanating from top-left
      */
     def this (topLeft: R2, side: Double)
     {
@@ -74,7 +74,7 @@ case class Triangle (vertex: Array [R2])
     /** Construct a Right Triangle.
      *  @param topLeft  the top left point for the triangle (min x and y coordinates)
      *  @param side1    the width of the triangle (change in x)
-     *  @param side2    the heigth of the triangle (change in y)
+     *  @param side2    the height of the triangle (change in y)
      */
     def this (topLeft: R2, side1: Double, side2: Double)
     {
@@ -84,7 +84,7 @@ case class Triangle (vertex: Array [R2])
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the topLeft coordinates of the polygons bounding box.
+    /** Get the top-left coordinates of the polygons bounding box.
      */
     def getTopLeft: R2 =
     {
@@ -96,7 +96,7 @@ case class Triangle (vertex: Array [R2])
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The Quad class enhances the Path2D.Double class (from the java.awt.geom
+/** The `Quad` class enhances the `Path2D.Double` class (from the `java.awt.geom`
  *  package) by adding a constructor for building a quadrilateral given its vertices.
  *  @param vertex  the four corner points of the quadrilateral
  */
@@ -112,7 +112,7 @@ case class Quad (vertex: Array [R2])
     } // primary constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a Square.
+    /** Construct a square.
      *  @param topLeft  the top left point for the square (min x and y coordinates)
      *  @param side     the length of each side in the square
      */
@@ -125,10 +125,10 @@ case class Quad (vertex: Array [R2])
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a Parallelogram (Rectangle if shift is 0).
+    /** Construct a parallelogram (rectangle if shift is 0).
      *  @param topLeft  the top left point for the parallelogram (min x and y coordinates).
      *  @param side1    the width of the parallelogram (change in x)
-     *  @param side2    the heigth of the parallelogram (change in y)
+     *  @param side2    the height of the parallelogram (change in y)
      *  @param shift    the x-shift between top and bottom sides 
      */
     def this (topLeft: R2, side1: Double, side2: Double, shift: Double = 0.0)
@@ -140,7 +140,7 @@ case class Quad (vertex: Array [R2])
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the topLeft coordinates of the polygons bounding box.
+    /** Get the top-left coordinates of the polygons bounding box.
      */
     def getTopLeft: R2 =
     {
@@ -152,7 +152,7 @@ case class Quad (vertex: Array [R2])
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The Pentagon class enhances the Path2D.Double class (from the java.awt.geom
+/** The `Pentagon` class enhances the `Path2D.Double` class (from the `java.awt.geom`
  *  package) by adding a constructor for building a pentagon given its vertices.
  *  @param vertex  the five corner points of the pentagon
  */
@@ -168,7 +168,7 @@ case class Pentagon (vertex: Array [R2])
     } // primary constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a equilateral Pentagon.
+    /** Construct a equilateral `Pentagon`.
      *  @param topLeft  the top left point for the pentagon (min x and y coordinates)
      *  @param side     the length of each side in the pentagon
      */
@@ -182,7 +182,7 @@ case class Pentagon (vertex: Array [R2])
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the topLeft coordinates of the polygons bounding box.
+    /** Get the top-left coordinates of the polygons bounding box.
      */
     def getTopLeft: R2 =
     {
@@ -194,7 +194,7 @@ case class Pentagon (vertex: Array [R2])
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The Hexagon class enhances the Path2D.Double class (from the java.awt.geom
+/** The `Hexagon` class enhances the `Path2D.Double` class (from the `java.awt.geom`
  *  package) by adding a constructor for building a hexagon given its vertices.
  *  @param vertex  the six corner points of the hexagon
  */
@@ -210,7 +210,7 @@ case class Hexagon (vertex: Array [R2])
     } // primary constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a equilateral Hexagon.
+    /** Construct a equilateral `Hexagon`.
      *  @param topLeft  the top left point for the hexagon (min x and y coordinates)
      *  @param side     the length of each side in the hexagon
      */
@@ -225,7 +225,7 @@ case class Hexagon (vertex: Array [R2])
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the topLeft coordinates of the polygons bounding box.
+    /** Get the top-left coordinates of the polygons bounding box.
      */
     def getTopLeft: R2 =
     {
@@ -237,7 +237,7 @@ case class Hexagon (vertex: Array [R2])
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The Octagon class enhances the Path2D.Double class (from the java.awt.geom
+/** The `Octagon` class enhances the `Path2D.Double` class (from the `java.awt.geom`
  *  package) by adding a constructor for building an octagon given its vertices.
  *  @param vertex  the eight corner points of the octagon
  */
@@ -253,7 +253,7 @@ case class Octagon (vertex: Array [R2])
     } // primary constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a equilateral Hexagon.
+    /** Construct a equi-lateral `Octagon`.
      *  @param topLeft  the top left point for the octagon (min x and y coordinates)
      *  @param side     the length of each side in the octagon
      */
@@ -270,7 +270,7 @@ case class Octagon (vertex: Array [R2])
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the topLeft coordinates of the polygons bounding box.
+    /** Get the top-left coordinates of the polygons bounding box.
      */
     def getTopLeft: R2 =
     {
@@ -286,7 +286,7 @@ case class Octagon (vertex: Array [R2])
  */
 object Constants
 {
-    val cos45 = cos (Pi / 4.0)   // same value for sin45
+    val cos45 = cos (Pi / 4.0)     // same value for sin45
     val cos60 = cos (Pi / 3.0)
     val sin60 = sin (Pi / 3.0)
     val cos72 = cos (2.0 * Pi / 5.0)
@@ -296,8 +296,8 @@ object Constants
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `PolygonTest` object tests the `Polygon`, `Triangle`, `Quad` and `Hexagon`
- *  classes.
+/** The `PolygonTest` object tests the `Polygon`, `Triangle`, `Quad`, `Hexagon`
+ *  and Octagon classes.
  */
 object PolygonTest extends App
 {
@@ -321,12 +321,12 @@ object PolygonTest extends App
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         /** Paint the components into the canvas (drawing panel).
-         *  @param gr  low-res graphics environment
+         *  @param gr  low-resolution graphics environment
          */
         override def paintComponent (gr: Graphics)
         {
             super.paintComponent (gr)
-            val g2d = gr.asInstanceOf [Graphics2D]            // use hi-res
+            val g2d = gr.asInstanceOf [Graphics2D]            // use hi-resolution
             g2d.setPaint (red);     g2d.fill (triangle)
             g2d.setPaint (black);   dot.setFrame (triangleXY.x, triangleXY.y, 5, 5); g2d.fill (dot)
             g2d.setPaint (green);   g2d.fill (square)

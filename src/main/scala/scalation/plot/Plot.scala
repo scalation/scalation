@@ -19,7 +19,7 @@ import scalation.scala2d.Shapes.{BasicStroke, Dimension, Graphics, Graphics2D}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Plot` class takes 'x' and 'y' vectors of data values and plots the '(x, y)'
  *  data points.  Optionally, a 'z' vector may be plotted with 'y'.  Note, axes are
- *  determined by the 'x' and 'y' vectors only.  For more vertical vectors use PlotM.
+ *  determined by the 'x' and 'y' vectors only.  For more vertical vectors use `PlotM`.
  *  @param x       the x vector of data values (horizontal)
  *  @param y       the y vector of data values (primary vertical)
  *  @param z       the z vector of data values (secondary vertical) to compare with y
@@ -85,7 +85,7 @@ class Canvas (x: VectoD, y: VectoD, z: VectoD, width: Int, height: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Paint the canvas by plotting the data points.
-     *  @param gr  low-res graphics environment
+     *  @param gr  low-resolution graphics environment
      */
     override def paintComponent (gr: Graphics)
     {

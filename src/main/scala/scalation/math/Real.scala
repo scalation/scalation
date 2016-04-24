@@ -8,7 +8,7 @@
 
 package scalation.math
 
-import annotation.strictfp
+//import annotation.strictfp
 
 import language.implicitConversions
 import math.log10
@@ -29,7 +29,7 @@ import Real._
  *  @param hi  the high portion of the real number
  *  @param lo  the low portion of the real number
  */
-@strictfp
+//@strictfp
 case class Real (hi: Double, lo: Double = 0.0) // extends strictfp
      extends Fractional [Real] with Ordered [Real]
 {
@@ -369,7 +369,7 @@ case class Real (hi: Double, lo: Double = 0.0) // extends strictfp
         var num = sigDigits
 
         if (sigDigits.charAt (0) == '.') {
-            num = "0" + sigDigits;
+            num = "0" + sigDigits
         } else if (decimalPt < 0) {
             val pad = "0" * -decimalPt
             num = "0." + pad + sigDigits
@@ -559,7 +559,7 @@ object Real
     /** Return 'e' raised to the 'x'-th power 'e^x'.  'x' is rescaled to improve
      *  convergence.  Rescaling causes slight reduction in precision.
      *  e = 2.718281828459045235360287471345   from scalation.math.Real.exp
-     *  E = 2.718281828459045235360287471352   given contant
+     *  E = 2.718281828459045235360287471352   given constant
      *  @see http://mathworld.wolfram.com/e.html
      *  @see bt.pa.msu.edu/pub/papers/HICOSYMSU08/HICOSYMSU08.pdf
      *  FIX: use a faster and more precise algorithm
@@ -576,7 +576,7 @@ object Real
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return 'e' raised to the 'x' power 'e^x' when 'x' < 1/2.
      *  When 'x' is small the Taylor series will converge quickly.
-     *  @param x  the real number exponenent
+     *  @param x  the real number exponent
      */
     private def exp_ (x: Real): Real =
     {
@@ -708,7 +708,7 @@ object Real
     {
         val xAbs = math.abs (x)
         val xMag = math.floor (log10 (xAbs)).toInt
-        if ((Double_Exp (10.0) ~^ xMag) * 10.0 <= xAbs) xMag + 1 else xMag   
+        if ((double_exp (10.0) ~^ xMag) * 10.0 <= xAbs) xMag + 1 else xMag   
     } // magnitude
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

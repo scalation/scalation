@@ -5,11 +5,11 @@
  *  @date    Sun Aug 23 15:42:06 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *
- *  An implementation supporting columnar relational databases faciltating easy
+ *  An implementation supporting columnar relational databases facilitating easy
  *  and rapid analytics.  The columns in a relation are vectors from the
  *  `scalation.linalgebra.mem_mapped` package.  Vectors and matrices may be readily
  *  extracted from a relation and feed into any of the numerous analytics techniques
- *  provided in `scalation.analytics`.  The implemenation provides most of the
+ *  provided in `scalation.analytics`.  The implementation provides most of the
  *  columnar relational algebra operators given in the following paper:
  *  @see db.csail.mit.edu/projects/cstore/vldb.pdf
  *
@@ -44,7 +44,7 @@ object MM_Relation
      *  @param colName  the names of columns
      *  @param row      the sequence of rows to be converted to columns for the columnar relation
      *  @param key      the column number for the primary key (< 0 => no primary key)
-     *  @param domain   an optional string indicating domains for columns (e.g., SD = StrNum, Double) 
+     *  @param domain   an optional string indicating domains for columns (e.g., 'SD' = `StrNum`, `Double`) 
      */
     def apply (name: String, colName: Seq [String], row: Seq [Row], key: Int, domain: String): MM_Relation =
     {
@@ -89,7 +89,7 @@ object MM_Relation
      *  @param name      the name of the relation
      *  @param colName   the names of columns
      *  @param key       the column number for the primary key (< 0 => no primary key)
-     *  @param domain    an optional string indicating domains for columns (e.g., SD = StrNum, Double) 
+     *  @param domain    an optional string indicating domains for columns (e.g., 'SD' = `StrNum`, `Double`) 
      *  @param skip      the number of lines in the CSV file to skip (e.g., header line(s))
      *  @param eSep      the element separation string/regex (e.g., "," ";" " +")
      */
@@ -113,7 +113,7 @@ object MM_Relation
      *  @param fileName  the file name of the data file
      *  @param name      the name of the relation
      *  @param key       the column number for the primary key (< 0 => no primary key)
-     *  @param domain    an optional string indicating domains for columns (e.g., SD = StrNum, Double)
+     *  @param domain    an optional string indicating domains for columns (e.g., 'SD' = `StrNum`, `Double`)
      *  @param eSep      the element separation string/regex (e.g., "," ";" " +")
      */
     def apply (fileName: String, name: String, key: Int, domain: String, eSep: String): MM_Relation =
@@ -146,7 +146,7 @@ object MM_Relation
      *  @param name      the name of the relation
      *  @param colName   the names of columns
      *  @param key       the column number for the primary key (< 0 => no primary key)
-     *  @param domain    an optional string indicating domains for columns (e.g., SD = StrNum, Double) 
+     *  @param domain    an optional string indicating domains for columns (e.g., 'SD' = `StrNum`, `Double`) 
      */
     def apply (fileName: String, name: String, colName: Seq [String], key: Int,
                domain: String): MM_Relation =
@@ -175,7 +175,7 @@ object MM_Relation
      *  @param name     the name of the relation
      *  @param colName  the names of columns
      *  @param key      the column number for the primary key (< 0 => no primary key)
-     *  @param domain   an optional string indicating domains for columns (e.g., SD = StrNum, Double) 
+     *  @param domain   an optional string indicating domains for columns (e.g., 'SD' = `StrNum`, `Double`) 
      */
     def fromMatriD (xy: MatriD, name: String, colName: Seq [String], key: Int = -1,
                     domain: String = null): MM_Relation =
@@ -192,7 +192,7 @@ object MM_Relation
      *  @param name     the name of the relation
      *  @param colName  the names of columns
      *  @param key      the column number for the primary key (< 0 => no primary key)
-     *  @param domain   an optional string indicating domains for columns (e.g., SD = StrNum, Double) 
+     *  @param domain   an optional string indicating domains for columns (e.g., 'SD' = `StrNum`, `Double`) 
      */
     def fromMatriD_ (x: MatriD, y: Vec, name: String, colName: Seq [String], key: Int = -1,
                     domain: String = null): MM_Relation =
@@ -207,7 +207,7 @@ object MM_Relation
      *  @param name     the name of the relation
      *  @param colName  the names of columns
      *  @param key      the column number for the primary key (< 0 => no primary key)
-     *  @param domain   an optional string indicating domains for columns (e.g., SD = StrNum, Double) 
+     *  @param domain   an optional string indicating domains for columns (e.g., 'SD' = `StrNum`, `Double`) 
      */
     def fromMatriI (xy: MatriI, name: String, colName: Seq [String], key: Int = -1,
                     domain: String = null): MM_Relation =
@@ -223,7 +223,7 @@ object MM_Relation
      *  @param name     the name of the relation
      *  @param colName  the names of columns
      *  @param key      the column number for the primary key (< 0 => no primary key)
-     *  @param domain   an optional string indicating domains for columns (e.g., SD = StrNum, Double) 
+     *  @param domain   an optional string indicating domains for columns (e.g., 'SD' = `StrNum`, `Double`) 
      */
     def fromMatriII (x: MatriI, y: VectorI, name: String, colName: Seq [String], key: Int = -1,
                      domain: String = null): MM_Relation =
@@ -240,7 +240,7 @@ object MM_Relation
     def count (r: MM_Relation): Seq [Any] = for (j <- r.col.indices) yield r.col(j).size
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the minimun of each of the columns of columnar relation 'r'.
+    /** Return the minimum of each of the columns of columnar relation 'r'.
      *  @param r  the given relation
      */
     def min (r: MM_Relation): Seq [Any] = for (c <- r.col) yield Vec.min (c)
@@ -299,20 +299,20 @@ import MM_Relation._
  *  columns of the columnar relational datastore.  Columns may have any of the
  *  following types:
  *  <p>
- *      C - Complex  - VectorC - 128 bit complex number a + bi
- *      D - Double   - VectorD -  64 bit double precision floating point number
- *      I - Int      - VectorI -  32 bit integer
- *      L - Long     - VectorL -  64 bit long integer
- *      Q - Rational - VectorQ - 128 bit ratio of two long integers
- *      R - Real     - VectorR - 128 bit quad precision floating point number
- *      S - StrNum   - VectorS - variable length numeric string
+ *      C - `Complex`  - `VectorC` - 128 bit complex number a + bi
+ *      D - `Double`   - `VectorD` -  64 bit double precision floating point number
+ *      I - `Int`      - `VectorI` -  32 bit integer
+ *      L - `Long`     - `VectorL` -  64 bit long integer
+ *      Q - `Rational` - `VectorQ` - 128 bit ratio of two long integers
+ *      R - `Real`     - `VectorR` - 128 bit quad precision floating point number
+ *      S - `StrNum`   - `VectorS` - variable length numeric string
  *  <p>
  *------------------------------------------------------------------------------
  *  @param name     the name of the relation
  *  @param colName  the names of columns
  *  @param col      the Scala Vector of columns making up the columnar relation
  *  @param key      the column number for the primary key (< 0 => no primary key)
- *  @param domain   an optional string indicating domains for columns (e.g., SD = StrNum, Double) 
+ *  @param domain   an optional string indicating domains for columns (e.g., 'SD' = `StrNum`, `Double`) 
  */
 case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Vec],
                      key: Int = 0, domain: String = null)
@@ -322,7 +322,7 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
 
     Catalog.add (name, colName, key, domain)
 
-    /** The colMap maps column names to column positions
+    /** The 'colMap' maps column names to column positions
      */
     private val colMap = Map [String, Int] ()
     for (j <- colName.indices) colMap += colName(j) -> j
@@ -373,7 +373,7 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
     /** Select elements from column 'cName' in 'this' relation that satisfy the
      *  predicate 'p' and project onto that column.
      *  @param cName  the name of the column used for selection
-     *  @param p      the predicate (Boolean function) to be satisfied
+     *  @param p      the predicate (`Boolean` function) to be satisfied
      */
     def pisigmaC (cName: String, p: Complex => Boolean): MM_Relation =
     {
@@ -428,7 +428,7 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
     /** Select elements from columns in 'cName' in 'this' relation that satisfy
      *  the predicate 'p'.
      *  @param cName  the name of the column used for selection
-     *  @param p      the predicate (Boolean function) to be satisfied
+     *  @param p      the predicate (`Boolean` function) to be satisfied
      */
     def sigma [T <: Any] (cName: String, p: T => Boolean): MM_Relation =
     {
@@ -450,7 +450,7 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
     /** Select elements from columns in 'cName' in 'this' relation that satisfy
      *  the predicate 'p'.
      *  @param cName  the name of the column used for selection
-     *  @param p      the predicate (Boolean function) to be satisfied
+     *  @param p      the predicate (`Boolean` function) to be satisfied
      */
     def σ [T <: Any] (cName: String, p: T => Boolean): MM_Relation =
     {
@@ -472,7 +472,7 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
     /** Select elements from columns in 'cName' in 'this' relation that satisfy
      *  the predicate 'p'.
      *  @param cName  the name of the column used for selection
-     *  @param p      the predicate (Boolean function) to be satisfied
+     *  @param p      the predicate (`Boolean` function) to be satisfied
      */
     def sigmaC (cName: String, p: Complex => Boolean): MM_Relation = selectAt (selectC (cName, p))
 
@@ -492,7 +492,7 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
     /** Select the positions of elements from columns in 'cName' in 'this' relation
      *  that satisfy the predicate 'p'.
      *  @param cName  the name of the column used for selection
-     *  @param p      the predicate (Boolean function) to be satisfied
+     *  @param p      the predicate (`Boolean` function) to be satisfied
      */
     def selectC (cName: String, p: Complex => Boolean): Seq [Int] =
     {
@@ -694,7 +694,7 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Join 'this' relation and 'r2 by performing a "natural-join".  Rows from both
-     *  relations are compared requiring agreement on common attibutes (column names).
+     *  relations are compared requiring agreement on common attributes (column names).
      *  @param r2  the rhs relation in the join operation
      */
 //  def >< (r2: MM_Relation): MM_Relation =
@@ -707,7 +707,7 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Join 'this' relation and 'r2 by performing a "natural-join".  Rows from both
-     *  relations are compared requiring agreement on common attibutes (column names).
+     *  relations are compared requiring agreement on common attributes (column names).
      *  @param r2  the rhs relation in the join operation
      */
     def ⋈ (r2: Table): MM_Relation = this >< r2
@@ -724,15 +724,15 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a row by pulling values from all columns at position 'i'.
-     *  @param i  the ith position
+     *  @param i  the 'i'th position
      */
     def row (i: Int): Row = col.map (Vec (_, i)).toVector
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'tuple to 'this' relation as a new row.
-     *  FIX:  want an efficient, covariant, mutable data structue, but Array is invariant.
+     *  FIX:  want an efficient, covariant, mutable data structure, but Array is invariant.
      *  @param tuple  an aggregation of columns values (new row)
-     *  @param typ    the string of corresponding types, e.g., "SDI"
+     *  @param typ    the string of corresponding types, e.g., 'SDI'
      */
     def add (tuple: Row)
     {

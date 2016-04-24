@@ -49,7 +49,7 @@ class SSShortestPath (c: MatriD, s: Int)
         def compare (v: Item) = v.dd compare dd
     } // Item class
 
-    private val DEBUG = true                            // debug flag
+    private val DEBUG = false                           // debug flag
     private val MAX   = Double.MaxValue                 // infinity (indicates no path so far)
     private val n     = c.dim1                          // the number of vertices
     private val rang  = 0 until n                       // index range
@@ -100,6 +100,8 @@ class SSShortestPath (c: MatriD, s: Int)
  */
 object SSShortestPath
 {
+    private val DEBUG = false                           // debug flag
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert `VectorD` to `Double` by taking the minimum.  This is used
      *  to handle labels that are vectors.
@@ -110,10 +112,12 @@ object SSShortestPath
     /** Create an `SSShortestPath` object from a multi-digraph.  First convert
      *  the graph's adjaceny set representation to an adjacency matrix with
      *  edge weights (which optionally include initial vertex weight).
-     *  @param g  the multi-digraph to use
-     *  @param s  the source vertex for the multi-digraph
+     *  @param g            the multi-digraph to use
+     *  @param s            the source vertex for the multi-digraph
+     *  @param hasV_Weight  whether vertices carry weights or not (0.0)
+     *  @param hasE_Weight  whether edges carry specific weights or just unit weights (1.0)
      */
-    def apply (g: MGraph, s: Int, hasNodeWeight: Boolean = false): SSShortestPath =
+    def apply (g: MGraph, s: Int, hasV_Weight: Boolean = false, hasE_Weight: Boolean = true): SSShortestPath =
     {
         val n = g.size
         val c = new MatrixD (n, n)                             // cost/weight matrix
@@ -122,9 +126,10 @@ object SSShortestPath
             val e_ij = g.elabel((i, j))                        // edge(s) i -> j
 
             val w_edge: Double = e_ij
-            println (s"w ($i, $j) = $w_edge")
-            c(i, j) = if (hasNodeWeight) w_edge + v_i          // overall weight for edge i -> j
-                      else w_edge
+            if (DEBUG) println (s"w ($i, $j) = $w_edge")
+            val v_weight = if (hasV_Weight) v_i else 0.0
+            val e_weight = if (hasE_Weight) w_edge else 1.0
+            c(i, j) = v_weight + e_weight                      // overall weight for edge i -> j
         } // for
         new SSShortestPath (c, s)
     } // apply
@@ -196,7 +201,7 @@ object SSShortestPathTest2 extends App
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `SSShortestPathTest2` object is used to test the `SSShortestPath` class.
+/** The `SSShortestPathTest3` object is used to test the `SSShortestPath` class.
  *  Input is in the form of graphs (`MGraph`).  This test case requires
  *  'Tlabel' in `LabelType` to be VectorD.  Should be commented out otherwise.
  *  @see http://thescipub.com/PDF/jcssp.2013.377.382.pdf (Fig. 1)

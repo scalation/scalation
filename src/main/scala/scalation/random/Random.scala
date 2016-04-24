@@ -81,8 +81,8 @@ case class Random (stream: Int = 0)
     } // gen
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the next stream value as an integer (Int).
-     *  This calculation uses 64-bit integers (Long).
+    /** Return the next stream value as an integer 'Int'.
+     *  This calculation uses 64-bit integers 'Long'.
      */
     def igen: Int =
     {

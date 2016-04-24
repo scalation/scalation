@@ -26,12 +26,12 @@ import scalation.util.Monitor.trace
  *  @param name          the name of the source
  *  @param director      the director controlling the model
  *  @param makeEntity    the function to make entities of a specified type
- *  @param subtype       indicator of the subtype of the entities to me made
+ *  @param esubtype      indicator of the subtype of the entities to me made
  *  @param units         the number of entities to make
  *  @param iArrivalTime  the inter-arrival time distribution
- *  @param loc            the location of the source (x, y, w, h)
+ *  @param loc           the location of the source (x, y, w, h)
  */
-class Source (name: String, director: Model, makeEntity: () => SimActor, subtype: Int, units: Int,
+class Source (name: String, director: Model, makeEntity: () => SimActor, esubtype: Int, units: Int,
               iArrivalTime: Variate, loc: Array [Double])
       extends SimActor (name, director) with Component
 {
@@ -43,14 +43,15 @@ class Source (name: String, director: Model, makeEntity: () => SimActor, subtype
      *  @param name          the name of the source
      *  @param director      the director controlling the model
      *  @param makeEntity    the function to make entities of a specified type
+     *  @param esubtype      indicator of the subtype of the entities to me made
      *  @param units         the number of entities to make
      *  @param iArrivalTime  the inter-arrival time distribution
      *  @param xy            the (x, y) coordinates for the top-left corner of the source.
      */
-    def this (name: String, director: Model, makeEntity: () => SimActor, subtype: Int, units: Int,
+    def this (name: String, director: Model, makeEntity: () => SimActor, esubtype: Int, units: Int,
               iArrivalTime: Variate, xy: Tuple2 [Double, Double])
     {
-        this (name, director, makeEntity, subtype, units, iArrivalTime, Array (xy._1, xy._2, 20.0, 20.0))
+        this (name, director, makeEntity, esubtype, units, iArrivalTime, Array (xy._1, xy._2, 20.0, 20.0))
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -74,7 +75,7 @@ class Source (name: String, director: Model, makeEntity: () => SimActor, subtype
                 if (director.stopped) break                               // terminate source, simulation ended
                 val actor = makeEntity ()                                 // make new actor
                 actor.mySource = this                                     // actor's source
-                actor.subtype  = subtype                                  // set the subtype
+                actor.subtype  = esubtype                                 // set the entity subtype 
                 trace (this, "generates", actor, director.clock)
                 director.animate (actor, CreateToken, randomColor (actor.id), Ellipse (),
                          Array (loc(0) + loc(2) + RAD / 2.0, loc(1) + loc(3) / 2.0 - RAD))
@@ -112,14 +113,15 @@ object Source
      *  @param name          the name of the source
      *  @param director      the director controlling the model
      *  @param makeEntity    the function to make entities of a specified type
+     *  @param esubtype      indicator of the subtype of the entities to me made
      *  @param units         the number of entities to make
      *  @param iArrivalTime  the inter-arrival time distribution
      *  @param xy            the (x, y) coordinates for the top-left corner of the source.
      */
-    def apply (name: String, director: Model, makeEntity: () => SimActor, subtype: Int, units: Int,
+    def apply (name: String, director: Model, makeEntity: () => SimActor, esubtype: Int, units: Int,
               iArrivalTime: Variate, xy: Tuple2 [Int, Int]): Source =
     {
-        new Source (name, director, makeEntity, subtype, units, iArrivalTime,
+        new Source (name, director, makeEntity, esubtype, units, iArrivalTime,
                     Array (xy._1.toDouble, xy._2.toDouble, 20.0, 20.0))
     } // apply
 

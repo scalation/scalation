@@ -18,8 +18,8 @@ import Complex._
  *  Internally, a complex number is represented as two double precision
  *  floating point numbers (Double).  Externally, two forms are supported:
  *  <p>
- *      a+bi   = 2.1+3.2i       via: Complex ("2.1+3.2i"), toString
- *      (a, b) = (2.1, 3.2)     via: create ("(2.1, 3.2)"), toString2
+ *      a+bi   = 2.1+3.2i       via: Complex ("2.1+3.2i"),  'toString'
+ *      (a, b) = (2.1, 3.2)     via: create ("(2.1, 3.2)"),  'toString2'
  *  <p>
  *  Note: 'i * i = -1'.
  *-------------------------------------------------------------------------
@@ -29,7 +29,7 @@ import Complex._
 case class Complex (val re: Double, val im: Double = 0.0)
      extends Fractional [Complex] with Ordered [Complex]
 {
-    /** Format String used for printing parts of complex numbers (change using setFormat)
+    /** Format `String` used for printing parts of complex numbers (change using 'setFormat')
      */
     private var fString = "%g"
 
@@ -94,7 +94,7 @@ case class Complex (val re: Double, val im: Double = 0.0)
     def ~^ (r: Double): Complex =
     {
         val (rad, ang) = polar
-        Complex.create (Double_Exp (rad) ~^ r, ang * r)
+        Complex.create (double_exp (rad) ~^ r, ang * r)
     } // ~^
 
     def pow (c: Complex, r: Double): Complex = c ~^ r
@@ -109,12 +109,12 @@ case class Complex (val re: Double, val im: Double = 0.0)
     def near_eq (c: Complex, d: Complex): Boolean = c =~ d
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the radius of the complex number as a vector in the re-im plane.
+    /** Return the radius of the complex number as a vector in the 're'-'im' plane.
      */
-    def radius: Double = math.sqrt (Double_Exp (re) ~^ 2.0 + Double_Exp (im) ~^ 2.0)
+    def radius: Double = math.sqrt (double_exp (re) ~^ 2.0 + double_exp (im) ~^ 2.0)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the angle of the complex number as a vector in the re-im plane.
+    /** Return the angle of the complex number as a vector in the 're'-'im' plane.
      */
     def angle: Double = acos (re / radius)
 
@@ -195,7 +195,7 @@ case class Complex (val re: Double, val im: Double = 0.0)
     def ≥ (d: Complex) = this >= d
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' complex number to a Complex.
+    /** Convert 'this' complex number to a `Complex`.
      *  @param c  that complex number to convert
      */
     def toComplex (c: Complex): Complex = c
@@ -203,7 +203,7 @@ case class Complex (val re: Double, val im: Double = 0.0)
     def toComplex: Complex = this
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' complex number to a Double.
+    /** Convert 'this' complex number to a `Double`.
      *  @param c  that complex number to convert
      */
     def toDouble (c: Complex): Double = c.re
@@ -211,7 +211,7 @@ case class Complex (val re: Double, val im: Double = 0.0)
     def toDouble: Double = re
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' complex number to a Float.
+    /** Convert 'this' complex number to a `Float`.
      *  @param c  that complex number to convert
      */
     def toFloat (c: Complex): Float = c.re.toFloat
@@ -219,7 +219,7 @@ case class Complex (val re: Double, val im: Double = 0.0)
     def toFloat: Float = re.toFloat
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' complex number to an Int.
+    /** Convert 'this' complex number to an `Int`.
      *  @param c  that complex number to convert
      */
     def toInt (c: Complex): Int = c.re.toInt
@@ -227,7 +227,7 @@ case class Complex (val re: Double, val im: Double = 0.0)
     def toInt: Int = re.toInt
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' complex number to a Long.
+    /** Convert 'this' complex number to a `Long`.
      *  @param c  that complex number to convert
      */
     def toLong (c: Complex): Long = c.re.toLong
@@ -235,26 +235,26 @@ case class Complex (val re: Double, val im: Double = 0.0)
     def toLong: Long = re.toLong
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a complex number from a Double.
+    /** Create a complex number from a `Double`.
      *  @see Complex.double2Complex
      *  @param x  the double used to create the complex number
      */
 //  def fromDouble (x: Double): Complex = Complex (x)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a complex number from a Float.  Float currently not fully supported.
+    /** Create a complex number from a `Float`.  `Floa`t currently not fully supported.
      *  @param x  the float used to create the complex number
      */
 //  def fromFloat (x: Float): Complex = Complex (x)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a complex number from an Int.
+    /** Create a complex number from an `Int`.
      *  @param n  the integer used to create the complex number
      */
     def fromInt (n: Int): Complex = Complex (n)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a complex number from a Long.
+    /** Create a complex number from a `Long`.
      *  @param n  the long used to create the complex number
      */
     def fromLong (n: Long): Complex = Complex (n)
@@ -276,7 +276,7 @@ case class Complex (val re: Double, val im: Double = 0.0)
 
    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the format to the 'newFormat'.
-     *  @param  newFormat  the new format String
+     *  @param newFormat  the new format String
      */
     def setFormat (newFormat: String) { fString = newFormat }
 
@@ -361,22 +361,22 @@ object Complex
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a complex number from the given polar coordinates.
-     *  @param rad  the radius (the length of the vector in the re-im plane)
-     *  @param ang  the angle (the angle of the vector above the re-axis)
+     *  @param rad  the radius (the length of the vector in the 're-im' plane)
+     *  @param ang  the angle (the angle of the vector above the 're'-axis)
      */
     def create (rad: Double, ang: Double): Complex = Complex (rad * cos (ang), rad * sin (ang))
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute an arthmetic results (+, -, *, /) where the first argument is
+    /** Compute an arithmetic results (+, -, *, /) where the first argument is
      *  real and the second argument is complex.
      *  @param c  the first argument (a real number)
      *  @param c  the second argument (a complex number)
-    def + (r: Double, c: Complex) = Complex (r + c.re, c.im)
-    def - (r: Double, c: Complex) = Complex (r - c.re, c.im)
-    def * (r: Double, c: Complex) = Complex (r * c.re, r * c.im)
-    def / (r: Double, c: Complex) = Complex ((r * c.re) / (c.re * c.re + c.im * c.im),
-                                            (-r * c.im) / (c.re * c.re + c.im * c.im))
      */
+//  def + (r: Double, c: Complex) = Complex (r + c.re, c.im)
+//  def - (r: Double, c: Complex) = Complex (r - c.re, c.im)
+//  def * (r: Double, c: Complex) = Complex (r * c.re, r * c.im)
+//  def / (r: Double, c: Complex) = Complex ((r * c.re) / (c.re * c.re + c.im * c.im),
+//                                          (-r * c.im) / (c.re * c.re + c.im * c.im))
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the absolute value of that complex number.

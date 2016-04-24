@@ -12,7 +12,7 @@ package scalation.util
 /** The `Unicode` object provides arrays to facilitate the use of Unicode.
  *  ScalaTion currently uses a few UTF-16 characters, see code below.  Most UTF-16
  *  characters are 2 bytes (16 bits).  Extended characters are encoded in 4 bytes.
- *  ScalaTion limits characters to the range U+0000 to U+2bff.
+ *  ScalaTion limits characters to the range 'U+0000' to 'U+2bff'.
  *  Developers should test Unicode symbols here before trying them in the code.
  *  @see en.wikipedia.org/wiki/UTF-16
  *  @see www.tamasoft.co.jp/en/general-info/unicode.html
@@ -63,7 +63,7 @@ object Unicode
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `UnicodeTest` obejct is used to the `Unicode` object.
+/** The `UnicodeTest` object is used to the `Unicode` object.
  *  > run-main scalation.util.UnicodeTest
  */
 object UnicodeTest extends App

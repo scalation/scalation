@@ -45,7 +45,7 @@ object ExtremeD
     val MIN_EXPONENT = Double.MIN_EXPONENT
 
     /** Smallest positive normal value of type double, 2^-1022 (retains full precision).
-     *  Also, the smallest double such that 1.0 / SAFE_MIN does not overflow.
+     *  Also, the smallest double such that 1.0 / 'SAFE_MIN' does not overflow.
      */
     val MIN_NORMAL = Double.MIN_NORMAL
 
@@ -75,7 +75,7 @@ object ExtremeD
     val POSITIVE_INFINITY = Double.POSITIVE_INFINITY
 
     /** Special value representing an undefined value, i.e., "Not a Number": s11111111111m (m != 0)
-     *  Ex: 0.0 / 0.0 = ? (indeterminant), sqrt (-1.0) = Complex (0.0 + 1.0i) (not representable as a Double)
+     *  Ex: 0.0 / 0.0 = indeterminate, sqrt (-1.0) = Complex (0.0 + 1.0i) (not representable as a Double)
      *  @see https://en.wikipedia.org/wiki/NaN
      */
     val NaN = Double.NaN

@@ -16,12 +16,12 @@ import scalation.math.Real._0
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MM_SortingR` class provides direct and indirect methods to:
  *  <p>
- *      find 'k'-th median ('k'-th smallest element) using QuickSelect 
- *      sort large arrays using QuickSort
- *      sort small arrays using SelectionSort
+ *      find 'k'-th median ('k'-th smallest element) using `QuickSelect` 
+ *      sort large arrays using `QuickSort`
+ *      sort small arrays using `SelectionSort`
  *  <p>
  *  Direct methods are faster, but modify the array, while indirect methods are
- *  slower, but do not modify the array.  This class is specialized for Real.
+ *  slower, but do not modify the array.  This class is specialized for `Real`.
  *  @see `Sorting` for a generic version of this class.
  *  @param a  the array to operate on
  */
@@ -37,7 +37,7 @@ class MM_SortingR (a: MM_ArrayR)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the 'k'-median of the 'p' to 'r' partition of array 'a' using
-     *  the QuickSelect algorithm.
+     *  the `QuickSelect` algorithm.
      *  @see http://en.wikipedia.org/wiki/Quickselect
      *  @param p  the left cursor
      *  @param r  the right cursor
@@ -75,7 +75,7 @@ class MM_SortingR (a: MM_ArrayR)
     } // partition 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Recursively sort the 'p' to 'r' partition of array 'a' using QuickSort.
+    /** Recursively sort the 'p' to 'r' partition of array 'a' using `QuickSort`.
      *  @see http://mitpress.mit.edu/books/introduction-algorithms
      *  @param p  the left cursor
      *  @param r  the right cursor
@@ -93,12 +93,12 @@ class MM_SortingR (a: MM_ArrayR)
     } // qsort
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Sort array 'a' using QuickSort.
+    /** Sort array 'a' using `QuickSort`.
      */
     def qsort () { qsort (0, n-1) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Sort the 'p' to 'r' partition of array 'a' using SelectionSort.
+    /** Sort the 'p' to 'r' partition of array 'a' using `SelectionSort`.
      *  @param p  the left cursor
      *  @param r  the right cursor
      */
@@ -167,7 +167,7 @@ class MM_SortingR (a: MM_ArrayR)
     } // partition2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Recursively sort the 'p' to 'r' partition of array 'a' using QuickSort.
+    /** Recursively sort the 'p' to 'r' partition of array 'a' using `QuickSort`.
      *  Sort in decreasing order.
      *  @see http://mitpress.mit.edu/books/introduction-algorithms
      *  @param p  the left cursor
@@ -186,12 +186,12 @@ class MM_SortingR (a: MM_ArrayR)
     } // qsort2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Sort array 'a' using QuickSort.  Sort in decreasing order.
+    /** Sort array 'a' using `QuickSort`.  Sort in decreasing order.
      */
     def qsort2 () { qsort2 (0, n-1) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Sort the 'p' to 'r' partition of array 'a' using SelectionSort.
+    /** Sort the 'p' to 'r' partition of array 'a' using `SelectionSort`.
      *  Sort in decreasing order.
      *  @param p  the left cursor
      *  @param r  the right cursor
@@ -224,7 +224,7 @@ class MM_SortingR (a: MM_ArrayR)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Indirectly find the 'k'-median of the 'p' to 'r' partition of array 'a'
-     *  using the QuickSelect algorithm.
+     *  using the `QuickSelect` algorithm.
      *  @see http://en.wikipedia.org/wiki/Quickselect
      *  @param rk  the rank order
      *  @param p   the left cursor
@@ -269,7 +269,7 @@ class MM_SortingR (a: MM_ArrayR)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Recursively and indirectly sort the 'p' to 'r' partition of array 'a'
-     *  using  QuickSort.
+     *  using `QuickSort`.
      *  @param rk  the rank order
      *  @param p   the left cursor
      *  @param r   the right cursor
@@ -287,7 +287,7 @@ class MM_SortingR (a: MM_ArrayR)
     } // iqsort
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Indirectly sort array 'a' using QuickSort, returning the rank order.
+    /** Indirectly sort array 'a' using `QuickSort`, returning the rank order.
      */
     def iqsort (): Array [Int] = 
     {
@@ -297,7 +297,7 @@ class MM_SortingR (a: MM_ArrayR)
     } // iqsort
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Indirectly sort the 'p' to 'r' partition of array 'a' using SelectionSort.
+    /** Indirectly sort the 'p' to 'r' partition of array 'a' using `SelectionSort`.
      *  @param rk  the rank order
      *  @param p   the left cursor
      *  @param r   the right cursor
@@ -312,7 +312,7 @@ class MM_SortingR (a: MM_ArrayR)
     } // iselsort
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Indirectly sort array 'a' using SelectionSort, returning the rank order.
+    /** Indirectly sort array 'a' using `SelectionSort`, returning the rank order.
      */
     def iselsort (): Array [Int] =
     {
@@ -322,7 +322,7 @@ class MM_SortingR (a: MM_ArrayR)
     } // iselsort
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Indirectly swap the elements at 'i' and 'j', i.e., rk(i) <-> rk(j).
+    /** Indirectly swap the elements at 'i' and 'j', i.e., 'rk(i)' <-> 'rk(j)'.
      *  @param rk  the rank order
      *  @param i   the first index position
      *  @param j   the second index position
@@ -364,7 +364,7 @@ class MM_SortingR (a: MM_ArrayR)
     // Indirectly sorting in decreasing order --------------------------------
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Indirectly sort array 'a' using QuickSort.
+    /** Indirectly sort array 'a' using `QuickSort`.
      *  Sort in decreasing order.
      */
     def iqsort2 (): Array [Int] =
@@ -375,7 +375,7 @@ class MM_SortingR (a: MM_ArrayR)
     } // iqsort2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Indirectly sort the 'p' to 'r' partition of array 'a' using SelectionSort.
+    /** Indirectly sort the 'p' to 'r' partition of array 'a' using `SelectionSort`.
      *  Sort in decreasing order.
      *  @param rk  the rank order
      *  @param p   the left cursor
@@ -391,7 +391,7 @@ class MM_SortingR (a: MM_ArrayR)
     } // iselsort2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Indirectly sort array 'a' using SelectionSort, returning the rank order.
+    /** Indirectly sort array 'a' using `SelectionSort`, returning the rank order.
      *  Sort in decreasing order.
      */
     def iselsort2 (): Array [Int] =
@@ -590,7 +590,7 @@ object MM_SortingRTest2 extends App
     println ("Performance Test direct: aa.length = " + aa.length)
     for (k <- 0 until 20) {
 //      for (i <- 0 until n) aa(i) = rn.nextDouble ()
-//      print ("quicksort:   "); time { quickSort (aa) }    // Scala's QuickSort
+//      print ("quicksort:   "); time { quickSort (aa) }    // Scala's `QuickSort`
         for (i <- 0 until n) aa(i) = rn.nextDouble ()
         val srt = new MM_SortingR (aa)
         print ("qsort:       "); time { srt.qsort () }
@@ -673,6 +673,7 @@ object MM_SortingRTest3 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MM_SortingRTest4` object is used to test the correctness and performance
  *  of the 'qsort2' and 'iqsort2' sorting methods in the `MM_SortingR` class.
+ *  The sort is in decreasing order.
  */
 object MM_SortingRTest4 extends App
 {
@@ -710,7 +711,7 @@ object MM_SortingRTest4 extends App
     println ("Performance Test direct: aa.length = " + aa.length)
     for (k <- 0 until 20) {
 //      for (i <- 0 until n) aa(i) = rn.nextDouble ()
-//      print ("quicksort:   "); time { quickSort (aa) }    // Scala's QuickSort
+//      print ("quicksort:   "); time { quickSort (aa) }    // Scala's `QuickSort`
         for (i <- 0 until n) aa(i) = rn.nextDouble ()
         val srt = new MM_SortingR (aa)
         print ("qsort2:       "); time { srt.qsort2 () }
@@ -733,7 +734,7 @@ object MM_SortingRTest4 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MM_SortingRTest5` object is used to test the correctness and performance
  *  of the 'selsort2' and 'iselsort2' sorting methods in the `MM_SortingR` class.
- *  Thet sort in decreasing order.
+ *  The sort is in decreasing order.
  */
 object MM_SortingRTest5 extends App
 {

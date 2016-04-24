@@ -15,11 +15,13 @@ import scalation.scala2d.QCurve.{calcControlPoint, distance}
 import scalation.scala2d.Shapes.{Dimension, Graphics, Graphics2D}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `QCurve` class enhances the `QuadCurve.Double` class (from the java.awt.geom
+/** The `QCurve` class enhances the `QuadCurve.Double` class (from the `java.awt.geom`
  *  package) by allowing entities to move along such quadratic curves as well as
  *  lines.  Although the curve could be developed as a quadratic function where
  *  'y = ax^2 + bx + c'.  The following quadratic bezier formulation is used:
- *  p(t) = (x(t), y(t)) = [(1-t)^2 * p1] + [2 * (1-t) * t * pc] + [t^2 * p2].
+ *  <br>
+ *      p(t) = (x(t), y(t)) = [(1-t)^2 * p1] + [2 * (1-t) * t * pc] + [t^2 * p2].
+ *  <br>
  *  @param p1        the starting point for the quad curve
  *  @param pc        the control point for the quad curve
  *  @param p2        the ending point for the quad curve
@@ -32,7 +34,7 @@ case class QCurve (var p1:       R2      = R2 (0.0, 0.0),
      extends java.awt.geom.QuadCurve2D.Double (p1.x, p1.y, pc.x, pc.y, p2.x, p2.y)
      with CurvilinearShape
 {    
-    /** Length of the QCurve
+    /** Length of the `QCurve`
      */
     lazy private val _length = (distance (p1, p2) + distance (p1, pc) + distance (p2, pc)) / 2.0
 
@@ -107,7 +109,7 @@ case class QCurve (var p1:       R2      = R2 (0.0, 0.0),
     } // getCenterY
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set (or reset) the location for the QCurve as a line.
+    /** Set (or reset) the location for the `QCurve` as a line.
      *  @param _p1  the starting point
      *  @param _p2  the ending point
      */
@@ -119,7 +121,7 @@ case class QCurve (var p1:       R2      = R2 (0.0, 0.0),
     } // setLine
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set (or reset) the location for the QCurve as a curve using bend to
+    /** Set (or reset) the location for the `QCurve` as a curve using bend to
      *  calculate the control point.
      *  @param _p1   the starting point
      *  @param _p2   the ending point
@@ -134,7 +136,7 @@ case class QCurve (var p1:       R2      = R2 (0.0, 0.0),
     } // setLine
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set (or reset) the location for the QCurve as a curve using an explicitly
+    /** Set (or reset) the location for the `QCurve` as a curve using an explicitly
      *  given control point.
      *  @param _p1  the starting point
      *  @param _pc  the control point
@@ -169,12 +171,12 @@ case class QCurve (var p1:       R2      = R2 (0.0, 0.0),
     def getControl: R2 = pc
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the last/end point of the quad curve.
+    /** Get the last/end-point of the quad curve.
      */  
     def getLast: R2 = p2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the last/end point of the quad curve, adjusted from top-left to
+    /** Get the last/end-point of the quad curve, adjusted from top-left to
      *  center coordinates.
      *  @param width   the width of object traversing the curve
      *  @param height  the height of object traversing the curve
@@ -185,7 +187,7 @@ case class QCurve (var p1:       R2      = R2 (0.0, 0.0),
     } // getLast
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Are (x, y) and (xe, ye) essentially the same?
+    /** Whether ('x', 'y') and ('xe', 'ye') are essentially the same.
      */
     def isSame (x: Double, y: Double, xe: Double, ye: Double, step: Double): Boolean =
     {
@@ -193,9 +195,9 @@ case class QCurve (var p1:       R2      = R2 (0.0, 0.0),
     } // isSame
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given a value for the trajectory parameter t (in [0., 1.]) calculate
+    /** Given a value for the trajectory parameter 't' (in [0., 1.]) calculate
      *  the point on the curve using the Quadratic Bezier equation.
-     *  See http://en.wikipedia.org/wiki/Bézier_curve#Quadratic_curves
+     *  @see en.wikipedia.org/wiki/Bézier_curve#Quadratic_curves
      */
     def eval (): R2 =
     {
@@ -205,7 +207,7 @@ case class QCurve (var p1:       R2      = R2 (0.0, 0.0),
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the next point on the quad curve (one step beyond current point).
-     *  Return null if t > 1. (i.e., past end point).
+     *  Return null if 't > 1.0' (i.e., past end-point).
      */
     def next (): R2 =
     {
@@ -224,7 +226,7 @@ case class QCurve (var p1:       R2      = R2 (0.0, 0.0),
     /** Return the next point on the quad curve (one step beyond current point)
      *  and adjust from top-left to center coordinates for the object traversing
      *  the curve based on its width and height.
-     *  Return null if t > 1. (i.e., past end point).
+     *  Return null if 't > 1.0' (i.e., past end-point).
      *  @param width   the width of object traversing the curve
      *  @param height  the height of object traversing the curve
      */
@@ -244,12 +246,12 @@ case class QCurve (var p1:       R2      = R2 (0.0, 0.0),
     } // setSteps
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the length of this QCurve
+    /** Return the length of this `QCurve`.
      */
     def length: Double = _length
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Show the start, control and end points of the the QCurve.
+    /** Show the start, control and end-points of the the `QCurve`.
      */
     override def toString: String =
     {
@@ -269,8 +271,8 @@ object QCurve
     private val EPSILON = 1E-7
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Calculate the slope of the line defined by points p1 and p2.
-     *  Note: if deltaX is 0, the method returns infinity.
+    /** Calculate the slope of the line defined by points `p1` and `p2`.
+     *  Note:  if 'deltaX' is 0, the method returns infinity.
      *  @param p1  the starting point
      *  @param p2  the ending point
      */
@@ -280,8 +282,8 @@ object QCurve
     } // slope
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Calculate the distance or the length of the line connecting points p1
-     *  and p2.
+    /** Calculate the distance or the length of the line connecting points `p1`
+     *  and `p2`.
      *  @param p1  the starting point
      *  @param p2  the ending point
      */
@@ -291,10 +293,10 @@ object QCurve
     } // slope
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Calculate the location (x, y) of the control point.  It is positioned
-     *  orthogonally to the mid point of the line connecting p1 and p2 at a
-     *  distance dist, where dist = bend * || p2 - p1 ||.  A bend of 0. gives
-     *  a straight line, while 2./-2. gives a huge bend up-right/down-left.
+    /** Calculate the location ('x', 'y') of the control point.  It is positioned
+     *  orthogonal to the mid point of the line connecting 'p1' and 'p2' at a
+     *  distance 'dist', where 'dist = bend * || p2 - p1 ||'.  A bend of 0.0 gives
+     *  a straight line, while 2.0/-2.0 gives a huge bend up-right/down-left.
      *  @param p1    the starting point
      *  @param p2    the ending point
      *  @param bend  the bend or curvature 
@@ -341,12 +343,12 @@ object QCurveTest extends App
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         /** Paint the components into the canvas (drawing panel).
-         *  @param gr  low-res graphics environment
+         *  @param gr  low-resolution graphics environment
          */
         override def paintComponent (gr: Graphics)
         {
             super.paintComponent (gr)
-            val g2d = gr.asInstanceOf [Graphics2D]            // use hi-res
+            val g2d = gr.asInstanceOf [Graphics2D]            // use hi-resolution
             g2d.setPaint (red)
             g2d.draw (line1)
             g2d.draw (curve1)
@@ -371,7 +373,7 @@ object QCurveTest extends App
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `QCurveTest2` object tests traversals of `QCurve`'s (quad curves).
+/** The `QCurveTest2` object tests traversal of `QCurve`'s (quad curves).
  */
 object QCurveTest2 extends App
 {
@@ -405,12 +407,12 @@ object QCurveTest2 extends App
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             /** Paint the components into the canvas (drawing panel).
-             *  @param gr  low-res graphics environment
+             *  @param gr  low-resolution graphics environment
              */
             override def paintComponent (gr: Graphics)
             {
                 super.paintComponent (gr)
-                val g2d = gr.asInstanceOf [Graphics2D]            // use hi-res
+                val g2d = gr.asInstanceOf [Graphics2D]            // use hi-resolution
                 g2d.setPaint (red)           // R in RGB order
                 g2d.draw (curve(0))
                 g2d.setPaint (green)         // G in RGB order

@@ -21,7 +21,7 @@ import scala.reflect.runtime.currentMirror
 import scala.tools.reflect.ToolBox
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `QuasiQuoteTest` object is used to test how QuasiQuotes can be used for
+/** The `QuasiQuoteTest` object is used to test how Quasi-Quotes can be used for
  *  code generation.
  *  FIX: generate class files (.class) rather than execute the code
  *  > run-main scalation.util.QuasiQuoteTest 
@@ -51,5 +51,5 @@ object QuasiQuoteTest extends App
 
     } // for
    
-} // QuasiQuoteTest
+} // QuasiQuoteTest object
 

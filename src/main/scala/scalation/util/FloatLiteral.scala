@@ -15,8 +15,8 @@ import scala.util.matching.Regex
  *  dot ('.'), e.g., "12." -> "12.0".
  *  @see http://stackoverflow.com/questions/9655080/scala-operator-oddity
  *  "In scala 2.9 and before, 2. is interpreted as 2.0 so the ambiguous dot denotes a float literal.
- *  You’d explicitly call the method by using the syntax (2).+(2).  The ambiguous floating point
- *  syntax will however be deprecated in 2.10."
+ *  You should explicitly call the method by using the syntax (2).+(2).  The ambiguous floating
+ *  point syntax has been be deprecated since scala 2.10."
  */
 object FloatLiteral extends App
 {

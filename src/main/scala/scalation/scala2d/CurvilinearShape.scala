@@ -60,7 +60,7 @@ trait CurvilinearShape extends Shape with Error
     } // setFrame
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the next point on the CurvilinearShape (one step beyond current point)
+    /** Return the next point on the `CurvilinearShape` (one step beyond current point)
      *  and adjust from top-left to center coordinates for the object traversing
      *  the curve based on its width and height.  Return null if past end point.
      *  This is an optional method.

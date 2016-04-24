@@ -28,7 +28,7 @@ import LabelType._
 class MinSpanningTree (g: MGraph, min: Boolean = true, undirected: Boolean = true)
       extends Error
 {
-    private val DEBUG = true                           // debug flag
+    private val DEBUG = false                          // debug flag
     private val size  = g.size                         // the number of nodes for the spanning tree
     private val root  = new TreeNode (0, 0)            // for vertex 0 in g, create a root node
     private var stree: Tree = null                     // spanning tree built by calling span
@@ -51,8 +51,10 @@ class MinSpanningTree (g: MGraph, min: Boolean = true, undirected: Boolean = tru
      */
     def span (): Tree =
     {
-        val pred = makeITree ()                        // make an inverted tree
-        stree = Tree (pred, null, 3.5, "st")           // build spanning tree from pred array
+        val pred = makeITree ()                                     // make an inverted tree
+        val el   = Array.ofDim [TLabel] (pred.length)               // copy elabel value from g into a pred elabel array
+        for (i <- 1 until el.length) el(i) = g.elabel(pred(i), i)   // skipping root node (0)
+        stree = Tree (pred, el, 3.5, "st")                          // build spanning tree from pred array
         stree
     } // span
 
@@ -133,7 +135,7 @@ object MinSpanningTreeTest extends App
     st.span ()
     println ("spanning tree for graph " + g.name)
     println ("-" * 60)
-    st.printSTree
+    st.printSTree ()
     st.aniSTree
 
 } // MinSpanningTreeTest object
@@ -168,8 +170,8 @@ object MinSpanningTreeTest2 extends App
     st.span ()
     println ("spanning tree for graph " + g.name)
     println ("-" * 60)
-    st.printSTree
-    st.aniSTree
+    st.printSTree ()
+    st.aniSTree ()
 
 } // MinSpanningTreeTest2 object
 
@@ -204,8 +206,8 @@ object MinSpanningTreeTest3 extends App
     st.span ()
     println ("spanning tree for graph " + g.name)
     println ("-" * 60)
-    st.printSTree
-    st.aniSTree
+    st.printSTree ()
+    st.aniSTree ()
 
 } // MinSpanningTreeTest3 object
 

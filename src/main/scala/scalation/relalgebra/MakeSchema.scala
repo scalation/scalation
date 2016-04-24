@@ -37,7 +37,7 @@ object MakeSchema
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Infer the domains of a domain-less relation and create a new relation with
-     *  the inferred domains (e.g., "IIDIS").
+     *  the inferred domains (e.g., 'IIDIS').
      *  @param r  the relation to have its domain inferred
      */
     def apply (r: Relation): Relation =
@@ -54,7 +54,7 @@ object MakeSchema
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Infer the domains of a domain-less memory mapped relation and create a new
-     *  memory mapped relation with the inferred domains (e.g., "IIDIS").
+     *  memory mapped relation with the inferred domains (e.g., 'IIDIS').
      *  @param r  the memory mapped relation to have its domain inferred
      */
     def apply (r: MM_Relation): MM_Relation =

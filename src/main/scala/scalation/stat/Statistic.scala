@@ -17,8 +17,8 @@ import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Statistic` class is used to collect values and compute sample statistics
- *  on them (e.g., Waiting Time).  Contrast with `TimeStatistic` defined below.
- *  @param name      the name for this statistic (e.g., WatingTime)
+ *  on them (e.g., waiting time).  Contrast with `TimeStatistic` defined below.
+ *  @param name      the name for this statistic (e.g., 'watingTime')
  *  @param unbiased  whether the estimators are restricted to be unbiased
  */
 class Statistic (val name: String = "stat", unbiased: Boolean = false)
@@ -178,7 +178,7 @@ object Statistic
      *  @param sumSq     sum of the sample values squared
      *  @param minX      the minimum sample value
      *  @param maxX      the maximum sample value
-     *  @param name      the name for this statistic (e.g., WatingTime)
+     *  @param name      the name for this statistic (e.g., 'waitingTime')
      *  @param unbiased  whether the estimators are restricted to be unbiased
      */
     def apply (n: Int, sum: Double, sumSq: Double, minX: Double, maxX: Double,
@@ -227,7 +227,7 @@ object Statistic
 /** The `TimeStatistic` class is used to collect values and compute time-persistent
  *  statistics on them (e.g., Number in Queue).
  *  @see staff.unak.is/andy/Year%203%20Simulation/Laboratories/v4manual/internal.htm
- *  @param name        the name for this statistic (e.g., NumberInQueue or tellerQ)
+ *  @param name        the name for this statistic (e.g., 'numberInQueue' or 'tellerQ')
  *  @param _lastTime   the time of last observation
  *  @param _startTime  the time observation began
  */
@@ -312,8 +312,8 @@ object TimeStatistic
      *  @param sumSq       sum of the sample values squared
      *  @param minX        the minimum sample value
      *  @param maxX        the maximum sample value
-     *  @param name        the name for this statistic (e.g., WatingTime)
-     *  @param _lastTime   the time of lastest observation
+     *  @param name        the name for this statistic (e.g., 'waitingTime')
+     *  @param _lastTime   the time of latest observation
      *  @param _startTime  the time observation began
      */
     def apply (n: Int, sum: Double, sumSq: Double, minX: Double, maxX: Double, name: String = "p-stat",

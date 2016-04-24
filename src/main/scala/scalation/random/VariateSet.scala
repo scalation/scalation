@@ -102,7 +102,7 @@ case class RandomSet (count: Int = 10, max: Int = 20, skip: Int = -1, stream: In
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Generate a random set of unique integers 'r' in the range '0 to mx'.
      *  @param n    the size of the resultant random subset r
-     *  @param mx   generate integers in the range 0 (inclusive) to mx (inclusive)
+     *  @param mx   generate integers in the range 0 (inclusive) to 'mx' (inclusive)
      *  @param skp  skip this number, i.e, do not use it
      */
     def igen (n: Int, mx: Int, skp: Int = -1): Set [Int] =

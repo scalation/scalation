@@ -21,7 +21,7 @@ object Conversions
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Implicit conversion from `VectorD` to `StatVector`, which supports more
      *  advanced statistical operations on vectors (e.g., covariance).
-     *  Other vector types require to conversion to VectorD via 'toDouble'.
+     *  Other vector types require to conversion to `VectorD` via 'toDouble'.
      *  Caveat: won't work for vectors of string numbers (`VectorS`).
      *  @param x  the vector to be enriched
      */

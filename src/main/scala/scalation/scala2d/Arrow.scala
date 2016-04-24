@@ -115,12 +115,12 @@ object ArrowTest extends App
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         /** Paint the components into the canvas (drawing panel).
-         *  @param gr  low-res graphics environment
+         *  @param gr  low-resolution graphics environment
          */
         override def paintComponent (gr: Graphics)
         {
             super.paintComponent (gr)
-            val g2d = gr.asInstanceOf [Graphics2D]            // use hi-res
+            val g2d = gr.asInstanceOf [Graphics2D]            // use hi-resolution
             g2d.setPaint (red)
             g2d.draw (arrow1)
             g2d.setPaint (orange)

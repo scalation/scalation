@@ -11,8 +11,8 @@ package scalation.util
 import collection.mutable.ArrayBuffer
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Swap` class provides a method to swap elements in an Array or ArrayBuffer.
- *  Note, ArrayBuffer is resizable (similar to Java's ArrayList).
+/** The `Swap` class provides a method to swap elements in an `Array` or `ArrayBuffer`.
+ *  Note, `ArrayBuffer` is resizable (similar to Java's `ArrayList`).
  */
 object Swap
 {

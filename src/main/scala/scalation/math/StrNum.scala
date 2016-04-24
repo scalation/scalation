@@ -13,7 +13,7 @@ import language.implicitConversions
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StrO` object is used to represent and operate on string numbers.
- *  It contains an implicit class defintion for `StrNum`, which extends
+ *  It contains an implicit class definition for `StrNum`, which extends
  *  strings with `Numeric` operations, it it can be used in `VectorS`. 
  *  The semantics of `StrNum` operators are similar those in Pike.
  *  @see http://docs.roxen.com/pike/7.0/tutorial/strings/operators.xml
@@ -203,67 +203,67 @@ object StrO
         def getBytes (): Array [Byte] = ss.getBytes ()
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Create a string number from a double.
+        /** Create a string number from a `Double`.
          *  @param d  the source double
          */
         def fromDouble (d: Double): StrNum = d.toString
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Create a string number from an integer.
+        /** Create a string number from an `Int`.
          *  @param n  the source integer
          */
         def fromInt (n: Int): StrNum = n.toString
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Convert 'this' string number to a StrNum.
+        /** Convert 'this' string number to a `StrNum`.
          *  @param s  that string number to convert
          */
         def toStrNum: StrNum = this
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Convert 'this' string number to a Complex.
+        /** Convert 'this' string number to a `Complex`.
          *  @param s  that string number to convert
          */
         def toComplex (s: StrNum): Complex = Complex (s.ss)
         def toComplex: Complex = toComplex (this)
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Convert 'this' string number to a Rational.
+        /** Convert 'this' string number to a `Rational`.
          *  @param s  that string number to convert
          */
         def toRational (s: StrNum): Rational = Rational (s.ss)
         def toRational: Rational = toRational (this)
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Convert 'this' string number to a Real.
+        /** Convert 'this' string number to a `Real`.
          *  @param s  that string number to convert
          */
         def toReal (s: StrNum): Real = Real (s.ss)
         def toReal: Real = toReal (this)
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Convert 'this' string number to a Double.
+        /** Convert 'this' string number to a `Double`.
          *  @param s  that string number to convert
          */
         def toDouble (s: StrNum): Double = new StringOps (s.ss).toDouble
         def toDouble: Double = new StringOps (ss).toDouble
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Convert 'this' string number to a Float.
+        /** Convert 'this' string number to a `Float`.
          *  @param s  that string number to convert
          */
         def toFloat (s: StrNum): Float = new StringOps (s.ss).toFloat
         def toFloat: Float = new StringOps (ss).toFloat
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Convert 'this' string number to an Int.
+        /** Convert 'this' string number to an `Int`.
          *  @param s  that string number to convert
          */
         def toInt (s: StrNum): Int = new StringOps (s.ss).toInt
         def toInt: Int = new StringOps (ss).toInt
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Convert 'this' string number to a Long.
+        /** Convert 'this' string number to a `Long`.
          *  @param s  that string number to convert
          */
         def toLong (s: StrNum): Long = new StringOps (s.ss).toLong

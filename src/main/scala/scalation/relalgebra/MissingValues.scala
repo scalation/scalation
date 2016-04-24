@@ -30,7 +30,7 @@ object MissingValues
     /** Estimate the mean and variance for the column in table 'xy' having missing values.
      *  @param xy          the table/relation with missing values
      *  @param missingCol  the name of column having missing values
-     *  @param missingStr  the string used to denote a missing value (defaults to "?")
+     *  @param missingStr  the string used to denote a missing value (defaults to '?')
      */
     def estimateStats (xy: Table, missingCol: String, missingStr: String = "?"): (Double, Double) =
     {
@@ -45,7 +45,7 @@ object MissingValues
      *  @param xy          the table/relation with missing values
      *  @param ignore      the columns to ignore/exclude
      *  @param missingCol  the name of column having missing values
-     *  @param missingStr  the string used to denote a missing value (defaults to "?")
+     *  @param missingStr  the string used to denote a missing value (defaults to '?')
      */
     def replaceMissingValues (xy: Table, ignore: Seq [Int], missingCol: String, missingStr: String = "?"): Table =
     {

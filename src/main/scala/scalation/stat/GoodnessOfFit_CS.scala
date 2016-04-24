@@ -49,7 +49,7 @@ object GoodnessOfFit_CS
 import GoodnessOfFit_CS._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `GoodnessOfFit_CS` class is used to fit data to probability distibutions.
+/** The `GoodnessOfFit_CS` class is used to fit data to probability distributions.
  *  Choosing the number of 'intervals' can be challenging and can affect the result:
  *  Suggestions: each interval should have 'E_i = n*p_i >= 5' and intervals >= sqrt (n).
  *  It uses the Chi-square goodness of fit test with equal width intervals.

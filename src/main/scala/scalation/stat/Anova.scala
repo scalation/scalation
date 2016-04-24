@@ -82,7 +82,7 @@ class Anova (x: MatrixD)
     def f_stat = msg / mse
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Returns the critcal value from the Fisher (F) Distribution.
+    /** Returns the critical value from the Fisher (F) Distribution.
      */
     def f_crit = Quantile.fisherInv (.95, (dfg.toInt, dfe.toInt))
         

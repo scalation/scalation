@@ -15,17 +15,17 @@ import collection.mutable.Map
  */
 object Catalog
 {
-    /** Map of relationa, from name to meta-data
+    /** Map from relation-name to meta-data
      */
     private val relMap = Map [String, Tuple3 [Seq [String], Int, String]] ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add metadata about the new relation to the catalog.
+    /** Add meta-data about the new relation to the catalog.
      *  @param name     the name of the relation
      *  @param colName  the names of columns
      *  @param col      the Scala Vector of columns making up the columnar relation
      *  @param key      the column number for the primary key (< 0 => no primary key)
-     *  @param domain   an optional string indicating domains for columns (e.g., SD = StrNum, Double)
+     *  @param domain   an optional string indicating domains for columns (e.g., 'SD' = 'StrNum', 'Double')
      */
     def add (name: String, colName: Seq [String], key: Int, domain: String)
     {

@@ -25,8 +25,8 @@ import scala.collection.mutable._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PriorityQueue` class implements priority queues using a heap.
- *  To prioritize elements of type A there must be an implicit
- *  Ordering[A] available at creation.
+ *  To prioritize elements of type `A` there must be an implicit
+ *  `Ordering [A]` available at creation.
  *
  *  Only the `dequeue` and `dequeueAll` methods will return methods in priority
  *  order (while removing elements from the heap).  Standard collection methods
@@ -60,11 +60,12 @@ class PriorityQueue [A] (implicit val ord: Ordering [A])
 {
   import ord._
 
+
   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
   /** Inner class for accessing resizable arrays.
    */
-  private class ResizableArrayAccess [A]
-          extends AbstractSeq [A] with ResizableArray [A] with Serializable
+  private class ResizableArrayAccess [B]
+          extends AbstractSeq [B] with ResizableArray [B] with Serializable
   {
     def p_size0 = size0
 
@@ -77,6 +78,7 @@ class PriorityQueue [A] (implicit val ord: Ordering [A])
     def p_swap (a: Int, b: Int) = super.swap (a, b)
 
   } // ResizableArrayAccess inner class
+
 
   protected [this] override def newBuilder = new PriorityQueue [A]
 
@@ -100,7 +102,7 @@ class PriorityQueue [A] (implicit val ord: Ordering [A])
   override def isEmpty: Boolean = resarr.p_size0 < 2
 
   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-  /** Returns the reprentation.
+  /** Returns the representation. 
    */
   override def repr = this
 

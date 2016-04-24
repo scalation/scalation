@@ -69,7 +69,7 @@ class PlotM (x: VectoD, y: MatriD, var label: Array [String] = null,
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         /** Paint the canvas by plotting the data points.
-         *  @param gr  low-res graphics environment
+         *  @param gr  low-resolution graphics environment
          */
         override def paintComponent (gr: Graphics)
         {

@@ -4,19 +4,21 @@
  *  @version 1.2
  *  @date    Sun Sep  9 20:37:38 EDT 2012
  *  @see     LICENSE (MIT style license file).
- *  run: scala -cp classes scalation.util.CommentExtractor < Build.scala | hunspell -L
+ *
+ *  run-main: scala -cp classes scalation.util.CommentExtractor < Build.scala | hunspell -L
  */
 
 package scalation.util
 
-import io.StdIn.readLine
-import util.matching.Regex
+import scala.io.StdIn.readLine
+import scala.util.matching.Regex
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CommentExtractor` object is used to extract comments from source code
  *  (for example to send it to a spell checker).  It reads from standard input
  *  and writes to standard output.
  *  @see http://ostermiller.org/findcomment.html
+ *  > run-main scalation.util.CommentExtractor
  */
 object CommentExtractor extends App
 {

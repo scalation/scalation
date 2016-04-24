@@ -30,7 +30,7 @@ class MemoryMappedFileD (fname: String, sz: Int = 1024)
      */
     private val raf = new RandomAccessFile (MEM_MAPPED_DIR + fname, "rw");
 
-    /** The raf file mapped into memory
+    /** The random access file mapped into memory
      */
     private val mraf = raf.getChannel ().map (FileChannel.MapMode.READ_WRITE, 0, sz);
 

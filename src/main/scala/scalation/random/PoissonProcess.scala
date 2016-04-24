@@ -52,7 +52,7 @@ abstract class TimeVariate (stream: Int)
     def pf (z: Int, aa: Double, bb: Double): Double
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Comute the mean as a function of time.
+    /** Compute the mean as a function of time.
      *  @param tt  the time point for computing the mean
      */
     def count (tt: Double): Int =
@@ -100,7 +100,7 @@ case class PoissonProcess (lambda: Double, stream: Int = 0)
     private var t     = 0.0                                   // current time
     
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the mean number of arrivals for amount of time tt.
+    /** Compute the mean number of arrivals for amount of time 'tt'.
      *  @param tt  a number of intervals
      */
     def meanF (tt: Double): Double = lambda * tt
@@ -114,9 +114,9 @@ case class PoissonProcess (lambda: Double, stream: Int = 0)
     def pf (k: Int): Double = (lambda * t)~^k * exp (-lambda * t) / fac (k)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the probability P[ (N(t + tau) - N(t)) = k] using a general
+    /** Compute the probability 'P[ (N(t + tau) - N(t)) = k]' using a general
      *  factorial function implemented with the Gamma function and Ramanujan's
-     *  Approximation.  Switches to pf_ln for k >= 170 to handle large k-values.
+     *  Approximation.  Switches to 'pf_ln' for k >= 170 to handle large 'k'-values.
      *  @param k    the number of arrivals in the interval
      *  @param tau  the length of the interval
      */
@@ -127,7 +127,7 @@ case class PoissonProcess (lambda: Double, stream: Int = 0)
     } // pf
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the probability P[ (N(t + tau) - N(t)) = k] using the log of 
+    /** Compute the probability 'P[ (N(t + tau) - N(t)) = k]' using the log of 
      *  Ramanujan's Approximation formula.
      *  @param k    the number of arrivals in the interval
      *  @param tau  the length of the interval
@@ -140,7 +140,7 @@ case class PoissonProcess (lambda: Double, stream: Int = 0)
     } // pf_ln
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the probability P [ (N(b) - N(a)) = k ].
+    /** Compute the probability 'P [ (N(b) - N(a)) = k ]'.
      *  @param k  the number of arrivals in the interval
      *  @param a  the left end of the interval
      *  @param b  the right end of the interval
@@ -163,7 +163,7 @@ case class PoissonProcess (lambda: Double, stream: Int = 0)
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class generates arrival times according to a `NHPoissonProces`, an
  *  Non-Homogeneous Process Process (NHPP), where the arrival rate function
- *  'lambda(t)' is piecewise constant.  Rates are constant over basic time
+ *  'lambda(t)' is piece-wise constant.  Rates are constant over basic time
  *  intervals of length 'dt'.
  *  @see  http://en.wikipedia.org/wiki/Poisson_process#Non-homogeneous
  *  @param lambda  the vector of arrival rates
@@ -205,7 +205,7 @@ case class NHPoissonProcess (lambda: VectorD, dt: Double = 1.0, stream: Int = 0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: 
     /** Compute the probability of k arrivals occurring in the time
-     *  interval [0, tt].
+     *  interval '[0, tt]'.
      *  @param k   the number of arrivals in the time interval
      *  @param tt  the upper bound time value
      */
@@ -258,13 +258,13 @@ case class NHPoissonProcess (lambda: VectorD, dt: Double = 1.0, stream: Int = 0)
     } // gen
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute inter-arrival times of the NHPP. tlast is a global
+    /** Compute inter-arrival times of the NHPP. 'tlast' is a global
      *  variable.
      */
     def gen: Double = genTime - tlast
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Reset the NHPP by resetting e to zero.
+    /** Reset the NHPP by resetting 'e' to zero.
      */
     def reset () { e = 0.0 }
 

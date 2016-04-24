@@ -19,11 +19,11 @@ import scalation.math.{root => lroot}
  *  Internally, a rational number is represented as two long integers.
  *  Externally, two forms are supported:
  *  <p>
- *      a/b    = 2/3         via: Rational ("2/3"), toString
- *      (a, b) = (2, 3)      via: create ("(2, 3)") toString2
+ *      a/b    = 2/3         via: Rational ("2/3"), 'toString'
+ *      (a, b) = (2, 3)      via: create ("(2, 3)") 'toString2'
  *  <p>
  *  Rational number can be created without loss of precision using the constructor,
- *  apply, create or fromBigDecimal methods.  Other methods may lose precision.
+ *  'apply', 'create' or 'fromBigDecimal' methods.  Other methods may lose precision.
  *  @param num  the numerator (e.g., 2)
  *  @param den  the denominator (e.g., 3)
  */
@@ -37,7 +37,7 @@ case class Rational (val num: Long, val den: Long = 1l)
     val (val1, val2) = (num, den)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Reduce the mangnitude of the numerator and denonimator by dividing
+    /** Reduce the magnitude of the numerator and denonimator by dividing
      *  both by their Greatest Common Divisor (GCD).
      */
     def reduce (): Rational =
@@ -218,7 +218,7 @@ case class Rational (val num: Long, val den: Long = 1l)
     def toRational = this
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert that/this rational number to a BigDecimal number.
+    /** Convert that/this rational number to a `BigDecimal` number.
      *  @param q  that rational number to convert
      */
     def toBigDecimal (q: Rational): BigDecimal = BigDecimal (q.num) / BigDecimal (q.den)
@@ -226,7 +226,7 @@ case class Rational (val num: Long, val den: Long = 1l)
     def toBigDecimal: BigDecimal = BigDecimal (num) / BigDecimal (den)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert that/this rational number to a Double.
+    /** Convert that/this rational number to a `Double`.
      *  @param q  that rational number to convert
      */
     def toDouble (q: Rational): Double = q.num.toDouble / q.den.toDouble
@@ -234,7 +234,7 @@ case class Rational (val num: Long, val den: Long = 1l)
     def toDouble: Double = num.toDouble / den.toDouble
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert that/this rational number to a Float.
+    /** Convert that/this rational number to a `Float`.
      *  @param q  that rational number to convert
      */
     def toFloat (q: Rational): Float = (q.num.toDouble / q.den.toDouble).toFloat
@@ -242,7 +242,7 @@ case class Rational (val num: Long, val den: Long = 1l)
     def toFloat: Float = (num.toDouble / den.toDouble).toFloat
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert that/this rational number to an Int.
+    /** Convert that/this rational number to an `Int`.
      *  @param q  that rational number to convert
      */
     def toInt (q: Rational): Int = (q.num / q.den).toInt
@@ -250,7 +250,7 @@ case class Rational (val num: Long, val den: Long = 1l)
     def toInt: Int = (num / den).toInt
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert this rational number to a Long.
+    /** Convert this rational number to a `Long`.
      *  @param q  that rational number to convert
      */
     def toLong (q: Rational): Long = q.num / q.den
@@ -258,34 +258,34 @@ case class Rational (val num: Long, val den: Long = 1l)
     def toLong: Long = num / den
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a rational number from a BigDecimal number.
-     *  @param y  the BigDecimal used to create the rational number
+    /** Create a rational number from a `BigDecimal` number.
+     *  @param y  the `BigDecimal` used to create the rational number
      */
     def fromBigDecimal (y: BigDecimal): Rational = Rational.fromBigDecimal (y)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a rational number from a Double.
+    /** Create a rational number from a `Double`.
      *  @see Rational.double2Rational
-     *  @param y  the Double used to create the rational number
+     *  @param y  the `Double` used to create the rational number
      */
 //  def fromDouble (y: Double): Rational = Rational.fromDouble (y)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a rational number from a Float.  Float is currently not fully
+    /** Create a rational number from a `Float`.  `Float` is currently not fully
      *  supported.
-     *  @param y  the Float used to create the rational number
+     *  @param y  the `Float` used to create the rational number
      */
 //  def fromFloat (y: Float): Rational = Rational.fromDouble (y)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a rational number from an Int.
-     *  @param n  the Int used to create the rational number
+    /** Create a rational number from an `Int`.
+     *  @param n  the `Int` used to create the rational number
      */
     def fromInt (n: Int): Rational = Rational (n.toLong, 1l)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a rational number from a Long.
-     *  @param n  the Long used to create the rational number
+    /** Create a rational number from a `Long`.
+     *  @param n  the `Long` used to create the rational number
      */
     def fromLong (n: Long): Rational = Rational (n, 1l)
 
@@ -315,7 +315,7 @@ case class Rational (val num: Long, val den: Long = 1l)
     def toString2: String = "(" + num + ", " + den + ")"
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Find the Great Common Demoninator (GCD) of two long integers.
+    /** Find the Great Common Denominator (GCD) of two long integers.
      *  @param l1  the first long number
      *  @param l2  the second long number
      */
@@ -351,7 +351,7 @@ object Rational
     val maxDen = 0x40000000000000l
 //  val maxDen = 18014398509481984l
 
-    /** One in BigDecimal
+    /** One in `BigDecimal`
      */
     val _1_big = BigDecimal (1)
 
@@ -432,16 +432,16 @@ object Rational
                { def compare (x: Rational, y: Rational) = x compare y }
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a rational number from a BigDecimal number.
-     *  @param y  the BigDecimal used to create the rational number
+    /** Create a rational number from a `BigDecimal` number.
+     *  @param y   the `BigDecimal` used to create the rational number
      *  @param md  the maximum denominator
      */
     def fromBigDecimal (y: BigDecimal): Rational = Rational (from_BigDecimal (y))
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine the numerator and denonimator of the closest rational number
-     *  to the given BigDecimal number.
-     *  @param y  the BigDecimal used to create the rational number
+     *  to the given `BigDecimal` number.
+     *  @param y  the `BigDecimal` used to create the rational number
      *  @param md  the maximum denominator
      */
     def from_BigDecimal (y: BigDecimal, md: Long = Long.MaxValue): Tuple2 [Long, Long] =
@@ -476,7 +476,7 @@ object Rational
     } // from_BigDecimal
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a rational number from a double.
+    /** Create a rational number from a `Double`.
      *  @param y   the double used to create the rational number
      *  @param md  the maximum denominator
      */
@@ -484,7 +484,7 @@ object Rational
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine the numerator and denonimator of the closest rational number
-     *  to the given BigDecimal number.
+     *  to the given `BigDecimal` number.
      *  @see http://stackoverflow.com/questions/5124743/algorithm-for-simplifying-
      *       decimal-to-fractions/5128558#5128558
      *  @param y   the double used to create the rational number
@@ -522,8 +522,8 @@ object Rational
     } // from_Double
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a rational number from a Double.
-     *  FIX: if den not a power of 2, it goes to md.
+    /** Create a rational number from a `Double`.
+     *  FIX: if den not a power of 2, it goes to 'md'.
      *  @see http://rosettacode.org/wiki/Convert_decimal_number_to_rational
      *  @param y   the double used to create the rational number.
      *  @param md  the maximum denominator
@@ -564,19 +564,19 @@ object Rational
     } // fromDouble2
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a rational number from a Float.
+    /** Create a rational number from a `Float`.
      *  @param y  the float used to create the rational number.
      */
     def fromFloat (y: Float): Rational = fromDouble (y)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a rational number from an Int.
+    /** Create a rational number from an `Int`.
      *  @param n  the integer used to create the rational number.
      */
     def fromInt (n: Int) = Rational (n)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a rational number from a Long.
+    /** Create a rational number from a `Long`.
      *  @param n  the long used to create the rational number.
      */
     def fromLong (n: Long) = Rational (n)

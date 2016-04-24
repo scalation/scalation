@@ -28,7 +28,7 @@ object Combinatorics extends Error
     private val LOG_2PI   = log (_2PI)              // natural log of two Pi
     private val LOG_R_PI  = log (SQRT_PI)           // natural log of square root of Pi
 
-    /** Table of all factorials that can be represented as a long (64-bit) integer
+    /** Table of all factorial numbers that can be represented as a long (64-bit) integer
      */
     val lfac = Array (1l, 1l, 2l, 6l, 24l, 120l, 720l, 5040l, 40320l, 362880l, 3628800l, 39916800l, 479001600l,
                       6227020800l, 87178291200l, 1307674368000l, 20922789888000l, 355687428096000l,
@@ -149,7 +149,7 @@ object Combinatorics extends Error
     } // fac
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute 'k!' using Stirling's 2nd Order Factorial Approximation.
+    /** Compute 'k!' using Stirling's 2-nd Order Factorial Approximation.
      *  @see http://en.wikipedia.org/wiki/Stirling%27s_approximation     
      *  @param k  the nonnegative integer-valued argument to the factorial function
      */
@@ -187,7 +187,7 @@ object Combinatorics extends Error
     } // ramanujan
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the natural log factorial 'ln (k!' so 'k! = exp (logfac (k))'.
+    /** Compute the natural log factorial 'ln (k!)' so 'k! = exp (logfac (k))'.
      *  The formula is a log transformation of Ramanujan's Factorial Approximation.
      *  @param k  the value to take the log factorial of
      */
@@ -278,25 +278,24 @@ object Combinatorics extends Error
         gamma (a)
 
     } // gammaF
-/***
+
     // @see http://mathworld.wolfram.com/GammaFunction.html
-    def gammaF (a: Double): Double =
-    {
-        if (a <= 0) flaw ("gammaF", "only handle positive cases")
-        var prod = 1.0
-        val ia   = floor (a).toInt
-        val frac = a - floor (a)
-        if (frac < TOL) {
-            prod = fac (ia - 1)
-        } else if (approx (frac, .5)) {
-            for (i <- 2 to ia) prod *= 2.0 * i - 1.0
-            prod *= SQRT_PI / 2~^ia
-        } else {
-            flaw ("gammaF", "only handle positive integer and halves cases")
-        } // if
-        prod
-    } // gammaF
-***/
+//  def gammaF (a: Double): Double =
+//  {
+//      if (a <= 0) flaw ("gammaF", "only handle positive cases")
+//      var prod = 1.0
+//      val ia   = floor (a).toInt
+//      val frac = a - floor (a)
+//      if (frac < TOL) {
+//          prod = fac (ia - 1)
+//      } else if (approx (frac, .5)) {
+//          for (i <- 2 to ia) prod *= 2.0 * i - 1.0
+//          prod *= SQRT_PI / 2~^ia
+//      } else {
+//          flaw ("gammaF", "only handle positive integer and halves cases")
+//      } // if
+//      prod
+//  } // gammaF
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the 'k'th degree rising factorial of 'x'.  When 'x = 1', this is
@@ -327,7 +326,7 @@ object Combinatorics extends Error
      *  @see en.wikipedia.org/wiki/Hypergeometric_function
      *  For faster or more robust algorithms,
      *  @see people.maths.ox.ac.uk/porterm/research/pearson_final.pdf
-     *  @param a  the first paramater, a real/complex number
+     *  @param a  the first parameter, a real/complex number
      *  @param b  the second parameter, a real/complex number
      *  @param c  the third parameter, a real/complex number, may not be a negative integer
      *  @param z  the variable, a real/complex number s.t. |z| < 1
@@ -352,19 +351,17 @@ object Combinatorics extends Error
         } // match
     } // hyp2f1
 
-/***
-    def hyp2f1 (a: Double, b: Double, c: Double, z: Double): Double =
-    {
-        if (b == c) return (1.0-z)~^(-a)    // special cases
-
-        val MAX_ITER = 35
-        var sum      = 0.0
-        for (k <- 0 until MAX_ITER) {
-            sum += ((rfac (k, a) * rfac (k, b)) / rfac (k, c)) * (z~^k / fac (k))
-        } // for
-        sum
-    } // hyp2f1
-***/
+//  def hyp2f1 (a: Double, b: Double, c: Double, z: Double): Double =
+//  {
+//      if (b == c) return (1.0-z)~^(-a)    // special cases
+//
+//      val MAX_ITER = 35
+//      var sum      = 0.0
+//      for (k <- 0 until MAX_ITER) {
+//          sum += ((rfac (k, a) * rfac (k, b)) / rfac (k, c)) * (z~^k / fac (k))
+//      } // for
+//      sum
+//  } // hyp2f1
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the beta function 'B(a, b)' for the following two cases:

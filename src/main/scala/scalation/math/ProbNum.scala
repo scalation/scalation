@@ -36,15 +36,15 @@ case class ProbNum (x: Double, p: Double = 1.0)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add two probabilistic numbers.
-     *  @param xp  add xp to this
+     *  @param xp  add 'xp' to this
      */
     def + (xp: ProbNum) = ProbNum (x * p + xp.x * xp.p, p + xp.p)
 
     def plus (xp: ProbNum, yq: ProbNum) = xp + yq
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Substract two probabilistic numbers.
-     *  @param xp  subtract xp from this
+    /** Subtract two probabilistic numbers.
+     *  @param xp  subtract 'xp' from this
      */
     def - (xp: ProbNum) = ProbNum (x * p - xp.x * p, p + xp.p)
 
@@ -52,7 +52,7 @@ case class ProbNum (x: Double, p: Double = 1.0)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply two probabilistic numbers.
-     *  @param xp  multiply this times xp
+     *  @param xp  multiply this times 'xp'
      */
     def * (xp: ProbNum) = ProbNum (x * p * xp.x * xp.p, p + xp.p)
 
@@ -71,43 +71,43 @@ case class ProbNum (x: Double, p: Double = 1.0)
     def compare (xp: ProbNum, yq: ProbNum) =  xp.x compare yq.x
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare this probabilistic number with that probabilistic number yq.
+    /** Compare this probabilistic number with that probabilistic number 'yq'.
      *  @param yq  that probabilistic number
      */	
     def compare (yq: ProbNum) = x compare yq.x
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert the probabilistic number to a Double.
+    /** Convert the probabilistic number to a `Double`.
      *  @param xp  the probabilistic number to convert
      */
     def toDouble (xp: ProbNum) = xp.x
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert the probabilistic number to a Float.
+    /** Convert the probabilistic number to a `Float`.
      *  @param xp  the probabilistic number to convert
      */
     def toFloat (xp: ProbNum) = xp.x.asInstanceOf [Float]
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert the probabilistic number to a Long.
+    /** Convert the probabilistic number to a `Long`.
      *  @param xpc  the probabilistic number to convert
      */
     def toLong (xp: ProbNum) = xp.asInstanceOf [Long]
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert the probabilistic number to an Int.
+    /** Convert the probabilistic number to an `Int`.
      *  @param xp  the probabilistic number to convert
      */
     def toInt (xp: ProbNum) = xp.asInstanceOf [Int]
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a probabilistic number from an Int.
+    /** Create a probabilistic number from an `Int`.
      *  @param n  the integer used to create the probabilistic number.
      */
     def fromInt (n: Int) = ProbNum (n, 0.0)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert this probabilistic number to a String.
+    /** Convert this probabilistic number to a `String`.
      */
     override def toString = "ProbNum ( " + x + " , " + p + " )"
 

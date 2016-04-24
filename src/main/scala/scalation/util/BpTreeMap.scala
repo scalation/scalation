@@ -144,7 +144,7 @@ class BpTreeMap [K <% Ordered [K]: ClassTag, V: ClassTag] (order: Int = 5)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Optionally return the value in 'this' B+Tree map associated with the 
-     *  key 'key'.  Use 'apply' method to remove optionality.
+     *  key 'key'.  Use 'apply' method to remove optional.
      *  @param key  the key used for look up
      */
     def get (key: K): Option [V] = Option (find (key, root))
@@ -181,7 +181,7 @@ class BpTreeMap [K <% Ordered [K]: ClassTag, V: ClassTag] (order: Int = 5)
     //  P R I V A T E   M E T H O D S  -----------------------------------------
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Print 'this' B+Tree map using a pre-order traveral and indenting each level.
+    /** Print 'this' B+Tree map using a preorder traversal and indenting each level.
      *  @param n      the current node to print
      *  @param level  the current level in the B+Tree
      */
@@ -338,12 +338,11 @@ object BpTreeMapTest2 extends App
     val max     = 10 * totKeys
 
     // for unique random integers
-/***
-    import scalation.random.RandiU0         // comment out due to package dependency
-    val stream = 2
-    val rng    = RandiU0 (max, stream)
-    for (i <- 1 until totKeys) tree.put (rng.iigen (max), i * i)
-***/
+
+//  import scalation.random.RandiU0         // comment out due to package dependency
+//  val stream = 2
+//  val rng    = RandiU0 (max, stream)
+//  for (i <- 1 until totKeys) tree.put (rng.iigen (max), i * i)
 
     // for random integers
     import java.util.Random

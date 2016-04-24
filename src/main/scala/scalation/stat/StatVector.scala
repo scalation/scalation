@@ -200,7 +200,7 @@ class StatVector (val self: VectorD)
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `StatVector` companion object extends stat vector operations to matrices.
+/** The `StatVector` companion object extends statistics vector operations to matrices.
  */
 object StatVector
 {
@@ -215,7 +215,7 @@ object StatVector
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the sample covariance matrix for the columns of matrix 'x'.
-     *  @param x  the matrix whose column columns covariances are sought
+     *  @param x  the matrix whose column covariances are sought
      */
     def cov (x: MatrixD): MatrixD =
     {

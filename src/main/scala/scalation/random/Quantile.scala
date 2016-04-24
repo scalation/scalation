@@ -22,7 +22,7 @@ import CDF.{buildEmpiricalCDF, chiSquareCDF, fisherCDF}
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Quantile` object contains methods for computing 'Finv', the "inverse"
  *  Cumulative Distribution Functions (iCDF's) for popular sampling distributions:
- *  StandardNormal, StudentT, ChiSquare and Fisher.
+ *  `StandardNormal`, `StudentT`, `ChiSquare` and `Fisher`.
  *  For a given CDF 'F' and probability/quantile 'p', compute 'x' such that 'F(x) = p'.
  *  The iCDF may be thought of as giving value of 'x' for which the area under the
  *  curve from -infinity to 'x' of the probability density function (pdf) is equal to 'p'.
@@ -55,7 +55,7 @@ object Quantile
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the 'p'-th quantile for the Uniform distribution function.
      *  @param p   the p-th quantile, e.g., .95 (95%)
-     *  @param pr  parameters for the endpoints of the Uniform distribution
+     *  @param pr  parameters for the end-points of the `Uniform` distribution
      */
     def uniformInv (p: Double, pr: Parameters = null): Double =
     {
@@ -226,7 +226,7 @@ object Quantile
      *  This algorithm is less accurate than the one above.
      *-------------------------------------------------------------------------
      *  It is a transliteration of the 'STUDTP' function given in Appendix C
-     *  of "Principles of Discrete Event Simulation", G. S. Fishman, Wiley, 1978.
+     *  @see "Principles of Discrete Event Simulation", G. S. Fishman, Wiley, 1978.
      *-------------------------------------------------------------------------
      *  @param p   the p-th quantile, e.g., 95 (95%)
      *  @param pr  parameter for the degrees of freedom
@@ -349,7 +349,7 @@ object Quantile
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the 'p'-th quantile for "Fisher (F) distribution" function.
      *  @param p   the p-th quantile, e.g., .95 (95%)
-     *  @param df  the pair of degrees of freedom (df1 and df2)
+     *  @param df  the pair of degrees of freedom ('df1' and 'df2')
      */
     def fisherInv (p: Double, df: Tuple2 [Int, Int]): Double =
     {
@@ -368,9 +368,9 @@ trait QuantileTest
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the given iCDF 'fi' over a range of 'p' values for the given parameters
-     *  e.g., degrees of freedom (df).
-     *  @param fi     the iCDF Finv(.)
-     *  @param name   the name of iCDF Finv(.)
+     *  e.g., degrees of freedom 'df'.
+     *  @param fi     the iCDF 'Finv(.)'
+     *  @param name   the name of iCDF 'Finv(.)'
      *  @param pr     the parameters for the distribution, e.g., degrees of freedom
      */
     def test_df (fi: Distribution, name: String, pr: Parameters = null)

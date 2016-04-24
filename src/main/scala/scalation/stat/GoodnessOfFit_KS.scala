@@ -5,7 +5,7 @@
  *  @date    Tue Oct 20 13:28:57 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *-----------------------------------------------------------------------------
- *  GoodnessOfFit_KS:  KS goodness of fit test
+ *  `GoodnessOfFit_KS`:  KS goodness of fit test
  *  @see also `GoodnessOfFit_CS`, `GoodnessOfFit_CS2`
  */
 
@@ -60,7 +60,7 @@ object GoodnessOfFit_KS
     } // lilliefors
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Cummulative Distribution Function (CDF) for 'P(D_n < d)'.
+    /** Compute the Cumulative Distribution Function (CDF) for 'P(D_n < d)'.
      *  It can used for p-values or critical values for the KS test.
      *  Translated from C code given in paper below.
      *  @see www.jstatsoft.org/article/view/v008i18/kolmo.pdf
@@ -106,7 +106,7 @@ object GoodnessOfFit_KS
      *  Translated from C code given in paper below.
      *  @see www.jstatsoft.org/article/view/v008i18/kolmo.pdf
      *  @param a   the matrix whose n-th power is sought
-     *  @patam eA  the initial shift on the exponent
+     *  @param eA  the initial shift on the exponent
      *  @param n   the power to raise the matrix a to
      */
     private def mPower (a: MatrixD, eA: Int, n: Int): Tuple2 [MatrixD, Int] =
@@ -126,7 +126,7 @@ object GoodnessOfFit_KS
 import GoodnessOfFit_KS._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `GoodnessOfFit_KS` class is used to fit data to a probability distibution.
+/** The `GoodnessOfFit_KS` class is used to fit data to a probability distribution.
  *  It uses the Kolmogorov-Smirnov Goodness of Fit Test.  Determine the maximum
  *  absolute difference 'd_max' between the data points 'd_i' and the theoretical
  *  value from a CDF F,
@@ -135,7 +135,7 @@ import GoodnessOfFit_KS._
  *  <p>
  *      d_max = max 1≤i≤n {F(d_i) − (i−1)/n, i/n − F(d_i)}       (calculation)
  *  <p>
- *  where Fe(.) is the empirical distribution and F(.) is the theorectical distribution.
+ *  where 'Fe(.)' is the empirical distribution and 'F(.)' is the theoretical distribution.
  *  If 'd_max' is large, the fit should be rejected.
  *  @see www.eg.bucknell.edu/~xmeng/Course/CS6337/Note/master/node66.html
  *  @see www.itl.nist.gov/div898/handbook/eda/section3/eda35g.htm
@@ -156,9 +156,9 @@ class GoodnessOfFit_KS (private var d: VectorD, makeStandard: Boolean = true)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform a KS goodness of fit test, matching the CDF of the given data 'd' with
-     *  the random variable's Cummulative Distribritution Function (CDF).
+     *  the random variable's Cumulative Distribution Function (CDF).
      *  @see www.usna.edu/Users/math/dphillip/sa421.f13/chapter02.pdf
-     *  @param cdf    the Cummulative Distribritution Function to test
+     *  @param cdf    the Cumulative Distribution Function to test
      *  @param parms  the parameters for the distribution
      */
     def fit (cdf: Distribution, parms: Parameters = null): Double =
@@ -167,11 +167,9 @@ class GoodnessOfFit_KS (private var d: VectorD, makeStandard: Boolean = true)
         println ("Test goodness of fit for " + cdf.getClass.getSimpleName ())
         println ("-------------------------------------------------------------")
 
-/*******
-        val ey = eCDF._2
-        val y = VectorD ((for (x: Double <- eCDF._1) yield cdf (x, parms)).toSeq)
-        val d_max = (ey - y).mag                          // maximum absolute difference
-*******/
+//      val ey = eCDF._2
+//      val y = VectorD ((for (x: Double <- eCDF._1) yield cdf (x, parms)).toSeq)
+//      val d_max = (ey - y).mag                          // maximum absolute difference
 
         d.sort ()
         val d_max = d.indices.map (i => {
@@ -184,11 +182,9 @@ class GoodnessOfFit_KS (private var d: VectorD, makeStandard: Boolean = true)
             println ("d_max = " + d_max)                  // maximum absolute distance
         } // if
 
-/*******
-        val critical = lilliefors (d_max, n)              // approximate critical value
-        println (s"d_max = $d_max <=? critical = $critical")
-        d_max <= critical                                 // false => null hypothesis rejected
-*******/
+//      val critical = lilliefors (d_max, n)              // approximate critical value
+//      println (s"d_max = $d_max <=? critical = $critical")
+//      d_max <= critical                                 // false => null hypothesis rejected
 
         1.0 - ksCDF (d_max, n)                            // p-value for the KS Test
     } // fit

@@ -50,8 +50,8 @@ case class Random2 (stream: Int = 0)
     private var x23    = x(5)                          // x_i-3 for MRG2
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the next random number as a real (Double) in the interval (0, 1).
-     *  This calculation uses 32-bit integers (Int).
+    /** Return the next random number as a real `Double` in the interval (0, 1).
+     *  This calculation uses 32-bit integers `Int`.
      */
     def gen: Double =
     {
@@ -82,7 +82,7 @@ case class Random2 (stream: Int = 0)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the next stream value as an integer.
-     *  This calculation uses 32-bit integers (Int).
+     *  This calculation uses 32-bit integers `Int`.
      */
     def igen: Int =
     {

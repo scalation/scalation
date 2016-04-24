@@ -49,7 +49,7 @@ case class QArrow (var p1:  R2  = R2 (0.0, 0.0),
     } // primary constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a QArrow (quad arc) where bend indicates the distance to the
+    /** Construct a `QArrow` (quad arc) where bend indicates the distance to the
      *  control point.
      *  @param p1    the starting point for the curve/arc
      *  @param p2    the ending point for the curve/arc
@@ -79,7 +79,7 @@ case class QArrow (var p1:  R2  = R2 (0.0, 0.0),
     } // getCenterY
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set (or reset) the location for the QArrow as a line.
+    /** Set (or reset) the location for the `QArrow` as a line.
      *  @param _p1   the starting point
      *  @param _p2   the ending point
      */
@@ -91,7 +91,7 @@ case class QArrow (var p1:  R2  = R2 (0.0, 0.0),
     } // setLine
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set (or reset) the location for the QArrow as a curve using bend
+    /** Set (or reset) the location for the `QArrow` as a curve using bend
      *  to compute the control point.
      *  @param _p1   the starting point
      *  @param _p2   the ending point
@@ -105,7 +105,7 @@ case class QArrow (var p1:  R2  = R2 (0.0, 0.0),
     } // setLine
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set (or reset) the location for the QArrow as a curve using an explicitly
+    /** Set (or reset) the location for the `QArrow` as a curve using an explicitly
      *  given control point.
      *  @param _p1  the starting point
      *  @param _pc  the control point
@@ -154,12 +154,12 @@ object QArrowTest extends App
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         /** Paint the components into the canvas (drawing panel).
-         *  @param gr  low-res graphics environment
+         *  @param gr  low-resolution graphics environment
          */
         override def paintComponent (gr: Graphics)
         {
             super.paintComponent (gr)
-            val g2d = gr.asInstanceOf [Graphics2D]            // use hi-res
+            val g2d = gr.asInstanceOf [Graphics2D]            // use hi-resolution
             g2d.setPaint (red)
             g2d.draw (arc1)
             g2d.setPaint (orange)

@@ -12,7 +12,8 @@ import util.Random
  
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Colors` convenience object defines numerous common colors.
- *  Source of colors:  http://www.webmoments.com/colorchart.htm
+ *  Source of colors:
+ *  @see www.webmoments.com/colorchart.htm
  */
 object Colors
 {

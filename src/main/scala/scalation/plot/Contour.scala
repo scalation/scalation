@@ -17,10 +17,10 @@ import scalation.scala2d.Colors._
 import scalation.scala2d.Shapes.{BasicStroke, Dimension, Graphics, Graphics2D}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Contour` class takes a function 'f' and diplays color-coded values for
+/** The `Contour` class takes a function 'f' and displays color-coded values for
  *  'f(x, y)' over a two dimensional grid defined the lower 'lb' and upper 'ub' bounds.
  *  An optional path is included that can be used to show, for example, the
- *  search path taken by an optimzer (e.g., a Conjugate Gradient NLP solver).
+ *  search path taken by an optimizer (e.g., a Conjugate Gradient NLP solver).
  *  @param f       the function whose color-coded contour plot is sought
  *  @param lb      the lower bounds on the plotting domain
  *  @param ub      the upper bounds on the plotting domain
@@ -65,7 +65,7 @@ class Contour (f: VectoD => Double, lb: VectoD, ub: VectoD, path: List [VectoD] 
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         /** Paint the canvas by plotting the data points.
-         *  @param gr  low-res graphics environment
+         *  @param gr  low-resolution graphics environment
          */
         override def paintComponent (gr: Graphics)
         {
@@ -152,8 +152,8 @@ class Contour (f: VectoD => Double, lb: VectoD, ub: VectoD, path: List [VectoD] 
     } // primary constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Reset the bounds on the functional values of f.  If the caller fails to
-     *  provide an estimate for deltaF, this method should be called.
+    /** Reset the bounds on the functional values of 'f'.  If the caller fails to
+     *  provide an estimate for 'deltaF', this method should be called.
      */
     def resetBounds ()
     {

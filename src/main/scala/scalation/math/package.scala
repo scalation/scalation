@@ -20,8 +20,8 @@ import math.ExtremeD.{MIN_NORMAL, EPSILON, TOL}    // smallest full precision, m
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `math` package contains classes, traits and objects for common mathematical
- *  operations.  Its package object defines exponentiation/logarithmic operators
- *  and functions.
+ *  operations.  Its package object defines exponentiation, logarithmic, trigonometric,
+ *  etc. operators and functions.
  */
 package object math
 {
@@ -36,54 +36,6 @@ package object math
     /** The natural log of 10
      */
     val log_10 = log (10.0)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The `Int_Exp` value class adds an exponentiation operator 'x ~^ y' and a
-     *  near_eq operator 'x =~ y' to `Int`.
-     *  The '~^' has higher precedence than '*' or '/'.
-     *  @param self  the underlying object to be accessed via the self accessor
-     */
-    class Int_Exp (val self: Int) extends AnyVal
-    { 
-        def ~^ (y: Int)     = scala.math.pow (self, y).toInt 
-        def =~ (y: Double)  = near_eq (self, y)
-        def !=~ (y: Double) = ! near_eq (self, y)
-        def ≠ (y: Int)      = self != y
-        def ≤ (y: Int)      = self <= y
-        def ≥ (y: Int)      = self >= y
-    } // Int_Exp class
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The `Long_Exp` value class adds an exponentiation operator 'x ~^ y' and a
-     *  near_eq operator 'x =~ y' to `Long`.
-     *  The '~^' has higher precedence than '*' or '/'.
-     *  @param self  the underlying object to be accessed via the self accessor
-     */
-    class Long_Exp (val self: Long) extends AnyVal
-    {
-        def ~^ (y: Long)    = pow (self, y) 
-        def =~ (y: Double)  = near_eq (self, y)
-        def !=~ (y: Double) = ! near_eq (self, y)
-        def ≠ (y: Long)     = self != y
-        def ≤ (y: Long)     = self <= y
-        def ≥ (y: Long)     = self >= y
-    } // Long_Exp class
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The `Double_Exp` value class adds an exponentiation operator 'x ~^ y' and
-     *  a near_eq operator 'x =~ y' to `Double`.
-     *  The '~^' has higher precedence than '*' or '/'.
-     *  @param self  the underlying object to be accessed via the self accessor
-     */
-    case class Double_Exp (val self: Double)
-    {
-        def ~^ (y: Double)  = scala.math.pow (self, y)
-        def =~ (y: Double)  = near_eq (self, y)
-        def !=~ (y: Double) = ! near_eq (self, y)
-        def ≠ (y: Double)   = self != y
-        def ≤ (y: Double)   = self <= y
-        def ≥ (y: Double)   = self >= y
-    } // Double_Exp class
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Implicit conversion from 'Int' to 'Int_Exp', which supports exponentiation
@@ -114,7 +66,7 @@ package object math
     /** Determine whether two double precision floating point numbers 'x' and 'y'
      *  are nearly equal.  Two numbers are considered to be nearly equal, if within
      *  '2 EPSILON'.  A number is considered to be nearly zero, if within '2 MIN_NORMAL'.
-     *  To accomadate round-off errors, may use 'TOL' instead of 'EPSILON'.
+     *  To accommodate round-off errors, may use 'TOL' instead of 'EPSILON'.
      *--------------------------------------------------------------------------
      *  @see `BasicTest`
      *  @see stackoverflow.com/questions/4915462/how-should-i-do-floating-point-comparison
@@ -190,7 +142,7 @@ package object math
     } // root
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Negative exponential funtion (e to the minus 'x').
+    /** Negative exponential function (e to the minus 'x').
      *  @param x  the argument of the function
      */
     def nexp (x: Double) = scala.math.exp (-x)

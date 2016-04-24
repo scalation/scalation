@@ -5,11 +5,11 @@
  *  @date    Sun Aug 23 15:42:06 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *
- *  An implementation supporting columnar relational databases faciltating easy
+ *  An implementation supporting columnar relational databases facilitating easy
  *  and rapid analytics.  The columns in a relation are vectors from the
  *  `scalation.linalgebra` package.  Vectors and matrices may be readily extracted
  *  from a relation and feed into any of the numerous analytics techniques provided
- *  in `scalation.analytics`.  The implemenation provides most of the columnar
+ *  in `scalation.analytics`.  The implementation provides most of the columnar
  *  relational algebra operators given in the following paper:
  *  @see db.csail.mit.edu/projects/cstore/vldb.pdf
  *
@@ -39,17 +39,17 @@ object TableObj
      */
     type Row = Vector [Any]
 
-    /** Filename extension for serialized relations
+    /** File-name extension for serialized relations
      *  FIX: investigate using more efficient serialization, e.g.,
      *  @see github.com/EsotericSoftware/kryo
      */
     val SER = ".ser"
 
-    /** Filename extension for CSV data files
+    /** File-name extension for CSV data files
      */
     val CSV = ".csv"
 
-    /** Filename extension for JSON data files
+    /** File-name extension for JSON data files
      */
     val JSON = ".json"
 
@@ -109,20 +109,20 @@ import TableObj._
  *  columns of the columnar relational datastore.  Columns may have any of the
  *  following types:
  *  <p>
- *      C - Complex  - VectorC - 128 bit complex number a + bi
- *      D - Double   - VectorD -  64 bit double precision floating point number
- *      I - Int      - VectorI -  32 bit integer
- *      L - Long     - VectorL -  64 bit long integer
- *      Q - Rational - VectorQ - 128 bit ratio of two long integers
- *      R - Real     - VectorR - 128 bit quad precision floating point number
- *      S - StrNum   - VectorS - variable length numeric string
+ *      C - `Complex`  - `VectorC` - 128 bit complex number a + bi
+ *      D - `Double`   - `VectorD` -  64 bit double precision floating point number
+ *      I - `Int`      - `VectorI` -  32 bit integer
+ *      L - `Long`     - `VectorL` -  64 bit long integer
+ *      Q - `Rational` - `VectorQ` - 128 bit ratio of two long integers
+ *      R - `Real`     - `VectorR` - 128 bit quad precision floating point number
+ *      S - `StrNum`   - `VectorS` - variable length numeric string
  *  <p>
  *------------------------------------------------------------------------------
  *  @param name     the name of the relation
  *  @param colName  the names of columns
  *  @param col      the Scala Vector of columns making up the columnar relation
  *  @param key      the column number for the primary key (< 0 => no primary key)
- *  @param domain   an optional string indicating domains for columns (e.g., SD = StrNum, Double) 
+ *  @param domain   an optional string indicating domains for columns (e.g., 'SD' = `StrNum`, `Double`) 
  */
 trait Table
 {
@@ -159,7 +159,7 @@ trait Table
     /** Select elements from column 'cName' in 'this' relation that satisfy the
      *  predicate 'p' and project onto that column.
      *  @param cName  the name of the column used for selection
-     *  @param p      the predicate (Boolean function) to be satisfied
+     *  @param p      the predicate (`Boolean` function) to be satisfied
      */
     def pisigmaC (cName: String, p: Complex => Boolean): Table
 
@@ -179,7 +179,7 @@ trait Table
     /** Select elements from columns in 'cName' in 'this' relation that satisfy
      *  the predicate 'p'.
      *  @param cName  the name of the column used for selection
-     *  @param p      the predicate (Boolean function) to be satisfied
+     *  @param p      the predicate (`Boolean` function) to be satisfied
      */
     def sigma [T <: Any] (cName: String, p: T => Boolean): Table
 
@@ -187,7 +187,7 @@ trait Table
     /** Select elements from columns in 'cName' in 'this' relation that satisfy
      *  the predicate 'p'.
      *  @param cName  the name of the column used for selection
-     *  @param p      the predicate (Boolean function) to be satisfied
+     *  @param p      the predicate (`Boolean` function) to be satisfied
      */
     def σ [T <: Any] (cName: String, p: T => Boolean): Table
 
@@ -195,7 +195,7 @@ trait Table
     /** Select elements from columns in 'cName' in 'this' relation that satisfy
      *  the predicate 'p'.
      *  @param cName  the name of the column used for selection
-     *  @param p      the predicate (Boolean function) to be satisfied
+     *  @param p      the predicate (`Boolean` function) to be satisfied
      */
     def sigmaC (cName: String, p: Complex => Boolean): Table
 
@@ -215,7 +215,7 @@ trait Table
     /** Select the positions of elements from columns in 'cName' in 'this' relation
      *  that satisfy the predicate 'p'.
      *  @param cName  the name of the column used for selection
-     *  @param p      the predicate (Boolean function) to be satisfied
+     *  @param p      the predicate (`Boolean` function) to be satisfied
      */
     def selectC (cName: String, p: Complex => Boolean): Seq [Int]
 
@@ -305,21 +305,21 @@ trait Table
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Join 'this' relation and 'r2 by performing a "natural-join".  Rows from both
-     *  relations are compared requiring agreement on common attibutes (column names).
+     *  relations are compared requiring agreement on common attributes (column names).
      *  @param r2  the rhs relation in the join operation
      */
     def >< (r2: Table): Table
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Join 'this' relation and 'r2 by performing a "natural-join".  Rows from both
-     *  relations are compared requiring agreement on common attibutes (column names).
+     *  relations are compared requiring agreement on common attributes (column names).
      *  @param r2  the rhs relation in the join operation
      */
     def ⋈ (r2: Table): Table
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Combine two sequences of column names, disambiguating any repeated names by
-     *  appending "2".
+    /** Combine two sequences of column names and disambiguate any repeated names
+     *  by appending "2".
      *  @param cn1  the first sequence of column names
      *  @param cn2  the second sequence of column names 
      */
@@ -352,7 +352,7 @@ trait Table
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a row by pulling values from all columns at position 'i'.
-     *  @param i  the ith position
+     *  @param i  the 'i'th position
      */
     def row (i: Int): Row
 
@@ -360,7 +360,7 @@ trait Table
     /** Create a row by pulling values from an array of strings and converting
      *  elements to their appropriate types.
      *  @param sos   the sequence of strings holding the values
-     *  @param _typ  the string of corresponding types, e.g., "SDI"
+     *  @param _typ  the string of corresponding types, e.g., 'SDI'
      */
     def row (sos: Seq [String], _typ: String): Row =
     {
@@ -379,9 +379,9 @@ trait Table
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'tuple to 'this' relation as a new row.
-     *  FIX:  want an efficient, covariant, mutable data structue, but Array is invariant.
+     *  FIX:  want an efficient, covariant, mutable data structure, but `Array` is invariant.
      *  @param tuple  an aggregation of columns values (new row)
-     *  @param typ    the string of corresponding types, e.g., "SDI"
+     *  @param typ    the string of corresponding types, e.g., 'SDI'
      */
     def add (tuple: Row)
 

@@ -67,7 +67,7 @@ abstract class VariateVec (stream: Int = 0)
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `ProbabilityVec` class generates a probability vector where the ith
+/** The `ProbabilityVec` class generates a probability vector where the 'i'th
  *  probability is '1/n' with a +/- randomizing displacement of at most 'd'.
  *  Note, the probability vector must add to one.
  *  @param n  the dimension/size of the probability vector
@@ -206,7 +206,7 @@ case class PermutedVecI (x: VectorI, stream: Int = 0)
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RandomVecD` class generates a random vector of doubles.
  *  Ex: (3.0, 2.0, 0.0, 4.0, 1.0) has 'dim' = 5 and 'max' = 4.
- *  @param dim      the dimesnion/size of the vector (number of elements)
+ *  @param dim      the dimension/size of the vector (number of elements)
  *  @param max      generate integers in the range min (inclusive) to max (inclusive)
  *  @param min      generate integers in the range min (inclusive) to max (inclusive)
  *  @param density  sparsity basis = 1 - density
@@ -281,7 +281,7 @@ case class RandomVecI (dim: Int = 10, max: Int = 20, min: Int = 10, skip: Int = 
  *  which generalize Bernoulli trials ({0, 1} to the case where the outcome is
  *  in {0, 1, ..., k-1}.
  *  @see http://www.math.uah.edu/stat/bernoulli/Multinomial.html
- *  @param p       array of cummulative probabilities as CDF values
+ *  @param p       array of cumulative probabilities as CDF values
  *  @param n       the number of independent trials
  *  @param stream  the random number stream
  */
