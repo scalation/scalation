@@ -13,13 +13,13 @@ import math.max
 import scalation.linalgebra.VectorI
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class performs local search to find minima of functions defined on
- *  integer vector domains (z^n).
+/** The `IntegerLocalSearch` class performs local search to find minima of functions
+ *  defined on integer vector domains (z^n).
  *
  *  minimize    f(x)
  *  subject to  g(x) <= 0, x in Z^n
  *
- *  @param f        the objective function to be minimize (f maps an integer vector to a double)
+ *  @param f        the objective function to be minimize ('f' maps an integer vector to a double)
  *  @param g        the constraint function to be satisfied, if any
  *  @param maxStep  the maximum/starting step size (make larger for larger domains)
  */
@@ -44,8 +44,8 @@ class IntegerLocalSearch (f: VectorI => Double,
     private val maxIter = 4 * maxStep * maxStep     // maxStep = 5 => MaxIter = 100
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The objective function f re-scaled by a weighted penalty, if constrained.
-     *  @param x  the coordinate values of the currrent point
+    /** The objective function 'f' re-scaled by a weighted penalty, if constrained.
+     *  @param x  the coordinate values of the current point
      */
     def fg (x: VectorI): Double =
     {
@@ -58,11 +58,11 @@ class IntegerLocalSearch (f: VectorI => Double,
     } // fg
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Find a minimal neighbor of the current point x that is a distance step away.
-     *  Let x be the current point with y being a step down and x being a step up
-     *  in dimension i.  Recurse to handle all of the dimensions.
+    /** Find a minimal neighbor of the current point 'x' that is a distance step away.
+     *  Let 'x' be the current point with 'y' being a step down and 'x' being a step
+     *  up in dimension 'i'.  Recurse to handle all of the dimensions.
      *  @param x_f0  the current pair (the point and its functional value)
-     *  @param i     the i-th dimension or coordinate (facilitates recursion)
+     *  @param i     the 'i'th dimension or coordinate (facilitates recursion)
      *  @param step  examine points that are this far away
      */
     def minNeighbor (x_f0: Vec_Func, i: Int, step: Int = 1): Vec_Func =
@@ -115,7 +115,8 @@ class IntegerLocalSearch (f: VectorI => Double,
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the IntegerLocalSearch class (unconstrained).
+/** The `IntegerLocalSearchTest` object is used to test the `IntegerLocalSearch` class
+ *  (unconstrained).
  */
 object IntegerLocalSearchTest extends App
 {
@@ -128,7 +129,8 @@ object IntegerLocalSearchTest extends App
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the IntegerLocalSearch class (constrained).
+/** The `IntegerLocalSearchTest2` object is used to test the `IntegerLocalSearch` class
+ *  (constrained).
  */
 object IntegerLocalSearchTest2 extends App
 {

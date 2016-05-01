@@ -14,8 +14,8 @@ import scalation.linalgebra.VectorD.one
 import RegTechnique._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** A Generalized Linear Model (GZLM) can be developed using the `GZLM` object.
- *  It provides factory methods for General Linear Models (GLM) via inheritance
+/** A Generalized Linear Model 'GZLM' can be developed using the `GZLM` object.
+ *  It provides factory methods for General Linear Models 'GLM' via inheritance
  *  and for proper Generalized Linear Models:
  *  `LogisticRegression` - logistic regression,
  *  `PoissonRegression`  - Poisson regression,
@@ -42,7 +42,7 @@ object GZLM extends GLM
      *  @param x        the input/design m-by-n matrix
      *  @param y        the integer response vector, y_i in {0, 1, ... }
      *  @param fn       the names for all factors
-     *  @param poisson  whether it is PoissonRegression
+     *  @param poisson  whether it is `PoissonRegression`
      */
     def apply (x: MatrixD, y: VectorI, fn: Array [String], poisson: Boolean): PoissonRegression =
     {

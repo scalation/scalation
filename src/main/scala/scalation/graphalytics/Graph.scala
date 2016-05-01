@@ -16,7 +16,7 @@ import LabelType.TLabel
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Graph` class stores vertex-labeled directed graphs using an adjacency
- *  set ('ch') representation, e.g., ch = { {1, 2}, {0}, {1} } means that the
+ *  set 'ch' representation, e.g., 'ch = { {1, 2}, {0}, {1} }' means that the
  *  graph has the following edges { (0, 1), (0, 2), (1, 0), (2, 1) }.
  *  Optionally, inverse adjacency via the 'pa' array can be stored at the cost
  *  of nearly doubling the storage requirements.
@@ -69,7 +69,7 @@ class Graph (val ch:      Array [SET [Int]],
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given an array of labels, return an index from labels to the sets of
      *  vertices containing those labels.
-     *  @param label  the array of vertex labels of type TLabel
+     *  @param label  the array of vertex labels of type `TLabel`
      */
     def buildLabelMap (label: Array [TLabel]): Map [TLabel, SET [Int]] =
     {
@@ -101,7 +101,8 @@ class Graph (val ch:      Array [SET [Int]],
     def isConnected: Boolean = (new GraphDFS (this)).weakComps == 1
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check whether the endpoint vertex id of each edge is within bounds: 0..maxId.
+    /** Check whether the end-point vertex id of each edge is within bounds:
+     *  0 .. 'maxId'.
      */
     def checkEdges: Boolean =
     {
@@ -142,7 +143,7 @@ class Graph (val ch:      Array [SET [Int]],
 
    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert the 'i'th row/line of 'this' graph to a string.
-     *  @param i     the ith row/line
+     *  @param i     the 'i'th row/line
      *  @param clip  whether to clip out "Set(" and ")"
      */
     def toLine (i: Int, clip: Boolean = true): String =

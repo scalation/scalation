@@ -16,7 +16,8 @@
  *  Some of the operators have unicode versions: @see `scalation.util.UnicodeTest`
  */
 
-package scalation.relalgebra
+package scalation
+package relalgebra
 
 import java.io.{FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream, PrintWriter}
 
@@ -27,7 +28,7 @@ import scalation.linalgebra.MatrixKind._
 import scalation.linalgebra.mem_mapped._
 import scalation.math.{Complex, Rational, Real}
 import scalation.math.StrO._
-import scalation.util.{DATA_DIR, getFromURL_File, STORE_DIR, Error, SEP}
+import scalation.util.{getFromURL_File, Error}
 
 import TableObj._
 
@@ -1014,7 +1015,7 @@ object MM_RelationTest extends App
     println ("--------------------------------------------")
     println ("week >< weekend                           = " + (week >< weekend))
 
-    week.writeCSV ("relalgebra" + SEP + "week.csv")
+    week.writeCSV ("relalgebra" + ⁄ + "week.csv")
 
 } // MM_RelationTest object
 

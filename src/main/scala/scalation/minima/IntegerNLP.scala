@@ -16,20 +16,20 @@ import scalation.calculus.Calculus.FunctionV2S
 import scalation.linalgebra.VectorD
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class solves Integer Non-Linear Programming (INLP) and Mixed Integer
+/** This `IntegerNLP`solves Integer Non-Linear Programming (INLP) and Mixed Integer
  *  Linear Non-Programming (MINLP) problems recursively using the Simplex algorithm.
- *  First, an NLP problem is solved.  If the optimal solution vector x is
- *  entirely integer valued, the INLP is solved.  If not, pick the first x_j
- *  that is not integer valued.  Define two new NLP problems which bound x_j
+ *  First, an NLP problem is solved.  If the optimal solution vector 'x' is
+ *  entirely integer valued, the INLP is solved.  If not, pick the first 'x_j'
+ *  that is not integer valued.  Define two new NLP problems which bound 'x_j'
  *  to the integer below and above, respectively.  Branch by solving each of
  *  these NLP problems in turn.  Prune by not exploring branches less optimal
  *  than the currently best integer solution.  This technique is referred to
  *  as Branch and Bound.  An exclusion set may be optionally provided for
  *  MINLP problems.
  *
- *  Given an objective function f(x) and a constraint function g(x),
+ *  Given an objective function 'f(x)' and a constraint function 'g(x)',
  *  find values for the solution/decision vector 'x' that minimize the
- *  objective function f(x), while satisfying the constraint function, i.e.,
+ *  objective function 'f(x)', while satisfying the constraint function, i.e.,
  *
  *  minimize    f(x) 
  *  subject to  g(x) <= 0, some x_i must integer-valued
@@ -61,7 +61,7 @@ class IntegerNLP (f: FunctionV2S, n: Int, var g: FunctionV2S = null, excl: Set [
     /** Add a new constraint to the current set of bounding constraints: x_j - bound <= 0
      *  or x_j - bound >= 0 (e.g., x_1 - 2 <= 0 or x_0 - 4 >= 0).
      *  @param j      the index of variable x_j
-     *  @param le     whether it is a "less than or equal to" (le) constraint
+     *  @param le     whether it is a "less than or equal to" 'le' constraint
      *  @param bound  the bounding value
      */
     def addConstraint (j: Int, le: Boolean, bound: Double): Boolean =
@@ -118,8 +118,8 @@ class IntegerNLP (f: FunctionV2S, n: Int, var g: FunctionV2S = null, excl: Set [
     } // fractionalVar
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve the Mixed Integer Nonlinear Linear Programming (MINLP) problem by using
-     *  Branch and Bound and an NLP Algorithm (e.g., QuasiNewton), recursively.
+    /** Solve the Mixed Integer Non-linear, Linear Programming (MINLP) problem by using
+     *  Branch and Bound and an NLP Algorithm, e.g., `QuasiNewton`, recursively.
      *  @param dp  the current depth of recursion
      *  @param gb  the supplementary constraint function formed from bounds
      */
@@ -172,7 +172,7 @@ class IntegerNLP (f: FunctionV2S, n: Int, var g: FunctionV2S = null, excl: Set [
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the IntegerNLP class.
+/** The `IntegerNLPTest` object is used to test the `IntegerNLP` class.
  *  real solution    x = (.8, 1.6), f = 8.8
  *  integer solution x = (2, 1),    f = 10
  *  @see Linear Programming and Network Flows, Example 6.14

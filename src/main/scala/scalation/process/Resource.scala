@@ -38,12 +38,12 @@ class Resource (name: String, line: WaitQueue, private var units: Int, serviceTi
     private var inUse = 0
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Auxiliary constructor that uses defaults for width (w) and height (h).
+    /** Auxiliary constructor that uses defaults for width 'w' and height 'h'.
      *  @param name         the name of the resource
      *  @param line         the line/queue where entities wait
      *  @param units        the number of service units (e.g., bank tellers)
      *  @param serviceTime  the service time distribution
-     *  @param xy           the (x, y) coordinates for the top-left corner of the resourse.
+     *  @param xy           the (x, y) coordinates for the top-left corner of the resource.
      */
     def this (name: String, line: WaitQueue, units: Int, serviceTime: Variate,
               xy: Tuple2 [Double, Double])
@@ -52,7 +52,7 @@ class Resource (name: String, line: WaitQueue, private var units: Int, serviceTi
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Change the number of units in this resourse (e.g., add a teller).
+    /** Change the number of units in 'this' resource (e.g., add a teller).
      *  @param dUnits  the number of units to add (+ve) or remove (-ve)
      */
     def changeUnits (dUnits: Int)
@@ -64,7 +64,7 @@ class Resource (name: String, line: WaitQueue, private var units: Int, serviceTi
     } // changeUnits
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Tell the animation engine to display this Resource.
+    /** Tell the animation engine to display 'this' resource.
      */
     def display ()
     {
@@ -72,14 +72,14 @@ class Resource (name: String, line: WaitQueue, private var units: Int, serviceTi
     } // display
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine whether the Resource is busy (no units available).
+    /** Determine whether 'this' resource is busy (no units available).
      */
     def busy = inUse == units
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Utilize the Resource for a period of time (models an activity).
+    /** Utilize 'this' resource for a period of time (models an activity).
      *  The duration (service time) is randomly generated according to the
-     *  Resource's service time distribution.
+     *  resource's service time distribution.
      */
     def utilize ()
     {
@@ -96,7 +96,7 @@ class Resource (name: String, line: WaitQueue, private var units: Int, serviceTi
     } // utilize
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Utilize the Resource for a given period of time (models an activity).
+    /** Utilize 'this' resource for a given period of time (models an activity).
      *  @param duration  the given service time
      */
     def utilize (duration: Double)
@@ -112,7 +112,7 @@ class Resource (name: String, line: WaitQueue, private var units: Int, serviceTi
     } // utilize
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Release the Resource after service is finished (also check waiting queue).
+    /** Release 'this' resource after service is finished (also check wait-queue).
      */
     def release ()
     {
@@ -135,12 +135,12 @@ class Resource (name: String, line: WaitQueue, private var units: Int, serviceTi
 object Resource
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a resource using defaults for width (w) and heigth (h).
+    /** Create a resource using defaults for width 'w' and height 'h'.
      *  @param name         the name of the resource
      *  @param line         the line/queue where entities wait
      *  @param units        the number of service units (e.g., bank tellers)
      *  @param serviceTime  the service time distribution
-     *  @param xy           the (x, y) coordinates for the top-left corner of the resourse.
+     *  @param xy           the (x, y) coordinates for the top-left corner of the resource.
      */
     def apply (name: String, line: WaitQueue, units: Int, serviceTime: Variate,
               xy: Tuple2 [Int, Int]): Resource =
@@ -150,7 +150,7 @@ object Resource
     } // apply
 
    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a group of related resources using defaults for width (w) and heigth (h).
+    /** Create a group of related resources using defaults for width 'w' and height 'h'.
      *  @param serviceTime  the service time distribution
      *  @param xy           the (x, y) coordinates for the top-left corner of the reference resource.
      *  @param rsc          repeated resource specific info: name, line, units, offset

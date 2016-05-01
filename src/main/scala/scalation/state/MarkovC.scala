@@ -20,12 +20,12 @@ import scalation.scala2d.Colors._
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class supports the creation and use of Continuous-Time Markov Chains
- *  (CTMC).  Note: the transition matrix tr gives the state transition rates
+/** The `MarkovC` class supports the creation and use of Continuous-Time Markov Chains
+ *  'CTMC's.  Note: the transition matrix 'tr' gives the state transition rates
  *  off-diagonal.  The diagonal elements must equal minus the sum of the rest
- *  of their row.  Transient solution: Solve the Chapman-Kolmogorov differemtial
- *  equations.  Equilibrium solution (steady-state): solve for p in p * tr = 0.
- *  See: www.math.wustl.edu/~feres/Math450Lect05.pdf
+ *  of their row.  Transient solution: Solve the Chapman-Kolmogorov differential
+ *  equations.  Equilibrium solution (steady-state): solve for 'p' in 'p * tr = 0'.
+ *  @see www.math.wustl.edu/~feres/Math450Lect05.pdf
  *  @param tr  the transition rate matrix
  */
 class MarkovC (tr: MatrixD) extends Error
@@ -34,7 +34,7 @@ class MarkovC (tr: MatrixD) extends Error
      */
     private val EPSILON = 1E-7
 
-    /** The jump matrix derived from the transition rate matrix (tr)
+    /** The jump matrix derived from the transition rate matrix 'tr'
      */
     val jump = new MatrixD (tr.dim1, tr.dim2)
    
@@ -80,7 +80,7 @@ class MarkovC (tr: MatrixD) extends Error
      */
     private val aniQ = dgAni.getCommandQueue
 
-    /** Amount of bend in the QArrow
+    /** Amount of bend in the `QArrow`
      */
     private val bend = .25
 
@@ -95,9 +95,9 @@ class MarkovC (tr: MatrixD) extends Error
     } // next
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the limiting probabilistic state as t -> infinity, by finding the
-     *  left nullspace of the tr matrix: solve for p such that p * tr = 0 and
-     *  normalize p, i.e.0, ||p|| = 1.
+    /** Compute the limiting probabilistic state as 't -> infinity', by finding the
+     *  left nullspace of the tr matrix: solve for 'p' such that 'p * tr = 0' and
+     *  normalize 'p', i.e., '||p|| = 1'.
      */
     def limit: VectorD =
     {
@@ -105,7 +105,7 @@ class MarkovC (tr: MatrixD) extends Error
     } // limit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Simulate the continuous-time Markov chain, by starting in state i0 and after
+    /** Simulate the continuous-time Markov chain, by starting in state 'i0' and after
      *  the state's holding, making a transition to the next state according to the
      *  jump matrix.
      *  @param i0       the initial/start state
@@ -148,7 +148,7 @@ class MarkovC (tr: MatrixD) extends Error
     } // simulate
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Animate this continuous-time Markov Chain.  Place the nodes around a circle
+    /** Animate 'this' continuous-time Markov Chain.  Place the nodes around a circle
      *  and connect them if there is a such a transition.
      */
     def animate ()
@@ -189,7 +189,7 @@ class MarkovC (tr: MatrixD) extends Error
     } // animate
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert this continuous-time Markov Chain to s string.
+    /** Convert 'this' continuous-time Markov Chain to s string.
      */
     override def toString: String = "MarkovC(" + tr + ")"
 
@@ -197,7 +197,7 @@ class MarkovC (tr: MatrixD) extends Error
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object tests the MarkovC class (Continuous-Time Markov Chains).
+/** The `MarkovCTest` object tests the `MarkovC` class (Continuous-Time Markov Chains).
  */
 object MarkovCTest extends App
 {

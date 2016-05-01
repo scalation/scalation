@@ -16,14 +16,14 @@ import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NonLinRegression` class supports non-linear regression.  In this case,
- *  'x' can be multi-dimensional [1, x1, ... xk] and the function 'f' is non-linear
+ *  'x' can be multi-dimensional '[1, x1, ... xk]' and the function 'f' is non-linear
  *  in the parameters 'b'.  Fit the parameter vector 'b' in the regression equation
  *  <p>
  *      y  =  f(x, b) + e
  *  <p>
  *  where 'e' represents the residuals (the part not explained by the model).
  *  Use Least-Squares (minimizing the residuals) to fit the parameter vector
- *  'b' by using Non-linear Programming to minimize Sum of Squares Error (SSE).
+ *  'b' by using Non-linear Programming to minimize Sum of Squares Error 'SSE'.
  *  @see www.bsos.umd.edu/socy/alan/stats/socy602_handouts/kut86916_ch13.pdf
  *  @param x       the input/design matrix augmented with a first column of ones
  *  @param y       the response vector
@@ -46,9 +46,9 @@ class NonLinRegression (x: MatrixD, y: VectorD,
     private var fStat      = -1.0                       // F statistic (quality of fit)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Function to compute the Sum of Squares Error (SSE) for given values for
-     *  the parameter vector b.
-     *  @param b  the parameter vector - FIX - to VectoD
+    /** Function to compute the Sum of Squares Error 'SSE' for given values for
+     *  the parameter vector 'b'.
+     *  @param b  the parameter vector - FIX - to `VectoD`
      */
     def sseF (b: VectorD): Double =
     {
@@ -91,7 +91,7 @@ class NonLinRegression (x: MatrixD, y: VectorD,
     } // diagnose
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit rSquared including rSquared.
+    /** Return the quality of fit including 'rSquared'.
      */
     def fit: VectorD = VectorD (rSquared, rBarSq, fStat)
 

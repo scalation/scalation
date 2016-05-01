@@ -15,13 +15,16 @@ import scalation.calculus.Calculus.{gradient, gradientD}
 import scalation.linalgebra.VectorD
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class performs a line search on f(x) to find a minimal value for f.
- *  It requires no derivatives and only one functional evaluation per iteration. 
- *  A search is conducted from x1 (often 0) to xmax.  A guess for xmax must be
- *  given, but can be made larger during the expansion phase, that occurs before
- *  the recursive golden section search is called.  It works on scalar functions
- *  (see IntegerGoldenSectionLSTest).  If starting with a vector function f(x), simply
- *  define a new function g(y) = x0 + direction * y (see IntegerGoldenSectionLSTest2).
+/** The `IntegerGoldenSectionLS` class performs a line search on 'f(x)' to find a
+ *  minimal value for 'f'.  It requires no derivatives and only one functional
+ *  evaluation per iteration.  A search is conducted from 'x1' (often 0) to 'xmax'.
+ *  A guess for 'xmax' must be given, but can be made larger during the expansion phase,
+ *  that occurs before the recursive golden section search is called.  It works on
+ *  scalar functions
+ *  @see IntegerGoldenSectionLSTest.
+ *  If starting with a vector function 'f(x)', simply  define a new function
+ *  'g(y) = x0 + direction * y'.
+ *  @see IntegerGoldenSectionLSTest2.
  *  @param f  the scalar objective function to minimize
  */
 class IntegerGoldenSectionLS (f: Int => Double)
@@ -64,9 +67,9 @@ class IntegerGoldenSectionLS (f: Int => Double)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform a Line Search (LS) using the Integer Golden Search Algorithm.  Two
-     *  phases are used:  an expansion phase (moving the endpoint) to find a
+     *  phases are used:  an expansion phase (moving the end-point) to find a
      *  down-up pattern, followed by a traditional golden section search.
-     *  @param xmax  a rough guess for the right endpoint of the line search
+     *  @param xmax  a rough guess for the right end-point of the line search
      *  @param x1    the left (smallest) anchor point for the search (usually 1)
      */
     def solve (xmax: Int = 5, x1: Int = 1): Int =
@@ -111,7 +114,8 @@ class IntegerGoldenSectionLS (f: Int => Double)
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the IntegerGoldenSectionLS class on scalar functions.
+/** The `IntegerGoldenSectionLSTest` object is used to test the `IntegerGoldenSectionLS`
+ *  class on scalar functions.
  */
 object IntegerGoldenSectionLSTest extends App
 {
@@ -124,40 +128,40 @@ object IntegerGoldenSectionLSTest extends App
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the IntegerGoldenSectionLS class on vector functions.
- *
-object IntegerGoldenSectionLSTest2 extends App
-{
-    val zo   = VectorD (0.0, 0.0)                       // zero vector, the origin
-    val dir  = VectorD (1.0, 1.0)                       // direction to search in
-    val ymax = 5.0
-    var y    = 0.0
-    var x    = zo
-
-    def f (x: VectorD): Double  = (x(0) - 2.0) * (x(0) - 2.0) + (x(1) - 3.0) * (x(1) - 3.0) + 1.0
-    def g (y: Double): Double = f(zo + dir * y)
-    def f2 (x: VectorD): Double = x(0)/4.0 + 5.0*x(0)*x(0) + pow(x(0),4) -
-                                  9.0*x(0)*x(0)*x(1) + 3.0*x(1)*x(1) + 2.0*pow(x(1),4)
-    def g2 (y: Double): Double = f2(zo + dir * y)
-
-    val solver  = new IntegerGoldenSectionLS (g)
-    val solver2 = new IntegerGoldenSectionLS (g2)
-
-    println ("\nProblem 1: (x_0 - 2)^2 + (x_1 - 3)^2 + 1") 
-    y = solver.search (ymax)
-    println ("optimal y solution = " + y)
-    x = zo + dir * y
-    println ("optimal x solution = " + x)
-    println ("optimal f solution = " + f(x))
-
-    println ("\nProblem 4: x_0/4 + 5x_0^2 + x_0^4 - 9x_0^2 x_1 + 3x_1^2 + 2x_1^4")
-    // @see http://math.fullerton.edu/mathews/n2003/gradientsearch/GradientSearchMod/Links/GradientSearchMod_lnk_5.html
-    y = solver2.search (ymax)
-    println ("optimal y solution = " + y)
-    x = zo + dir * y
-    println ("optimal x solution = " + x)
-    println ("optimal f solution = " + f(x))
-
-} // IntegerGoldenSectionLSTest2 object
+/** The `IntegerGoldenSectionLSTest2` object is used to test the `IntegerGoldenSectionLS`
+ *  class on vector functions.
  */
+//object IntegerGoldenSectionLSTest2 extends App
+//{
+//  val zo   = VectorD (0.0, 0.0)                       // zero vector, the origin
+//  val dir  = VectorD (1.0, 1.0)                       // direction to search in
+//  val ymax = 5.0
+//  var y    = 0.0
+//  var x    = zo
+//
+//  def f (x: VectorD): Double  = (x(0) - 2.0) * (x(0) - 2.0) + (x(1) - 3.0) * (x(1) - 3.0) + 1.0
+//  def g (y: Double): Double = f(zo + dir * y)
+//  def f2 (x: VectorD): Double = x(0)/4.0 + 5.0*x(0)*x(0) + pow(x(0),4) -
+//                                  9.0*x(0)*x(0)*x(1) + 3.0*x(1)*x(1) + 2.0*pow(x(1),4)
+//  def g2 (y: Double): Double = f2(zo + dir * y)
+//
+//  val solver  = new IntegerGoldenSectionLS (g)
+//  val solver2 = new IntegerGoldenSectionLS (g2)
+//
+//  println ("\nProblem 1: (x_0 - 2)^2 + (x_1 - 3)^2 + 1") 
+//  y = solver.search (ymax)
+//  println ("optimal y solution = " + y)
+//  x = zo + dir * y
+//  println ("optimal x solution = " + x)
+//  println ("optimal f solution = " + f(x))
+//
+//  println ("\nProblem 4: x_0/4 + 5x_0^2 + x_0^4 - 9x_0^2 x_1 + 3x_1^2 + 2x_1^4")
+//  // @see http://math.fullerton.edu/mathews/n2003/gradientsearch/GradientSearchMod/Links/GradientSearchMod_lnk_5.html
+//  y = solver2.search (ymax)
+//  println ("optimal y solution = " + y)
+//  x = zo + dir * y
+//  println ("optimal x solution = " + x)
+//  println ("optimal f solution = " + f(x))
+//
+//} // IntegerGoldenSectionLSTest2 object
 

@@ -118,14 +118,13 @@ class SupportVectorMachine (x: MatrixD, y: VectorI, fn: Array [String] = Array (
      *  Classify returns 1 meaning 'z' belongs to the positive class, while 
      *  -1 means it belongs to the negative class.
      *  @param z  the vector to classify
-     *
-    def classify (z: VectorI): Tuple2 [Int, String] =
-    {
-        val zd = new VectorD (z.dim)
-        for (j <- 0 until z.dim) zd(j) = z(j).toDouble
-        classify (zd)
-    } // classify
      */
+//    def classify (z: VectorI): Tuple2 [Int, String] =
+//    {
+//        val zd = new VectorD (z.dim)
+//        for (j <- 0 until z.dim) zd(j) = z(j).toDouble
+//        classify (zd)
+//    } // classify
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset or re-initialize the frequency tables and the probability tables.
@@ -149,8 +148,8 @@ class SupportVectorMachine (x: MatrixD, y: VectorI, fn: Array [String] = Array (
     private def kernel_func (i1: Int, i2: Int): Double = x(i1) dot x(i2)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Optimize by replacing old values of Lagrange multipliers al1, al2 with
-     *  new values a1 and a2.
+    /** Optimize by replacing old values of Lagrange multipliers 'al1', 'al2' with
+     *  new values 'a1' and 'a2.'
      *  @param i1  the index for the first Lagrange multipliers (alpha) 
      *  @param i2  the index for the second Lagrange multipliers (alpha)
      */

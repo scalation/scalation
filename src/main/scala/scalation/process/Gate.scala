@@ -2,7 +2,7 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Casey Bowman
  *  @version 1.2
- *  @date    Sat 04 Jan 2014 03:18:01 PM EST 
+ *  @date    Sat 04 Jan 2014 03:18:01 EST 
  *  @see     LICENSE (MIT style license file).
  */
 
@@ -29,7 +29,7 @@ import util.control.Breaks.{breakable, break}
  *  @param onTime    distribution of time that gate will be open
  *  @param offTime   distribution of time that gate will be closed
  *  @param loc       the location of the Gate (x, y, w, h)
- *  @param shut0     boolean indicating if the gate is initially opened or closed
+ *  @param shut0     `Boolean` indicating if the gate is initially opened or closed
  *  @param cap       the maximum number of entities that will be released when the gate is opened
  */
 class Gate (name: String, director: Model, line: WaitQueue, units: Int, onTime: Variate, offTime: Variate,
@@ -46,7 +46,7 @@ class Gate (name: String, director: Model, line: WaitQueue, units: Int, onTime: 
     schedule (0.0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Auxiliary constructor that uses defaults for width (w) and heigth (h).
+    /** Auxiliary constructor that uses defaults for width 'w' and height 'h'.
      *  @param name      the name of the gate
      *  @param director  the model/container for this gate
      *  @param line      the queue holding entities waiting for this gate to open
@@ -54,7 +54,7 @@ class Gate (name: String, director: Model, line: WaitQueue, units: Int, onTime: 
      *  @param onTime    distribution of time that gate will be open
      *  @param offTime   distribution of time that gate will be closed
      *  @param xy        the (x, y) coordinates for the top-left corner of the sink.
-     *  @param shut0     boolean indicating if the gate is initially opened or closed
+     *  @param shut0     `Boolean` indicating if the gate is initially opened or closed
      *  @param cap       the maximum number of entities that will be released when the gate is opened
      */
     def this (name: String, director: Model, line: WaitQueue, units: Int, onTime: Variate, offTime: Variate,
@@ -134,7 +134,7 @@ class Gate (name: String, director: Model, line: WaitQueue, units: Int, onTime: 
 object Gate
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a gate using defaults for width (w) and heigth (h).
+    /** Create a gate using defaults for width 'w' and height 'h'.
      *  @param name      the name of the gate
      *  @param director  the model/container for this gate
      *  @param line      the queue holding entities waiting for this gate to open
@@ -142,7 +142,7 @@ object Gate
      *  @param onTime    distribution of time that gate will be open
      *  @param offTime   distribution of time that gate will be closed
      *  @param xy        the (x, y) coordinates for the top-left corner of the sink.
-     *  @param shut0     boolean indicating if the gate is initially opened or closed
+     *  @param shut0     `Boolean` indicating if the gate is initially opened or closed
      *  @param cap       the maximum number of entities that will be released when the gate is opened
      */
     def apply (name: String, director: Model, line: WaitQueue, units: Int, onTime: Variate, offTime: Variate,
@@ -153,7 +153,7 @@ object Gate
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a group of related gates using defaults for width (w) and heigth (h).
+    /** Create a group of related gates using defaults for width 'w' and height 'h'.
      *  @param director  the director controlling the model
      *  @param units     number of units/phases of operation
      *  @param onTime    distribution of time that gate will be open

@@ -26,11 +26,11 @@ import scalation.util.Error
  *      boundary conditions  (u(0, t), u(xm, t)) = bc
  *  <p>
  *  @param v   the velocity field function v(x, t)
- *  @param dt  delta t
- *  @param dx  delta x
+ *  @param dt  delta 't'
+ *  @param dx  delta 'x'
  *  @param xm  the length of the column
- *  @param ic  the initial conditions as a function of position x
- *  @param bc  the boundary conditions as a 2-tuple for endpoints 0 and xm
+ *  @param ic  the initial conditions as a function of position 'x'
+ *  @param bc  the boundary conditions as a 2-tuple for end-points 0 and 'xm'
  */
 class FirstOrderPDE (v: (Double, Double) => Double, dt: Double, dx: Double, xm: Double,
                      ic: FunctionS2S, bc: Tuple2 [Double, Double])
@@ -84,7 +84,7 @@ class FirstOrderPDE (v: (Double, Double) => Double, dt: Double, dx: Double, xm: 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `FirstOrderPDETest` object is used to test the `FirstOrderPDE` class.
- *  Numerically solve the Advection Equation:  du/dt + v(x, t) * du/dx = 0
+ *  Numerically solve the Advection Equation:  'du/dt + v(x, t) * du/dx = 0'
  */
 object FirstOrderPDETest extends App
 {
@@ -106,7 +106,7 @@ object FirstOrderPDETest extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `FirstOrderPDETest2` object is used to test the `FirstOrderPDE` class.
- *  Numerically solve the Advection Equation:  du/dt + v(x, t) * du/dx = 0
+ *  Numerically solve the Advection Equation:  'du/dt + v(x, t) * du/dx = 0'
  */
 object FirstOrderPDETest2 extends App
 {
@@ -136,7 +136,7 @@ object FirstOrderPDETest2 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `FirstOrderPDETest3` object is used to test the `FirstOrderPDE` class.
- *  Numerically solve the Advection Equation:  du/dt + v(x, t) * du/dx = 0
+ *  Numerically solve the Advection Equation:  'du/dt + v(x, t) * du/dx = 0'
  *  @see www.public.asu.edu/~hhuang38/pde_slides_numerical.pdf
  */
 object FirstOrderPDETest3 extends App

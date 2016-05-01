@@ -25,9 +25,9 @@ import Derivatives.Derivative
 import DormandPrince._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** Given an Ordinary Differential Equation (ODE) paramaterized using the vector 'b'
- *  with Initial Value (IV) 'y0', estimate the parameter values 'b' for the ODE
- *  using weighted Nonlinear Least Squares (NLS).
+/** Given an Ordinary Differential Equation 'ODE' parameterized using the vector 'b'
+ *  with Initial Value 'IV' 'y0', estimate the parameter values 'b' for the ODE
+ *  using weighted Non-linear Least Squares 'NLS'.
  *  <p>
  *      ODE:  dy/dt = f(t, y)
  *      IV:   y(t0) = y0
@@ -65,7 +65,7 @@ class NLS_ODE (z: VectorD, ts: VectorD, b_init: VectorD, private var w: VectorD 
     } // init
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Function to compute the Weighted Sum of Squares Error (SSE) for given values
+    /** Function to compute the Weighted Sum of Squares Error 'SSE' for given values
      *  for parameter vector 'b'.
      *  @param b  the parameter vector
      */
@@ -80,7 +80,7 @@ class NLS_ODE (z: VectorD, ts: VectorD, b_init: VectorD, private var w: VectorD 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) using a
-     *  nonlinear least squares method.
+     *  non-linear least squares method.
      */
     def train ()
     {

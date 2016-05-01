@@ -71,7 +71,7 @@ class Perceptron (x: MatrixD, y: VectorD, eta: Double = 1.0)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Minimize the error in the prediction by adjusting the weight vector 'w'.
      *  The error 'e' is simply the difference between the target value 'y' and the
-     *  predicted value 'z'.  Mininize 1/2 of the dot product of error with itself
+     *  predicted value 'z'.  Minimize 1/2 of the dot product of error with itself
      *  using gradient-descent. The gradient is '-x.t * (e * z * (_1 - z))', so
      *  move in the opposite direction of the gradient.
      */
@@ -87,7 +87,7 @@ class Perceptron (x: MatrixD, y: VectorD, eta: Double = 1.0)
     } // minimizeError
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the fit, the weigth vector 'w'.
+    /** Return the fit, the weight vector 'w'.
      */
     def fit: VectorD = w
 

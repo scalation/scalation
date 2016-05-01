@@ -24,14 +24,17 @@ import scalation.graphalytics.Pair
  */
 case class Block (_id: Int)
 {
-     val id = _id                                   // the block identifier
-     val vertices = SET [Int] ()                    // set of vertices contained in
-     var parent: Block = null                       // the parent block in block tree
+    val id = _id                                   // the block identifier
+    val vertices = SET [Int] ()                    // set of vertices contained in
+    var parent: Block = null                       // the parent block in block tree
 
-     override def toString: String =
-     {
-         s"Block ($id, $vertices, " + (if (parent == null) "null)" else s"${parent.id})")
-     } // toString
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert a block to a `String`.
+     */
+    override def toString: String =
+    {
+        s"Block ($id, $vertices, " + (if (parent == null) "null)" else s"${parent.id})")
+    } // toString
 
 } // Block class
 
@@ -40,7 +43,7 @@ case class Block (_id: Int)
 /** The `BiconnectedComp` class provides methods for finding the cut points and
  *  blocks in undirected graphs.  Removal of a cut point will make the graph
  *  disconnected.  Cut points and blocks are also referred to as articulation
- *  points and biconnected compoenents, respectively.
+ *  points and biconnected components, respectively.
  *  @param g_  the graph whose cut points/blocks are sought
  */
 case class BiconnectedComp (g_ : Graph)
@@ -56,7 +59,7 @@ case class BiconnectedComp (g_ : Graph)
     if (DEBUG) g.printG ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Find all the cut points in undirected graph 'g_'.  Translated from Jave code.
+    /** Find all the cut points in undirected graph 'g_'.  Translated from Java code.
      *  Use when only cut points (not blocks) are sought.
      *  @see algs4.cs.princeton.edu/41graph/Biconnected.java.html
      */
@@ -98,7 +101,7 @@ case class BiconnectedComp (g_ : Graph)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find all the blocks (and cut points) in undirected graph 'g_'.
-     *  The parent block is also determined.  Translated from psuedocode.
+     *  The parent block is also determined.  Translated from pseudo-code.
      *  @see www.cs.umd.edu/class/fall2005/cmsc451/biconcomps.pdf
      */
     def findBlocks (): ArrayBuffer [Block] =
@@ -239,24 +242,22 @@ object BiconnectedCompTest2 extends App
                         Array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14),   // vertex labels
                         false, "g1")                                                // inverse, name
 
-/***
-    val mg1 = MGraph (g1, Map ((0, 1)   -> 2.0,     // edge labels
-                               (0, 8)   -> 2.0,
-                               (1, 2)   -> 9.0,
-                               (1, 3)   -> 9.0,
-                               (2, 4)   -> 1.0,
-                               (3, 5)   -> 1.0,
-                               (4, 6)   -> 3.0,
-                               (5, 6)   -> 3.0,
-                               (6, 7)   -> 7.0,
-                               (8, 9)   -> 5.0,
-                               (9, 10)  -> 9.0,
-                               (9, 12)  -> 2.0,
-                               (10, 11) -> 6.0,
-                               (12, 13) -> 9.0,
-                               (13, 14) -> 1.0),
-                      "mg1")
-***/
+//  val mg1 = MGraph (g1, Map ((0, 1)   -> 2.0,     // edge labels
+//                             (0, 8)   -> 2.0,
+//                             (1, 2)   -> 9.0,
+//                             (1, 3)   -> 9.0,
+//                             (2, 4)   -> 1.0,
+//                             (3, 5)   -> 1.0,
+//                             (4, 6)   -> 3.0,
+//                             (5, 6)   -> 3.0,
+//                             (6, 7)   -> 7.0,
+//                             (8, 9)   -> 5.0,
+//                             (9, 10)  -> 9.0,
+//                             (9, 12)  -> 2.0,
+//                             (10, 11) -> 6.0,
+//                             (12, 13) -> 9.0,
+//                             (13, 14) -> 1.0),
+//                    "mg1")
 
     g1.printG ()
     println ("-" * 60)

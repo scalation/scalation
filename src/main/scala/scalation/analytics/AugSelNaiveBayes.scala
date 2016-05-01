@@ -30,7 +30,7 @@ import scalation.linalgebra.gen.HMatrix4
  *  @param fn     the names for all features/variables
  *  @param k      the number of classes
  *  @param cn     the names for all classes
- *  @param fset   the Boolean array indicating the selected features
+ *  @param fset   the `Boolean` array indicating the selected features
  *  @param vc     the value count (number of distinct values) for each feature
  *  @param me     use m-estimates (me == 0 => regular MLE estimates)
  *  @param thres  the correlation threshold between 2 features for possible parent-child relationship
@@ -241,7 +241,7 @@ object AugSelNaiveBayes
      *  @param fn     the names of the features/variables
      *  @param k      the number of classes
      *  @param cn     the names for all classes
-     *  @param fset   the Boolean array indicating the selected features
+     *  @param fset   the `Boolean` array indicating the selected features
      *  @param vc     the value count (number of distinct values) for each feature
      *  @param me     use m-estimates (me == 0 => regular MLE estimates)
      *  @param thres  the correlation threshold between 2 features for possible parent-child relationship

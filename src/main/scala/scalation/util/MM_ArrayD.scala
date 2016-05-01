@@ -9,7 +9,8 @@
  *  @see www.programering.com/a/MDO2cjNwATI.html
  */
 
-package scalation.util
+package scalation
+package util
 
 import java.io.{RandomAccessFile, Serializable}
 import java.lang.Cloneable

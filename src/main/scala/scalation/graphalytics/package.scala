@@ -14,20 +14,18 @@ package scalation
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `graphalytics` package contains classes, traits and objects for graph
- *  analytics on Trees, DAGs and Directed Graphs.  It provides an implicit
+ *  analytics on Trees, 'DAG's and Directed Graphs.  It provides an implicit
  *  conversion when needed for converting doubles to vectors.
  */
 package object graphalytics
 {
-    import scalation.util.SEP
-
-    /** The `EdgeType` object define basic type for represeting edges.
+    /** The `EdgeType` object define basic type for representing edges
      */
     type Pair = Tuple2 [Int, Int]         // edge = (vertex, vertex)
 
     /** The relative path for base directory
      */
-    val BASE = "data" + SEP + "graphalytics" + SEP
+    val BASE_DIR = DATA_DIR + "graphalytics" + ⁄
 
     /** The standard file extension for graphs
      */

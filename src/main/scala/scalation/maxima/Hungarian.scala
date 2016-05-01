@@ -20,15 +20,15 @@ import util.control.Breaks.{breakable, break}
 import scalation.linalgebra.MatrixD
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This is an O(n^3) implementation of the Hungarian algorithm (or Kuhn-Munkres
- *  algorithm).  Find the maximum cost set of pairings between m x-nodes (workers)
- *  and n y-nodes (jobs) such that each worker is assigned to one job and each
- *  job has at most one worker assigned.
+/** The `Hungarian` is an O(n^3) implementation of the Hungarian algorithm
+ *  (or Kuhn-Munkres algorithm).  Find the maximum cost set of pairings between
+ *  'm' x-nodes (workers) and 'n' y-nodes (jobs) such that each worker is assigned
+ *  to one job and each job has at most one worker assigned.
  *  It solves the maximum-weighted bipartite graph matching problem.
  *
  *  maximize sum i = 0 .. m-1 { cost(x_i, y_i) }
  *
- *  Caveat: only works if m <= n (i.e., there is at least one job for every worker).
+ *  Caveat: only works if 'm <= n' (i.e., there is at least one job for every worker).
  *  @param cost  the cost matrix: cost(x, y) = cost of assigning worker to job
  */
 class Hungarian (cost: MatrixD)
@@ -89,7 +89,7 @@ class Hungarian (cost: MatrixD)
     } // addToTree
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Find a root (an unparied x-node) and compute slack values for y-nodes. 
+    /** Find a root (an unpaired x-node) and compute slack values for y-nodes. 
      */
     private def findRootSetSlack (prev: Array [Int], xSet: Array [Boolean])
     {
@@ -127,7 +127,7 @@ class Hungarian (cost: MatrixD)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** A recursive procedure to find augmenting paths to improve the assignments.
-     *  Terminate when nMatch == maxMatch.
+     *  Terminate when 'nMatch == maxMatch'.
      */
     private def augment ()
     {
@@ -177,7 +177,7 @@ class Hungarian (cost: MatrixD)
     /** The main procedure to solve an assignment problem by finding initial pairings
      *  and then finding augmenting paths to improve the pairings/assignments.
      */
-    private def solve (): Double =
+    def solve (): Double =
     {
         if (m > n) { println ("Hungarian: error - m = " + m + " > n = " + n); return -1.0 }
         initLabels ()   // initial the cost labels for x-nodes
@@ -197,9 +197,10 @@ class Hungarian (cost: MatrixD)
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the Hungarian class.
+/** The `HungarianTest` object is used to test the `Hungarian` class.
+ *  > run-main scalation.maxima.HungarianTest
  */
-object Hungarian extends App
+object HungarianTest extends App
 {
     // m = 3 workers, n = 3 jobs
     val cost1 = new MatrixD ((3, 3), 1, 4, 5,
@@ -229,5 +230,5 @@ object Hungarian extends App
     println ("optimal cost3 = " + (new Hungarian (cost3).solve ()))
     println ("optimal cost4 = " + (new Hungarian (cost4).solve ()))
 
-} // Hungarian object
+} // HungarianTest object
 

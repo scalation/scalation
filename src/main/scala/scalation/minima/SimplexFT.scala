@@ -21,6 +21,9 @@ import scala.util.control.Breaks.{breakable, break}
 import scalation.linalgebra.{MatriD, VectoD, VectorD, VectorI}
 import scalation.random.Randi
 
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Ftran` object ...
+ */
 object Ftran
 {
     val m      = 10
@@ -42,7 +45,7 @@ object Ftran
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /**
-     *  Figure 2.4: Standard ftran with permuted LU factors
+     *  Figure 2.4: Standard 'ftran' with permuted LU factors
      */
     def ftran ()
     {
@@ -114,13 +117,13 @@ object Ftran
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /**
-     *  Figure 2.6: DFS based hyper-sparse ftran: search stage
+     *  Figure 2.6: DFS based hyper-sparse 'ftran': search stage
      */
     def dfs_search (Xcount: Int)
     {
         for (t <- 1 to Xcount) {
 
-            var (i, k) = (0, 0)                                     // ith eta matrix of H, the next non-zero position to visit
+            var (i, k) = (0, 0)                                  // ith eta matrix of H, the next non-zero position to visit
             i = Hlookup(Xindex(t))
             k = Hstart(i)
 
@@ -128,13 +131,13 @@ object Ftran
                 visited(i) = 1
                 var go = true
 
-                while (go) {                                    // keep searching current ETA until finish
+                while (go) {                                     // keep searching current ETA until finish
                     if (k < Hend(i)) {
-                        val child = Hlookup(Hindex(k))          // move to a child if it is not yet been visited
+                        val child = Hlookup(Hindex(k))           // move to a child if it is not yet been visited
                         k += 1
                         if (visited(child) == 0) {
                             visited(child) = 1
-                            stack.push ((i, k))                 // store current eta (the father) to stack
+                            stack.push ((i, k))                  // store current eta (the father) to stack
                             i = child
                             k = Hstart(child)                    // start to search the child
                         } // if
@@ -152,6 +155,7 @@ object Ftran
 
 } // Ftran object
 
+
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SimplexFT` class solves Linear Programming (LP) problems using the Forrest-Tomlin
  *  (FT) Simplex Algorithm.  Given a constraint matrix 'a', constant vector 'b'
@@ -162,9 +166,9 @@ object Ftran
  *  minimize    f(x) = c x
  *  subject to  a x <= b, x >= 0
  *
- *  The FT Simplex Algorithm performs LU Fractorization/Decomposition of the
+ *  The FT Simplex Algorithm performs LU Factorization/Decomposition of the
  *  basis-matrix ('ba' = 'B') rather than computing inverses ('b_inv').  It has
- *  benefits over the (Revised) Simplex Algorithm (less runtime, less memory,
+ *  benefits over the (Revised) Simplex Algorithm (less run-time, less memory,
  *  and much reduced chance of round off errors).
  *
  *  @param a    the constraint matrix
@@ -258,8 +262,8 @@ class SimplexFT (a: MatriD, b: VectoD, c: VectoD, var x_B: Array [Int] = null)
     } // unbounded
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Pivot by replacing x_k with x_l in the basis.  Update b_inv (actually lu),
-     *  b_ and c_.
+    /** Pivot by replacing 'x_k' with 'x_l' in the basis.  Update 'b_inv' (actually 'lu'),
+     *  'b_' and 'c_'.
      *  @param k  the leaving variable
      *  @param l  the entering variable
      */
@@ -279,7 +283,7 @@ class SimplexFT (a: MatriD, b: VectoD, c: VectoD, var x_B: Array [Int] = null)
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve a Linear Programming (LP) problem using the FT Simplex Algorithm.
      *  Iteratively pivot until there an optimal solution is found or it is
-     *  determined that the solution is unbounded.  Return the optimal vector x.
+     *  determined that the solution is unbounded.  Return the optimal vector 'x'.
      */
     def solve (): VectoD =
     {
@@ -299,7 +303,7 @@ class SimplexFT (a: MatriD, b: VectoD, c: VectoD, var x_B: Array [Int] = null)
     } // solve
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine whether the current solution (x = primal) is still primal feasible.
+    /** Determine whether the current solution 'x = primal' is still primal feasible.
      */
     def infeasible: Boolean =
     {
@@ -312,12 +316,12 @@ class SimplexFT (a: MatriD, b: VectoD, c: VectoD, var x_B: Array [Int] = null)
     } // infeasible
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the primal (basis only) solution vector (x).
+    /** Return the primal (basis only) solution vector 'x'.
      */
     def primal: VectoD = ba.solve (lu, b)            // (u_inv * l_inv)  * b
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the full primal solution vector (xx).
+    /** Return the full primal solution vector 'xx'.
      */
     def primalFull (x: VectoD): VectorD = 
     {
@@ -327,12 +331,12 @@ class SimplexFT (a: MatriD, b: VectoD, c: VectoD, var x_B: Array [Int] = null)
     } // primalFull
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the dual solution vector (y).
+    /** Return the dual solution vector 'y'.
      */
     def dual: VectoD = z.slice (N - M, N).asInstanceOf [VectoD]   // FIX
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the optimal objective function value (f(x) = c x).
+    /** Return the optimal objective function value 'f(x) = c x'.
      *  @param x  the primal solution vector
      */
     def objF (x: VectoD): Double = c.select (x_B) dot x
@@ -349,7 +353,7 @@ class SimplexFT (a: MatriD, b: VectoD, c: VectoD, var x_B: Array [Int] = null)
      } // showTableau
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert the current FT tableau (basis, b_inv, b_, and c_) to a string.
+    /** Convert the current FT tableau 'basis', b_inv', b_', and c_' to a string.
      */
     override def toString: String =
     {
@@ -366,7 +370,7 @@ class SimplexFT (a: MatriD, b: VectoD, c: VectoD, var x_B: Array [Int] = null)
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the SimplexFT class.
+/** The `SimplexFT` object is used to test the `SimplexFT` class.
  */
 object SimplexFTTest extends App
 {
@@ -375,7 +379,7 @@ object SimplexFTTest extends App
      *  @param a    the constraint matrix
      *  @param b    the limit/RHS vector
      *  @param c    the cost vector
-     *  @param x_B  the indices of the intial basis
+     *  @param x_B  the indices of the initial basis
      */
     def test (a: MatriD, b: VectoD, c: VectoD, x_B: Array [Int] = null)
     {

@@ -6,14 +6,14 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.tableau
+package scalation
+package tableau
 
 import java.io.File
 
 import scalation.linalgebra.MatrixD
 import scalation.model.Modelable
 import scalation.random.{Exponential, Randi, Variate}
-import scalation.util.SEP
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Model` class support tableau oriented simulation models in which each
@@ -39,7 +39,7 @@ class Model (name: String, m: Int, rv: Array [Variate], label: Array [String])
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform tableau-based simulation by recording timing information about
-     *  the ith entity in the ith row of the matrix.  This method may need to
+     *  the 'i'th entity in the 'i'th row of the matrix.  This method may need to
      *  be overridden for other models.
      */
     def simulate (startTime: Double = 0.0)
@@ -70,19 +70,19 @@ class Model (name: String, m: Int, rv: Array [Variate], label: Array [String])
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Save the table/matrix in a Comma Separated Value (.csv) file suitable for
-     *  openning in a spreadsheet.  Note, the file 'data.tableau.csv' is overwritten.
+     *  opening in a spreadsheet.  Note, the file 'data.tableau.csv' is overwritten.
      */
     def save ()
     {
-        table.write ("data" + SEP + "tableau.csv")
+        table.write ("data" + ⁄ + "tableau.csv")
     } // save
 
 } // Model
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `ModelTest` object is used to test the `Model` class.  See apps.tableau
- *  for additional exmaples.
+/** The `ModelTest` object is used to test the `Model` class.
+ *  @see `apps.tableau`for additional examples.
  */
 object ModelTest extends App
 {

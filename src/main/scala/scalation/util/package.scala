@@ -13,7 +13,6 @@ import java.lang.System.nanoTime
 import java.net.{URL, MalformedURLException}
 
 import scala.io.Source.{fromFile, fromURL}
-import scala.util.Properties.envOrElse
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `util` package contains classes, traits and objects for basic utility
@@ -21,30 +20,6 @@ import scala.util.Properties.envOrElse
  */
 package object util
 {
-    /** The file, path separation character: '/' for Linux/Mac, '\' for Windows
-     */
-    val SEP = File.separator
-
-    /** File system path for input/output data directory
-     *  Use 'SCALATION_HOME' environment variable or else current directory "."
-     */
-    val DATA_DIR = envOrElse ("SCALATION_HOME", ".") + SEP + "data" + SEP
-
-    /** File system path for memory mapped files directory
-     *  Use 'SCALATION_HOME' environment variable or else current directory "."
-     */
-    val MEM_MAPPED_DIR = envOrElse ("SCALATION_HOME", ".") + SEP + "mem_mapped" + SEP
-
-    /** File system path for database storage directory
-     *  Use 'SCALATION_HOME' environment variable or else current directory "."
-     */
-    val STORE_DIR = envOrElse ("SCALATION_HOME", ".") + SEP + "store" + SEP
-
-    /** File system path for src (source code) directory
-     *  Use 'SCALATION_HOME' environment variable or else current directory "."
-     */
-    val SRC_DIR = envOrElse ("SCALATION_HOME", ".") + SEP + "src" + SEP
-
     /** The number of nanoseconds per millisecond
      */
     val NS_PER_MS = 1E-6

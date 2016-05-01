@@ -15,10 +15,10 @@ import scalation.random.NormalVec
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KalmanFilter` class is used to fit state-space models.
  *  @see en.wikipedia.org/wiki/Kalman_filter
- *  FIX: needs more thorough testting
+ *  FIX: needs more thorough testing
  *  @param ff  the state transition matrix
  *  @param hh  the observation matrix
- *  @param qq  the process noise covaraince matrix
+ *  @param qq  the process noise covariance matrix
  *  @param rr  the observation noise covariance matrix
  *  @param bb  the optional control-input matrix
  */

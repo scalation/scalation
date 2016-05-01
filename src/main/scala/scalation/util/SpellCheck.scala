@@ -2,11 +2,12 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 1.2
- *  @date    Sun Sep  9 20:37:38 EDT 2012
+ *  @date    Sat Apr 23 23:40:31 EDT 2016
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.util
+package scalation
+package util
 
 import java.io.File
 
@@ -15,52 +16,75 @@ import scala.collection.mutable.Set
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RunSpellCheck` object is used to check the spelling of the a given package.
  *  The package directory (relative path) is entered as a command-line argument.
+ *  Ex:  'scalation/math'
  *  > run-main scalation.util.RunSpellCheck <package directory>
  */
 object RunSpellCheck extends App
 {
-    val packdir = if (args.length > 0) args(0) else "scalation/util"
+    val packdir = if (args.length > 0) args(0) else "scalation" + ⁄ + "util"
     val sp = SpellCheck
-    sp.checkDir (SRC_DIR + "main/scala" + SEP + packdir)
+    sp.checkDir (SRC_DIR + "main" + ⁄ + "scala" + ⁄ + packdir)
 
 } // RunSpellCheck object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SpellCheck` object is used to check the spelling in source code comments.
+ *  If not using Linux, may need to replace path for 'DICTIONARY'.
+ *  Note, okay to use '/' since the dictionary location is system-dependent anyway.
  */
 object SpellCheck extends Error
 {
-    private val DICTIONARY    = "/usr/share/dict/american-english"
-    private val CUSTOM        = Set (
+    /** Dictionary of word provides by the Operating System
+     */
+    private val DICTIONARY = "/usr/share/dict/words"
+//  private val DICTIONARY = "/usr/share/dict/american-english"
+
+    /** Custom words to be added to the dictionary.
+     */
+    private val CUSTOM = Set (
          // date-time
             "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec",
             "sun", "mon", "tue", "wed", "thu", "fri", "sat", "edt", "est",
          // math
-            "accumulators", "anova", "ancova", "bezier", "cdf", "cmrg", "combinatorics", "congruential", "cosecant",
-            "cotangent", "covariance", "covariances", "denonimator", "dimensionality", "div", "eratosthenes",
-            "equi", "exp", "gauss", "gcd", "icdf", "kurtosis", "lcg", "lhs", "max", "min", "modulo", "mrg",
-            "nlp", "nonnegative", "pdf", "pearson", "pf", "pmf", "pow", "quantile", "quantiles", "radians",
-            "rhs", "rms", "rv", "secant", "significand", "signum", "skewness", "sqrt", "taylor", "trinomial",
-            "tuple", "tuples", "unary", "variates",
+            "accumulators", "acyclic", "adjacency", "anova", "ancova", "bayes", "bayesian", "bezier",
+            "bfgs", "biconnected", "bijection", "bijections", "bfs", "cdf", "centroid", "centroids",
+            "cholesky", "collinearity", "cmrg", "combinatorics", "congruential", "cosecant", "cotangent",
+            "covariance", "covariances", "dag", "denonimator", "dfs", "dimensionality", "div",
+            "eigenvalue", "eigenvalues", "eigenvector", "eigenvectors", "eratosthenes", "equi", "exp",
+            "gauss", "gcd", "hessian", "hypermatrix", "hypermatrices", "hungarian", "icdf", "infeasible",
+            "integrators", "isomorphism", "isomorphically", "jacobian", "jordan", "kurtosis", "lagrange",
+            "laplacian", "lcg", "lhs", "linearized", "logit", "lp", "markov", "markovian", "max", "min",
+            "mle", "modulo", "mrg", "nlp", "nonnegative", "nullspace", "optimality", "pde", "pdf",
+            "pearson", "pf", "pmf", "pow", "quantile", "quantiles", "queueing", "petri", "radians",
+            "rhs", "rms", "rv", "secant", "significand", "sigmoid", "signum", "skewness", "sqrt",
+            "stoichiometry", "subgraph", "subgraphs", "subparts", "subtree", "subtrees", "taylor",
+            "treewidth", "triangulated", "tridiagonal", "trinomial", "tuple", "tuples", "unary",
+            "unconstrained", "variates", "vif",
          // probability distributions
-            "bernoulli", "chisquare", "erlang", "gaussian", "hypergeometric", "lorentz", "multinomial",
-            "nhpp", "pareto", "poisson", "weibull",
+            "bernoulli", "bivariate", "chisquare", "erlang", "gaussian", "hypergeometric", "lorentz",
+            "multinomial", "nhpp", "pareto", "poisson", "univariate", "weibull",
          // first, second, third, fourth
             "st", "nd", "rd", "th",
          // scala
-            "covariant", "datatype", "def", "hashcode", "java", "nan", "nullary", "recoded", "regex", "sbt",
-            "scala", "scalation", "subclass", "subclasses", "subtypes", "superclass", "superclasses", "val", "var",
+            "coroutine", "coroutines", "covariant", "datatype", "def", "hashcode", "java", "nan", "nullary",
+            "parameterized", "recoded", "regex", "sbt", "scala", "scalation", "subclass", "subclasses",
+            "subtype", "subtypes", "superclass", "superclasses", "val", "var",
          // files
-            "csv", "dataset", "datastore", "dir", "eol", "gb", "html", "json", "kb", "mb", "unicode", "url",
-            "utf", "src",
+            "csv", "dataset", "datastore", "dir", "eol", "gb", "html", "json", "kb", "mb", "unicode",
+            "url", "utf", "src",
          // other
-            "accessor", "analytics", "apache", "bi", "columnar", "etc", "fanout", "ieee", "linux", "mac",
-            "meta", "mit", "multi", "olap", "precompute", "precomputed", "preorder", "reposition", "rescaled",
-            "rescaling", "resizable", "resize", "representable", "reproducibility", "subinterval", "traversal",
-            "traversable", "uncomment")
+            "accessor", "advection", "analytics", "apache", "attractor", "bi", "classifier", "classifiers",
+            "columnar", "durations", "dequeue", "dequeued", "diagostics", "enqueue", "enqueued", "etc",
+            "fanout", "ieee", "incrementally", "iteratively", "lexicographical", "linux", "mac", "matcher",
+            "meta", "mit", "multi", "olap", "pairings", "precompute", "precomputed", "predictors",
+            "preorder", "prepend", "prepending", "recompute", "recurse", "reposition", "rescaled",
+            "rescaling", "resizable", "resize", "representable", "reproducibility", "stateful", "subinterval",
+            "timestamp", "traversal", "traversable", "uncomment", "undirected", "unpaired", "unvisited")
 
-    private val dictionary    = buildDictionary          // dictionary - correctly spelled word
+    /** Dictionary of correctly spelled word
+     */
+    private val dictionary    = buildDictionary
 
     private val START_COMMENT = """/**"""                // comment start pattern
     private val END_COMMENT   = """*/"""                 // comment end pattern
@@ -148,7 +172,7 @@ object SpellCheck extends Error
         if (dir.isDirectory ()) {
             for (fi <- dir.listFiles ()) {
                 val fname = fi.getName
-                if (fname endsWith ".scala") checkFile (dir_name + SEP + fname, checkAll)
+                if (fname endsWith ".scala") checkFile (dir_name + ⁄ + fname, checkAll)
             } // of
         } else {
             flaw ("checkDirectory", dir_name + " is not a directory")
@@ -164,12 +188,11 @@ object SpellCheck extends Error
  */
 object SpellCheckTest extends App
 {
-    
     val sp = SpellCheck
     println ("Test line:")
     sp.checkLine ("is this spellled correcty", 1)
-    sp.checkFile (SRC_DIR + "main/scala/scalation/util/SpellCheck.scala")
-    sp.checkDir (SRC_DIR + "main/scala/scalation/util")
+    sp.checkFile (SRC_DIR + "main" + ⁄ + "scala" + ⁄ + "scalation" + ⁄ + "util" + ⁄ + "SpellCheck.scala")
+    sp.checkDir  (SRC_DIR + "main" + ⁄ + "scala" + ⁄ + "scalation" + ⁄ + "util")
 
 } // SpellCheckTest object
 

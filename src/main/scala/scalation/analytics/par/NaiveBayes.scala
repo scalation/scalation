@@ -24,7 +24,7 @@ import scalation.stat.vectorD2StatVector
  *  by multiplying these by values computed using conditional probabilities.  The
  *  classifier is naive, because it assumes feature independence and therefore
  *  simply multiplies the conditional probabilities.
- *  This version uses parallel matrix implemtations.
+ *  This version uses parallel matrix implementations.
  *-----------------------------------------------------------------------------
  *  @param x   the integer-valued data vectors stored as rows of a matrix
  *  @param y   the class vector, where y(l) = class for row l of the matrix x, x(l)

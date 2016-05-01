@@ -47,8 +47,8 @@ class PoissonRegression (x: MatrixD, y: VectorI, fn: Array [String] = null)
     private var pseudo_rSq = -1.0                     // McFaffen's pseudo R-squared
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** For a given parameter vector b, compute - Log-Likelihood (-LL).
-     *  -LL is the standard measure.
+    /** For a given parameter vector 'b', compute '-Log-Likelihood' (-LL).
+     *  '-LL' is the standard measure.
      *  @see dept.stat.lsa.umich.edu/~kshedden/Courses/Stat600/Notes/glm.pdf
      *  @param b  the parameters to fit
      */
@@ -63,8 +63,8 @@ class PoissonRegression (x: MatrixD, y: VectorI, fn: Array [String] = null)
     } // ll
    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** For a given parameter vector b = [b(0)], compute -2 * Log-Likelihood (-2LL).
-     *  -2LL is the standard measure that follows a Chi-Square distribution. 
+    /** For a given parameter vector 'b = [b(0)], compute -2 * Log-Likelihood' (-2LL).
+     *  '-2LL' is the standard measure that follows a Chi-Square distribution. 
      *  @see dept.stat.lsa.umich.edu/~kshedden/Courses/Stat600/Notes/glm.pdf
      *  @param b  the parameters to fit
      */
@@ -81,7 +81,7 @@ class PoissonRegression (x: MatrixD, y: VectorI, fn: Array [String] = null)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** For the full model, train the classifier by fitting the parameter vector
      *  (b-vector) in the logistic regression equation using maximum likelihood.
-     *  Do this by minimizing -2LL.
+     *  Do this by minimizing '-2LL'.
      */
     override def train ()
     {
@@ -96,7 +96,7 @@ class PoissonRegression (x: MatrixD, y: VectorI, fn: Array [String] = null)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** For the null model, train the classifier by fitting the parameter vector
      *  (b-vector) in the logistic regression equation using maximum likelihood.
-     *  Do this by minimizing -2LL.
+     *  Do this by minimizing '-2LL'.
      */
     def train_null ()
     {
@@ -108,7 +108,7 @@ class PoissonRegression (x: MatrixD, y: VectorI, fn: Array [String] = null)
     } // train_null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including rSquared. Assumes both train_null and
+    /** Return the quality of fit including 'rSquared'.  Assumes both train_null and
      *  train have already been called.
      */
     def fit: VectorD = 
@@ -126,55 +126,53 @@ class PoissonRegression (x: MatrixD, y: VectorI, fn: Array [String] = null)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Classify the value of 'y = f(z)' by evaluating the formula 'y = exp (b dot z)',
      *  for an integer vector.
+     *  FIX or remove.
      *  @param z  the new integer vector to predict
-     *
-    def predict (z: VectorI): Tuple2 [Int, String] = predict (z.toDouble)
      */
+//  def predict (z: VectorI): Tuple2 [Int, String] = predict (z.toDouble)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new R-squared value and the new F statistic.
-     *  FIX or remove
-     * 
-    def backElim (): Tuple4 [Int, VectorD, Double, Double] =
-    {
-        var j_max   = -1                     // index of variable to eliminate
-        var b_max: VectorD = null            // parameter values for best solution
-        var rSq_max = -1.0                   // currently maximizing R squared
-        var fS_max  = -1.0                   // could optimize on F statistic
-
-        for (j <- 1 to k) {
-            val keep = n.toInt               // i-value large enough to not exclude any rows in slice
-            val rg_j = new PoissonRegression (x.sliceExclude (keep, j), y)       // regress with x_j removed
-            rg_j.train ()
-            val (b, rSq, fS, rBar) =  rg_j.fit
-            if (rSq > rSq_max) { j_max = j; b_max = b; rSq_max = rSq; fS_max = fS}
-        } // for
-        (j_max, b_max, rSq_max, fS_max)
-    } // backElim
+     *  FIX or remove.
      */
+//  def backElim (): Tuple4 [Int, VectorD, Double, Double] =
+//  {
+//      var j_max   = -1                     // index of variable to eliminate
+//      var b_max: VectorD = null            // parameter values for best solution
+//      var rSq_max = -1.0                   // currently maximizing R squared
+//      var fS_max  = -1.0                   // could optimize on F statistic
+//
+//      for (j <- 1 to k) {
+//          val keep = n.toInt               // i-value large enough to not exclude any rows in slice
+//          val rg_j = new PoissonRegression (x.sliceExclude (keep, j), y)       // regress with x_j removed
+//          rg_j.train ()
+//          val (b, rSq, fS, rBar) =  rg_j.fit
+//          if (rSq > rSq_max) { j_max = j; b_max = b; rSq_max = rSq; fS_max = fS}
+//      } // for
+//      (j_max, b_max, rSq_max, fS_max)
+//    } // backElim
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Variance Inflation Factor (VIF) for each variable to test
-     *  for multi-colinearity by regressing xj against the rest of the variables.
-     *  A VIF over 10 indicates that over 90% of the varaince of xj can be predicted
-     *  from the other variables, so xj is a candidate for removal from the model.
-     *  FIX or remove
-     *
-    def vif: VectorD =
-    {
-        val vifV = new VectorD (k)           // VIF vector
-        for (j <- 1 to k) {
-            val keep = n.toInt               // i-value large enough to not exclude any rows in slice
-            val x_j  = x.col(j)                                               // x_j is jth column in x
-            val rg_j = new PoissonRegression (x.sliceExclude (keep, j), x_j)    // regress with x_j removed
-            rg_j.train ()
-            vifV(j-1) =  1.0 / (1.0 - rg_j.fit._2)                            // store vif for x_1 in vifV(0)
-        } // for
-        vifV
-    } // vif
+    /** Compute the Variance Inflation Factor 'VIF' for each variable to test
+     *  for multi-collinearity by regressing 'xj' against the rest of the variables.
+     *  A VIF over 10 indicates that over 90% of the variance of 'xj' can be predicted
+     *  from the other variables, so 'xj' is a candidate for removal from the model.
+     *  FIX or remove.
      */
+//  def vif: VectorD =
+//  {
+//      val vifV = new VectorD (k)           // VIF vector
+//      for (j <- 1 to k) {
+//          val keep = n.toInt               // i-value large enough to not exclude any rows in slice
+//          val x_j  = x.col(j)                                               // x_j is jth column in x
+//          val rg_j = new PoissonRegression (x.sliceExclude (keep, j), x_j)    // regress with x_j removed
+//          rg_j.train ()
+//          vifV(j-1) =  1.0 / (1.0 - rg_j.fit._2)                            // store vif for x_1 in vifV(0)
+//      } // for
+//      vifV
+//  } // vif
 
 } // PoissonRegression class
 

@@ -16,7 +16,7 @@ import scalation.math.FunctionS2S
 import scalation.analytics.RegTechnique._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** A General Linear Model (GLM) can be developed using the `GLM` trait and object
+/** A General Linear Model 'GLM' can be developed using the `GLM` trait and object
  *  (see below).  The implementation currently supports univariate models with
  *  multivariate models (where each response is a vector) planned for the future.
  *  This version uses parallel processing to speed up execution.
@@ -150,7 +150,7 @@ trait GLM
     /** Build a Trigonometric Regression model.  It makes a matrix using 'expand'.
      *  @param t  the input vector: t_i expands to x_i
      *  @param y  the response vector
-     *  @param k  the maximum multiplier in the trig function (kwt)
+     *  @param k  the maximum multiplier in the trig function 'kwt'
      *  @param w  the base displacement angle in radians
      */
     def apply (t: VectorD, y: VectorD, k: Int, w: Double): TrigRegression =
@@ -159,9 +159,9 @@ trait GLM
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build a Trigonomtetric Regression model.
+    /** Build a Trigonometric Regression model.
      *  @param ty  the combined input vector and response vector
-     *  @param k   the maximum multiplier in the trig function (kwt)
+     *  @param k   the maximum multiplier in the trig function 'kwt'
      *  @param w   the base displacement angle in radians
      */
     def apply (ty: MatrixD, k: Int, w: Double): TrigRegression =

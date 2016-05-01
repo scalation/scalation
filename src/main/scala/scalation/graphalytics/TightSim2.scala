@@ -231,8 +231,8 @@ class TightSim2 (g: Graph, q: Graph)
     } // calculateTotalEdges
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Calculate statistics (e.g., min, max, avg diameter and standard deviation)
-     *  on the  balls left after postprocessing.
+    /** Calculate statistics (e.g., min, max, average diameter and standard deviation)
+     *  on the  balls left after post-processing.
      *  @param balls  mappings from a center vertex to the Ball B(Graph, Center, Radius)
      */
     def calculateBallDiameterMetrics (balls: HashMap [Int, Ball]): Statistic =
@@ -244,7 +244,7 @@ class TightSim2 (g: Graph, q: Graph)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vertex from an array of central vertices, those which have 
-     *  highest ch set size and lowest frequency of label in the query graph, i.e.
+     *  highest 'ch' set size and lowest frequency of label in the query graph, i.e.,
      *  highest ratio.
      *  @param centr the array of vertices whose eccentricity is equal to the radius
      */

@@ -21,9 +21,9 @@ import scalation.linalgebra.MatrixD.eye
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Radau` object implements Radau IIA, which is a simple Ordinary Differential
- *  Equation (ODE) solver for moderately stiff systems.  Solve for 'y' given
+ *  Equation 'ODE' solver for moderately stiff systems.  Solve for 'y' given
  *  <p>
- *  d/dt  y = f(t, y).
+ *      d/dt  y = f(t, y).
  *  <p>
  */
 object Radau

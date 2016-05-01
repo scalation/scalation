@@ -39,7 +39,7 @@ object LogisticFunction
     } // logistic
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the log of the odds of an event ocurring (e.g., success, 1).
+    /** Compute the log of the odds of an event occurring (e.g., success, 1).
      *  The inverse of the logit function is the standard logistic function
      *  (sigmoid function).
      *  @param p  the probability, a number between 0 and 1.

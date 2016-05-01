@@ -29,9 +29,9 @@ import scalation.random.Randi
  *  minimize    f(x) = c x
  *  subject to  a x <= b, x >= 0
  *
- *  The BG Simplex Algorithm performs LU Fractorization/Decomposition of the
+ *  The BG Simplex Algorithm performs LU Factorization/Decomposition of the
  *  basis-matrix ('ba' = 'B') rather than computing inverses ('b_inv').  It has
- *  benefits over the (Revised) Simplex Algorithm (less runtime, less memory,
+ *  benefits over the (Revised) Simplex Algorithm (less run-time, less memory,
  *  and much reduced chance of round off errors).
  *
  *  @param a    the constraint matrix
@@ -233,7 +233,7 @@ class SimplexBG (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] = null
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the SimplexBG class.
+/** The `SimplexBGTest` object is used to test the `SimplexBG` class.
  */
 object SimplexBGTest extends App
 {
@@ -242,7 +242,7 @@ object SimplexBGTest extends App
      *  @param a    the constraint matrix
      *  @param b    the limit/RHS vector
      *  @param c    the cost vector
-     *  @param x_B  the indices of the intial basis
+     *  @param x_B  the indices of the initial basis
      */
     def test (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int] = null)
     {

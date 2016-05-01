@@ -19,7 +19,7 @@ import scalation.linalgebra.MatrixD.outer
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `CanCorrelation` class performs Canonical Correlation Analysis (CCA)
+/** The `CanCorrelation` class performs Canonical Correlation Analysis 'CCA'
  *  on two random vectors.  Samples for the first one are stored in the 'x'
  *  data matrix and samples for the second are stored in the 'y' data matrix.
  *  Find vectors a and b that maximize the correlation between x * a and y * b.
@@ -40,7 +40,7 @@ class CanCorrelation (x: MatrixD, y: MatrixD)
     private val EPSILON  = 1E-8                              // a value close to zero
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Reduce the orginal data ...
+    /** Reduce the original data ...
      */
     def reduce (): MatrixD =
     {
@@ -48,7 +48,7 @@ class CanCorrelation (x: MatrixD, y: MatrixD)
     } // reduce
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Approximately recover the orginal data ...
+    /** Approximately recover the original data ...
      */
     def recover (): MatrixD =
     {
@@ -56,7 +56,7 @@ class CanCorrelation (x: MatrixD, y: MatrixD)
     } // recover
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Reduce the orginal data ...
+    /** Reduce the original data ...
      */
     def reduce2 (): Tuple2 [MatrixD, MatrixD] =
     {
@@ -64,7 +64,7 @@ class CanCorrelation (x: MatrixD, y: MatrixD)
     } // reduce
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Approximately recover the orginal data ...
+    /** Approximately recover the original data ...
      */
     def recover2 (): Tuple2 [MatrixD, MatrixD] =
     {

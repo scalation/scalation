@@ -14,10 +14,10 @@ import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class solves Linear Programming (LP) problems using the Revised Simplex
- *  Algorithm.  Given a constraint matrix a, constant vector b and cost vector c,
- *  find values for the solution/decision vector x that maximize the objective
- *  function f(x), while satisfying all of the constraints, i.e.,
+/** The `RevisedSimplex` class solves Linear Programming (LP) problems using the
+ *  Revised Simplex Algorithm.  Given a constraint matrix 'a', constant vector 'b'
+ *  and cost vector 'c', find values for the solution/decision vector 'x' that
+ *  maximize the objective function 'f(x)', while satisfying all of the constraints, i.e.,
  *
  *  maximize    f(x) = c x
  *  subject to  a x <= b, x >= 0
@@ -52,10 +52,10 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     if (x_B == null) x_B = setBasis ()
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** There are M+N variables, N decision and M slack variables, of which,
+    /** There are 'M+N' variables, 'N' decision and 'M' slack variables, of which,
      *  for each iteration, M are chosen for a Basic Feasible Solution (BFS).
-     *  The the variables not in the basis are set to zero.  Setting j to N
-     *  will start with the slack variables in the basis (only works if b >= 0).
+     *  The the variables not in the basis are set to zero.  Setting 'j' to 'N'
+     *  will start with the slack variables in the basis (only works if 'b >= 0').
      *  @param j  the offset to start the basis
      *  @param l  the size of the basis
      */
@@ -67,7 +67,7 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     } // setBasis
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Find the best variable x_l to enter the basis.
+    /** Find the best variable 'x_l' to enter the basis.
      */
     def entering (): Int = 
     {
@@ -76,7 +76,7 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     } // entering 
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Find the best variable x_k to leave the basis given that x_l is entering.
+    /** Find the best variable 'x_k' to leave the basis given that 'x_l' is entering.
      *  @param l  the variable chosen to enter the basis
      */
     def leaving (l: Int): Int =
@@ -93,7 +93,7 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     } // leaving
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Pivot by replacing x_k with x_l in the basis.  Update b_inv, b_ and c_.
+    /** Pivot by replacing 'x_k' with 'x_l' in the basis.  Update 'b_inv',' b_' and 'c_'.
      *  @param k  the leaving variable
      *  @param l  the entering variable
      */
@@ -110,7 +110,7 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     } // pivot
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** if u <= 0., the solution is unbounded.
+    /** Determine whether 'u <= 0.0', i.e., the solution is unbounded.
      *  @param u  the ?? vector FIX
      */
     def unbounded (u: VectoD): Boolean =
@@ -143,23 +143,23 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
     } // solve
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the primal solution vector (x).
+    /** Return the primal solution vector 'x'.
      */
     def primal: VectorD = b_inv * b
 
    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the dual solution vector (y).  FIX
+    /** Return the dual solution vector 'y'.  FIX
      */
     def dual: VectoD = null
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the optimal objective function value (f(x) = c x).
+    /** Return the optimal objective function value 'f(x) = c x'.
      *  @param x  the primal solution vector
      */
     def objValue (x: VectorD): Double = c.select(x_B) dot x
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Show the current revised tableau displaying the basis, b_inv, b_, c_.
+    /** Show the current revised tableau displaying the basis, 'b_inv', 'b_', 'c_'.
      */
     def showTableau ()
     {
@@ -176,7 +176,8 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** Test the Revised Simplex Algorithm class with the following maximization problem:
+/** The `RevisedSimplexTest` tests the Revised Simplex Algorithm class with the
+ *  following maximization problem:
  *  Maximize    z = 2x_0 + 3x_1 + 4x_2
  *  Subject to      3x_0 + 2x_1 + 1x_2 + 1y_3 + 0y_4 = 10
  *                 2x_0 + 5x_1 + 3x_2 + 0y_3 + 1y_4 = 15
@@ -200,21 +201,19 @@ object RevisedSimplexTest extends App
     println ("optimal x = " + result._1 + ", max cx = " + result._2)
     println ("---------------------------------------------------")
 
-/*
     // initialize matrix a and vectors b and c
     //
-    val a = new MatrixD ((2, 3), 3.0, 2.0, 1.0,
-                                 2.0, 5.0, 3.0)
-    val c   = VectorD           (2.0, 3.0, 4.0)
-    val b   = VectorD (10.0, 15.0)
-    val x_B = Array (1, 2)
-
-    val result = (new RevisedSimplex (a, b, c, x_B)).solve ()
-
-    println ("---------------------------------------------------")
-    println ("optimal x = " + result._1 + ", max cx = " + result._2)
-    println ("---------------------------------------------------")
-*/
+//  val a = new MatrixD ((2, 3), 3.0, 2.0, 1.0,
+//                               2.0, 5.0, 3.0)
+//  val c   = VectorD           (2.0, 3.0, 4.0)
+//  val b   = VectorD (10.0, 15.0)
+//  val x_B = Array (1, 2)
+//
+//  val result = (new RevisedSimplex (a, b, c, x_B)).solve ()
+//
+//  println ("---------------------------------------------------")
+//  println ("optimal x = " + result._1 + ", max cx = " + result._2)
+//  println ("---------------------------------------------------")
 
 } // RevisedSimplexTest object
 

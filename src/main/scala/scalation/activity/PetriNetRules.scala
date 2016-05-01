@@ -15,7 +15,7 @@ import scalation.linalgebra.{VectorD, VectorI}
 import scalation.random.{Sharp, Variate}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `PetriNetRules` class is used to define firing rules for the PetriNet class.
+/** The `PetriNetRules` class is used to define firing rules for the `PetriNet` class.
  *  It supports both constant flow and linear flow models of token (integer valued)
  *  and fluid (real valued) flow.  Typically, in the constant flow model, a base
  *  flow vector is used  for the threshold (require at least this number of tokens/amount
@@ -102,8 +102,8 @@ trait PetriNetRules
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the amount of fluid to flow over an arc according to the
-     *  system of first-order Ordinary Differential Equation (ODE's):
-     *  "integral derv from t0 to t".  Supports ODE base flow models.
+     *  system of first-order Ordinary Differential Equation 'ODE's:
+     *  "integral 'derv' from t0 to t".  Supports ODE base flow models.
      *  @param f     the fluid vector (amount of fluid per color)
      *  @param derv  the array of derivative functions
      *  @param t0    the current time

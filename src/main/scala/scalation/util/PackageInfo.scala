@@ -6,7 +6,8 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.util
+package scalation
+package util
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PackageInfo` trait provides methods to retrieve meta-data about packages.
@@ -23,7 +24,7 @@ trait PackageInfo
      */
     def getDataPath: String =
     {
-        getPackageName.replace ("scalation", "data").replace (".", SEP) + SEP
+        getPackageName.replace ("scalation", "data").replace (".", ⁄) + ⁄
     } // gatDataPath
 
 } // PackageInfo trait

@@ -18,17 +18,18 @@ import scalation.linalgebra.VectorD
 import scalation.math.FunctionS2S
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class performs an inexact line search on f to find a point x that exhibits
- *  (1) sufficient decrease (f(x) enough less that f(0)) and
+/** The `WolfeLS` class performs an inexact line search on 'f' to find a point 'x'
+ *  that exhibits
+ *  (1) sufficient decrease ('f(x)' enough less that 'f(0)') and
  *  (2) the slope at x is less steep than the slope at 0.
- *  That is, the line search looks for a value for x satisfying the two Wolfe conditions.
+ *  That is, the line search looks for a value for 'x' satisfying the two Wolfe conditions.
  *  
  *     f(x) <= f(0) + c1 * f'(0) * x      Wolfe condition 1 (Armijo condition)
  *  |f'(x)| <= |c2 * f'(0)|               Wolfe condition 2 (Strong version)
  *    f'(x) >= c2 * f'(0)                 Wolfe condition 2 (Weak version, more robust)
  *  
- *  It works on scalar functions (see WolfeLSTest).  If starting with a vector function
- *  f(x), simply define a new function g(y) = x0 + direction * y (see WolfeLSTest2).
+ *  It works on scalar functions (@see `WolfeLSTest`).  If starting with a vector function
+ *  f(x), simply define a new function g(y) = x0 + direction * y (@see `WolfeLSTest2`).
  *  
  *  @param f   the scalar objective function to minimize
  *  @param c1  constant for sufficient decrease (Wolfe condition 1)
@@ -85,7 +86,7 @@ class WolfeLS (f: FunctionS2S, c1: Double = .0001, c2: Double = .9)
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the WolfeLS class on scalar functions.
+/** The `WolfeLSTest` object is used to test the `WolfeLS` class on scalar functions.
  */
 object WolfeLSTest extends App
 {
@@ -99,7 +100,7 @@ object WolfeLSTest extends App
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the WolfeLS class on vector functions.
+/** The `WolfeLSTest2` object is used to test the `WolfeLS` class on vector functions.
  */
 object WolfeLSTest2 extends App
 {

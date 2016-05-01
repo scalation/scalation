@@ -2,7 +2,7 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Naman Fatehpuria
  *  @version 1.2
- *  @date    Mon July 29 14:09:25 EDT 2013
+ *  @date    Mon Jul 29 14:09:25 EDT 2013
  *  @see     LICENSE (MIT style license file).
  */
 
@@ -13,8 +13,8 @@ import math.{ceil, min}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NMFactorization` class factors a matrix 'v' into two non negative matrices 
- *  'w' and 'h' such that v = wh approximately.
- *  @see  http://en.wikipedia.org/wiki/Non-negative_matrix_factorization
+ *  'w' and 'h' such that 'v = wh' approximately.
+ *  @see  en.wikipedia.org/wiki/Non-negative_matrix_factorization
  *  @param v      the matrix to be factored 
  *  @param loops  the number of iterations before checking the termination condition  
  *  @param r      factor the m-by-n matrix 'v' in to two factors: an m-by-r and r-by-n matrix  

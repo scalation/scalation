@@ -5,12 +5,12 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.relalgebra
+package scalation
+package relalgebra
 
 import scalation.math.StrO.StrNum
 import scalation.random.Random
 import scalation.stat.vectorD2StatVector
-import scalation.util.SEP
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MissingValues` object is used to replace missing values in a dataset.
@@ -64,14 +64,14 @@ object MissingValues
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `MissingValuesTest` object is used to test the `MissingValues` object
+/** The `MissingValuesTest` object is used to test the `MissingValues` object.
  *  > run-main scalation.relalgebra.MissingValuesTest
  */
-object MissingValuesTest extends App {
-
+object MissingValuesTest extends App
+{
     import MissingValues.replaceMissingValues
 
-    val fname = "analytics" + SEP + "reaction_network.csv"
+    val fname = "analytics" + ⁄ + "reaction_network.csv"
     val seq = (0 to 28).map (_.toString ())
     val tab1 = Relation (fname, "Reaction Network", seq, 0, null)
     val tab2 = replaceMissingValues (tab1, Seq (0), "4")

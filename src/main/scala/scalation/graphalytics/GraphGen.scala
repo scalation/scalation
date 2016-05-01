@@ -31,9 +31,9 @@ object GraphGen
     //------------------------------------------------------------------------
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Generates a random graph with the specified size (number of vertices), 
+    /** Generate a random graph with the specified size (number of vertices), 
      *  average degree and labels evenly distributed across vertices from 0 to
-     *  nLabels - 1.  Not necessarily a connected graph.
+     *  'nLabels - 1'.  Not necessarily a connected graph.
      *  @param size      the number of vertices to generate
      *  @param nLabels   the number of labels (distributed uniformly)
      *  @param avDegree  the average degree
@@ -52,7 +52,7 @@ object GraphGen
     } // genRandomGraph
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Generates a random connected graph by using genRandomGraph and
+    /** Generate a random connected graph by using 'genRandomGraph' and
      *  checking whether it is connected.
      *  @param size      the number of vertices to generate
      *  @param nLabels   the number of labels (distributed uniformly)
@@ -69,7 +69,7 @@ object GraphGen
     } // genRandomConnectedGraph
   
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Generates a random graph with labels distributed based on a power law
+    /** Generate a random graph with labels distributed based on a power law
      *  distribution (currently with the magic number 2.1 for the power law exponent).
      *  @param size      the number of vertices to generate
      *  @param nLabels   the number of labels (distributed according to power law)
@@ -95,7 +95,7 @@ object GraphGen
     //------------------------------------------------------------------------
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Generates a graph with power law degree distribution with exponent 'distPow'
+    /** Generate a graph with power law degree distribution with exponent 'distPow'
      *  and uniformly distributed labels.
      *  @param size       the number of vertices 
      *  @param nLabels    the number of labels (distributed uniformly)
@@ -116,7 +116,7 @@ object GraphGen
     } // genPowerLawGraph
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Generates a graph with power law degree distribution with exponent 'distPow'
+    /** Generate a graph with power law degree distribution with exponent 'distPow'
      *  and power law distributed labels.
      *  @param size       the number of vertices 
      *  @param nLabels    the number of labels (distributed according to power law)
@@ -142,7 +142,7 @@ object GraphGen
     //------------------------------------------------------------------------
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given a graph 'g', performs a breadth first search starting at a random vertex
+    /** Given a graph 'g', perform a breadth first search starting at a random vertex
      *  until the breadth first tree contains 'size' vertices.  At each junction,
      *  it chooses a random number of children to traverse, with that random
      *  number averaging to 'avDegree'.
@@ -205,7 +205,7 @@ object GraphGen
     } // genBFSQuery
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Extracts a subgraph of 'size' vertices from graph 'g' by performing a
+    /** Extract a subgraph of 'size' vertices from graph 'g' by performing a
      *  breadth-first search from a random vertex.
      *  @param size     the number of vertices to extract
      *  @param g        the data graph to extract from
@@ -266,7 +266,7 @@ object GraphGen
     //------------------------------------------------------------------------
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Returns an array with labels distributed between 0 and nLabels - 1
+    /** Return an array with labels distributed between 0 and 'nLabels - 1'
      *  based on a uniform distribution.
      *  @param size     the number of vertices
      *  @param nLabels  the number of labels
@@ -277,7 +277,7 @@ object GraphGen
     } // randDistLabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Returns an array with labels distributed between 0 and nLabels - 1
+    /** Return an array with labels distributed between 0 and 'nLabels - 1'
      *  based on a power law distribution.
      *  @param size     the number of vertices
      *  @param nLabels  the number of labels
@@ -289,7 +289,7 @@ object GraphGen
     } // powDistLabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Returns an array with labels distributed between 0 and nLabels - 1
+    /** Return an array with labels distributed between 0 and 'nLabels - 1'
      *  based on a Gaussian/Normal distribution.
      *  @param size     the number of vertices
      *  @param nLabels  the number of labels
@@ -300,7 +300,7 @@ object GraphGen
     } // gaussianDistLabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Returns a random integer between min and max with a frequency determined
+    /** Return a random integer between min and max with a frequency determined
      *  by a power law distribution.
      *  @param min      the minimum value
      *  @param max      the maximum value
@@ -313,11 +313,11 @@ object GraphGen
                        (1.0 / exp)).toInt
     } // powInt
 
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Returns an integer with a probability based on a gaussian distribution
-     *  centered at d
-     *  FIX: may need to truncate with math.min(math.max((rand.nextGaussian()*d+d).toInt, 0), d*2).toInt
-     *  @param d  the WHAT??
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return an integer with a probability based on a Gaussian distribution
+     *  FIX: may need to truncate with
+     *       'math.min(math.max((rand.nextGaussian()*d+d).toInt, 0), d*2).toInt
+     *  @param d  the distance/rescaling parameter
      */
     private def gaussInt (d: Double) = (rand.nextGaussian () * 2.0 * d).toInt
 
@@ -325,8 +325,8 @@ object GraphGen
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The 'GraphGenTest' object is used to test the 'GraphGen' class
- *  for building random graphs where a vertex's degree is uniformly distributed.
+/** The `GraphGenTest` object is used to test the `GraphGen` class for building
+ *  random graphs where a vertex's degree is uniformly distributed.
  */
 object GraphGenTest extends App
 {
@@ -354,8 +354,8 @@ object GraphGenTest extends App
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The 'GraphGenTest2' object is used to test the 'GraphGen' class
- *  for building power law graphs.
+/** The `GraphGenTest2` object is used to test the `GraphGen` class for building
+ *  power law graphs.
  */
 object GraphGenTest2 extends App
 {
@@ -375,8 +375,8 @@ object GraphGenTest2 extends App
 } // GraphGenTest2
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `GraphGenTest3` object is used to test the `GraphGen` class
- *  for extracting query graphs from data graphs.
+/** The `GraphGenTest3` object is used to test the `GraphGen` class for
+ *  extracting query graphs from data graphs.
  */
 object GraphGenTest3 extends App
 {

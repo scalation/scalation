@@ -6,15 +6,14 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.graphalytics.mutable
+package scalation.graphalytics
+package mutable
 
 import java.io.PrintWriter
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.{Set => SET}
 import scala.io.Source.fromFile
-
-import scalation.graphalytics.BASE
 
 import LabelType.{TLabel, toTLabel}
 import MGraphIO.EXT
@@ -39,7 +38,7 @@ class MGraphIO (g: MGraph)
      *  @param base  the base sub-directory for storing graphs
      *  @param ext   the standard file extension for graph
      */
-    def write (name: String = g.name, base: String = BASE, ext: String = EXT)
+    def write (name: String = g.name, base: String = BASE_DIR, ext: String = EXT)
     {
         val gFile = base + name + ext                             // relative path-name for file
         val pw    = new PrintWriter (gFile)
@@ -52,7 +51,7 @@ class MGraphIO (g: MGraph)
     } // write
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Write the graph to TWO igraph compatible files.
+    /** Write the graph to TWO 'igraph' compatible files.
      *  @see igraph.sourceforge.net
      */
     def write2IgraphFiles (prefix: String): (String, String) =
@@ -69,8 +68,8 @@ class MGraphIO (g: MGraph)
     } // write2IgraphFiles
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Write the graph to TWO Neo4J compatible files: lFile and eFile so that
-     *  they may be fed into Neo4j with one of its utilities.
+    /** Write the graph to TWO 'Neo4J' compatible files: 'lFile' and 'eFile' so that
+     *  they may be fed into 'Neo4j' with one of its utilities.
      *  FIX:  need to handle multiple edge types.
      *  @param lFile  the file containing the graph labels (line: vertex-id TAB label)
      *  @param eFile  the file the edges (line: start-id TAB end-id TAB type)
@@ -134,7 +133,7 @@ object MGraphIO
      *  @param ext   the standard file extension for graph
      *  @param sep   the character separating the values (e.g., ',', ' ', '\t')
      */
-    def apply (name: String, base: String = BASE, ext: String = EXT, sep: Char = ','): MGraph =
+    def apply (name: String, base: String = BASE_DIR, ext: String = EXT, sep: Char = ','): MGraph =
     {
         val gFile  = base + name + ext                             // relative path-name for file
         val l      = fromFile (gFile).getLines.toArray             // get the lines from gFile

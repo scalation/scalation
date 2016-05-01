@@ -6,9 +6,9 @@
  *  @see     LICENSE (MIT style license file).
  *-----------------------------------------------------------------------------
  *  @see Linear Programming and Network Flows, Bazaraa and Jarvis
- *       www.wiley.com/WileyCDA/WileyTitle/productCd-0470462728,subjectCd-BA04.html
+ *  @see www.wiley.com/WileyCDA/WileyTitle/productCd-0470462728,subjectCd-BA04.html
  *  @see Algorithms, 4th Edition, Robert Sedgewick and Kevin Wayne
- *       www.cs.princeton.edu/algs4/63or/Simplex.java.html
+ *  @see www.cs.princeton.edu/algs4/63or/Simplex.java.html
  *  @see en.wikibooks.org/wiki/Operations_Research/The_Simplex_Method
  */
 
@@ -20,17 +20,17 @@ import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class checks the solution to Linear Programming (LP) problems.  Given
- *  a constraint matrix 'a', limit/RHS vector 'b' and cost vector 'c', determine
+/** The `CheckLP` class checks the solution to Linear Programming (LP) problems.
+ *  Given a constraint matrix 'a', limit/RHS vector 'b' and cost vector 'c', determine
  *  if the values for the solution/decision vector 'x' maximizes the objective
- *  function f(x), while satisfying all of the constraints, i.e.,
+ *  function 'f(x)', while satisfying all of the constraints, i.e.,
  *
  *  maximize    f(x) = c x
  *  subject to  a x <= b, x >= 0
  *
  *  Check the feasibility and optimality of the solution.
  *  @param a  the M-by-N constraint matrix
- *  @param b  the M-length limit/RHS vector (make b_i negative for ">=" constaint => surplus)
+ *  @param b  the M-length limit/RHS vector (make b_i negative for '>=' constraint => surplus)
  *  @param c  the N-length cost vector
  */
 class CheckLP (a: MatrixD, b: VectorD, c: VectorD)
@@ -45,7 +45,7 @@ class CheckLP (a: MatrixD, b: VectorD, c: VectorD)
     if (c.dim != N) flaw ("constructor", "c.dim = " + c.dim + " != " + N)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Is the solution primal feasible (x >= 0 and a x [<= | >=] b)?
+    /** Determine whether the solution primal feasible '(x >= 0 and a x [<= | >=] b)'.
      *  @param x  the N-length primal solution vector
      */
     def isPrimalFeasible (x: VectorD): Boolean =
@@ -78,7 +78,7 @@ class CheckLP (a: MatrixD, b: VectorD, c: VectorD)
     } // isPrimalFeasible
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Is the solution dual feasible (y >= 0 and y a >= c)?
+    /** Determine whether the solution dual feasible 'y >= 0 and y a >= c'.
      *  @param y  the M-length dual solution vector
      */
     def isDualFeasible (y: VectorD): Boolean =

@@ -28,7 +28,7 @@ trait Component extends Identifiable with Locatable
      */
     val DIAM = 2.0 * RAD
 
-    /** List of subparts of the Component (empty for atomics, nonempty for composites)
+    /** List of subparts of the Component (empty for atomic components, nonempty for composites)
      */
     val subpart = ListBuffer [Component] ()
 
@@ -68,7 +68,7 @@ trait Component extends Identifiable with Locatable
     def composite: Boolean = subpart.size > 0
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Initialize this component (all of its vars).
+    /** Initialize this component (all of its 'var's).
      *  @param label  the name of this component
      *  @param loc    the location of this component
      */

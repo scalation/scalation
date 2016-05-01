@@ -259,7 +259,7 @@ class Tree (val root: TreeNode, depth: Double, val name: String = "tree")
     def printTree () { printPre (root, 0) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Recursive helper method for printing the tree using a pre-order traversal.
+    /** Recursive helper method for printing the tree using a preorder traversal.
      *  @param n    the current node to print
      *  @param lev  the level of the node => amount of indentation
      */
@@ -305,7 +305,7 @@ class Tree (val root: TreeNode, depth: Double, val name: String = "tree")
     } // aniTree
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Recursive helper method for animating the tree using a pre-order traversal.
+    /** Recursive helper method for animating the tree using a preorder traversal.
      *  @param n     the current node to animate
      *  @param p     the parent node
      *  @param ord   the birth order of the node

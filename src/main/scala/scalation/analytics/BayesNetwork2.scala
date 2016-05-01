@@ -16,12 +16,12 @@ import scalation.linalgebra.{MatrixI, VectorD, VectorI}
 import scalation.linalgebra.gen.HMatrix5
 import scalation.random.{PermutedVecI, RandomVecI}
 import scalation.random.RNGStream.ranStream
-import scalation.util.{DATA_DIR, SEP, time}
+import scalation.util.time
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BayesNetwork2` class implements an Integer-Based Bayesian Network Classifier,
  *  which is a commonly used such classifier for discrete input data.  Each node is
- *  limited to have at most 2 parents, and hence the "2" in the class name "BayesNetwork2".
+ *  limited to have at most 2 parents, and hence the "2" in the class name `BayesNetwork2`.
  *  The classifier is trained using a data matrix 'x' and a classification vector 'y'.
  *  Each data vector in the matrix is classified into one of 'k' classes numbered
  *  0, ..., k-1.  Prior probabilities are calculated based on the population of
@@ -81,8 +81,8 @@ class BayesNetwork2 (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arr
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the parent of each feature based on the correlation matrix.
-     *  Feature x_i is only a possible candidate for parent of feature x_j if
-     *  x_i appears before x_j in featureOrder.
+     *  Feature 'x_i' is only a possible candidate for parent of feature 'x_j' if
+     *  'x_i' appears before 'x_j' in 'featureOrder'.
      */
     def computeParent ()
     {
@@ -136,12 +136,11 @@ class BayesNetwork2 (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arr
                 else popX(i, j, x(l, j), 0, 0) += 1
             } // for
         } // for
-/*******
-        if (DEBUG) {
-            println("popC = " + popC)        // #(C = i)
-            println("popX = " + popX)        // #(X_j = x & C = i)
-        } // if
-*******/
+
+//      if (DEBUG) {
+//          println("popC = " + popC)        // #(C = i)
+//          println("popX = " + popX)        // #(X_j = x & C = i)
+//      } // if
     } // frequencies
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -167,12 +166,11 @@ class BayesNetwork2 (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arr
                 } // for
             } // for
         } // for
-/*******
-        if (DEBUG) {
-            println("probC = " + probC)      // P(C = i)
-            println("probX = " + probX)      // P(X_j = x | C = i)
-        } // if
-*******/
+
+//      if (DEBUG) {
+//          println("probC = " + probC)      // P(C = i)
+//          println("probX = " + probX)      // P(X_j = x | C = i)
+//      } // if
     } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -219,7 +217,7 @@ class BayesNetwork2 (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arr
     } // reset
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Log-Likelihood for the given Baysian Network structure and
+    /** Compute the Log-Likelihood for the given Bayesian Network structure and
      *  data.
      */
     def logLikelihood: Double =
@@ -239,7 +237,7 @@ class BayesNetwork2 (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arr
     } // logLikelihood
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the AIC for the given Baysian Network structure and data.
+    /** Compute the 'AIC' for the given Bayesian Network structure and data.
      */
     def aic: Double =
     {
@@ -249,7 +247,7 @@ class BayesNetwork2 (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arr
     } // aic
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build the Bayes Networks2 classier model by using the AIC criterion.
+    /** Build the Bayes Networks2 classier model by using the 'AIC' criterion.
      *  Limited dependencies between variables/features are also supported.
      *  Maximum number of parents for each feature is 2.
      */
@@ -358,13 +356,13 @@ class BayesNetwork2 (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arr
     } // buildModel
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Swap jth and j+1th element of featureOrder, and store the result of the
-     *  calculated criterion in the cth element of 'criterion', then swap the
+    /** Swap 'j'th and j'+1'th element of 'featureOrder', and store the result of the
+     *  calculated criterion in the 'c'th element of 'criterion', then swap the
      *  features back.
-     *  @param j index of featureOrder
-     *  @param c index of criterion
-     *  @param criterion the vector that stores all the calculated criterions,
-     *                  i.e. the AIC criterion.
+     *  @param j          index of 'featureOrder'
+     *  @param c          index of criterion
+     *  @param criterion  the vector that stores all the calculated criterions,
+     *                  i.e., the 'AIC' criterion.
      */
     def testSwapping (j: Int, criterion: VectorD, c: Int)
     {
@@ -385,9 +383,9 @@ class BayesNetwork2 (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arr
     } // swapFeatures
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Swap jth and j+1th element in featureOrder, add the swap operation to
+    /** Swap 'j'th and 'j+1'th element in 'featureOrder', add the swap operation to
      *  the tabu list, reset, and re-train the classifier.
-     *  @param j index of featureOrder
+     *  @param j index of 'featureOrder'
      */
     def swapFeatures (j: Int)
     {
@@ -397,9 +395,9 @@ class BayesNetwork2 (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arr
     } // swapFeatures
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add the jth and j+1th element of featureOrder into the tabu list.
+    /** Add the 'j'th and 'j+1'th element of 'featureOrder' into the tabu list.
      *  If the tabu list is too large, remove the oldest element.
-     *  @param j index of featureOrder
+     *  @param j index of 'featureOrder'
      */
     def addTaboo (j: Int)
     {
@@ -408,8 +406,8 @@ class BayesNetwork2 (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arr
     } // addTaboo
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check if the jth and j+1th element of featureOrder are in the tabu list.
-     *  @param j index of featureOrder
+    /** Check if the 'j'th and 'j+1'th element of 'featureOrder' are in the tabu list.
+     *  @param j index of 'featureOrder'
      */
     def notInTaboo (j: Int): Boolean =
     {
@@ -435,7 +433,7 @@ object BayesNetwork2
       * @param thres  the correlation threshold between 2 features for possible parent-child relationship
       */
     def apply (xy: MatrixI, fn: Array [String], k: Int, cn: Array [String],
-              vc: VectorI = null, me: Int = 3, thres: Double = 0.3) =
+               vc: VectorI = null, me: Int = 3, thres: Double = 0.3) =
     {
         new BayesNetwork2 (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn,
                            vc, me, thres)
@@ -480,15 +478,13 @@ object BayesNetwork2Test extends App
     // bn2.train ()
     bn2.buildModel ()
 
-/***
     // test sample ------------------------------------------------------------
-    val z1 = VectorI (1, 0, 1)        // existing data vector to classify
-    val z2 = VectorI (1, 1, 1)        // new data vector to classify
-    println("classify (" + z1 + ") = " + bn2.classify (z1) + "\n")
-    println("classify (" + z2 + ") = " + bn2.classify (z2) + "\n")
-
-    bn2.crossValidate ()              // cross validate the classifier
-***/
+//  val z1 = VectorI (1, 0, 1)        // existing data vector to classify
+//  val z2 = VectorI (1, 1, 1)        // new data vector to classify
+//  println("classify (" + z1 + ") = " + bn2.classify (z1) + "\n")
+//  println("classify (" + z2 + ") = " + bn2.classify (z2) + "\n")
+//
+//  bn2.crossValidate ()              // cross validate the classifier
 
     println ("Log-likelihood = " + bn2.logLikelihood)
     println ("AIC = " + bn2.aic)
@@ -542,13 +538,14 @@ object BayesNetwork2Test2 extends App
 
 } // BayesNetwork2Test2 object
 
+
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BayesNetwork2Test3` object is used to test the `BayesNetwork2` class.
   * > run-main scalation.analytics.BayesNetwork2Test3
   */
 object BayesNetwork2Test3 extends App
 {
-    val fname  = DATA_DIR + "analytics" + SEP + "bayes_data.csv"                 // file's relative path name
+    val fname  = BASE_DIR + "bayes_data.csv"                      // file's relative path name
     val (m, n) = (683, 10)                                        // number of (rows/lines, columns) in file
 
     val xy = ClassifierInt (fname, m, n)                          // load 'xy' data matrix from file
@@ -561,11 +558,9 @@ object BayesNetwork2Test3 extends App
     val cn = Array ("benign", "malignant")
     val vc = VectorI (11, 11, 11, 11, 11, 11, 11, 11, 11)
 
-    /*
-    println ("---------------------------------------------------------------")
-    println ("D A T A   M A T R I X")
-    println ("xy = " + xy)
-    */
+//  println ("---------------------------------------------------------------")
+//  println ("D A T A   M A T R I X")
+//  println ("xy = " + xy)
 
     val bn2 = BayesNetwork2(xy, fn, k, cn, vc, 3) // create the classifier
 

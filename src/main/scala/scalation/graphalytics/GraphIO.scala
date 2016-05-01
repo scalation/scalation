@@ -28,14 +28,14 @@ class GraphIO (g: Graph)
      *  <p>
      *      Graph (<name>, <inverse> <nVertices>
      *      <vertexId> <label> <chVertex0> <chVertex1> ...
-            ...
-            )
+     *      ...
+     *      )
      *  <p>
      *  @param name  the file-name containing the graph's vertex, edge and label information
      *  @param base  the base sub-directory for storing graphs
      *  @param ext   the standard file extension for graph
      */
-    def write (name: String = g.name, base: String = BASE, ext: String = EXT)
+    def write (name: String = g.name, base: String = BASE_DIR, ext: String = EXT)
     {
         val gFile = base + name + ext                             // relative path-name for file
         val pw    = new PrintWriter (gFile)
@@ -47,7 +47,7 @@ class GraphIO (g: Graph)
     } // write
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Write the graph to TWO igraph compatible files.
+    /** Write the graph to TWO 'igraph' compatible files.
      *  @see igraph.sourceforge.net
      */
     def write2IgraphFiles (prefix: String): (String, String) =
@@ -64,8 +64,8 @@ class GraphIO (g: Graph)
     } // write2IgraphFiles
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Write the graph to TWO Neo4J compatible files: lFile and eFile so that
-     *  they may be fed into Neo4j with one of its utilities.
+    /** Write the graph to TWO 'Neo4J' compatible files: 'lFile' and 'eFile' so that
+     *  they may be fed into 'Neo4j' with one of its utilities.
      *  FIX:  need to handle multiple edge types.
      *  @param lFile  the file containing the graph labels (line: vertex-id TAB label)
      *  @param eFile  the file the edges (line: start-id TAB end-id TAB type)
@@ -95,7 +95,7 @@ class GraphIO (g: Graph)
 object GraphIO
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given an array of integers as straings, make the corresponding set.
+    /** Given an array of integers as strings, make the corresponding set.
      *  @param line  the element string array
      */
     def makeSet (eStrArr: Array [String]): SET [Int] =
@@ -116,7 +116,7 @@ object GraphIO
      *  @param ext   the standard file extension for graph
      *  @param sep   the character separating the values (e.g., ',', ' ', '\t')
      */
-    def apply (name: String, base: String = BASE, ext: String = EXT, sep: Char = ','): Graph =
+    def apply (name: String, base: String = BASE_DIR, ext: String = EXT, sep: Char = ','): Graph =
     {
         val gFile = base + name + ext                             // relative path-name for file
         val l     = fromFile (gFile).getLines.toArray             // get the lines from gFile

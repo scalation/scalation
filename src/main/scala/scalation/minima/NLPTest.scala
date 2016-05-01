@@ -17,11 +17,11 @@ import scalation.linalgebra.VectorD
 /** The `NLPTest1` object used to test several Non-Linear Programming (NLP) algorithms
  *  on unconstrained problems.
  *  Algorithms:
- *      sdcs - Steepest Descent with Custom Line Search
- *      sdgs - Steepest Descent with Golden Section Line Search
- *      prcg - Polak-Ribiere Conjugate Gradient with Golden Section Line Search
- *      sdws - Steepest Descent with Wolfe Line Search
- *      bfgs - Broyden–Fletcher–Goldfarb–Shanno with Wolfe Line Search
+ *      'sdcs' - Steepest Descent with Custom Line Search
+ *      'sdgs' - Steepest Descent with Golden Section Line Search
+ *      'prcg' - Polak-Ribiere Conjugate Gradient with Golden Section Line Search
+ *      'sdws' - Steepest Descent with Wolfe Line Search
+ *      'bfgs' - Broyden–Fletcher–Goldfarb–Shanno with Wolfe Line Search
  */
 object NLPTest1 extends App
 {

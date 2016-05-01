@@ -29,7 +29,7 @@ import Probability.entropy
  *  @param x       the data vectors stored as rows of a matrix
  *  @param y       the class array, where y_i = class for row i of the matrix x
  *  @param fn      the names for all features/variables
- *  @param isCont  boolean value to indicate whether according feature is continuous
+ *  @param isCont  `Boolean` value to indicate whether according feature is continuous
  *  @param k       the number of classes
  *  @param cn      the names for all classes
  *  @param vc      the value count array indicating number of distinct values per feature
@@ -43,7 +43,7 @@ class DecisionTreeC45 (val x: MatrixI, val y: VectorI, fn: Array [String], isCon
      *  @param f         feature of the node, if it is leaf, contains the feature of its parent
      *  @param value     branch value
      *  @param theshold  threshold for continuous feature
-     *  @param leaf      boolean value indicate whether is leaf node
+     *  @param leaf      `Boolean` value indicate whether is leaf node
      *  @param decision  decision if it is leaf node
      */
     class Node (val f: Int, var value: Int, val threshold: Double = -1,
@@ -81,7 +81,7 @@ class DecisionTreeC45 (val x: MatrixI, val y: VectorI, fn: Array [String], isCon
     
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a feature column (e.g., 2 (Humidity)) and a value (e.g., 1 (High))
-     *  use the frequency of ocurrence the value for each classification
+     *  use the frequency of occurrence the value for each classification
      *  (e.g., 0 (no), 1 (yes)) to estimate k probabilities.  Also, determine
      *  the fraction of training cases where the feature has this value
      *  (e.g., fraction where Humidity is High = 7/14).
@@ -376,7 +376,7 @@ object DecisionTreeC45
     /** Create a 'DecisionTreeID3` object, passing 'x' and 'y' together in one table.
      *  @param xy  the data vectors along with their classifications stored as rows of a matrix
      *  @param fn      the names for all features/variables
-     *  @param isCont  boolean value to indicate whether according feature is continuous
+     *  @param isCont  `Boolean` value to indicate whether according feature is continuous
      *  @param k       the number of classes
      *  @param cn      the names for all classes
      *  @param vc      the value count array indicating number of distinct values per feature

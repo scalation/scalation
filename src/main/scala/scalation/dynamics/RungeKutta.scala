@@ -19,11 +19,11 @@ import scalation.util.Error
  *  ODE solver.  Given an unknown, time-dependent function 'y(t)' governed by an
  *  Ordinary Differential Equation (ODE) of the form:
  *  <p>
- *  d/dt y(t) = f(t, y)
+ *      d/dt y(t) = f(t, y)
  *  <p>
- *  Compute 'y(t)' using a 4th-order Runge-Kutta Integrator (RK4).  Note: the
- *  integrateV method for a system of separable ODEs is mixed in from the
- *  Integrator trait.
+ *  Compute 'y(t)' using a 4th-order Runge-Kutta Integrator 'RK4'.  Note: the
+ *  'integrateV' method for a system of separable ODEs is mixed in from the
+ *  `Integrator` trait.
  */
 object RungeKutta
        extends Integrator

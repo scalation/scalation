@@ -15,10 +15,10 @@ import scalation.calculus.Calculus.derivative
 import scalation.math.FunctionS2S
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class is used to find roots (zeros) for a one-dimensional (scalar)
- *  function f.  If f is the derivative of some other function g, then this
- *  technique can be used to find optima for g.
- *  Caveat:  Use Conjugate Gradient or Quasi-Newton for complex optimizations.
+/** The `NewtonRaphson` class is used to find roots (zeros) for a one-dimensional
+ *  (scalar) function 'f'.  If f is the derivative of some other function 'g',
+ *  then this technique can be used to find optima for 'g'.
+ *  Caveat:  Use Conjugate Gradient or Quasi-Newton for complex optimization.
  *  @param f  the function to find roots of
  */
 class NewtonRaphson (f: FunctionS2S)
@@ -27,7 +27,7 @@ class NewtonRaphson (f: FunctionS2S)
     private val MAX_ITER = 100             // the maximum number of iterations
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for/find a root close to the starting point/guess x0.  
+    /** Solve for/find a root close to the starting point/guess 'x0'.  
      *  @param x0  the starting point/guess
      */
     def solve (x0: Double): Double =
@@ -46,11 +46,12 @@ class NewtonRaphson (f: FunctionS2S)
         x
     } // solve
 
-} // NewtonRaphson
+} // NewtonRaphson class
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the NewtonRaphson class.
+/** The `NewtonRaphsonTest` object is used to test the `NewtonRaphson` class.
+ *  > run-main scalation.minima.NewtonRaphsonTest
  */
 object NewtonRaphsonTest extends App
 {
@@ -60,5 +61,5 @@ object NewtonRaphsonTest extends App
     
     nr.solve (0.0)
 
-} // NewtonRaphsonTest
+} // NewtonRaphsonTest object
 

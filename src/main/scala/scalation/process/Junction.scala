@@ -33,7 +33,7 @@ class Junction (name: String, director: Model, jTime: Variate, at: Array [Double
     private var onJunction = 0        // the number of entities/sim-actors on this Junction
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Auxiliary constructor that uses defaults for width (w) and heigth (h).
+    /** Auxiliary constructor that uses defaults for width 'w' and height 'h'.
      *  @param name      the name of the junction
      *  @param director  the director controlling the model
      *  @param jTime     the jump-time through the junction
@@ -53,7 +53,7 @@ class Junction (name: String, director: Model, jTime: Variate, at: Array [Double
     } // display
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Jump the entity (SimActor) from the incoming "from" transport to the
+    /** Jump the entity `SimActor` from the incoming "from" transport to the
      *  the middle of the junction.
      */
     def jump ()
@@ -81,7 +81,7 @@ class Junction (name: String, director: Model, jTime: Variate, at: Array [Double
 object Junction
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a junction using defaults for width (w) and heigth (h).
+    /** Create a junction using defaults for width 'w' and height 'h'.
      *  @param name      the name of the junction
      *  @param director  the director controlling the model
      *  @param jTime     the jump-time through the junction
@@ -94,7 +94,7 @@ object Junction
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a group of related junctions using defaults for width (w) and heigth (h).
+    /** Create a group of related junctions using defaults for width 'w' and height 'h'.
      *  @param director  the director controlling the model
      *  @param jTime     the jump-time through the junction
      *  @param xy        the (x, y) coordinates for the top-left corner of the reference junction.

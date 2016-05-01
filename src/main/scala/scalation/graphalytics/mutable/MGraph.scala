@@ -5,7 +5,7 @@
  *  @date    Wed May 13 14:58:25 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *
- *  Multi-Graph (MGraph) Data Structure Using Mutable Sets
+ *  Multi-Graph 'MGraph' Data Structure Using Mutable Sets
  */
 
 package scalation.graphalytics.mutable
@@ -19,7 +19,7 @@ import LabelType.TLabel
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraph` class stores vertex/edge-labeled multi-directed graphs using
- *  an adjacency set ('ch') representation, e.g., ch = { {1, 2}, {0}, {1} } means
+ *  an adjacency set 'ch' representation, e.g., 'ch = { {1, 2}, {0}, {1} }' means
  *  that the graph has the following edges { (0, 1), (0, 2), (1, 0), (2, 1) }.
  *  Optionally, inverse adjacency via the 'pa' array can be stored at the cost
  *  of nearly doubling the storage requirements.
@@ -52,7 +52,7 @@ class MGraph (ch:      Array [SET [Int]],
     } // clone
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check whether the edges in the elabel map correspond to edges in the
+    /** Check whether the edges in the 'elabel' map correspond to edges in the
      *  the adjacency list.
      */
     def checkElabels: Boolean =
@@ -89,7 +89,7 @@ class MGraph (ch:      Array [SET [Int]],
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert the 'i'th row/line of 'this' multi-digraph to a string.
-     *  @param i     the ith row/line
+     *  @param i     the 'i'th row/line
      *  @param clip  whether to clip out "Set(" and ")"
      */
     override def toLine (i: Int, clip: Boolean = true): String =

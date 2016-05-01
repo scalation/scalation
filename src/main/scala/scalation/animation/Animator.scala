@@ -80,8 +80,8 @@ class Animator (graph: Dgraph) extends Transform with Error
      *  @param label     the label for the created edge
      *  @param primary   whether it is a primary (true) or secondary (false)
      *  @param color     the color of the token
-     *  @param from_eid  the eid of the origination node
-     *  @param to_eid    the eid of the destination node
+     *  @param from_eid  the 'eid' of the origination node
+     *  @param to_eid    the 'eid' of the destination node
      *  @param pts       the coordinates and dimensions of the edge
      */
     def createEdge (eid: Int, shape: CurvilinearShape, label: String, primary: Boolean,
@@ -132,7 +132,7 @@ class Animator (graph: Dgraph) extends Transform with Error
      *  @param label    the label for the created token
      *  @param primary  whether it is a primary (true) or secondary (false)
      *  @param color    the color of the token
-     *  @param on_eid   the eid of the node it is on
+     *  @param on_eid   the 'eid' of the node it is on
      *  @param pts      the coordinates and dimensions of the token
      */
     def createToken (eid: Int, shape: RectangularShape, label: String, primary: Boolean,
@@ -338,7 +338,7 @@ class Animator (graph: Dgraph) extends Transform with Error
      *  @param color     the color of the tokens to move
      *  @param from_eid  the external id of the node tokens are to be taken from
      *  @param to_eid    the external id of the node the tokens are to be moved to
-     *  @param pts       one dimesional array containing number of tokens to move
+     *  @param pts       one dimensional array containing number of tokens to move
      */
     def moveTokens2Node (color: Color, from_eid: Int, to_eid: Int, pts: Array [Double])
     {
@@ -425,7 +425,7 @@ class Animator (graph: Dgraph) extends Transform with Error
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Scale the node, i.e., make it larger or smaller. 
-     *  Edges cannot be scaled directly, but must adjust to node scalings.
+     *  Edges cannot be scaled directly, but must adjust to node scaling.
      *  @param eid  the external id of the node to scale
      *  @param pts  the new width, height dimensions
      */
@@ -464,7 +464,7 @@ class Animator (graph: Dgraph) extends Transform with Error
      *  @param color     the color of the tokens/fluids to move
      *  @param from_eid  the external id of the node tokens/fluids are to be taken from
      *  @param to_eid    the external id of the node tokens/fluids are to be moved to
-     *  @param pts       one dimesional array containing amount of fluids to move
+     *  @param pts       one dimensional array containing amount of fluids to move
      */
     def scaleTokensAt (color: Color, from_eid: Int, to_eid: Int, pts: Array [Double])
     {
@@ -568,7 +568,7 @@ class Animator (graph: Dgraph) extends Transform with Error
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Adjust the time dilation: >1 slows down animation, <1 speeds up animation.
-     *  @param pts  one dimesional array containing the new time dilation factor
+     *  @param pts  one dimensional array containing the new time dilation factor
      */
     def timeDilation (pts: Array [Double])
     {

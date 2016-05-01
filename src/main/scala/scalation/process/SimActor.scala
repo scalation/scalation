@@ -17,39 +17,39 @@ import scalation.util.Monitor.trace
  *  The 'act' abstract method, which specifies entity behavior, must be defined
  *  for each subclass.  Each `SimActor` extends Scala's `Actor` class and may be
  *  roughly thought of as running in its own thread.
- *  @param label     the label/name of the entity/SimActor
+ *  @param label     the label/name of the entity (`SimActor`)
  *  @param director  the director controlling the model
  */
 abstract class SimActor (label: String, director: Model)
 //       extends Actor with Ordered [SimActor] with Monitor with Identifiable with PQItem
          extends Coroutine (label) with PQItem with Ordered [SimActor] with Locatable with Error
 {
-    name = label           // set the name for this sim-actor
+    name = label           // set the name for 'this' entity (`SimActor`
 
-    /** The time at which the entity/sim-actor arrived
+    /** The time at which 'this' entity (`SimActor`) arrived
      */
     var arrivalT = director.clock
 
-    /** The indicator of subtype of the sim-actor
+    /** The indicator of subtype of 'this' entity (`SimActor`) 
      */
     var subtype = 0
 
-    /** The indicator of subtype of the sim-actor
+    /** The indicator of subtype of 'this' entity (`SimActor`)
      */
     var mySource: Source = null 
 
-    /** Value of the trajectory along the QCurve for this sim-actor
+    /** Value of the trajectory along the `QCurve` for this entity (`SimActor`)
      */
     private var _trajectory = 0.0
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the current trajectory (along the QCurve) of this SimActor.
+    /** Get the current trajectory (along the `QCurve`) of 'this' `SimActor`.
      */
     def trajectory: Double = _trajectory
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the value of the trajectory along the QCurve for this SimActor.
-     *  @param t  the new trajectory for the SimActor
+    /** Set the value of the trajectory along the `QCurve` for 'this' `SimActor`.
+     *  @param t  the new trajectory for the `SimActor`
      */
     def trajectory_= (trajectory: Double)
     {
@@ -66,12 +66,13 @@ abstract class SimActor (label: String, director: Model)
     def compare (actor2: SimActor): Int = actor2.actTime compare actTime
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The abstract method, act, is defined in each subclass to provide specific behavior.
+    /** The abstract method, 'act', is defined in each subclass to provide specific
+     *  behavior.
      */
     def act ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Schedule a reactivation of this SimActor delay time units in the future.
+    /** Schedule a reactivation of 'this' `SimActor` delay time units in the future.
      *  @param delay     the time delay before reactivation
      */
     def schedule (delay: Double)
@@ -91,7 +92,7 @@ abstract class SimActor (label: String, director: Model)
     } // yieldToDirector
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Show the SimActor's full name and activation time.
+    /** Show the `SimActor`s full name and activation time.
      */
     override def toString = "SimActor ( " + me + " at " + actTime + " ) "
 

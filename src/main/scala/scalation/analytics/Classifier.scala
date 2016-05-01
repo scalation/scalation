@@ -27,7 +27,7 @@ trait Classifier
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier, i.e., calculate statistics and create conditional
-     *  density (cd) functions.  Assumes that conditional densities follow the
+     *  density 'cd' functions.  Assumes that conditional densities follow the
      *  Normal (Gaussian) distribution.
      */
     def train () { train (0, 0) }
@@ -58,10 +58,10 @@ trait Classifier
     def reset ()
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Test the accuaracy of the classified results by crossvalidation, returning
-     *  the accuaracy.  The "test data" starts at 'testStart' and ends at 'testEnd',
+    /** Test the accuracy of the classified results by cross-validation, returning
+     *  the accuracy.  The "test data" starts at 'testStart' and ends at 'testEnd',
      *  the rest of the data is "training data'.
-     *  @param nx  number of crosses and crossvalidations (defaults to 5x).
+     *  @param nx  number of crosses and cross-validations (defaults to 5x).
      */
     def crossValidate (nx: Int = 5): Double =
     {

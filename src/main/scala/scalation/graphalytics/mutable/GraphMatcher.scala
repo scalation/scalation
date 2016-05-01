@@ -39,8 +39,8 @@ abstract class GraphMatcher (g: Graph, q: Graph)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Apply a graph pattern matching algorithm to find subgraphs of data graph
      *  'g' that isomorphically match query graph 'q'.  These are represented
-     *  by a set of single-valued bijective functions {'psi'} where each 'psi'
-     *  function maps each query graph vertex 'u' to a data graph vertices 'v'.
+     *  by a set of single-valued bijections {'psi'} where each 'psi' function
+     *  maps each query graph vertex 'u' to a data graph vertices 'v'.
      */
     def bijections (): SET [Array [Int]] =
     {

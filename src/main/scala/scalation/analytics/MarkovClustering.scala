@@ -19,7 +19,7 @@ import scalation.math.double_exp
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `MarkovClustering` class implements a Markov Clustering Algorithm (MCL)
+/** The `MarkovClustering` class implements a Markov Clustering Algorithm 'MCL'
  *  and is used to cluster nodes in a graph.  The graph is represented as an
  *  edge-weighted adjacency matrix (a non-zero cell indicates nodes i and j are
  *  connected).
@@ -29,7 +29,7 @@ import scalation.util.Error
  *  method must be called to convert it into a Markov transition matrix.
  *  Before normalizing, it may be helpful to add self loops to the graph.
  *  The matrix (graph or transition) may be either dense or sparse.
- *  See the MarkovClusteringTest object at the bottom of the file for examples.
+ *  See the `MarkovClusteringTest` object at the bottom of the file for examples.
  *  @param t  either an adjacency matrix of a graph or a Markov transition matrix
  *  @param k  the strength of expansion
  *  @param r  the strength of inflation
@@ -71,7 +71,7 @@ class MarkovClustering (t: MatrixD, k: Int = 2, r: Double = 2.0)
     } // expand
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Inflation tends to strenthen strong connections and weaken weak ones.
+    /** Inflation tends to strengthen strong connections and weaken weak ones.
      *  Inflate by raising each cell to the r-th power and normalize column-by-column.
      *  If a cell is close to zero, set it to zero (prune).  Also, detect
      *  convergence by making sure that the variance in each column is small
@@ -158,9 +158,10 @@ class MarkovClustering (t: MatrixD, k: Int = 2, r: Double = 2.0)
  */
 object MarkovClusteringTest extends App
 {
+    import scalation.linalgebra.SparseMatrixD
+
     // Test the MCL Algorithm on a graph represented as an adjacency matrix.
 
-/***
     val g = new MatrixD ((12, 12),
         0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0,  0.0,
         1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  0.0,
@@ -173,7 +174,7 @@ object MarkovClusteringTest extends App
         0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0,  1.0,
         1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0,  0.0,
         0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0,  1.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,  0.) 
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,  0.0) 
 
     println ("-----------------------------------------------------------")
     println ("g = " + g)
@@ -207,29 +208,37 @@ object MarkovClusteringTest extends App
 
     // Test the MCL Algorithm on a graph represented as a sparse adjacency matrix.
 
-    val x = new SparseMatrixD (12, 0.0)
-    x(0)  = ListMap ((1, 1.0), (5, 1.0), (6, 1.0), (9, 1.0))
-    x(1)  = ListMap ((0, 1.0), (2, 1.0), (4, 1.0))
-    x(2)  = ListMap ((1, 1.0), (3, 1.0), (4, 1.0))
-    x(3)  = ListMap ((2, 1.0), (7, 1.0), (8, 1.0), (10, 1.0))
-    x(4)  = ListMap ((1, 1.0), (2, 1.0), (6, 1.0), (7, 1.0))
-    x(5)  = ListMap ((0, 1.0), (9, 1.0))
-    x(6)  = ListMap ((0, 1.0), (4, 1.0), (9, 1.0))
-    x(7)  = ListMap ((3, 1.0), (4, 1.0), (8, 1.0), (10, 1.0))
-    x(8)  = ListMap ((3, 1.0), (7, 1.0), (10, 1.0), (11, 1.0))
-    x(9)  = ListMap ((0, 1.0), (5, 1.0), (6, 1.0))
-    x(10) = ListMap ((3, 1.0), (7, 1.0), (8, 1.0), (11, 1.0))
-    x(11) = ListMap ((8, 1.0))
+//  val x = new SparseMatrixD (12, 12)
+//  x(0)  = ListMap ((1, 1.0), (5, 1.0), (6, 1.0), (9, 1.0))
+//  x(1)  = ListMap ((0, 1.0), (2, 1.0), (4, 1.0))
+//  x(2)  = ListMap ((1, 1.0), (3, 1.0), (4, 1.0))
+//  x(3)  = ListMap ((2, 1.0), (7, 1.0), (8, 1.0), (10, 1.0))
+//  x(4)  = ListMap ((1, 1.0), (2, 1.0), (6, 1.0), (7, 1.0))
+//  x(5)  = ListMap ((0, 1.0), (9, 1.0))
+//  x(6)  = ListMap ((0, 1.0), (4, 1.0), (9, 1.0))
+//  x(7)  = ListMap ((3, 1.0), (4, 1.0), (8, 1.0), (10, 1.0))
+//  x(8)  = ListMap ((3, 1.0), (7, 1.0), (10, 1.0), (11, 1.0))
+//  x(9)  = ListMap ((0, 1.0), (5, 1.0), (6, 1.0))
+//  x(10) = ListMap ((3, 1.0), (7, 1.0), (8, 1.0), (11, 1.0))
+//  x(11) = ListMap ((8, 1.0))
 
-    println ("-----------------------------------------------------------")
-    println ("x = " + x)
-    val mx = new MarkovClustering (x)
-    mx.addSelfLoops ()
-    mx.normalize ()
-    println ("result  = " + mx.processMatrix ())
-    println ("cluster = " + mx.cluster ())
-***/
+//  println ("-----------------------------------------------------------")
+//  println ("x = " + x)
+//  val mx = new MarkovClustering (x)
+//  mx.addSelfLoops ()
+//  mx.normalize ()
+//  println ("result  = " + mx.processMatrix ())
+//  println ("cluster = " + mx.cluster ())
 
+} // MarkovClusteringTest object
+
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `MarkovClusteringTest2` object is used to test the `MarkovClustering` class.
+ */
+object MarkovClusteringTest2 extends App
+{
     // Test the MCL Algorithm on a randomly generated graph represented as an adjacency matrix.
 
     val rg = new RandomGraph (1000, .05, 10)
@@ -245,5 +254,5 @@ object MarkovClusteringTest extends App
     println ("-----------------------------------------------------------")
     println ("cluster = " + cluster)
 
-} // MarkovClusteringTest object
+} // MarkovClusteringTest2 object
 

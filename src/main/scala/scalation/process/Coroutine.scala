@@ -117,7 +117,7 @@ abstract class Coroutine (label: String = "cor")
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Coroutine` companion object provides functions to startup and shutdown
+/** The `Coroutine` companion object provides functions to start-up and shutdown
  *  the coroutine system as well as counters for the `Coroutine` class.
  */
 object Coroutine extends Error
@@ -141,7 +141,7 @@ object Coroutine extends Error
     private def threadPoolExecutor = pool.asInstanceOf [ThreadPoolExecutor]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Startup the coroutine system. This function can also set the core 
+    /** Start-up the coroutine system.  This function can also set the core 
      *  number of threads for the internal cached thread pool.
      *  @param nCoreThreads  the new core size 
      */
@@ -179,10 +179,10 @@ object Coroutine extends Error
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CoroutineTest` object is used to test the `Coroutine` class.
  *  Should print:
- *    Cor1: phase 1
- *    Cor2: phase 1
- *    Cor1: phase 2
- *    Cor2: phase 2
+ *    `Cor1`: phase 1
+ *    `Cor2`: phase 1
+ *    `Cor1`: phase 2
+ *    `Cor2`: phase 2
  */
 object CoroutineTest extends App
 {

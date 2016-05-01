@@ -43,9 +43,9 @@ import RegTechnique._
  *  <p>
  *  where 'x_pinv' is the pseudo-inverse.  Three techniques are provided:
  *  <p>
- *      Fac_QR         // QR Factorization: slower, more stable (default)
- *      Fac_Cholesky   // Cholesky Factorization: faster, less stable (reasonable choice)
- *      Inverse        // Inverse/Gaussian Elimination, classical textbook technique (outdated)
+ *      'Fac_QR'         // QR Factorization: slower, more stable (default)
+ *      'Fac_Cholesky'   // Cholesky Factorization: faster, less stable (reasonable choice)
+ *      'Inverse'        // Inverse/Gaussian Elimination, classical textbook technique (outdated)
  *  <p>
  *  @see see.stanford.edu/materials/lsoeldsee263/05-ls.pdf
  *  @param x          the input/design m-by-n matrix augmented with a first column of ones
@@ -89,7 +89,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  multiple regression equation
      *      y  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_1 , ... x_k] + e
-     *  using the ordinary least squares (OLS) method.
+     *  using the ordinary least squares 'OLS' method.
      */
     def train ()
     {
@@ -103,7 +103,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
     /** Retrain the predictor by fitting the parameter vector (b-vector) in the
      *  multiple regression equation
      *      yy  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_1 , ... x_k] + e
-     *  using the ordinary least squares (OLS) method.
+     *  using the ordinary least squares 'OLS' method.
      *  @param yy  the new response vector
      */
     def train (yy: VectoD)
@@ -142,7 +142,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
     } // diagnose
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including rSquared.
+    /** Return the quality of fit including 'rSquared'.
      */
     def fit: VectorD = VectorD (rSquared, rBarSq, fStat)
 
@@ -183,10 +183,10 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
     } // backElim
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Variance Inflation Factor (VIF) for each variable to test
-     *  for multi-colinearity by regressing xj against the rest of the variables.
-     *  A VIF over 10 indicates that over 90% of the varaince of xj can be predicted
-     *  from the other variables, so xj is a candidate for removal from the model.
+    /** Compute the Variance Inflation Factor 'VIF' for each variable to test
+     *  for multi-collinearity by regressing 'xj' against the rest of the variables.
+     *  A VIF over 10 indicates that over 90% of the variance of 'xj' can be predicted
+     *  from the other variables, so 'xj' is a candidate for removal from the model.
      */
     def vif: VectorD =
     {
@@ -330,7 +330,7 @@ object RegressionTest2 extends App
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `RegressionTest3` object tests the multi-colinearity method in the
+/** The `RegressionTest3` object tests the multi-collinearity method in the
  *  `Regression` class using the following regression equation.
  *  <p>
  *      y = b dot x = b_0 + b_1*x_1 + b_2*x_2 + b_3*x_3 + b_4 * x_4

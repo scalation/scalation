@@ -13,7 +13,7 @@ import scala.collection.immutable.{Set => SET}
 import scalation.util.time
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This `GraphSimIso` object provides an implementation for Subgraph Isomorphism
+/** The `GraphSimIso` object provides an implementation for Subgraph Isomorphism
  *  that uses an adjacency set version of Ullmann's Algorithm.
  *  @param g  the data graph  G(V, E, l)
  *  @param q  the query graph Q(U, D, k)
@@ -41,8 +41,8 @@ class GraphSimIso (g: Graph, q: Graph)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Apply the Ullmann's Subgraph Isomorphism algorithm to find subgraphs of data
      *  graph 'g' that isomorphically match query graph 'q'.  These are represented
-     *  by a set of single-valued bijective functions {'psi'} where each 'psi'
-     *  function maps each query graph vertex 'u' to a data graph vertices 'v'.
+     *  by a set of single-valued bijections {'psi'} where each 'psi' function
+     *  maps each query graph vertex 'u' to a data graph vertices 'v'.
      */
     override def bijections (): SET [Array [Int]] =
     {
@@ -83,7 +83,7 @@ class GraphSimIso (g: Graph, q: Graph)
     def makeOrder (): Array [Int] = q.ch.zipWithIndex.sortBy (-1 * _._1.size).map (_._2)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Is vertex j contained in any phi(i) for the previous depths?
+    /** Determine whether vertex 'j' is contained in any 'phi(i)' for the previous depths.
      *  @param phi       array of mappings from a query vertex u_q to { graph vertices v_g }
      *  @param j         the vertex j to check
      *  @param ordering  the 'ch' size based ordering of the vertices

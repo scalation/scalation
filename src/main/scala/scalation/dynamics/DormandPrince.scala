@@ -21,9 +21,9 @@ import scalation.util.Error
  *  <p>
  *      d/dt y(t) = f(t, y)
  *  <p>
- *  compute 'y(t)' using a (4,5)-order Dormand-Prince Integrator (DOPRI).  Note:
- *  the integrateV method for a system of separable ODEs is mixed in from the
- *  Integrator trait.
+ *  compute 'y(t)' using a (4,5)-order Dormand-Prince Integrator 'DOPRI'.  Note:
+ *  the 'integrateV' method for a system of separable ODEs is mixed in from the
+ *  `Integrator` trait.
  *  @see http://adorio-research.org/wordpress/?p=6565
  */
 object DormandPrince

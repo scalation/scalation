@@ -93,7 +93,7 @@ class MinSpanningTree (g: MGraph, min: Boolean = true, undirected: Boolean = tru
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Make an inverted tree by recording the predecessor/parent array.
-     *  Each note except the root will have one parent.  See pseudocode on p. 28
+     *  Each note except the root will have one parent.  See pseudo-code on p. 28
      *  @see www.cse.ust.hk/~dekai/271/notes/L07/L07.pdf
      */
     def makeITree (): Array [Int] =

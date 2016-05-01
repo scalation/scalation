@@ -99,7 +99,7 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  quadratic rsm regression equation, e.g., for 2D
+     *  quadratic 'rsm' regression equation, e.g., for 2D
      *      y  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_0, x_0^2, x_1, x_1*x_0, x_1^2] + e
      *  using the least squares method.
      */
@@ -107,7 +107,7 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Retrain the predictor by fitting the parameter vector (b-vector) in the
-     *  quadratic rsm regression equation, e.g., for 2D
+     *  quadratic 'rsm' regression equation, e.g., for 2D
      *      yy  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_0, x_0^2, x_1, x_1*x_0, x_1^2] + e
      *  using the least squares method.
      *  @param yy  the new response vector
@@ -115,12 +115,12 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
     def train (yy: VectorD) { rsm.train (yy) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including rSquared.
+    /** Return the quality of fit including 'rSquared'.
      */
     def fit: VectorD = rsm.fit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given a point z, use the quadratic rsm regression equation to predict a
+    /** Given a point z, use the quadratic 'rsm' regression equation to predict a
      *  value for the function at z.
      *  for 1D:  b_0 + b_1*z_0 + b_2*z_0^2
      *  for 2D:  b_0 + b_1*z_0 + b_2*z_0^2 + b_3*z_1 + b_4*z_1*z_0 + b_5*z_1^2
@@ -146,10 +146,10 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
     def backElim (): Tuple3 [Int, VectoD, VectorD] = rsm.backElim ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Variance Inflation Factor (VIF) for each variable to test
-     *  for multi-colinearity by regressing xj against the rest of the variables.
-     *  A VIF over 10 indicates that over 90% of the varaince of xj can be predicted
-     *  from the other variables, so xj is a candidate for removal from the model.
+    /** Compute the Variance Inflation Factor 'VIF' for each variable to test
+     *  for multi-collinearity by regressing 'xj' against the rest of the variables.
+     *  A VIF over 10 indicates that over 90% of the variance of 'xj' can be predicted
+     *  from the other variables, so 'xj' is a candidate for removal from the model.
      */
     def vif: VectorD = rsm.vif
 

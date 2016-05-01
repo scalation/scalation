@@ -6,9 +6,9 @@
  *  @see     LICENSE (MIT style license file).
  *------------------------------------------------------------------------------
  *  @see Linear Programming and Network Flows, Bazaraa and Jarvis
- *       www.wiley.com/WileyCDA/WileyTitle/productCd-0470462728,subjectCd-BA04.html
+ *  @see www.wiley.com/WileyCDA/WileyTitle/productCd-0470462728,subjectCd-BA04.html
  *  @see Algorithms, 4th Edition, Robert Sedgewick and Kevin Wayne
- *       www.cs.princeton.edu/algs4/63or/Simplex.java.html
+ *  @see www.cs.princeton.edu/algs4/63or/Simplex.java.html
  *  @see en.wikibooks.org/wiki/Operations_Research/The_Simplex_Method
  *  @see dspace.vpmthane.org:8080/.../Dual%20Simplex%20Method%20-%2...
  */
@@ -21,8 +21,8 @@ import scala.util.control.Breaks.{breakable, break}
 import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class solves Linear Programming (LP) problems using a tableau based
- *  Dual Simplex Algorithm.  It is particularly useful when re-optimizing
+/** The `DualSimplex` class solves Linear Programming (LP) problems using a tableau
+ *  based Dual Simplex Algorithm.  It is particularly useful when re-optimizing
  *  after a constraint has been added.  The algorithm starts with an infeasible
  *  super-optimal solution and moves toward (primal) feasibility and optimality.
  *
@@ -33,7 +33,7 @@ import scalation.linalgebra.{MatrixD, VectoD, VectorD}
  *  minimize    f(x) = c x
  *  subject to  a x <= b, x >= 0
  *
- *  Creates an MM-by-NN simplex tableau with
+ *  Creates an 'MM-by-NN' simplex tableau with
  *  -- [0..M-1, 0..N-1]    = a (constraint matrix)
  *  -- [0..M-1, N..M+N-1]  = s (slack/surplus variable matrix)
  *  -- [0..M-1, NN-1]      = b (limit/RHS vector)
@@ -182,12 +182,12 @@ class DualSimplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int])
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the DualSimplex class.
+/** The `DualSimplexTest` object is used to test the `DualSimplex` class.
  */
 object DualSimplexTest extends App
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Test the DualSimplex Algorithm for solving Linear Programming problems.
+    /** Test the Dual Simplex Algorithm for solving Linear Programming problems.
      *  @param a the constraint matrix
      *  @param b the limit/RHS vector
      *  @param c the cost vector
@@ -207,7 +207,7 @@ object DualSimplexTest extends App
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test case 1:  Initialize matrix 'a', vectors 'b' and 'c', and optionally
-     *  the basis 'x_B'.  For DualSimplex, matrix 'a' and vector 'c' are not augmented.
+     *  the basis 'x_B'.  For Dual Simplex, matrix 'a' and vector 'c' are not augmented.
      *--------------------------------------------------------------------------
      *  Minimize    z =  2x_0 + 3x_1 + 4x_2
      *  Subject to       1x_0 + 2x_1 + 1x_2 >= 3

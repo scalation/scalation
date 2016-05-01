@@ -78,7 +78,7 @@ class SimpleRegression (x: MatrixD, y: VectorD)
     } // diagnose
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit includinhg rSquared.
+    /** Return the quality of fit including 'rSquared'.
      */
     def fit: VectorD = VectorD (rSquared, rBarSq, fStat)
 
@@ -93,7 +93,8 @@ class SimpleRegression (x: MatrixD, y: VectorD)
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** Object to test SimpleRegression class:  y = b dot x = (b_0, b_1) dot (1, x_1).
+/** The `SimpleRegressionTest` object to test `SimpleRegression` class:
+ *  'y = b dot x = (b_0, b_1) dot (1, x_1)'.
  *  @see http://www.analyzemath.com/statistics/linear_regression.html
  */
 object SimpleRegressionTest extends App

@@ -18,7 +18,7 @@ import scalation.util.Identifiable
  *  @param entity    the entity involved in this event
  *  @param director  the controller/scheduler that this event is a part of
  *  @param delay     the time delay before this event's occurrence
- *  @param stat      the stat object for collecting statistics about delay times
+ *  @param stat      the object for collecting statistics about delay times
  *  @param proto     the prototype (serves as node in animation) for this event
  */
 abstract class Event (val entity: Entity, director: Model, delay: Double = 0.0,
@@ -36,7 +36,7 @@ abstract class Event (val entity: Entity, director: Model, delay: Double = 0.0,
     if (stat != null) stat.tally (delay)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare the activation times of the two events (ev and this).
+    /** Compare the activation times of the two events ('ev' and 'this').
      *  @param ev  the other event
      */
     def compare (ev: Event): Int = ev.actTime compare actTime
@@ -54,7 +54,7 @@ abstract class Event (val entity: Entity, director: Model, delay: Double = 0.0,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Execute this event where the event-logic is specified in the 'occur' method.
      *  This method is abstract, so it must be implemented in subclasses and it
-     *  (i) may schedule other events and (ii) may specify state changes.
+     *  (1) may schedule other events and (2) may specify state changes.
      */
     def occur ()
 

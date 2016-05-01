@@ -5,7 +5,7 @@
  *  @date    Wed May 13 14:58:25 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *
- *  MultiGraph (MGraph) Dual Simulation Using Mutable Sets
+ *  Multi-Graph 'MGraph' Dual Simulation Using Mutable Sets
  */
 
 package scalation.graphalytics.mutable
@@ -17,7 +17,7 @@ import scalation.util.time
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualSim` class provides a second implementation for Dual Graph Simulation.
- *  It differs from DualSim by not using inverse adjacency sets ('pa') in
+ *  It differs from `DualSim` by not using inverse adjacency sets ('pa') in
  *  order to save space.
  *  @param g  the data graph  G(V, E, l)
  *  @param q  the query graph Q(U, D, k)
@@ -118,26 +118,25 @@ object MDualSimTest extends App
 import GraphGen._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `MDualSimTest2` object is used to test the 'MDualSim' class.
+/** The `MDualSimTest2` object is used to test the `MDualSim` class.
  *  run-main scalation.graphalytics.mutable.MDualSimTest2
- *
-object MDualSimTest2 extends App
-{
-    val gSize     = 1000         // size of the data graph
-    val qSize     =   10         // size of the query graph
-    val nLabels   =  100         // number of distinct labels
-    val gAvDegree =    5         // average vertex out degree for data graph
-    val qAvDegree =    2         // average vertex out degree for query graph
-
-    q.printG ()
-
-    val g = genRandomGraph (gSize, nLabels, gAvDegree, false, "g")
-    val q = genBFSQuery (qSize, qAvDegree, g, false, "q")
-
-    val matcher = new MDualSim (g, q)                   // Dual Graph Simulation Pattern Matcher
-    val phi     = time { matcher.mappings () }             // time the matcher
-    matcher.showMappings (phi)                             // display results
-
-} // MDualSimTest2 object
  */
+//object MDualSimTest2 extends App
+//{
+//    val gSize     = 1000         // size of the data graph
+//    val qSize     =   10         // size of the query graph
+//    val nLabels   =  100         // number of distinct labels
+//    val gAvDegree =    5         // average vertex out degree for data graph
+//    val qAvDegree =    2         // average vertex out degree for query graph
+//
+//    q.printG ()
+//
+//    val g = genRandomGraph (gSize, nLabels, gAvDegree, false, "g")
+//    val q = genBFSQuery (qSize, qAvDegree, g, false, "q")
+//
+//    val matcher = new MDualSim (g, q)                   // Dual Graph Simulation Pattern Matcher
+//    val phi     = time { matcher.mappings () }             // time the matcher
+//    matcher.showMappings (phi)                             // display results
+//
+//} // MDualSimTest2 object
 

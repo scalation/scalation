@@ -25,12 +25,12 @@ import scalation.math.ExtremeD.MAX_VALUE
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** Broyden–Fletcher–Goldfarb–Shanno (BFGS) Quasi-Newton Algorithm for solving
- *  Non-Linear Programming (NLP) problems.  BFGS determines a search direction by
- *  deflecting the steepest descent direction vector (opposite the gradient) by
- *  multiplying it by a matrix that approximates the inverse Hessian.  Note, this
- *  implementation may be set up to work with the matrix 'b' (approximate Hessian)
- *  or directly with the 'binv' matrix (the inverse of b).
+/** The `QuasiNewton` the class implements the Broyden–Fletcher–Goldfarb–Shanno (BFGS)
+ *  Quasi-Newton Algorithm for solving Non-Linear Programming (NLP) problems.
+ *  BFGS determines a search direction by  deflecting the steepest descent direction
+ *  vector (opposite the gradient) by *  multiplying it by a matrix that approximates
+ *  the inverse Hessian.  Note, this  implementation may be set up to work with the matrix
+ *  'b' (approximate Hessian) or directly with the 'binv' matrix (the inverse of 'b').
  *
  *  minimize    f(x)
  *  subject to  g(x) <= 0   [ optionally g(x) == 0 ]
@@ -38,8 +38,8 @@ import scalation.util.Error
  *  @param f        the objective function to be minimized
  *  @param g        the constraint function to be satisfied, if any
  *  @param ineq     whether the constraint is treated as inequality (default) or equality
- *  @param exactLS  whether to use exact (e.g., GoldenLS)
- *                            or inexact (e.g., WolfeLS) Line Search
+ *  @param exactLS  whether to use exact (e.g., `GoldenLS`)
+ *                            or inexact (e.g., `WolfeLS`) Line Search
  */
 class QuasiNewton (f: FunctionV2S, g: FunctionV2S = null,
                     ineq: Boolean = true, exactLS: Boolean = false)
@@ -65,15 +65,14 @@ class QuasiNewton (f: FunctionV2S, g: FunctionV2S = null,
      *  better direction than steepest descent (-gradient).
      *  @param s  the step vector (next point - current point)
      *  @param y  the difference in the gradients (next - current)
-     *
-    def updateB (s: VectorD, y: VectorD)
-    {
-        var sy = s dot y                     // dot product of s and y
-        if (abs (sy) < TOL) sy = TOL
-        val sb = s * b
-        b += outer (y, y) / sy - outer (sb, sb) / (sb dot s)
-    } // updateB
      */
+//  def updateB (s: VectorD, y: VectorD)
+//  {
+//      var sy = s dot y                     // dot product of s and y
+//      if (abs (sy) < TOL) sy = TOL
+//      val sb = s * b
+//      b += outer (y, y) / sy - outer (sb, sb) / (sb dot s)
+//  } // updateB
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Update the 'binv' matrix, which is used to deflect -gradient to a better
@@ -121,7 +120,7 @@ class QuasiNewton (f: FunctionV2S, g: FunctionV2S = null,
     } // fg
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform an exact (GoldenSectionLS) or inexact (WolfeLS) Line Search.
+    /** Perform an exact 'GoldenSectionLS' or inexact 'WolfeLS' Line Search.
      *  Search in direction 'dir', returning the distance 'z' to move in that direction.
      *  Default to 
      *  @param x     the current point
@@ -142,7 +141,7 @@ class QuasiNewton (f: FunctionV2S, g: FunctionV2S = null,
      *  replace 'gradient (fg, x._1 + s)' with 'gradientD (df,  x._1 + s)'.
      *  @param x0     the starting point 
      *  @param step   the initial step size
-     *  @param toler  the tolerence
+     *  @param toler  the tolerance
      */
     def solve (x0: VectorD, step: Double = STEP, toler: Double = TOL): VectorD =
     {
@@ -181,7 +180,8 @@ class QuasiNewton (f: FunctionV2S, g: FunctionV2S = null,
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the QuasiNewton class.
+/** The `QuasiNewtonTest` object is used to test the `QuasiNewton` class.
+ *  > run-main scalation.minima.QuasiNewtonTest
  */
 object QuasiNewtonTest extends App
 {

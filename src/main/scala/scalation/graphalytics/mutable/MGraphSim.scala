@@ -5,7 +5,7 @@
  *  @date    Wed May 13 14:58:25 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *
- *  MultiGraph (MGraph) Simulation Using Mutable Sets
+ *  Multi-Graph 'MGraph' Simulation Using Mutable Sets
  */
 
 package scalation.graphalytics.mutable
@@ -18,8 +18,8 @@ import scalation.util.time
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphSim` class provides a second implementation for Simple Graph
- *  Simulation.  It differ from GraphSim in the looping order in the main for-loop
- *  and early termination when phi(u) is empty.
+ *  Simulation.  It differ from `GraphSim` in the looping order in the main for-loop
+ *  and early termination when 'phi(u)' is empty.
  *  @param g  the data graph  G(V, E, l)
  *  @param q  the query graph Q(U, D, k)
  */
@@ -127,26 +127,25 @@ object MGraphSimTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphSimTest2` object is used to test the `MGraphSim` class.
  *  > run-main scalation.graphalytics.mutable.MGraphSimTest2
- *
-object MGraphSimTest2 extends App
-{
-    val gSize     = 1000         // size of the data graph
-    val qSize     =   10         // size of the query graph
-    val nLabels   =  100         // number of distinct labels
-    val gAvDegree =    5         // average vertex out degree for data graph
-    val qAvDegree =    2         // average vertex out degree for query graph
-
-    val g = GraphGen.genRandomGraph (gSize, nLabels, gAvDegree, false, "g")
-    val q = GraphGen.genBFSQuery (qSize, qAvDegree, g, false, "q")
-
-    println (s"q.checkEdges   = " + q.checkEdges)
-    println (s"q.checkElabels = " + q.checkElabels)
-    q.printG ()
-
-    val matcher = new MGraphSim (g, q)                     // Graph Simulation Pattern Matcher
-    val phi     = time { matcher.mappings () }           // time the matcher
-    matcher.showMappings (phi)                           // show results
-
-} // MGraphSimTest2 object
  */
+//object MGraphSimTest2 extends App
+//{
+//    val gSize     = 1000         // size of the data graph
+//    val qSize     =   10         // size of the query graph
+//    val nLabels   =  100         // number of distinct labels
+//    val gAvDegree =    5         // average vertex out degree for data graph
+//    val qAvDegree =    2         // average vertex out degree for query graph
+//
+//    val g = GraphGen.genRandomGraph (gSize, nLabels, gAvDegree, false, "g")
+//    val q = GraphGen.genBFSQuery (qSize, qAvDegree, g, false, "q")
+//
+//    println (s"q.checkEdges   = " + q.checkEdges)
+//    println (s"q.checkElabels = " + q.checkElabels)
+//    q.printG ()
+//
+//    val matcher = new MGraphSim (g, q)                     // Graph Simulation Pattern Matcher
+//    val phi     = time { matcher.mappings () }           // time the matcher
+//    matcher.showMappings (phi)                           // show results
+//
+//} // MGraphSimTest2 object
 

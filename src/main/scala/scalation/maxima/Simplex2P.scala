@@ -6,9 +6,9 @@
  *  @see     LICENSE (MIT style license file).
  *-----------------------------------------------------------------------------
  *  @see Linear Programming and Network Flows, Bazaraa and Jarvis
- *       www.wiley.com/WileyCDA/WileyTitle/productCd-0470462728,subjectCd-BA04.html
+ *  @see www.wiley.com/WileyCDA/WileyTitle/productCd-0470462728,subjectCd-BA04.html
  *  @see Algorithms, 4th Edition, Robert Sedgewick and Kevin Wayne
- *       www.cs.princeton.edu/algs4/63or/Simplex.java.html
+ *  @see www.cs.princeton.edu/algs4/63or/Simplex.java.html
  *  @see en.wikibooks.org/wiki/Operations_Research/The_Simplex_Method
  */
 
@@ -21,24 +21,24 @@ import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class solves Linear Programming (LP) problems using a tableau based
+/** The `Simplex2P` class solves Linear Programming (LP) problems using a tableau based
  *  Simplex Algorithm.  Given a constraint matrix 'a', limit/RHS vector 'b' and
  *  cost vector 'c', find values for the solution/decision vector 'x' that maximize
- *  the objective function f(x), while satisfying all of the constraints, i.e.,
+ *  the objective function 'f(x)', while satisfying all of the constraints, i.e.,
  *
  *  maximize    f(x) = c x
  *  subject to  a x <= b, x >= 0
  *
- *  In case of "a_i x >= b_i", use -b_i as an indicator of a ">=" constraint.
+ *  In case of 'a_i x >= b_i', use '-b_i' as an indicator of a '>=' constraint.
  *  The program will flip such negative b_i back to positive as well as use
- *  a surplus and artificial variable instead of the usual slack variable, ie.,
- *  a_i x <= b_i  =>  a_i x + s_i = b_i    // use slack variable s_i with coeff 1
- *  a_i x >= b_i  =>  a_i x + s_i = b_i    // use surplus variable s_i with coeff -1
+ *  a surplus and artificial variable instead of the usual slack variable, i.e.,
+ *  a_i x <= b_i  =>  a_i x + s_i = b_i    // use slack variable s_i with coefficient 1
+ *  a_i x >= b_i  =>  a_i x + s_i = b_i    // use surplus variable s_i with coefficient -1
  *  For each ">=" constraint, an artificial variable is introduced and put into
  *  the initial basis.  These artificial variables must be removed from the basis
  *  during Phase I of the Two-Phase Simplex Algorithm.  After this, or if there
- *  are no artificial variables, Phase II is used to find an optimal value for x
- *  and the optimum value for f. 
+ *  are no artificial variables, Phase II is used to find an optimal value for 'x'
+ *  and the optimum value for 'f'. 
  *
  *  Creates an MM-by-nn simplex tableau with
  *  -- [0..M-1, 0..N-1]    = a (constraint matrix)
@@ -85,8 +85,8 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
     /** Find the best variable x_l to enter the basis.  Determine the index of
      *  entering variable corresponding to column l (e.g., using Dantiz's Rule
      *  or Bland's Rule).  Return -1 to indicate no such column.
-     *  t(M).firstPos (jj)        // use Bland's rule (lowest index, +ve)
-     *  t(M).argmaxPos (jj)       // use Dantiz's rule (min index, +ve, cycling possible)
+     *  t(M).firstPos (jj)        // use Bland's rule (lowest index, positive)
+     *  t(M).argmaxPos (jj)       // use Dantiz's rule (min index, positive, cycling possible)
      */
     def enteringMin () = t(M).firstPos (jj)          // minimization mode
     def enteringMax () = t(M).firstNeg (jj)          // maximization mode
@@ -169,7 +169,7 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
     } // solve
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Remove the artifical variables and reset the cost row (M) in the tableau.
+    /** Remove the artificial variables and reset the cost row (M) in the tableau.
      */
     def removeArtificials ()
     {
@@ -185,7 +185,7 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
     } // removeArtificials
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve the LP maximization problem using two phases if neceassry.  Note:
+    /** Solve the LP maximization problem using two phases if necessary.  Note:
      *  phase I is always minimization.  Two phases are necessary if the number
      *  of artificial variables R > 0.
      */
@@ -263,7 +263,7 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the Simplex2P class.
+/** The `Simplex2PTest` object is used to test the `Simplex2P` class.
  */
 object Simplex2PTest extends App
 {

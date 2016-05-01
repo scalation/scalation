@@ -26,14 +26,14 @@ case class CausalLink (label: String, director: Model, val condition: () => Bool
                        causedEvent: Event)
       extends Identifiable
 {
-    /** Default amount of bend in the QCurve
+    /** Default amount of bend in the `QCurve`
      */
     private val bend = .25
 
     name = label                  // set the name of the causal link
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Tell the animation engine to display this CausalLink.
+    /** Tell the animation engine to display this `CausalLink`.
      *  @param from  the starting event prototype
      *  @param to    the ending event prototype
      */

@@ -65,7 +65,7 @@ class Model (name: String, animating: Boolean = false)
     } // addStats
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Place an event on the Future Event List (FEL) for later execution, thus
+    /** Place an event on the Future Event List 'FEL' for later execution, thus
      *  scheduling the event to occur sometime in the future.  Events are ordered
      *  by their event/act time.
      *  @param event  the event to schedule
@@ -225,7 +225,7 @@ object ModelTest extends App
         addStats (t_a_stat)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** `Arrival` is a subclass of `EventNode` for handling arrival events (MakeCall).
+        /** `Arrival` is a subclass of `EventNode` for handling arrival events.
          *  @param call   the entity that arrives, in this case a phone call
          *  @param delay  the time delay for this event's occurrence
          */

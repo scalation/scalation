@@ -39,7 +39,7 @@ object MGraphGen
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Generates a random graph with the specified size (number of vertices), 
      *  average degree and labels evenly distributed across vertices from 0 to
-     *  nLabels - 1.  Not necessarily a connected graph.
+     *  'nLabels - 1'.  Not necessarily a connected graph.
      *  @param size      the number of vertices to generate
      *  @param nLabels   the number of vertex labels (distributed uniformly)
      *  @param eLabels   the number of edge labels (distributed uniformly)
@@ -62,7 +62,7 @@ object MGraphGen
     } // genRandomGraph
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Generates a random connected graph by using genRandomGraph and
+    /** Generates a random connected graph by using 'genRandomGraph' and
      *  checking whether it is connected.
      *  @param size      the number of vertices to generate
      *  @param nLabels   the number of vertex labels (distributed uniformly)
@@ -295,21 +295,20 @@ object MGraphGen
     /** Renumber the selected nodes (give them new consecutive ids).
      *  @param node
      *  @param chMap
-     *
-    private def renumber (node: SET [Int], chMap: Map [Int, SET [Int]]): Array [SET [Int]] =
-    {
-        val oldId2newId = Map [Int, Int] ()
-        var i = 0
-        for (v <- node) { oldId2newId += (v -> i); i += 1 }
-        val newToOldLabels = Array.ofDim [Int] (size)
-        for (
-        newLabelMap.foreach { case (oldL, newL) => newToOldLabels (newL) = oldL }
-        Array.ofDim [SET [Int]] (size).map (x => SET [Int] ())
-    } // renumber
      */
+//  private def renumber (node: SET [Int], chMap: Map [Int, SET [Int]]): Array [SET [Int]] =
+//  {
+//      val oldId2newId = Map [Int, Int] ()
+//      var i = 0
+//      for (v <- node) { oldId2newId += (v -> i); i += 1 }
+//      val newToOldLabels = Array.ofDim [Int] (size)
+//      for (
+//      newLabelMap.foreach { case (oldL, newL) => newToOldLabels (newL) = oldL }
+//      Array.ofDim [SET [Int]] (size).map (x => SET [Int] ())
+//  } // renumber
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return an array with labels distributed between 0 and nLabels - 1
+    /** Return an array with labels distributed between 0 and 'nLabels - 1'.
      *  based on a uniform distribution.
      *  @param size     the number of vertices
      *  @param nLabels  the number of labels
@@ -320,7 +319,7 @@ object MGraphGen
     } // randDistLabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return an array with edge labels distributed between 0 and eLabels - 1
+    /** Return an array with edge labels distributed between 0 and 'eLabels - 1'.
      *  based on a uniform distribution.
      *  @param ch       the adjacency (child array)
      *  @param nLabels  the number of edge labels
@@ -333,7 +332,7 @@ object MGraphGen
     } // randDisteLabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return an array with labels distributed between 0 and nLabels - 1
+    /** Return an array with labels distributed between 0 and 'nLabels - 1'.
      *  based on a power law distribution.
      *  @param size     the number of vertices
      *  @param nLabels  the number of labels
@@ -345,7 +344,7 @@ object MGraphGen
     } // powDistLabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return an array with labels distributed between 0 and nLabels - 1
+    /** Return an array with labels distributed between 0 and 'nLabels - 1'.
      *  based on a Gaussian/Normal distribution.
      *  @param size     the number of vertices
      *  @param nLabels  the number of labels
@@ -372,8 +371,9 @@ object MGraphGen
    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return an integer with a probability based on a gaussian distribution
      *  centered at d
-     *  FIX: may need to truncate with math.min(math.max((rand.nextGaussian()*d+d).toInt, 0), d*2).toInt
-     *  @param d  the WHAT??
+     *  FIX: may need to truncate with
+     *      'math.min(math.max((rand.nextGaussian()*d+d).toInt, 0), d*2).toInt'
+     *  @param d  the distance indicator
      */
     private def gaussInt (d: Double) = (rand.nextGaussian () * 2.0 * d).toInt
 

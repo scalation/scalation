@@ -17,7 +17,7 @@ import scalation.linalgebra.{MatriD, MatrixD, VectoD}
 object Centering
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Center the input matrix 'x' to zero mean, columnwise, by subtracting the mean.
+    /** Center the input matrix 'x' to zero mean, column-wise, by subtracting the mean.
      *  @param x     the input matrix to center
      *  @param mu_x  the vector of column means of matrix x
      */

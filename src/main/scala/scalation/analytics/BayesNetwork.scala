@@ -28,7 +28,7 @@ class DAG (val par: Array [Array [Int]])
  *  highest Joint Probability of 'z' and the outcome (i.e., one of the 'k'
  *  classes) of occurring.  The Joint Probability calculation is factored
  *  into multiple calculations of Conditional Probability.  Conditional
- *  dependencies are specified using a Directed Acyclic Graph (DAG).  Nodes
+ *  dependencies are specified using a Directed Acyclic Graph 'DAG'.  Nodes
  *  are conditionally dependent on their parents only.  Conditional probability
  *  are recorded in tables.  Training is achieved by ...
  *  @param x      the integer-valued training/test data vectors stored as rows of a matrix
@@ -46,7 +46,7 @@ class BayesNetwork (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arra
     private val DEBUG = true                 // debug flag
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Joint Probability (JP) of vector 'x'  ('z' concat outcome).
+    /** Compute the Joint Probability 'JP' of vector 'x'  ('z' concatenate outcome).
      *  as the product of each of its element's conditional probability.
      *  @param x  the vector of variables
      */
@@ -58,9 +58,9 @@ class BayesNetwork (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arra
     } // jp
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Conditional Probability (CP) of 'x_i' given its parents' values.
-     *  @param i    the ith variable (whose conditional probability is sought)
-     *  @param key  the values of x_i's parents and x_i
+    /** Compute the Conditional Probability 'CP' of 'x_i' given its parents' values.
+     *  @param i    the 'i'th variable (whose conditional probability is sought)
+     *  @param key  the values of 'x_i's parents and 'x_i'
      */
     def cp (i: Int, key: VectorI): Double =
     {
@@ -100,14 +100,13 @@ class BayesNetwork (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arra
      *  (0, ..., k-1) with the highest relative posterior probability.
      *  The vector 'z' id first converted to an integer valued vector by rounding.
      *  @param z  the data vector to classify
-     *
-    def classify (z: VectorD): Tuple2 [Int, String] =
-    {
-        val z_int = new VectorI (z.dim)
-        for (i <- 0 until z.dim) z_int(i) = round (z(i)).toInt
-        classify (z_int)
-    } // classify
      */
+//  def classify (z: VectorD): Tuple2 [Int, String] =
+//  {
+//      val z_int = new VectorI (z.dim)
+//      for (i <- 0 until z.dim) z_int(i) = round (z(i)).toInt
+//      classify (z_int)
+//  } // classify
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset or re-initialize the frequency tables and the probability tables.

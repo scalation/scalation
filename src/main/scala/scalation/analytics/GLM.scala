@@ -16,13 +16,13 @@ import scalation.linalgebra.VectorD.one
 import RegTechnique._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** A General Linear Model (GLM) can be developed using the `GLM` trait and object
+/** A General Linear Model 'GLM' can be developed using the `GLM` trait and object
  *  (see below).  The implementation currently supports univariate models with
  *  multivariate models (where each response is a vector) planned for the future.
  *  It provides factory methods for the following special types of GLMs:
  *  `SimpleRegression` - simple linear regression,
- *  `Regression`       - multiple linear regression using OLS
- *  `Regression_WLS`   - multiple linear regression using WLS
+ *  `Regression`       - multiple linear regression using Ordinary Least Squares 'OLS'
+ *  `Regression_WLS`   - multiple linear regression using Weighted Least Squares 'WLS'
  *  `RidgeRegression`  - robust multiple linear regression,
  *  `TranRegression`   - transformed (e.g., log) multiple linear regression,
  *  `PolyRegression`   - polynomial regression,
@@ -49,7 +49,7 @@ trait GLM
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build a Multiple Linear Regression model using Ordinary Least Squares (OLS).
+    /** Build a Multiple Linear Regression model using Ordinary Least Squares 'OLS'.
      *  @param x  the input/design m-by-n matrix
      *  @param y  the response m-vector
      */
@@ -62,7 +62,7 @@ trait GLM
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build a Multiple Linear Regression model using Ordinary Least Squares (OLS).
+    /** Build a Multiple Linear Regression model using Ordinary Least Squares 'OLS'.
      *  @param xy  the combined input/design m-by-n matrix and response m-vector
      */
     def apply (xy: MatrixD): Regression [MatrixD, VectorD] =
@@ -75,7 +75,7 @@ trait GLM
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build a Multiple Linear Regression model using Weighted Least Squares (WLS).
+    /** Build a Multiple Linear Regression model using Weighted Least Squares 'WLS'.
      *  @param x  the input/design m-by-n matrix
      *  @param y  the response m-vector
      */
@@ -159,9 +159,9 @@ trait GLM
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Trigonometric Regression model.
-     *  @param t  the input vector: t_i expands to x_i
+     *  @param t  the input vector: 't_i' expands to 'x_i'
      *  @param y  the response vector
-     *  @param k  the maximum multiplier in the trig function (kwt)
+     *  @param k  the maximum multiplier in the trig function 'kwt'
      *  @param w  the base displacement angle in radians
      */
     def apply (t: VectorD, y: VectorD, k: Int, w: Double): TrigRegression =
@@ -170,9 +170,9 @@ trait GLM
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build a Trigonomtetric Regression model.
+    /** Build a Trigonometric Regression model.
      *  @param ty  the combined input vector and response vector
-     *  @param k   the maximum multiplier in the trig function (kwt)
+     *  @param k   the maximum multiplier in the trig function 'kwt'
      *  @param w   the base displacement angle in radians
      */
     def apply (ty: MatrixD, k: Int, w: Double): TrigRegression =

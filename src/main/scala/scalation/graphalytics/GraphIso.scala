@@ -25,7 +25,7 @@ class GraphIso (g: Graph, q: Graph)
     private val dualIso = new DualIso (g, q)      // create subgraph isomorphism matcher
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine whether graphs 'g' anf 'q 'are graph isomorphic.  This is done by
+    /** Determine whether graphs 'g' and 'q' are graph isomorphic.  This is done by
      *  (1) checking that 'g' and 'q' have the same number of vertices and
      *  (2) 'q' has at least one subgraph isomorphic match in 'g'.
      */

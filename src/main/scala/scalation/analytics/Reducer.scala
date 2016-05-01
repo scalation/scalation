@@ -18,7 +18,7 @@ trait Reducer
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given the original data matrix, produce a lower dimensionality matrix
-     *  that maintains most of the descriptive power of the orginal matrix.
+     *  that maintains most of the descriptive power of the original matrix.
      */
     def reduce (): MatrixD
 

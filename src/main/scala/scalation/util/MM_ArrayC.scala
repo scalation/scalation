@@ -9,15 +9,17 @@
  *  @see www.programering.com/a/MDO2cjNwATI.html
  */
 
-package scalation.util
+package scalation
+package util
 
 import java.io.{RandomAccessFile, Serializable}
 import java.lang.Cloneable
 import java.nio.{ByteBuffer, MappedByteBuffer}
 import java.nio.channels.FileChannel
 
-import collection._
-import collection.mutable.{AbstractSeq, IndexedSeq}
+import scala.collection._
+import scala.collection.mutable.{AbstractSeq, IndexedSeq}
+
 import scalation.math.Complex
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -104,7 +104,7 @@ class NaiveBayesR (x: MatrixD, y: VectorI, fn: Array [String], k: Int, cn: Array
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier, i.e., calculate statistics and create conditional
-     *  density (cd) functions.  Assumes that conditional densities follow the
+     *  density 'cd' functions.  Assumes that conditional densities follow the
      *  Normal (Gaussian) distribution.
      *  @param testStart  starting index of test region (inclusive) used in cross-validation
      *  @param testEnd    ending index of test region (exclusive) used in cross-validation

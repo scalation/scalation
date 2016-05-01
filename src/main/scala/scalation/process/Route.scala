@@ -16,7 +16,7 @@ import scalation.scala2d.{QCurve, R2}
 import scalation.scala2d.Colors._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Route` class provides a multilane pathway between two other components.
+/** The `Route` class provides a multi-lane pathway between two other components.
  *  The components in a `Model` conceptually form a graph in which the edges
  *  are `Transport`s and the nodes are other `Component`s.
  *  A `Route` is a composite component that bundles several `Transport`s.
@@ -52,12 +52,12 @@ class Route (name: String, k: Int, val from: Component, val to: Component,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the direction/turn random variate to determine next the direction.
      *  This allows an application model to select the next component.
-     *  The decision is delegated to this route's lane(0) transport.
+     *  The decision is delegated to 'this' route's lane(0) transport.
      */
     def selector: Variate = lane(0).selector
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the direction/turn random variate in this route's lane(0) transport.
+    /** Set the direction/turn random variate in 'this' route's lane(0) transport.
      *  @param selectorRV  the random variate used to select the direction
      */
     def selector_= (selector: Variate) { lane(0).selector = selector }
@@ -79,7 +79,7 @@ class Route (name: String, k: Int, val from: Component, val to: Component,
     override def at: Array [Double] = lane(0).at
         
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Tell the animation engine to display this Transport.
+    /** Tell the animation engine to display 'this' `Transport`.
      */
     def display ()
     {

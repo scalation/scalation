@@ -42,7 +42,7 @@ object GraphGen
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Generates a random graph with the specified size (number of vertices), 
      *  average degree and labels evenly distributed across vertices from 0 to
-     *  nLabels - 1.  Not necessarily a connected graph.
+     *  'nLabels - 1'.  Not necessarily a connected graph.
      *  @param size      the number of vertices to generate
      *  @param nLabels   the number of labels (distributed uniformly)
      *  @param avDegree  the average degree
@@ -62,7 +62,7 @@ object GraphGen
     } // genRandomGraph
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Generates a random connected graph by using genRandomGraph and
+    /** Generates a random connected graph by using 'genRandomGraph' and
      *  checking whether it is connected.
      *  @param size      the number of vertices to generate
      *  @param nLabels   the number of labels (distributed uniformly)
@@ -228,7 +228,7 @@ object GraphGen
     //------------------------------------------------------------------------
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Returns an array with labels distributed between 0 and nLabels - 1
+    /** Returns an array with labels distributed between 0 and 'nLabels - 1'.
      *  based on a uniform distribution.
      *  @param size     the number of vertices
      *  @param nLabels  the number of labels
@@ -239,7 +239,7 @@ object GraphGen
     } // randDistLabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Returns an array with labels distributed between 0 and nLabels - 1
+    /** Returns an array with labels distributed between 0 and 'nLabels - 1'.
      *  based on a power law distribution.
      *  @param size     the number of vertices
      *  @param nLabels  the number of labels

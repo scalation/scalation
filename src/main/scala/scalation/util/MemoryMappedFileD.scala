@@ -8,7 +8,8 @@
  *  @see www.programering.com/a/MDO2cjNwATI.html
  */
 
-package scalation.util
+package scalation
+package util
 
 import java.io.RandomAccessFile
 import java.nio.{ByteBuffer, MappedByteBuffer}

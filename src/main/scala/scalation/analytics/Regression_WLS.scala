@@ -32,9 +32,9 @@ import RegTechnique._
  *  <p>
  *  where 'x_pinv' is the pseudo-inverse.  Three techniques are provided:
  *  <p>
- *      Fac_QR         // QR Factorization: slower, more stable (default)
- *      Fac_Cholesky   // Cholesky Factorization: faster, less stable (reasonable choice)
- *      Inverse        // Inverse/Gaussian Elimination, classical textbook technique (outdated)
+ *      'Fac_QR'         // QR Factorization: slower, more stable (default)
+ *      'Fac_Cholesky'   // Cholesky Factorization: faster, less stable (reasonable choice)
+ *      'Inverse'        // Inverse/Gaussian Elimination, classical textbook technique (outdated)
  *  <p>
  *  @see www.markirwin.net/stat149/Lecture/Lecture3.pdf
  *  @param x          the input/design m-by-n matrix augmented with a first column of ones
@@ -77,10 +77,10 @@ class Regression_WLS (x: MatrixD, y: VectorD, private var w: VectoD = null, tech
     } // if
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the predictor by fitting the parameter vector (b-vector) in the
+    /** Train the predictor by fitting the parameter vector ('b'-vector) in the
      *  multiple regression equation
      *      y  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_1 , ... x_k] + e
-     *  using the weighted least squares (WLS) method.
+     *  using the weighted least squares 'WLS' method.
      */
     def train ()
     {
@@ -99,10 +99,10 @@ class Regression_WLS (x: MatrixD, y: VectorD, private var w: VectoD = null, tech
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the predictor by fitting the parameter vector (b-vector) in the
+    /** Train the predictor by fitting the parameter vector ('b'-vector) in the
      *  multiple regression equation
      *      y  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_1 , ... x_k] + e
-     *  using the weighted least squares (WLS) method.
+     *  using the weighted least squares 'WLS' method.
      *  @param yy  the new response vector
      */
     def train (yy: VectorD)
@@ -122,7 +122,7 @@ class Regression_WLS (x: MatrixD, y: VectorD, private var w: VectoD = null, tech
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including rSquared.
+    /** Return the quality of fit including 'rSquared'.
      */
     def fit: VectorD = VectorD (rSquared, rBarSq, fStat)
 
@@ -157,10 +157,10 @@ class Regression_WLS (x: MatrixD, y: VectorD, private var w: VectoD = null, tech
     } // backElim
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Variance Inflation Factor (VIF) for each variable to test
-     *  for multi-colinearity by regressing xj against the rest of the variables.
-     *  A VIF over 10 indicates that over 90% of the varaince of xj can be predicted
-     *  from the other variables, so xj is a candidate for removal from the model.
+    /** Compute the Variance Inflation Factor 'VIF' for each variable to test
+     *  for multi-collinearity by regressing 'xj' against the rest of the variables.
+     *  A VIF over 10 indicates that over 90% of the variance of 'xj' can be predicted
+     *  from the other variables, so 'xj' is a candidate for removal from the model.
      */
     def vif: VectorD =
     {

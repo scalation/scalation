@@ -28,8 +28,8 @@ import scalation.util.Monitor.trace
  *  @param motion    the speed/trip-time to move down the transport
  *  @param isSpeed   whether speed or trip-time is used for motion
  *  @param bend      the bend or curvature of the transport (0 => line)
- *  @param shift1    the x-y shift for the transport's first endpoint (from-side)
- *  @param shift2    the x-y shift for the transport's second endpoint (to-side)
+ *  @param shift1    the x-y shift for the transport's first end-point (from-side)
+ *  @param shift2    the x-y shift for the transport's second end-point (to-side)
  */
 class Transport (name: String, val from: Component, val to: Component,
                  motion: Variate, isSpeed: Boolean = false,
@@ -63,7 +63,7 @@ class Transport (name: String, val from: Component, val to: Component,
     } // if
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Calculate the coordinates of the two endpoints.
+    /** Calculate the coordinates of the two end-points.
      */
     private def calcEndPoints (): Tuple2 [R2, R2] =
     {
@@ -82,7 +82,7 @@ class Transport (name: String, val from: Component, val to: Component,
     } // calcEndPoints
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Tell the animation engine to display this Transport.
+    /** Tell the animation engine to display 'this' transport.
      */
     def display ()
     {
@@ -101,8 +101,8 @@ class Transport (name: String, val from: Component, val to: Component,
     } // at
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Jump the entity (SimActor) down this Transport.  Place it in the middle
-     *  of the Transport/Edge/QCurve for the entire trip time.
+    /** Jump the entity 'SimActor' down 'this' transport.  Place it in the middle
+     *  of the `Transport`s `QCurve` for the entire trip time.
      */
     def jump ()
     {
@@ -124,9 +124,9 @@ class Transport (name: String, val from: Component, val to: Component,
     } // jump
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Move the entity (SimActor) smoothly down this Transport.  Repeatedely
-     *  move it along the Transport/Edge/QCurve.  Caveat: tokens coordinates
-     *  are computed using a shadow QCurve (same coordinates as the one that
+    /** Move the entity `SimActor` smoothly down 'this' transport.  Repeatedly
+     *  move it along the `Transport`s `QCurve`.  Caveat: tokens coordinates
+     *  are computed using a shadow `QCurve` (same coordinates as the one that
      *  will be created by the animation engine).
      */
     def move ()

@@ -13,22 +13,17 @@
  *  relational algebra operators given in the following paper:
  *  @see db.csail.mit.edu/projects/cstore/vldb.pdf
  *
- *  Some of the operators have unicode versions: @see `scalation.util.UnicodeTest`
+ *  Some of the operators have Unicode versions: @see `scalation.util.UnicodeTest`
  */
 
 package scalation.relalgebra
 
-import java.io.{FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream, PrintWriter}
-
 import scala.collection.immutable.StringOps
-import scala.collection.mutable.Map
 
 import scalation.linalgebra._
 import scalation.linalgebra.MatrixKind._
 import scalation.math.{Complex, Rational, Real}
-import scalation.math.ExtremeD.NaN
 import scalation.math.StrO._
-import scalation.util.{DATA_DIR, STORE_DIR, Error, SEP}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Table` object provides functions for the `Table` companion objects.

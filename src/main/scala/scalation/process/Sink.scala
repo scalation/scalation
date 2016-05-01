@@ -16,7 +16,7 @@ import scalation.scala2d.Colors._
 import scalation.util.Monitor.trace
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Sink` class is used to terminate entities (SimActors) when they are finished.
+/** The `Sink` class is used to terminate entities `SimActor`s when they are finished.
  *  @param name  the name of the sink
  *  @param at    the location of the sink (x, y, w, h)
  */
@@ -26,7 +26,7 @@ class Sink (name: String, at: Array [Double])
     initComponent (name, at)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Auxiliary constructor that uses defaults for width (w) and heigth (h).
+    /** Auxiliary constructor that uses defaults for width 'w' and height 'h'.
      *  @param name  the name of the sink
      *  @param xy    the (x, y) coordinates for the top-left corner of the sink.
      */
@@ -44,7 +44,7 @@ class Sink (name: String, at: Array [Double])
     } // display
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Leave the model, effectively terminating the entity (SimActor).
+    /** Leave the model, effectively terminating the entity `SimActor`.
      */
     def leave ()
     {
@@ -65,7 +65,7 @@ class Sink (name: String, at: Array [Double])
 object Sink
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a sink using defaults for width (w) and heigth (h).
+    /** Create a sink using defaults for width 'w' and height 'h'.
      *  @param name  the name of the sink
      *  @param xy    the (x, y) coordinates for the top-left corner of the sink.
      */
@@ -75,7 +75,7 @@ object Sink
     } // apply
 
    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a group of related sinks using defaults for width (w) and heigth (h).
+    /** Create a group of related sinks using defaults for width 'w' and height 'h'.
      *  @param xy   the (x, y) coordinates for the top-left corner of the reference sink.
      *  @param snk  repeated sink specific info: name, offset
      */

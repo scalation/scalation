@@ -21,7 +21,7 @@ object TopSort
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Topological sort that returns an edge compatible ordering of the vertices.
-     *  Translated from pseudocode and implements Tarjan's algorithm.
+     *  Translated from pseudo-code and implements Tarjan's algorithm.
      *  The topological sort will contain negative values, if there is a cycle.
      *  @see en.wikipedia.org/wiki/Topological_sorting
      *  @param g  the directed graph

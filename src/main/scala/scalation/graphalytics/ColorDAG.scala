@@ -17,10 +17,10 @@ import scalation.scala2d.Colors._
 import scalation.scala2d.{Ellipse, QCurve, Rectangle}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `ColorDAG` class provides a data structure Directed Acyclic Graphs (DAGs) with colored
- *  nodes.  The ColorDAG consists of source nodes (in-degree is 0), sink nodes (out-degree is 0)
+/** The `ColorDAG` class provides a data structure Directed Acyclic Graphs 'DAG's with colored
+ *  nodes.  The `ColorDAG` consists of source nodes (in-degree is 0), sink nodes (out-degree is 0)
  *  and internal nodes.  The edges connecting nodes must have color compatibility.
- *  The ColorDAG is divided into 'k' stages:  e.g., sources (stage 0), internals (stages 1..k-2)
+ *  The `ColorDAG` is divided into 'k' stages:  e.g., sources (stage 0), internals (stages 1..k-2)
  *  and sinks (stage k-1).
  *  @param dimensions  the dimension (number of nodes) for each stage
  *  @param maxIn       the maximum number of input colors for an internal node
@@ -56,7 +56,7 @@ class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
 
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** This innner class holds information about a node in the DAG.
+    /** This inner class holds information about a node in the DAG.
      *  @param id         the id number for this node
      *  @param inDegree   the number of incoming edges/inputs for this node
      *  @param outDegree  the number of outgoing edges/outputs for this node
@@ -133,7 +133,7 @@ class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
     /** For each node in the DAG, check that (1) all of its "inputs" are color/type compatible
      *  with an output from a node from the previous stage, and (2) at least one of its
      *  "outputs" is color/type compatible with an input to a node from the next stage.
-     *  Nodes that fails to have all of their inputs satified (check number 1) are thrown
+     *  Nodes that fails to have all of their inputs satisfied (check number 1) are thrown
      *  out before check if they have at least one useful output.  Nodes failing check
      *  number 2 will also be thrown out.
      */
@@ -194,7 +194,7 @@ class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
     } // connect
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Populate the in and out ListBuffers for each node based on the DAG's list of edges.
+    /** Populate the in and out `ListBuffers` for each node based on the DAG's list of edges.
      */
     def popInOut ()
     {
@@ -269,7 +269,7 @@ class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
     } // printInOut
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Print the ColorTree used by the DAG for node and edge colors/type and animate its
+    /** Print the `ColorTree` used by the DAG for node and edge colors/type and animate its
      *  construction.
      */ 
     def printColorTree ()

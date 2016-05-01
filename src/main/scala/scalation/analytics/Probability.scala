@@ -19,8 +19,8 @@ import scalation.util.Error
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Probability` object provides methods for operating on univariate and
  *  bivariate probability distributions of discrete random variables 'X' and 'Y'.
- *  A probability distribution is specified by its probabilty mass functions (pmf)
- *  stored either as a "probabilty vector" for a univariate distribution or
+ *  A probability distribution is specified by its probability mass functions (pmf)
+ *  stored either as a "probability vector" for a univariate distribution or
  *  a "probability matrix" for a bivariate distribution.
  *  <p>
  *      joint probability matrix:       pxy(i, j)  = P(X = x_i, Y = y_j)
@@ -31,9 +31,9 @@ import scalation.util.Error
  *  methods for computing entropy and mutual information are also provided.
  *  Entropy provides a measure of disorder or randomness.  If there is
  *  little randomness, entropy will close to 0, while when randomness is
- *  high, entropy will be close to, e.g., log2 (px.dim).  Mutual information
+ *  high, entropy will be close to, e.g., 'log2 (px.dim)'.  Mutual information
  *  provides a robust measure of dependency between random variables
- *  (constrast with correletion).
+ *  (contrast with correlation).
  *  @see scalation.stat.StatVector
  */
 object Probability

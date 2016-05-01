@@ -18,10 +18,11 @@ import scalation.linalgebra.MatrixD.outer
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `PrincipalComponents` class performs the Principal Component Analysis (PCA)
+/** The `PrincipalComponents` class performs the Principal Component Analysis 'PCA'
  *  on data matrix 'x'.  It can be used to reduce the dimensionality of the data.
- *  First find the PCs by calling 'findPCs' and then call 'reduce' to reduce
- *  the data (i.e., reduce matrix 'x' to a lower dimensionality matrix).
+ *  First find the Principal Components 'PC's by calling 'findPCs' and then call
+ *  'reduce' to reduce the data (i.e., reduce matrix 'x' to a lower dimensionality
+ *  matrix).
  *  @param x  the data matrix to reduce, stored column-wise
  */
 class PrincipalComponents (x: MatrixD)
@@ -50,7 +51,7 @@ class PrincipalComponents (x: MatrixD)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Center the data about the means (i.e., subtract the means) and return
-     *  the mean vector (i.e., the mean for each varaibale/dimension).
+     *  the mean vector (i.e., the mean for each variable/dimension).
      */
     def meanCenter (): VectorD =
     {
@@ -75,7 +76,7 @@ class PrincipalComponents (x: MatrixD)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the unit eigenvectors for the covariance matrix.
-     *  @param eVal  the vector of eigenvalues for the covariance matrrix
+     *  @param eVal  the vector of eigenvalues for the covariance matrix
      */
     def computeEigenVectors (eVal: VectorD): MatrixD =
     {
@@ -85,9 +86,9 @@ class PrincipalComponents (x: MatrixD)
     } // computeEigenVectors
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Find the Principal Components/Features, the eigenvectors with the k
+    /** Find the Principal Components/Features, the eigenvectors with the 'k'
      *  highest eigenvalues.
-     *  @param k  the number of Principal Components (PCs) to find
+     *  @param k  the number of Principal Components 'PC's to find
      */
     def findPCs (k: Int): MatrixD =
     {
@@ -106,7 +107,7 @@ class PrincipalComponents (x: MatrixD)
     } // reduce
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Approximately recover the orginal data by multiplying the reduced matrix
+    /** Approximately recover the original data by multiplying the reduced matrix
      *  by the inverse (via transpose) of the feature matrix and then adding back
      *  the means.
      */
@@ -143,27 +144,26 @@ object PrincipalComponentsTest extends App
 //------------------------------------------------------------------------------
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for the i-th Principal Component PC_i return the score and loading
+    /** Solve for the i-th Principal Component 'PC_i' return the score and loading
      *  vectors t and p.
-     *  @param i  the i-th Principal Component PC_i
-     *
-    def solve (i: Int): Tuple2 [VectorD, VectorD] =
-    {
-        var t  = x.col (i)          // the scores for PC_i, initialized to i-th column of x
-        var p  = new VectorD (1)    // the loadings for PC_i
-        var tt = new VectorD (1)    // saved value for t (the old t)
-        var dt = new VectorD (1)    // the difference between t and tt
-
-        breakable { for (k <- 1 to MAX_ITER) {
-            p  = (e * t) / t.normSq           // project x onto t to find the corresponding loading p
-            p  = p / p.norm                   // normalise loading vector p to length 1
-            tt = t                            // save the old value of t
-            t  = (e * p) / p.normSq           // project x onto p to find corresponding score vector t
-            dt = t - tt                       // calculate dt as the difference between previous and current scores
-            if (i > 1 && dt.norm > EPSILON) break  // check for the convergence
-        }} // for
-        e = e - outer (t, p)                   // remove the estimated PC_i component from e
-        (t, p)
-    } // solve
+     *  @param i  the i-th Principal Component 'PC_i'
      */
+//  def solve (i: Int): Tuple2 [VectorD, VectorD] =
+//  {
+//      var t  = x.col (i)          // the scores for PC_i, initialized to i-th column of x
+//      var p  = new VectorD (1)    // the loadings for PC_i
+//      var tt = new VectorD (1)    // saved value for t (the old t)
+//      var dt = new VectorD (1)    // the difference between t and tt
+//
+//      breakable { for (k <- 1 to MAX_ITER) {
+//          p  = (e * t) / t.normSq           // project x onto t to find the corresponding loading p
+//          p  = p / p.norm                   // normalise loading vector p to length 1
+//          tt = t                            // save the old value of t
+//          t  = (e * p) / p.normSq           // project x onto p to find corresponding score vector t
+//          dt = t - tt                       // calculate dt as the difference between previous and current scores
+//          if (i > 1 && dt.norm > EPSILON) break  // check for the convergence
+//      }} // for
+//      e = e - outer (t, p)                   // remove the estimated PC_i component from e
+//      (t, p)
+//  } // solve
 

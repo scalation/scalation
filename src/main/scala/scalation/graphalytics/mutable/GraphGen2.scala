@@ -35,7 +35,7 @@ object GraphGen2
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Generates a random graph with the specified size (number of vertices), 
      *  average degree and labels evenly distributed across vertices from 0 to
-     *  nLabels - 1.  Not necessarily a connected graph.
+     *  'nLabels - 1'.  Not necessarily a connected graph.
      *  @param size      the number of vertices to generate
      *  @param nLabels   the number of labels (distributed uniformly)
      *  @param avDegree  the average degree
@@ -56,7 +56,7 @@ object GraphGen2
     } // genRandomGraph
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Generates a random connected graph by using genRandomGraph and
+    /** Generates a random connected graph by using 'genRandomGraph' and
      *  checking whether it is connected.
      *  @param size      the number of vertices to generate
      *  @param nLabels   the number of labels (distributed uniformly)
@@ -279,21 +279,20 @@ object GraphGen2
     /** Renumber the selected nodes (give them new consecutive ids).
      *  @param node
      *  @param chMap
-     *
-    private def renumber (node: SET [Int], chMap: Map [Int, SET [Int]]): Array [SET [Int]] =
-    {
-        var oldId2newId = Map [Int, Int] ()
-        var i = 0
-        for (v <- node) { oldId2newId += (v -> i); i += 1 }
-        val newToOldLabels = Array.ofDim [Int] (size)
-        for (
-        newLabelMap.foreach { case (oldL, newL) => newToOldLabels (newL) = oldL }
-        Array.ofDim [SET [Int]] (size).map (x => SET [Int] ())
-    } // renumber
      */
+//  private def renumber (node: SET [Int], chMap: Map [Int, SET [Int]]): Array [SET [Int]] =
+//  {
+//      var oldId2newId = Map [Int, Int] ()
+//      var i = 0
+//      for (v <- node) { oldId2newId += (v -> i); i += 1 }
+//      val newToOldLabels = Array.ofDim [Int] (size)
+//      for (
+//      newLabelMap.foreach { case (oldL, newL) => newToOldLabels (newL) = oldL }
+//      Array.ofDim [SET [Int]] (size).map (x => SET [Int] ())
+//  } // renumber
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Returns an array with labels distributed between 0 and nLabels - 1
+    /** Returns an array with labels distributed between 0 and 'nLabels - 1'.
      *  based on a uniform distribution.
      *  @param size     the number of vertices
      *  @param nLabels  the number of labels
@@ -304,7 +303,7 @@ object GraphGen2
     } // randDistLabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Returns an array with labels distributed between 0 and nLabels - 1
+    /** Returns an array with labels distributed between 0 and 'nLabels - 1'.
      *  based on a power law distribution.
      *  @param size     the number of vertices
      *  @param nLabels  the number of labels
@@ -316,7 +315,7 @@ object GraphGen2
     } // powDistLabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Returns an array with labels distributed between 0 and nLabels - 1
+    /** Returns an array with labels distributed between 0 and 'nLabels - 1'.
      *  based on a Gaussian/Normal distribution.
      *  @param size     the number of vertices
      *  @param nLabels  the number of labels
@@ -343,8 +342,9 @@ object GraphGen2
    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Returns an integer with a probability based on a gaussian distribution
      *  centered at d
-     *  FIX: may need to truncate with math.min(math.max((rand.nextGaussian()*d+d).toInt, 0), d*2).toInt
-     *  @param d  the WHAT??
+     *  FIX: may need to truncate with
+     *       'math.min(math.max((rand.nextGaussian()*d+d).toInt, 0), d*2).toInt'
+     *  @param d  the distance indicator
      */
     private def gaussInt (d: Double) = (rand.nextGaussian () * 2.0 * d).toInt
 

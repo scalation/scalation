@@ -156,7 +156,7 @@ object BayesClassifier
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert a selected feature set from a list to a Boolean array representation.
+    /** Convert a selected feature set from a list to a `Boolean` array representation.
      *  @param list  the list of selected features, e.g., (1, 3, 5) 
      *  @param n     the total number (selected or not) of features 
      */

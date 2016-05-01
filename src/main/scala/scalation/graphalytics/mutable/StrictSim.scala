@@ -26,14 +26,13 @@ import scalation.stat.Statistic
 class StrictSim (g: Graph, q: Graph) 
       extends GraphMatcher (g, q)
 {
-
     private val listOfDistinctReducedSet = new ListBuffer [SET [String]] ()   // contains total number of matches 
                                                                               // after post processing
     private val mapOfBallWithSize = Map [Int, Long] ()                        // contains balls left after
                                                                               // post processing with diameter.
     private val listOfMatchedBallVertices = MutableList [Int] ()              // contains list of center vertices
 
-    private val qmet = new GraphMetrics (q.clone, false)                        // creating graph metrics object of query graph
+    private val qmet = new GraphMetrics (q.clone, false)                      // creating graph metrics object of query graph
 
     private val dataSize  = g.size                                            // size of the data graph
     private val querySize = q.size                                            // size of the query graph
@@ -230,9 +229,9 @@ class StrictSim (g: Graph, q: Graph)
     } // calculateTotalEdges
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Calculate statistics (e.g., min, max, avg diameter and standard deviation)
-     *  on the  balls left after postprocessing.
-     *  @param balls  mappings from a center vertex to the Ball B(Graph, Center, Radius)
+    /** Calculate statistics (e.g., min, max, average diameter and standard deviation)
+     *  on the balls left after post-processing.
+     *  @param balls  mappings from a center vertex to the Ball 'B(Graph, Center, Radius)'
      */
     def calculateBallDiameterMetrics (balls: HashMap [Int, Ball]): Statistic =
     {
@@ -243,7 +242,7 @@ class StrictSim (g: Graph, q: Graph)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vertex from an array of central vertices, those which have 
-     *  highest ch set size and lowest frequency of label in the query graph, i.e.
+     *  highest 'ch' set size and lowest frequency of label in the query graph, i.e.,
      *  highest ratio.
      *  @param centr the array of vertices whose eccentricity is equal to the radius
      */

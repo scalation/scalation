@@ -10,7 +10,8 @@
 
 // U N D E R   D E V E L O P M E N T
 
-package scalation.util
+package scalation
+package util
 
 import java.io.{RandomAccessFile, Serializable}
 import java.lang.Cloneable

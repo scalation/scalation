@@ -148,7 +148,7 @@ class NelderMeadSimplex (f: FunctionV2S, n: Int)
     } // shrink
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform an exact (e.g., GoldenSectionLS) or inexact (e.g., WolfeLS) line search.
+    /** Perform an exact (e.g., `GoldenSectionLS`) or inexact (e.g., `WolfeLS`) line search.
      *  Search in direction 'dir', returning the distance 'z' to move in that direction.
      *  Currently NOT USED, but may be used to find a better point to add to simplex.
      *  @param x     the current point
@@ -174,7 +174,7 @@ class NelderMeadSimplex (f: FunctionV2S, n: Int)
      *  Try the reflection, expansion, outer contraction and inner contraction
      *  points, in that order.  If none succeeds, shrink the simplex and iterate.
      *  Return both distance and difference between x_h (worst) and x_l (best).
-     *  @param toler  the tolerence used for termination
+     *  @param toler  the tolerance used for termination
      */
     def improveSimplex (toler: Double = EPSILON): Tuple2 [Double, Double] =
     {
@@ -223,7 +223,7 @@ class NelderMeadSimplex (f: FunctionV2S, n: Int)
      *  Simplex algorithm.
      *  @param x0     the given starting point
      *  @param step   the initial step size
-     *  @param toler  the tolerence used for termination
+     *  @param toler  the tolerance used for termination
      */
     def solve (x0: VectorD, step: Double = STEP, toler: Double = EPSILON): VectorD =
     {
@@ -247,7 +247,8 @@ class NelderMeadSimplex (f: FunctionV2S, n: Int)
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the NelderMeadSimplex class.
+/** The `NelderMeadSimplexTest` object is used to test the `NelderMeadSimplex` class.
+ *  > run-main scalation.minima.NelderMeadSimplexTest
  */
 object NelderMeadSimplexTest extends App
 {

@@ -26,17 +26,17 @@ import LabelType.TLabel
  */
 class GraphqlOpt (g: Graph, q: Graph) 
 {
-     private var phi           = Array.ofDim [SET [Int]] (q.size)     // initialize empty feasible match sets
-     private var matches       = Set [Array [Int]] ()                 // initialize empty matches
-     private var matchedVertex = Array.fill (q.size) {-1}             // initialize matched vertex for each u to -1
-     private val qProfileMap   = HashMap [Int, MutableList [TLabel]] ()  // initialize profile mapping of each query vertex 'u' to empty list
-     private val gProfileMap   = HashMap [Int, MutableList [TLabel]] ()  // initialize profile mapping of each data vertex 'v' to empty list
-     private val searchOrder   = Array.ofDim [Int] (q.size)           // initialize empty search order
-     private val searchOrderEnabled = true                            // by default search order is enabled
-     private val LIMIT = 1E7                                          // quit after too many matches
+     private var phi           = Array.ofDim [SET [Int]] (q.size)        // empty feasible match sets
+     private var matches       = Set [Array [Int]] ()                    // empty matches
+     private var matchedVertex = Array.fill (q.size) {-1}                // matched vertex for each u to -1
+     private val qProfileMap   = HashMap [Int, MutableList [TLabel]] ()  // profile mapping of each query vertex 'u' to empty list
+     private val gProfileMap   = HashMap [Int, MutableList [TLabel]] ()  // profile mapping of each data vertex 'v' to empty list
+     private val searchOrder   = Array.ofDim [Int] (q.size)              // empty search order
+     private val searchOrderEnabled = true                               // by default search order is enabled
+     private val LIMIT = 1E7                                             // quit after too many matches
    
-     for (u <- 0 until q.size) qProfileMap += u -> getNeighborProfile (q, u)   // get Neighborhood profile of query vertex 'u', Figure 13
-     for (v <- 0 until g.size) gProfileMap += v -> getNeighborProfile (g, v)   // get Neighborhood profile of data vertex 'v', Figure 13
+     for (u <- 0 until q.size) qProfileMap += u -> getNeighborProfile (q, u)   // get neighborhood of query vertex 'u', Figure 13
+     for (v <- 0 until g.size) gProfileMap += v -> getNeighborProfile (g, v)   // get neighborhood of data vertex 'v', Figure 13
      println ("Neighbor, Profile processing done")
    
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -50,29 +50,30 @@ class GraphqlOpt (g: Graph, q: Graph)
      } // feasibleMates
 
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-     /** Apply the GraphQL Subgraph Isomorphism algorithm to find subgraphs of data
+     /** Apply the 'GraphQL' Subgraph Isomorphism algorithm to find subgraphs of data
       *  graph 'g' that isomorphically match query graph 'q'.  
-      *  This method represents the Algorithm 1: Graph Pattern Matching of the GraphQL paper
+      *  This method represents the Algorithm 1: Graph Pattern Matching of the
+      *  'GraphQL' paper.
       */
      def bijections () 
      {
          matches = Set [Array [Int]] ()
          phi     = feasibleMates ()                               // initial mappings from label match
          println ("Neighbor Local Pruning started")
-         neighborProfilePruning ()                                // neighborhood local pruning, Section 4.2 of the GraphQL paper
+         neighborProfilePruning ()                                // neighborhood local pruning, Section 4.2 of GraphQL paper
          println ("Neighbor Local Pruning completed")
          println ("Global Pruning started")
-//       refineSearchSpace (q.size)                               // reduce global search space, Section 4.3 of the GraphQL paper
+//       refineSearchSpace (q.size)                               // reduce global search space, Section 4.3 of GraphQL paper
          println ("Global search space pruning completed")
-         getSearchOrder ()                                        // optimize search order, Section 4.4 of the GraphQL paper
+         getSearchOrder ()                                        // optimize search order, Section 4.4 of GraphQL paper
          search (0)
      } // bijections
     
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      /** Sorts according to the feasible matches size in ascending order.
       *  This method represents the Section 4.4.2 : Optimization of search order based
-      *  on greedy approach of the GraphQL paper.
-      *  i.e., at join i, choose a leaf node that minimizes the estimated cost of the join.
+      *  on greedy approach of the 'GraphQL' paper.
+      *  i.e., at join 'i', choose a leaf node that minimizes the estimated cost of the join.
       */
      def getSearchOrder ()
      {
@@ -83,8 +84,8 @@ class GraphqlOpt (g: Graph, q: Graph)
      } // getSearchOrder
     
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-     /** Iterates on the u'th Node to find feasible mapping for that node.
-      *  This is the part of Algorithm 1, Line 8 to 18, of the GraphQL paper
+     /** Iterates on the 'u'th Node to find feasible mapping for that node.
+      *  This is the part of Algorithm 1, Line 8 to 18, of the 'GraphQL' paper
       *  @param depth  the depth of recursion
       */
      def search (depth: Int) 
@@ -106,9 +107,9 @@ class GraphqlOpt (g: Graph, q: Graph)
      } // search
     
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-     /** Is vertex v contained in any matched vertex?
-      *  @param matVert   array of matched vertex from a query vertex u to graph vertex v
-      *  @param v         the vertex v to check
+     /** Determine whether vertex 'v' is contained in any matched vertex.
+      *  @param matVert  array of matched vertex from a query vertex u to graph vertex v
+      *  @param v        the vertex v to check
       */
      def contains (matVert: Array [Int], v: Int): Boolean =
      {
@@ -117,8 +118,8 @@ class GraphqlOpt (g: Graph, q: Graph)
      } // contains
     
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-     /** Examines, if u can be mapped to v, by considering their edges.
-      *  This method is the part of Algorithm 1, line 19 to 26, of the GraphQL paper.
+     /** Examines, if 'u' can be mapped to 'v', by considering their edges.
+      *  This method is the part of Algorithm 1, line 19 to 26, of the 'GraphQL' paper.
       *  @param u  vertex u can be mapped to v
       *  @param v  vertex v can be mapped to u
       */
@@ -149,9 +150,10 @@ class GraphqlOpt (g: Graph, q: Graph)
      } // check
     
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-     /** Examines neighborhood profile(sorted neighborhood labels) of query vertex u
-      *  with feasible vertex v profile of v must contain profile of u.
-      *  This method is the part of Algorithm 1: line 3 and the section 4.2 of the GraphQL paper.
+     /** Examines neighborhood profile(sorted neighborhood labels) of query vertex 'u'
+      *  with feasible vertex 'v' profile of 'v' must contain profile of 'u'.
+      *  This method is the part of Algorithm 1: line 3 and the section 4.2 of
+      *  the 'GraphQL' paper.
       */
      def neighborProfilePruning ()
      {
@@ -163,40 +165,42 @@ class GraphqlOpt (g: Graph, q: Graph)
       } // neighborProfilePruning
     
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-     /** Checks whether at level l, subtree of u is sub-isomorphic to v only if
-      *  Bipartite graph of B(u,v) has semi-perfect matching.  This method is the
-      *  implementation of Algorithm 2: Refine Search Space, of the GraphQL paper.
+     /** Checks whether at level l, subtree of 'u' is sub-isomorphic to 'v' only if
+      *  Bipartite graph of 'B(u, v)' has semi-perfect matching.  This method is the
+      *  implementation of Algorithm 2: Refine Search Space, of the 'GraphQL' paper.
       *  @param level   to what level we want to refine.
-      *
-     def refineSearchSpace (level: Int) 
-     {
-         val mark = HashMap [String, Boolean] ()
-         for (u <- 0 until q.size; v <- phi (u)) mark.put ("(" +u + "," +v + ")", true) {             // initialize all pair of u and v to true
-             breakable { 
-                 for (i <- 1 to level) {
-                     for (u <- 0 until q.size; v <- phi (u) if (mark("(" +u + "," +v + ")"))) {
-                         val bipartite = Array.fill (q.size, g.size) (false)                          // start constructing bipartite graph B(u,v)
-                         val uNeighbors = getNeighbors (q, u)
-                         val vNeighbors = getNeighbors (g, v)
-                         for (u0 <- uNeighbors; v0 <- vNeighbors if (phi (u0) contains v0)) bipartite (u0)(v0) = true    // construct bipartite graph
-                         val maxBipSize = new BipartiteMatching (bipartite).maxBPM                    // find max bipartite match all u to v, unique pair
-                         if (maxBipSize == uNeighbors.size) mark.put ("(" +u + "," +v + ")", false)   // max bipartite is equal to u's neighbor size,
-                                                                                                      // that means a semi-perfect match is found    
-                         else {
-                             phi(u) -= v                                                              // if not semi-perfect match, remove v from phi(u)
-                             for (u0 <- uNeighbors ; v0 <- vNeighbors if (phi (u0) contains v0)) mark.put ("(" +u0 + "," +v0 + ")", true )
-                         } // if
-                      } // for
-                      if (! mark.values.toList.contains (true)) break                                 // no pair (u,v) in mark is true, then no further pruning
-                  } // for
-             } // breakable
-         } // for
-     } // refineSearchSpace
       */
+//   def refineSearchSpace (level: Int) 
+//   {
+//       val mark = HashMap [String, Boolean] ()
+//       for (u <- 0 until q.size; v <- phi (u)) mark.put ("(" +u + "," +v + ")", true) {       // initialize all pair of u and v to true
+//             breakable { for (i <- 1 to level) {
+//                 for (u <- 0 until q.size; v <- phi (u) if (mark("(" +u + "," +v + ")"))) {
+//                     val bipartite = Array.fill (q.size, g.size) (false)                      // start constructing bipartite graph B(u,v)
+//                     val uNeighbors = getNeighbors (q, u)
+//                     val vNeighbors = getNeighbors (g, v)
+//                     for (u0 <- uNeighbors; v0 <- vNeighbors if (phi (u0) contains v0)) {
+//                         bipartite (u0)(v0) = true                                            // construct bipartite graph
+//                     } // for
+//                     val maxBipSize = new BipartiteMatching (bipartite).maxBPM                // find max bipartite match u to v, unique pair
+//                     if (maxBipSize == uNeighbors.size) {
+//                         mark.put ("(" +u + "," +v + ")", false)                              // max bipartite is equal to u's neighbor size,
+//                                                                                              // that means a semi-perfect match is found    
+//                     } else {
+//                         phi(u) -= v                                                          // if not semi-perfect match, remove v from phi(u)
+//                         for (u0 <- uNeighbors ; v0 <- vNeighbors if (phi (u0) contains v0)) {
+//                             mark.put ("(" +u0 + "," +v0 + ")", true )
+//                         } // for
+//                     } // if
+//                } // for
+//                if (! mark.values.toList.contains (true)) break                               // no pair (u, v) in mark => no further pruning
+//           }} // breakable for
+//       } // for
+//   } // refineSearchSpace
     
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-     /** Finds neighborhood profile of vertex u in a graph. The profile is constructed
-      *  in lexicographic order, refer figure 13 of the GraphQL paper for example.
+     /** Find neighborhood profile of vertex 'u' in a graph. The profile is constructed
+      *  in lexicographical order, refer figure 13 of the 'GraphQL' paper for example.
       *  @param graph   For which graph, we are finding neighbor profile of u
       *  @param u       Vertex u, for which neighborhood profile is created
       */
@@ -211,7 +215,7 @@ class GraphqlOpt (g: Graph, q: Graph)
      } // getNeighborProfile
     
      //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-     /** Finds all the neighbors of vertex u in a graph.
+     /** Finds all the neighbors of vertex 'u' in a graph.
       *  @param graph   For which graph, we are finding neighbors of u
       *  @param u       Vertex u, for which all neighbors are found
       */

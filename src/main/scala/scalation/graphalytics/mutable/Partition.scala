@@ -20,7 +20,7 @@ import LabelType.TLabel
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Partition` class is used to partition large directed graphs.
- *  It support the following three algorithms: group_ran, group_ord, group_lp.
+ *  It support the following three algorithms: 'group_ran', 'group_ord', 'group_lp'.
  *
  *  (1) Random Partitioning - excellent balance, poor edge cuts
  *  Each vertex is given a randomly assigned integer label 'ilabel' and is grouped
@@ -30,7 +30,7 @@ import LabelType.TLabel
  *  Each vertex is assigned an integer label 'ilabel' incrementally and is grouped
  *  accordingly, e.g., {0, 1, ..., 9}, {10, 11, ..., 19}, ...
  *
- *  (3) Label Propogation partitioning - fair balance, fair edge cuts
+ *  (3) Label Propagation partitioning - fair balance, fair edge cuts
  *  Each vertex is initially given a unique integer label 'ilabel'.  On each iteration,
  *  each vertex will have its 'ilabel' reassigned to the most popular/frequent 'ilabel'
  *  in its neighborhood (which includes its children, parents and itself).
@@ -71,7 +71,7 @@ class Partition (g: Graph)
     } // group_ord
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Group the vertices based on their 'ilabel's using label propogation.
+    /** Group the vertices based on their 'ilabel's using label propagation.
      *  @param k  the number of subgraphs to create
      */
     def group_lp (k: Int)
@@ -105,7 +105,7 @@ class Partition (g: Graph)
     } // partition
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Form subgraphs 'gi's from the orginal graph 'g'
+    /** Form subgraphs 'gi's from the original graph 'g'
      */
     def formGraphs (): ArrayBuffer [Graph] =
     {
@@ -182,7 +182,7 @@ class Partition (g: Graph)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PartitionTest` object is used to test the `Partition` class.
- *  This test uses random partitoning.
+ *  This test uses random partitioning.
  *  > run-main scalation.graphalytics.mutable.PartitionTest
  */
 object PartitionTest extends App
@@ -238,7 +238,7 @@ object PartitionTest2 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PartitionTest3` object is used to test the `Partition` class.
- *  This test uses label propogation for partitioning.
+ *  This test uses label propagation for partitioning.
  *  > run-main scalation.graphalytics.mutable.PartitionTest3
  */
 object PartitionTest3 extends App

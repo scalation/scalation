@@ -80,7 +80,7 @@ class GeneticAlgorithm (f:       VectorI => Double,
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The objective function f re-scaled by a weighted penalty, if constrained.
-     *  @param x  the coordinate values of the currrent point
+     *  @param x  the coordinate values of the current point
      */
     def fg (x: VectorI): Double =
     {
@@ -209,15 +209,14 @@ object GeneticAlgorithmTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GeneticAlgorithmTest2` object is used to test the `GeneticAlgorithm` class
  *  (constrained).
- *
-object GeneticAlgorithmTest2 extends App
-{
-    def f (x: VectorI): Double = (x(0) - 10) * (x(0) - 10) + (x(1) - 20) * (x(1) - 20) + 1
-    def g (x: VectorI): Double = -max (x(0) - 1, x(1) - 1)    // require x(i) >= 1
-    val x0  = new VectorI (2); x0.set (1)
-    val ils = new GeneticAlgorithm (f, g)
-    println ("optimal solution = " + ils.solve (x0))
-
-} // GeneticAlgorithmTest2 object
  */
+// object GeneticAlgorithmTest2 extends App
+// {
+//     def f (x: VectorI): Double = (x(0) - 10) * (x(0) - 10) + (x(1) - 20) * (x(1) - 20) + 1
+//     def g (x: VectorI): Double = -max (x(0) - 1, x(1) - 1)    // require x(i) >= 1
+//     val x0  = new VectorI (2); x0.set (1)
+//     val ils = new GeneticAlgorithm (f, g)
+//     println ("optimal solution = " + ils.solve (x0))
+//
+// } // GeneticAlgorithmTest2 object
 

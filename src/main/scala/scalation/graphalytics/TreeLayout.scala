@@ -15,9 +15,8 @@ package scalation.graphalytics
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TreeLayout` class is used to display multi-way trees with the root at the
- *  top and leaves at the bottom.  It is translated from the pseudocode given
- *  in Appendix A of the Christoph Buchheim, Michael Junger and Sebastian Leipert
- *  paper.
+ *  top and leaves at the bottom.  It is translated from the pseudo-code given in
+ *  @see Appendix A of Christoph Buchheim, Michael Junger and Sebastian Leipert paper.
  *  @see onlinelibrary.wiley.com/doi/10.1002/spe.713/pdf
  *  @param t  the tree to be displayed
  */

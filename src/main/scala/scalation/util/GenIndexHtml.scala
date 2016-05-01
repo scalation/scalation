@@ -6,7 +6,8 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.util
+package scalation
+package util
 
 import java.io.{BufferedWriter, File, FileWriter}
 
@@ -21,11 +22,11 @@ object GenIndexHtml extends App
 {
     private val SKIP = "old"                     // do not process files in this directory
 
-    private val mainCodeDir = SRC_DIR + "main" + SEP + "scala"
+    private val mainCodeDir = SRC_DIR + "main" + ⁄ + "scala"
     println ("Generate index.html files starting from mainCodeDir = " + mainCodeDir)
     recCreate (new File (mainCodeDir))
 
-    private val testCodeDir = SRC_DIR + "test" + SEP + "scala"
+    private val testCodeDir = SRC_DIR + "test" + ⁄ + "scala"
     println ("Generate index.html files starting from testCodeDir = " + testCodeDir)
     recCreate (new File (testCodeDir))
 

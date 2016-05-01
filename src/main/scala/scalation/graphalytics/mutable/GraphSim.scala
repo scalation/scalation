@@ -15,8 +15,8 @@ import scala.collection.mutable.{Set => SET}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSim` class provides a second implementation for Simple Graph
- *  Simulation.  It differ from GraphSim in the looping order in the main for-loop
- *  and early termination when phi(u) is empty.
+ *  Simulation.  It differ from `GraphSim` in the parent directory in the looping
+ *  order in the main for-loop and early termination when 'phi(u)' is empty.
  *  @param g  the data graph  G(V, E, l)
  *  @param q  the query graph Q(U, D, k)
  */

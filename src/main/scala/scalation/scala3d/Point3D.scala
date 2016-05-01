@@ -21,15 +21,15 @@ object Point3D
      */
     val ZERO = geometry.Point3D.ZERO
 
-    /** The unit vector pointng along the x-axis.
+    /** The unit vector pointing along the x-axis.
      */
     val X_AXIS = new geometry.Point3D (1.0, 0.0, 0.0)
 
-    /** The unit vector pointng along the y-axis.
+    /** The unit vector pointing along the y-axis.
      */
     val Y_AXIS = new geometry.Point3D (0.0, 1.0, 0.0)
 
-    /** The unit vector pointng along the z-axis.
+    /** The unit vector pointing along the z-axis.
      */
     val Z_AXIS = new geometry.Point3D (0.0, 0.0, 1.0)
 

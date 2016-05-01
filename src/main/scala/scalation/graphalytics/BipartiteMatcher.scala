@@ -10,8 +10,8 @@ package scalation.graphalytics
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BipartiteMatcher` class provides an implementation of finding maximal
  *  Bipartite Matching.
- *  @see http://www.geeksforgeeks.org/maximum-bipartite-matching/
- *  @param  bpGraph  the bipartitte graph
+ *  @see www.geeksforgeeks.org/maximum-bipartite-matching/
+ *  @param bpGraph  the bipartite graph
  */
 class BipartiteMatcher (bpGraph: Array [Array [Boolean]]) 
 {
@@ -45,8 +45,8 @@ class BipartiteMatcher (bpGraph: Array [Array [Boolean]])
     } // bpm
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Returns maximum number of matching from M to N.
-     *  The value of matchR(i) is the applicant number assigned to job i,
+    /** Returns maximum number of matching from 'M' to 'N'.
+     *  The value of 'matchR(i)' is the applicant number assigned to job 'i',
      *  the value -1 indicates nobody is assigned. 
      */
     def maxBPM (): Int = 

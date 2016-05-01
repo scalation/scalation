@@ -48,17 +48,17 @@ object CommandType extends Enumeration
  *  @param color     the color of the component
  *  @param pts       the set points/dimensions giving the shapes location and size
  *  @param time      simulation time when the command is to be performed
- *  @param from_eid  the eid of the orgination node (only for edges)
- *  @param to_eid    the eid of the destination node (only for edges)
+ *  @param from_eid  the 'eid' of the origination node (only for edges)
+ *  @param to_eid    the 'eid' of the destination node (only for edges)
  */
 case class AnimateCommand (action: CommandType.Value, eid: Int, shape: Shape, label: String,
                            primary: Boolean, color: Color, pts: Array [Double], time: Double,
                            from_eid: Int = -1, to_eid: Int = -1)
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** This method compares two AnimateCommand objects to see which one has
+    /** This method compares two `AnimateCommand` objects to see which one has
      *  the most recent timestamp.
-     *  @param command2  the AnimateCommand to compare this to
+     *  @param command2  the animate command to compare 'this' to
      */
     def compare (command2: AnimateCommand) = time compare command2.time
 

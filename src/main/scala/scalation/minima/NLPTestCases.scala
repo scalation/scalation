@@ -16,21 +16,21 @@ import scalation.linalgebra.VectorD
 import scalation.math.double_exp
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object used to test several Non-Linear Programming (NLP) algorithms on
- *  unconstrained problems.
+/** The `NLPTestCases1` object used to test several Non-Linear Programming (NLP)
+ *  algorithms on unconstrained problems.
  *  Algorithms:
- *      sdcs - Steepest Descent with Custom Line Search
- *      sdgs - Steepest Descent with Golden Section Line Search
- *      prcg - Polak-Ribiere Conjugate Gradient with Golden Section Line Search
- *      sdws - Steepest Descent with Wolfe Line Search
- *      bfgs - Broyden–Fletcher–Goldfarb–Shanno with Wolfe Line Search
+ *      'sdcs' - Steepest Descent with Custom Line Search
+ *      'sdgs' - Steepest Descent with Golden Section Line Search
+ *      'prcg' - Polak-Ribiere Conjugate Gradient with Golden Section Line Search
+ *      'sdws' - Steepest Descent with Wolfe Line Search
+ *      'bfgs' - Broyden–Fletcher–Goldfarb–Shanno with Wolfe Line Search
  */
 object NLPTestCases1 extends App
 {
     println ("NLPTest")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Test the NLP algorithms on objective function f.
+    /** Test the NLP algorithms on objective function 'f'.
      *  @param f  the objective function to minimize 
      *  @param n  the dimensionality of the problem
      */
@@ -95,13 +95,13 @@ object NLPTestCases1 extends App
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object used to test several Non-Linear Programming (NLP) algorithms on
- *  constrained problems.
+/** The `NLPTestCases2` object used to test several Non-Linear Programming (NLP)
+ *  algorithms on constrained problems.
  */
 object NLPTestCases2 extends App
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Test the NLP algorithms on objective function f with constraint function g.
+    /** Test the NLP algorithms on objective function 'f' with constraint function 'g'.
      *  @param f      the objective function to minimize 
      *  @param g      the constraint function to be satisfied
      *  @param n      the dimensionality of the problem

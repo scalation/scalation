@@ -16,7 +16,7 @@ import scalation.analytics.Predictor
 import scalation.analytics.RegTechnique._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `ANCOVA` class supports ANalysis of COVAraiance (ANCOVA).  It allows
+/** The `ANCOVA` class supports ANalysis of COVAriance (ANCOVA).  It allows
  *  the addition of a categorical treatment variable 't' into a multiple linear
  *  regression.  This is done by introducing dummy variables 'dj' to distinguish
  *  the treatment level.  The problem is again to fit the parameter vector 'b'
@@ -87,7 +87,7 @@ class ANCOVA (x_ : MatrixD, t: VectorI, y: VectorD, levels: Int, technique: RegT
     def train (yy: VectorD) { rg.train (yy) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including rSquared.
+    /** Return the quality of fit including 'rSquared'.
      */
     def fit: VectorD = rg.fit
 
@@ -106,10 +106,10 @@ class ANCOVA (x_ : MatrixD, t: VectorI, y: VectorD, levels: Int, technique: RegT
     def backElim (): Tuple3 [Int, VectoD, VectorD] = rg.backElim ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Variance Inflation Factor (VIF) for each variable to test
-     *  for multi-colinearity by regressing xj against the rest of the variables.
-     *  A VIF over 10 indicates that over 90% of the varaince of xj can be predicted
-     *  from the other variables, so xj is a candidate for removal from the model.
+    /** Compute the Variance Inflation Factor 'VIF' for each variable to test
+     *  for multi-collinearity by regressing 'xj' against the rest of the variables.
+     *  A VIF over 10 indicates that over 90% of the variance of 'xj' can be predicted
+     *  from the other variables, so 'xj' is a candidate for removal from the model.
      */
     def vif: VectorD = rg.vif
 

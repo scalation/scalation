@@ -15,7 +15,7 @@ package scalation.graphalytics
 import scala.collection.immutable.{Set => SET}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The 'DualSim' classs provides an implementation for Dual Graph Simulation.
+/** The `DualSim` class provides an implementation for Dual Graph Simulation.
  *  @param g  the data graph  G(V, E, l)
  *  @param q  the query graph Q(U, D, k)
  */
@@ -106,7 +106,7 @@ object DualSimTest2 extends App
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The 'DualSimTest3' object is used to test the 'DualSim' class.  Read the
+/** The `DualSimTest3` object is used to test the `DualSim` class.  Read the
  *  query graph 'q' and data graph 'g' from files.
  *  > run-main scalation.graphalytics.DualSimTest3
  */

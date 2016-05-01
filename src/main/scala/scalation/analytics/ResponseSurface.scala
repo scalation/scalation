@@ -64,8 +64,8 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a vector/point 'p', compute the values for all of its quadratic,
      *  linear and constant forms/terms, returning them as a vector.
-     *  for 1D: p = (x_0)      => VectorD (1, x_0, x_0^2)
-     *  for 2D: p = (x_0, x_1) => VectorD (1, x_0, x_0^2, x_0*x_1, x_1, x_1^2)
+     *  for 1D: p = (x_0)      => 'VectorD (1, x_0, x_0^2)'
+     *  for 2D: p = (x_0, x_1) => 'VectorD (1, x_0, x_0^2, x_0*x_1, x_1, x_1^2)'
      *  @param p  the source vector/point for creating forms/terms
      */
     def qForms (p: VectorD): VectorD =
@@ -80,10 +80,10 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a vector/point 'p', compute the values for all of its cubic, quadratic,
      *  linear and constant forms/terms, returning them as a vector.
-     *  for 1D: p = (x_0)      => VectorD (1, x_0, x_0^2, x_0^3)
-     *  for 2D: p = (x_0, x_1) => VectorD (1, x_0, x_0^2, x_0^3,
+     *  for 1D: p = (x_0)      => 'VectorD (1, x_0, x_0^2, x_0^3)'
+     *  for 2D: p = (x_0, x_1) => 'VectorD (1, x_0, x_0^2, x_0^3,
      *                                        x_0*x_1, x_0^2*x_1, x_0*x_1^2,
-     *                                        x_1, x_1^2, x_1^3)
+     *                                        x_1, x_1^2, x_1^3)'
      *  @param p  the source vector/point for creating forms/terms
      */
     def cForms (p: VectorD): VectorD =
@@ -96,16 +96,16 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
     } // cForms
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  quadratic rsm regression equation, e.g., for 2D
+    /** Train the predictor by fitting the parameter vector ('b'-vector) in the
+     *  quadratic 'rsm' regression equation, e.g., for 2D
      *      y  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_0, x_0^2, x_1, x_1*x_0, x_1^2] + e
      *  using the least squares method.
      */
     def train () { rsm.train () }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Retrain the predictor by fitting the parameter vector (b-vector) in the
-     *  quadratic rsm regression equation, e.g., for 2D
+    /** Retrain the predictor by fitting the parameter vector ('b'-vector) in the
+     *  quadratic 'rsm' regression equation, e.g., for 2D
      *      yy  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_0, x_0^2, x_1, x_1*x_0, x_1^2] + e
      *  using the least squares method.
      *  @param yy  the new response vector
@@ -113,7 +113,7 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
     def train (yy: VectorD) { rsm.train (yy) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including rSquared.
+    /** Return the quality of fit including 'rSquared'.
      */
     def fit: VectorD = rsm.fit
 
@@ -123,8 +123,8 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
     override def residual: VectoD = rsm.residual
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given a point z, use the quadratic rsm regression equation to predict a
-     *  value for the function at z.
+    /** Given a point 'z', use the quadratic 'rsm' regression equation to predict a
+     *  value for the function at 'z'.
      *  for 1D:  b_0 + b_1*z_0 + b_2*z_0^2
      *  for 2D:  b_0 + b_1*z_0 + b_2*z_0^2 + b_3*z_1 + b_4*z_1*z_0 + b_5*z_1^2
      *  @param z  the point/vector whose functional value is to be predicted
@@ -150,9 +150,9 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor (VIF) for each variable to test
-     *  for multi-colinearity by regressing xj against the rest of the variables.
-     *  A VIF over 10 indicates that over 90% of the varaince of xj can be predicted
-     *  from the other variables, so xj is a candidate for removal from the model.
+     *  for multi-collinearity by regressing 'xj' against the rest of the variables.
+     *  A VIF over 10 indicates that over 90% of the variance of 'xj' can be predicted
+     *  from the other variables, so 'xj' is a candidate for removal from the model.
      */
     def vif: VectorD = rsm.vif
 

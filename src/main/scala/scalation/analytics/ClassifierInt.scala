@@ -53,7 +53,7 @@ abstract class ClassifierInt (x: MatrixI, y: VectorI, fn: Array [String], k: Int
     def size: Int = m
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return default values for binary input data (value count (vc) set to 2).
+    /** Return default values for binary input data (value count 'vc' set to 2).
      */
     def vc_default: VectorI = { val vc = new VectorI (n); vc.set (2); vc }
 
@@ -86,7 +86,7 @@ abstract class ClassifierInt (x: MatrixI, y: VectorI, fn: Array [String], k: Int
     /** Test the quality of the training with a test-set and return the fraction
      *  of correct classifications.
      *  @param xx  the integer-valued test vectors stored as rows of a matrix
-     *  @param yy  the test classification vector, where yy_i = class for row i of xx
+     *  @param yy  the test classification vector, where 'yy_i = class' for row 'i' of 'xx'
      */
     def test (xx: MatrixI, yy: VectorI): Double =
     {
@@ -119,12 +119,12 @@ abstract class ClassifierInt (x: MatrixI, y: VectorI, fn: Array [String], k: Int
  */
 object ClassifierInt
 {
-    private val SEP = ','                     // the token separation character
+    private val SP = ','                      // the token separation character
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Read the data set (e.g., a CSV file) and return the 'xy' data matrix.
      *  It will make sure the classification column 'cc' is last.
-     *  @param fname  the filename (file should contain lines of data)
+     *  @param fname  the file-name (file should contain lines of data)
      *  @param m      the number of data rows
      *  @param n      the number of data columns/features (including the classification)
      *  @param skip   the number of columns at the beginning the line to skip (e.g., id column)
@@ -135,7 +135,7 @@ object ClassifierInt
         val lines = getFromURL_File (fname)
         val xy    = new MatrixI (m, n)
         var i     = 0
-        for (ln <- lines) { xy(i) = VectorI (ln.split (SEP), skip); i += 1; }
+        for (ln <- lines) { xy(i) = VectorI (ln.split (SP), skip); i += 1; }
 
         if (cc >= 0 && cc != n-1) {       // want the classification column (cc) to be the last column
             val c1 = xy.col (cc)          // swap column cc with last (n-1), if necessary

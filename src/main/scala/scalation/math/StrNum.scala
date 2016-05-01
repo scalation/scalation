@@ -114,14 +114,14 @@ object StrO
         def minus (s: StrNum, t: StrNum): StrNum = s.ss diff t.ss
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Multiply two string numbers, by replacing 'SEP' by 's'.
+        /** Multiply two string numbers, by replacing 'SP' by 's'.
          *  @param s  multiply this times s
          */
         def * (s: StrNum): StrNum = ss.replace (SP, s.ss)
         def times (s: StrNum, t: StrNum): StrNum = s.ss.replace (SP, t.ss)
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Divide two string numbers, by replacing 's' by 'SEP.
+        /** Divide two string numbers, by replacing 's' by 'SP.
          *  @param s  divide this by s
          */
         def / (s: StrNum): StrNum = ss.replace (s.ss, SP)

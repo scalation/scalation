@@ -29,10 +29,10 @@ object Derivatives
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Integrator` trait provides a template for writing numerical integrators
- *  (e.g., Runge-Kutta (RK4) or Dormand-Prince (DOPRI)) to produce trajectories for
- *  first-order Ordinary Differential Equations (ODE's).  The ODE is of the form:
+ *  (e.g., Runge-Kutta 'RK4' or Dormand-Prince 'DOPRI') to produce trajectories for
+ *  first-order Ordinary Differential Equations 'ODE's.  The ODE is of the form:
  *  <p>
- *  d/dt y(t) = f(t, y)  with initial condition y0 = y(t0)
+ *      d/dt y(t) = f(t, y)  with initial condition y0 = y(t0)
  *  <p>
  *  If 'f' is a linear function of the form 'a(t) * y(t) + b(t)', then the ODE is
  *  linear, if 'a(t) = a' (i.e., a constant) the ODE has constant coefficients and
@@ -62,7 +62,7 @@ trait Integrator
      *  return the value of y(t) at time t.  The derivative function takes a scalar t
      *  and a scalar y.
      *  @param f     the derivative function f(t, y)
-     *  @param y0    the intial value of the y-function at time t0, y0 = y(t0)
+     *  @param y0    the initial value of the y-function at time t0, y0 = y(t0)
      *  @param t     the time value at which to compute y(t)
      *  @param t0    the initial time
      *  @param step  the step size

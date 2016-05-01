@@ -16,13 +16,13 @@ import scalation.util.time
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `APShortestPath` class is used to solve shortest path problems for graphs
- *  stored in matrices.  It solves the All-Pairs Shortest Path (APSP) problem
+ *  stored in matrices.  It solves the All-Pairs Shortest Path 'APSP' problem
  *  for directed graphs.  The edge cost/distance (must be non-negative) can be
  *  stored in either a dense or sparse matrix.  The Floyd-Warshall Algorithm is used.
  *  @see http://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm
- *  APSP can be used to determine a graph's eccentricities, radius and diameter.
+ *  'APSP' can be used to determine a graph's eccentricities, radius and diameter.
  *  These can also be computed using a BFS-based algorithm.
- *  @see http://math.stackexchange.com/questions/240556/radius-diameter-and-center-of-graph
+ *  @see math.stackexchange.com/questions/240556/radius-diameter-and-center-of-graph
  *  @param c  the cost/distance matrix.
  */
 class APShortestPath (c: MatriD)
@@ -77,7 +77,7 @@ object APShortestPath
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create an `APShortestPath` object from a graph.  First convert the graph's
-     *  adjaceny set representation to an adjacency matrix with unit edge lengths.
+     *  adjacency set representation to an adjacency matrix with unit edge lengths.
      *  @param g  the graph to use
      */
     def apply (g: Graph): APShortestPath =

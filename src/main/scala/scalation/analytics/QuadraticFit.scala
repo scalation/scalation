@@ -111,8 +111,8 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a vector 'x', compute the values for all of its quadratic, linear
      *  and constant forms/terms, returning them as a vector.
-     *  for 1D:  VectorD (1., x(0), x(0)~^2.)
-     *  for 2D:  VectorD (1., x(0), x(0)~^2., x(1), x(1)*x(0), x(1)~^2.)
+     *  for 1D:  'VectorD (1., x(0), x(0)~^2.)'
+     *  for 2D:  'VectorD (1., x(0), x(0)~^2., x(1), x(1)*x(0), x(1)~^2.)'
      *  @param x  the source vector for creating forms/terms
      */
     def qForms (x: VectorD): VectorD =
@@ -157,7 +157,7 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reduce from the full model to one with fewer variable.
-     *  FIX: adjust qFormEval to skip left out variable
+     *  FIX: adjust 'qFormEval' to skip left out variable
      */
     def reduce ()
     {

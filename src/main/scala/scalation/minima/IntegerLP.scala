@@ -14,26 +14,26 @@ import util.control.Breaks.{breakable, break}
 import scalation.linalgebra.{MatrixD, VectorD}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class solves Integer Linear Programming (ILP) and Mixed Integer
+/** The `IntegerLP` class solves Integer Linear Programming (ILP) and Mixed Integer
  *  Linear Programming (MILP) problems recursively using the Simplex algorithm.
  *  First, an LP problem is solved.  If the optimal solution vector x is
- *  entirely integer valued, the ILP is solved.  If not, pick the first x_j
- *  that is not integer valued.  Define two new LP problems which bound x_j
+ *  entirely integer valued, the ILP is solved.  If not, pick the first 'x_j'
+ *  that is not integer valued.  Define two new LP problems which bound 'x_j'
  *  to the integer below and above, respectively.  Branch by solving each of
  *  these LP problems in turn.  Prune by not exploring branches less optimal
  *  than the currently best integer solution.  This technique is referred to
  *  as Branch and Bound.  An exclusion set may be optionally provided for
  *  MILP problems.
- *  TODO: Use the Dual Simplex Algorithm for better performance.
+ *  FIX: Use the Dual Simplex Algorithm for better performance.
  *
  *  Given a constraint matrix 'a', limit/RHS vector 'b' and cost vector 'c',
- *  find values for the solution/decision vector 'x' that minmize the
- *  objective function f(x), while satisfying all of the constraints, i.e.,
+ *  find values for the solution/decision vector 'x' that minimize the
+ *  objective function 'f(x)', while satisfying all of the constraints, i.e.,
  *
  *  minimize    f(x) = c x
  *  subject to  a x <= b, x >= 0, some x_i must be integer valued
  *
- *  Make b_i negative to indicate a ">=" constraint
+ *  Make 'b_i' negative to indicate a '>=' constraint.
  *
  *  @param a     the M-by-N constraint matrix
  *  @param b     the M-length limit/RHS vector
@@ -61,7 +61,7 @@ class IntegerLP (a: MatrixD, b: VectorD, c: VectorD, excl: Set [Int] = Set ())
     /** Add a new constraint to the current set of bounding constraints: x_j <= bound
      *  or x_j >= bound (e.g., x_1 <= 2. or x_0 >= 4.).
      *  @param j      the index of variable x_j
-     *  @param le     whether it is a "less than or equal to" (le) constraint
+     *  @param le     whether it is a "less than or equal to" 'le' constraint
      *  @param bound  the bounding value
      */
     def addConstraint (j: Int, le: Boolean, bound: Double): Boolean =
@@ -174,7 +174,7 @@ class IntegerLP (a: MatrixD, b: VectorD, c: VectorD, excl: Set [Int] = Set ())
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the IntegerLP class.
+/** The `IntegerLPTest` object is used to test the `IntegerLP` class.
  *  real solution    x = (.8, 1.6), f = 8.8
  *  integer solution x = (2, 1),    f = 10
  *  @see Linear Programming and Network Flows, Example 6.14

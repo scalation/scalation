@@ -18,15 +18,15 @@ import scalation.util.Error
 /** The `LinearDiffEq` class may be used for solving a system of linear differential
  *  equations that are ordinary and first-order with constant coefficients of the form
  *  <p>
- *  d/dt y(t) = a * y(t)
+ *      d/dt y(t) = a * y(t)
  *  <p>
  *  'y(t)' is the vector function of time and 'a' is the coefficient matrix.  The
  *  initial value vector 'y0 = y(0)' must also be given.  Note, higher-order differential
  *  equations may be converted to first-order by introducing additional variables.
  *  The above equation is the homogeneous case.
  *  Caveats: the following cases are not currently handled:
- *  (i) The non-homogeneous equation: d/dt y(t) = a * y(t) + f(t).
- *  (ii) Complex or repeated eigenvalues.
+ *  (1) The non-homogeneous equation: 'd/dt y(t) = a * y(t) + f(t)'.
+ *  (2) Complex or repeated eigenvalues.
  *  @param a   the coefficient matrix
  *  @param y0  the initial value vector
  */
@@ -49,7 +49,7 @@ class LinearDiffEq (a: MatrixD, y0: VectorD)
       */
      private val c = v.solve (y0)
 
-     /** Matrix of tranformed/final constants
+     /** Matrix of transformed/final constants
       */
      private val k = v ** c
 

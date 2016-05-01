@@ -85,12 +85,12 @@ object TestGraphContainer
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The 'GraphMatcherTest' object runs six pattern matching algorithms on
  *  the above test graph.  The algorithms tested are the following:
- *  GraphSim   - Simple Graph Simulation
- *  GraphSim2  - Simple Graph Simulation (with early termination)
- *  DualSim    - Dual Graph Simulation
- *  DualSim2   - Dual Graph Simulation (with reduced memory footprint) 
- *  UllmannIso - Adjacency List Version of Ullmann's Subgraph Isomorphism Algorithm
- *  DualIso    - Subgraph Isomorphism using Dual Simulation for Pruning
+ *  `GraphSim`   - Simple Graph Simulation
+ *  `GraphSim2`  - Simple Graph Simulation (with early termination)
+ *  `DualSim`    - Dual Graph Simulation
+ *  `DualSim2`   - Dual Graph Simulation (with reduced memory footprint) 
+ *  `UllmannIso` - Adjacency List Version of Ullmann's Subgraph Isomorphism Algorithm
+ *  `DualIso`    - Subgraph Isomorphism using Dual Simulation for Pruning
  */
 object GraphMatcherTest extends App 
 {

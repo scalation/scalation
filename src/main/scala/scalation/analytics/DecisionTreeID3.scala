@@ -51,7 +51,7 @@ class DecisionTreeID3 (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: A
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a feature column (e.g., 2 (Humidity)) and a value (e.g., 1 (High))
-     *  use the frequency of ocurrence of the value for each classification
+     *  use the frequency of occurrence of the value for each classification
      *  (e.g., 0 (no), 1 (yes)) to estimate k probabilities.  Also, determine
      *  the fraction of training cases where the feature has this value
      *  (e.g., fraction where Humidity is High = 7/14).
@@ -114,7 +114,7 @@ class DecisionTreeID3 (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: A
     } // gain
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the decsion tree.
+    /** Train the decision tree.
      *  @param testStart  starting index of test region (inclusive) used in cross-validation.
      *  @param testEnd    ending index of test region (exclusive) used in cross-validation.
      */

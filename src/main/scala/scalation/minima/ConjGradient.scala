@@ -17,22 +17,22 @@ import scalation.linalgebra.VectorD
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** Polak-Ribiere Conjugate Gradient (PR-CG) Algorithm for solving Non-Linear
- *  Programming (NLP) problems.  PR-CG determines a search direction as a
- *  weighted combination of the steepest descent direction (-gradient) and the
- *  previous direction.  The weighting is set by the beta function, which for
- *  this implementation used the Polak-Ribiere technique.
+/** The `ConjGradient` class implements the Polak-Ribiere Conjugate Gradient (PR-CG)
+ *  Algorithm for solving Non-Linear  Programming (NLP) problems.  PR-CG determines
+ *  a search direction as a weighted combination of the steepest descent direction
+ *  (-gradient) and the previous direction.  The weighting is set by the beta function,
+ *  which for this implementation used the Polak-Ribiere technique.
  * 
  *  dir_k = -gradient (x) + beta * dir_k-1 
  *
  *  minimize    f(x)
  *  subject to  g(x) <= 0    [ optionally g(x) == 0 ]
  *
- *  @param f     the objective function to be minimized
- *  @param g     the constraint function to be satisfied, if any
- *  @param ineq  whether the constraint function must satisfy inequality or equality
- *  @param exactLS  whether to use exact (e.g., GoldenLS)
- *                            or inexact (e.g., WolfeLS) Line Search
+ *  @param f        the objective function to be minimized
+ *  @param g        the constraint function to be satisfied, if any
+ *  @param ineq     whether the constraint function must satisfy inequality or equality
+ *  @param exactLS  whether to use exact (e.g., `GoldenLS`)
+ *                            or inexact (e.g., `WolfeLS`) Line Search
  */
 class ConjGradient (f: FunctionV2S, g: FunctionV2S = null,
                     ineq: Boolean = true, exactLS: Boolean = true)
@@ -83,7 +83,7 @@ class ConjGradient (f: FunctionV2S, g: FunctionV2S = null,
     } // fg
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform an exact (GoldenSectionLS) or inexact (WolfeLS) line search.
+    /** Perform an exact 'GoldenSectionLS' or inexact 'WolfeLS' line search.
      *  Search in direction 'dir', returning the distance 'z' to move in that direction.
      *  @param x     the current point
      *  @param dir   the direction to move in
@@ -103,7 +103,7 @@ class ConjGradient (f: FunctionV2S, g: FunctionV2S = null,
      *  'gradientD (df,  x)'.
      *  @param x0     the starting point 
      *  @param step   the initial step size
-     *  @param toler  the tolerence
+     *  @param toler  the tolerance
      */
     def solve (x0: VectorD, step: Double = STEP, toler: Double = EPSILON): VectorD =
     {
@@ -137,7 +137,7 @@ class ConjGradient (f: FunctionV2S, g: FunctionV2S = null,
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the ConjGradient class.
+/** The `ConjGradientTest` object is used to test the `ConjGradient` class.
  */
 object ConjGradientTest extends App
 {

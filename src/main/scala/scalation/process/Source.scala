@@ -39,7 +39,7 @@ class Source (name: String, director: Model, makeEntity: () => SimActor, esubtyp
     at = loc
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Auxiliary constructor that uses defaults for width (w) and height (h).
+    /** Auxiliary constructor that uses defaults for width 'w' and height 'h'.
      *  @param name          the name of the source
      *  @param director      the director controlling the model
      *  @param makeEntity    the function to make entities of a specified type
@@ -55,7 +55,7 @@ class Source (name: String, director: Model, makeEntity: () => SimActor, esubtyp
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Display this source as a node on the animation canvas.
+    /** Display 'this' source as a node on the animation canvas.
      */
     def display ()
     {
@@ -63,8 +63,8 @@ class Source (name: String, director: Model, makeEntity: () => SimActor, esubtyp
     } // display
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The Sources as a special SimActor will act over time to make entities
-     *  (other SimActors).
+    /** The `Source`s as special `SimActor` will act over time to make entities
+     *  (other `SimActor`s).
      */
     def act ()
     {
@@ -109,7 +109,7 @@ class Source (name: String, director: Model, makeEntity: () => SimActor, esubtyp
 object Source
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a source using defaults for width (w) and heigth (h).
+    /** Create a source using defaults for width 'w' and height 'h'.
      *  @param name          the name of the source
      *  @param director      the director controlling the model
      *  @param makeEntity    the function to make entities of a specified type
@@ -126,7 +126,7 @@ object Source
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a group of related sources using defaults for width (w) and heigth (h).
+    /** Create a group of related sources using defaults for width 'w' and height 'h'.
      *  @param director      the director controlling the model
      *  @param makeEntity    the function to make entities of a specified type
      *  @param units         the number of entities to make

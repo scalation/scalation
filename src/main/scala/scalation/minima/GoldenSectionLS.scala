@@ -16,13 +16,13 @@ import scalation.linalgebra.VectorD
 import scalation.math.FunctionS2S
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class performs a line search on f(x) to find a minimal value for f.
- *  It requires no derivatives and only one functional evaluation per iteration. 
- *  A search is conducted from x1 (often 0) to xmax.  A guess for xmax must be
- *  given, but can be made larger during the expansion phase, that occurs before
- *  the recursive golden section search is called.  It works on scalar functions
- *  (see GoldenSectionLSTest).  If starting with a vector function f(x), simply
- *  define a new function g(y) = x0 + direction * y (see GoldenSectionLSTest2).
+/** The `GoldenSectionLS` class performs a line search on 'f(x)' to find a minimal
+ *  value for 'f'.  It requires no derivatives and only one functional evaluation per
+ *  iteration.  A search is conducted from 'x1' (often 0) to 'xmax'.  A guess for 'xmax'
+ *  must be  given, but can be made larger during the expansion phase, that occurs
+ *  before the recursive golden section search is called.  It works on scalar functions
+ *  (see `GoldenSectionLSTest`).  If starting with a vector function 'f(x)', simply
+ *  define a new function 'g(y) = x0 + direction * y' (see `GoldenSectionLSTest2`).
  *  @param f  the scalar objective function to minimize
  */
 class GoldenSectionLS (f: FunctionS2S)
@@ -72,9 +72,9 @@ class GoldenSectionLS (f: FunctionS2S)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform an exact Line Search (LS) using the Golden Search Algorithm.
-     *  Two phases are used:  an expansion phase (moving the endpoint) to find
+     *  Two phases are used:  an expansion phase (moving the end-point) to find
      *  a down-up pattern, followed by a traditional golden section search.
-     *  @param xmax  a rough guess for the right endpoint of the line search
+     *  @param xmax  a rough guess for the right end-point of the line search
      *  @param x1    the left (smallest) anchor point for the search (usually 0)
      */
     def lsearch (xmax: Double = 2.0, x1: Double = 0.0): Double =
@@ -121,7 +121,8 @@ class GoldenSectionLS (f: FunctionS2S)
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the GoldenSectionLS class on scalar functions.
+/** The `GoldenSectionLSTest` object is used to test the `GoldenSectionLS` class
+ *  on scalar functions.
  */
 object GoldenSectionLSTest extends App
 {
@@ -135,7 +136,8 @@ object GoldenSectionLSTest extends App
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the GoldenSectionLS class on vector functions.
+/** The `GoldenSectionLSTest2` object is used to test the `GoldenSectionLS` class
+ *  on vector functions.
  */
 object GoldenSectionLSTest2 extends App
 {

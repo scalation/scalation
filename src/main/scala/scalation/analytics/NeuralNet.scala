@@ -25,7 +25,7 @@ import LogisticFunction.sigmoid
 /** The `NeuralNet` class supports basic 3-layer (input, hidden and output) Neural
  *  Networks.  Given several input and output vectors (training data), fit the weights
  *  connecting the layers, so that for a new input vector 'zi', the net can predict
- *  the output vector 'zo' ('zh' is the itermediate value at the hidden layer), i.e.,
+ *  the output vector 'zo' ('zh' is the intermediate value at the hidden layer), i.e.,
  *  <p>
  *      zi --> zh = f (w * zi) --> zo = g (v * zh)
  *  <p>
@@ -83,7 +83,7 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int, eta: Double = 1.0)
     def train () { if (w == null) setWeights (); backProp () }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Use back propogation to adjust the weight matrices 'w' and 'v' to make the
+    /** Use back propagation to adjust the weight matrices 'w' and 'v' to make the
      *  predictions more accurate.  First adjust the 'v' weights (hidden to output layer)
      *  and then move back to adjust the 'w' weights (input to hidden layer).
      *  @see http://www4.rgu.ac.uk/files/chapter3%20-%20bp.pdf
@@ -104,7 +104,7 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int, eta: Double = 1.0)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Minimize the error in the prediction by adjusting the weight vector 'w'.
      *  The error 'eo' is simply the difference between the target value 'yi' and the
-     *  predicted value 'zo'.  Mininize 1/2 of the dot product of error with itself
+     *  predicted value 'zo'.  Minimize 1/2 of the dot product of error with itself
      *  using gradient-descent.
      *  @param xx  the effective input layer training data/matrix
      *  @param yy  the effective output layer training data/matrix
@@ -130,7 +130,7 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int, eta: Double = 1.0)
     } // minimizeError
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the fit (weigth matrix 'w' and weigth matrix 'v').
+    /** Return the fit (weight matrix 'w' and weight matrix 'v').
      *  FIX - make compatible with `Predictor`
      */
     def fit2: Tuple2 [MatrixD, MatrixD] = (w, v)

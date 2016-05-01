@@ -21,17 +21,15 @@ import scalation.scala2d.Colors._
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class supports the creation and use of Discrete-Time Markov Chains (DTMC).
- * Transient solution: compute the next state p' = p * tr where 'p' is the current
- * state probability vector and 'tr' is the transition probability matrix.
- * Equilibrium solution (steady-state): solve for p in p = p * tr.
- * @param tr  the transition probability matrix
+/** The `Markov` class supports the creation and use of Discrete-Time Markov Chains
+ *  'DTMC's.  Transient solution: compute the next state 'pp = p * tr' where 'p' is
+ *  the current state probability vector and 'tr' is the transition probability matrix.
+ *  Equilibrium solution (steady-state): solve for 'p' in 'p = p * tr'.
+ *  @param tr  the transition probability matrix
  */
 class Markov (tr: MatriD) extends Error
 {
-    {
-        if ( ! isStochastic) flaw ("constructor", "transition matrices must be stochastic")
-    } // primary constructor
+    if ( ! isStochastic) flaw ("constructor", "transition matrices must be stochastic")
 
     /** A number close to zero
      */
@@ -65,14 +63,14 @@ class Markov (tr: MatriD) extends Error
      */
     private val aniQ = dgAni.getCommandQueue
 
-    /** Amount of bend in the QArrow
+    /** Amount of bend in the `QArrow`
      */
     private val bend = .25
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the kth next probabilistic state (p * tr^k).
+    /** Compute the 'k'th next probabilistic state 'p * tr^k'.
      *  @param p  the current state probability vector
-     *  @param k  compute for the kth step/epoch
+     *  @param k  compute for the 'k'th step/epoch
      */
     def next (p: VectoD, k: Int = 1): VectoD =
     {
@@ -82,10 +80,10 @@ class Markov (tr: MatriD) extends Error
     } // next
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the limiting probabilistic state (p * tr^k) as k -> infinity, by
-     *  solving a left eigenvalue problem: p = p * tr => p * (tr - I) = 0, where the
-     *  eigenvalue is 1.  Solve for p by computing the left nullspace of the tr - I
-     *  matrix (appropriately sliced) and then normalize p so ||p|| = 1.
+    /** Compute the limiting probabilistic state 'p * tr^k' as 'k -> infinity', by
+     *  solving a left eigenvalue problem: 'p = p * tr' => 'p * (tr - I) = 0', where the
+     *  eigenvalue is 1.  Solve for p by computing the left nullspace of the 'tr - I'
+     *  matrix (appropriately sliced) and then normalize 'p' so '||p|| = 1'.
      */
     def limit: VectoD =
     {
@@ -94,7 +92,7 @@ class Markov (tr: MatriD) extends Error
     } // limit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Simulate the discrete-time Markov chain, by starting in state i0 and after
+    /** Simulate the discrete-time Markov chain, by starting in state 'i0' and after
      *  the state's holding, making a transition to the next state according to the
      *  jump matrix.
      *  @param i0       the initial/start state
@@ -191,7 +189,7 @@ class Markov (tr: MatriD) extends Error
     } // isStochastic
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert this discrete-time Markov Chain to s string.
+    /** Convert 'this' discrete-time Markov Chain to a string.
      */ 
     override def toString: String = "Markov(" + tr + ")"
    
@@ -199,7 +197,8 @@ class Markov (tr: MatriD) extends Error
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object tests the Markov class (Discrete-Time Markov Chains).
+/** The `MarkovTest` object tests the `Markov` class (Discrete-Time Markov Chains).
+ *  > run-main scalation.state.MarkovTest
  */
 object MarkovTest extends App
 {

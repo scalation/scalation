@@ -53,12 +53,11 @@ class HiddenMarkov (ob: VectorI, m: Int, n: Int)
     for (i <- rng) { a(i) = pvn.gen; b(i) = pvm.gen }   // initialize a and b matrices
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The alpha-pass: a forward pass from time t = 0 to tt-1 that computes
+    /** The alpha-pass: a forward pass from time 't = 0' to 'tt-1' that computes
      *  alpha 'alp'. 
      */
     def alp_pass ()
     {
-
         for (i <- rng) {
             alp(0, i) = pi(i) * b(i, ob(0))                // compute alpha_0 (at time t = 0)
         } // for
@@ -79,7 +78,7 @@ class HiddenMarkov (ob: VectorI, m: Int, n: Int)
     } // alp_pass
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The beta-pass: a backward pass from time t = tt-1 to 0 that computes
+    /** The beta-pass: a backward pass from time 't = tt-1' to 0 that computes
      *  beta 'bet'.
      */
     def bet_pass ()
@@ -98,7 +97,7 @@ class HiddenMarkov (ob: VectorI, m: Int, n: Int)
     } // bet_pass
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The gamma-pass: a forward pass from time t = 0 to tt-2 that computes
+    /** The gamma-pass: a forward pass from time 't = 0' to 'tt-2' that computes
      *  gamma 'gam'. 
      */
     def gam_pass ()

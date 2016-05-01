@@ -25,9 +25,9 @@ import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ARMA` class provide basic time series analysis capabilities for Auto-
- *  Regressive (AR) and Moving Average (MA) models.  In an 'ARMA(p, q)' model,
+ *  Regressive 'AR' and Moving Average 'MA' models.  In an 'ARMA(p, q)' model,
  *  'p' and 'q' refer to the order of the Auto-Regressive and Moving Average
- *  components of the model.   ARMA models are often used for forecasting.
+ *  components of the model.   `ARMA` models are often used for forecasting.
  *  @param y  the input vector (time series data)
  *  @param t  the time vector
  */
@@ -54,11 +54,11 @@ class ARMA (y: VectorD, t: VectorD)
     } // for
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Estimate the coefficients for a pth order Auto-Regressive AR(p) model.
-     *  x_t = phi_0 * x_t-1 + ... + phi_p-1 * x_t-p + e_t
+    /** Estimate the coefficients for a 'p'th order Auto-Regressive 'AR(p)' model.
+     *  'x_t = phi_0 * x_t-1 + ... + phi_p-1 * x_t-p + e_t'
      *  Uses the Durbin-Levinson Algorithm to determine the coefficients.
-     *  The phi vector is pth row of psi matrix (ignoring the first (0th) column).
-     *  @param p  the order of the AR model
+     *  The 'phi' vector is 'p'th row of 'psi' matrix (ignoring the first (0th) column).
+     *  @param p  the order of the 'AR' model
      */
     def est_ar (p: Int = 1): VectorD =
     {
@@ -68,9 +68,9 @@ class ARMA (y: VectorD, t: VectorD)
     } // est_ar
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Apply the Durbin-Levinson Algorithm to iteratively compute the psi matrix.
-     *  The last row of the matrix gives AR coefficients.
-     *  @see http://www.stat.tamu.edu/~suhasini/teaching673/time_series.pdf
+    /** Apply the Durbin-Levinson Algorithm to iteratively compute the 'psi' matrix.
+     *  The last row of the matrix gives 'AR' coefficients.
+     *  @see www.stat.tamu.edu/~suhasini/teaching673/time_series.pdf
      */
     def durbinLevinson: MatrixD =
     {
@@ -90,10 +90,10 @@ class ARMA (y: VectorD, t: VectorD)
     } // durbinLevinson
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return a vector that is the predictions of a pth order Auto-Regressive (AR(p))
+    /** Return a vector that is the predictions of a 'p'th order Auto-Regressive 'AR(p))
      *  model.
-     *  f_t = phi_0 * x_t-1 + ... + phi_p-1 * x_t-p + e_t
-     *  @param phi  the estimated AR(p) coefficients
+     *  'f_t = phi_0 * x_t-1 + ... + phi_p-1 * x_t-p + e_t'
+     *  @param phi  the estimated 'AR(p)' coefficients
      */
     def ar (phi: VectorD): VectorD =
     {
@@ -108,10 +108,10 @@ class ARMA (y: VectorD, t: VectorD)
     } // ar
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Estimate the coefficients for a qth order a Moving Average(q) model.
+    /** Estimate the coefficients for a 'q'th order a Moving Average(q) model.
      *  x_t = e_t - theta_0 * e_t-1 - ... - theta_q-1 * e_t-q
      *  FIX: use Method of Innovations
-     *  @param p  the order of the AR model
+     *  @param p  the order of the 'AR' model
      */
     def est_ma (q: Int = 1): VectorD =
     {
@@ -123,7 +123,7 @@ class ARMA (y: VectorD, t: VectorD)
     } // est_ma
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return a vector that is the predictions of a qth order Moving Average (MA)
+    /** Return a vector that is the predictions of a 'q'th order Moving Average (MA)
      *  model.
      *  x_t = e_t + theta_0 * e_t-1 + ... + theta_q-1 * e_t-q
      *  @param theta  the estimated MA(q) coefficients
@@ -144,7 +144,7 @@ class ARMA (y: VectorD, t: VectorD)
     } // ma
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Fit an ARMA model to times series data.
+    /** Fit an `ARMA` model to times series data.
      */
     def train ()
     {
@@ -152,7 +152,7 @@ class ARMA (y: VectorD, t: VectorD)
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including rSquared.
+    /** Return the quality of fit including 'rSquared'.
      */
     def fit: VectorD =
     {
@@ -169,7 +169,8 @@ class ARMA (y: VectorD, t: VectorD)
     } // predict
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Plot a function, e.g.,  Auto-Correlation Function (ACF), Partial ACF (PACF).
+    /** Plot a function, e.g.,  Auto-Correlation Function 'ACF', Partial Auto-Correlation
+     *  Function 'PACF'.
      *  @param fVec  the vector given function values
      *  @param name  the name of the function
      */
@@ -182,7 +183,7 @@ class ARMA (y: VectorD, t: VectorD)
     } // plotFunc
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Smooth the y vector by taking the lth order moving average.
+    /** Smooth the 'y' vector by taking the 'l'th order moving average.
      *  @param l  the number of points to average
      */
     def smooth (l: Int): VectorD =

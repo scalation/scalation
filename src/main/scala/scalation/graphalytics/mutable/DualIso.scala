@@ -29,16 +29,16 @@ class DualIso (g: Graph, q: Graph)
     private var limit        = 1000000                     // limit on number of matches
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set an upper bound on the number matches to allow before quiting.
-     *  @param _limit  the number of matches before quiting
+    /** Set an upper bound on the number matches to allow before quitting.
+     *  @param _limit  the number of matches before quitting
      */
     def setLimit (_limit: Int) { limit = _limit }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Apply the Dual Subgraph Isomorphism algorithm to find subgraphs of data
      *  graph 'g' that isomorphically match query graph 'q'.  These are represented
-     *  by a set of single-valued bijective functions {'psi'} where each 'psi'
-     *  function maps each query graph vertex 'u' to a data graph vertices 'v'.
+     *  by a set of single-valued bijections {'psi'} where each 'psi' unction
+     *  maps each query graph vertex 'u' to a data graph vertices 'v'.
      */
     override def bijections (): SET [Array [Int]] =
     {
@@ -93,7 +93,7 @@ class DualIso (g: Graph, q: Graph)
     } // saltzDualIso
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Is vertex j contained in any phi(i) for the previous depths?
+    /** Determine whether vertex 'j' is contained in any 'phi(i)' for the previous depths.
      *  @param phi    array of mappings from a query vertex u_q to { graph vertices v_g }
      *  @param depth  the current depth of recursion
      *  @param j      the vertex j to check

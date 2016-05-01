@@ -19,18 +19,18 @@ import LabelType.TLabel
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SSShortestPath` class is used to solve shortest path problems for graphs
- *  stored in matrices.  It solves the Single-Source Shortest Path (SSSP) problem
+ *  stored in matrices.  It solves the Single-Source Shortest Path 'SSSP' problem
  *  for directed graphs (both digraphs and multi-digraphs).  The `SSShortestPath`
  *  companion object is used to form a matrix from an `MGraph`.
  *----------------------------------------------------------------------------
  *  The edge cost/distance (must be non-negative) can be stored in either a dense
  *  or sparse matrix.  Dijkstra's Algorithm is used.
- *  @see http://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
+ *  @see en.wikipedia.org/wiki/Dijkstra%27s_algorithm
  *----------------------------------------------------------------------------
  *  For multi-digraphs, each multi-edge between a pair vertices has it own edge
- *  weight (TLabel = `VectorD` in this case).  The minimum is taking when forming
+ *  weight (`TLabel` = `VectorD` in this case).  The minimum is taking when forming
  *  the corresponding matrix.
- *  @see http://thescipub.com/PDF/jcssp.2013.377.382.pdf
+ *  @see thescipub.com/PDF/jcssp.2013.377.382.pdf
  *----------------------------------------------------------------------------
  *  @param c  the cost/distance matrix, where a value of zero implies no connection.
  *            If the actual distance is zero, use a very small number instead.
@@ -110,7 +110,7 @@ object SSShortestPath
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create an `SSShortestPath` object from a multi-digraph.  First convert
-     *  the graph's adjaceny set representation to an adjacency matrix with
+     *  the graph's adjacency set representation to an adjacency matrix with
      *  edge weights (which optionally include initial vertex weight).
      *  @param g            the multi-digraph to use
      *  @param s            the source vertex for the multi-digraph
@@ -203,35 +203,35 @@ object SSShortestPathTest2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SSShortestPathTest3` object is used to test the `SSShortestPath` class.
  *  Input is in the form of graphs (`MGraph`).  This test case requires
- *  'Tlabel' in `LabelType` to be VectorD.  Should be commented out otherwise.
- *  @see http://thescipub.com/PDF/jcssp.2013.377.382.pdf (Fig. 1)
+ *  `Tlabel` in `LabelType` to be `VectorD`.  Should be commented out otherwise.
+ *  @see thescipub.com/PDF/jcssp.2013.377.382.pdf (Fig. 1)
  *  > run-main scalation.graphalytics.mutable.SSShortestPathTest3
- *
-object SSShortestPathTest3 extends App
-{
-    val g = new MGraph (Array (SET (1, 2),                       // ch(0)
-                               SET (0, 3),                       // ch(1)
-                               SET (0, 1, 3),                    // ch(2)
-                               SET (1, 2)),                      // ch(3)
-                        Array (10, 11, 12, 13),                  // for A, B, C, D
-                        Map ((0, 1) -> VectorD (65, 72),
-                             (0, 2) -> VectorD (46),
-                             (1, 0) -> VectorD (39),
-                             (1, 3) -> VectorD (14),
-                             (2, 0) -> VectorD (46),
-                             (2, 1) -> VectorD (37),
-                             (2, 3) -> VectorD (21),
-                             (3, 1) -> VectorD (19),
-                             (3, 2) -> VectorD (15)),
-                        false, "g")
-
-    g.checkEdges
-    g.checkElabels
-    g.printG ()
-
-    val s  = 0
-    val sp = SSShortestPath (g, s)
-    println ("(d, p) = " + sp.spath ())        // shortest distance from s to all vertices
-
-} // SSShortestPathTest3 object
  */
+//object SSShortestPathTest3 extends App
+//{
+//    val g = new MGraph (Array (SET (1, 2),                       // ch(0)
+//                               SET (0, 3),                       // ch(1)
+//                               SET (0, 1, 3),                    // ch(2)
+//                               SET (1, 2)),                      // ch(3)
+//                        Array (10, 11, 12, 13),                  // for A, B, C, D
+//                        Map ((0, 1) -> VectorD (65, 72),
+//                             (0, 2) -> VectorD (46),
+//                             (1, 0) -> VectorD (39),
+//                             (1, 3) -> VectorD (14),
+//                             (2, 0) -> VectorD (46),
+//                             (2, 1) -> VectorD (37),
+//                             (2, 3) -> VectorD (21),
+//                             (3, 1) -> VectorD (19),
+//                             (3, 2) -> VectorD (15)),
+//                        false, "g")
+//
+//    g.checkEdges
+//    g.checkElabels
+//    g.printG ()
+//
+//    //val s  = 0
+//    val sp = SSShortestPath (g, s)
+//    println ("(d, p) = " + sp.spath ())        // shortest distance from s to all vertices
+//
+//} // SSShortestPathTest3 object
+

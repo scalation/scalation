@@ -15,19 +15,19 @@ import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class solves Quadratic Programming (QP) problems using the Quadratic
- *  Simplex Algorithm.  Given a constraint matrix 'a', constant vector 'b',
+/** The `QuadraticSimplex` class solves Quadratic Programming (QP) problems using the
+ *  Quadratic Simplex Algorithm.  Given a constraint matrix 'a', constant vector 'b',
  *  cost matrix 'q' and cost vector 'c', find values for the solution/decision
- *  vector x that minimize the objective function f(x), while satisfying all of
+ *  vector 'x' that minimize the objective function 'f(x)', while satisfying all of
  *  the constraints, i.e.,
  *
  *  minimize    f(x) = 1/2 x q x + c x
  *  subject to  a x <= b, x >= 0
  *
- *  Creates an MM-by-NN simplex tableau.  This implementation is restricted to
- *  linear constraints (a x <= b) and q being a positive semi-definite matrix.
- *  Pivoting must now also handle nonlinear complementary slackness
- *  @see http://www.engineering.uiowa.edu/~dbricker/lp_stacks.html
+ *  Creates an 'MM-by-NN' simplex tableau.  This implementation is restricted to
+ *  linear constraints 'a x <= b' and 'q' being a positive semi-definite matrix.
+ *  Pivoting must now also handle non-linear complementary slackness
+ *  @see www.engineering.uiowa.edu/~dbricker/lp_stacks.html
  *
  *  @param a      the M-by-N constraint matrix
  *  @param b      the M-length constant/limit vector
@@ -49,8 +49,8 @@ class QuadraticSimplex (a: MatrixD, b: VectorD, q: MatrixD, c: VectorD, var x_B:
     if (b.dim != M) flaw ("constructor", "b.dim = " + b.dim + " != " + M)
     if (c.dim != N) flaw ("constructor", "c.dim = " + c.dim + " != " + N)
 
-    /** The (MM)-by-(NN) simplex tableau [ x, w, y, v, r | bc ]
-     *  The complementary variables are x_i v_i = 0 = w_i y_i
+    /** The 'MM-by-NN' simplex tableau '[ x, w, y, v, r | bc ]'
+     *  The complementary variables are 'x_i v_i = 0 = w_i y_i'
      */
     private val t = new MatrixD (MM, NN)
     for (i <- 0 until M) {                 // fill the top part of the tableau
@@ -75,10 +75,10 @@ class QuadraticSimplex (a: MatrixD, b: VectorD, q: MatrixD, c: VectorD, var x_B:
     pivot (k, l)                           // special pivot puts artificial variable in basis
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** There are M+N variables, N decision and M slack variables, of which,
-     *  for each iteration, M are chosen for a Basic Feasible Solution (BFS).
-     *  The the variables not in the basis are set to zero.  Setting j to N
-     *  will start with the slack variables in the basis (only works if b >= 0).
+    /** There are 'M+N' variables, 'N' decision and 'M' slack variables, of which,
+     *  for each iteration, 'M' are chosen for a Basic Feasible Solution (BFS).
+     *  The variables not in the basis are set to zero.  Setting 'j' to 'N'
+     *  will start with the slack variables in the basis (only works if 'b >= 0').
      *  @param j  the offset to start the basis
      *  @param l  the size of the basis
      */
@@ -90,8 +90,8 @@ class QuadraticSimplex (a: MatrixD, b: VectorD, q: MatrixD, c: VectorD, var x_B:
     } // setBasis
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Find a variable x_l to enter the basis.  Determine the index of entering
-     *  variable corresponding to column l.  Neighter the variable nor its complement
+    /** Find a variable 'x_l' to enter the basis.  Determine the index of entering
+     *  variable corresponding to column l.  Neither the variable nor its complement
      *  may be in the current basis.   Return -1 to indicate no such column.
      */
     def entering (): Int =
@@ -217,12 +217,12 @@ class QuadraticSimplex (a: MatrixD, b: VectorD, q: MatrixD, c: VectorD, var x_B:
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the QuadraticSimplex class.
+/** The `QuadraticSimplexTest` object is used to test the `QuadraticSimplex` class.
  */
 object QuadraticSimplexTest extends App
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Test the QuadraticSimplex Algorithm for solving Quadratic Programs:
+    /** Test the `QuadraticSimplex` Algorithm for solving Quadratic Programs:
      *  min { 1/2 x q x + c x | a x <= b, x >= 0 }.
      *  @param a  the constraint matrix
      *  @param b  the constant vector
@@ -241,7 +241,7 @@ object QuadraticSimplexTest extends App
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test case 1: solution x = (.222222), 1.55556), z = -8.44444.
-     *  @see http://www.engineering.uiowa.edu/~dbricker/Stacks_pdf2/QP_LCP_Example.pdf
+     *  @see www.engineering.uiowa.edu/~dbricker/Stacks_pdf2/QP_LCP_Example.pdf
      *  min x^2 - 2xy + y^2 - 4x - 6y
      *  st  2x + y <= 2
      *      -x + y <= 4

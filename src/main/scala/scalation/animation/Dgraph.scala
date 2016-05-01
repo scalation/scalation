@@ -41,7 +41,7 @@ class Dgraph (name: String = "Dgraph", bipartite: Boolean = false)
      *  @param primary  whether it is a primary/transition/true or secondary/place node/false
      *  @param color    the color of the node
      *  @param x        the x-coordinate (top left)
-     *  @param y        the y-ccordinate (top left)
+     *  @param y        the y-coordinate (top left)
      *  @param w        the width
      *  @param h        the height
      */

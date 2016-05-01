@@ -15,20 +15,20 @@ import scalation.linalgebra.VectorD
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class solves unconstrained Non-Linear Programming (NLP) problems using
- *  the Steepest Descent algorithm.  Given a function 'f' and a starting point 'x',
- *  the algorithm computes the gradient and takes steps in the opposite direction.
- *  The algorithm iterates until it converges.  The class assumes that partial
- *  derivative functions are not availble unless explicitly given via the
- *  setDerivatives method.
+/** The `SteepestDescent` class solves unconstrained Non-Linear Programming (NLP)
+ *  problems using the Steepest Descent algorithm.  Given a function 'f' and a
+ *  starting point 'x', the algorithm computes the gradient and takes steps in
+ *  the opposite direction.  The algorithm iterates until it converges.  The class
+ *  assumes that partial derivative functions are not available unless explicitly
+ *  given via the 'setDerivatives' method.
  *
  *  dir_k = -gradient (x)
  *
  *  minimize    f(x)
  *
  *  @param f        the vector-to-scalar objective function
- *  @param exactLS  whether to use exact (e.g., GoldenLS)
- *                            or inexact (e.g., WolfeLS) Line Search
+ *  @param exactLS  whether to use exact (e.g., `GoldenLS`)
+ *                            or inexact (e.g., `WolfeLS`) Line Search
  */
 class SteepestDescent (f: FunctionV2S, exactLS: Boolean = true)
       extends Minimizer with Error
@@ -48,7 +48,7 @@ class SteepestDescent (f: FunctionV2S, exactLS: Boolean = true)
     def setDerivatives (partials: Array [FunctionV2S]) { df = partials; given = true } 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform an exact (GoldenSectionLS) or inexact (WolfeLS) line search.
+    /** Perform an exact 'GoldenSectionLS' or inexact 'WolfeLS' line search.
      *  Search in direction 'dir', returning the distance 'z' to move in that direction.
      *  @param x     the current point
      *  @param dir   the direction to move in
@@ -67,7 +67,7 @@ class SteepestDescent (f: FunctionV2S, exactLS: Boolean = true)
      *  algorithm.
      *  @param x0     the starting point
      *  @param step   the initial step size
-     *  @param toler  the tolerence
+     *  @param toler  the tolerance
      */
     def solve (x0: VectorD, step: Double = STEP, toler: Double = EPSILON): VectorD =
     {
@@ -100,7 +100,7 @@ class SteepestDescent (f: FunctionV2S, exactLS: Boolean = true)
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the SteepestDescent class.
+/** The `SteepestDescentTest` object is used to test the `SteepestDescent` class.
  */
 object SteepestDescentTest extends App
 {

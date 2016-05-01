@@ -5,7 +5,7 @@
  *  @date    Tue Aug 11 12:17:19 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *
- *  Multi-Digraph (TDigraph) Data Structure Using Mutable Sets
+ *  Multi-Digraph `TDigraph` Data Structure Using Mutable Sets
  */
 
 package scalation.graphalytics
@@ -30,7 +30,7 @@ import TripleType.Triple
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TDigraph` class stores vertex/edge-labeled multi-directed graphs using
- *  an adjacency set ('ch') representation, e.g., ch = { {1, 2}, {0}, {1} } means
+ *  an adjacency set 'ch' representation, e.g., 'ch = { {1, 2}, {0}, {1} }' means
  *  that the graph has the following edges { (0, 1), (0, 2), (1, 0), (2, 1) }.
  *  Optionally, inverse adjacency via the 'pa' array can be stored at the cost
  *  of nearly doubling the storage requirements.
@@ -205,18 +205,17 @@ object TDigraphTest extends App
 /** The `TDigraphTest2` object is used to test the `TDigraph` class using a
  *  randomly generated multi-digraph.
  *  > run-main scalation.graphalytics.TDigraphTest2
- *
-object TDigraphTest2 extends App
-{
-    private val nVertices = 20         // number of vertices
-    private val nLabels   = 5          // number of distinct vertex labels
-    private val eLabels   = 3          // number of distinct edge labels
-    private val outDegree = 2          // average out degree
-    private val inverse   = false      // whether inverse adjacency is used (parents)
-    private val name      = "gr"       // name of the graph
-
-    MDigGen.genRandomGraph (nVertices, nLabels, eLabels, outDegree, inverse, name).printG ()
-
-} // TDigraphTest2
  */
+//object TDigraphTest2 extends App
+//{
+//    private val nVertices = 20         // number of vertices
+//    private val nLabels   = 5          // number of distinct vertex labels
+//    private val eLabels   = 3          // number of distinct edge labels
+//    private val outDegree = 2          // average out degree
+//    private val inverse   = false      // whether inverse adjacency is used (parents)
+//    private val name      = "gr"       // name of the graph
+//
+//    MDigGen.genRandomGraph (nVertices, nLabels, eLabels, outDegree, inverse, name).printG ()
+//
+//} // TDigraphTest2
 

@@ -17,10 +17,10 @@ import scalation.linalgebra.VectorD
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** Polak-Ribiere Conjugate Gradient (PR-CG) Algorithm for solving Non-Linear
- *  Programming (NLP) problems.  PR-CG determines a search direction as a
- *  weighted combination of the steepest descent direction (-gradient) and the
- *  previous direction.  The weighting is set by the beta function, which for
+/** The `ConjGradient` implements the Polak-Ribiere Conjugate Gradient (PR-CG) Algorithm
+ *  for solving Non-Linear Programming (NLP) problems.  PR-CG determines a search
+ *  direction as a weighted combination of the steepest descent direction (-gradient)
+ *  and the previous direction.  The weighting is set by the beta function, which for
  *  this implementation used the Polak-Ribiere technique.
  * 
  *  dir_k = -gradient (x) + beta * dir_k-1 
@@ -75,7 +75,7 @@ class ConjGradient (f: FunctionV2S, g: FunctionV2S = null, ineq: Boolean = true)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The objective function f re-scaled by a weighted penalty, if constrained.
-     *  @param x  the coordinate values of the currrent point
+     *  @param x  the coordinate values of the current point
      */
     def fg (x: VectorD): Double =
     {
@@ -88,7 +88,7 @@ class ConjGradient (f: FunctionV2S, g: FunctionV2S = null, ineq: Boolean = true)
     } // fg
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform an inexact (e.g., WolfeLS) or exact (e.g., GoldenSectionLS) line search
+    /** Perform an inexact (e.g., 'WolfeLS' or exact (e.g., 'GoldenSectionLS' line search
      *  in the direction 'dir', returning the distance 'z' to move in that direction.
      *  @param x    the current point
      *  @param dir  the direction to move in
@@ -134,7 +134,7 @@ class ConjGradient (f: FunctionV2S, g: FunctionV2S = null, ineq: Boolean = true)
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the ConjGradient class.
+/** The `ConjGradientTest` object is used to test the `ConjGradient` class.
  */
 object ConjGradientTest extends App
 {

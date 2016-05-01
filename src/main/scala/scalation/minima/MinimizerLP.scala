@@ -12,8 +12,8 @@ import scalation.linalgebra.VectoD
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This trait sets the pattern for optimization algorithms for solving Linear
- *  Programming (NLP) problems of the form:
+/** The `MinimizerLP` trait sets the pattern for optimization algorithms for solving
+ *  Linear Programming (LP) problems of the form:
  * 
  *  minimize    c x
  *  subject to  a x <= b, x >= 0
@@ -22,8 +22,8 @@ import scalation.util.Error
  *        b is the limit/RHS vector
  *        c is the cost vector
  *
- *  Classes mixing in this trait must implement an objective function (objF)
- *  an iterative method (solve) that searches for improved solutions (x-vectors
+ *  Classes mixing in this trait must implement an objective function 'objF'
+ *  an iterative method (solve) that searches for improved solutions 'x'-vectors
  *  with lower objective function values.
  */
 trait MinimizerLP

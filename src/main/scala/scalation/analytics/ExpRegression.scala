@@ -47,8 +47,8 @@ class ExpRegression (x: MatrixD, nonneg: Boolean, y: VectorD)
     private var fStat      = -1.0                // F statistic (quality of fit)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** For a given parameter vector b, compute -2 * Log-Likelihood (-2LL).
-     *  -2LL is the standard measure that follows a Chi-Square distribution. 
+    /** For a given parameter vector b, compute '-2 * Log-Likelihood' (-2LL).
+     *  '-2LL' is the standard measure that follows a Chi-Square distribution. 
      *  @see www.stat.cmu.edu/~cshalizi/350/lectures/26/lecture-26.pdf
      *  @see www.statisticalhorizons.com/wp-content/uploads/Allison.StatComp.pdf
      *  @param b  the parameters to fit
@@ -64,7 +64,7 @@ class ExpRegression (x: MatrixD, nonneg: Boolean, y: VectorD)
     } // ll
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** For a given parameter vector b, compute -2 * Log-Likelihood (-2LL) for
+    /** For a given parameter vector b, compute '-2 * Log-Likelihood' (-2LL) for
      *  the null model (the one that does not consider the effects of x(i)).
      *  @param b  the parameters to fit
      */
@@ -97,7 +97,7 @@ class ExpRegression (x: MatrixD, nonneg: Boolean, y: VectorD)
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the fit (parameter vector b, quality of fit including rSquared).
+    /** Return the quality of fit including 'rSquared'.
      */
     def fit: VectorD = VectorD (rSquared, rBarSq, fStat)
 
@@ -113,7 +113,7 @@ class ExpRegression (x: MatrixD, nonneg: Boolean, y: VectorD)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ExpRegressionTest` object tests `ExpRegression` class using the following
- *  exponentail regression problem.
+ *  exponential regression problem.
  */
 object ExpRegressionTest extends App
 {
@@ -146,9 +146,9 @@ object ExpRegressionTest2 extends App
     import scalation.random.{Uniform, Exponential, Random}
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Test ExpRegression by simulating n-many observations.
+    /** Test `ExpRegression` by simulating 'n'-many observations.
      *  @param n  number of observations
-     *  @param k  number of regressors
+     *  @param k  number of variables
      *  @return   (actual, estimated, r^2)
      */
     def test (n: Int = 10000, k: Int = 5): Tuple5 [Int, Int, VectorD, VectoD, Double] =

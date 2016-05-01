@@ -16,11 +16,12 @@ import scalation.scala2d.Colors._
 import scalation.util.Monitor.trace
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `WaitQueue` class is a wrapper for Scala's Queue class, which supports
- *  FCSC Queues.  It adds monitoring capabilities and optional capacity restrictions.
- *  If the queue is full, entities (`SimActor`s) attempting to enter the queue
- *  are 'barred'.   At the model level, such entities may be (1) held in place,
- *  (2) take an alternate route, or (3) be lost (e.g., dropped call/packet). 
+/** The `WaitQueue` class is a wrapper for Scala's `Queue` class, which supports
+ *  First-Come, First-Serve 'FCSC' Queues.  It adds monitoring capabilities and
+ *  optional capacity restrictions.  If the queue is full, entities (`SimActor`s)
+ *  attempting to enter the queue are 'barred'.   At the model level, such entities
+ *  may be (1) held in place, (2) take an alternate route, or (3) be lost (e.g.,
+ *  dropped call/packet). 
  *  @param name  the name of the wait-queue
  *  @param at    the location of the wait-queue (x, y, w, h)
  *  @param cap   the capacity of the queue (defaults to unbounded)
@@ -30,7 +31,7 @@ class WaitQueue (name: String, at: Array [Double], cap: Int = Int.MaxValue)
 {
     initComponent (name, at)
 
-    /** The number of entities barred from enterring due to the wait queue being full
+    /** The number of entities barred from entering due to the wait-queue being full
      */
     private var _barred = 0
 
@@ -46,17 +47,17 @@ class WaitQueue (name: String, at: Array [Double], cap: Int = Int.MaxValue)
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return whether the queue is full.
+    /** Return whether 'this' queue is full.
      */
     def isFull: Boolean = length >= cap
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the number entities barred because of this wait queue being full.
+    /** Return the number entities barred because of 'this' wait-queue being full.
      */
     def barred: Int = _barred
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Tell the animation queue to display this WaitQueue.
+    /** Tell the animation queue to display 'this' wait-queue.
      */
     def display ()
     {
@@ -117,7 +118,7 @@ object WaitQueue
     } // apply
 
    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a group of related wait queues using defaults for width (w) and heigth (h).
+    /** Create a group of related wait-queues using defaults for width 'w' and height 'h'.
      *  @param xy   the (x, y) coordinates for the top-left corner of the reference queue.
      *  @param snk  repeated queue specific info: name, offset
      */

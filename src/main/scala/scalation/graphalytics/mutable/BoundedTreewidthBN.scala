@@ -24,7 +24,7 @@ import BoundedTreeWidthChains._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BoundedTreeWidthBN` class provides bounded treewidth Bayesian Networks.
- *  @param g_in  the input directed graph (FIX: training data ??)
+ *  @param g_in  the input directed graph (FIX: training data)
  *  @param kMax  the maximum allowed treewidth
  */
 class BoundedTreeWidthBN (g_in: MGraph, kMax: Int)
@@ -124,7 +124,7 @@ class BoundedTreeWidthBN (g_in: MGraph, kMax: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the size of the largest clique in the graph.
-     *  @param  mp  the triangulated moralized graph whose maximum clique size is sought
+     *  @param mp  the triangulated moralized graph whose maximum clique size is sought
      */
     def maxCliqueSize (mp: MGraph): Int =
     {

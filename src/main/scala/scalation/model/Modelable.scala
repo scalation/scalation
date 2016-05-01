@@ -9,7 +9,7 @@
 package scalation.model
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The Modelable trait defines what is common to all models supported in ScalaTion.
+/** The `Modelable` trait defines what is common to all models supported in ScalaTion.
  */
 trait Modelable
 {
@@ -36,7 +36,7 @@ trait Modelable
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Run the simulation beginning with 'startTime' and continuing until a
-     *  stopping rule evalutes to true.
+     *  stopping rule evaluates to true.
      *  @param startTime  the start time of the simulation
      */
     def simulate (startTime: Double)

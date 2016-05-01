@@ -12,8 +12,8 @@ import scalation.linalgebra.{MatrixD, VectorD, VectoD, VectorI}
 import scalation.stat.StatVector.{cov, mean}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `LDA` class implements a Linear Discriminant Analysis (LDA) classifier.
- *  @see https://en.wikipedia.org/wiki/Linear_discriminant_analysis
+/** The `LDA` class implements a Linear Discriminant Analysis 'LDA' classifier.
+ *  @see en.wikipedia.org/wiki/Linear_discriminant_analysis
  *  @param x   the real-valued training/test data vectors stored as rows of a matrix
  *  @param y   the training/test classification vector, where y_i = class for row i of the matrix x
  *  @param fn  the names for all features/variables

@@ -63,12 +63,12 @@ class DgAnimator (_title: String, fgColor: Color = black, bgColor: Color = white
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         /** Paint the display panel component.
-         *  @param gr  low-res graphics environment
+         *  @param gr  low-resolution graphics environment
          */
         override def paintComponent (gr: Graphics)
         {
             super.paintComponent (gr)
-            val g2d = gr.asInstanceOf [Graphics2D]            // use hi-res
+            val g2d = gr.asInstanceOf [Graphics2D]            // use hi-reso;ution
 
             //:: Display the animation clock
 

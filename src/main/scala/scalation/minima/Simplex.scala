@@ -6,9 +6,9 @@
  *  @see     LICENSE (MIT style license file).
  *-----------------------------------------------------------------------------
  *  @see Linear Programming and Network Flows, Bazaraa and Jarvis
- *       www.wiley.com/WileyCDA/WileyTitle/productCd-0470462728,subjectCd-BA04.html
+ *  @see www.wiley.com/WileyCDA/WileyTitle/productCd-0470462728,subjectCd-BA04.html
  *  @see Algorithms, 4th Edition, Robert Sedgewick and Kevin Wayne
- *       www.cs.princeton.edu/algs4/63or/Simplex.java.html
+ *  @see www.cs.princeton.edu/algs4/63or/Simplex.java.html
  *  @see en.wikibooks.org/wiki/Operations_Research/The_Simplex_Method
  */
 
@@ -21,19 +21,19 @@ import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.random.Randi
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class solves Linear Programming (LP) problems using a tableau based
+/** The `Simplex` class solves Linear Programming (LP) problems using a tableau based
  *  Simplex Algorithm.  Given a constraint matrix 'a', limit/RHS vector 'b' and
  *  cost vector 'c', find values for the solution/decision vector 'x' that minimize
- *  the objective function f(x), while satisfying all of the constraints, i.e.,
+ *  the objective function 'f(x)', while satisfying all of the constraints, i.e.,
  *
  *  minimize    f(x) = c x
  *  subject to  a x <= b, x >= 0
  *
- *  In case of "a_i x >= b_i", use -b_i as an indicator of a ">=" constraint.
+ *  In case of 'a_i x >= b_i', use '-b_i' as an indicator of a '>=' constraint.
  *  The program will flip such negative b_i back to positive as well as use
  *  a surplus variable instead of the usual slack variable, i.e.,
- *  a_i x <= b_i  =>  a_i x + s_i = b_i    // use slack variable s_i with coeff 1
- *  a_i x >= b_i  =>  a_i x + s_i = b_i    // use surplus variable s_i with coeff -1
+ *  a_i x <= b_i  =>  a_i x + s_i = b_i    // use slack variable s_i with coefficient 1
+ *  a_i x >= b_i  =>  a_i x + s_i = b_i    // use surplus variable s_i with coefficient -1
  *
  *  Creates an MM-by-NN simplex tableau with
  *  -- [0..M-1, 0..N-1]    = a (constraint matrix)
@@ -45,7 +45,7 @@ import scalation.random.Randi
  *  @param b     the M-length limit/RHS vector (input b_i negative for surplus)
  *  @param c     the N-length cost vector
  *  @param x_B   the indices of the initial basis (if not available use Simple2P)
- *  @param n_eq  the number of equality contraints (must come last)
+ *  @param n_eq  the number of equality constraints (must come last)
  */
 class Simplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int], n_eq: Int = 0)
       extends MinimizerLP
@@ -82,7 +82,7 @@ class Simplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int], n_eq: Int =
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** In case there are no surplus variables (only slacks), the slack variables
-     *  can form an inittial basis.
+     *  can form an initial basis.
      *  @param a  the M-by-N constraint matrix
      *  @param b  the M-length limit/RHS vector (input b_i negative for surplus)
      *  @param c  the N-length cost vector
@@ -96,8 +96,8 @@ class Simplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int], n_eq: Int =
     /** Find the best variable x_l to enter the basis.  Determine the index of
      *  entering variable corresponding to COLUMN l (e.g., using Dantiz's Rule
      *  or Bland's Rule).  Return -1 to indicate no such column.
-     *  t(M).argmaxPos (JJ)       // use Dantiz's rule (index of max +ve, cycling possible)
-     *  t(M).firstPos (JJ)        // use Bland's rule  (index of first +ve, FPE possible)
+     *  t(M).argmaxPos (JJ)       // use Dantiz's rule (index of max positive, cycling possible)
+     *  t(M).firstPos (JJ)        // use Bland's rule  (index of first positive, FPE possible)
      */
     def entering (): Int =
     {
@@ -221,7 +221,7 @@ class Simplex (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int], n_eq: Int =
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the Simplex class.
+/** The `SimplexTest` object is used to test the `Simplex` class.
  */
 object SimplexTest extends App
 {
@@ -230,7 +230,7 @@ object SimplexTest extends App
      *  @param a    the constraint matrix
      *  @param b    the limit/RHS vector
      *  @param c    the cost vector
-     *  @param x_B  the indices of the intial basis
+     *  @param x_B  the indices of the initial basis
      */
     def test (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int] = null)
     {

@@ -15,7 +15,7 @@ import scalation.linalgebra.{MatrixD, MatrixI, VectorD}
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `SSA` class implements the Gillespie Stochastic Simulation Algorithm (SSA).
+/** The `SSA` class implements the Gillespie Stochastic Simulation Algorithm 'SSA'.
  *  @param c   the matrix giving sub-volume connectivity
  *  @param r   the matrix indicating which the reactions that are active in each sub-volume
  *  @param z   the matrix giving stoichiometry for all reactions

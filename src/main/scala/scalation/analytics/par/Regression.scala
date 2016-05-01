@@ -32,9 +32,9 @@ import scalation.analytics.RegTechnique._
  *  <p>
  *  where 'x_pinv' is the pseudo-inverse.  Three techniques are provided:
  *  <p>
- *      Fac_QR         // QR Factorization: slower, more stable (default)
- *      Fac_Cholesky   // Cholesky Factorization: faster, less stable (reasonable choice)
- *      Inverse        // Inverse/Gaussian Elimination, classical textbook technique (outdated)
+ *      'Fac_QR'         // QR Factorization: slower, more stable (default)
+ *      'Fac_Cholesky'   // Cholesky Factorization: faster, less stable (reasonable choice)
+ *      'Inverse'        // Inverse/Gaussian Elimination, classical textbook technique (outdated)
  *  <p>
  *  This version uses parallel processing to speed up execution.
  *  @see see.stanford.edu/materials/lsoeldsee263/05-ls.pdf
@@ -108,7 +108,7 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the fit (parameter vector b, quality of fit including rSquared).
+    /** Return the quality of the fit, including 'rSquared'.
      */
     def fit: VectorD = VectorD (rSquared, rBarSq, fStat)
 
@@ -142,10 +142,10 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
     } // backElim
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Variance Inflation Factor (VIF) for each variable to test
-     *  for multi-colinearity by regressing xj against the rest of the variables.
-     *  A VIF over 10 indicates that over 90% of the varaince of xj can be predicted
-     *  from the other variables, so xj is a candidate for removal from the model.
+    /** Compute the Variance Inflation Factor 'VIF' for each variable to test
+     *  for multi-collinearity by regressing 'xj' against the rest of the variables.
+     *  A VIF over 10 indicates that over 90% of the variance of 'xj' can be predicted
+     *  from the other variables, so 'xj' is a candidate for removal from the model.
      */
     def vif: VectorD =
     {
@@ -192,13 +192,11 @@ object RegressionTest extends App
     val yp = rg.predict (z)                              // predict y for one point
     println ("predict (" + z + ") = " + yp)
 
-/***
-    val yyp = rg.predict (x)                             // predict y for several points
-    println ("predict (" + x + ") = " + yyp)
-
-    new Plot (x.col(1), y, yyp)
-    new Plot (x.col(2), y, yyp)
-***/
+//  val yyp = rg.predict (x)                             // predict y for several points
+//  println ("predict (" + x + ") = " + yyp)
+//
+//  new Plot (x.col(1), y, yyp)
+//  new Plot (x.col(2), y, yyp)
 
     println ("reduced model: fit = " + rg.backElim ())   // eliminate least predictive variable
 
@@ -236,13 +234,11 @@ object RegressionTest2 extends App
     val yp = rg.predict (z)                          // predict y for on3 point
     println ("predict (" + z + ") = " + yp)
 
-/***
-    val yyp = rg.predict (x)                         // predict y for several points
-    println ("predict (" + x + ") = " + yyp)
-
-    new Plot (x.col(1), y, yyp)
-    new Plot (x.col(2), y, yyp)
-***/
+//  val yyp = rg.predict (x)                         // predict y for several points
+//  println ("predict (" + x + ") = " + yyp)
+//
+//  new Plot (x.col(1), y, yyp)
+//  new Plot (x.col(2), y, yyp)
 
     println ("-------------------------------------------------")
     println ("Fit the parameter vector b using Cholesky Factorization")
@@ -262,7 +258,7 @@ object RegressionTest2 extends App
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `RegressionTest3` object tests the multi-colinearity method in the
+/** The `RegressionTest3` object tests the multi-collinearity method in the
  *  `Regression` class using the following regression equation.
  *  <p>
  *      y = b dot x = b_0 + b_1*x_1 + b_2*x_2 + b_3*x_3 + b_4 * x_4

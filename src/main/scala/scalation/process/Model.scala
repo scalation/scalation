@@ -27,10 +27,10 @@ import scalation.util.Monitor.trace
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Model` class maintains a list of components making up the model and
- *  controls the flow of entities (SimActors) through the model, following the
+ *  controls the flow of entities (`SimActor`s) through the model, following the
  *  process-interaction world-view.  It maintains a time-ordered priority queue
- *  to activate/re-activate each of the entities.  Each entity (SimActor) is
- *  implemeneted as a Scala Actor and may be thought of as running in its own thread.
+ *  to activate/re-activate each of the entities.  Each entity (`SimActor`) is
+ *  implemented as a Scala `Actor` and may be thought of as running in its own thread.
  *  @param name       the name of the model
  *  @param reps       the number of independent replications to run
  *  @param aniRatio   the ratio of simulation speed vs. animation speed
@@ -43,7 +43,7 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
 {
     initComponent (name, Array ())
 
-    /** The map of stat vectors records the means of each replication
+    /** The map of statistics vectors records the means of each replication
      */
     val statV = HashMap [String, VectorD] ()
 
@@ -219,7 +219,7 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
     } // reschedule
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The model itself is an Actor (not an ordinary SimActor) and may be
+    /** The model itself is an Actor (not an ordinary `SimActor`) and may be
      *  thought of as the director.  The director iteratively manages the clock
      *  and the agenda of actors until the simulation flag becomes false
      *  or the agenda (priority queue) becomes empty.
@@ -330,7 +330,7 @@ class Model (name: String, val reps: Int = 1, animating: Boolean = true, aniRati
     } // animate
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare the order of actors based on their actTime.
+    /** Compare the order of actors based on their 'actTime's.
      *  @param actor1  the first actor in comparison
      */
     private def orderedActor (actor1: SimActor): Ordered [SimActor] =

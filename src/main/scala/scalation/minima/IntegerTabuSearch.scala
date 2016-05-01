@@ -14,14 +14,14 @@ import math.max
 import scalation.linalgebra.VectorI
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class performs tabu search to find minima of functions defined on
- *  integer vector domains (z^n).  Tabu search will not re-visit points already
- *  deemed sub-optimal.
+/** The `IntegerTabuSearch` class performs tabu search to find minima of functions
+ *  defined on integer vector domains 'z^n'.  Tabu search will not re-visit points
+ *  already deemed sub-optimal.
  *
  *  minimize    f(x)
  *  subject to  g(x) <= 0, x in Z^n
  *
- *  @param f        the objective function to be minimize (f maps an integer vector to a double)
+ *  @param f        the objective function to be minimize ('f' maps an integer vector to a double)
  *  @param g        the constraint function to be satisfied, if any
  *  @param maxStep  the maximum/starting step size (make larger for larger domains)
  */
@@ -50,8 +50,8 @@ class IntegerTabuSearch (f: VectorI => Double,
     private val tabu = HashSet [VectorI] ()
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The objective function f re-scaled by a weighted penalty, if constrained.
-     *  @param x  the coordinate values of the currrent point
+    /** The objective function 'f' re-scaled by a weighted penalty, if constrained.
+     *  @param x  the coordinate values of the current point
      */
     def fg (x: VectorI): Double =
     {
@@ -122,11 +122,12 @@ class IntegerTabuSearch (f: VectorI => Double,
         x_f                                      // return sub-optimal solution
     } // solve
 
-} // IntegerTabuSearch
+} // IntegerTabuSearch class
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the IntegerTabuSearch class (unconstrained).
+/** The `IntegerTabuSearchTest` object is used to test the `IntegerTabuSearch` class
+ *  (unconstrained).
  */
 object IntegerTabuSearchTest extends App
 {
@@ -139,7 +140,8 @@ object IntegerTabuSearchTest extends App
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the IntegerTabuSearch class (constrained).
+/** The `IntegerTabuSearchTest2` object is used to test the `IntegerTabuSearch` class
+ *  (constrained).
  */
 object IntegerTabuSearchTest2 extends App
 {

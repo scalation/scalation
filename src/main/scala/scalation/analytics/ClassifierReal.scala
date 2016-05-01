@@ -79,7 +79,7 @@ abstract class ClassifierReal (x: MatriD, y: VectorI, fn: Array [String], k: Int
     /** Test the quality of the training with a test-set and return the fraction
      *  of correct classifications.
      *  @param xx  the real-valued test vectors stored as rows of a matrix
-     *  @param yy  the test classification vector, where yy_i = class for row i of xx
+     *  @param yy  the test classification vector, where 'yy_i = class for row i of xx'
      */
     def test (xx: MatrixD, yy: VectorI): Double =
     {
@@ -93,7 +93,6 @@ abstract class ClassifierReal (x: MatriD, y: VectorI, fn: Array [String], k: Int
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Calculate the correlation matrix for the feature vectors 'fea'.
      *  If the correlations are too high, the independence assumption may be dubious.
-     *  FIX: generalize StatVector to work with all types of vectors.
      */
     def calcCorrelation: MatriD =
     {

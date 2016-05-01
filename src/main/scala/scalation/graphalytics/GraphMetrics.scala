@@ -111,21 +111,20 @@ class GraphMetrics (val g: Graph, isUndirected: Boolean = true)
  */
 object GraphMetricsTest extends App
 {
-/***
-    val g = new Graph (Array (SET (4, 5),                // 0           // ch
-                              SET (5),                   // 1
-                              SET (6, 7),                // 2
-                              SET (7, 8),                // 3
-                              SET (0, 5, 9),             // 4
-                              SET (0, 1, 4, 6, 10),      // 5
-                              SET (2, 5, 7, 10, 11),     // 6
-                              SET (2, 3, 6, 8),          // 7
-                              SET (3, 7, 12),            // 8
-                              SET (4),                   // 9
-                              SET (5, 6),                // 10
-                              SET (6),                   // 11
-                              SET (8)))                  // 12   
-***/
+//  val g = new Graph (Array (SET (4, 5),                // 0           // ch
+//                            SET (5),                   // 1
+//                            SET (6, 7),                // 2
+//                            SET (7, 8),                // 3
+//                            SET (0, 5, 9),             // 4
+//                            SET (0, 1, 4, 6, 10),      // 5
+//                            SET (2, 5, 7, 10, 11),     // 6
+//                            SET (2, 3, 6, 8),          // 7
+//                            SET (3, 7, 12),            // 8
+//                            SET (4),                   // 9
+//                            SET (5, 6),                // 10
+//                            SET (6),                   // 11
+//                            SET (8)))                  // 12   
+
     val g = new Graph (Array (SET (2, 1),                // 0           // ch
                               SET (3),                   // 1
                               SET (),                    // 2

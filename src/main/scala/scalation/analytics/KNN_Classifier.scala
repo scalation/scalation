@@ -50,8 +50,8 @@ class KNN_Classifier (x: MatrixD, y: VectorI, fn: Array [String], k: Int, cn: Ar
     } // distance
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Find the 'knn' nearest neighbors (top-knn) to vector 'z' and store in
-     *  topK array.
+    /** Find the 'knn' nearest neighbors (top-'knn') to vector 'z' and store in
+     *  the 'topK' array.
      *  @param z  the vector to be classified
      */
     def kNearest (z: VectoD)
@@ -66,7 +66,7 @@ class KNN_Classifier (x: MatrixD, y: VectorI, fn: Array [String], k: Int, cn: Ar
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Training involves resetting the data structures before each classification.
-     *  KNN uses lazy training, so most of it is done during classification.
+     *  It uses lazy training, so most of it is done during classification.
      *  @param testStart  starting index of test region (inclusive) used in cross-validation.
      *  @param testEnd    ending index of test region (exclusive) used in cross-validation.
      */

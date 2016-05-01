@@ -25,11 +25,11 @@ import scalation.util.Error
  *      boundary conditions  (u(0, t), u(xm, t)) = bc
  *  <p>
  *  @param k   the thermal conductivity
- *  @param dt  delta t
- *  @param dx  delta x
+ *  @param dt  delta 't'
+ *  @param dx  delta 'x'
  *  @param xm  the length of the rod
- *  @param ic  the initial conditions as a function of position x
- *  @param bc  the boundary conditions as a 2-tuple for endpoints 0 and xm
+ *  @param ic  the initial conditions as a function of position 'x'
+ *  @param bc  the boundary conditions as a 2-tuple for end-points 0 and 'xm'
  */
 class ParabolicPDE (k: Double, dt: Double, dx: Double, xm: Double,
                     ic: FunctionS2S, bc: Tuple2 [Double, Double])
@@ -39,7 +39,7 @@ class ParabolicPDE (k: Double, dt: Double, dx: Double, xm: Double,
     private val r  = k * dt / (dx * dx)                      // multiplier in recurrence equation
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for the temperature of the rod at time t, returning the vector of
+    /** Solve for the temperature of the rod at time 't', returning the vector of
      *  temperatures representing the temperature profile of the rod over its length.
      *  This method uses an explicit finite difference technique to solve the PDE.
      *  @param t  the time the solution is desired
@@ -71,14 +71,14 @@ class ParabolicPDE (k: Double, dt: Double, dx: Double, xm: Double,
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for the temperature of the rod at time t, returning the vector of
+    /** Solve for the temperature of the rod at time 't', returning the vector of
      *  temperatures representing the temperature profile of the rod over its length.
      *  This method uses the implicit Crank-Nicolson technique to solve the PDE,
      *  which provides greater stability and accuracy.
      *  Implicit recurrence equation:
      *      -r*u(i-1, j2) + 2.*(1.+r)*u(i, j2) - r*u(i+1, j2) =
      *       r*u(i-1, j1) + 2.*(1.-r)*u(i, j1) + r*u(i+1, j1)
-     *  This equation is solved simultaneously:  solve for u in mat * u = vec
+     *  This equation is solved simultaneously:  solve for 'u' in 'mat * u = vec'
      *  @see people.sc.fsu.edu/~jpeterson/5-CrankNicolson.pdf
      *  @param t  the time the solution is desired
      */
@@ -111,9 +111,9 @@ class ParabolicPDE (k: Double, dt: Double, dx: Double, xm: Double,
     } // solveCN
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Form the tridiagonal matrix that is used in the equation "mat * u = vec".
+    /** Form the tridiagonal matrix that is used in the equation 'mat * u = vec'.
      *  @param r   the multiplier in the recurrence equation
-     *  @param mx  the number of positions (x) excluding the first and last
+     *  @param mx  the number of positions 'x' excluding the first and last
      */
     private def formMatrix (r: Double, mx: Int): MatrixD =
     {
@@ -131,7 +131,7 @@ class ParabolicPDE (k: Double, dt: Double, dx: Double, xm: Double,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ParabolicPDETest` object is used to test the `ParabolicPDE` class.
- *  Numerically solve the Heat Equation:  du/dt = k * d^2u/dx^2.
+ *  Numerically solve the Heat Equation:  'du/dt = k * d^2u/dx^2'.
  *  @see personales.unican.es/gutierjm/cursos/cornell/9_PDEs.pdf
  */
 object ParabolicPDETest extends App

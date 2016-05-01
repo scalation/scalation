@@ -10,15 +10,15 @@
 
 package scalation.minima
 
-import util.control.Breaks.{breakable, break}
+import scala.util.control.Breaks.{breakable, break}
 
 import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.random.Randi
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class solves Linear Programming (LP) problems using the Revised Simplex
- *  Algorithm.  Given a constraint matrix 'a', constant vector 'b' and cost
- *  vector 'c', find values for the solution/decision vector 'x' that minimize
+/** The `RevisedSimplex` class solves Linear Programming (LP) problems using the
+ *  Revised Simplex Algorithm.  Given a constraint matrix 'a', constant vector 'b'
+ *  and cost vector 'c', find values for the solution/decision vector 'x' that minimize
  *  the objective function 'f(x)', while satisfying all of the constraints, i.e.,
  *
  *  minimize    f(x) = c x
@@ -228,7 +228,7 @@ object RevisedSimplexTest extends App
      *  @param a    the constraint matrix
      *  @param b    the limit/RHS vector
      *  @param c    the cost vector
-     *  @param x_B  the indices of the intial basis
+     *  @param x_B  the indices of the initial basis
      */
     def test (a: MatrixD, b: VectorD, c: VectorD, x_B: Array [Int] = null)
     {
