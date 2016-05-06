@@ -77,7 +77,7 @@ class BankModel2 (name: String, nArrivals: Int, iArrivalRV: Variate, serviceRV: 
     addStats (t_a_stat, t_s_stat)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** `Arrival` is a subclass of `EventNode` for handling arrival events.
+    /** `Arrival` is a subclass of `Event` for handling arrival events.
      *  @param customer  the entity that arrives, in this case a bank customer
      *  @param delay     the time delay for this event's occurrence
      */
@@ -102,9 +102,9 @@ class BankModel2 (name: String, nArrivals: Int, iArrivalRV: Variate, serviceRV: 
     } // Arrival class
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** `Departure` is a subclass of `EventNode` for handling departure events.
+    /** `Departure` is a subclass of `Event` for handling departure events.
      *  @param customer  the entity that arrives, in this case a bank customer
-     *  @param delay  the time delay for this event's occurrence
+     *  @param delay     the time delay for this event's occurrence
      */
     case class Departure (customer: Entity, delay: Double)
          extends Event (customer, this, delay, t_s_stat, dProto)

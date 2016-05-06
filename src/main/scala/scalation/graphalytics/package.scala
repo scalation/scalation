@@ -34,7 +34,7 @@ package object graphalytics
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /*  Implicit conversion from 'Double' to 'VectorD' for cases when TLable
      *  is a vector.
-     *  @param d  the double to connvert to a vector
+     *  @param d  the double to convert to a vector
      */
 //  implicit def double2VectorD (d: Double): VectorD = VectorD (d)
 

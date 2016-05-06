@@ -16,8 +16,8 @@ import scalation.tableau.Model
 /** The `CallCenter` object defines a simple tableau model of a Call Center where
  *  service is provided by one tele-service representative and models an M/M/1/1
  *  queue (i.e., no call waiting).  The default 'simulate' method provided by
- *  'scalation.tableau.Model' won't suffice and must be overridden in the
- *  'CallCenterModel' class.
+ *  `scalation.tableau.Model` won't suffice and must be overridden in the
+ *  `CallCenterModel` class.
  */
 object CallCenter extends App with Modelable
 {
@@ -61,7 +61,7 @@ class CallCenterModel (name: String, m: Int, rv: Array [Variate], label: Array [
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform tableau-based simulation by recording timing information about
-     *  the ith entity in the ith row of the matrix.
+     *  the 'i'th entity in the 'i'th row of the matrix.
      *  @param startTime  the start time for the simulation
      */
     override def simulate (startTime: Double)

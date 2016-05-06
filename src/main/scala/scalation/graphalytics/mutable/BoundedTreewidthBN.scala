@@ -128,7 +128,7 @@ class BoundedTreeWidthBN (g_in: MGraph, kMax: Int)
      */
     def maxCliqueSize (mp: MGraph): Int =
     {
-        1                                            // FIX - to be implemeted
+        1                                            // FIX - to be implemented
     } // maxCliqueSize
 
 } // BoundedTreeWidthBN class
@@ -147,7 +147,7 @@ object BoundedTreeWidthBNTest extends App
                                   SET (),                      // ch(4)
                                   SET ()),                     // ch(5)
                                   Array.fill (6)(-1),          // vertex labels
-                           Map ((0, 1) -> 1.0,                 // edge lables
+                           Map ((0, 1) -> 1.0,                 // edge labels
                                 (0, 3) -> 10.0,
                                 (0, 4) -> 3.0,
                                 (1, 2) -> 2.0,

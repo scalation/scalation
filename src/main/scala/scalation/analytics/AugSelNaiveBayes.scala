@@ -260,7 +260,7 @@ object AugSelNaiveBayes
 /** The `AugSelNaiveBayesTest` object is used to test the `AugSelNaiveBayes` class.
  *  Classify whether a car is more likely to be stolen (1) or not (1).
  *  @see www.inf.u-szeged.hu/~ormandi/ai2/06-AugSelNaiveBayes-example.pdf
- *  > run-main scalation.analaytics.AugSelNaiveBayes
+ *  > run-main scalation.analytics.AugSelNaiveBayes
  */
 object AugSelNaiveBayesTest extends App
 {
@@ -308,7 +308,7 @@ object AugSelNaiveBayesTest extends App
 /** The `AugSelNaiveBayesTest2` object is used to test the `AugSelNaiveBayes` class.
  *  Given whether a person is Fast and/or Strong, classify them as making C = 1
  *  or not making C = 0 the football team.
- *  > run-main scalation.analaytics.AugSelNaiveBayes2
+ *  > run-main scalation.analytics.AugSelNaiveBayes2
  */
 object AugSelNaiveBayesTest2 extends App
 {

@@ -106,7 +106,7 @@ class GraphMetrics (val g: Graph, isUndirected: Boolean = true)
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `GraphMetricstest` object is used to test the `GraphMetrics` class.
+/** The `GraphMetricsTest` object is used to test the `GraphMetrics` class.
  *  @see http://math.stackexchange.com/questions/240556/radius-diameter-and-center-of-graph
  */
 object GraphMetricsTest extends App

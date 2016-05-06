@@ -27,7 +27,6 @@ object RunSpellCheck extends App
 
 } // RunSpellCheck object
 
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SpellCheck` object is used to check the spelling in source code comments.
  *  If not using Linux, may need to replace path for 'DICTIONARY'.
@@ -74,12 +73,13 @@ object SpellCheck extends Error
             "csv", "dataset", "datastore", "dir", "eol", "gb", "html", "json", "kb", "mb", "unicode",
             "url", "utf", "src",
          // other
-            "accessor", "advection", "analytics", "apache", "attractor", "bi", "classifier", "classifiers",
-            "columnar", "durations", "dequeue", "dequeued", "diagostics", "enqueue", "enqueued", "etc",
-            "fanout", "ieee", "incrementally", "iteratively", "lexicographical", "linux", "mac", "matcher",
-            "meta", "mit", "multi", "olap", "pairings", "precompute", "precomputed", "predictors",
-            "preorder", "prepend", "prepending", "recompute", "recurse", "reposition", "rescaled",
-            "rescaling", "resizable", "resize", "representable", "reproducibility", "stateful", "subinterval",
+            "accessor", "accuracies", "advection", "analytics", "apache", "attractor", "bi", "classifier",
+            "classifiers", "columnar", "dalton", "daltons", "durations", "dequeue", "dequeued", "diagostics",
+            "enqueue", "enqueued", "etc", "fanout", "glycan", "glycans", "ieee", "incrementally",
+            "iteratively", "lexicographical", "linux", "mac", "matcher", "meta", "mit", "multi", "olap",
+            "pairings", "perceptron", "precompute", "precomputed", "predictors", "preorder", "prepend",
+            "prepending", "recompute", "recurse", "reposition", "rescaled", "rescaling", "resizable",
+            "resize", "representable", "reproducibility", "spectrometer", "stateful", "subinterval",
             "timestamp", "traversal", "traversable", "uncomment", "undirected", "unpaired", "unvisited")
 
     /** Dictionary of correctly spelled word

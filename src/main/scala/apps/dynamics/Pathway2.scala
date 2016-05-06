@@ -16,9 +16,10 @@ import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.plot.Plot
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to simulate a simple plant metabolic pathway.
+/** The `Pathway2` object is used to simulate a simple plant metabolic pathway.
  *  @see Experimental and mathematical approaches to modeling plant metabolic networks
- *  Phytochemistry Vol. 68 (2007) pp. 2351–2374, Elsevier Science Direct
+ *  @see Phytochemistry Vol. 68 (2007) pp. 2351–2374, Elsevier Science Direct
+ *  > run-main apps.dynamics.Pathway2
  */
 object Pathway2 extends App
 {

@@ -62,7 +62,7 @@ import RotateOrder._
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Xform` class supports custom tranforms (Translate, Rotate and Scale).
+/** The `Xform` class supports custom transforms (Translate, Rotate and Scale).
  */
 class Xform extends Group
 {

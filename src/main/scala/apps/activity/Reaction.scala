@@ -15,11 +15,12 @@ import scalation.random.Sharp
 import scalation.scala2d.Colors._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object models a simple biochemical reaction.  A glycan will pick up
- *  a new glycan residue to form another glycan.  The reaction will be catalyzed
+/** The `Reaction` object models a simple biochemical reaction.  A glycan will pick
+ *  up a new glycan residue to form another glycan.  The reaction will be catalyzed
  *  by an protein enzyme.
  *  @see scalation.activity.PetriNetTest, scalation.activity.PetriNetRulesTest
  *  for more examples of test code.
+ *  > run-main apps.activity.Reaction
  */
 object Reaction extends App
 {

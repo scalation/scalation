@@ -18,7 +18,7 @@ import scalation.util.Error
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Statistic` class is used to collect values and compute sample statistics
  *  on them (e.g., waiting time).  Contrast with `TimeStatistic` defined below.
- *  @param name      the name for this statistic (e.g., 'watingTime')
+ *  @param name      the name for this statistic (e.g., 'waitingTime')
  *  @param unbiased  whether the estimators are restricted to be unbiased
  */
 class Statistic (val name: String = "stat", unbiased: Boolean = false)

@@ -205,7 +205,7 @@ object GraphIOTest extends App
     (new GraphIO (ran_graph)).write ()
     println ("end writing graph to " + name)
 
-    // Read the file to create a new indentical graph
+    // Read the file to create a new identical graph
 
     val g = GraphIO (name)
     println (s"g = $g")

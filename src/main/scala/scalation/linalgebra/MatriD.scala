@@ -9,7 +9,7 @@
 
 package scalation.linalgebra
 
-import math.{abs => ABS}
+import scala.math.{abs => ABS}
 
 import scalation.math.double_exp
 import scalation.util.Error
@@ -175,7 +175,7 @@ trait MatriD
     def set (i: Int, u: VectoD, j: Int = 0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert this matrix to a dense matrix.
+    /** Convert 'this' matrix to a dense matrix.
      */
     def toDense: MatriD
 

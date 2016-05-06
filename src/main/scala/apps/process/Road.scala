@@ -13,6 +13,7 @@ import scalation.random.{Bernoulli, Uniform, Variate}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Road` object is used to run the `RoadModel` class.
+ *  > run-main apps.process.Road
  */
 object Road extends App 
 {

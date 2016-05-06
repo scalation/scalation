@@ -9,6 +9,7 @@
 package scalation.linalgebra
 
 import scala.collection.Traversable
+import scala.collection.mutable.IndexedSeq
 import scala.util.Sorting.quickSort
 
 import scala.math.{abs => ABS, max => MAX, sqrt}
@@ -120,7 +121,7 @@ trait VectoD
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's entire sequence/array.
      */
-    def apply (): Seq [Double]
+    def apply (): IndexedSeq [Double]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' vector's element at the 'i'-th index position. 
@@ -178,7 +179,7 @@ trait VectoD
      *  the index positions.
      *  @param p  the predicate (Boolean function) to apply
      */
-    def filterPos (p: Double => Boolean): Seq [Int]
+    def filterPos (p: Double => Boolean): IndexedSeq [Int]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Map the elements of 'this' vector by applying the mapping function 'f'.

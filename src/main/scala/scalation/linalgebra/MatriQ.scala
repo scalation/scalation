@@ -175,7 +175,7 @@ trait MatriQ
     def set (i: Int, u: VectoQ, j: Int = 0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert this matrix to a dense matrix.
+    /** Convert 'this' matrix to a dense matrix.
      */
     def toDense: MatriQ
 

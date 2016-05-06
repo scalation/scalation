@@ -28,7 +28,7 @@ object TopSort
      */
     def topSort (g: Graph): Array [Int] =
     {
-        val n       = g.size                                // the number of vetices in g
+        val n       = g.size                                // the number of vertices in g
         val color   = Array.fill (n)(G_N)                   // traffic light: GreeN, YelloW or ReD
         val vList   = Array.fill (n)(-1)                    // ordered list of vertices
         var last    = n - 1                                 // last open position in vList
@@ -83,7 +83,7 @@ object TopSortTest extends App
     val pg2 = new Graph (Array (SET (1, 2),        // edges from 0:  0 -> 1, 0 -> 2
                                 SET (2),           // edges from 1:  1 -> 2
                                 SET (0)))          // edges form 2:  2 -> 0
-    println ("Precedence Diraph pg2: --------------------------------------------")
+    println ("Precedence Digraph pg2: --------------------------------------------")
     pg2.printG ()
     println ("pg2 order = " + topSort (pg2).deep)
     

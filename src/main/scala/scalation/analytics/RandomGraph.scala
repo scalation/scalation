@@ -24,7 +24,7 @@ import scalation.random.Randi0
 class RandomGraph (n: Int, p: Double, c: Int)
 {
     private val g    = new MatrixD (n, n)     // adjacency matrix representation of graph
-    private val coin = Bernoulli (p)          // a baised coin (p = probability of head(1))
+    private val coin = Bernoulli (p)          // a biased coin (p = probability of head(1))
     private val pick = Randi0 (n-1)           // random integer generator: 0, ..., n-1
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

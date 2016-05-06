@@ -85,7 +85,7 @@ class WaitQueue (name: String, at: Array [Double], cap: Int = Int.MaxValue)
         } // if
 
         val timeOut = director.clock
-        tally (timeOut - timeIn)                 // collect for sample/durations staistics
+        tally (timeOut - timeIn)                 // collect for sample/durations statistics
         accum (if (joined) size + 1 else size)   // collect for persistent statistics
         trace (this, "wait ends", actor, timeOut)
         joined

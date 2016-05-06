@@ -327,17 +327,17 @@ object GraphGenTest3 extends App
     val avDegree  =    16     
     var g = genRandomGraph (nVertices, nLabels, avDegree)
     println ("done generating data graph")
-    println ("g.size     = " + g.size)
-    println ("g.nEdges   = " + g.nEdges)
-    println ("av degreee = " + g.nEdges / g.size.toDouble)
+    println ("g.size    = " + g.size)
+    println ("g.nEdges  = " + g.nEdges)
+    println ("av degree = " + g.nEdges / g.size.toDouble)
 
     println ("GraphGenTest3: test genBFSQuery")
     (1 to 5).foreach { _ =>
         var q = genBFSQuery (20, 3, g)
         q.printG ()
-        println ("q.size     = " + q.size)
-        println ("q.nEdges   = " + q.nEdges)
-        println ("av degreee = " + q.nEdges / q.size.toDouble)
+        println ("q.size    = " + q.size)
+        println ("q.nEdges  = " + q.nEdges)
+        println ("av degree = " + q.nEdges / q.size.toDouble)
     } // foreach
     println ("done")
 

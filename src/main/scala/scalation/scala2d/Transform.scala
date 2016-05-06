@@ -60,7 +60,7 @@ trait Transform
     def scale (shape: RectangularShape, p: Array [Double]) 
     {
         if (p.length != 2) {
-            println ("Trandform.scale", "p array must be of size 2")
+            println ("Transform.scale", "p array must be of size 2")
         } else {
             shape.setFrame (shape.getX, shape.getY, p(0), p(1))
         } // if

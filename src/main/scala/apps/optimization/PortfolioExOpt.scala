@@ -4,9 +4,8 @@
  *  @version 1.2
  *  @date    Sat Jan  5 14:10:45 EST 2013
  *  @see     LICENSE (MIT style license file).
- *  @see     http://reference.wolfram.com/mathematica/tutorial/ConstrainedOptimizationLocalNumerical.html
- *  @compile scalac -cp ../../classes -d classes PortfolioExOpt.scala
- *  @run     scala -cp ../../classes:classes simopt.PortfolioExOpt
+ *
+ *  @see     reference.wolfram.com/mathematica/tutorial/ConstrainedOptimizationLocalNumerical.html
  */
 
 package apps.optimization
@@ -18,9 +17,10 @@ import scalation.stat.StatVector
 import scalation.minima.ConjGradient
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object solves the following Quadratic Programming (QP) problem:
- *  Given n investment instruments, find a combination/portfolio that
+/** The `PortfolioExOpt` object solves the following Quadratic Programming 'QP' problem:
+ *  Given 'n' investment instruments, find a combination/portfolio that
  *  minimizes risk for a given expected return.
+ *  > run-main apps.optimization.PortfolioExOpt
  */
 object PortfolioExOpt extends App
 {

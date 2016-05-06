@@ -17,10 +17,11 @@ import scalation.random.{Exponential, Uniform, Variate}
 import scalation.util.Monitor
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `BankOpt` object performs Simulation Optimization (SO) on a bank model to
- *  find the number of tellers that mimimizes the overall cost function.  Cost is
+/** The `BankOpt2` object performs Simulation Optimization 'SO' on a bank model to
+ *  find the number of tellers that minimizes the overall cost function.  Cost is
  *  based on the daily pay for a teller (8 hours * 20 dollars per hour) and a
- *  cost based on customer wait time (10 dollarsper minute of mean waiting time).
+ *  cost based on customer wait time (10 dollars per minute of mean waiting time).
+ *  > run-main apps.process.BankOpt2
  */
 object BankOpt2 extends App
 {

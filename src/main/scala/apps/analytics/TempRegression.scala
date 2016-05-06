@@ -24,6 +24,7 @@ import scalation.util.time
  *  A fit is created for both the full model and a reduce model created using
  *  backward elimination.
  *  @see www.stat.ufl.edu/~winner/cases/txtemp.ppt
+ *  > run-main apps.analytics.TempRegression
  */
 object TempRegression extends App
 {

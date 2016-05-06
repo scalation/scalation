@@ -1,6 +1,6 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  John Miller, Vishnu Gowda  Harish
+/** @author  John Miller, Vishnu Gowda Harish
  *  @version 1.2
  *  @date    Fri Jan 29 15:43:08 EST 2016
  *  @see     LICENSE (MIT style license file).
@@ -8,8 +8,8 @@
 
 package scalation.linalgebra
 
-import scala.collection.Traversable
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.{breakOut, Traversable}
+import scala.collection.mutable.{ArrayBuffer, IndexedSeq}
 import scala.util.Sorting.quickSort
 
 import scala.math.{abs => ABS, max => MAX, sqrt}
@@ -95,7 +95,10 @@ class SparseVectorD (val dim_ : Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's entire array.
      */
-    def apply (): Seq [Double] = for (i <- range) yield v.getOrElse (i, 0.0)
+    def apply (): IndexedSeq [Double] =
+    {
+        (for (i <- range) yield v.getOrElse (i, 0.0))(breakOut)
+    } // apply
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' vector's element at the 'i'-th index position. 
@@ -214,7 +217,10 @@ class SparseVectorD (val dim_ : Int,
      *  the index positions.
      *  @param p  the predicate (Boolean function) to apply
      */
-    def filterPos (p: Double => Boolean): Seq [Int] = for (i <- range if p (this(i))) yield i
+    def filterPos (p: Double => Boolean): IndexedSeq [Int] =
+    {
+        (for (i <- range if p (this(i))) yield i)(breakOut)
+    } // filterPos
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Map the elements of 'this' vector by applying the mapping function 'f'.
@@ -870,7 +876,7 @@ class SparseVectorD (val dim_ : Int,
     def toDense: VectorD = VectorD (for (i <- range) yield this(i))
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' vector to a String.
+    /** Convert 'this' vector to a `String`.
      */
     override def toString: String = 
     {
@@ -884,7 +890,7 @@ class SparseVectorD (val dim_ : Int,
     } // toString
   
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' vector to a String, showing the zero elements as well,
+    /** Convert 'this' vector to a `String`, showing the zero elements as well,
      */ 
     def toString2: String = 
     {
@@ -910,9 +916,9 @@ object SparseVectorD
     type RowMap = SortedLinkedHashMap [Int, Double]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `SparseVectorD` from one or more values (repeated values Double*).
-     *  @param x   the first Double number
-     *  @param xs  the rest of the Double numbers
+    /** Create a `SparseVectorD` from one or more values (repeated values `Double`*).
+     *  @param x   the first `Double` number
+     *  @param xs  the rest of the `Double` numbers
      */
     def apply (x: Double, xs: Double*): SparseVectorD =
     {
@@ -923,7 +929,7 @@ object SparseVectorD
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `SparseVectorD` from a sequence of Doubles.
+    /** Create a `SparseVectorD` from a sequence of `Double`s.
      *  @param xs  the sequence of the Double numbers
      */
     def apply (xs: Seq [Double]): SparseVectorD =
@@ -934,21 +940,21 @@ object SparseVectorD
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `SparseVectorD` from one or more values (repeated values String*).
-     *  @param x   the first String
-     *  @param xs  the rest of the Strings
+    /** Create a `SparseVectorD` from one or more values (repeated values `String`*).
+     *  @param x   the first `String`
+     *  @param xs  the rest of the `String`s
      */
     def apply (x: String, xs: String*): SparseVectorD =
     {
         val c = new SparseVectorD (1 + xs.length)
         c(0)  = x.toDouble
-        for (i <- 1 until c.dim) c(i) = xs(i-1).toDouble
+        for (i <- 0 until c.dim-1) c(i+1) = xs(i).toDouble
         c
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `SparseVectorD` from an array of Strings.
-     *  @param xs  the array of the Strings
+    /** Create a `SparseVectorD` from an array of `String`s.
+     *  @param xs  the array of the `String`s
      */
     def apply (xs: Array [String]): SparseVectorD =
     {
@@ -958,10 +964,10 @@ object SparseVectorD
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `SparseVectorD` from an array of Strings, skipping the first 'skip'
+    /** Create a `SparseVectorD` from an array of `String`s, skipping the first 'skip'
      *  elements.  If an element is non-numeric, use its hashcode.
-     *  FIX:  Might be better to map non-numeric Strings to ordinal values.
-     *  @param xs    the array of the Strings
+     *  FIX:  Might be better to map non-numeric `String`s to ordinal values.
+     *  @param xs    the array of the `String`s
      *  @param skip  the number of elements at the beginning to skip (e.g., id column)
      */
     def apply (xs: Array [String], skip: Int): SparseVectorD =
@@ -1000,127 +1006,12 @@ object SparseVectorD
 } // SparseVectorD object
 
 
-object SparseVectorDTest1 extends App
-{
-  println(1/0)
-  /*  
-    val v = VectorD(0,1,2,0,0,0,0,4,0,0,0,0,0,0,0,0,2,0,0,0)
-    val z = SparseVectorD(v())
-    
-    println(s"Dense Vector is : \t \t\t${v}")
-    println(s"Sparse Vector z : \t \t \t${z}")
-    println(s"Sparse Vector z : \t \t \t${z.toString2}")
-    
-    var x = 0.0
-    println(x += 2.0)
-    println(x)
-    //println(s"z += 2.0 : \t \t \t \t${z += 2.0}")
-    
-    
-    //z(0) = 0.0
-   // println(s"z(0) : \t \t \t${z(0)}")
-
-    println(s"Dense Vector is : \t \t\t${v}")
-    println(s"Sparse Vector z : \t \t \t${z}")
-    println(s"RowMap values v :  \t \t \t${z.nonZero().deep}")
-    println(s"RowMap indexes of values  v :  \t \t${z.v.keys}")
-    println(s"z.filter((x: Double) => x > 1.00) : \t${z.filter((x: Double) => x > 1.00)}")  
-    println(s"z.filterPos((x: Double) => x > 1.00) : \t${z.filterPos((x: Double) => x > 1.00)}")
-    println(s"Selected Dense Vector is : \t \t${v.select(Array(0,1,3,4,5,16))}")
-    println(s"z.select(Array(0,1,3,4,5,16)) : \t${z.select(Array(0,1,3,4,5,16))().deep}")
-   
-     //Scalar Operations 
-    println(s"z.+(2) : \t \t \t \t${z.+(2)}")
-    println(s"z.-(2) : \t \t \t \t${z.-(2)}")
-    println(s"z.+((2.0,1)) : \t \t${z.+((0,2.0))}")
-    println(s"z.-((2.0,1)) : \t \t${z.-((0,2.0))}")
-    println(s"z.-=(2) : \t \t \t \t${z.-=(2.0)}")
-    println(s"z.+=(2) : \t \t \t \t${z.+=(2.0)}")
-    
-    
-   
-*/}
-
-
-
-
-object SparseVectorDTest2 extends App
-{
-  val r = scala.util.Random  
-  val v1 = new VectorD(1000000)  
-  val v2 = new VectorD(1000000)
-
-  for ( x <- 0 until 10 ) {    
-     var cnt = 0   
-     while(cnt < 1000000) {
-     val x = r.nextInt(50).toDouble + 1
-     val x1 = r.nextInt(90)
-     if( x1 == 1 ) v1(cnt) =  x
-     else v1(cnt) = 0.0
-     
-     val z = r.nextInt(50).toDouble + 1
-     val z1 = r.nextInt(90)
-     if( z1 == 1 ) v2(cnt) =  z
-     else v2(cnt) = 0.0
-     cnt += 1
-   }
-     
-     var z1 = SparseVectorD(v1())
-     var z2 = SparseVectorD(v2())
-     
-     
-     //println(s"z1.size is ${z1.getTable().size}")
-     //println(s"z2.size is ${z2.getTable().size}")
-     println(v1.dot(v2))
-     println(z1.⦁(z2))
-}
-}
-
-
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SparseVectorDTest` object tests the operations provided by `SparseVectorD`.
  *  > run-main scalation.linalgebra.SparseVectorDTest
  */
 object SparseVectorDTest extends App
-{
-    
-  
-  var x      = SparseVectorD(7.36864,	4.28984,	4.67949,	19.9497,	17.6045,	11.3151,	11.1607,	2.90098,	12.4075,	9.60246)
-  x.distinct
-  //var x  = SparseVectorD(10,1,2,0,0,4,3,4,5,6,7,0,8)
-  
-  /*x.sort()
-  println(x)
-  x.sort2()
-  println(x)*/
-  
-  
-  var z = VectorD(10,1,2,0,0,4,3,4,5,6,7,0,8)
-  println(z.rank)
-//  println(x.rank)
-  
-  println(x.contains(11.0))
-  
-  
-  /*var z = x.filter((x: Double) => x < 5.00)
-  var z1 = x.filter((x: Double) => x > 5.00)
-  var z2 = x.filter((x: Double) => x == 5.00)
- 
-  z1.sort()
-  
-  println(x().deep)
-  println("*******")
-  println(z)
-   println(z().deep)
-   println("*******")
-   println(z1)
-   println(z1().deep)
-   println("*******")
-   println(z2)
-   println(z2().deep)*/
-  
-  /*
+{   
     var x: SparseVectorD = null
     var y: SparseVectorD = null
 
@@ -1163,5 +1054,38 @@ object SparseVectorDTest extends App
     println ("z.map (_ * 2)    = " + z.map ((e: Double) => e * 2))
     println ("z.filter (_ > 2) = " + z.filter (_ > 2))
 
-*/} // SparseVectorDTest
+} // SparseVectorDTest
 
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SparseVectorDTest2` object tests the dot product operation provided by `SparseVectorD`.
+ *  > run-main scalation.linalgebra.SparseVectorDTest2
+ */
+object SparseVectorDTest2 extends App
+{
+    val r  = scala.util.Random  
+    val v1 = new VectorD (1000000)  
+    val v2 = new VectorD (1000000)
+
+    for (x <- 0 until 10) {    
+        var cnt = 0   
+        while(cnt < 1000000) {
+            val x  = r.nextInt (50).toDouble + 1
+            val x1 = r.nextInt (90)
+            if(x1 == 1) v1(cnt) = x
+            else v1(cnt) = 0.0  
+            val z  = r.nextInt (50).toDouble + 1
+            val z1 = r.nextInt (90)
+            if(z1 == 1) v2(cnt) = z
+            else v2(cnt) = 0.0
+            cnt += 1
+        } // while   
+
+    var z1 = SparseVectorD (v1())
+    var z2 = SparseVectorD (v2())
+  
+    println (v1.dot (v2))
+    println (z1.⦁(z2))
+  } // for
+    
+} // SparseVectorDTest2

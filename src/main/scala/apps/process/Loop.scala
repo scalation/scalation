@@ -13,6 +13,7 @@ import scalation.random.{Bernoulli, Sharp, Uniform, Variate}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Loop` object is used to run the `LoopModel` class.
+ *  > run-main apps.process.Loop
  */
 object Loop extends App 
 {

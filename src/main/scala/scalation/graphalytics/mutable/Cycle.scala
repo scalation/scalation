@@ -32,7 +32,7 @@ object Cycle
 
         for (v <- color.indices if color(v) == G_N && loopback (v)) return true 
 
-        /*  Search the decendents of vertex 'u' to see if there is a loopback.
+        /*  Search the descendants of vertex 'u' to see if there is a loopback.
          *  @param u  the vertex where the search starts
          */
         def loopback (u: Int): Boolean =
@@ -73,7 +73,7 @@ object CycleTest extends App
     val pg2 = new Graph (Array (SET (1, 2),        // edges from 0:  0 -> 1, 0 -> 2
                                 SET (2),           // edges from 1:  1 -> 2
                                 SET (0)))          // edges form 2:  2 -> 0
-    println ("Precedence Diraph pg2: --------------------------------------------")
+    println ("Precedence Digraph pg2: --------------------------------------------")
     pg2.printG ()
     println ("pg2 has cycle? = " + hasCycle (pg2))
     

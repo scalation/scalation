@@ -1,7 +1,7 @@
 
 package apps
 
-/** The game package contains example apps for simulation oriented
+/** The `game` package contains example applications for simulation oriented
  *  games.
  */
 package object game { } 

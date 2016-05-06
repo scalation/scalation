@@ -129,7 +129,7 @@ class KMeansClustering (x: MatrixD, k: Int, s: Int = 0, primary: Boolean = true)
             println ("(" + l + ") clustr = " + clustr)
             println ("(" + l + ") cent  = " + cent)
         }} // for   
-        clustr                                       // return the cluster assignmemnt vector
+        clustr                                       // return the cluster assignment vector
     } // cluster
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

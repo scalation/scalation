@@ -8,7 +8,8 @@
 
 package scalation.linalgebra
 
-import scala.collection.Traversable
+import scala.collection.{breakOut, Traversable}
+import scala.collection.mutable.{IndexedSeq, WrappedArray}
 import scala.util.Sorting.quickSort
 
 import scalation.math.Real.{abs => ABS, max => MAX, _}
@@ -94,7 +95,7 @@ class VectorR (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's entire array.
      */
-    def apply (): Seq [Real] = v
+    def apply (): WrappedArray [Real] = v
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' vector's element at the 'i'-th index position. 
@@ -177,7 +178,10 @@ class VectorR (val dim: Int,
      *  the index positions.
      *  @param p  the predicate (Boolean function) to apply
      */
-    def filterPos (p: Real => Boolean): Seq [Int] = for (i <- range if p (v(i))) yield i
+    def filterPos (p: Real => Boolean): IndexedSeq [Int] =
+    {
+        (for (i <- range if p (v(i))) yield i)(breakOut)
+    } // filterPos
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Map the elements of 'this' vector by applying the mapping function 'f'.

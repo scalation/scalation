@@ -117,7 +117,7 @@ class ANOVA (t: VectorI, y: VectorD, levels: Int, technique: RegTechnique = Fac_
  */
 object ANOVATest extends App
 {
-    val t = VectorI (1, 1, 2, 2, 3)                              // treatements levels
+    val t = VectorI (1, 1, 2, 2, 3)                              // treatments levels
     val y = VectorD (745.0, 895.0, 442.0, 440.0, 1598.0)         // response vector
     val z = VectorD (1.0, 20.0, 80.0, 1.0)
 

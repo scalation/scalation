@@ -16,6 +16,7 @@ import scalation.random.{Exponential, Uniform, Variate}
 /** The `CallCenter` object defines a particular scenario under which to execute
  *  the call center model.
  *  @see scalation.process.ModelTest for another example of test code.
+ *  > run-main apps.process.CallCenter
  */
 object CallCenter extends App with Modelable
 {

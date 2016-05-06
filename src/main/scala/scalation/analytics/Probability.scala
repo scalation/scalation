@@ -201,7 +201,7 @@ object ProbabilityTest extends App
 {
     import Probability._
 
-    // coin experimenet: probability for 0, 1, 2 heads, when flipping 2 coins
+    // coin experiment: probability for 0, 1, 2 heads, when flipping 2 coins
     val px = VectorD (.25, .5, .25)
 
     // dice experiment: probability for 2, 3, ... 11, 12, when rolling 2 dice

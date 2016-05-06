@@ -28,7 +28,7 @@ object BinarySearch
         var max    = a.length - 1                      // highest possible index
         while (min <= max) {
             val m = (max + min) / 2                    // compute mid-point
-            probes += 1                                // incremment probes count
+            probes += 1                                // increment probes count
             if (a(m) == key) return (m, probes)        // found the key
             if (a(m) < key) min = m + 1                // a_m too low, search m+1 to max
             else            max = m - 1                // a_m too high, search min to m-1
@@ -46,7 +46,7 @@ import scalation.random.{Randi0, RandomVecI}
 import BinarySearch.search
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `BinarySearchTest` object performs performance testing on `BinarySerach`. 
+/** The `BinarySearchTest` object performs performance testing on `BinarySearch`. 
  *  > run-main scalation.util.BinarySearchTest
  */
 object BinarySearchTest extends App

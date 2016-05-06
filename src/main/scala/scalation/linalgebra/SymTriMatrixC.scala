@@ -268,7 +268,7 @@ class SymTriMatrixC (val d1: Int)
         val c = new MatrixC (dim1, dim1)
         for (i <- range1) {
             c(i, i) = _dg(i) 
-            if (i > 0)      c(i-1, i) = _sd(i)
+            if (i > 0)      c(i, i-1) = _sd(i-1)
             if (i < dim1-1) c(i, i+1) = _sd(i)
         } // for
         c

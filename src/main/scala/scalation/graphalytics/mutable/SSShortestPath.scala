@@ -42,7 +42,7 @@ class SSShortestPath (c: MatriD, s: Int)
     /** The `Item` inner case class has two fields, vertex id and distance from
      *  vertex s (the source) as well as a compare method based on distance.
      *  @param id  the id of the vertex
-     *  @param dd  the vextex's distance from vertex s
+     *  @param dd  the vertex's distance from vertex s
      */
     case class Item (id: Int, dd: Double) extends Ordered [Item]
     {

@@ -4,19 +4,17 @@
  *  @version  1.2
  *  @date     Fri Apr 26 17:52:27 EDT 2013
  *  @see      LICENSE (MIT style license file).
- *  @compile  scalac -cp ../../classes:classes -d classes ServiceNetwork.scala
- *  @run      scala -cp ../../classes:classes optimization.ServiceNetworkTest
  */
 
 package apps.optimization
 
-import collection.mutable.HashMap
+import scala.collection.mutable.HashMap
 
 import scalation.graphalytics.ColorDAG
 import scalation.random.Randi
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class is used for optimizing service networks.
+/** The `ServiceNetwork` class is used for optimizing service networks.
  *  @param dimensions  the dimension (number of nodes) for each stage
  *  @param maxIn       the maximum number of input colors for an internal node
  *  @param maxOut      the maximum number of output colors for an internal node
@@ -61,7 +59,8 @@ class ServiceNetwork (dimensions: Array [Int], maxIn: Int, maxOut: Int,
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to the run the ServiceNetwork example.
+/** The `ServiceNetworkTest` object is used to the run the `ServiceNetwork` example.
+ *  > run-main apps.optimization.ServiceNetworkTest
  */
 object ServiceNetworkTest extends App
 {

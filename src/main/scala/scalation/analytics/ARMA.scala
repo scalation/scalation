@@ -117,7 +117,7 @@ class ARMA (y: VectorD, t: VectorD)
     {
         if (q != 1) flaw ("est_ma", "estimation for q > 1 not yet implemented")
 
-        val theta = new VectorD (q)         // MA(q) cofficients: theta_0, ..., theta_q-1
+        val theta = new VectorD (q)         // MA(q) coefficients: theta_0, ..., theta_q-1
         theta(0) = 0.0                      // FIX: need to estimate theta(0)
         theta           
     } // est_ma

@@ -47,7 +47,7 @@ class Route (name: String, k: Int, val from: Component, val to: Component,
         subpart += lane(i)
     } // for
 
-    private var _selector: Variate = _               // random variate for determing next direction
+    private var _selector: Variate = _               // random variate for determining next direction
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the direction/turn random variate to determine next the direction.

@@ -16,11 +16,12 @@ import scalation.random.{Uniform, Variate}
 import scalation.util.Monitor
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `ERoomOpt` object performs Simulation Optimization (SO) on an Emergency Room (ER)
- *  model to find the numbers of nurses and doctors that mimimize the overall cost function.
+/** The `ERoomOpt` object performs Simulation Optimization 'SO' on an Emergency Room 'ER'
+ *  model to find the numbers of nurses and doctors that minimize the overall cost function.
  *  Cost is based on the daily pay for a nurse (8 hours * 30 dollars per hour), a doctor
  *  (8 hours * 60 dollars per hour) and a cost based on customer wait time (10 dollars
  *  per minute of mean waiting time).
+ *  > run-main apps.process.ERoomOpt
  */
 object ERoomOpt extends App
 {
@@ -68,9 +69,9 @@ object ERoomOpt extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ERModelOpt` class defines a simple process-interaction model of an Emergency
- *  Room (ER) model where service is provided by one or more nurses and one or more doctors.
+ *  Room 'ER' model where service is provided by one or more nurses and one or more doctors.
  *  A patient will first see a nurse and then a doctor.
- *  @param name        the name of the ER model
+ *  @param name        the name of the 'ER' model
  *  @param nArrivals   the number of arrivals to generate (stopping condition)
  *  @param iArrivalRV  the inter-arrival time distribution
  *  @param nurses      the number of nurses (service units)

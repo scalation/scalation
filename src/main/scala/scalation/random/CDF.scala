@@ -20,7 +20,7 @@ import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CDF` object contains methods for computing 'F(x)', the Cumulative
- *  Distribution Functions (CDF's) for popular distributions:
+ *  Distribution Functions 'CDF's for popular distributions:
  *  `Uniform`
  *  `Exponential`
  *  `Weibel`
@@ -35,7 +35,7 @@ object CDF
        extends Error
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
+    /** Compute the Cumulative Distribution Function 'CDF' 'F(x)' for the
      *  Uniform distribution.
      *  @param x  the x coordinate, argument to F(x)
      *  @param b  the upper end-point of the uniform distribution 
@@ -50,7 +50,7 @@ object CDF
     } // uniformCDF
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
+    /** Compute the Cumulative Distribution Function 'CDF' 'F(x)' for the
      *  Uniform distribution.
      *  @param x   the x coordinate, argument to F(x)
      *  @param pr  parameters giving the end-points of the uniform distribution 
@@ -62,7 +62,7 @@ object CDF
     } // uniformCDF
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
+    /** Compute the Cumulative Distribution Function 'CDF' 'F(x)' for the
      *  `Exponential` distribution.
      *  @param x  the x coordinate, argument to F(x)
      *  @param λ  the rate parameter
@@ -74,7 +74,7 @@ object CDF
     } // exponentialCDF
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
+    /** Compute the Cumulative Distribution Function 'CDF' 'F(x)' for the
      *  `Exponential` distribution.
      *  @param x     the x coordinate, argument to F(x)
      *  @param parm  parameter giving the rate 
@@ -86,7 +86,7 @@ object CDF
     } // exponentialCDF
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
+    /** Compute the Cumulative Distribution Function 'CDF' 'F(x)' for the
      *  `Weibull` distribution.
      *  @param x  the x coordinate, argument to F(x)
      *  @param α  the shape parameter
@@ -99,7 +99,7 @@ object CDF
     } // weibullCDF
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
+    /** Compute the Cumulative Distribution Function 'CDF' 'F(x)' for the
      *  `Weibull` distribution.
      *  @param x     the x coordinate, argument to F(x)
      *  @param parm  parameters giving the shape and scale
@@ -133,7 +133,7 @@ object CDF
     } // buildEmpiricalCDF
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the
+    /** Compute the Cumulative Distribution Function 'CDF' 'F(x)' for the
      *  Empirical distribution 'eCDF'.
      *  @param x     the x coordinate, argument to F(x)
      *  @param eCDF  the Empirical CDF
@@ -221,7 +221,7 @@ object CDF
      */
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::    
-    /** Compute the Cumulative Distribution Function (CDF) 'F(x)' for the Standard
+    /** Compute the Cumulative Distribution Function 'CDF' 'F(x)' for the Standard
      *  Normal distribution using the Hart function.  Recoded in Scala from Java code.
      *  Apache license given above.
      *  @see mail-archives.apache.org/mod_mbox/commons-dev/200401.mbox/%3C20040126030431.92035.qmail@minotaur.apache.org%3E
@@ -255,7 +255,7 @@ object CDF
                        6.59881378689285515e-2, 3.78239633202758244e-3,
                        7.29751555083966205e-5)
 
-        val sixten       = 16.0
+        val sixteen      = 16.0
         val M_1_SQRT_2PI = 0.398942280401432677939946059934        // 1/sqrt(2pi)
         val M_SQRT_32    = 5.656854249492380195206754896838        // sqrt(32)    
   
@@ -292,7 +292,7 @@ object CDF
                   xden = (xden + d(i)) * y
               } // for
               temp = (xnum + c(7)) / (xden + d(7))
-              xsq = floor (y*sixten) / sixten
+              xsq = floor (y*sixteen) / sixteen
               del = (y - xsq) * (y + xsq)
               cum = exp (-(xsq*xsq*0.5)) * exp(-(del*0.5)) * temp
               ccum = 1.0 - cum
@@ -309,7 +309,7 @@ object CDF
               } // for
               temp = xsq * (xnum + p(4)) / (xden + q(4))
               temp = (M_1_SQRT_2PI - temp) / y
-              xsq = floor (x*sixten) / sixten
+              xsq = floor (x*sixteen) / sixteen
               del = (x - xsq) * (x + xsq)
               cum = exp (-(xsq*xsq*0.5)) * exp (-(del*0.5)) * temp
               ccum = 1.0 - cum

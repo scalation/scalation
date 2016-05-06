@@ -74,7 +74,7 @@ class CallCenterModel (name: String, nArrivals: Int, iArrivalRV: Variate,
     addStats (t_a_stat, t_s_stat)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** `Arrival` is a subclass of `Event` for handling arrival events (MakeCall).
+    /** `Arrival` is a subclass of `Event` for handling arrival events 'MakeCall'.
      *  @param call   the entity that arrives, in this case a call
      *  @param delay  the time delay for this event's occurrence
      */
@@ -97,7 +97,7 @@ class CallCenterModel (name: String, nArrivals: Int, iArrivalRV: Variate,
     } // Arrival class
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** `Departure` is a subclass of `Event` for handling departure events (HangUp).
+    /** `Departure` is a subclass of `Event` for handling departure events 'HangUp'.
      *  @param call   the entity that departs, in this case a call
      *  @param delay  the time delay for this event's occurrence
      *  @param stat   the statistics collection object for delay times

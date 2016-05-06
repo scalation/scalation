@@ -14,7 +14,8 @@
 
 package scalation.linalgebra.par
 
-import scala.collection.Traversable
+import scala.collection.{breakOut, Traversable}
+import scala.collection.mutable.{IndexedSeq, WrappedArray}
 import scala.util.Sorting.quickSort
 
 import math.{abs => ABS, max => MAX, sqrt}
@@ -159,7 +160,7 @@ class VectorD (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's entire array.
      */
-    def apply (): Seq [Double] = v
+    def apply (): WrappedArray [Double] = v
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' vector's element at the 'i'-th index position. 
@@ -216,9 +217,9 @@ class VectorD (val dim: Int,
      *  the index positions.
      *  @param p  the predicate (Boolean function) to apply
      */
-    def filterPos (p: Double => Boolean): Seq [Int] =
+    def filterPos (p: Double => Boolean): IndexedSeq [Int] =
     {
-        for (i <- range if p (v(i))) yield i
+        (for (i <- range if p (v(i))) yield i) (breakOut)
     } // filterPos
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -142,7 +142,7 @@ class Animator (graph: Dgraph) extends Transform with Error
         val npts    = if (pts != null) pts.length else 0
         var token: graph.Token = null
 
-        if (primary) {                                      // create a free (can go awywhere) token
+        if (primary) {                                      // create a free (can go anywhere) token
             if (npts == 2) {
                 token = new graph.Token (shape, label, true, color, pts(0), pts(1), default, default)
                 graph.addFreeToken (token)                  // add free token to the graph
@@ -590,7 +590,7 @@ object EidCounter
 {
     private var count = 1000000    // nodes (places, transitions), edges <= 1000,
                                    // tokens/fluids > 1000
-                                   // internall created tokens/fluids > 1000000
+                                   // internally created tokens/fluids > 1000000
 
     def next (): Int = { count += 1; count }
 

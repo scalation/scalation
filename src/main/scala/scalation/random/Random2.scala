@@ -55,7 +55,7 @@ case class Random2 (stream: Int = 0)
      */
     def gen: Double =
     {
-        // Caluclate MRG1 (first component)
+        // Calculate MRG1 (first component)
 
         var y1 = ((x12 & MASK12) << 22) + (x12 >>> 9) + ((x13 & MASK13) << 7) + (x13 >>> 24)
         if (y1 < 0 || y1 >= M1) y1 -= M1    //must also check overflow
@@ -86,7 +86,7 @@ case class Random2 (stream: Int = 0)
      */
     def igen: Int =
     {
-        // Caluclate MRG1 (first component)
+        // Calculate MRG1 (first component)
 
         var y1 = ((x12 & MASK12) << 22) + (x12 >>> 9) + ((x13 & MASK13) << 7) + (x13 >>> 24)
         if (y1 < 0 || y1 >= M1) y1 -= M1    //must also check overflow

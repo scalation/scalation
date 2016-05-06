@@ -9,6 +9,7 @@
 package scalation.linalgebra
 
 import scala.collection.Traversable
+import scala.collection.mutable.IndexedSeq
 import scala.util.Sorting.quickSort
 
 import scalation.math.StrO.{abs => ABS, max => MAX, _}
@@ -41,7 +42,7 @@ trait VectoS
     /** Format String used for printing vector values (change using setFormat)
      *  Ex: "%d,\t", "%.6g,\t" or "%12.6g,\t"
      */
-    protected var fString = "%g,\t"
+    protected var fString = "%s,\t"
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the size (number of elements) of 'this' vector.
@@ -120,7 +121,7 @@ trait VectoS
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's entire sequence/array.
      */
-    def apply (): Seq [StrNum]
+    def apply (): IndexedSeq [StrNum]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' vector's element at the 'i'-th index position. 
@@ -178,7 +179,7 @@ trait VectoS
      *  the index positions.
      *  @param p  the predicate (Boolean function) to apply
      */
-    def filterPos (p: StrNum => Boolean): Seq [Int]
+    def filterPos (p: StrNum => Boolean): IndexedSeq [Int]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Map the elements of 'this' vector by applying the mapping function 'f'.

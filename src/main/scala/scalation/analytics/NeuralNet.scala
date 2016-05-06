@@ -180,7 +180,7 @@ object NeuralNetTest extends App
                                   0.0, 0.5, 0.5)
     val v  = new MatrixD ((2, 3), 0.0, 0.5, 0.5,   // weight matrix v (hidden to output layer)
                                   0.0, 0.0, 0.0)
-    ann.setWeights (w, v)                          // set intial weights and biases
+    ann.setWeights (w, v)                          // set initial weights and biases
 
     val zi = VectorD (1.0, 1.0, 1.0)               // predict output zo from input zi
     println ("input vector:  zi = " + zi)
@@ -204,7 +204,7 @@ object NeuralNetTest2 extends App
                                   0.0, 0.8, 0.6)
     val v  = new MatrixD ((1, 3), 0,0, 0.3, 0.9)     // weight matrix v (hidden to output layer)
 
-    ann.setWeights (w, v)                            // set intial weights
+    ann.setWeights (w, v)                            // set initial weights
 
     println ("input vector:  x(0) = " + x(0))
     println ("=== target output vector: y(0) = " + y(0))

@@ -82,7 +82,7 @@ class MarkovClustering (t: MatrixD, k: Int = 2, r: Double = 2.0)
         var done = true
         for (j <- 0 until t.dim2) {
             var sum   = 0.0                       // column sum
-            var sumSq = 0.0                       // column sum of sqaures
+            var sumSq = 0.0                       // column sum of squares
             var n     = 0.0                       // number of non-zero entries in column
 
             for (i <- 0 until t.dim1) {

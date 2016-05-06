@@ -95,7 +95,7 @@ case class PoissonProcess (lambda: Double, stream: Int = 0)
     if (lambda <= 0.0) flaw ("constructor", "parameter lambda must be positive")
 
     private val e_rv  = Exponential (1.0 / lambda, stream)    // exponential rv generator
-    private val _1_30 = 1.0 / 30.0                            // one thirtith
+    private val _1_30 = 1.0 / 30.0                            // one thirtieth
     private val _1_6  = 1.0 / 6.0                             // one sixth
     private var t     = 0.0                                   // current time
     
@@ -161,7 +161,7 @@ case class PoissonProcess (lambda: Double, stream: Int = 0)
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class generates arrival times according to a `NHPoissonProces`, an
+/** This class generates arrival times according to a `NHPoissonProcess`, an
  *  Non-Homogeneous Process Process (NHPP), where the arrival rate function
  *  'lambda(t)' is piece-wise constant.  Rates are constant over basic time
  *  intervals of length 'dt'.

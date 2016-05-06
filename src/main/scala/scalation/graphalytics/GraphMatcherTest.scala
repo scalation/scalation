@@ -64,7 +64,7 @@ object TestGraphContainer
                                Array (0, 3, 4, 2))
 
     //------------------------------------------------------------------------
-    // Specified correct reults for Simple Graph Simulation, Dual Graph Simulation
+    // Specified correct results for Simple Graph Simulation, Dual Graph Simulation
     // and Subgraph Isomorphism
     //------------------------------------------------------------------------
 

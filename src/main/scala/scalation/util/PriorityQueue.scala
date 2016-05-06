@@ -409,7 +409,7 @@ object PriorityQueueTest extends App
 
   val pq = PriorityQueue (E(0, 5.5), E(1, 2.2), E(2, 4.4), E(3, 3.3), E(4, 1.1))(EOrder)
 
-  pq.increaseKey (E(1, 2.2), E(1, 4.0))      // increase the prioiry of 1
+  pq.increaseKey (E(1, 2.2), E(1, 4.0))      // increase the priority of 1
 
   while (pq.nonEmpty) println (pq.dequeue ())
 

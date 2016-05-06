@@ -65,7 +65,7 @@ class Regression_WLS (x: MatrixD, y: VectorD, private var w: VectoD = null, tech
         val ols_r = new Regression (x, r, technique)           // run OLS on rad
         ols_r.train ()
         val rp = ols_r.predict (x)                             // predicted rad
-        w      = rp.recip                                      // set weight vector for WLS to reciporcal of rp
+        w      = rp.recip                                      // set weight vector for WLS to reciprocal of rp
 
         if (DEBUG) {
             println ("b_OLS      = " + ols_y.fit)             // Ordinary Least Squares (OLS)

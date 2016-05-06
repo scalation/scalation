@@ -124,7 +124,7 @@ object Coroutine extends Error
 {
     private val DEBUG                 = false   // debug flag
     private val CORE_THREADS          = 0       // number of core threads
-    private val SHUTDOWN_TIMEOUT      = 60      // shutdown timout, in seconds
+    private val SHUTDOWN_TIMEOUT      = 60      // shutdown timeout, in seconds
     private var pool: ExecutorService = null    // thread pool
 
     private var nCreated = 0                    // number of Coroutines created

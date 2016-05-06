@@ -224,7 +224,7 @@ object VectorD_T extends Tester // with App
     test ("set",            { x set s; x },
                             new VectorD (x.dim, Array.fill (x.dim)(s)))
     test ("set",            { x set y(); x },
-                            new VectorD (x.dim, y()))
+                            new VectorD (x.dim, y().toArray))
     test ("sumNE",          x sumNE 1,
                             x().sum - x(1))
     test ("slice",          x.slice (j, k),

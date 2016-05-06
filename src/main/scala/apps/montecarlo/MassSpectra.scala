@@ -4,8 +4,6 @@
  *  @version 1.2
  *  @date    Sun Sep  2 20:50:53 EDT 2012
  *  @see     LICENSE (MIT style license file).
- *  @compile scalac -cp ../../classes -d classes MassSpectra.scala
- *  @run     scala -cp ../../classes:classes montecarlo.MassSpectraTest
  */
 
 package apps.montecarlo
@@ -16,13 +14,13 @@ import scalation.random.{Binomial, Trinomial}
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object maintains information about the isotopes of elements commonly
- *  found in organic molecules such as glycans.
+/** The `Isotopes` object maintains information about the isotopes of elements
+ *  commonly found in organic molecules such as glycans.
  */
 object Isotopes
 {
     /** Maps elements to an array of abundant (>1E-4) stable isotopes
-     *  @see http://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl
+     *  @see physics.nist.gov/cgi-bin/Compositions/stand_alone.pl
      *  Each row is a tuple (baryon count, AMUs in daltons, relative abundance)
      */
     val elementMap = Map ("H" -> Array (( 1,  1.00782503207, .999885),
@@ -46,8 +44,8 @@ object Isotopes
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class calculates the masses and corresponding probabilities for organic
- *  molecules, providing a Monte Carlo simulation of their mass spectra. 
+/** The `MassSpectra` class calculates the masses and corresponding probabilities
+ *  for organic molecules, providing a Monte Carlo simulation of their mass spectra. 
  *  @param thres  the lowest detectable relative abundance (probability) level 
  *  @param noise  the noise level of the mass spectrometer
  */
@@ -85,9 +83,9 @@ class MassSpectra (thres: Double = 1E-6, noise: Double = 1E-5)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get all the masses for n atoms of element e, so long as its relative abundance
-     *  (probability) is above threshold thres.  Return a set (mass, prob) tuples.
-     *  @param e  the given element (e.g, "O" for Oxygen)
-     *  @param n  the number of such atoms in the molecule (e.g., 2 in CO2)
+     *  (probability) is above threshold 'thres'.  Return a set '(mass, prob)' tuples.
+     *  @param e  the given element (e.g., "O" for Oxygen)
+     *  @param n  the number of such atoms in the molecule (e.g., 2 in 'CO2')
      */
     def getElementMasses (e: String, n: Int): Set [Tuple2 [Double, Double]] =
     {
@@ -130,7 +128,8 @@ class MassSpectra (thres: Double = 1E-6, noise: Double = 1E-5)
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the MassSpectra class.
+/** The `MassSpectraTest` object is used to test the `MassSpectra` class.
+ *  > run-main apps.montecarlo.MassSpectraTest
  */
 object MassSpectraTest extends App
 {
@@ -140,15 +139,13 @@ object MassSpectraTest extends App
     //val comp = Set (("O", 2))                          // Oxygen
     println ("spectra = " + ms.simulate (comp))
 
-/*------------------------------------------------------------------------------
-spectra = Set((43.98982923912, 0.9844978437175699),
-              (44.99318407692, 0.010648061182430042),
-              (44.99404631956, 7.5004096076E-4))
-              (45.99407561956, 0.0040462736041000855),
-              (45.99740115736, 8.112239240000031E-6),
-              (46.99743045736, 4.37633959000011E-5),
-              (47.998322,      4.157533250000175E-6),
-------------------------------------------------------------------------------*/
+//spectra = Set((43.98982923912, 0.9844978437175699),
+//              (44.99318407692, 0.010648061182430042),
+//              (44.99404631956, 7.5004096076E-4))
+//              (45.99407561956, 0.0040462736041000855),
+//              (45.99740115736, 8.112239240000031E-6),
+//              (46.99743045736, 4.37633959000011E-5),
+//              (47.998322,      4.157533250000175E-6),
 
 } // MassSpectraTest object
 

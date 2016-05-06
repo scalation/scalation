@@ -58,7 +58,7 @@ abstract class SimActor (label: String, director: Model)
     } // trajectory_=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare the activation times of the two actors, 'this' and 'actror2'.
+    /** Compare the activation times of the two actors, 'this' and 'actor2'.
      *  Their activation times are used to order them in the director's agenda
      *  (a time-based priority queue).
      *  @param actor2  the other actor to compare with this

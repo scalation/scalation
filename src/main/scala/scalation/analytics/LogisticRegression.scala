@@ -116,7 +116,7 @@ class LogisticRegression (x: MatrixD, y: VectorI, fn: Array [String], cn: Array 
          val bfgs = new QuasiNewton (ll_null)   // minimizer for -2LL
 
          val b_n = bfgs.solve (b0)              // find optimal solution for parameters
-         n_dev   = ll_null (b_n)                // measure of fitness for null nodel
+         n_dev   = ll_null (b_n)                // measure of fitness for null model
     } // train_null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

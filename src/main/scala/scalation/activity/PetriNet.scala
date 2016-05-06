@@ -453,7 +453,7 @@ class PetriNet (colors: Array [Color], placeI: Array [PlaceI], placeD: Array [Pl
     def this (colors: Array [Color], placeI: Array [PlaceI], transition: Array [Transition])
     {
         this (colors, placeI, Array [PlaceD] (), transition)
-    } // contructor
+    } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a continuous Petri net (fluids, but no tokens).
@@ -464,7 +464,7 @@ class PetriNet (colors: Array [Color], placeI: Array [PlaceI], placeD: Array [Pl
     def this (colors: Array [Color], placeD: Array [PlaceD], transition: Array [Transition])
     {
         this (colors, Array [PlaceI] (), placeD, transition)
-    } // contructor
+    } // constructor
 
     /** The current time
      */

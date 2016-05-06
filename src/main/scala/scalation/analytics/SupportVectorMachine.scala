@@ -35,7 +35,7 @@ class SupportVectorMachine (x: MatrixD, y: VectorI, fn: Array [String] = Array (
     private val EPSILON = 1E-3               // a number close to zero
     private val TOL     = 1E-3               // tolerance level
     private val C       = 0.05               // crossing penalty
-    private val alp     = new VectorD (m)    // alpha (Langrange multipliers)
+    private val alp     = new VectorD (m)    // alpha (Lagrange multipliers)
     private val fCache  = new VectorD (m)    // errors for all non-bound examples
     private val w       = new VectorD (n)    // weights
     
@@ -51,10 +51,10 @@ class SupportVectorMachine (x: MatrixD, y: VectorI, fn: Array [String] = Array (
     private var i_Low   = -1                 // index for b_Low
     private var i_Up    = -1                 // index for b_Up
     
-    private var al1     = 0.0                // old Langrange multiplier 1
-    private var a1      = 0.0                // new Langrange multiplier 1
-    private var al2     = 0.0                // old Langrange multiplier 2
-    private var a2      = 0.0                // new Langrange multiplier 2
+    private var al1     = 0.0                // old Lagrange multiplier 1
+    private var a1      = 0.0                // new Lagrange multiplier 1
+    private var al2     = 0.0                // old Lagrange multiplier 2
+    private var a2      = 0.0                // new Lagrange multiplier 2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train uses SMO (Sequential Minimum Optimization) algorithm to solves the 

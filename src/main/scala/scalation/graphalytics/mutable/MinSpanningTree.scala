@@ -155,7 +155,7 @@ object MinSpanningTreeTest2 extends App
                                SET (),                      // ch(4)
                                SET ()),                     // ch(5)
                                Array.fill (6)(-1),          // vertex labels
-                        Map ((0, 1) -> 1.0,                 // edge lables
+                        Map ((0, 1) -> 1.0,                 // edge labels
                              (0, 3) -> 10.0,
                              (0, 4) -> 3.0,
                              (1, 2) -> 2.0,
@@ -191,7 +191,7 @@ object MinSpanningTreeTest3 extends App
                                SET (),                      // ch(4)
                                SET ()),                     // ch(5)
                                Array.fill (6)(-1),          // vertex labels
-                        Map ((0, 1) -> 1.0,                 // edge lables
+                        Map ((0, 1) -> 1.0,                 // edge labels
                              (0, 3) -> 10.0,
                              (0, 4) -> 3.0,
                              (1, 2) -> 2.0,

@@ -298,7 +298,7 @@ object RegressionTest3 extends App
     time { rg.train () }
 
     println ("fit      = " + rg.fit)        // fit model y = b_0 + b_1*x_1 + b_2*x_2 + b_3*x_3 + b_4*x_4
-    println ("vif      = " + rg.vif)        // test multi-colinearity (VIF)
+    println ("vif      = " + rg.vif)        // test multi-collinearity (VIF)
 
 } // RegressionTest3 object
 

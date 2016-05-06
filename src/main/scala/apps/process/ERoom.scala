@@ -28,10 +28,10 @@ object ERoom extends App
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `ERModel` class defines a simple process-interaction model of an Emergenct Room (ER)
+/** The `ERModel` class defines a simple process-interaction model of an Emergency Room 'ER'
  *  model where service is provided by one or more nurses and one or more doctors.
  *  A patient will first see a nurse and then a doctor.
- *  @param name        the name of the ER model
+ *  @param name        the name of the 'ER' model
  *  @param nArrivals   the number of arrivals to generate (stopping condition)
  *  @param iArrivalRV  the inter-arrival time distribution
  *  @param nurses      the number of nurses (service units)

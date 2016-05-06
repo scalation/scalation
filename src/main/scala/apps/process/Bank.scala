@@ -16,6 +16,7 @@ import scalation.random.{Exponential, Uniform, Variate}
 /** The `Bank` object defines a particular scenario under which to execute the
  *  bank model.
  *  @see scalation.process.ModelTest for another example of test code.
+ * > run-main apps.process.Bank
  */
 object Bank extends App with Modelable
 {

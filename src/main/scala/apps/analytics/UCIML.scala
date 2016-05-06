@@ -80,7 +80,8 @@ class UCIMLMeta (val url: String)
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `UCIML` object extracts meta-data from Web pages at the University of
  *  California, Irvine (UCI) Machine Learning Repository.
- *  @see http://archive.ics.uci.edu/ml/
+ *  @see archive.ics.uci.edu/ml/
+ *  > run-main apps.analytics.UCIML
  */
 object UCIML extends App {
  

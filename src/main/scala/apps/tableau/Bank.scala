@@ -13,10 +13,11 @@ import scalation.random.Exponential
 import scalation.tableau.Model
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Bank` object defines a simple tableau model of a Bank where service is
+/** The `Bank` object defines a simple tableau model of a bank where service is
  *  provided by one teller and models an M/M/1 queue.  In this case, the default
- *  'simulate' method in 'scalation.tableau.Model is sufficient and need not be
+ *  'simulate' method in `scalation.tableau.Model` is sufficient and need not be
  *  overridden.
+ *  run-main apps.tableau.Bank
  */
 object Bank extends App with Modelable
 {
@@ -30,7 +31,7 @@ object Bank extends App with Modelable
                             "End-5", "Wait-6", "Total-7")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Run the simulation of the `Model` "Bank".
+    /** Run the simulation of the model `Bank`.
      *  @param startTime  the start time for the simulation
      */
     def simulate (startTime: Double)

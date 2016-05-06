@@ -12,11 +12,12 @@ import scalation.state.MarkovC
 import scalation.linalgebra.MatrixD
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object finds the steady-state solution and simulates a simple Markovian
- *  Queue (an M/M/1/2) where the arrival rate is 4 and the service rate is 5.
+/** The `MarkovQueue` object finds the steady-state solution and simulates a simple
+ *  Markovian Queue (an M/M/1/2) where the arrival rate is 4 and the service rate is 5.
  *  Note, each diagonal value must make their row sum to 0.
  *  @see scalation.state.MarkovTest, scalation.state.MarkovCTest for example
  *  test code for discrete-time and continuous-time Markov chains, respectively.
+ *  > run-main apps.state.MarkovQueue
  */
 object MarkovQueue extends App
 {

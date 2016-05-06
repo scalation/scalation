@@ -781,7 +781,7 @@ case class Normal (mu: Double = 0.0, sigma2: Double = 1.0, stream: Int = 0)
 case class Pareto (a: Double = 1.0, b: Double = 0.0, stream: Int = 0)
      extends Variate (stream)
 {
-    if (a <= 0.0 || b < 0.0) flaw ("constructor", "parameters must be positive, nonegtative")
+    if (a <= 0.0 || b < 0.0) flaw ("constructor", "parameters must be positive, nonegative")
 
     val mean = if (a > 1.0) a * b / (a-1.0) else Double.PositiveInfinity
 

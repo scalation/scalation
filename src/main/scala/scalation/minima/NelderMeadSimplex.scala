@@ -39,7 +39,7 @@ class NelderMeadSimplex (f: FunctionV2S, n: Int)
     private val simplex = Array.ofDim [Vertex] (np1)  // simplex used for search
 
     private val alpha = 1.0                           // alpha (> 0)  parameter for reflection
-    private val beta  = 0.5                           // beta  (0, 1) parameter for constraction
+    private val beta  = 0.5                           // beta  (0, 1) parameter for contraction
     private val gamma = 2.0                           // gamma (> 1)  parameter for expansion
     private val delta = 0.5                           // delta (0, 1) parameter for shrinkage
 

@@ -134,7 +134,7 @@ object ANCOVATest extends App
                                  1.0, 47.0,  64.0,
                                  1.0, 32.0,  53.0,
                                  1.0,  1.0, 101.0)
-    val t = VectorI (1, 1, 2, 2, 3)                              // treatements levels
+    val t = VectorI (1, 1, 2, 2, 3)                              // treatments levels
     val y = VectorD (745.0, 895.0, 442.0, 440.0, 1598.0)         // response vector
     val z = VectorD (1.0, 20.0, 80.0, 1.0)
 

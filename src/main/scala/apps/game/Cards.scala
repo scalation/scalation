@@ -54,8 +54,9 @@ class Cards
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Cards` object is used to test the `Cards` class.
+ *  > run-main apps.game.CardsTest
  */
-object Cards extends App
+object CardsTest extends App
 {
     val deck = new Cards ()
     println ("\nOrdered deck of cards:")
@@ -66,5 +67,5 @@ object Cards extends App
     val hand = for (i <- 1 to 5) yield deck.value (deck.draw ())
     println ("\n5 card hand = " + hand)
 
-} // Cards object
+} // CardsTest object
 

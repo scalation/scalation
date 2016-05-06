@@ -32,7 +32,7 @@ object Cycle
 
         for (v <- color.indices if color(v) == G_N && loopback (v)) return true 
 
-        /*  Search the decendents of vertex 'u' to see if there is a loopback.
+        /*  Search the descendants of vertex 'u' to see if there is a loopback.
          *  @param u  the vertex where the search starts
          */
         def loopback (u: Int): Boolean =

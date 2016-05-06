@@ -19,7 +19,7 @@ import scalation.stat.vectorD2StatVector
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class is used to solve Portfilio Optimization Problems.
+/** The `PortfolioOpt` class is used to solve Portfolio Optimization Problems.
  *  @param r      the return matrix as in revenue/profit
  *  @param label  the label vector
  */
@@ -81,8 +81,9 @@ class PortfolioOpt (r: MatrixD, label: Array [String])
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the PortfolioOpt class.
- *  @see http://www.math.uni-magdeburg.de/~girlich/preprints/preprint0906.pdf
+/** The `PortfolioOptTest` object is used to test the `PortfolioOpt` class.
+ *  @see www.math.uni-magdeburg.de/~girlich/preprints/preprint0906.pdf
+ *  > run-main apps.optimization.PortfolioOptTest
  */
 object PortfolioOptTest extends App
 {

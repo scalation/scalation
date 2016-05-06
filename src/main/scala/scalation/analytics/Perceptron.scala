@@ -111,7 +111,7 @@ object PerceptronTest extends App
     val ann = new Perceptron (x, y)            // create a Perceptron
 
     val w  = VectorD (0.0, 0.5, 0.5)           // weight vector w (input to output layer)
-    ann.setWeights (w)                         // set intial weights
+    ann.setWeights (w)                         // set initial weights
 
     val z_i = VectorD (1.0, 1.0, 1.0)          // predict output z_o from input z_i
     println ("input vector:  z_i = " + z_i)
@@ -132,7 +132,7 @@ object PerceptronTest2 extends App
     val ann = new Perceptron (x, y)                  // create a Perceptron
 
     val w  = VectorD (0.0, 0.5, 0.5)                 // weight vector w (input to output layer)
-    ann.setWeights (w)                               // set intial weights
+    ann.setWeights (w)                               // set initial weights
 
     println ("input vector:  x(0) = " + x(0))
     println ("=== target output value: y(0) = " + y(0))

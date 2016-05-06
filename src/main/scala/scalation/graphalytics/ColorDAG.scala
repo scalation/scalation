@@ -67,7 +67,7 @@ class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
         val outColors = Array.ofDim [TreeNode] (outDegree)     // array to hold the node's output colors
         val in        = ListBuffer [DagNode] ()                // list to hold all the nodes providing inputs to this node
         val out       = ListBuffer [DagNode] ()                // list to hold all the nodes this node provides outputs for
-        var used      = false                                  // flag to mark that a node is definitlely included in DAG
+        var used      = false                                  // flag to mark that a node is definitely included in DAG
         var unused    = false                                  // flag to mark that a node is ruled out of inclusion in DAG
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -338,11 +338,11 @@ object ColorDAGTest extends App
     dag.genNodes ()                                    // generate the nodes in the color DAG
     dag.checkIO ()                                     // throw out nodes that are color/type incompatible
     dag.connect ()                                     // connect the remaining node via edges
-    dag.popInOut ()                                    // populated the input/ouput lists from edges
+    dag.popInOut ()                                    // populated the input/output lists from edges
 
     dag.printDAG ()                                    // print the nodes and edges
     dag.printColors ()                                 // print inputs and output colors for each node
-//  dag.printInOut ()                                  // print the input and ouput lists for each node
+//  dag.printInOut ()                                  // print the input and output lists for each node
     dag.animateDAG ()                                  // animate the color DAG
 
 } // ColorDAGTest

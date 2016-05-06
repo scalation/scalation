@@ -16,8 +16,9 @@ import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.plot.Plot
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to simulate a simple chemical pathway for making H2O.
- *  @see the KINSOLVER Paper: http:// www.cs.uga.edu/~thiab/paper25.pdf
+/** The `Pathway` object is used to simulate a simple chemical pathway for making H2O.
+ *  @see the KINSOLVER Paper: www.cs.uga.edu/~thiab/paper25.pdf
+ *  > run-main apps.dynamics.Pathway
  */
 object Pathway extends App
 {

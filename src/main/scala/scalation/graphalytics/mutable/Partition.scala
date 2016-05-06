@@ -55,7 +55,7 @@ class Partition (g: Graph)
     def group_ran (k: Int)
     {
         for (i <- ilabel.indices) ilabel(i) = rng.igen % k
-        if (DEBUG) println (s"group_ran: after grouping nDistnct = ${ilabel.distinct}")
+        if (DEBUG) println (s"group_ran: after grouping nDistinct = ${ilabel.distinct}")
     } // group_ran
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -67,7 +67,7 @@ class Partition (g: Graph)
     {
         val gsize = ceil (ilabel.dim / k.toDouble).toInt
         for (i <- ilabel.indices) ilabel(i) = i / gsize
-        if (DEBUG) println (s"group_ord: after grouping nDistnct = ${ilabel.distinct}")
+        if (DEBUG) println (s"group_ord: after grouping nDistinct = ${ilabel.distinct}")
     } // group_ord
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -76,16 +76,16 @@ class Partition (g: Graph)
      */
     def group_lp (k: Int)
     {
-        var nDistnct = 0
+        var nDistinct = 0
         for (it <- 1 to MAX_ITER) {
-            for (i <- ilabel.indices) getPopularLabel (i)         // re-determine the popoular labels
+            for (i <- ilabel.indices) getPopularLabel (i)         // re-determine the popular labels
             if (DEBUG) println (s"group_lp: ilabel2 = $ilabel2")
             for (i <- ilabel.indices) {
                 reassign (i)                                      // reassign vertex labels
-                nDistnct = ilabel.countinct
+                nDistinct = ilabel.countinct
                 if (ilabel.countinct <= k) return                 // quit when only k parts
             } // for
-            if (DEBUG) println (s"group_lp: after iteration $it nDistnct = $nDistnct")
+            if (DEBUG) println (s"group_lp: after iteration $it nDistinct = $nDistinct")
         } // for
     } // group
 
@@ -243,7 +243,7 @@ object PartitionTest2 extends App
  */
 object PartitionTest3 extends App
 {
-    println ("TEST label propogation for partitioning")
+    println ("TEST label propagation for partitioning")
     val g  = Graph.g2p
     val dp = new Partition (g)
     dp.group_lp (4)

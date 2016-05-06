@@ -134,9 +134,9 @@ object PrincipalComponentsTest extends App
                                   1.1, 0.9)
 
     val pca = new PrincipalComponents (x)           // perform Principal Component Analysis (PCA)
-    println ("pc         = " + pca.findPCs (1))     // find 1 Principal Components
-    println ("reduced  x = " + pca.reduce)          // the reduce data (lower dimensionality)
-    println ("recoverd x = " + pca.recover)         // the approximately recovered data
+    println ("pc          = " + pca.findPCs (1))     // find 1 Principal Components
+    println ("reduced   x = " + pca.reduce)          // the reduce data (lower dimensionality)
+    println ("recovered x = " + pca.recover)         // the approximately recovered data
 
 } // PrincipalComponentsTest
 

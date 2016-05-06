@@ -34,7 +34,7 @@ class KNN_Classifier (x: MatrixD, y: VectorI, fn: Array [String], k: Int, cn: Ar
                       knn: Int = 3)
       extends ClassifierReal (x, y, fn, k, cn)
 {
-    private val DEBUG      = true                                        // degug flag
+    private val DEBUG      = true                                        // debug flag
     private val MAX_DOUBLE = Double.PositiveInfinity                     // infinity
     private val topK       = Array.ofDim [Tuple2 [Int, Double]] (knn)    // top-knn nearest points (in reserve order)
     private val count      = new VectorI (k)                             // how many nearest neighbors in each class.
@@ -72,8 +72,8 @@ class KNN_Classifier (x: MatrixD, y: VectorI, fn: Array [String], k: Int, cn: Ar
      */
     def train (testStart: Int, testEnd: Int)    // FIX - use these parameters
     {
-        for (i <- 0 until knn) topK(i)  = (-1, MAX_DOUBLE)   // intialize top-knn
-        for (j <- 0 until k) count(j) = 0                    // initilize counters
+        for (i <- 0 until knn) topK(i)  = (-1, MAX_DOUBLE)   // initialize top-knn
+        for (j <- 0 until k) count(j) = 0                    // initialize counters
     } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

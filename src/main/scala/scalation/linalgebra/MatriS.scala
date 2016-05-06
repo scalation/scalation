@@ -175,7 +175,7 @@ trait MatriS
     def set (i: Int, u: VectoS, j: Int = 0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert this matrix to a dense matrix.
+    /** Convert 'this' matrix to a dense matrix.
      */
     def toDense: MatriS
 
@@ -523,7 +523,7 @@ trait MatriS
      *  @param lu  the lower and upper triangular matrices
      *  @param b   the constant vector
      */
-    def solve (lu: Tuple2 [MatriS, MatriS], b: VectoS): VectoS = solve (lu._1, lu._2, b)
+    def solve (lu: Tuple2 [MatriS, MatriS], b: VectoS): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' matrix.

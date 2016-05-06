@@ -175,7 +175,7 @@ trait MatriC
     def set (i: Int, u: VectoC, j: Int = 0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert this matrix to a dense matrix.
+    /** Convert 'this' matrix to a dense matrix.
      */
     def toDense: MatriC
 

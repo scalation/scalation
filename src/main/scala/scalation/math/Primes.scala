@@ -193,7 +193,7 @@ object Primes
             }} // for
 	} // for
 
-	for (n <- 2 to 3) sieve(n) = true             // initialize the frist two primes
+	for (n <- 2 to 3) sieve(n) = true             // initialize the first two primes
 	for (n <- lb to ub if sieve(n)) primes += n   // create the prime number array
 	primes                                        // return the array of primes
     } // genPrimesSoA

@@ -119,7 +119,7 @@ class ParabolicPDE (k: Double, dt: Double, dx: Double, xm: Double,
     {
         val mat = new MatrixD (mx, mx)
         for (i <- 0 until mx) {
-            if (i > 0) mat(i, i-1) = -r                       // sub-digonal
+            if (i > 0) mat(i, i-1) = -r                       // sub-diagonal
             mat(i, i) = 2.0*(1.0+r)                           // diagonal
             if (i < mx-1) mat(i, i+1) = -r                    // super-diagonal
         } // for

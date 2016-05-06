@@ -1,231 +1,260 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  John Miller
+/** @author  John Miller, Vishnu Gowda Harish
  *  @version 1.2
- *  @date    Sun Sep 16 14:09:25 EDT 2012
+ *  @date    Fri Jan 29 15:43:08 EST 2016
  *  @see     LICENSE (MIT style license file).
  */
 
 package scalation.linalgebra
 
 import scala.collection.{breakOut, Traversable}
-import scala.collection.mutable.{IndexedSeq, WrappedArray}
+import scala.collection.mutable.{ArrayBuffer, IndexedSeq}
 import scala.util.Sorting.quickSort
 
-import scalation.math.Rational.{abs => ABS, max => MAX, _}
+import scalation.math.Complex.{abs => ABS, max => MAX, _}
 
-import scalation.math.Rational
-import scalation.util.Error
-import scalation.util.SortingQ
-import scalation.util.SortingQ.{iqsort, qsort2}
+import scalation.math.Complex
+import scalation.util.{Error, SortedLinkedHashMap}
+import scalation.util.SortingC
+import scalation.util.SortingC.{iqsort, qsort2}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `VectorQ` class stores and operates on Numeric Vectors of base type `Rational`.
+/** The `SparseVectorC` class stores and operates on Numeric Vectors of base type `Complex`.
  *  It follows the framework of `gen.VectorN [T]` and is provided for performance.
- *  @param dim  the dimension/size of the vector
- *  @param v    the 1D array used to store vector elements
+ *  @param dim_  the dimension/size of the vector
+ *  @param v     the SortedLinkedHashMap used to store vector elements
  */
-class VectorQ (val dim: Int,
-     protected var v:   Array [Rational] = null)
-      extends VectoQ
-//    extends Traversable [Rational] with PartiallyOrdered [VectorQ] with Vec with Error with Serializable
+class SparseVectorC (val dim_ : Int,
+           protected var v:     SparseVectorC.RowMap = null)
+      extends VectoC
+//    extends Traversable [Complex] with PartiallyOrdered [SparseVectorC] with Vec with Error with Serializable
 {
-    if (v == null) {
-        v = Array.ofDim [Rational] (dim)
-    } else if (dim != v.length) {
-        flaw ("constructor", "dimension is wrong")
-    } // if
-
+    /** Dimension
+     */
+    lazy val dim = dim_
+    
+    if (v == null) v = new SparseVectorC.RowMap ()
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a vector and assign values from vector 'u'.
      *  @param u  the other vector
      */
-    def this (u: VectoQ) { this (u.dim); for (i <- range) v(i) = u(i) }
+    def this (u: VectoC) { this (u.dim); for (i <- range) this(i) = u(i) } 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a vector and assign 'value' at 'index' position.
+    /** Construct a vector and assign values from vector 'u'.
      *  @param iv  the tuple containing (index, value)
      *  @param dm  the dimension for the new vector
      */
-    def this (iv: Tuple2 [Int, Rational], dm: Int) { this (dm); v(iv._1) = iv._2 }
+    def this (iv: Tuple2 [Int, Complex], dm: Int) { this (dm); this(iv._1) = iv._2 }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create an exact copy of 'this' vector.
      */
-    def copy: VectorQ = new VectorQ (this)
+    def copy: SparseVectorC = new SparseVectorC (dim, v.clone.asInstanceOf [SparseVectorC.RowMap])
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a zero vector (all elements are zero) of length 'size'.
      *  @param size  the number of elements in the vector
      */
-    def zero (size: Int = dim): VectorQ = new VectorQ (size)
+    def zero (size: Int = dim): SparseVectorC = new SparseVectorC (size)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a one vector (all elements are one) of length 'size'.
      *  @param size  the number of elements in the vector
      */
-    def one (size: Int = dim): VectorQ = new VectorQ (size, Array.fill (size)(_1))
-
+    def one (size: Int = dim): SparseVectorC = { val sv = new SparseVectorC (size); sv.set (_1); sv }
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a vector of the form (0, ... 1, ... 0) where the 1 is at position j.
      *  @param j     the position to place the 1
      *  @param size  the size of the vector (upper bound = size - 1)
      */
-    def oneAt (j: Int, size: Int = dim): VectorQ = new VectorQ ((j, _1), size)
+    def oneAt (j: Int, size: Int = dim): SparseVectorC = new SparseVectorC ((j, _1), size)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a vector of the form (0, ... -1, ... 0) where the -1 is at position j.
      *  @param j     the position to place the -1
      *  @param size  the size of the vector (upper bound = size - 1)
      */
-    def _oneAt (j: Int, size: Int = dim): VectorQ = new VectorQ ((j, -_1), size)
-
+    def _oneAt (j: Int, size: Int = dim): SparseVectorC = new SparseVectorC ((j, -_1), size) 
+      
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's element at the 'i'-th index position. 
      *  @param i  the given index
      */
-    def apply (i: Int): Rational = v(i)
-
+    def apply (i: Int): Complex = if (i >= dim) throw new IndexOutOfBoundsException else v.getOrElse (i, _0)
+                                   
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's elements within the given range (vector slicing).
      *  @param r  the given range
      */
-    def apply (r: Range): VectorQ = slice (r.start, r.end)
-
+    def apply (r: Range): SparseVectorC = slice (r.start, r.end)
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get 'this' vector's entire array.
      */
-    def apply (): WrappedArray [Rational] = v
-
+    def apply (): IndexedSeq [Complex] =
+    {
+        (for (i <- range) yield v.getOrElse (i, _0))(breakOut)
+    } // apply
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' vector's element at the 'i'-th index position. 
      *  @param i  the given index
      *  @param x  the value to assign
      */
-    def update (i: Int, x: Rational) { v(i) = x }
+    def update (i: Int, x: Complex) 
+    { 
+        if (i >= dim) throw new IndexOutOfBoundsException
+        if (x =~ _0) v.remove(i) else v(i) = x        
+    } // update
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' vector's elements over the given range (vector slicing).
      *  @param r  the given range
      *  @param x  the value to assign
      */
-    def update (r: Range, x: Rational) { for (i <- r) v(i) = x }
+    def update (r: Range, x: Complex)  { for (i <- r) this(i) = x } 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' vector's elements over the given range (vector slicing).
      *  @param r  the given range
      *  @param u  the vector to assign
      */
-    def update (r: Range, u: VectoQ) { for (i <- r) v(i) = u(i - r.start) }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set each value in 'this' vector to 'x'.
-     *  @param x  the value to be assigned
-     */
-    def set (x: Rational) { for (i <- range) v(i) = x }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the values in 'this' vector to the values in sequence/array 'u'.
-     *  @param u  the sequence/array of values to be assigned
-     */
-    def set (u: Seq [Rational]) { for (i <- range) v(i) = u(i) }
-
+    def update (r: Range, u: VectoC) { for (i <- r) this(i) = u(i - r.start) }
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Iterate over 'this' vector element by element.
      *  @param f  the function to apply
      */
-    def foreach [U] (f: Rational => U) { var i = 0; while (i < dim) { f (v(i)); i += 1 } }
-
+    def foreach [U] (f: Complex => U) { var i = 0; while (i < dim) { f (this(i)); i += 1 } } 
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `VectorQ` into a `VectorI`.
+    /** Set each value in 'this' vector to 'x'.
+     *  @param x  the value to be assigned
      */
-    def toInt: VectorI = VectorI (v.map (_.toInt))
+    def set (x: Complex) { for (i <- range) this(i) = x }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `VectorQ` into a `VectorL`.
+    /** Set the values in 'this' vector to the values in array 'u'.
+     *  @param u  the array of values to be assigned
+     */
+    def set (u: Seq [Complex]) { for (i <- range) this(i) = u(i) }
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `SparseVectorC` into a `VectorI`.
+     */
+    def toInt: VectorI = 
+    {
+        val c = new VectorI (dim)
+        for (i <- range) c(i) = this(i).toInt
+        c
+    } // toInt
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `SparseVectorC` into a `VectorL`.
       */
-    def toLong: VectorL = VectorL (v.map (_.toLong))
+    def toLong: VectorL =
+    { 
+        val c = new VectorL (dim)
+        for (i <- range) c(i) = this(i).toLong
+        c
+    } // toLong
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `VectorQ` into a `VectorD`.
+    /** Convert 'this' `SparseVectorC` into a `VectorD`.
      */
-    def toDouble: VectorD = VectorD (v.map (_.toDouble))
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `VectorQ` into a dense `VectorQ`.
-     */
-    def toDense: VectorQ = this
+    def toDouble: VectorD =
+    {    
+        val c = new VectorD (dim)
+        for (i <- range) c(i) = this(i).toDouble
+        c
+    } // toDouble
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Expand the size (dim) of 'this' vector by 'more' elements.
      *  @param more  the number of new elements to add
      */
-    def expand (more: Int = dim): VectorQ =
+    def expand (more: Int = dim): SparseVectorC =
     {
         if (more < 1) this       // no change
-        else          new VectorQ (dim + more, Array.concat (v, new Array [Rational] (more)))
+        else {
+            val sv = new SparseVectorC (dim + more)
+            sv.v ++= v
+            sv
+        } // if
     } // expand
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return 'this' vector's entire array of stored (i.e., non-zero) elements.
+     */
+    private def nonZero: Array [Complex] = v.values.toArray
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return 'this' vector's positive elements as an array.
+     */
+    private def positive: Array [Complex] = v.values.filter (_ > _0).toArray
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return 'this' vector's negatives elements as an array.
+     */
+    private def negative: Array [Complex] = v.values.filter (_ < _0).toArray
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  a new vector.
      *  @param p  the predicate (Boolean function) to apply
      */
-    override def filter (p: Rational => Boolean): VectorQ = VectorQ (v.filter (p))
-
+    override def filter (p: Complex => Boolean): SparseVectorC =
+    { 
+        SparseVectorC (for (i <- range if p (this(i)) ) yield v(i))
+    } // filter
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  the index positions.
      *  @param p  the predicate (Boolean function) to apply
      */
-    def filterPos (p: Rational => Boolean): IndexedSeq [Int] =
+    def filterPos (p: Complex => Boolean): IndexedSeq [Int] =
     {
-        (for (i <- range if p (v(i))) yield i)(breakOut)
+        (for (i <- range if p (this(i))) yield i)(breakOut)
     } // filterPos
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Map the elements of 'this' vector by applying the mapping function 'f'.
      *  @param f  the function to apply
      */
-    def map (f: Rational => Rational): VectorQ = VectorQ (v.map (f))
+    def map (f: Complex => Complex): SparseVectorC = SparseVectorC (this ().map (f))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice 'this' vector 'from' to 'end'.
      *  @param from  the start of the slice (included)
      *  @param till  the end of the slice (excluded)
      */
-    override def slice (from: Int, till: Int = dim): VectorQ = new VectorQ (till - from, v.slice (from, till))
-
+    override def slice (from: Int, till: Int): SparseVectorC =
+    {
+        null    // FIX: new SparseVectorC (till - from, v.slice (from, till))
+    } // slice
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select a subset of elements of 'this' vector corresponding to a 'basis'.
      *  @param basis  the set of index positions (e.g., 0, 2, 5)
      */
-    def select (basis: Array [Int]): VectorQ =
+    def select (basis: Array [Int]): SparseVectorC =
     {
-        val c = new VectorQ (basis.length)
-        for (i <- c.range) c.v(i) = v(basis(i))
-        c
+        SparseVectorC (for (i <- 0 until basis.length) yield this(basis(i)))
     } // select
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate 'this' vector and vector' b'.
-     *  @param b  the vector to be concatenated (any kind)
+     *  @param b  the vector to be concatenated
      */
-    def ++ (b: VectoQ): VectorQ =
+    def ++ (b: VectoC): SparseVectorC =
     {
-        val c = new VectorQ (dim + b.dim)
-        for (i <- c.range) c.v(i) = if (i < dim) v(i) else b(i - dim)
-        c
-    } // ++
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate 'this' vector and vector' b'.
-     *  @param b  the vector to be concatenated (same kind, more efficient)
-     */
-    def ++ (b: VectorQ): VectorQ =
-    {
-        val c = new VectorQ (dim + b.dim)
-        for (i <- c.range) c.v(i) = if (i < dim) v(i) else b.v(i - dim)
+        val c = new SparseVectorC (dim + b.dim)
+        for (i <- c.range) c(i) = if (i < dim) this(i) else b(i - dim)
         c
     } // ++
 
@@ -233,370 +262,338 @@ class VectorQ (val dim: Int,
     /** Concatenate 'this' vector and scalar 's'.
      *  @param s  the scalar to be concatenated
      */
-    def ++ (s: Rational): VectorQ =
+    def ++ (s: Complex): SparseVectorC =
     {
-        val c = new VectorQ (dim + 1)
-        for (i <- c.range) c.v(i) = if (i < dim) v(i) else s
+        val c = new SparseVectorC (dim + 1)
+        for (i <- c.range) c(i) = if (i < dim) this(i) else s
         c
     } // ++
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' vector and vector 'b'.
-     *  @param b  the vector to add (any kind)
+     *  @param b  the vector to add
      */
-    def + (b: VectoQ): VectorQ = 
-    {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = v(i) + b(i)
-        c
-    } // +
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add 'this' vector and vector 'b'.
-     *  @param b  the vector to add (same kind, more efficient)
-     */
-    def + (b: VectorQ): VectorQ = 
-    {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = v(i) + b.v(i)
-        c
-    } // +
+    def + (b: VectoC): SparseVectorC = { SparseVectorC (for ( i <- range) yield this(i) + b(i)) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' vector and scalar 's'.
      *  @param s  the scalar to add
      */
-    def + (s: Rational): VectorQ =
+    def + (s: Complex): SparseVectorC =
     {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = v(i) + s
-        c
+        if (s =~ _0) this 
+        else SparseVectorC (for (i <- range) yield this(i) + s)       
     } // +
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' vector and scalar 's._2' only at position 's._1'.
-     *  @param s  the (position, scalar) to add
+     *  @param s  the (scalar, position) to add
      */
-    def + (s: Tuple2 [Int, Rational]): VectorQ =
+    def + (s: Tuple2 [Int, Complex]): SparseVectorC =
     {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = if (i == s._1) v(i) + s._2 else v(i)
-        c
+        if (s._1 =~ _0) this
+        else {
+            val c = new SparseVectorC (this)
+            c(s._1) += s._2
+            c
+        } // if    
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add (any kind)
+     *  @param b  the vector to add
      */
-    def += (b: VectoQ): VectorQ = { for (i <- range) v(i) += b(i); this }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add (same kind, more efficient)
-     */
-    def += (b: VectorQ): VectorQ = { for (i <- range) v(i) += b.v(i); this }
+    def += (b: VectoC): SparseVectorC = { for (i <- range) this(i) += b(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' vector and scalar 's'.
      *  @param s  the scalar to add
      */
-    def += (s: Rational): VectorQ = { for (i <- range) v(i) += s; this }
+    def += (s: Complex): SparseVectorC = { for (i <- range) this(i) += s; this } 
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the negative of 'this' vector (unary minus).
      */
-    def unary_- (): VectorQ =
+    def unary_- (): SparseVectorC =
     {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = -v(i)
+        val c = new SparseVectorC (dim)
+        for (x <- v) c(x._1) = -x._2 
         c
     } // unary_-
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract vector 'b'.
-     *  @param b  the vector to subtract (any kind)
+     *  @param b  the vector to subtract
      */
-    def - (b: VectoQ): VectorQ =
-    {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = v(i) - b(i)
-        c
-    } // -
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' vector subtract vector 'b'.
-     *  @param b  the vector to subtract (same kind, more efficient)
-     */
-    def - (b: VectorQ): VectorQ =
-    {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = v(i) - b.v(i)
-        c
-    } // -
+    def - (b: VectoC): SparseVectorC = { SparseVectorC (for ( i <- range) yield this(i) - b(i)) }
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract scalar 's'.
      *  @param s  the scalar to subtract
      */
-    def - (s: Rational): VectorQ =
+    def - (s: Complex): SparseVectorC =
     {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = v(i) - s
-        c
+        if (s =~ _0) this 
+        else SparseVectorC (for (i <- range) yield this(i) - s)       
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract scalar 's._2' only at position 's._1'.
-     *  @param s  the (position, scalar) to subtract
+     *  @param s  the (scalar, position) to subtract
      */
-    def - (s: Tuple2 [Int, Rational]): VectorQ =
+    def - (s: Tuple2 [Int, Complex]): SparseVectorC =
     {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = if (i == s._1) v(i) - s._2 else v(i)
-        c
+        if (s._1 =~ _0) this
+        else {
+            val c = new SparseVectorC (this)
+            c(s._1) -= s._2
+            c
+        } // if    
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place vector 'b'.
-     *  @param b  the vector to add (any kind)
+     *  @param b  the vector to add
      */
-    def -= (b: VectoQ): VectorQ = { for (i <- range) v(i) -= b(i); this }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' vector subtract in-place vector 'b'.
-     *  @param b  the vector to add (same kind, more efficient)
-     */
-    def -= (b: VectorQ): VectorQ = { for (i <- range) v(i) -= b.v(i); this }
+    def -= (b: VectoC): SparseVectorC = { for (i <- range) this(i) -= b(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place scalar 's'.
      *  @param s  the scalar to add
      */
-    def -= (s: Rational): VectorQ = { for (i <- range) v(i) -= s; this }
+    def -= (s: Complex): SparseVectorC = { for (i <- range) this(i) -= s; this }
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' vector by vector 'b'.
-     *  @param b  the vector to multiply by (any kind)
+     *  @param b  the vector to multiply by
      */
-    def * (b: VectoQ): VectorQ =
-    {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = v(i) * b(i)
-        c
-    } // *
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply 'this' vector by vector 'b'.
-     *  @param b  the vector to multiply by (same kind, more efficient)
-     */
-    def * (b: VectorQ): VectorQ =
-    {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = v(i) * b.v(i)
-        c
+    def * (b: VectoC): SparseVectorC = 
+    {     
+        val c = new SparseVectorC (dim)
+        for (x <- v) c(x._1) = x._2 * b(x._1) 
+        c    
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' vector by scalar 's'.
      *  @param s  the scalar to multiply by
      */
-    def * (s: Rational): VectorQ =
+    def * (s: Complex): SparseVectorC =
     {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = v(i) * s
+        val c = new SparseVectorC (dim)
+        if( s !=~ _0 ) for (x <- v) c(x._1) = x._2 * s  
         c
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add (any kind)
+     *  @param b  the vector to add
      */
-    def *= (b: VectoQ): VectorQ = { for (i <- range) v(i) *= b(i); this }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add (same kind, more efficient)
-     */
-    def *= (b: VectorQ): VectorQ = { for (i <- range) v(i) *= b.v(i); this }
+    def *= (b: VectoC): SparseVectorC = { for (x <- v) this(x._1) = x._2 * b(x._1); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and scalar 's'.
      *  @param s  the scalar to add
      */
-    def *= (s: Rational): VectorQ = { for (i <- range) v(i) *= s; this }
+    def *= (s: Complex): SparseVectorC = { for (x <- v) this(x._1) = x._2 * s; this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide 'this' vector by vector 'b' (element-by-element).
-     *  @param b  the vector to divide by (any kind)
+     *  @param b  the vector to divide by
      */
-    def / (b: VectoQ): VectorQ =
+    def / (b: VectoC): SparseVectorC =
     {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = v(i) / b(i)
-        c
+        val c = new SparseVectorC (dim)
+        for (x <- v) c(x._1) = x._2 / b(x._1) 
+        c    
     } // /
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide 'this' vector by vector 'b' (element-by-element).
-     *  @param b  the vector to divide by (same kind, more efficient)
-     */
-    def / (b: VectorQ): VectorQ =
-    {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = v(i) / b.v(i)
-        c
-    } // /
-
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide 'this' vector by scalar 's'.
      *  @param s  the scalar to divide by
      */
-    def / (s: Rational): VectorQ =
+    def / (s: Complex): SparseVectorC =
     {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = v(i) / s
+        val c = new SparseVectorC (dim)
+        for (x <- v) c(x._1) = x._2 / s  
         c
     } // /
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add (any kind)
+     *  @param b  the vector to add
      */
-    def /= (b: VectoQ): VectorQ = { for (i <- range) v(i) /= b(i); this }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add (same kind, more efficient)
-     */
-    def /= (b: VectorQ): VectorQ = { for (i <- range) v(i) /= b.v(i); this }
+    def /= (b: VectoC): SparseVectorC = { for (x <- v) this(x._1) = x._2 / b(x._1); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and scalar 's'.
      *  @param s  the scalar to add
      */
-    def /= (s: Rational): VectorQ = { for (i <- range) v(i) /= s; this }
-
+    def /= (s: Complex): SparseVectorC = { for (x <- v) this(x._1) = x._2 / s; this }
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector containing each element of 'this' vector raised to the
      *  s-th power.
      *  @param s  the scalar exponent
      */
-    def ~^ (s: Rational): VectorQ =
+    def ~^ (s: Double): SparseVectorC =
     {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = v(i) ~^ s
+        val c = new SparseVectorC (dim)
+        if (s =~ _0) c.set(_1)
+        else for (x <- v) c(x._1) = x._2 ~^ s
         c
     } // ~^
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Raise in-place each element of 'this' vector to the 's'-th power.
+    /** Raise each element of 'this' vector to the 's'-th power.
      *  @param s  the scalar exponent
      */
-    def ~^= (s: Rational): VectorQ = { for (i <- range) v(i) = v(i) ~^ s; this }
+    def ~^= (s: Double): SparseVectorC = 
+    {
+        if (s =~ _0) set (_1) else for (x <- v) this(x._1) = x._2 ~^ s
+        this
+    } // ~^= 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector containing the reciprocal of each element of 'this' vector.
      */
-    def recip: VectorQ =
+    def recip: SparseVectorC =
     {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = _1 / v(i)
+        val c = new SparseVectorC (dim)
+        for (x <- v) c(x._1) = _1 / x._2
         c
     } // recip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector that is the element-wise absolute value of 'this' vector.
      */
-    def abs: VectorQ =
+    def abs: SparseVectorC =
     {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = ABS (v(i))
-        c
+        val c = new SparseVectorC (dim)
+        for (x <- v) c(x._1) = ABS (x._2)
+        c        
     } // abs
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of 'this' vector.
-     */
-    def sum: Rational = v.foldLeft (_0)((s, x) => s + x)
+     */ 
+    def sum: Complex = 
+    {
+        var sum = _0
+        for (x <- v) sum += x._2
+        sum
+    } // sum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the absolute value of the elements of 'this' vector.
      */
-    def sumAbs: Rational = v.foldLeft (_0)((s, x) => s + ABS (x))
+    def sumAbs: Complex = 
+    {
+        var sum = _0
+        for (x <- v) sum += ABS (x._2)
+        sum
+    } // sumAbs
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of 'this' vector skipping the 'i'-th element (Not Equal 'i').
      *  @param i  the index of the element to skip
      */
-    def sumNE (i: Int): Rational = sum - v(i)
+    def sumNE (i: Int): Complex = sum - this(i)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the positive (> 0) elements of 'this' vector.
      */
-    def sumPos: Rational = v.foldLeft (_0)((s, x) => s + MAX (x, _0))
+    def sumPos: Complex = 
+    {    
+        var sum = _0
+        for (x <- v) sum += MAX (x._2, _0)
+        sum  
+    } // sumPos
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Establish the rank order of the elements in 'self' vector, e.g.,
      *  (8.0, 2.0, 4.0, 6.0) is (3, 0, 1, 2).
      */
-    def rank: VectorI = VectorI (iqsort (v))
+    def rank: VectorI = VectorI (iqsort (this().toArray))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Cumulate the values of 'this' vector from left to right (e.g., create a
      *  CDF from a pmf).  Example: (4, 2, 3, 1) --> (4, 6, 9, 10)
      */
-    def cumulate: VectorQ =
+    def cumulate: SparseVectorC =
     {
-        val c = new VectorQ (dim)
+        val c = new SparseVectorC (dim)
         var sum = _0
-        for (i <- range) { sum += v(i); c.v(i) = sum }
+        for (x <- v) { sum += x._2; c(x._1) = sum }
         c
     } // cumulate
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize 'this' vector so that it sums to one (like a probability vector).
      */
-    def normalize: VectorQ = this * (_1 / sum)
+    def normalize: SparseVectorC = this * (_1 / sum)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize 'this' vector so its length is one (unit vector).
      */
-    def normalizeU: VectorQ = this * (_1 / norm)
+    def normalizeU: SparseVectorC = this * (_1 / norm)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize 'this' vector to have a maximum of one.
      */
-    def normalize1: VectorQ = this * (_1 / max ())
+    def normalize1: SparseVectorC = this * (_1 / max ())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
-     *  @param b  the other vector (any kind)
+     *  @param b  the other vector
      */
-    def dot (b: VectoQ): Rational =
+    def dot (b: VectoC): Complex = 
     {
         var sum = _0
-        for (i <- range) sum += v(i) * b(i)
+        for (x <- v) sum += x._2 * b(x._1) 
         sum
     } // dot
-
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
-     *  @param b  the other vector (same kind, more efficient)
+     *  @param b  the other vector
      */
-    def dot (b: VectorQ): Rational =
+    def dot (b: SparseVectorC): Complex = 
     {
         var sum = _0
-        for (i <- range) sum += v(i) * b.v(i)
+        for (x <- v) sum += x._2 * b.v.getOrElse (x._1, _0)
         sum
     } // dot
-
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
+     *  @param b  the other vector
+     */
+    def ⦁ (b: VectoC): Complex = 
+    {
+        var sum = _0
+        for (x <- v) sum += x._2 * b(x._1) 
+        sum
+    } // ⦁
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product (or inner product) of 'this' vector with vector 'b'.
+     *  @param b  the other vector
+     */
+    def ⦁ (b: SparseVectorC): Complex = 
+    {
+        var sum = _0
+        for (x <- v) sum += x._2 * b.v.getOrElse(x._1, _0)
+        sum
+    } // ⦁
+     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Manhattan norm (1-norm) of 'this' vector.
      */
-    def norm1: Rational =
-    {
+    def norm1: Complex =
+    {  
         var sum = _0
-        for (i <- range) sum += ABS (v(i))
+        for ( x <- v ) sum += ABS (x._2)
         sum
     } // norm1
 
@@ -604,65 +601,51 @@ class VectorQ (val dim: Int,
     /** Find the maximum element in 'this' vector.
      *  @param e  the ending index (exclusive) for the search
      */
-    def max (e: Int = dim): Rational =
+    def max (e: Int = dim): Complex =
     {
-        var x = v(0)
-        for (i <- 1 until e if v(i) > x) x = v(i)
-        x
-    } // max
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Take the maximum of 'this' vector with vector 'b' (element-by element).
-     *  @param b  the other vector (any kind)
-     */
-    def max (b: VectoQ): VectorQ =
-    {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = if (b(i) > v(i)) b(i) else v(i)
+        var c = this(0)
+        for (x <- v if (x._1 < e && x._2 > c)) c = x._2
         c
     } // max
-
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Take the maximum of 'this' vector with vector 'b' (element-by element).
-     *  @param b  the other vector (same kind, more efficient)
+     *  @param b  the other vector
      */
-    def max (b: VectorQ): VectorQ =
-    {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = if (b.v(i) > v(i)) b.v(i) else v(i)
-        c
+    def max (b: VectoC): SparseVectorC =
+    { 
+        val c = new SparseVectorC (dim)
+        for (i <- range) { 
+            val x = this(i)
+            val y = b(i)
+            c(i) = if (y > x) y else x 
+        } // for
+        c 
     } // max
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the minimum element in 'this' vector.
      *  @param e  the ending index (exclusive) for the search
      */
-    def min (e: Int = dim): Rational =
-    {
-        var x = v(0)
-        for (i <- 1 until e if v(i) < x) x = v(i)
-        x
+    def min (e: Int = dim): Complex =
+    {     
+        var c = this(0)
+        for (x <- v if (x._1 < e && x._2 < c)) c = x._2
+        c
     } // max
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Take the minimum of 'this' vector with vector 'b' (element-by element).
-     *  @param b  the other vector (any kind)
+     *  @param b  the other vector
      */
-    def min (b: VectoQ): VectorQ =
+    def min (b: VectoC): SparseVectorC =
     {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = if (b(i) < v(i)) b(i) else v(i)
-        c
-    } // min
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Take the minimum of 'this' vector with vector 'b' (element-by element).
-     *  @param b  the other vector (same kind, more efficient)
-     */
-    def min (b: VectorQ): VectorQ =
-    {
-        val c = new VectorQ (dim)
-        for (i <- range) c.v(i) = if (b.v(i) < v(i)) b.v(i) else v(i)
+        val c = new SparseVectorC (dim)
+        for (i <- range) { 
+            val x = this(i) 
+            val y = b(i)
+            c(i) = if (y < x) y else x 
+        } // for
         c
     } // min
 
@@ -672,9 +655,9 @@ class VectorQ (val dim: Int,
      */
     def argmax (e: Int = dim): Int =
     {
-        var j = 0
-        for (i <- 1 until e if v(i) > v(j)) j = i
-        j
+        var i = 0
+        for (x <- v if (x._1 < e && x._2 > this(i))) i = x._1
+        i
     } // argmax
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -683,13 +666,13 @@ class VectorQ (val dim: Int,
      */
     def argmin (e: Int = dim): Int =
     {
-        var j = 0
-        for (i <- 1 until e if v(i) < v(j)) j = i
-        j
+        var i = 0
+        for (x <- v if (x._1 < e && x._2 < this(i))) i = x._1
+        i
     } // argmin
-
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the argument minimum of 'this' vector (-1 if it's not negative).
+    /** Return the argument minimum of 'this' vector (-1 if its not negative).
      *  @param e  the ending index (exclusive) for the search
      */
     def argminNeg (e: Int = dim): Int =
@@ -698,7 +681,7 @@ class VectorQ (val dim: Int,
     } // argmaxNeg
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the argument maximum of 'this' vector (-1 if it's not positive).
+    /** Return the argument maximum of 'this' vector (-1 if its not positive).
      *  @param e  the ending index (exclusive) for the search
      */
     def argmaxPos (e: Int = dim): Int =
@@ -710,19 +693,13 @@ class VectorQ (val dim: Int,
     /** Return the index of the first negative element in 'this' vector (-1 otherwise).
      *  @param e  the ending index (exclusive) for the search
      */
-    def firstNeg (e: Int = dim): Int =
-    {
-        for (i <- 0 until e if v(i) < _0) return i; -1
-    } // firstNeg
+    def firstNeg (e: Int = dim): Int = { for (x <- v if x._2 < _0) return x._1; -1 }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the index of the first positive element in 'this' vector (-1 otherwise).
      *  @param e  the ending index (exclusive) for the search
      */
-    def firstPos (e: Int = dim): Int =
-    {
-        for (i <- 0 until e if v(i) > _0) return i; -1
-    } // firstPos
+    def firstPos (e: Int = dim): Int = { for (x <- v if x._2 > _0) return x._1; -1 }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the index of the first occurrence of element 'x' in 'this' vector,
@@ -731,8 +708,9 @@ class VectorQ (val dim: Int,
      *  @param e  the ending index (exclusive) for the search
      */
     def indexOf (x: Int, e: Int = dim): Int =
-    {
-        for (i <- 0 until e if v(i) == x) return i; -1
+    {        
+        if (x =~ 0.0) { for (i <- range if this(i) =~ 0.0) return i; -1 }
+        for (x <- v if (x._1 < e && x._2 == x)) return x._1; -1 
     } // indexOf
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -740,7 +718,10 @@ class VectorQ (val dim: Int,
      *  -1 if not found.
      *  @param p  the predicate to check
      */
-    def indexWhere (p: (Rational) => Boolean): Int = v.indexWhere (p)
+    def indexWhere (p: (Complex) => Boolean): Int =
+    {
+        for (i <- range if p(this(i))) return i; -1
+    } // indexWhere
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of strictly negative elements in 'this' vector.
@@ -748,7 +729,7 @@ class VectorQ (val dim: Int,
     def countNeg: Int =
     {
         var count = 0
-        for (i <- 0 until dim if v(i) < _0) count += 1
+        for (x <- v if x._2 < _0) count += 1
         count
     } // countNeg
 
@@ -758,82 +739,117 @@ class VectorQ (val dim: Int,
     def countPos: Int =
     {
         var count = 0
-        for (i <- 0 until dim if v(i) > _0) count += 1
+        for (x <- v if x._2 > _0) count += 1
         count
     } // countPos
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Count the number of distinct elements in 'this' vector.
-     *
-    def distinct: Int =
-    {
-        var count = 1
-        val us = new VectorQ (this); us.sort ()                // sorted vector
-        for (i <- 1 until dim if us(i) != us(i-1)) count += 1
-        count
-    } // distinct
-     */
-
+    
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return a new vector consisting of the distinct elements from 'this' vector.
      */
-    def distinct: VectorQ = VectorQ (v.distinct)
-
+    def distinct: SparseVectorC = 
+    {
+        val us = new SparseVectorC (this); us.sort ()
+        var c1 = ArrayBuffer [Complex]()     
+        c1 += us(0)  
+        for (i <- 1 until dim) { val x = us(i); if (x != us(i-1)) c1 += x }
+        SparseVectorC(c1)       
+    } // distinct
+    
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of distinct elements in 'this' vector.
      */
-    def countinct: Int = v.distinct.length
+    def countinct: Int =
+    {
+        var count = 1
+        val us = new SparseVectorC (this); us.sort ()                // sorted vector
+        for (i <- 1 until dim if us(i) != us(i-1)) count += 1
+        count
+    } // distinct
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether the predicate 'pred' holds for some element in 'this' vector.
+     *  @param pred  the predicate to test (e.g., "_ == 5.")
+     */
+//  def exists (pred: (Complex) => Boolean): Boolean = v.exists (pred)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether 'x' is contained in 'this' vector.
      *  @param x  the element to be checked
      */
-    def contains (x: Rational): Boolean = v contains x
-
+    def contains (x: Complex): Boolean = v.values.exists (_ == x)
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reverse the order of the elemnets in 'this' vector.
      */
-    def reverse (): VectorQ = new VectorQ (dim, v.reverse)
+    def reverse (): SparseVectorC = 
+    {        
+         SparseVectorC (for (i <- (0 until dim).reverse) yield this(i))
+    } // reverse
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine whether 'this' vector is in sorted (ascending) order.
+    /** Determine whether 'this' vector is in sorted (accending) order.
      */
-    def isSorted: Boolean = (new SortingQ (v)).isSorted
-
+    def isSorted: Boolean = (new SortingC (this().toArray)).isSorted
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sort 'this' vector in-place in ascending (non-decreasing) order.
      */
-    def sort () { quickSort (v) }
+    def sort () 
+    {                  
+        val neg = negative; quickSort(neg)
+        val pos = positive; quickSort(pos)  
+        v =  SparseVectorC (neg ++ Array.fill(dim - (neg.length + pos.length))(_0) ++ pos).v          
+    } // sort
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sort 'this' vector in-place in descending (non-increasing) order.
      */
-    def sort2 () { qsort2 (v) }
+    def sort2 ()
+    {                  
+        val neg = negative; qsort2 (neg)
+        val pos = positive; qsort2 (pos)  
+        v =  SparseVectorC (pos ++ Array.fill (dim - (neg.length + pos.length))(_0) ++ neg).v          
+    } // sort2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Swap elements 'i' and 'j' in 'this' vector.
      *  @param i  the first element in the swap
      *  @param j  the second element in the swap
      */
-    def swap (i: Int, j: Int) { val t = v(j); v(j) = v(i); v(i) = t }
+    def swap (i: Int, j: Int)
+    {      
+         val (x, y) = (this(i), this(j))
+         if (x =~ _0 && y =~ _0) return      
+         this(i) = y; this(j) = x           
+    } // swap
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Check whether the other vector 'b' is at least as long as 'this' vector.
+     *  @param b  the other vector
+     */
+    def sameDimensions (b: SparseVectorC): Boolean = dim <= b.dim
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check whether 'this' vector is nonnegative (has no negative elements).
      */
-    def isNonnegative: Boolean = { for (i <- range if v(i) < _0) return false; true }
+    def isNonnegative: Boolean =
+    {   
+        for ( x <- v if x._2 < _0) return false
+        true
+    } // isNonnegative
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compare 'this' vector with vector 'b'.
      *  @param b  the other vector
      */
-    def tryCompareTo [B >: VectorQ] (b: B)
+    def tryCompareTo [B >: SparseVectorC] (b: B)
         (implicit view_1: (B) => PartiallyOrdered [B]): Option [Int] =
     {
         var le = true
         var ge = true
 
         for (i <- range) {
-            val b_i = b.asInstanceOf [VectorQ] (i)
+            val b_i = b.asInstanceOf [SparseVectorC] (i)
             if      (ge && (v(i) compare b_i) < 0) ge = false
             else if (le && (v(i) compare b_i) > 0) le = false
         } // for
@@ -841,168 +857,168 @@ class VectorQ (val dim: Int,
     } // tryCompareTo
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Override equals to determine whether 'this' vector equals vector 'b'.
+    /** Override equals to determine whether 'this' vector equals vector 'b..
      *  @param b  the vector to compare with this
      */
     override def equals (b: Any): Boolean =
     {
-//      b.isInstanceOf [VectorQ] && (v.deep equals b.asInstanceOf [VectorQ].v.deep)
-
-        if (! b.isInstanceOf [VectoQ]) return false
-        val bb = b.asInstanceOf [VectoQ]
-        for (i <- range if v(i) !=~ bb(i)) return false               // within TOL
-        true
+        b.isInstanceOf [SparseVectorC] && (v equals b.asInstanceOf [SparseVectorC].v)
     } // equals
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Must also override hashCode for 'this' vector to be compatible with equals.
      */
-    override def hashCode: Int = v.deep.hashCode
-
+    override def hashCode: Int = v.hashCode
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' vector to a String.
+    /** Convert 'this' sparse vector to a dense vector.
+     */
+    def toDense: VectorC = VectorC (for (i <- range) yield this(i))
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' vector to a `String`.
      */
     override def toString: String = 
     {
-        var sb = new StringBuilder ("VectorQ(")
+        var sb = new StringBuilder ("SparseVectorC(")
         if (dim == 0) return sb.append (")").mkString
         for (i <- range) {
-            sb.append (fString.format (v(i)))
+            if (v contains i) sb.append (fString.format (v(i)))
             if (i == dim-1) sb = sb.dropRight (1)
         } // for
         sb.replace (sb.length-1, sb.length, ")").mkString
     } // toString
   
-} // VectorQ class
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' vector to a `String`, showing the zero elements as well,
+     */ 
+    def toString2: String = 
+    {
+        var sb = new StringBuilder ("SparseVectorC(")
+        if (dim == 0) return sb.append (")").mkString
+        for (i <- range) {
+            sb.append (fString.format (this(i)))
+            if (i == dim-1) sb = sb.dropRight (1)
+        } // for
+        sb.replace (sb.length-1, sb.length, ")").mkString
+    } // toString2
+    
+} // SparseVectorC class
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `VectorQ` object is the companion object for the `VectorQ` class.
+/** The `SparseVectorC` object is the companion object for the `SparseVectorC` class.
  */
-object VectorQ
+object SparseVectorC
 {
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `VectorQ` from one or more values (repeated values Rational*).
-     *  @param x   the first Rational number
-     *  @param xs  the rest of the Rational numbers
+    /** Shorthand type definition for sparse vector
      */
-    def apply (x: Rational, xs: Rational*): VectorQ =
+    type RowMap = SortedLinkedHashMap [Int, Complex]
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a `SparseVectorC` from one or more values (repeated values `Complex`*).
+     *  @param x   the first `Complex` number
+     *  @param xs  the rest of the `Complex` numbers
+     */
+    def apply (x: Complex, xs: Complex*): SparseVectorC =
     {
-        val c = new VectorQ (1 + xs.length)
-        c(0)  = x
-        for (i <- 0 until c.dim-1) c.v(i+1) = xs(i)
+        val c = new SparseVectorC (1 + xs.length)
+        c(0) = x
+        for (i <- 1 until c.dim) c(i) = xs(i-1)
         c
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `VectorQ` from a sequence/array of Rationals.
-     *  @param xs  the sequence/array of the Rational numbers
+    /** Create a `SparseVectorC` from a sequence of `Complex`s.
+     *  @param xs  the sequence of the Complex numbers
      */
-    def apply (xs: Seq [Rational]): VectorQ =
+    def apply (xs: Seq [Complex]): SparseVectorC =
     {
-        val c = new VectorQ (xs.length)
-        for (i <- 0 until c.dim) c.v(i) = xs(i)
+        val c = new SparseVectorC (xs.length)
+        for (i <- 0 until c.dim) c(i) = xs(i)
         c
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `VectorQ` from one or more values (repeated values String*).
-     *  @param x   the first String
-     *  @param xs  the rest of the Strings
+    /** Create a `SparseVectorC` from one or more values (repeated values `String`*).
+     *  @param x   the first `String`
+     *  @param xs  the rest of the `String`s
      */
-    def apply (x: String, xs: String*): VectorQ =
+    def apply (x: String, xs: String*): SparseVectorC =
     {
-        val c = new VectorQ (1 + xs.length)
-        c(0)  = Rational (x)
-        for (i <- 0 until c.dim-1) c.v(i+1) = Rational (xs(i))
+        val c = new SparseVectorC (1 + xs.length)
+        c(0)  = Complex (x)
+        for (i <- 0 until c.dim-1) c(i+1) = Complex (xs(i))
         c
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `VectorQ` from an array of Strings.
-     *  @param xs  the array of the Strings
+    /** Create a `SparseVectorC` from an array of `String`s.
+     *  @param xs  the array of the `String`s
      */
-    def apply (xs: Array [String]): VectorQ =
+    def apply (xs: Array [String]): SparseVectorC =
     {
-        val c = new VectorQ (xs.length)
-        for (i <- c.range) c.v(i) = Rational (xs(i))
+        val c = new SparseVectorC (xs.length)
+        for (i <- c.range) c(i) = Complex (xs(i))
         c
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `VectorQ` from an array of Strings, skipping the first 'skip'
+    /** Create a `SparseVectorC` from an array of `String`s, skipping the first 'skip'
      *  elements.  If an element is non-numeric, use its hashcode.
-     *  FIX:  Might be better to map non-numeric Strings to ordinal values.
-     *  @param xs    the array of the Strings
+     *  FIX:  Might be better to map non-numeric `String`s to ordinal values.
+     *  @param xs    the array of the `String`s
      *  @param skip  the number of elements at the beginning to skip (e.g., id column)
      */
-    def apply (xs: Array [String], skip: Int): VectorQ =
+    def apply (xs: Array [String], skip: Int): SparseVectorC =
     {
-        val c = new VectorQ (xs.length - skip)
+        val c = new SparseVectorC (xs.length - skip)
         for (i <- skip until xs.length) {
-            c.v(i - skip) = if (xs(i) matches "[\\-\\+]?\\d+(/[\\-\\+]?\\d+)?") Rational (xs(i)) else xs(i).hashCode ()
+            c.v(i - skip) = if (xs(i) matches "[\\-\\+]?\\d*(\\.\\d+)?") Complex (xs(i)) else xs(i).hashCode ()
         } // for
         c
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a one vector (all elements are one) of length 'size'.
-     *  @param size  the size of the new vector
-     */
-    def one (size: Int): VectorQ = new VectorQ (size, Array.fill (size)(_1))
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate scalar 'b' and vector 'u'.
      *  @param b  the scalar to be concatenated - first part
-     *  @param u  the vector to be concatenated - second part (any kind)
+     *  @param u  the vector to be concatenated - second part
      */
-    def ++ (b: Rational, u: VectoQ): VectorQ =
+    def ++ (b: Complex, u: SparseVectorC): SparseVectorC =
     {
-        val c = new VectorQ (u.dim + 1)
-        for (i <- c.range) c(i) = if (i == 0) b else u(i-1)
+        val c = new SparseVectorC (u.dim + 1)
+        for (i <- c.range) c(i) = if (i == 0) b else u.v(i - 1)
         c
     } // ++
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate scalar 'b' and vector 'u'.
-     *  @param b  the scalar to be concatenated - first part
-     *  @param u  the vector to be concatenated - second part (same kind, more efficient)
-     */
-    def ++ (b: Rational, u: VectorQ): VectorQ =
-    {
-        val c = new VectorQ (u.dim + 1)
-        for (i <- c.range) c(i) = if (i == 0) b else u.v(i-1)
-        c
-    } // ++
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return a `VectorQ` containing a sequence of increasing integers in a range.
+    /** Return a `SparseVectorC` containing a sequence of increasing integers in a range.
      *  @param start  the start value of the vector, inclusive
      *  @param end    the end value of the vector, exclusive (i.e., the first value not returned)
      */
-    def range (start: Int, end: Int): VectorQ =
+    def range (start: Int, end: Int): SparseVectorC =
     {
-        val c = new VectorQ (end - start)
-        for (i <- c.range) c.v(i) = (start + i).toRational
+        val c = new SparseVectorC (end - start)
+        for (i <- c.range) c.v(i) = (start + i).toComplex
         c
     } // range
 
-} // VectorQ object
+} // SparseVectorC object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `VectorQTest` object tests the operations provided by `VectorQ`.
- *  > run-main scalation.linalgebra.VectorQTest
+/** The `SparseVectorDTest` object tests the operations provided by `SparseVectorC`.
+ *  > run-main scalation.linalgebra.SparseVectorDTest
  */
-object VectorQTest extends App
-{
-    var x: VectorQ = null
-    var y: VectorQ = null
+object SparseVectorCTest extends App
+{   
+    var x: SparseVectorC = null
+    var y: SparseVectorC = null
 
     for (l <- 1 to 4) {
-        println ("\n\tTest VectorQ on vectors of dim " + l)
-        x = new VectorQ (l)
-        y = new VectorQ (l)
+        println ("\n\tTest SparseVectorC on vectors of dim " + l)
+        x = new SparseVectorC (l)
+        y = new SparseVectorC (l)
         x.set (2)
         y.set (3)
 
@@ -1033,10 +1049,43 @@ object VectorQTest extends App
     println ("hashCode (" + x + ") = " + x.hashCode ())
     println ("hashCode (" + y + ") = " + y.hashCode ())
 
-    val z = VectorQ ("1", "2", "3", "4")
+    val z = SparseVectorC ("1", "2", "3", "4")
     println ("z = " + z)
-    println ("z.map (_ * 2)    = " + z.map ((e: Rational) => e * 2))
+    println ("z.map (_ * 2)    = " + z.map ((e: Complex) => e * 2))
     println ("z.filter (_ > 2) = " + z.filter (_ > 2))
 
-} // VectorQTest
+} // SparseVectorDTest
 
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SparseVectorDTest2` object tests the dot product operation provided by `SparseVectorC`.
+ *  > run-main scalation.linalgebra.SparseVectorDTest2
+ */
+object SparseVectorCTest2 extends App
+{
+    val r  = scala.util.Random  
+    val v1 = new VectorC (1000000)  
+    val v2 = new VectorC (1000000)
+
+    for (x <- 0 until 10) {    
+        var cnt = 0   
+        while(cnt < 1000000) {
+            val x  = r.nextInt (50).toComplex + 1
+            val x1 = r.nextInt (90)
+            if(x1 == 1) v1(cnt) = x
+            else v1(cnt) = _0  
+            val z  = r.nextInt (50).toComplex + 1
+            val z1 = r.nextInt (90)
+            if(z1 == 1) v2(cnt) = z
+            else v2(cnt) = _0
+            cnt += 1
+        } // while   
+
+    var z1 = SparseVectorC (v1())
+    var z2 = SparseVectorC (v2())
+  
+    println (v1.dot (v2))
+    println (z1.⦁(z2))
+  } // for
+    
+} // SparseVectorDTest2

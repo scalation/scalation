@@ -299,7 +299,7 @@ object Simplex2PTest extends App
      */
     def test (a: MatrixD, b: VectorD, c: VectorD)
     {
-        val lp = new Simplex2P (a, b, c)   // test the Two-Phase Simplex Algoeithm
+        val lp = new Simplex2P (a, b, c)   // test the Two-Phase Simplex Algorithm
         val x  = lp.solve ()               // the primal solution vector x
         val y  = lp.dual                   // the dual solution vector y
         val f  = lp.objF (x)               // the minimum value of the objective function

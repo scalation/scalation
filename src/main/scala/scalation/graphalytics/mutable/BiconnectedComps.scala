@@ -66,7 +66,7 @@ case class BiconnectedComp (g_ : Graph)
     def cutPoints (): ArrayBuffer [Int] =
     {
         val pre = Array.fill (n)(-1)                    // array of vertex pre-order numbers
-        val low = Array.fill (n)(-1)                    // array of vertex lowpoints
+        val low = Array.fill (n)(-1)                    // array of vertex low-points
         var cnt = 0
 
         for (v <- 0 until n if pre(v) == -1) dfs (v, v)
@@ -108,7 +108,7 @@ case class BiconnectedComp (g_ : Graph)
     {
         val stack  = Stack [Pair] ()                    // edge stack
         val depth  = Array.ofDim [Int](n)               // vertex depth
-        val low    = Array.fill (n)(-1)                 // array of vertex lowpoints
+        val low    = Array.fill (n)(-1)                 // array of vertex low-points
         val parent = Array.fill(n)(-1)                  // array of vertex parents
         val go     = Array.fill (n)(true)               // go => not yet visited
 

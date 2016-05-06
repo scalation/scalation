@@ -130,7 +130,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
         aic      = m * log (sse) - m * log (m) + 2.0 * (k+1)     // Akaike Information Criterion (AIC)
         bic      = aic + (k+1) * (log (m) - 2.0)                 // Bayesian Information Criterion (BIC)
 
-        val facCho = new Fac_Cholesky (x.t * x)                  // FIX - avoid re-calulating
+        val facCho = new Fac_Cholesky (x.t * x)                  // FIX - avoid re-calculating
         val varEst = sse / (m-k-1.0)                             // variance estimate
         val l      = facCho.factor1 ()                           // cholesky factorization
         val varCov = l.inverse.t * l.inverse * varEst            // variance covariance matrix

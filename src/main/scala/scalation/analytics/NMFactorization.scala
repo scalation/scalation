@@ -32,7 +32,7 @@ class NMFactorization (v: MatrixD,
 
     private val w  = new MatrixD (m, r)     // left factor (m-by-r matrix)
     private val h  = new MatrixD (r, n)     // right factor (r-by-n matrix)
-    w.set (1.0); h.set (1.0)                // intialize all matrix elements to 1
+    w.set (1.0); h.set (1.0)                // initialize all matrix elements to 1
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor the original matrix 'v' into left 'w' and right 'h' matrices by

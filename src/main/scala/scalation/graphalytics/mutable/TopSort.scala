@@ -83,7 +83,7 @@ object TopSortTest extends App
     val pg2 = new Graph (Array (SET (1, 2),        // edges from 0:  0 -> 1, 0 -> 2
                                 SET (2),           // edges from 1:  1 -> 2
                                 SET (0)))          // edges form 2:  2 -> 0
-    println ("Precedence Diraph pg2: --------------------------------------------")
+    println ("Precedence Digraph pg2: --------------------------------------------")
     pg2.printG ()
     println ("pg2 order = " + topSort (pg2).deep)
     

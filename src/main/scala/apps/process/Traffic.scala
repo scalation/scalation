@@ -15,6 +15,7 @@ import scalation.random.{Bernoulli, Sharp, Uniform, Variate}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Traffic` object is used to run the `TrafficModel` class.
+ *  > run-main apps.process.Traffic
  */
 object Traffic extends App 
 {

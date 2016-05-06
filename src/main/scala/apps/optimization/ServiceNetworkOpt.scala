@@ -4,8 +4,6 @@
  *  @version 1.2
  *  @date    Mon Mar  4 14:56:27 EST 2013
  *  @see     LICENSE (MIT style license file).
- *  @compile scalac -cp ../../classes -d classes ServiceNetwork.scala
- *  @run     scala -cp ../../classes:classes optimization.ServiceNetwork
  */
 
 package apps.optimization
@@ -14,8 +12,9 @@ import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.minima.Simplex
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** Optimize the service network by solving the following Linear Programming (LP)
- *  Problem.
+/** The `ServiceNetworkOpt` object optimizes the service network by solving the
+ *  following Linear Programming 'LP' Problem.
+ *  > run-main apps.optimization.ServiceNetworkOpt
  */
 object ServiceNetworkOpt extends App
 {
@@ -51,10 +50,9 @@ object ServiceNetworkOpt extends App
      println ("x = " + x)                  // optimal values for variables x = [x_i, y_i, z_i]
      println ("f = " + f)                  // optimal value for objective function (- profit)
 
-/** Solution:
-    x = VectorD (6.0	12.0	18.0	6.0	9.0	12.0	5.0	6.0	4.0	3.0	3.0	6.0	3.0)
-    f = -868.9999999999999
-*/
+//  Solution:
+//  x = VectorD (6.0	12.0	18.0	6.0	9.0	12.0	5.0	6.0	4.0	3.0	3.0	6.0	3.0)
+//  f = -868.9999999999999
 
 } // ServiceNetworkOpt
 

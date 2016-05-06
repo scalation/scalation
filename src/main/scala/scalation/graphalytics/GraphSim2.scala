@@ -20,7 +20,7 @@ import scala.collection.immutable.{Set => SET}
 class GraphSim2 (g: Graph, q: Graph)
       extends GraphMatcher (g, q)
 {
-    private val DEGUG = true                    // debug flag
+    private val DEBUG = true                    // debug flag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Apply the Graph Simulation pattern matching algorithm to find the mappings
@@ -39,13 +39,13 @@ class GraphSim2 (g: Graph, q: Graph)
     {
         var alter = true
         while (alter) {                                          // check for matching children
-            if (DEGUG) showMappings (phi)
+            if (DEBUG) showMappings (phi)
             alter = false
 
             // loop over query vertices u, u's children u_c, and data vertices v in phi(u)
 
             for (u <- qRange; u_c <- q.ch(u); v <- phi(u)) {
-                if ((g.ch(v) & phi(u_c)).isEmpty) {             // v must have a child in phi(u_c)
+                if ((g.ch(v) & phi(u_c)).isEmpty) {              // v must have a child in phi(u_c)
                     phi(u) -= v                                  // remove vertex v from phi(u)
                     if (phi(u).isEmpty) return phi               // no match for vertex u => no overall match
                     alter = true

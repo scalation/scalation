@@ -120,7 +120,7 @@ class SparseMatrixD (val d1: Int,
      */
     private val v = new Array [RowMap] (d1)
     for (i <- 0 until d1) v(i) = new RowMap ()
-
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a 'dim1' by 'dim2' sparse matrix from an array of sorted-linked-maps.
      *  @param dim1  the row dimension

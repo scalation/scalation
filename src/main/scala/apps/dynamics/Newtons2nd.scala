@@ -17,14 +17,17 @@ import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.plot.Plot
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Newtons2nd` object is used to illustrate the RungeKutta (RK) and DormandPrince
- *  (DP) ODE solvers by applying them to Newton's Second Law of Motion, f = ma = -gm.
+/** The `Newtons2nd` object is used to illustrate the `RungeKutta` 'RK' and
+ *  `DormandPrince` 'DP' ODE solvers by applying them to Newton's Second Law of Motion,
+ *  'f = ma = -gm'.
  *  The flight of a golf ball is simulated from impact until the ball hits the
  *  ground.  Note, a more realistic simulation would take additional forces into
  *  account: drag, lift and spin.
- *  @see http://home2.fvcc.edu/~dhicketh/DiffEqns/Spring11projects/Brett_Burglund_Ryan_Street/Diff%20Q/pdfscreen/projectoutline.pdf
- *  @see http://claymore.engineer.gvsu.edu/~lait/312/golfball.pdf
- *  The accurracies of RK and DP versus the  exact solution (EX) are compared.
+ *  @see home2.fvcc.edu/~dhicketh/DiffEqns/Spring11projects/Brett_Burglund_Ryan_Street/
+ *  @see     Diff%20Q/pdfscreen/projectoutline.pdf
+ *  @see claymore.engineer.gvsu.edu/~lait/312/golfball.pdf
+ *  The accuracies of 'RK' and 'DP' versus the exact solution (EX) are compared.
+ *  > run-main apps.dynamics.Newtons2nd
  */
 object Newtons2nd extends App
 {

@@ -15,7 +15,8 @@ import scalation.linalgebra.{MatrixI, VectorI}
 /** The `TennisBayes` object is a sample application that uses the `NaiveBayes`
  *  class.  Classify (No/Yes) whether a person will play tennis based on the
  *  measured integer-valued features.
- *  @see http://suanpalm3.kmutnb.ac.th/teacher/FileDL/choochart82255418560.pdf
+ *  @see suanpalm3.kmutnb.ac.th/teacher/FileDL/choochart82255418560.pdf
+ *  > run-main apps.analytics.TennisBayes
  */
 object TennisBayes extends App
 {

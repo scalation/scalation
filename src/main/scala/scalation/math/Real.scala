@@ -514,7 +514,7 @@ object Real
         var x     = _0                           // Real value to return
         var nd    = 0                            // number of digits processed
         var i     = 0                            // character position, ignoring whitespace
-        var isNeg = false                        // whether the number is nagative
+        var isNeg = false                        // whether the number is negative
         var exp   = 0                            // optional exponent
         var decPt = 0                            // position of decimal point
 
