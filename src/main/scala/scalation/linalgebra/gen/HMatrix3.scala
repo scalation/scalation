@@ -53,7 +53,7 @@ class HMatrix3 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     def setFormat (newFormat: String) { fString = newFormat }
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a cuboidic 3-dimensional hypermatrix, where the last dimension
+    /** Construct a cuboidic 3-dimensional hypermatrix, where the 3rd dimension
      *  is fixed as well.
      *  @param dim1  size of the 1st dimension of the hypermatrix
      *  @param dim2  size of the 2nd dimension of the hypermatrix
@@ -66,8 +66,8 @@ class HMatrix3 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     } // aux constructor
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a 3-dimensional hypermatrix, where the last dimension
-     *  varies only with the second dimension.
+    /** Construct a 3-dimensional hypermatrix, where the 3rd dimension varies
+     *  only with the 2nd dimension.
      *  @param dim1   size of the 1st dimension of the hypermatrix
      *  @param dim2   size of the 2nd dimension of the hypermatrix
      *  @param dims3  array of sizes of the 3rd dimension of the hypermatrix
@@ -88,14 +88,17 @@ class HMatrix3 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Allocate one element of the 3rd dimension of the hypermatrix for the
-     *  specified 'i' and 'j' indices.  Although, this allows the 3rd dimension
+     *  specified '(i, j)' indices.  Although, this allows the 3rd dimension
      *  to vary with both the first and second dimensions, it should only vary
      *  with the second dimension. 
      *  @param i     1st dimension index of the hypermatrix
      *  @param j     2nd dimension index of the hypermatrix
      *  @param dim3  size of the array to be allocated in row i and column j
      */
-    def alloc (i: Int, j: Int, dim3: Int) { hmat(i)(j) = Array.ofDim [T] (dim3) }
+    def alloc (i: Int, j: Int, dim3: Int)
+    {
+        hmat(i)(j) = Array.ofDim [T] (dim3)
+    } // alloc
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Allocate all elements of the 3rd dimension of the hypermatrix, where

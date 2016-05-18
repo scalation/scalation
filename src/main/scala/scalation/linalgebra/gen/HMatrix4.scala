@@ -50,20 +50,7 @@ class HMatrix4 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     def setFormat (newFormat: String) { fString = newFormat }
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a cuboidic 4-dimensional hypermatrix, where the 3rd dimension
-     *  is fixed as well.
-     *  @param dim1  size of the 1st dimension of the hypermatrix
-     *  @param dim2  size of the 2nd dimension of the hypermatrix
-     *  @param dim3  size of the 3rd dimension of the hypermatrix
-     */
-    def this (dim1: Int, dim2: Int, dim3: Int) =
-    {
-        this (dim1, dim2)
-        for (i <- range1; j <- range2) hmat(i)(j) = Array.ofDim [Array [T]] (dim3)
-    } // aux constructor
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a cuboidic 4-dimensional hypermatrix, where the last 2 dimensions
+    /** Construct a cuboidic 4-dimensional hypermatrix, where the 3rd and 4th dimensions
      *  are fixed as well.
      *  @param dim1  size of the 1st dimension of the hypermatrix
      *  @param dim2  size of the 2nd dimension of the hypermatrix
@@ -77,8 +64,21 @@ class HMatrix4 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     } // aux constructor
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a 4-dimensional hypermatrix, where the last dimension
-     *  varies only with the third dimension.
+    /** Construct a 4-dimensional hypermatrix, where the 3rd dimension is fixed
+     *  as well, but the 4th dimension my vary.
+     *  @param dim1  size of the 1st dimension of the hypermatrix
+     *  @param dim2  size of the 2nd dimension of the hypermatrix
+     *  @param dim3  size of the 3rd dimension of the hypermatrix
+     */
+    def this (dim1: Int, dim2: Int, dim3: Int) =
+    {
+        this (dim1, dim2)
+        for (i <- range1; j <- range2) hmat(i)(j) = Array.ofDim [Array [T]] (dim3)
+    } // aux constructor
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Construct a 4-dimensional hypermatrix, where the 3rd dimension is fixed,
+     *  and the 4th dimension varies only with the 3rd dimension.
      *  @param dim1   size of the 1st dimension of the hypermatrix
      *  @param dim2   size of the 2nd dimension of the hypermatrix
      *  @param dim3   size of the 3rd dimension of the hypermatrix
@@ -92,9 +92,8 @@ class HMatrix4 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     } // aux constructor
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a 4-dimensional hypermatrix, where the third dimension varies
-     *  only with the second dimension, and the last dimension varies only with
-     *  the third dimension.
+    /** Construct a 4-dimensional hypermatrix, where the 3rd and 4th dimensions
+     *  vary only with the 2nd dimension.
      *  @param dim1   size of the 1st dimension of the hypermatrix
      *  @param dim2   size of the 2nd dimension of the hypermatrix
      *  @param dims3  array of sizes of the 3rd dimension of the hypermatrix
@@ -104,7 +103,7 @@ class HMatrix4 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     {
         this (dim1, dim2)
         if (dims3.length != dim2) flaw ("constructor", "wrong number of elements for 3rd dimension")
-        if (dims4.length != dims3.length) flaw ("constructor", "wrong number of elements for 4th dimension")
+        if (dims4.length != dim2) flaw ("constructor", "wrong number of elements for 4th dimension")
         for (i <- range1; j <- range2) hmat(i)(j) = Array.ofDim [T] (dims3(j), dims4(j))
     } // aux constructor
 
@@ -124,26 +123,28 @@ class HMatrix4 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     def dim_4 (i: Int, j: Int, k: Int): Int = hmat(i)(j)(k).length
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Allocate a 2D array into the 3rd and 4th dimension of the hypermatrix at the
-     *  given index.
-     *  @param i  1st dimension index of the hypermatrix
-     *  @param j  2nd dimension index of the hypermatrix
-     *  @param v  size of the 3rd dimension
-     *  @param p  size of the 4th dimension
+    /** Allocate a 2D array for the 3rd and 4th dimensions of the hypermatrix
+     *  for the given '(i, j)' cell.
+     *  @param i     1st dimension index of the hypermatrix
+     *  @param j     2nd dimension index of the hypermatrix
+     *  @param dim3  size of the 3rd dimension
+     *  @param dim4  size of the 4th dimension
      */
-    def alloc (i: Int, j: Int, v: Int, p: Int) { hmat(i)(j) = Array.ofDim [T] (v, p) }
+    def alloc (i: Int, j: Int, dim3: Int, dim4: Int)
+    {
+        hmat(i)(j) = Array.ofDim [T] (dim3, dim4)
+    } // alloc
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Allocate all elements of the 3rd and 4th dimensions of the hypermatrix, where
-     *  the 4th dimension only vary with the 3rd dimension, which only varies with
-     *  the 2nd dimension.
+    /** Allocate all elements of the 3rd and 4th dimensions of the hypermatrix,
+     *  where the 3rd and 4th dimensions vary with the 2nd dimension.
      *  @param dims3  array of sizes of the 3rd dimension of the hypermatrix
      *  @param dims4  array of sizes of the 4th dimension of the hypermatrix
      */
     def alloc (dims3: Array [Int], dims4: Array [Int])
     {
         if (dims3.length != dim2) flaw ("alloc", "wrong number of elements for 3rd dimension")
-        if (dims4.length != dims3.length) flaw ("constructor", "wrong number of elements for 4th dimension")
+        if (dims4.length != dim2) flaw ("alloc", "wrong number of elements for 4th dimension")
         for (i <- range1; j <- range2) hmat(i)(j) = Array.ofDim [T] (dims3(j), dims4(j))
     } // alloc
 

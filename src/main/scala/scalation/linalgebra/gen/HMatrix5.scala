@@ -15,7 +15,7 @@ import scalation.util.Error
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HMatrix5` class is a simple implementation of a 5-dimensional hypermatrix.
  *  The first two dimensions must be fixed and known, while the third, fourth and fifth
- *  dimension may be dynamically allocated by the user.
+ *  dimensions may be dynamically allocated by the user.
  *  @param dim1  size of the 1st dimension of the hypermatrix
  *  @param dim2  size of the 2nd dimension of the hypermatrix
  */
@@ -50,8 +50,23 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     def setFormat (newFormat: String) { fString = newFormat }
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a cuboidic 5-dimensional hypermatrix, where the 4th dimension
-     *  is fixed as well.
+    /** Construct a cuboidic 5-dimensional hypermatrix, where the last 3 dimensions
+     *  are fixed as well.
+     *  @param dim1  size of the 1st dimension of the hypermatrix
+     *  @param dim2  size of the 2nd dimension of the hypermatrix
+     *  @param dim3  size of the 3rd dimension of the hypermatrix
+     *  @param dim4  size of the 4th dimension of the hypermatrix
+     *  @param dim5  size of the 5th dimension of the hypermatrix
+     */
+    def this (dim1: Int, dim2: Int, dim3: Int, dim4: Int, dim5: Int) =
+    {
+        this (dim1, dim2)
+        for (i <- range1; j <- range2) hmat(i)(j) = Array.ofDim [T] (dim3, dim4, dim5)
+    } // aux constructor
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Construct a 5-dimensional hypermatrix, where the 3rd dimension
+     *  is fixed as well, but the 4th and 5th dimensions may vary.
      *  @param dim1  size of the 1st dimension of the hypermatrix
      *  @param dim2  size of the 2nd dimension of the hypermatrix
      *  @param dim3  size of the 3rd dimension of the hypermatrix
@@ -63,8 +78,8 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     } // aux constructor
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a cuboidic 4-dimensional hypermatrix, where the last 2 dimensions
-     *  are fixed as well.
+    /** Construct a 5-dimensional hypermatrix, where the 3rd and 4th dimensions
+     *  are fixed as well, but the 5th dimension may vary.
      *  @param dim1  size of the 1st dimension of the hypermatrix
      *  @param dim2  size of the 2nd dimension of the hypermatrix
      *  @param dim3  size of the 3rd dimension of the hypermatrix
@@ -77,24 +92,8 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     } // aux constructor
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a cuboidic 4-dimensional hypermatrix, where the last 2 dimensions
-     *  are fixed as well.
-     *  @param dim1  size of the 1st dimension of the hypermatrix
-     *  @param dim2  size of the 2nd dimension of the hypermatrix
-     *  @param dim3  size of the 3rd dimension of the hypermatrix
-     *  @param dim4  size of the 4th dimension of the hypermatrix
-     *  @param dim5  size of the 5th dimension of the hypermatrix
-     */
-    def this (dim1: Int, dim2: Int, dim3: Int, dim4: Int, dim5:Int) =
-    {
-        this (dim1, dim2)
-        for (i <- range1; j <- range2) hmat(i)(j) = Array.ofDim [T] (dim3, dim4, dim5)
-    } // aux constructor
-
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a 4-dimensional hypermatrix, where the last dimension
-     *  varies only with the third dimension.
+    /** Construct a 5-dimensional hypermatrix, where 3rd and 4th dimensions are
+     *  fixed as well, and the 5th dimension varies only with the 4th dimension.
      *  @param dim1   size of the 1st dimension of the hypermatrix
      *  @param dim2   size of the 2nd dimension of the hypermatrix
      *  @param dim3   size of the 3rd dimension of the hypermatrix
@@ -103,27 +102,45 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
      */
     def this (dim1: Int, dim2: Int, dim3: Int, dim4: Int, dims5: Array [Int]) =
     {
-        this (dim1, dim2, dim3,dim4)
+        this (dim1, dim2, dim3, dim4)
         if (dims5.length != dim4) flaw ("constructor", "wrong number of elements for 5th dimension")
-        for (i <- range1; j <- range2; k <- 0 until dim3; l<- 0 until dim4) hmat(i)(j)(k)(l) = Array.ofDim [T] (dims5(l))
+        for (i <- range1; j <- range2; k <- 0 until dim3; l <- 0 until dim4) hmat(i)(j)(k)(l) = Array.ofDim [T] (dims5(l))
     } // aux constructor
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a 4-dimensional hypermatrix, where the third dimension varies
-     *  only with the second dimension, and the last dimension varies only with
-     *  the third dimension.
+    /** Construct a 5-dimensional hypermatrix, where the 3rd dimension is fixed
+     *  as well, and the 4th and 5th dimensions vary only with the 3rd dimension.
+     *  varies only with the 4th.
+     *  @param dim1   size of the 1st dimension of the hypermatrix
+     *  @param dim2   size of the 2nd dimension of the hypermatrix
+     *  @param dim3   size of the 3rd dimension of the hypermatrix
+     *  @param dims4  array of sizes of the 4th dimension of the hypermatrix
+     *  @param dims5  array of sizes of the 5th dimension of the hypermatrix
+     */
+    def this (dim1: Int, dim2: Int, dim3: Int, dims4: Array [Int], dims5: Array [Int]) =
+    {
+        this (dim1, dim2, dim3)
+        if (dims4.length != dim3) flaw ("constructor", "wrong number of elements for 4th dimension")
+        if (dims5.length != dim3) flaw ("constructor", "wrong number of elements for 5th dimension")
+        for (i <- range1; j <- range2; k <- 0 until dim3) hmat(i)(j)(k) = Array.ofDim [T] (dims4(k), dims5(k))
+    } // aux constructor
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Construct a 5-dimensional hypermatrix, where the 3rd, 4th and 5th dimensions
+     *  vary only with the 2nd dimension.
      *  @param dim1   size of the 1st dimension of the hypermatrix
      *  @param dim2   size of the 2nd dimension of the hypermatrix
      *  @param dims3  array of sizes of the 3rd dimension of the hypermatrix
      *  @param dims4  array of sizes of the 4th dimension of the hypermatrix
+     *  @param dims5  array of sizes of the 5th dimension of the hypermatrix
      */
-    def this (dim1: Int, dim2: Int, dims3: Array [Int], dims4: Array [Int],dims5: Array[Int]) =
+    def this (dim1: Int, dim2: Int, dims3: Array [Int], dims4: Array [Int], dims5: Array [Int]) =
     {
         this (dim1, dim2)
         if (dims3.length != dim2) flaw ("constructor", "wrong number of elements for 3rd dimension")
-        if (dims4.length != dims3.length) flaw ("constructor", "wrong number of elements for 4th dimension")
-        if (dims5.length != dims4.length) flaw ("constructor", "wrong number of elements for 5th dimension")
-        for (i <- range1; j <- range2) hmat(i)(j) = Array.ofDim [T] (dims3(j), dims4(j),dims5(j))
+        if (dims4.length != dim2) flaw ("constructor", "wrong number of elements for 4th dimension")
+        if (dims5.length != dim2) flaw ("constructor", "wrong number of elements for 5th dimension")
+        for (i <- range1; j <- range2) hmat(i)(j) = Array.ofDim [T] (dims3(j), dims4(j), dims5(j))
     } // aux constructor
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -151,27 +168,29 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     def dim_5 (i: Int, j: Int, k: Int, l: Int): Int = hmat(i)(j)(k)(l).length
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Allocate a 2D array into the 4th and 5th dimension of the hypermatrix at the
-     *  given index.
-     *  @param i  1st dimension index of the hypermatrix
-     *  @param j  2nd dimension index of the hypermatrix
-     *  @param k  size of the 3rd dimension
-     *  @param v  size of the 4th dimension
-     *  @param p  size of the 5th dimension
+    /** Allocate a 3D array for the 3rd, 4th and 5th dimensions of the hypermatrix
+     *  for the given '(i, j)' cell.
+     *  @param i     1st dimension index of the hypermatrix
+     *  @param j     2nd dimension index of the hypermatrix
+     *  @param dim3  size of the 3rd dimension
+     *  @param dim4  size of the 4th dimension
+     *  @param dim5  size of the 5th dimension
      */
-    def alloc (i: Int, j: Int, k:Int, v: Int, p: Int) { hmat(i)(j) = Array.ofDim [T] (k,v, p) }
+    def alloc (i: Int, j: Int, dim3: Int, dim4: Int, dim5: Int)
+    {
+        hmat(i)(j) = Array.ofDim [T] (dim3, dim4, dim5)
+    } // alloc
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Allocate all elements of the 3rd and 4th dimensions of the hypermatrix, where
-     *  the 4th dimension only vary with the 3rd dimension, which only varies with
-     *  the 2nd dimension.
+    /** Allocate all elements of the 3rd and 4th dimensions of the hypermatrix,
+     *  where the 3rd and 4th dimensions only vary with the 2nd dimension.
      *  @param dims3  array of sizes of the 3rd dimension of the hypermatrix
      *  @param dims4  array of sizes of the 4th dimension of the hypermatrix
      */
     def alloc (dims3: Array [Int], dims4: Array [Int])
     {
         if (dims3.length != dim2) flaw ("alloc", "wrong number of elements for 3rd dimension")
-        if (dims4.length != dims3.length) flaw ("constructor", "wrong number of elements for 4th dimension")
+        if (dims4.length != dim2) flaw ("alloc", "wrong number of elements for 4th dimension")
         for (i <- range1; j <- range2) hmat(i)(j) = Array.ofDim [Array[T]] (dims3(j), dims4(j))
     } // alloc
 

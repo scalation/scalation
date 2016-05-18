@@ -562,9 +562,6 @@ Vectors and matrices of real (Double) and complex numbers are supported.
 <td> <a href = "src/test/scala/testing/random/"> testing.random </a>
 <td> Tests for package for random numbers and random variates (Normal distribution, etc.)
 <tr>
-<td> <a href = "src/test/scala/testing/random/"> testing.random </a>
-<td> Tests for package for random numbers and random variates (Normal distribution, etc.)
-<tr>
 <td> <a href = "src/test/scala/testing/stat/"> testing.stat </a>
 <td> Tests for package of statistical objects and operations needed for simulation,
 including implementations for summary statitistics and ANOVA.
@@ -617,20 +614,17 @@ including implementations for summary statitistics and ANOVA.
 <h3> Code Release Process </h3>
 <p>
 
-<ul>
-<li>
-sbt> compile
-<li>
-sbt> test
-<li>
-sbt> run-main scalation.util.RunSpellCheck <package directory>
-<li>
-sbt> run-main scalation.util.GenIndexHtml
-<li>
-sbt> clean
-<li>
-sbt> doc
-</ul>
+pre><code>
+$ cd scalation_1.2 <br>
+$ sbt <br>
+> compile <br>
+> test <br>
+> run-main scalation.util.RunSpellCheck 'package-directory' <br>
+> run-main scalation.util.GenIndexHtml <br>
+> clean <br>
+> doc <br>
+> exit
+</code></pre>
 
 <p>
 </body>

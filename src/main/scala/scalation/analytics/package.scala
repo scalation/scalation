@@ -13,9 +13,9 @@ package scalation
  */
 package object analytics
 {
-   /** The relative path for base directory
+    /** The relative path for base directory
      */
-    val BASE_DIR = DATA_DIR + "graphalytics" + ⁄
+    val BASE_DIR = DATA_DIR + "analytics" + ⁄
 
 } // analytics package object 
 
