@@ -23,7 +23,7 @@ import scalation.util.Error
  *  @see http://www.stat.wisc.edu/~larget/math496/qr.html
  *  @see http://en.wikipedia.org/wiki/Gram–Schmidt_process
  *       (stabilized Gram–Schmidt orthonormalization)
- *  @param a  the matrix to be factor into q and r
+ *  @param a  the matrix to be factor into q and 
  */
 class Fac_QR_MGS (a: MatrixD)
       extends Factorization with Error
@@ -36,7 +36,7 @@ class Fac_QR_MGS (a: MatrixD)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor matrix 'a' into the product of two matrices, 'a = q * r', returning
      *  both the orthogonal 'q' matrix and the right upper triangular 'r' matrix.
-     *  This algorithm uses Modified Gram-Schmidt (MGS) orthogonalization.
+     *  This algorithm uses Modified Gram-Schmidt 'MGS' orthogonalization.
      *  @see Algorithm 5.2.6 in Matrix Computations.
      */
     def factor (): Tuple2 [MatrixD, MatrixD] =
@@ -69,7 +69,7 @@ class Fac_QR_MGS (a: MatrixD)
     def factor2 (): MatrixD = { if (raw) factor (); r }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in 'a*x = b' using the QR Factorization 'a = q*r' via
+    /** Solve for 'x' in 'a*x = b' using the 'QR' Factorization 'a = q*r' via
      *  'r*x = q.t * b'.
      *  @param  b the constant vector
      */
@@ -90,7 +90,7 @@ class Fac_QR_MGS (a: MatrixD)
     } // backSub
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the nullspace of matrix 'a: { x | a*x = 0 }' using QR Factorization
+    /** Compute the nullspace of matrix 'a: { x | a*x = 0 }' using 'QR' Factorization
      *  'q*r*x = 0'.  Gives a basis of dimension 'n' - rank for the nullspace
      *  @param rank  the rank of the matrix (number of linearly independent row vectors)
      *  FIX: should work, but it does not
@@ -102,7 +102,7 @@ class Fac_QR_MGS (a: MatrixD)
     } // nullspace
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the nullspace of matrix 'a: { x | a*x = 0 }' using QR Factorization
+    /** Compute the nullspace of matrix 'a: { x | a*x = 0 }' using 'QR' Factorization
      *  'q*r*x = 0'.  Gives only one vector in the nullspace.
      */
     def nullspaceV: VectorD =

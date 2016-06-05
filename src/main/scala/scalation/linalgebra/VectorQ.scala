@@ -169,14 +169,14 @@ class VectorQ (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  a new vector.
-     *  @param p  the predicate (Boolean function) to apply
+     *  @param p  the predicate (`Boolean` function) to apply
      */
     override def filter (p: Rational => Boolean): VectorQ = VectorQ (v.filter (p))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  the index positions.
-     *  @param p  the predicate (Boolean function) to apply
+     *  @param p  the predicate (`Boolean` function) to apply
      */
     def filterPos (p: Rational => Boolean): IndexedSeq [Int] =
     {
@@ -764,15 +764,14 @@ class VectorQ (val dim: Int,
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of distinct elements in 'this' vector.
-     *
-    def distinct: Int =
-    {
-        var count = 1
-        val us = new VectorQ (this); us.sort ()                // sorted vector
-        for (i <- 1 until dim if us(i) != us(i-1)) count += 1
-        count
-    } // distinct
      */
+//  def distinct: Int =
+//  {
+//      var count = 1
+//      val us = new VectorQ (this); us.sort ()                // sorted vector
+//      for (i <- 1 until dim if us(i) != us(i-1)) count += 1
+//      count
+//  } // distinct
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return a new vector consisting of the distinct elements from 'this' vector.
@@ -791,7 +790,7 @@ class VectorQ (val dim: Int,
     def contains (x: Rational): Boolean = v contains x
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Reverse the order of the elemnets in 'this' vector.
+    /** Reverse the order of the elements in 'this' vector.
      */
     def reverse (): VectorQ = new VectorQ (dim, v.reverse)
 
@@ -882,9 +881,9 @@ class VectorQ (val dim: Int,
 object VectorQ
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `VectorQ` from one or more values (repeated values Rational*).
-     *  @param x   the first Rational number
-     *  @param xs  the rest of the Rational numbers
+    /** Create a `VectorQ` from one or more values (repeated values `Rational`*).
+     *  @param x   the first `Rational` number
+     *  @param xs  the rest of the `Rational` numbers
      */
     def apply (x: Rational, xs: Rational*): VectorQ =
     {
@@ -895,8 +894,8 @@ object VectorQ
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `VectorQ` from a sequence/array of Rationals.
-     *  @param xs  the sequence/array of the Rational numbers
+    /** Create a `VectorQ` from a sequence/array of `Rational`s.
+     *  @param xs  the sequence/array of the `Rational` numbers
      */
     def apply (xs: Seq [Rational]): VectorQ =
     {

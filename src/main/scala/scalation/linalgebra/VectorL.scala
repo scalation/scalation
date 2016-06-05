@@ -169,14 +169,14 @@ class VectorL (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  a new vector.
-     *  @param p  the predicate (Boolean function) to apply
+     *  @param p  the predicate (`Boolean` function) to apply
      */
     override def filter (p: Long => Boolean): VectorL = VectorL (v.filter (p))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  the index positions.
-     *  @param p  the predicate (Boolean function) to apply
+     *  @param p  the predicate (`Boolean` function) to apply
      */
     def filterPos (p: Long => Boolean): IndexedSeq [Int] =
     {
@@ -764,15 +764,14 @@ class VectorL (val dim: Int,
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of distinct elements in 'this' vector.
-     *
-    def distinct: Int =
-    {
-        var count = 1
-        val us = new VectorL (this); us.sort ()                // sorted vector
-        for (i <- 1 until dim if us(i) != us(i-1)) count += 1
-        count
-    } // distinct
      */
+//  def distinct: Int =
+//  {
+//      var count = 1
+//      val us = new VectorL (this); us.sort ()                // sorted vector
+//      for (i <- 1 until dim if us(i) != us(i-1)) count += 1
+//      count
+//  } // distinct
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return a new vector consisting of the distinct elements from 'this' vector.
@@ -791,7 +790,7 @@ class VectorL (val dim: Int,
     def contains (x: Long): Boolean = v contains x
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Reverse the order of the elemnets in 'this' vector.
+    /** Reverse the order of the elements in 'this' vector.
      */
     def reverse (): VectorL = new VectorL (dim, v.reverse)
 
@@ -882,9 +881,9 @@ class VectorL (val dim: Int,
 object VectorL
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `VectorL` from one or more values (repeated values Long*).
-     *  @param x   the first Long number
-     *  @param xs  the rest of the Long numbers
+    /** Create a `VectorL` from one or more values (repeated values `Long`*).
+     *  @param x   the first `Long` number
+     *  @param xs  the rest of the `Long` numbers
      */
     def apply (x: Long, xs: Long*): VectorL =
     {
@@ -895,8 +894,8 @@ object VectorL
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `VectorL` from a sequence/array of Longs.
-     *  @param xs  the sequence/array of the Long numbers
+    /** Create a `VectorL` from a sequence/array of `Long`s.
+     *  @param xs  the sequence/array of the `Long` numbers
      */
     def apply (xs: Seq [Long]): VectorL =
     {

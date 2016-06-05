@@ -18,7 +18,7 @@ import scalation.util.Error
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Matrices` object provides convenience definitions for commonly used types of
  *  matrices.  For efficiency, non-generic versions of `MatrixD`, `MatrixC` and `MatrixR`
- *  are provided in the  linalgebra package.
+ *  are provided in the `linalgebra` package.
  */
 object Matrices
 {
@@ -79,15 +79,15 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     val _1n = -_1 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a dim1 by dim1 square matrix.
+    /** Construct a 'dim1-by-dim1' square matrix.
      *  @param dim1  the row and column dimension
      */
     def this (dim1: Int) { this (dim1, dim1) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a dim1 by dim2 matrix and assign each element the value x.
+    /** Construct a 'dim1-by-dim2' matrix and assign each element the value 'x'.
      *  @param dim1  the row dimension
-     *  @param dim2  the column dimesion
+     *  @param dim2  the column dimension
      *  @param x     the scalar value to assign
      */
     def this (dim1: Int, dim2: Int, x: T)
@@ -97,9 +97,9 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a dim1 by dim1 square matrix with x assigned on the diagonal
-     *  and y assigned off the diagonal.  To obtain an identity matrix, let x = 1
-     *  and y = 0.
+    /** Construct a 'dim1-by-dim1' square matrix with 'x' assigned on the diagonal
+     *  and y assigned off the diagonal.  To obtain an identity matrix, let 'x = 1'
+     *  and 'y = 0'.
      *  @param dim1  the row and column dimension
      *  @param x     the scalar value to assign on the diagonal
      *  @param y     the scalar value to assign off the diagonal
@@ -111,7 +111,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a matrix and assign values from array of arrays u.
+    /** Construct a matrix and assign values from array of arrays 'u.'
      *  @param u  the 2D array of values to assign
      */
     def this (u: Array [Array [T]]) { this (u.length, u(0).length, u) }
@@ -128,7 +128,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a matrix and assign values from array of vectors u.
+    /** Construct a matrix and assign values from array of vectors 'u'.
      *  @param u  the 2D array of values to assign
      */
     def this (u: Array [VectorN [T]])
@@ -138,7 +138,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a matrix and assign values from matrix u.
+    /** Construct a matrix and assign values from matrix 'u'.
      *  @param u  the matrix of values to assign
      */
     def this (u: MatrixN [T])
@@ -148,20 +148,20 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get this matrix's element at the i,j-th index position. 
+    /** Get this matrix's element at the 'i,j'-th index position. 
      *  @param i  the row index
      *  @param j  the column index
      */
     def apply (i: Int, j: Int): T = v(i)(j)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get this matrix's vector at the i-th index position (i-th row).
+    /** Get this matrix's vector at the 'i'th index position ('i'th row).
      *  @param i  the row index
      */
     def apply (i: Int): VectorN [T] = new VectorN [T] (v(i))
 
    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get a slice this matrix row-wise on range ir and column-wise on range jr.
+    /** Get a slice this matrix row-wise on range 'ir' and column-wise on range 'jr'.
      *  Ex: b = a(2..4, 3..5)
      *  @param ir  the row range
      *  @param jr  the column range
@@ -169,7 +169,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     def apply (ir: Range, jr: Range): MatrixN [T] = slice (ir.start, ir.end, jr.start, jr.end)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get a slice this matrix row-wise on range ir and column-wise at index j.
+    /** Get a slice this matrix row-wise on range 'ir' and column-wise at index 'j'.
      *  Ex: u = a(2..4, 3)
      *  @param ir  the row range
      *  @param j   the column index
@@ -177,7 +177,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     def apply (ir: Range, j: Int): VectorN [T] = col(j)(ir)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get a slice this matrix row-wise at index i and column-wise on range jr.
+    /** Get a slice this matrix row-wise at index 'i' and column-wise on range 'jr'.
      *  Ex: u = a(2, 3..5)
      *  @param i   the row index
      *  @param jr  the column range
@@ -185,7 +185,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     def apply (i: Int, jr: Range): VectorN [T] = this(i)(jr)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set this matrix's element at the i,j-th index position to the scalar x.
+    /** Set this matrix's element at the 'i,j'-th index position to the scalar 'x'.
      *  @param i  the row index
      *  @param j  the column index
      *  @param x  the scalar value to assign
@@ -193,14 +193,14 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     def update (i: Int, j: Int, x: T) { v(i)(j) = x }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set this matrix's row at the i-th index position to the vector u.
+    /** Set this matrix's row at the 'i'th index position to the vector 'u'.
      *  @param i  the row index
      *  @param u  the vector value to assign
      */
     def update (i: Int, u: VectorN [T]) { v(i) = u() }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set a slice this matrix row-wise on range ir and column-wise on range jr.
+    /** Set a slice this matrix row-wise on range 'ir' and column-wise on range 'jr'.
      *  Ex: a(2..4, 3..5) = b
      *  @param ir  the row range
      *  @param jr  the column range
@@ -212,7 +212,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // update
 
    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set a slice this matrix row-wise on range ir and column-wise at index j.
+    /** Set a slice this matrix row-wise on range 'ir' and column-wise at index 'j'.
      *  Ex: a(2..4, 3) = u
      *  @param ir  the row range
      *  @param j   the column index
@@ -221,7 +221,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     def update (ir: Range, j: Int, u: VectorN [T]) { col(j)(ir) = u }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set a slice this matrix row-wise at index i and column-wise on range jr.
+    /** Set a slice this matrix row-wise at index 'i' and column-wise on range 'jr'.
      *  Ex: a(2, 3..5) = u
      *  @param i   the row index
      *  @param jr  the column range
@@ -230,13 +230,13 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     def update (i: Int, jr: Range, u: VectorN [T]) { this(i)(jr) = u }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set all the elements in this matrix to the scalar x.
+    /** Set all the elements in this matrix to the scalar 'x'.
      *  @param x  the scalar value to assign
      */
     def set (x: T) { for (i <- range1; j <- range2) v(i)(j) = x }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set all the values in this matrix as copies of the values in 2D array u.
+    /** Set all the values in this matrix as copies of the values in 2D array 'u'.
      *  @param u  the 2D array of values to assign
      */
     def set (u: Array [Array [T]])
@@ -245,7 +245,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set this matrix's ith row starting at column j to the vector u.
+    /** Set this matrix's 'i'th row starting at column 'j' to the vector 'u'.
      *  @param i  the row index
      *  @param u  the vector value to assign
      *  @param j  the starting column index
@@ -256,7 +256,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Slice this matrix row-wise from to end.
+    /** Slice this matrix row-wise 'from' to 'end'.
      *  @param from  the start row of the slice (inclusive)
      *  @param end   the end row of the slice (exclusive)
      */
@@ -266,7 +266,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // slice
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Slice this matrix row-wise r_from to r_end and column-wise c_from to c_end.
+    /** Slice this matrix row-wise 'r_from' to 'r_end' and column-wise 'c_from' to 'c_end'.
      *  @param r_from  the start of the row slice
      *  @param r_end   the end of the row slice
      *  @param c_from  the start of the column slice
@@ -345,7 +345,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // t
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate this matrix and vector u.
+    /** Concatenate this matrix and vector 'u'.
      *  @param u  the vector to be concatenated as the new last row in matrix
      */
     def ++ (u: VectorN [T]): MatrixN [T] =
@@ -357,8 +357,8 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // ++
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add this matrix and matrix u.
-     *  @param u  the matrix to add (requires leDimensions)
+    /** Add this matrix and matrix 'u'.
+     *  @param u  the matrix to add (requires 'leDimensions')
      */
     def + (u: MatrixN [T]): MatrixN [T] =
     {
@@ -368,7 +368,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add this matrix and scalar x.
+    /** Add this matrix and scalar 'x'.
      *  @param x  the scalar to add
      */
     def + (x: T): MatrixN [T] =
@@ -379,8 +379,8 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // +
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add in-place this matrix and matrix b.
-     *  @param b  the matrix to add (requires leDimensions)
+    /** Add in-place this matrix and matrix 'b'.
+     *  @param b  the matrix to add (requires 'leDimensions')
      */
     def += (b: MatrixN [T]): MatrixN [T] =
     {
@@ -389,7 +389,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add in-place this matrix and scalar x.
+    /** Add in-place this matrix and scalar 'x'.
      *  @param x  the scalar to add
      */
     def += (x: T): MatrixN [T] =
@@ -399,8 +399,8 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // +=
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract matrix b.
-     *  @param b  the matrix to subtract (requires leDimensions)
+    /** From this matrix subtract matrix 'b'.
+     *  @param b  the matrix to subtract (requires 'leDimensions')
      */
     def - (b: MatrixN [T]): MatrixN [T] =
     {
@@ -410,7 +410,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // -
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract scalar x.
+    /** From this matrix subtract scalar 'x'.
      *  @param x  the scalar to subtract
      */
     def - (x: T): MatrixN [T] =
@@ -421,8 +421,8 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // -
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract in-place matrix b.
-     *  @param b  the matrix to subtract (requires leDimensions)
+    /** From this matrix subtract in-place matrix 'b'.
+     *  @param b  the matrix to subtract (requires 'leDimensions')
      */
     def -= (b: MatrixN [T]): MatrixN [T] =
     {
@@ -441,20 +441,19 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // -=
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by matrix b (concise solution).
-     *  @param b  the matrix to multiply by (requires sameCrossDimensions)
-     *
-    def * (b: Matrix [T]): MatrixN [T] =
-    {
-        val c = new MatrixN [T] (dim1, b.dim2)
-        for (i <- range1; j <- c.range2) c.v(i)(j) = row(i) dot b.col(j)
-        c
-    } // *
+    /** Multiply this matrix by matrix 'b' (concise solution).
+     *  @param b  the matrix to multiply by (requires 'sameCrossDimensions')
      */
+//  def * (b: Matrix [T]): MatrixN [T] =
+//  {
+//      val c = new MatrixN [T] (dim1, b.dim2)
+//      for (i <- range1; j <- c.range2) c.v(i)(j) = row(i) dot b.col(j)
+//      c
+//  } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by matrix b (efficient solution).
-     *  @param b  the matrix to multiply by (requires sameCrossDimensions)
+    /** Multiply this matrix by matrix 'b' (efficient solution).
+     *  @param b  the matrix to multiply by (requires 'sameCrossDimensions')
      */
     def * (b: MatrixN [T]): MatrixN [T] =
     {
@@ -468,19 +467,18 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector u (concise solution).
+    /** Multiply this matrix by vector 'u' (concise solution).
      *  @param u  the vector to multiply by
-     *
-    def * (u: VectorN [T]): VectorN [T] =
-    {
-        val c = new VectorN [T] (dim1)
-        for (i <- range1) c(i) = row(i) dot u
-        c
-    } // *
      */
+//  def * (u: VectorN [T]): VectorN [T] =
+//  {
+//      val c = new VectorN [T] (dim1)
+//      for (i <- range1) c(i) = row(i) dot u
+//      c
+//  } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector u (efficient solution).
+    /** Multiply this matrix by vector 'u' (efficient solution).
      *  @param u  the vector to multiply by
      */
     def * (u: VectorN [T]): VectorN [T] =
@@ -495,7 +493,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector u (efficient solution).
+    /** Multiply this matrix by vector 'u' (efficient solution).
      *  @param u  the vector to multiply by
      */
     def * (u: VectorD): VectorD =
@@ -510,7 +508,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by scalar x.
+    /** Multiply this matrix by scalar 'x'.
      *  @param x  the scalar to multiply by
      */
     def * (x: T): MatrixN [T] =
@@ -521,9 +519,9 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by matrix b.  If b and this reference the
-     *  same matrix (b == this), a copy of the this matrix is made.
-     *  @param b  the matrix to multiply by (requires square and sameCrossDimensions)
+    /** Multiply in-place this matrix by matrix 'b'.  If 'b' and this reference the
+     *  same matrix 'b == this', a copy of the this matrix is made.
+     *  @param b  the matrix to multiply by (requires square and 'sameCrossDimensions')
      */
     def *= (b: MatrixN [T]): MatrixN [T] =
     {
@@ -540,7 +538,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // *=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by scalar x.
+    /** Multiply in-place this matrix by scalar 'x'.
      *  @param x  the scalar to multiply by
      */
     def *= (x: T): MatrixN [T] =
@@ -550,7 +548,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // *=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector u to produce another matrix (a_ij * b_j)
+    /** Multiply this matrix by vector 'u' to produce another matrix 'a_ij * b_j'.
      *  @param u  the vector to multiply by
      */
     def ** (u: VectorN [T]): MatrixN [T] =
@@ -561,7 +559,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // **
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by vector u to produce another matrix (a_ij * b_j)
+    /** Multiply in-place this matrix by vector 'u' to produce another matrix 'a_ij * b_j'.
      *  @param u  the vector to multiply by
      */
     def **= (u: VectorN [T]): MatrixN [T] =
@@ -571,7 +569,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // **=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide this matrix by scalar x.
+    /** Divide this matrix by scalar 'x'.
      *  @param x  the scalar to divide by
      */
     def / (x: T) (implicit fr: Fractional [T]): MatrixN [T] =
@@ -583,7 +581,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // /
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide in-place this matrix by scalar x.
+    /** Divide in-place this matrix by scalar 'x'.
      *  @param x  the scalar to divide by
      */
     def /= (x: T) (implicit fr: Fractional [T]): MatrixN [T] =
@@ -594,7 +592,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // /=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Raise this matrix to the pth power (for some integer p >= 2).
+    /** Raise this matrix to the 'p'th power (for some integer 'p >= 2').
      *  Caveat: should be replace by a divide and conquer algorithm.
      *  @param p  the power to raise this matrix to
      */
@@ -640,7 +638,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Decompose this matrix into the product of upper and lower triangular
-     *  matrices (l, u) using the LU Decomposition algorithm.  This version uses
+     *  matrices '(l, u)' using the 'LU' Decomposition algorithm.  This version uses
      *  no partial pivoting.
      */
     def lud_npp (implicit fr: Fractional [T]): Tuple2 [MatrixN [T], MatrixN [T]] =
@@ -665,7 +663,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Decompose this matrix into the product of lower and upper triangular
-     *  matrices (l, u) using the LU Decomposition algorithm.  This version uses
+     *  matrices '(l, u)' using the 'LU' Decomposition algorithm.  This version uses
      *  partial pivoting.
      */
     def lud (implicit fr: Fractional [T]): Tuple2 [MatrixN [T], MatrixN [T]] =
@@ -694,7 +692,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Decompose in-place this matrix into the product of lower and upper triangular
-     *  matrices (l, u) using the LU Decomposition algorithm.  This version uses
+     *  matrices '(l, u)' using the 'LU' Decomposition algorithm.  This version uses
      *  partial pivoting.
      */
     def lud_ip (implicit fr: Fractional [T]): Tuple2 [MatrixN [T], MatrixN [T]] =
@@ -723,7 +721,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Use partial pivoting to find a maximal non-zero pivot and return its row
-     *  index, i.e., find the maximum element (k, i) below the pivot (i, i).
+     *  index, i.e., find the maximum element '(k, i)' below the pivot '(i, i)'.
      *  @param a  the matrix to perform partial pivoting on
      *  @param i  the row and column index for the current pivot
      */
@@ -742,7 +740,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // partialPivoting
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Swap the elements in rows i and k starting from column col.
+    /** Swap the elements in rows 'i' and 'k' starting from column 'col'.
      *  @param a    the matrix containing the rows to swap
      *  @param i    the higher row  (e.g., contains a zero pivot)
      *  @param k    the lower row (e.g., contains max element below pivot)
@@ -756,7 +754,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // swap
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for x in the equation l*u*x = b (see lud above).
+    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
      *  @param l  the lower triangular matrix
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
@@ -778,7 +776,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for x in the equation l*u*x = b (see lud above).
+    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
      *  @param lu  the lower and upper triangular matrices
      *  @param b   the constant vector
      */
@@ -789,7 +787,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for x in the equation a*x = b where a is this matrix (see lud above).
+    /** Solve for 'x' in the equation 'a*x = b' where 'a' is this matrix (see 'lud' above).
      *  @param b  the constant vector.
      */
     def solve (b: VectorN [T]) (implicit fr: Fractional [T]): VectorN [T] =
@@ -798,8 +796,8 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Combine this matrix with matrix b, placing them along the diagonal and
-     *  filling in the bottom left and top right regions with zeros; [this, b].
+    /** Combine this matrix with matrix 'b', placing them along the diagonal and
+     *  filling in the bottom left and top right regions with zeros; '[this, b]'.
      *  @param b  the matrix to combine with this matrix
      */
     def diag (b: MatrixN [T]): MatrixN [T] =
@@ -817,8 +815,8 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // diag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Form a matrix [Ip, this, Iq] where Ir is a r by r identity matrix, by
-     *  positioning the three matrices Ip, this and Iq along the diagonal.
+    /** Form a matrix '[Ip, this, Iq]' where 'Ir' is a 'r-by-r' identity matrix, by
+     *  positioning the three matrices 'Ip', this and 'Iq' along the diagonal.
      *  @param p  the size of identity matrix Ip
      *  @param q  the size of identity matrix Iq
      */
@@ -836,7 +834,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // diag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get kth main diagonal of this matrix.  Assumes dim2 >= dim1.
+    /** Get 'k'th main diagonal of this matrix.  Assumes 'dim2 >= dim1'.
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
     def getDiag (k: Int = 0): VectorN [T] =
@@ -848,7 +846,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // getDiag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the kth diagonal of this matrix to the vector u.  Assumes dim2 >= dim1.
+    /** Set the 'k'th diagonal of this matrix to the vector 'u'.  Assumes 'dim2 >= dim1'.
      *  @param u  the vector to set the diagonal to
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
@@ -859,13 +857,13 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // setDiag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the main diagonal of this matrix to the scalar x.  Assumes dim2 >= dim1.
+    /** Set the main diagonal of this matrix to the scalar 'x'.  Assumes 'dim2 >= dim1'.
      *  @param x  the scalar to set the diagonal to
      */
     def setDiag (x: T) { for (i <- range1) v(i)(i) = x }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Invert this matrix (requires a squareMatrix) not using partial pivoting.
+    /** Invert this matrix (requires a 'squareMatrix') not using partial pivoting.
      */
     def inverse_npp (implicit fr: Fractional [T]): MatrixN [T] =
     {
@@ -892,7 +890,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // inverse_npp
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Invert this matrix (requires a squareMatrix) using partial pivoting.
+    /** Invert this matrix (requires a 'squareMatrix') using partial pivoting.
      */
     def inverse (implicit fr: Fractional [T]): MatrixN [T] =
     {
@@ -924,7 +922,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // inverse
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Invert in-place this matrix (requires a squareMatrix) using partial pivoting.
+    /** Invert in-place this matrix (requires a 'squareMatrix') using partial pivoting.
      */
     def inverse_ip (implicit fr: Fractional [T]): MatrixN [T] =
     {
@@ -957,7 +955,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Use Gauss-Jordan reduction on this matrix to make the left part embed an
-     *  identity matrix.  A constraint on this m by n matrix is that n >= m.
+     *  identity matrix.  A constraint on this 'm-by-n' matrix is that 'n >= m'.
      */
     def reduce (implicit fr: Fractional [T]): MatrixN [T] =
     {
@@ -985,7 +983,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Use Gauss-Jordan reduction in-place on this matrix to make the left part
-     *  embed an identity matrix.  A constraint on this m by n matrix is that n >= m.
+     *  embed an identity matrix.  A constraint on this 'm-by-n' matrix is that 'n >= m'.
      */
     def reduce_ip (implicit fr: Fractional [T])
     {
@@ -1025,11 +1023,11 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // clean
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the (right) nullspace of this m by n matrix (requires n = m + 1)
+    /** Compute the (right) nullspace of this 'm-by-n' matrix (requires 'n = m + 1')
      *  by performing Gauss-Jordan reduction and extracting the negation of the
-     *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
-     *  the same as the right nullspace of a.t (a transpose).
+     *  last column augmented by 1.  The nullspace of matrix 'a' is "this vector 'v'
+     *  times any scalar 's'", i.e., 'a*(v*s) = 0'.  The left nullspace of matrix 'a' is
+     *  the same as the right nullspace of 'a.t' ('a' transpose).
      */
     def nullspace (implicit fr: Fractional [T]): VectorN [T] =
     {
@@ -1038,11 +1036,11 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // nullspace
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the (right) nullspace in-place of this m by n matrix (requires n = m + 1)
+    /** Compute the (right) nullspace in-place of this 'm-by-n' matrix (requires 'n = m + 1')
      *  by performing Gauss-Jordan reduction and extracting the negation of the
-     *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
-     *  the same as the right nullspace of a.t (a transpose).
+     *  last column augmented by 1.  The nullspace of matrix 'a' is "this vector 'v'
+     *  times any scalar 's'", i.e., 'a*(v*s) = 0'.  The left nullspace of matrix 'a' is
+     *  the same as the right nullspace of 'a.t' ('a' transpose).
      */
     def nullspace_ip (implicit fr: Fractional [T]): VectorN [T] =
     {
@@ -1085,8 +1083,8 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
     } // sumLower
 
    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the abs sum of this matrix, i.e., the sum of the absolute value
-     *  of its elements.  This is useful for comparing matrices (a - b).sumAbs
+    /** Compute the 'abs' sum of this matrix, i.e., the sum of the absolute value
+     *  of its elements.  This is useful for comparing matrices '(a - b).sumAbs'.
      */
     def sumAbs: T =
     {
@@ -1097,7 +1095,7 @@ class MatrixN [T: ClassTag: Numeric] (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the 1-norm of this matrix, i.e., the maximum 1-norm of the
-     *  column vectors.  This is useful for comparing matrices (a - b).norm1
+     *  column vectors.  This is useful for comparing matrices '(a - b).norm1'.
      */
     def norm1: T =
     {

@@ -17,14 +17,14 @@ import scalation.util.Error
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MatriQ` trait specifies the operations to be defined by the concrete
  *  classes implementing `Rational` matrices, i.e.,
- *      MatrixQ           - dense matrix
- *      BidMatrixQ        - bidiagonal matrix - useful for computing Singular Values
- *      SparseMatrixQ     - sparse matrix - majority of elements should be zero
- *      SymTriMatrixQ     - symmetric triangular matrix - useful for computing Eigenvalues
- *      par.MatrixQ       - parallel dense matrix
- *      par.SparseMatrixQ - parallel sparse matrix
+ *      `MatrixQ`           - dense matrix
+ *      `BidMatrixQ`        - bidiagonal matrix - useful for computing Singular Values
+ *      `SparseMatrixQ`     - sparse matrix - majority of elements should be zero
+ *      `SymTriMatrixQ`     - symmetric triangular matrix - useful for computing Eigenvalues
+ *      `par.MatrixQ`       - parallel dense matrix
+ *      `par.SparseMatrixQ` - parallel sparse matrix
  * Some of the classes provide a few custom methods, e.g., methods beginning with "times"
- * or ending with "npp".
+ * or ending with 'npp'.
  *------------------------------------------------------------------------------
  *                  row-wise                 column-wise
  * Prepend:      vector +: matrix         vector +^: matrix  (right associative)
@@ -50,13 +50,13 @@ trait MatriQ
      */
     val range2 = 0 until dim2
 
-    /** Format string used for printing vector values (change using setFormat)
+    /** Format string used for printing vector values (change using 'setFormat')
      */
     protected var fString = "%s,\t"
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the format to the 'newFormat'.
-     *  @param  newFormat  the new format string
+     *  @param newFormat  the new format string
      */
     def setFormat (newFormat: String) { fString = newFormat }
 
@@ -66,7 +66,7 @@ trait MatriQ
     def copy (): MatriQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create an m-by-n matrix with all elements intialized to zero.
+    /** Create an m-by-n matrix with all elements initialized to zero.
      *  @param m  the number of rows
      *  @param n  the number of columns
      */
@@ -94,7 +94,7 @@ trait MatriQ
     def apply (ir: Range, jr: Range): MatriQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get a slice 'this' matrix row-wise on range ir and column-wise at index j.
+    /** Get a slice 'this' matrix row-wise on range 'ir' and column-wise at index j.
      *  Ex: u = a(2..4, 3)
      *  @param ir  the row range
      *  @param j   the column index
@@ -240,7 +240,7 @@ trait MatriQ
     def setCol (col: Int, u: VectoQ)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Select columns from 'this' matrix according to the given index/basis colIndex.
+    /** Select columns from 'this' matrix according to the given index/basis 'colIndex'.
      *  Ex:  Can be used to divide a matrix into a basis and a non-basis.
      *  @param colIndex  the column index positions (e.g., (0, 2, 5))
      */
@@ -289,9 +289,9 @@ trait MatriQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' matrix and matrix 'b' for any type extending `MatriQ`.
-     *  Note, subtypes of MatriQ should also implement a more efficient version,
-     *  e.g., `def + (b: MatrixD): MatrixD`.
-     *  @param b  the matrix to add (requires leDimensions)
+     *  Note, subtypes of `MatriQ` should also implement a more efficient version,
+     *  e.g., `def + (b: MatrixQ): MatrixQ`.
+     *  @param b  the matrix to add (requires 'leDimensions')
      */
     def + (b: MatriQ): MatriQ
 
@@ -309,9 +309,9 @@ trait MatriQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' matrix and matrix 'b' for any type extending `MatriQ`.
-     *  Note, subtypes of MatriQ should also implement a more efficient version,
-     *  e.g., `def += (b: MatrixD): MatrixD`.
-     *  @param b  the matrix to add (requires leDimensions)
+     *  Note, subtypes of `MatriQ` should also implement a more efficient version,
+     *  e.g., `def += (b: MatrixQ): MatrixQ`.
+     *  @param b  the matrix to add (requires 'leDimensions')
      */
     def += (b: MatriQ): MatriQ
 
@@ -329,9 +329,9 @@ trait MatriQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' matrix subtract matrix 'b' for any type extending `MatriQ`.
-     *  Note, subtypes of MatriQ should also implement a more efficient version,
-     *  e.g., `def - (b: MatrixD): MatrixD`.
-     *  @param b  the matrix to subtract (requires leDimensions)
+     *  Note, subtypes of `MatriQ` should also implement a more efficient version,
+     *  e.g., `def - (b: MatrixQ): MatrixQ`.
+     *  @param b  the matrix to subtract (requires 'leDimensions')
      */
     def - (b: MatriQ): MatriQ
 
@@ -349,9 +349,9 @@ trait MatriQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' matrix subtract in-place matrix 'b' for any type extending `MatriQ`.
-     *  Note, subtypes of MatriQ should also implement a more efficient version,
-     *  e.g., `def -= (b: MatrixD): MatrixD`.
-     *  @param b  the matrix to subtract (requires leDimensions)
+     *  Note, subtypes of `MatriQ` should also implement a more efficient version,
+     *  e.g., `def -= (b: MatrixQ): MatrixQ`.
+     *  @param b  the matrix to subtract (requires 'leDimensions')
      */
     def -= (b: MatriQ): MatriQ
 
@@ -369,9 +369,9 @@ trait MatriQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' matrix and matrix 'b' for any type extending `MatriQ`.
-     *  Note, subtypes of MatriQ should also implement a more efficient version,
-     *  e.g., `def * (b: MatrixD): MatrixD`.
-     *  @param b  the matrix to add (requires leDimensions)
+     *  Note, subtypes of `MatriQ` should also implement a more efficient version,
+     *  e.g., `def * (b: MatrixQ): MatrixQ`.
+     *  @param b  the matrix to add (requires 'leDimensions')
      */
     def * (b: MatriQ): MatriQ
 
@@ -389,9 +389,9 @@ trait MatriQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' matrix and matrix 'b' for any type extending `MatriQ`.
-     *  Note, subtypes of MatriQ should also implement a more efficient version,
-     *  e.g., `def *= (b: MatrixD): MatrixD`.
-     *  @param b  the matrix to multiply by (requires leDimensions)
+     *  Note, subtypes of `MatriQ` should also implement a more efficient version,
+     *  e.g., `def *= (b: MatrixQ): MatrixQ`.
+     *  @param b  the matrix to multiply by (requires 'leDimensions')
      */
     def *= (b: MatriQ): MatriQ
 
@@ -409,13 +409,13 @@ trait MatriQ
     def *: (u: VectoQ): VectoQ = this.t * u
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply 'this' matrix by vector 'u' to produce another matrix (a_ij * u_j)
+    /** Multiply 'this' matrix by vector 'u' to produce another matrix 'a_ij * u_j'.
      *  @param u  the vector to multiply by
      */
     def ** (u: VectoQ): MatriQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place 'this' matrix by vector 'u' to produce another matrix (a_ij * u_j)
+    /** Multiply in-place 'this' matrix by vector 'u' to produce another matrix 'a_ij * u_j'.
      *  @param u  the vector to multiply by
      */
     def **= (u: VectoQ): MatriQ
@@ -440,7 +440,7 @@ trait MatriQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the dot product of 'this' matrix and vector 'u', by first transposing
-     *  'this' matrix and then multiplying by 'u' (ie., 'a dot u = a.t * u').
+     *  'this' matrix and then multiplying by 'u' (i.e., 'a dot u = a.t * u').
      *  @param u  the vector to multiply by (requires same first dimensions)
      */
     def dot (u: VectoQ): VectoQ
@@ -498,20 +498,20 @@ trait MatriQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Decompose 'this' matrix into the product of lower and upper triangular
-     *  matrices '(l, u)' using the LU Decomposition algorithm.  This version uses
+     *  matrices '(l, u)' using the 'LU' Decomposition algorithm.  This version uses
      *  partial pivoting.
      */
     def lud: Tuple2 [MatriQ, MatriQ]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Decompose in-place 'this' matrix into the product of lower and upper triangular
-     *  matrices '(l, u)' using the LU Decomposition algorithm.  This version uses
+     *  matrices '(l, u)' using the 'LU' Decomposition algorithm.  This version uses
      *  partial pivoting.
      */
     def lud_ip (): Tuple2 [MatriQ, MatriQ]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' (see lud above).
+    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
      *  @param l  the lower triangular matrix
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
@@ -519,7 +519,7 @@ trait MatriQ
     def solve (l: MatriQ, u: MatriQ, b: VectoQ): VectoQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' (see lud above).
+    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
      *  @param lu  the lower and upper triangular matrices
      *  @param b   the constant vector
      */
@@ -533,9 +533,9 @@ trait MatriQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine the rank of 'this' m-by-n matrix by taking the upper triangular
-     *  matrix 'u' from the LU Decomposition and counting the number of non-zero
+     *  matrix 'u' from the 'LU' Decomposition and counting the number of non-zero
      *  diagonal elements.  Implementing classes may override this method with
-     *  a better one (e.g., SVD or Rank Revealing QR).
+     *  a better one (e.g., 'SVD' or Rank Revealing 'QR').
      *  @see http://en.wikipedia.org/wiki/Rank_%28linear_algebra%29
      */
     def rank: Int =
@@ -556,7 +556,7 @@ trait MatriQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Form a matrix '[Ip, this, Iq]' where 'Ir' is a 'r-by-r' identity matrix, by
-     *  positioning the three matrices Ip, this and Iq along the diagonal.
+     *  positioning the three matrices 'Ip', this and 'Iq' along the diagonal.
      *  @param p  the size of identity matrix Ip
      *  @param q  the size of identity matrix Iq
      */
@@ -582,12 +582,12 @@ trait MatriQ
     def setDiag (x: Rational)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Invert 'this' matrix (requires a squareMatrix) and use partial pivoting.
+    /** Invert 'this' matrix (requires a 'squareMatrix') and use partial pivoting.
      */
     def inverse: MatriQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Invert in-place 'this' matrix (requires a squareMatrix) and use partial pivoting.
+    /** Invert in-place 'this' matrix (requires a 'squareMatrix') and use partial pivoting.
      */
     def inverse_ip (): MatriQ
 
@@ -623,7 +623,7 @@ trait MatriQ
      *  FIX: need a more robust algorithm for computing nullspace (@see Fac_QR.scala).
      *  FIX: remove the 'n = m+1' restriction.
      *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
-     *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
+     *  @see /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
     def nullspace: VectoQ
 
@@ -638,7 +638,7 @@ trait MatriQ
      *  FIX: need a more robust algorithm for computing nullspace (@see Fac_QR.scala).
      *  FIX: remove the 'n = m+1' restriction.
      *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
-     *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
+     *  @see /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
     def nullspace_ip (): VectoQ
 
@@ -660,8 +660,8 @@ trait MatriQ
     def sumLower: Rational
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the abs sum of 'this' matrix, i.e., the sum of the absolute value
-     *  of its elements.  This is useful for comparing matrices (a - b).sumAbs
+    /** Compute the 'abs' sum of 'this' matrix, i.e., the sum of the absolute value
+     *  of its elements.  This is useful for comparing matrices '(a - b).sumAbs'.
      */
     def sumAbs: Rational
 
@@ -693,7 +693,7 @@ trait MatriQ
     def sameDimensions (b: MatriQ): Boolean = dim1 == b.dim1 && dim2 == b.dim2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check whether 'this' matrix dimensions are less than or equal to (le) those
+    /** Check whether 'this' matrix dimensions are less than or equal to 'le' those
      *  of the other matrix 'b'.
      *  @param b  the other matrix
      */
@@ -707,8 +707,8 @@ trait MatriQ
     def sameCrossDimensions (b: MatriQ): Boolean = dim2 == b.dim1
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check whether 'this' matrix is bidiagonal (has non-zreo elements only in
-     *  main diagonal and superdiagonal).  The method may be overriding for
+    /** Check whether 'this' matrix is bidiagonal (has non-zero elements only in
+     *  main diagonal and super-diagonal).  The method may be overriding for
      *  efficiency.
      */
     def isBidiagonal: Boolean =
@@ -751,8 +751,8 @@ trait MatriQ
     } // isSymmetric
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check whether 'this' matrix is bidiagonal (has non-zreo elements only in
-     *  main diagonal and superdiagonal).  The method may be overriding for
+    /** Check whether 'this' matrix is bidiagonal (has non-zero elements only in
+     *  main diagonal and super-diagonal).  The method may be overriding for
      *  efficiency.
      */
     def isTridiagonal: Boolean =

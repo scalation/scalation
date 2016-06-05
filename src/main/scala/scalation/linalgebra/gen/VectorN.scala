@@ -8,11 +8,11 @@
 
 package scalation.linalgebra.gen
 
-import Numeric._
-import collection.Traversable
-import math.{BigDecimal, ceil, sqrt}
-import reflect.ClassTag
-import util.Sorting.quickSort
+import scala.Numeric._
+import scala.collection.Traversable
+import scala.math.{BigDecimal, ceil, sqrt}
+import scala.reflect.ClassTag
+import scala.util.Sorting.quickSort
 
 import scalation.linalgebra.VectorD
 import scalation.math.Primes.prime
@@ -21,7 +21,7 @@ import scalation.util.Error
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Vectors` object contains convenience definitions for commonly used types of
  *  vectors.  For efficiency, non-generic versions of `VectorD`, `VectorC` and `VectorR`
- *  are provided in the linalgebra package.
+ *  are provided in the `linalgebra` package.
  */
 object Vectors
 {
@@ -40,7 +40,7 @@ object Vectors
 /** The `VectorN` class stores and operates on Numeric Vectors of various sizes
  *  and types.  The element type may be any subtype of Numeric.  Some methods
  *  only work for Fractional types.  When/if Scala adds 'sqrt' and 'pow' to
- *  Fractional types the following methods will be implemented: ~^, ~^=, normalizeU.
+ *  `Fractional` types the following methods will be implemented: ~^, ~^=, 'normalizeU'.
  *  @param dim  the dimension/size of the vector
  *  @param v    the 1D array used to store vector elements
  */
@@ -86,7 +86,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     def this (u: Array [T]) { this (u.length, u) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a vector and assign values from vector u.
+    /** Construct a vector and assign values from vector 'u'.
      *  @param u  the other vector
      */
     def this (u: VectorN [T])
@@ -96,7 +96,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Expand the size (dim) of this vector by 'more' elements.
+    /** Expand the size 'dim' of this vector by 'more' elements.
      *  @param factor  the expansion factor
      */
     def expand (more: Int = dim): VectorN [T] =
@@ -106,7 +106,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // expand
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a vector of the form (0, ... 1, ... 0) where the 1 is at position j.
+    /** Create a vector of the form (0, ... 1, ... 0) where the 1 is at position 'j'.
      *  @param j     the position to place the 1
      *  @param size  the size of the vector (upper bound = size - 1)
      */
@@ -118,7 +118,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // oneAt
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a vector of the form (0, ... -1, ... 0) where the -1 is at position j.
+    /** Create a vector of the form (0, ... -1, ... 0) where the -1 is at position 'j'.
      *  @param j     the position to place the 1
      *  @param size  the size of the vector (upper bound = size - 1)
      */
@@ -132,17 +132,16 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a ramp-up vector of increasing values: 0, 1, 2, ..., size - 1.
      *  @param size  the size of the vector (upper bound = size - 1)
-     * 
-    def ramp (size: Int = dim): VectorN [T] =
-    {
-        val c = new VectorN [T] (size)
-        for (i <- 0 until size) c.v(i) = nu.fromInt (i)
-        c
-    } // ramp
      */
+//  def ramp (size: Int = dim): VectorN [T] =
+//  {
+//      val c = new VectorN [T] (size)
+//      for (i <- 0 until size) c.v(i) = nu.fromInt (i)
+//      c
+//  } // ramp
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert a VectorN [T] into a VectorN [Int] (VectorI).
+    /** Convert a `VectorN [T]` into a `VectorN [Int]`, i.e., `VectorI`.
      *  @param u  the vector to convert an integer vector
      */
     def toInt: VectorI =
@@ -153,7 +152,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // toInt
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert a VectorN [T] into a VectorN [Double] (VectorD).
+    /** Convert a `VectorN [T]` into a `VectorN [Double]`, i.e., `VectorD`.
      *  @param u  the vector to convert a double vector
      */
     def toDouble: VectorD =
@@ -164,7 +163,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // toDouble
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get this vector's element at the i-th index position. 
+    /** Get this vector's element at the 'i'th index position. 
      *  @param i  the given index
      */
     def apply (i: Int): T = v(i)
@@ -181,7 +180,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     def apply (): Array [T] = v
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set this vector's element at the i-th index position. 
+    /** Set this vector's element at the 'i'th index position. 
      *  @param i  the given index
      *  @param x  the value to assign
      */
@@ -202,13 +201,13 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     def update (r: Range, u: VectorN [T]) { for (i <- r) v(i) = u(i) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set each value in this vector to x.
+    /** Set each value in this vector to 'x'.
      *  @param x  the value to be assigned
      */
     def set (x: T) { for (i <- range) v(i) = x }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the values in this vector to the values in array u.
+    /** Set the values in this vector to the values in array 'u'.
      *  @param u  the array of values to be assigned
      */
     def setAll (u: Array [T]) { for (i <- range) v(i) = u(i) }
@@ -224,7 +223,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // foreach
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Slice this vector from to end.
+    /** Slice this vector 'from' to 'end'.
      *  @param from  the start of the slice (included)
      *  @param till  the end of the slice (excluded)
      */
@@ -242,7 +241,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // select
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate this vector and scalar b.
+    /** Concatenate this vector and scalar 'b'.
      *  @param b  the vector to be concatenated
      */
     def ++ (b: T): VectorN [T] =
@@ -253,7 +252,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // ++
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate this vector and vector b.
+    /** Concatenate this vector and vector 'b'.
      *  @param b  the vector to be concatenated
      */
     def ++ (b: VectorN [T]): VectorN [T] =
@@ -264,7 +263,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // ++
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add this vector and vector b.
+    /** Add this vector and vector 'b'.
      *  @param b  the vector to add
      */
     def + (b: VectorN [T]): VectorN [T] =
@@ -275,7 +274,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add this vector and scalar s.
+    /** Add this vector and scalar 's'.
      *  @param s  the scalar to add
      */
     def + (s: T): VectorN [T] =
@@ -286,7 +285,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // +
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add this vector and scalar s._1 only at position s._2.
+    /** Add this vector and scalar 's._1' only at position 's._2'.
      *  @param s  the (scalar, position) to add
      */
     def + (s: Tuple2 [T, Int]): VectorN [T] =
@@ -297,13 +296,13 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add in-place this vector and vector b.
+    /** Add in-place this vector and vector 'b'.
      *  @param b  the vector to add
      */
     def += (b: VectorN [T]): VectorN [T] = { for (i <- range) v(i) += b.v(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add in-place this vector and scalar s.
+    /** Add in-place this vector and scalar 's'.
      *  @param s  the scalar to add
      */
     def += (s: T): VectorN [T] = { for (i <- range) v(i) += s; this }
@@ -319,7 +318,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // unary_-
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this vector subtract vector b.
+    /** From this vector subtract vector 'b'.
      *  @param b  the vector to subtract
      */
     def - (b: VectorN [T]): VectorN [T] =
@@ -330,7 +329,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // -
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this vector subtract scalar s.
+    /** From this vector subtract scalar 's'.
      *  @param s  the scalar to subtract
      */
     def - (s: T): VectorN [T] =
@@ -341,7 +340,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // -
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this vector subtract scalar s._1 only at position s._2.
+    /** From this vector subtract scalar 's._1' only at position 's._2'.
      *  @param s  the (scalar, position) to subtract
      */
     def - (s: Tuple2 [T, Int]): VectorN [T] =
@@ -352,19 +351,19 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this vector subtract in-place vector b.
+    /** From this vector subtract in-place vector 'b'.
      *  @param b  the vector to add
      */
     def -= (b: VectorN [T]): VectorN [T] = { for (i <- range) v(i) -= b.v(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this vector subtract in-place scalar s.
+    /** From this vector subtract in-place scalar 's'.
      *  @param s  the scalar to add
      */
     def -= (s: T): VectorN [T] = { for (i <- range) v(i) -= s; this }
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this vector by scalar s.
+    /** Multiply this vector by scalar 's'.
      *  @param s  the scalar to multiply by
      */
     def * (s: T): VectorN [T] =
@@ -375,7 +374,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this vector by vector b.
+    /** Multiply this vector by vector 'b'.
      *  @param b  the vector to multiply by
      */
     def * (b: VectorN [T]): VectorN [T] =
@@ -386,25 +385,25 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this 'row' vector by matrix m.
+    /** Multiply this 'row' vector by matrix 'm'.
      *  @param m  the matrix to multiply by
      */
     def * (m: Matrix [T]): VectorN [T] = m.t * this
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this vector and vector b.
+    /** Multiply in-place this vector and vector 'b'.
      *  @param b  the vector to add
      */
     def *= (b: VectorN [T]): VectorN [T] = { for (i <- range) v(i) *= b.v(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this vector and scalar s.
+    /** Multiply in-place this vector and scalar 's'.
      *  @param s  the scalar to add
      */
     def *= (s: T): VectorN [T] = { for (i <- range) v(i) *= s; this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide this vector by vector b (element-by-element).
+    /** Divide this vector by vector 'b' (element-by-element).
      *  @param b  the vector to divide by
      */
     def / (b: VectorN [T]) (implicit fr: Fractional [T]): VectorN [T] =
@@ -416,7 +415,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // /
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide this vector by scalar s.
+    /** Divide this vector by scalar 's'.
      *  @param s  the scalar to divide by
      */
     def / (s: T) (implicit fr: Fractional [T]): VectorN [T] =
@@ -428,7 +427,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // /
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide in-place this vector and vector b.
+    /** Divide in-place this vector and vector 'b'.
      *  @param b  the vector to add
      */
     def /= (b: VectorN [T]) (implicit fr: Fractional [T]): VectorN [T] =
@@ -439,7 +438,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // /=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide in-place this vector and scalar s.
+    /** Divide in-place this vector and scalar 's'.
      *  @param s  the scalar to add
      */
     def /= (s: T) (implicit fr: Fractional [T]): VectorN [T] =
@@ -451,28 +450,26 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector containing each element of this vector raised to the
-     *  s-th power.
+     *  's'th power.
      *  @param s  the scalar exponent
-     *
-    def ~^ (s: T) (implicit fr: Fractional [T]): VectorN [T] =
-    {
-        import fr._
-        val c = new VectorN [T] (dim)
-        for (i <- range) c.v(i) = math.pow (v(i), s)
-        c
-    } // ~^
      */
+//  def ~^ (s: T) (implicit fr: Fractional [T]): VectorN [T] =
+//  {
+//      import fr._
+//      val c = new VectorN [T] (dim)
+//      for (i <- range) c.v(i) = math.pow (v(i), s)
+//      c
+//  } // ~^
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Raise each element of this vector to the s-th power.
+    /** Raise each element of this vector to the 's'th power.
      *  @param s  the scalar exponent
-     *
-    def ~^= (s: T) (implicit fr: Fractional [T])
-    {
-        import fr._
-        for (i <- range) v(i) = math.pow (v(i), s) 
-    } // ~^
      */
+//  def ~^= (s: T) (implicit fr: Fractional [T])
+//  {
+//      import fr._
+//      for (i <- range) v(i) = math.pow (v(i), s) 
+//  } // ~^
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Square each element of this vector.
@@ -495,7 +492,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     def sum: T = v.sum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Sum the elements of this vector skipping the i-th element.
+    /** Sum the elements of this vector skipping the 'i'th element.
      *  @param i  the index of the element to skip
      */
     def sum_ne (i: Int): T = sum - v(i)
@@ -533,13 +530,12 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize this vector so its length is one (unit vector).
-     *
-    def normalizeU (implicit fr: Fractional [T]): VectorN [T] =
-    {
-        import fr._
-        this * (one / norm)
-    } // normalizeU
      */
+//  def normalizeU (implicit fr: Fractional [T]): VectorN [T] =
+//  {
+//      import fr._
+//      this * (one / norm)
+//  } // normalizeU
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize this vector to have a maximum of one.
@@ -551,7 +547,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // normalize1
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the dot product (or inner product) of this vector with vector b.
+    /** Compute the dot product (or inner product) of this vector with vector 'b'.
      *  @param b  the other vector
      */
     def dot (b: VectorN [T]): T =
@@ -567,7 +563,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     def normSq: T = this dot this
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Euclidean norm (2-norm) of this vector (requires Fractional type).
+    /** Compute the Euclidean norm (2-norm) of this vector (requires `Fractional` type).
      */
     def norm (implicit fr: Fractional [T]): Double = sqrt (normSq.toDouble)
 
@@ -588,7 +584,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     def max (e: Int = dim): T = v.slice (0, e).max
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Take the maximum of this vector with vector b (element-by element).
+    /** Take the maximum of this vector with vector 'b' (element-by element).
      *  @param b  the other vector
      */
     def max (b: VectorN [T]): VectorN [T] =
@@ -605,7 +601,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     def min (e: Int = dim): T = v.slice (0, e).min
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Take the minimum of this vector with vector b (element-by element).
+    /** Take the minimum of this vector with vector 'b' (element-by element).
      *  @param b  the other vector
      */
     def min (b: VectorN [T]): VectorN [T] =
@@ -699,7 +695,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // countPos
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine whether the predicate pred holds for some element in this vector.
+    /** Determine whether the predicate 'pred' holds for some element in this vector.
      *  @param pred  the predicate to test (e.g., "_ == 5.")
      */
 //  def exists (pred: (T) => Boolean): Boolean = v.exists (pred)
@@ -731,7 +727,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // isNonnegative
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare this vector with vector b.
+    /** Compare this vector with vector 'b'.
      *  @param b  the other vector
      */
     def tryCompareTo [B >: VectorN [T]] (b: B)
@@ -749,7 +745,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     } // tryCompareTo
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Override equals to determine whether vector this equals vector b.
+    /** Override equals to determine whether vector this equals vector 'b'.
      *  @param b  the vector to compare with this
      */
     override def equals (b: Any): Boolean =
@@ -769,15 +765,14 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
     /** Hash a vector into an integer.  Serves as the default hash function for
      *  vectors.  Warning, collisions may be unavoidable.
      *  @param x  the vector of type T to hash
-     *
-    override def hashCode (): Int =
-    {
-        if (dim > prime.length) flaw ("hash", "not enough primes for computing hash function")
-        var accum = 0
-        for (i <- range) accum ^= (ceil (v(i).toDouble * prime(i))).toInt
-        accum
-    } // hashCode
      */
+//  override def hashCode (): Int =
+//  {
+//      if (dim > prime.length) flaw ("hash", "not enough primes for computing hash function")
+//      var accum = 0
+//      for (i <- range) accum ^= (ceil (v(i).toDouble * prime(i))).toInt
+//      accum
+//  } // hashCode
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert this vector to a string.
@@ -798,7 +793,7 @@ class VectorN [T <% Ordered [T]: ClassTag: Numeric] (val dim: Int,
 object VectorN extends Error
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a VectorN [T] from one or more values (repeated values T*).
+    /** Create a `VectorN [T]` from one or more values (repeated values T*).
      *  @param u0  the first value
      *  @param u   the rest of the values (zero or more additional values)
      */
@@ -811,7 +806,7 @@ object VectorN extends Error
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a VectorN [T] from one or more values (repeated values String*).
+    /** Create a 'VectorN [T]' from one or more values (repeated values String*).
      *  @param skip  dummy value to set data type
      *  @param x     the first String
      *  @param xs    the rest of the Strings
@@ -833,7 +828,7 @@ object VectorN extends Error
     } // apply
 
    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a VectorN [T] from an array of Strings.
+    /** Create a 'VectorN [T]' from an array of strings.
      *  @param skip  dummy value to set data type
      *  @param xa    the array of the Strings
      */
@@ -854,7 +849,7 @@ object VectorN extends Error
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return a VectorN containing a sequence of increasing integers in a range.
+    /** Return a `VectorN` containing a sequence of increasing integers in a range.
      *  @param skip   dummy value to set data type
      *  @param start  the start value of the vector, inclusive
      *  @param end    the end value of the vector, exclusive (i.e., the first value not returned)
@@ -944,5 +939,5 @@ object VectorNTest extends App
    val z = VectorN (0, "1", "2", "3", "4")
    println ("z = " + z)
 
-} // VectorNTest
+} // VectorNTest object
 

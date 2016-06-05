@@ -24,7 +24,7 @@ import scalation.math.ExtremeD.EPSILON
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `SVD` class is used to compute the Singlar Value Decomposition (SVD) of
+/** The `SVD` class is used to compute the Singular Value Decomposition 'SVD' of
  *  matrix 'aa' using the Golub-Kahan-Reinsch Algorithm.
  *  Decompose matrix 'aa' into the product of three matrices:
  *  <p>
@@ -34,7 +34,7 @@ import scalation.util.Error
  *        (LEFT SINGULAR VECTORS)
  *        'vv' is a matrix of orthogonal eigenvectors of 'aa.t * aa'
  *        (RIGHT SINGULAR VECTORS) and
- *        'a' is a diagonal matrix of square roots of eigenvalues of 'aa.t * aa' &' aa * aa.t'
+ *        'a' is a diagonal matrix of square roots of eigenvalues of 'aa.t * aa' & 'aa * aa.t'
  *        (SINGULAR VALUES).
  *  @param aa  the m-by-n matrix to deflate/decompose (algorithm requires m >= n)
  */
@@ -75,7 +75,7 @@ class SVD (aa: MatrixD)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Deflate matrix 'aa' and decompose it using a Singular Value Decomposition
-     *  (SVD) algorithm.
+     *  'SVD' algorithm.
      *  Deflate matrix 'aa' forming a diagonal matrix consisting of singular
      *  values and return the singular values in vector 's'.  Also return the
      *  singular vector matrices 'uu' and 'vv'.
@@ -171,7 +171,7 @@ class SVD (aa: MatrixD)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find/return the index of the first diagonal entry in 'a' from 'j' until 'k'
      *  that is zero; otherwise -1 (not found).
-     *  @param j  strart the search here
+     *  @param j  start the search here
      *  @param k  end the search here
      */
     private def findZero (j: Int, k: Int): Int =
@@ -256,7 +256,7 @@ object SVD
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDTest` object is used to test the `SVD` class starting with a matrix that
- *  is already bidiagonalized and gives eigenvalues of 28, 18 for the first step.
+ *  is already in bidiagonal form and gives eigenvalues of 28, 18 for the first step.
  *  @see http://ocw.mit.edu/ans7870/18/18.06/javademo/SVD/
  *  > run-main scalation.linalgebra.SVDTest
  */

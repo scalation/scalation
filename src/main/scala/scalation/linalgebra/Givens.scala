@@ -18,8 +18,8 @@ import scalation.linalgebra.MatrixD.eye
 import scalation.math.double_exp
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Givens` objects has methods for determinng values 'c = cos(theta)' and
- *  's = sin(theta) for Givens rotation matrices as well as methods for applying
+/** The `Givens` objects has methods for determining values 'c = cos(theta)' and
+ *  's = sin(theta)' for Givens rotation matrices as well as methods for applying
  *  Givens rotations.
  */
 object Givens
@@ -68,8 +68,8 @@ object Givens
     /** Efficiently perform a Givens row update: 'a = g (i, k, theta).t * a'.
      *  The update just affects two row.  FIX
      *  @param a   the matrix to update
-     *  @param i   the first row ??
-     *  @param k   the second row ??
+     *  @param i   the first row
+     *  @param k   the second row
      *  @param cs  the (cosine, sine) of theta
      *  @see Section 5.1.9 in Matrix Computation.
      */
@@ -88,8 +88,8 @@ object Givens
     /** Efficiently perform a Givens column update: a = a * g (i, k, theta).
      *  The update just affects two columns.  FIX
      *  @param a   the matrix to update
-     *  @param i   the first column ??
-     *  @param k   the second column ??
+     *  @param i   the first column
+     *  @param k   the second column
      *  @param cs  the (cosine, sine) of theta
      *  @see Section 5.1.9 in Matrix Computation.
      */

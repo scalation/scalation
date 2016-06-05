@@ -169,14 +169,14 @@ class VectorC (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  a new vector.
-     *  @param p  the predicate (Boolean function) to apply
+     *  @param p  the predicate (`Boolean` function) to apply
      */
     override def filter (p: Complex => Boolean): VectorC = VectorC (v.filter (p))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  the index positions.
-     *  @param p  the predicate (Boolean function) to apply
+     *  @param p  the predicate (`Boolean` function) to apply
      */
     def filterPos (p: Complex => Boolean): IndexedSeq [Int] =
     {
@@ -764,15 +764,14 @@ class VectorC (val dim: Int,
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of distinct elements in 'this' vector.
-     *
-    def distinct: Int =
-    {
-        var count = 1
-        val us = new VectorC (this); us.sort ()                // sorted vector
-        for (i <- 1 until dim if us(i) != us(i-1)) count += 1
-        count
-    } // distinct
      */
+//  def distinct: Int =
+//  {
+//      var count = 1
+//      val us = new VectorC (this); us.sort ()                // sorted vector
+//      for (i <- 1 until dim if us(i) != us(i-1)) count += 1
+//      count
+//  } // distinct
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return a new vector consisting of the distinct elements from 'this' vector.
@@ -791,7 +790,7 @@ class VectorC (val dim: Int,
     def contains (x: Complex): Boolean = v contains x
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Reverse the order of the elemnets in 'this' vector.
+    /** Reverse the order of the elements in 'this' vector.
      */
     def reverse (): VectorC = new VectorC (dim, v.reverse)
 
@@ -882,9 +881,9 @@ class VectorC (val dim: Int,
 object VectorC
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `VectorC` from one or more values (repeated values Complex*).
-     *  @param x   the first Complex number
-     *  @param xs  the rest of the Complex numbers
+    /** Create a `VectorC` from one or more values (repeated values `Complex`*).
+     *  @param x   the first `Complex` number
+     *  @param xs  the rest of the `Complex` numbers
      */
     def apply (x: Complex, xs: Complex*): VectorC =
     {
@@ -895,8 +894,8 @@ object VectorC
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `VectorC` from a sequence/array of Complexs.
-     *  @param xs  the sequence/array of the Complex numbers
+    /** Create a `VectorC` from a sequence/array of `Complex`s.
+     *  @param xs  the sequence/array of the `Complex` numbers
      */
     def apply (xs: Seq [Complex]): VectorC =
     {

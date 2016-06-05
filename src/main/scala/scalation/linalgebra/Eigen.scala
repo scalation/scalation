@@ -7,7 +7,7 @@
  *
  *  This file contains classes for Hessenburg reductions, finding Eigenvalues
  *  and computing Eigenvectors.
- *  Need to add ability to work with SparseMatrixD
+ *  Need to add ability to work with `SparseMatrixD`
  */
 
 package scalation.linalgebra
@@ -22,7 +22,7 @@ import scalation.math.ExtremeD.TOL
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Eigen` trait defines constants used by classes and objects the Eigen group.
+/** The `Eigen` trait defines constants used by classes and objects in the group.
  */
 trait Eigen
 {
@@ -31,6 +31,7 @@ trait Eigen
     protected val DEBUG = true
 
 } // Eigen trait
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Hessenburg` class is used to reduce, via similarity transformations, an
@@ -67,10 +68,10 @@ class Hessenburg (a: MatrixD)
  *  'a' using an iterative technique that applies similarity transformations to
  *  convert 'a' into an upper triangular matrix, so that the eigenvalues appear
  *  along the diagonal.  To improve performance, the 'a' matrix is first reduced
- *  to Hessenburg form.  During the iterative steps, a shifted QR decomposition
+ *  to Hessenburg form.  During the iterative steps, a shifted 'QR' decomposition
  *  is performed.
- *  Caveats: (i) it will not handle eigenvalues that are complex numbers,
- *           (ii) it uses a simple shifting strategy that may slow convergence.
+ *  Caveats: (1) it will not handle eigenvalues that are complex numbers,
+ *           (2) it uses a simple shifting strategy that may slow convergence.
  *  @param a  the matrix whose eigenvalues are sought 
  */
 class Eigenvalue (a: MatrixD)
@@ -159,7 +160,7 @@ class HouseholderT (a: MatrixD)
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `SymmetricQRstep` object performs a symmetric QR step with a Wilkinson shift.
+/** The `SymmetricQRstep` object performs a symmetric 'QR' step with a Wilkinson shift.
  *  @see Algorithm 8.3.2 in Matrix Computations.
  *  @see http://people.inf.ethz.ch/arbenz/ewp/Lnotes/chapter3.pdf (Algorithm 3.6)
  */
@@ -167,7 +168,7 @@ object SymmetricQRstep
        extends Eigen with Error
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Apply a QR reduction step to matrix t.
+    /** Apply a 'QR' reduction step to matrix 't'.
      *  @param t  the unreduced symmetric tridiagonal matrix
      *  @param p  the row index
      *  @param q  the column index
@@ -206,10 +207,10 @@ object SymmetricQRstep
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `EigenvalueSym` class is used to find the eigenvalues of an 'n' by 'n'
- *  symmetric matrix 'a' using an iterative technique, the Symmetric QR Algorithm.
+ *  symmetric matrix 'a' using an iterative technique, the Symmetric 'QR' Algorithm.
  *  @see Algorithm 8.3.3 in Matrix Computations.
- *  Caveats: (i) it will not handle eigenvalues that are complex numbers,
- *           (ii) it uses a simple shifting strategy that may slow convergence.
+ *  Caveats: (1) it will not handle eigenvalues that are complex numbers,
+ *           (2) it uses a simple shifting strategy that may slow convergence.
  *  @param a  the symmetric matrix whose eigenvalues are sought
  */
 class EigenvalueSym (a: MatrixD)
@@ -246,7 +247,7 @@ class EigenvalueSym (a: MatrixD)
 /** The `Eigenvector` class is used to find the eigenvectors of an 'n' by 'n' matrix
  *  'a' by solving equations of the form
  *  <p>
- *  (a - eI)v = 0
+ *      (a - eI)v = 0
  *  <p>
  *  where 'e' is the eigenvalue and 'v' is the eigenvector.  Place the eigenvectors
  *  in a matrix column-wise.
@@ -280,28 +281,26 @@ class Eigenvector (a: MatrixD, _e: VectorD = null)
         v.setCol (i, eVec)
     } // for
 
-/****
         // find eigenvectors using inverse iteration (also improves eigenvalues)
         // @see http://home.iitk.ac.in/~dasgupta/MathBook/lmastertrans.pdf (p. 130)
-        var y_k = new VectorD (m); y_k.set (1./m.toDouble)   // old estimate of eigenvector
-        var y_l: VectorD = null                                 // new estimate of eigenvector
-
-        for (i <- 0 until m) {               // compute eigenvector for i-th eigenvalue
-            breakable { for (k <- 0 until ITERATIONS) {
-                val a_Ie = a - ident * e(i)      // form matrix: [a - Ie]
-                println ("a_Ie = " + a_Ie)
-                val qr = new Fac_QR (a_Ie)
-                qr.factor ()
-                val y = qr.solve (y_k)           // solve [a - Ie]y = y_k
-                y_l   = y / y.norm               // normalize
-                e(i) += 1.0 / (y_k dot y)        // improve the eigenvalue
-                if ((y_l - y_k).norm < TOL) break
-                y_k = y_l                        // update the eigenvector
-            }} // for
-            println ("eigenvector for eigenvalue " + e(i) + " = " + y_l)
-            v.setCol (i, y_l)
-        } // for
-****/
+//      var y_k = new VectorD (m); y_k.set (1./m.toDouble)   // old estimate of eigenvector
+//      var y_l: VectorD = null                                 // new estimate of eigenvector
+//
+//      for (i <- 0 until m) {               // compute eigenvector for i-th eigenvalue
+//          breakable { for (k <- 0 until ITERATIONS) {
+//              val a_Ie = a - ident * e(i)      // form matrix: [a - Ie]
+//              println ("a_Ie = " + a_Ie)
+//              val qr = new Fac_QR (a_Ie)
+//              qr.factor ()
+//              val y = qr.solve (y_k)           // solve [a - Ie]y = y_k
+//              y_l   = y / y.norm               // normalize
+//              e(i) += 1.0 / (y_k dot y)        // improve the eigenvalue
+//              if ((y_l - y_k).norm < TOL) break
+//              y_k = y_l                        // update the eigenvector
+//          }} // for
+//          println ("eigenvector for eigenvalue " + e(i) + " = " + y_l)
+//          v.setCol (i, y_l)
+//      } // for
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the eigenvector v matrix.

@@ -34,7 +34,7 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
      */
     private val hmat = Array.ofDim [Array[Array[Array [T]]]] (dim1, dim2)
 
-    /** Format string used for printing vector values (change using setFormat)
+    /** Format string used for printing vector values (change using 'setFormat')
      */
     protected var fString = "%g,\t"
 
@@ -45,7 +45,7 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the format to the 'newFormat'.
-     *  @param  newFormat  the new format string
+     *  @param newFormat  the new format string
      */
     def setFormat (newFormat: String) { fString = newFormat }
 
@@ -230,7 +230,7 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' hypermatrix and hypermatrix 'b'.
-     *  @param b  the hypermatirx to add (requires leDimensions)
+     *  @param b  the hypermatrix to add (requires 'leDimensions')
      */
     def + (b: HMatrix5 [T]): HMatrix5 [T] =
     {
@@ -247,7 +247,7 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' hypermatrix subtract hypermatrix 'b'.
-     *  @param b  the hypermatirx to add (requires leDimensions)
+     *  @param b  the hypermatrix to add (requires 'leDimensions')
      */
     def - (b: HMatrix5 [T]): HMatrix5 [T] =
     {
@@ -264,7 +264,7 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check whether the dimensions of 'this' hypermatrix are less than or equal to
-     *  (le) those of the other hypermatrix 'b'.
+     *  'le' those of the other hypermatrix 'b'.
      *  @param b  the other hypermatrix
      */
     def leDimensions (b: HMatrix5 [T]): Boolean =

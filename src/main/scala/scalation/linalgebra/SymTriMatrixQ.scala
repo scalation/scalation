@@ -84,7 +84,7 @@ class SymTriMatrixQ (val d1: Int)
     def copy (): SymTriMatrixQ = new SymTriMatrixQ (dim1)             // FIX - copy the diagonals
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create an m-by-n symmetric tridiagonal matrix with all elements intialized to zero.
+    /** Create an m-by-n symmetric tridiagonal matrix with all elements initialized to zero.
      *  @param m  the number of rows
      *  @param n  the number of columns
      */
@@ -431,7 +431,7 @@ class SymTriMatrixQ (val d1: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' tridiagonal matrix and matrix 'b'.
-     *  @param b  the matrix to add (requires leDimensions)
+     *  @param b  the matrix to add (requires 'leDimensions')
      */
     def + (b: MatriQ): SymTriMatrixQ = 
     {
@@ -464,7 +464,7 @@ class SymTriMatrixQ (val d1: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' tridiagonal matrix and matrix 'b'.
-     *  @param b  the matrix to add (requires leDimensions)
+     *  @param b  the matrix to add (requires 'leDimensions')
      */
     def += (b: MatriQ): SymTriMatrixQ =
     {
@@ -498,7 +498,7 @@ class SymTriMatrixQ (val d1: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' tridiagonal matrix subtract matrix 'b'.
-     *  @param b  the matrix to subtract (requires leDimensions)
+     *  @param b  the matrix to subtract (requires 'leDimensions')
      */
     def - (b: MatriQ): SymTriMatrixQ = 
     {
@@ -531,7 +531,7 @@ class SymTriMatrixQ (val d1: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' tridiagonal matrix subtract in-place matrix 'b'.
-     *  @param b  the matrix to subtract (requires leDimensions)
+     *  @param b  the matrix to subtract (requires 'leDimensions')
      */
     def -= (b: MatriQ): SymTriMatrixQ =
     {
@@ -574,7 +574,7 @@ class SymTriMatrixQ (val d1: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' tridiagonal matrix by matrix 'b'.  Requires 'b' to have
-     *  type SymTriMatrixQ, but returns a more general type of matrix.
+     *  type `SymTriMatrixQ`, but returns a more general type of matrix.
      *  @param b  the matrix to multiply by
      */
     def * (b: SymTriMatrixQ): MatrixQ = 
@@ -643,7 +643,7 @@ class SymTriMatrixQ (val d1: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' tridiagonal matrix by vector 'u' to produce another matrix
-     *  '(a_ij * u_j)'.
+     *  'a_ij * u_j'.
      *  @param u  the vector to multiply by
      */
     def ** (u: VectoQ): SymTriMatrixQ = 
@@ -653,7 +653,7 @@ class SymTriMatrixQ (val d1: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' tridiagonal matrix by vector 'u' to produce another
-     *  matrix '(a_ij * u_j)'.
+     *  matrix 'a_ij * u_j'.
      *  @param u  the vector to multiply by
      */
     def **= (u: VectoQ): SymTriMatrixQ =
@@ -702,7 +702,7 @@ class SymTriMatrixQ (val d1: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor 'this' tridiagonal matrix into the product of lower and
-     *  upper triangular matrices '(l, u)' using the LU Factorization algorithm.
+     *  upper triangular matrices '(l, u)' using the 'LU' Factorization algorithm.
      *  'l' is lower bidiagonal and 'u' is upper bidiagonal.
      *  FIX: would be more efficient to use tridiagonal matrices than dense matrices.
      *  @see www.webpages.uidaho.edu/~barannyk/Teaching/LU_factorization_tridiagonal.pdf
@@ -721,13 +721,13 @@ class SymTriMatrixQ (val d1: Int)
         } // for
 
         l setDiag (ls, -1)                 // set subdiagonal for l
-        u setDiag (_sd, 1)                 // set superdiagonal for u
+        u setDiag (_sd, 1)                 // set super-diagonal for u
         u setDiag (ud)                     // set diagonal for u
         (l, u)
     } // lud
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'a*x = l*u*x = b' (see lud above).
+    /** Solve for 'x' in the equation 'a*x = l*u*x = b' (see 'lud' above).
      *  @param l  the lower triangular matrix
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
@@ -743,7 +743,7 @@ class SymTriMatrixQ (val d1: Int)
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' (see lud above).
+    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
      *  @param lu  the lower and upper triangular matrices
      *  @param b   the constant vector
      */
@@ -753,7 +753,7 @@ class SymTriMatrixQ (val d1: Int)
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' tridiagonal matrix,
      *  using the Thomas Algorithm.
      *  Caveat:  Stability vs. diagonal dominance.
-     *  This method is more efficient, since a lud creates dense matrices.
+     *  This method is more efficient, since a 'lud' creates dense matrices.
      *  @see en.wikibooks.org/wiki/Algorithm_Implementation/Linear_Algebra/Tridiagonal_matrix_algorithm
      *  @param b  the constant vector
      */
@@ -763,7 +763,7 @@ class SymTriMatrixQ (val d1: Int)
         val x = new VectorQ (b)               // solution vector, start with copy of b
         val c = _sd                           // subdiagonal
         val d = _dg                           // diagonal
-        val e = new VectorQ (_sd ++ _0)      // augmented superdiagonal
+        val e = new VectorQ (_sd ++ _0)      // augmented super-diagonal
  
         e(0) /= d(0)
         x(0) /= d(0)
@@ -837,7 +837,7 @@ class SymTriMatrixQ (val d1: Int)
     } // getDiag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the kth diagonal of 'this' tridiagonal matrix to the vector 'u'.
+    /** Set the 'k'th diagonal of 'this' tridiagonal matrix to the vector 'u'.
      *  Assumes 'dim2 >= dim1'.
      *  @param u  the vector to set the diagonal to
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
@@ -864,7 +864,7 @@ class SymTriMatrixQ (val d1: Int)
     {
         val c = _sd                           // subdiagonal
         val d = _dg                           // diagonal
-        val e = new VectorQ (_sd  ++ _0)     // augmented superdiagonal
+        val e = new VectorQ (_sd  ++ _0)     // augmented super-diagonal
 
         val a = new VectorQ (d1)              // alpha
         val g = new VectorQ (d1)              // gamma
@@ -918,7 +918,7 @@ class SymTriMatrixQ (val d1: Int)
      *  FIX: need a more robust algorithm for computing nullspace (@see Fac_QR.scala).
      *  FIX: remove the 'n = m+1' restriction.
      *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
-     *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
+     *  @see /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
     def nullspace: VectorQ =
     {
@@ -937,7 +937,7 @@ class SymTriMatrixQ (val d1: Int)
      *  FIX: need a more robust algorithm for computing nullspace (@see Fac_QR.scala).
      *  FIX: remove the 'n = m+1' restriction.
      *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
-     *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
+     *  @see /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
     def nullspace_ip (): VectorQ =
     {
@@ -959,7 +959,7 @@ class SymTriMatrixQ (val d1: Int)
     def sum: Rational = _dg.sum + _sd.sum + _sd.sum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the abs sum of 'this' tridiagonal matrix, i.e., the sum of the absolute
+    /** Compute the 'abs' sum of 'this' tridiagonal matrix, i.e., the sum of the absolute
      *  value of its elements.  This is useful for comparing matrices '(a - b).sumAbs'.
      */
     def sumAbs: Rational = _dg.sumAbs + _sd.sumAbs + _sd.sumAbs
@@ -1002,8 +1002,8 @@ class SymTriMatrixQ (val d1: Int)
     override def isSymmetric: Boolean = true
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check whether 'this' tridiagonal matrix is bidiagonal (has non-zreo elements
-     *  only in main diagonal and superdiagonal).  The method may be overriding for
+    /** Check whether 'this' tridiagonal matrix is bidiagonal (has non-zero elements
+     *  only in main diagonal and super-diagonal).  The method may be overriding for
      *  efficiency.
      */
     override def isTridiagonal: Boolean = true
@@ -1088,7 +1088,7 @@ object SymTriMatrixQ extends Error
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a matrix and assign values from the Scala `Vector` of vectors 'u'.
-     *  Assumes vectors are columwise.
+     *  Assumes vectors are column-wise.
      *  @param u  the Vector of vectors to assign
      */
     def apply (u: Vector [VectoQ]): SymTriMatrixQ =

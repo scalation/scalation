@@ -85,7 +85,7 @@ class Fac_QR [MatT <: MatriD] (a: MatT)
     } // factor
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in 'a*x = b' using the QR Factorization 'a = q*r' via
+    /** Solve for 'x' in 'a*x = b' using the 'QR' Factorization 'a = q*r' via
      *  'r*x = q.t * b'.
      *  @param  b the constant vector
      */
@@ -106,7 +106,7 @@ class Fac_QR [MatT <: MatriD] (a: MatT)
     } // backSub
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the nullspace of matrix 'a: { x | a*x = 0 }' using QR Factorization
+    /** Compute the nullspace of matrix 'a: { x | a*x = 0 }' using 'QR' Factorization
      *  'q*r*x = 0'.  Gives a basis of dimension 'n' - rank for the nullspace
      *  @param rank  the rank of the matrix (number of linearly independent row vectors)
      *  FIX: should work, but it does not
@@ -118,7 +118,7 @@ class Fac_QR [MatT <: MatriD] (a: MatT)
     } // nullspace
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the nullspace of matrix 'a: { x | a*x = 0 }' using QR Factorization
+    /** Compute the nullspace of matrix 'a: { x | a*x = 0 }' using 'QR' Factorization
      *  'q*r*x = 0'.  Gives only one vector in the nullspace.
      *  @param x  a vector with the correct dimension
      */

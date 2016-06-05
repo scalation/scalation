@@ -15,8 +15,6 @@
 
 package scalation.math
 
-import scala.language.implicitConversions
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Int_Exp` value class adds an exponentiation operator 'x ~^ y' and a
  *  'near_eq' operator 'x =~ y' to `Int`.
@@ -59,7 +57,7 @@ class Long_Exp (val self: Long) extends AnyVal
  *  The '~^' has higher precedence than '*' or '/'.
  *  @param self  the underlying object to be accessed via the self accessor
  */
-class Double_Exp (val self: Double)
+class Double_Exp (val self: Double) extends AnyVal
 {
     def ~^ (y: Double)  = scala.math.pow (self, y)
     def =~ (y: Double)  = near_eq (self, y)
@@ -67,15 +65,16 @@ class Double_Exp (val self: Double)
     def ≠ (y: Double)   = self != y
     def ≤ (y: Double)   = self <= y
     def ≥ (y: Double)   = self >= y
+
 } // Double_Exp class
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `ExtensionTest` object is used to test the Int_Exp`, `Long_Exp` and `Double_Exp`
+/** The `ExtensionTest` object is used to test the `Int_Exp`, `Long_Exp` and `Double_Exp`
  *  classes.
  *  > run-main scalation.math.ExtensionTest
  */
-object ExtensionTest
+object ExtensionTest extends App
 {
     println (2 ~^ 3)
     println (2l ~^ 3l)

@@ -55,7 +55,7 @@ class MatrixR (d1: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a 'dim1' by 'dim2' matrix and assign each element the value 'x'.
      *  @param dim1  the row dimension
-     *  @param dim2  the column dimesion
+     *  @param dim2  the column dimension
      *  @param x     the scalar value to assign
      */
     def this (dim1: Int, dim2: Int, x: Real)
@@ -97,7 +97,7 @@ class MatrixR (d1: Int,
     def copy (): MatrixR = new MatrixR (dim1, dim2, (for (i <- range1) yield v(i).clone ()).toArray)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create an m-by-n matrix with all elements intialized to zero.
+    /** Create an m-by-n matrix with all elements initialized to zero.
      *  @param m  the number of rows
      *  @param n  the number of columns
      */
@@ -145,7 +145,7 @@ class MatrixR (d1: Int,
     def update (i: Int, u: VectoR) { v(i) = u().toArray }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set a slice 'this' matrix row-wise on range ir and column-wise on range 'jr'.
+    /** Set a slice 'this' matrix row-wise on range 'ir' and column-wise on range 'jr'.
      *  Ex: a(2..4, 3..5) = b
      *  @param ir  the row range
      *  @param jr  the column range
@@ -300,14 +300,13 @@ class MatrixR (d1: Int,
         } // for
         c
     } // t
-/***
-    def t: MatrixR =
-    {
-        val c = new MatrixR (dim2, dim1)
-        for (i <- c.range1; j <- c.range2) c.v(i)(j) = v(j)(i)
-        c
-    } // t
-***/
+
+//  def t: MatrixR =
+//  {
+//      val c = new MatrixR (dim2, dim1)
+//      for (i <- c.range1; j <- c.range2) c.v(i)(j) = v(j)(i)
+//      c
+//  } // t
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate (row) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
@@ -383,7 +382,7 @@ class MatrixR (d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' matrix and matrix 'b'.
-     *  @param b  the matrix to add (requires leDimensions)
+     *  @param b  the matrix to add (requires 'leDimensions')
      */
     def + (b: MatrixR): MatrixR =
     {
@@ -394,7 +393,7 @@ class MatrixR (d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' matrix and matrix 'b' for any type extending MatriR.
-     *  @param b  the matrix to add (requires leDimensions)
+     *  @param b  the matrix to add (requires 'leDimensions')
      */
     def + (b: MatriR): MatrixR =
     {
@@ -427,7 +426,7 @@ class MatrixR (d1: Int,
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' matrix and matrix 'b'.
-     *  @param b  the matrix to add (requires leDimensions)
+     *  @param b  the matrix to add (requires 'leDimensions')
      */
     def += (b: MatrixR): MatrixR =
     {
@@ -437,7 +436,7 @@ class MatrixR (d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' matrix and matrix 'b' for any type extending MatriR.
-     *  @param b  the matrix to add (requires leDimensions)
+     *  @param b  the matrix to add (requires 'leDimensions')
      */
     def += (b: MatriR): MatrixR =
     {
@@ -467,7 +466,7 @@ class MatrixR (d1: Int,
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' matrix subtract matrix 'b'.
-     *  @param b  the matrix to subtract (requires leDimensions)
+     *  @param b  the matrix to subtract (requires 'leDimensions')
      */
     def - (b: MatrixR): MatrixR =
     {
@@ -478,7 +477,7 @@ class MatrixR (d1: Int,
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' matrix subtract matrix 'b' for any type extending MatriR.
-     *  @param b  the matrix to subtract (requires leDimensions)
+     *  @param b  the matrix to subtract (requires 'leDimensions')
      */
     def - (b: MatriR): MatrixR =
     {
@@ -511,7 +510,7 @@ class MatrixR (d1: Int,
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' matrix subtract in-place matrix 'b'.
-     *  @param b  the matrix to subtract (requires leDimensions)
+     *  @param b  the matrix to subtract (requires 'leDimensions')
      */
     def -= (b: MatrixR): MatrixR =
     {
@@ -521,7 +520,7 @@ class MatrixR (d1: Int,
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' matrix subtract in-place matrix 'b'.
-     *  @param b  the matrix to subtract (requires leDimensions)
+     *  @param b  the matrix to subtract (requires 'leDimensions')
      */
     def -= (b: MatriR): MatrixR =
     {
@@ -552,7 +551,7 @@ class MatrixR (d1: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' matrix by matrix 'b', transposing 'b' to improve efficiency.
      *  Use 'times' method to skip the transpose step.
-     *  @param b  the matrix to multiply by (requires sameCrossDimensions)
+     *  @param b  the matrix to multiply by (requires 'sameCrossDimensions')
      */
     def * (b: MatrixR): MatrixR =
     {
@@ -572,7 +571,7 @@ class MatrixR (d1: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' matrix by matrix 'b', transposing 'b' to improve efficiency.
      *  Use 'times' method to skip the transpose step.
-     *  @param b  the matrix to multiply by (requires sameCrossDimensions)
+     *  @param b  the matrix to multiply by (requires 'sameCrossDimensions')
      */
     def * (b: MatriR): MatrixR =
     {
@@ -620,7 +619,7 @@ class MatrixR (d1: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' matrix by matrix 'b', transposing 'b' to improve
      *  efficiency.  Use 'times_ip' method to skip the transpose step.
-     *  @param b  the matrix to multiply by (requires square and sameCrossDimensions)
+     *  @param b  the matrix to multiply by (requires square and 'sameCrossDimensions')
      */
     def *= (b: MatrixR): MatrixR =
     {
@@ -644,7 +643,7 @@ class MatrixR (d1: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' matrix by matrix 'b', transposing 'b' to improve
      *  efficiency.  Use 'times_ip' method to skip the transpose step.
-     *  @param b  the matrix to multiply by (requires square and sameCrossDimensions)
+     *  @param b  the matrix to multiply by (requires square and 'sameCrossDimensions')
      */
     def *= (b: MatriR): MatrixR =
     {
@@ -677,7 +676,7 @@ class MatrixR (d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the dot product of 'this' matrix and vector 'u', by first transposing
-     *  'this' matrix and then multiplying by 'u' (ie., 'a dot u = a.t * u').
+     *  'this' matrix and then multiplying by 'u' (i.e., 'a dot u = a.t * u').
      *  @param u  the vector to multiply by (requires same first dimensions)
      */
     def dot (u: VectoR): VectorR =
@@ -696,7 +695,7 @@ class MatrixR (d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the dot product of 'this' matrix and matrix 'b', by first transposing
-     *  'this' matrix and then multiplying by 'b' (ie., 'a dot b = a.t * b').
+     *  'this' matrix and then multiplying by 'b' (i.e., 'a dot b = a.t * b').
      *  @param b  the matrix to multiply by (requires same first dimensions)
      */
     def dot (b: MatrixR): MatrixR =
@@ -718,7 +717,7 @@ class MatrixR (d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' matrix by matrix 'b' without first transposing 'b'.
-     *  @param b  the matrix to multiply by (requires sameCrossDimensions)
+     *  @param b  the matrix to multiply by (requires 'sameCrossDimensions')
      */
     def times (b: MatrixR): MatrixR =
     {
@@ -737,7 +736,7 @@ class MatrixR (d1: Int,
     /** Multiply in-place 'this' matrix by matrix 'b' without first transposing 'b'.
      *  If b and this reference the same matrix (b == this), a copy of the this
      *  matrix is made.
-     *  @param b  the matrix to multiply by (requires square and sameCrossDimensions)
+     *  @param b  the matrix to multiply by (requires square and 'sameCrossDimensions')
      */
     def times_ip (b: MatrixR)
     {
@@ -758,7 +757,7 @@ class MatrixR (d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' matrix by matrix 'b' using 'dot' product (concise solution).
-     *  @param b  the matrix to multiply by (requires sameCrossDimensions)
+     *  @param b  the matrix to multiply by (requires 'sameCrossDimensions')
      */
     def times_d (b: MatriR): MatrixR =
     {
@@ -774,7 +773,7 @@ class MatrixR (d1: Int,
      *  algorithm.  Both matrices ('this' and 'b') must be square.  Although the
      *  algorithm is faster than the traditional cubic algorithm, its requires
      *  more memory and is often less stable (due to round-off errors).
-     *  FIX:  could be make more efficient using a virtual slice (vslice) method.
+     *  FIX:  could be make more efficient using a virtual slice 'vslice' method.
      *  @see http://en.wikipedia.org/wiki/Strassen_algorithm
      *  @param b  the matrix to multiply by (it has to be a square matrix)
      */
@@ -816,7 +815,7 @@ class MatrixR (d1: Int,
     } // times_s
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply 'this' matrix by vector 'u' to produce another matrix '(a_ij * u_j)'.
+    /** Multiply 'this' matrix by vector 'u' to produce another matrix 'a_ij * u_j'.
      *  E.g., multiply a matrix by a diagonal matrix represented as a vector.
      *  @param u  the vector to multiply by
      */
@@ -828,7 +827,7 @@ class MatrixR (d1: Int,
     } // **
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place 'this' matrix by vector 'u' to produce another matrix '(a_ij * u_j)'.
+    /** Multiply in-place 'this' matrix by vector 'u' to produce another matrix 'a_ij * u_j'.
      *  @param u  the vector to multiply by
      */
     def **= (u: VectoR): MatrixR =
@@ -921,7 +920,7 @@ class MatrixR (d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor 'this' matrix into the product of upper and lower triangular
-     *  matrices '(l, u)' using the LU Factorization algorithm.  This version uses
+     *  matrices '(l, u)' using the 'LU' Factorization algorithm.  This version uses
      *  no partial pivoting.
      */
     def lud_npp: Tuple2 [MatrixR, MatrixR] =
@@ -945,7 +944,7 @@ class MatrixR (d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor 'this' matrix into the product of lower and upper triangular
-     *  matrices '(l, u)' using the LU Factorization algorithm.  This version uses
+     *  matrices '(l, u)' using the 'LU' Factorization algorithm.  This version uses
      *  partial pivoting.
      */
     def lud: Tuple2 [MatrixR, MatrixR] =
@@ -973,7 +972,7 @@ class MatrixR (d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor in-place 'this' matrix into the product of lower and upper triangular
-     *  matrices '(l, u)' using the LU Factorization algorithm.  This version uses
+     *  matrices '(l, u)' using the 'LU' Factorization algorithm.  This version uses
      *  partial pivoting.
      */
     def lud_ip (): Tuple2 [MatrixR, MatrixR] =
@@ -1022,7 +1021,7 @@ class MatrixR (d1: Int,
     } // partialPivoting
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' (see lud above).
+    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
      *  @param l  the lower triangular matrix
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
@@ -1042,7 +1041,7 @@ class MatrixR (d1: Int,
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' (see lud above).
+    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
      *  @param lu  the lower and upper triangular matrices
      *  @param b   the constant vector
      */
@@ -1082,7 +1081,7 @@ class MatrixR (d1: Int,
     } // diag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Form a matrix '[Ip, this, Iq]' where Ir is a r-by-r identity matrix, by
+    /** Form a matrix '[Ip, this, Iq]' where Ir is a 'r-by-r' identity matrix, by
      *  positioning the three matrices 'Ip', 'this' and 'Iq' along the diagonal.
      *  Fill the rest of matrix with zeros.
      *  @param p  the size of identity matrix Ip
@@ -1102,7 +1101,7 @@ class MatrixR (d1: Int,
     } // diag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the kth diagonal of 'this' matrix.  Assumes 'dim2 >= dim1'.
+    /** Get the 'k'th diagonal of 'this' matrix.  Assumes 'dim2 >= dim1'.
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
     def getDiag (k: Int = 0): VectorR =
@@ -1114,7 +1113,7 @@ class MatrixR (d1: Int,
     } // getDiag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the kth diagonal of 'this' matrix to the vector 'u'.  Assumes 'dim2 >= dim1'.
+    /** Set the 'k'th diagonal of 'this' matrix to the vector 'u'.  Assumes 'dim2 >= dim1'.
      *  @param u  the vector to set the diagonal to
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
@@ -1189,7 +1188,7 @@ class MatrixR (d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Invert in-place 'this' matrix (requires a square matrix) and uses partial pivoting.
-     *  Note: this method turns the orginal matrix into the identity matrix.
+     *  Note: this method turns the original matrix into the identity matrix.
      *  The inverse is returned and is captured by assignment.
      */
     def inverse_ip (): MatrixR =
@@ -1300,7 +1299,7 @@ class MatrixR (d1: Int,
      *  FIX: need a more robust algorithm for computing nullspace (@see Fac_QR.scala).
      *  FIX: remove the 'n = m+1' restriction.
      *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
-     *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
+     *  @see /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
     def nullspace: VectorR =
     {
@@ -1320,7 +1319,7 @@ class MatrixR (d1: Int,
      *  FIX: need a more robust algorithm for computing nullspace (@see Fac_QR.scala).
      *  FIX: remove the 'n = m+1' restriction.
      *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
-     *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
+     *  @see /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
     def nullspace_ip (): VectorR =
     {
@@ -1355,7 +1354,7 @@ class MatrixR (d1: Int,
     } // sum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the abs sum of 'this' matrix, i.e., the sum of the absolute value
+    /** Compute the 'abs' sum of 'this' matrix, i.e., the sum of the absolute value
      *  of its elements.  This is useful for comparing matrices '(a - b).sumAbs'.
      */
     def sumAbs: Real =
@@ -1482,8 +1481,8 @@ object MatrixR extends Error
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a matrix and assign values from the Scala `Vector` of vectors 'u'.
-     *  Assumes vectors are columwise.
-     *  @param u  the Vector of vectors to assign
+     *  Assumes vectors are column-wise.
+     *  @param u  the `Vector` of vectors to assign
      */
     def apply (u: Vector [VectoR]): MatrixR =
     {
@@ -1555,7 +1554,7 @@ object MatrixR extends Error
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply vector 'u' by matrix 'a'.  Treat 'u' as a row vector.
      *  @param u  the vector to multiply by
-     *  @param a  the matrix to multiply by (requires sameCrossDimensions)
+     *  @param a  the matrix to multiply by (requires 'sameCrossDimensions')
      */
     def times (u: VectoR, a: MatrixR): VectorR =
     {

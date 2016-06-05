@@ -23,7 +23,7 @@ object Converter
     /** Convert a `VectorS` into a `VectorI` by mapping each distinct value in
      *  `VectorS` into a distinct numeric integer value, returning the new vector
      *  and the mapping.
-     *  e.g.. VectorS ("A", "B", "C", "A", "D") will be mapped to VectorI (0, 1, 2, 0, 3)
+     *  e.g., VectorS ("A", "B", "C", "A", "D") will be mapped to VectorI (0, 1, 2, 0, 3)
      *  @param s  the vector of string numbers to convert
      */
     def mapToInt (s: VectoS): Tuple2 [VectorI, Map [StrNum, Int]] =

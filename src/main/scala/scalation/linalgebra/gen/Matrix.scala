@@ -13,7 +13,7 @@ import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Matrix` trait specifies the operations to be defined by three concrete
- *  implemeting classes: `MatrixN`, `SparseMatrixN` and `SymTriMatrix`.
+ *  implementing classes: `MatrixN`, `SparseMatrixN` and `SymTriMatrix`.
  */
 trait Matrix [T]
       extends Error
@@ -35,20 +35,20 @@ trait Matrix [T]
     protected val range2 = 0 until dim2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get this matrix's element at the i,j-th index position.
+    /** Get this matrix's element at the 'i,j'-th index position.
      *  @param i  the row index
      *  @param j  the column index
      */
     def apply (i: Int, j: Int): T
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get this matrix's vector at the i-th index position (i-th row).
+    /** Get this matrix's vector at the 'i'th index position ('i'th row).
      *  @param i  the row index
      */
     def apply (i: Int): VectorN [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get a slice this matrix row-wise on range ir and column-wise on range jr.
+    /** Get a slice this matrix row-wise on range 'ir' and column-wise on range 'jr'.
      *  Ex: b = a(2..4, 3..5)
      *  @param ir  the row range
      *  @param jr  the column range
@@ -56,7 +56,7 @@ trait Matrix [T]
     def apply (ir: Range, jr: Range): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get a slice this matrix row-wise on range ir and column-wise at index j.
+    /** Get a slice this matrix row-wise on range 'ir' and column-wise at index 'j'.
      *  Ex: u = a(2..4, 3)
      *  @param ir  the row range
      *  @param j   the column index
@@ -64,7 +64,7 @@ trait Matrix [T]
     def apply (ir: Range, j: Int): VectorN [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get a slice this matrix row-wise at index i and column-wise on range jr.
+    /** Get a slice this matrix row-wise at index 'i' and column-wise on range 'jr'.
      *  Ex: u = a(2, 3..5)
      *  @param i   the row index
      *  @param jr  the column range
@@ -72,7 +72,7 @@ trait Matrix [T]
     def apply (i: Int, jr: Range): VectorN [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set this matrix's element at the i,j-th index position to the scalar x.
+    /** Set this matrix's element at the 'i,j'-th index position to the scalar 'x'.
      *  @param i  the row index
      *  @param j  the column index
      *  @param x  the scalar value to assign
@@ -80,14 +80,14 @@ trait Matrix [T]
     def update (i: Int, j: Int, x: T)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set this matrix's row at the i-th index position to the vector u.
+    /** Set this matrix's row at the 'i'th index position to the vector 'u'.
      *  @param i  the row index
      *  @param u  the vector value to assign
      */
     def update (i: Int, u: VectorN [T])
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set a slice this matrix row-wise on range ir and column-wise at index j.
+    /** Set a slice this matrix row-wise on range 'ir' and column-wise at index 'j'.
      *  Ex: a(2..4, 3) = u
      *  @param ir  the row range
      *  @param j   the column index
@@ -96,7 +96,7 @@ trait Matrix [T]
     def update (ir: Range, j: Int, u: VectorN [T])
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set a slice this matrix row-wise at index i and column-wise on range jr.
+    /** Set a slice this matrix row-wise at index 'i' and column-wise on range 'jr'.
      *  Ex: a(2, 3..5) = u
      *  @param i   the row index
      *  @param jr  the column range
@@ -105,19 +105,19 @@ trait Matrix [T]
     def update (i: Int, jr: Range, u: VectorN [T])
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set all the elements in this matrix to the scalar x.
+    /** Set all the elements in this matrix to the scalar 'x'.
      *  @param x  the scalar value to assign
      */
     def set (x: T)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the values in this matrix as copies of the values in 2D array u.
+    /** Set the values in this matrix as copies of the values in 2D array 'u'.
      *  @param u  the 2D array of values to assign
      */
     def set (u: Array [Array [T]])
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set this matrix's ith row starting a column j to the vector u.
+    /** Set this matrix's 'i'th row starting a column 'j' to the vector 'u'.
      *  @param i  the row index
      *  @param u  the vector value to assign
      *  @param j  the starting column index
@@ -135,14 +135,14 @@ trait Matrix [T]
     } // foreach
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Slice this matrix row-wise from to end.
+    /** Slice this matrix row-wise 'from' to 'end'.
      *  @param from  the start of the slice
      *  @param end   the end of the slice
      */
     def slice (from: Int, end: Int): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Slice this matrix row-wise r_from to r_end and column-wise c_from to c_end.
+    /** Slice this matrix row-wise 'r_from' to 'r_end' and column-wise 'c_from' to 'c_end'.
      *  @param r_from  the start of the row slice
      *  @param r_end   the end of the row slice
      *  @param c_from  the start of the column slice
@@ -190,79 +190,79 @@ trait Matrix [T]
     def t: Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate this matrix and vector u.
+    /** Concatenate this matrix and vector 'u'.
      *  @param u  the vector to be concatenated as the new last row in matrix
      */
     def ++ (u: VectorN [T]): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add this matrix and scalar x.
+    /** Add this matrix and scalar 'x'.
      *  @param x  the scalar to add
      */
     def + (x: T): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add in-place this matrix and scalar x.
+    /** Add in-place this matrix and scalar 'x'.
      *  @param x  the scalar to add
      */
     def += (x: T): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract scalar x.
+    /** From this matrix subtract scalar 'x'.
      *  @param x  the scalar to subtract
      */
     def - (x: T): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract in-place scalar x.
+    /** From this matrix subtract in-place scalar 'x'.
      *  @param x  the scalar to subtract
      */
     def -= (x: T): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector u.
+    /** Multiply this matrix by vector 'u'.
      *  @param u  the vector to multiply by
      */
     def * (u: VectorN [T]): VectorN [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by scalar x.
+    /** Multiply this matrix by scalar 'x'.
      *  @param x  the scalar to multiply by
      */
     def * (x: T): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by scalar x.
+    /** Multiply in-place this matrix by scalar 'x'.
      *  @param x  the scalar to multiply by
      */
     def *= (x: T): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector u to produce another matrix (a_ij * u_j)
+    /** Multiply this matrix by vector 'u' to produce another matrix 'a_ij * u_j'.
      *  @param u  the vector to multiply by
      */
     def ** (u: VectorN [T]): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by vector u to produce another matrix (a_ij * u_j)
+    /** Multiply in-place this matrix by vector 'u' to produce another matrix 'a_ij * u_j'.
      *  @param u  the vector to multiply by
      */
     def **= (u: VectorN [T]): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide this matrix by scalar x.
+    /** Divide this matrix by scalar 'x'.
      *  @param x  the scalar to divide by
      */
     def / (x: T) (implicit fr: Fractional [T]): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide in-place this matrix by scalar x.
+    /** Divide in-place this matrix by scalar 'x'.
      *  @param x  the scalar to divide by
      */
     def /= (x: T) (implicit fr: Fractional [T]): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Raise this matrix to the pth power (for some integer p >= 2).
+    /** Raise this matrix to the 'p'th power (for some integer 'p >= 2)'.
      *  Caveat: should be replace by a divide and conquer algorithm.
      *  @param p  the power to raise this matrix to
      */
@@ -287,20 +287,20 @@ trait Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Decompose this matrix into the product of lower and upper triangular
-     *  matrices (l, u) using the LU Decomposition algorithm.  This version uses
+     *  matrices '(l, u)' using the 'LU' Decomposition algorithm.  This version uses
      *  partial pivoting.
      */
     def lud (implicit fr: Fractional [T]): Tuple2 [Matrix [T], Matrix [T]]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Decompose in-place this matrix into the product of lower and upper triangular
-     *  matrices (l, u) using the LU Decomposition algorithm.  This version uses
+     *  matrices '(l, u)' using the 'LU' Decomposition algorithm.  This version uses
      *  partial pivoting.
      */
     def lud_ip (implicit fr: Fractional [T]): Tuple2 [Matrix [T], Matrix [T]]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for x in the equation l*u*x = b (see lud above).
+    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
      *  @param l  the lower triangular matrix
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
@@ -309,7 +309,7 @@ trait Matrix [T]
         (implicit fr: Fractional [T]): VectorN [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for x in the equation l*u*x = b (see lud above).
+    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
      *  @param lu  the lower and upper triangular matrices
      *  @param b   the constant vector
      */
@@ -317,15 +317,15 @@ trait Matrix [T]
         (implicit fr: Fractional [T]): VectorN [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for x in the equation a*x = b where a is this matrix (see lud above).
+    /** Solve for 'x' in the equation 'a*x = b' where 'a' is this matrix (see 'lud' above).
      *  @param b  the constant vector.
      */
     def solve (b: VectorN [T])
         (implicit fr: Fractional [T]): VectorN [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine the rank of this m by n matrix by taking the upper triangular
-     *  matrix from the LU Decomposition and counting the number of non-zero
+    /** Determine the rank of this 'm-by-n' matrix by taking the upper triangular
+     *  matrix from the 'LU' Decomposition and counting the number of non-zero
      *  diagonal elements.  FIX:  should implement in implementing classes.
      */
     def rank (implicit fr: Fractional [T]): Int =
@@ -338,55 +338,55 @@ trait Matrix [T]
     } // rank
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Form a matrix [Ip, this, Iq] where Ir is a r by r identity matrix, by
-     *  positioning the three matrices Ip, this and Iq along the diagonal.
+    /** Form a matrix '[Ip, this, Iq]' where 'Ir' is a 'r-by-r' identity matrix, by
+     *  positioning the three matrices 'Ip', this and 'Iq' along the diagonal.
      *  @param p  the size of identity matrix Ip
      *  @param q  the size of identity matrix Iq
      */
     def diag (p: Int, q: Int): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the kth diagonal of this matrix.  Assumes dim2 >= dim1.
+    /** Get the 'k'th diagonal of this matrix.  Assumes 'dim2 >= dim1'.
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
     def getDiag (k: Int = 0): VectorN [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the kth diagonal of this matrix to the vector u.  Assumes dim2 >= dim1.
+    /** Set the 'k'th diagonal of this matrix to the vector 'u'.  Assumes 'dim2 >= dim1'.
      *  @param u  the vector to set the diagonal to
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
     def setDiag (u: VectorN [T], k: Int = 0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the main diagonal of this matrix to the scalar x.  Assumes dim2 >= dim1.
+    /** Set the main diagonal of this matrix to the scalar 'x'.  Assumes 'dim2 >= dim1'.
      */
     def setDiag (x: T)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Invert this matrix (requires a squareMatrix) not using partial pivoting.
+    /** Invert this matrix (requires a 'squareMatrix') not using partial pivoting.
      */
     def inverse_npp (implicit fr: Fractional [T]): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Invert this matrix (requires a squareMatrix) using partial pivoting.
+    /** Invert this matrix (requires a 'squareMatrix') using partial pivoting.
      */
     def inverse (implicit fr: Fractional [T]): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Invert in-place this matrix (requires a squareMatrix) using partial pivoting.
+    /** Invert in-place this matrix (requires a 'squareMatrix') using partial pivoting.
      */
     def inverse_ip (implicit fr: Fractional [T]): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Use Gauss-Jordan reduction on this matrix to make the left part embed an
-     *  identity matrix.  A constraint on this m by n matrix is that n >= m.
+     *  identity matrix.  A constraint on this 'm-by-n' matrix is that 'n >= m'.
      */
     def reduce (implicit fr: Fractional [T]): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Use Gauss-Jordan reduction in-place on this matrix to make the left part
-     *  embed an identity matrix.  A constraint on this m by n matrix is that n >= m.
+     *  embed an identity matrix.  A constraint on this 'm-by-n' matrix is that 'n >= m'.
      */ 
     def reduce_ip (implicit fr: Fractional [T])
 
@@ -400,20 +400,20 @@ trait Matrix [T]
     def clean (thres: T, relative: Boolean = true) (implicit fr: Fractional [T]): Matrix [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the (right) nullspace of this m by n matrix (requires n = m + 1)
+    /** Compute the (right) nullspace of this 'm-by-n' matrix (requires 'n = m + 1')
      *  by performing Gauss-Jordan reduction and extracting the negation of the
-     *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
-     *  the same as the right nullspace of a.t (a transpose).
+     *  last column augmented by 1.  The nullspace of matrix 'a' is "this vector 'v'
+     *  times any scalar 's'", i.e., 'a*(v*s) = 0.'  The left nullspace of matrix 'a' is
+     *  the same as the right nullspace of 'a.t' ('a' transpose).
      */
     def nullspace (implicit fr: Fractional [T]): VectorN [T]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the (right) nullspace in-place of this m by n matrix (requires n = m + 1)
+    /** Compute the (right) nullspace in-place of this 'm-by-n' matrix (requires 'n = m + 1')
      *  by performing Gauss-Jordan reduction and extracting the negation of the
-     *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
-     *  the same as the right nullspace of a.t (a transpose).
+     *  last column augmented by 1.  The nullspace of matrix 'a' is "this vector 'v'
+     *  times any scalar 's'", i.e., 'a*(v*s) = 0'.  The left nullspace of matrix 'a' is
+     *  the same as the right nullspace of 'a.t' ('a' transpose).
      */
     def nullspace_ip (implicit fr: Fractional [T]): VectorN [T]
 
@@ -435,14 +435,14 @@ trait Matrix [T]
     def sumLower: T
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the abs sum of this matrix, i.e., the sum of the absolute value
-     *  of its elements.  This is useful for comparing matrices (a - b).sumAbs
+    /** Compute the 'abs' sum of this matrix, i.e., the sum of the absolute value
+     *  of its elements.  This is useful for comparing matrices '(a - b).sumAbs'.
      */
     def sumAbs: T
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the 1-norm of this matrix, i.e., the maximum 1-norm of the
-     *  column vectors.  This is useful for comparing matrices (a - b).norm1
+     *  column vectors.  This is useful for comparing matrices '(a - b).norm1'.
      */
     def norm1: T
 
@@ -458,7 +458,7 @@ trait Matrix [T]
     def sameDimensions (b: Matrix [T]): Boolean = dim1 == b.dim1 && dim2 == b.dim2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check whether this matrix dimensions are less than or equal to (le) those
+    /** Check whether this matrix dimensions are less than or equal to 'le' those
      *  of the other Matrix.
      *  @param b  the other matrix
      */

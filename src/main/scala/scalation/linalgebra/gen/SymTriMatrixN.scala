@@ -132,7 +132,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     def sd_ (v: VectorN [T]) { _sd = v }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get this matrix's element at the i,j-th index position.
+    /** Get this matrix's element at the 'i,j'-th index position.
      *  @param i  the row index
      *  @param j  the column index
      */
@@ -145,7 +145,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get this matrix's element at the i,j-th index position, returning 0. if
+    /** Get this matrix's element at the 'i,j'-th index position, returning 0.0 if
      *  off tridiagonal.
      *  @param i  the row index
      *  @param j  the column index
@@ -160,7 +160,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // at
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get this matrix's vector at the i-th index position (i-th row).
+    /** Get this matrix's vector at the 'i'th index position ('i'th row).
      *  @param i  the row index
      */
     def apply (i: Int): VectorN [T] =
@@ -173,7 +173,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get a slice this matrix row-wise on range ir and column-wise on range jr.
+    /** Get a slice this matrix row-wise on range 'ir' and column-wise on range 'jr'.
      *  Ex: b = a(2..4, 3..5)
      *  @param ir  the row range
      *  @param jr  the column range
@@ -185,7 +185,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get a slice this matrix row-wise on range ir and column-wise at index j.
+    /** Get a slice this matrix row-wise on range 'ir' and column-wise at index 'j'.
      *  Ex: u = a(2..4, 3)
      *  @param ir  the row range
      *  @param j   the column index
@@ -193,7 +193,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     def apply (ir: Range, j: Int): VectorN [T] = col(j)(ir)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get a slice this matrix row-wise at index i and column-wise on range jr.
+    /** Get a slice this matrix row-wise at index 'i' and column-wise on range 'jr'.
      *  Ex: u = a(2, 3..5)
      *  @param i   the row index
      *  @param jr  the column range
@@ -201,7 +201,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     def apply (i: Int, jr: Range): VectorN [T] = this(i)(jr)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set this matrix's element at the i,j-th index position to the scalar x.
+    /** Set this matrix's element at the 'i,j'-th index position to the scalar 'x'.
      *  Only store x if it is non-zero.
      *  @param i  the row index
      *  @param j  the column index
@@ -216,7 +216,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // update
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set this matrix's row at the i-th index position to the vector u.
+    /** Set this matrix's row at the 'i'th index position to the vector 'u'.
      *  @param i  the row index
      *  @param u  the vector value to assign
      */
@@ -228,7 +228,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // update
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set a slice this matrix row-wise on range ir and column-wise on range jr.
+    /** Set a slice this matrix row-wise on range 'ir' and column-wise on range 'jr'.
      *  Ex: a(2..4, 3..5) = b
      *  @param ir  the row range
      *  @param jr  the column range
@@ -244,7 +244,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // update
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set a slice this matrix row-wise on range ir and column-wise at index j.
+    /** Set a slice this matrix row-wise on range 'ir' and column-wise at index 'j'.
      *  Ex: a(2..4, 3) = u
      *  @param ir  the row range
      *  @param j   the column index
@@ -253,7 +253,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     def update (ir: Range, j: Int, u: VectorN [T]) { col(j)(ir) = u }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set a slice this matrix row-wise at index i and column-wise on range jr.
+    /** Set a slice this matrix row-wise at index 'i' and column-wise on range 'jr'.
      *  Ex: a(2, 3..5) = u
      *  @param i   the row index
      *  @param jr  the column range
@@ -262,7 +262,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     def update (i: Int, jr: Range, u: VectorN [T]) { this(i)(jr) = u }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set all the elements in this matrix to the scalar x.
+    /** Set all the elements in this matrix to the scalar 'x'.
      *  @param x  the scalar value to assign
      */
     def set (x: T)
@@ -274,7 +274,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set all the values in this matrix as copies of the values in 2D array u.
+    /** Set all the values in this matrix as copies of the values in 2D array 'u'.
      *  @param u  the 2D array of values to assign
      */
     def set (u: Array [Array [T]])
@@ -283,7 +283,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set this matrix's ith row starting at column j to the vector u.
+    /** Set this matrix's 'i'th row starting at column 'j' to the vector 'u'.
      *  @param i  the row index
      *  @param u  the vector value to assign
      *  @param j  the starting column index
@@ -294,7 +294,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Slice this matrix row-wise from to end.
+    /** Slice this matrix row-wise 'from' to 'end'.
      *  @param from  the start row of the slice (inclusive)
      *  @param end   the end row of the slice (exclusive)
      */
@@ -309,7 +309,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // slice
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Slice this matrix row-wise r_from to r_end and column-wise c_from to c_end.
+    /** Slice this matrix row-wise 'r_from' to 'r_end' and column-wise 'c_from' to 'c_end'.
      *  @param r_from  the start of the row slice
      *  @param r_end   the end of the row slice
      *  @param c_from  the start of the column slice
@@ -379,7 +379,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     def t: SymTriMatrixN [T] = this
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Concatenate this matrix and vector u.
+    /** Concatenate this matrix and vector 'u'.
      *  @param u  the vector to be concatenated as the new last row in matrix
      */
     def ++ (u: VectorN [T]): SymTriMatrixN [T] =
@@ -388,8 +388,8 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // ++
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add this matrix and matrix b.
-     *  @param b  the matrix to add (requires leDimensions)
+    /** Add this matrix and matrix 'b'.
+     *  @param b  the matrix to add (requires 'leDimensions')
      */
     def + (b: Matrix [T]): SymTriMatrixN [T] = 
     {
@@ -403,7 +403,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add this matrix and scalar x.
+    /** Add this matrix and scalar 'x'.
      *  @param x  the scalar to add
      */
     def + (x: T): SymTriMatrixN [T] =
@@ -412,8 +412,8 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add in-place this matrix and matrix b.
-     *  @param b  the matrix to add (requires leDimensions)
+    /** Add in-place this matrix and matrix 'b'.
+     *  @param b  the matrix to add (requires 'leDimensions')
      */
     def += (b: Matrix [T]): SymTriMatrixN [T] =
     {
@@ -428,7 +428,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add in-place this matrix and scalar x.
+    /** Add in-place this matrix and scalar 'x'.
      * @param x  the scalar to add
      */
     def += (x: T): SymTriMatrixN [T] =
@@ -437,8 +437,8 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract matrix b.
-     *  @param b  the matrix to subtract (requires leDimensions)
+    /** From this matrix subtract matrix 'b'.
+     *  @param b  the matrix to subtract (requires 'leDimensions')
      */
     def - (b: Matrix [T]): SymTriMatrixN [T] = 
     {
@@ -452,7 +452,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract scalar x.
+    /** From this matrix subtract scalar 'x'.
      *  @param x  the scalar to subtract
      */
     def - (x: T): SymTriMatrixN [T] =
@@ -461,8 +461,8 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract in-place matrix b.
-     *  @param b  the matrix to subtract (requires leDimensions)
+    /** From this matrix subtract in-place matrix 'b'.
+     *  @param b  the matrix to subtract (requires 'leDimensions')
      */
     def -= (b: Matrix [T]): SymTriMatrixN [T] =
     {
@@ -477,7 +477,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From this matrix subtract in-place scalar x.
+    /** From this matrix subtract in-place scalar 'x'.
      *  @param x  the scalar to subtract
      */
     def -= (x: T): SymTriMatrixN [T] =
@@ -486,7 +486,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by matrix b.
+    /** Multiply this matrix by matrix 'b'.
      *  @param b  the matrix to multiply by
      */
     def * (b: Matrix [T]): SymTriMatrixN [T] = 
@@ -495,7 +495,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by matrix b.  Requires b to have type SymTriMatrixN [T],
+    /** Multiply this matrix by matrix 'b'.  Requires b to have type `SymTriMatrixN [T]`,
      *  but returns a more general type of matrix.
      *  @param b  the matrix to multiply by
      */
@@ -513,7 +513,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector u.
+    /** Multiply this matrix by vector 'u'.
      *  @param u  the vector to multiply by
      */
     def * (u: VectorN [T]): VectorN [T] = 
@@ -528,7 +528,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by scalar x.
+    /** Multiply this matrix by scalar 'x'.
      *  @param x  the scalar to multiply by
      */
     def * (x: T): SymTriMatrixN [T] =
@@ -537,7 +537,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by matrix b
+    /** Multiply in-place this matrix by matrix 'b'.
      *  @param b  the matrix to multiply by
      */
     def *= (b: Matrix [T]): SymTriMatrixN [T] =
@@ -546,7 +546,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // *=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by scalar x.
+    /** Multiply in-place this matrix by scalar 'x'.
      *  @param x  the scalar to multiply by
      */
     def *= (x: T): SymTriMatrixN [T] =
@@ -555,7 +555,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // *=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply this matrix by vector u to produce another matrix (a_ij * u_j)
+    /** Multiply this matrix by vector 'u' to produce another matrix 'a_ij * u_j'
      *  @param u  the vector to multiply by
      */
     def ** (u: VectorN [T]): SymTriMatrixN [T] = 
@@ -564,7 +564,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // **
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply in-place this matrix by vector u to produce another matrix (a_ij * u_j)
+    /** Multiply in-place this matrix by vector 'u' to produce another matrix 'a_ij * u_j'
      *  @param u  the vector to multiply by
      */
     def **= (u: VectorN [T]): SymTriMatrixN [T] =
@@ -573,7 +573,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // **=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide this matrix by scalar x.
+    /** Divide this matrix by scalar 'x'.
      *  @param x  the scalar to divide by
      */
     def / (x: T) (implicit fr: Fractional [T]): SymTriMatrixN [T] =
@@ -583,7 +583,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // /
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide in-place this matrix by scalar x.
+    /** Divide in-place this matrix by scalar 'x'.
      *  @param x  the scalar to divide by
      */
     def /= (x: T) (implicit fr: Fractional [T]): SymTriMatrixN [T] =
@@ -593,7 +593,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // /=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Raise this matrix to the pth power (for some integer p >= 2).
+    /** Raise this matrix to the 'p'th power (for some integer 'p >= 2').
      *  @param p  the power to raise this matrix to
      */
     def ~^ (p: Int): SymTriMatrixN [T] =
@@ -619,7 +619,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     def mag: T = abs (max ()) max abs (min ())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the kth diagonal of this matrix.  Assumes dim2 >= dim1.
+    /** Get the 'k'th diagonal of this matrix.  Assumes 'dim2 >= dim1'.
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
     def getDiag (k: Int = 0): VectorN [T] =
@@ -630,7 +630,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // getDiag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the kth diagonal of this matrix to the vector u.  Assumes dim2 >= dim1.
+    /** Set the 'k'th diagonal of this matrix to the vector 'u'.  Assumes 'dim2 >= dim1'.
      *  @param u  the vector to set the diagonal to
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
@@ -642,7 +642,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // setDiag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the main diagonal of this matrix to the scalar x.  Assumes dim2 >= dim1.
+    /** Set the main diagonal of this matrix to the scalar 'x'.  Assumes 'dim2 >= dim1'.
      *  @param x  the scalar to set the diagonal to
      */
     def setDiag (x: T) { _dg.set (x) }
@@ -668,7 +668,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     def det: T = detHelper (d1 - 1)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for x in the equation a*x = d where a is this matrix.
+    /** Solve for 'x' in the equation 'a*x = 'd where 'a' is this matrix.
      *  @param d  the constant vector.
      */
     def solve (d: VectorN [T]) (implicit fr: Fractional [T]): VectorN [T] =
@@ -718,10 +718,10 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     } // nullspace
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the (right) nullspace in-place of this m by n matrix (requires n = m + 1)
+    /** Compute the (right) nullspace in-place of this 'm-by-n' matrix (requires n = m + 1)
      *  by performing Gauss-Jordan reduction and extracting the negation of the
-     *  last column augmented by 1.  The nullspace of matrix a is "this vector v
-     *  times any scalar s", i.e., a*(v*s) = 0.  The left nullspace of matrix a is
+     *  last column augmented by 1.  The nullspace of matrix a is "this vector 'v'
+     *  times any scalar s", i.e., 'a*(v*s) = 0.0'.  The left nullspace of matrix 'a' is
      *  the same as the right nullspace of a.t (a transpose).
      */
     def nullspace_ip (implicit fr: Fractional [T]): VectorN [T] =
@@ -749,14 +749,14 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
     def sumLower: T = _sd.sum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the abs sum of this matrix, i.e., the sum of the absolute value
-     *  of its elements.  This is useful for comparing matrices (a - b).sumAbs
+    /** Compute the 'abs' sum of this matrix, i.e., the sum of the absolute value
+     *  of its elements.  This is useful for comparing matrices '(a - b).sumAbs'.
      */
     def sumAbs: T = _dg.norm1 + _sd.norm1 + _sd.norm1
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the 1-norm of this matrix, i.e., the maximum 1-norm of the
-     *  column vectors.  This is useful for comparing matrices (a - b).norm1
+     *  column vectors.  This is useful for comparing matrices '(a - b).norm1'.
      */
     def norm1: T =
     {
@@ -846,6 +846,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SymTriMatrixNTest` object is used to test the `SymTriMatrixN` class.
+ *  > run-main scalation.linalgebra.gen.SymTriMatrixNTest
  */
 object SymTriMatrixNTest extends App
 {

@@ -29,8 +29,8 @@ import scalation.math.ExtremeD.{EPSILON, MIN_NORMAL, TOL}
 /** The `SVD3` class is used to solve Singular Value Decomposition for bidiagonal matrices.
  *
  *  It computes the singular values and, optionally, the right and/or left singular vectors
- *  from the singular value decomposition (SVD) of a real n-by-n (upper) bidiagonal matrix B
- *  using the implicit zero-shift QR algorithm.  The SVD of B has the form
+ *  from the singular value decomposition 'SVD' of a real n-by-n (upper) bidiagonal matrix B
+ *  using the implicit zero-shift 'QR' algorithm.  The 'SVD' of B has the form
  *
  *     B = Q * S * P.t
  *
@@ -44,19 +44,19 @@ import scalation.math.ExtremeD.{EPSILON, MIN_NORMAL, TOL}
  *
  *     A = (U*Q) * S * (P.t*VT)
  *
- *  is the SVD of the general matrix A.  A positve tolerance (TOL) gives relative accurracy;
- *  for absolute accurracy negate it.
+ *  is the 'SVD' of the general matrix A.  A positive tolerance 'TOL' gives relative accuracy;
+ *  for absolute accuracy negate it.
  *
  *  @see "Computing Small Singular Values of Bidiagonal Matrices With Guaranteed High Relative Accuracy,"
- *  J. Demmel and W. Kahan, LAPACK Working Note #3 (or SIAM J. Sci. Statist. Comput. 11:5, pp. 873-912, Sept 1990)
+ *  @see J. Demmel and W. Kahan, LAPACK Working Note #3 (or SIAM J. Sci. Statist. Comput. 11:5, pp. 873-912, Sept 1990)
  *
  *  @see "Accurate singular values and differential qd algorithms," B. Parlett and V. Fernando,
- *  Technical Report CPAM-554, Mathematics Department, University of California at Berkeley, July 1992
+ *  @see Technical Report CPAM-554, Mathematics Department, University of California at Berkeley, July 1992
  *
  *  @see fortranwiki.org/fortran/show/svd
  *  @see LAPACK SUBROUTINE DBDSQR (UPLO, N, NCVT, NRU, NCC, D, E, VT, LDVT, U, LDU, C, LDC, WORK, INFO)
  *
- *  @param a   the biagonal matrix A consisting of a diagonal and superdiagonal
+ *  @param a   the bidiagonal matrix A consisting of a diagonal and super-diagonal
  *  @param vt  the right orthogonal matrix from b = bidiagonalize (a)
  *  @param u   the left orthogonal matrix from b = bidiagonalize (a)
  */
@@ -137,7 +137,7 @@ class SVD3 (b: BidMatrixD, vt: MatrixD = new MatrixD (0, 0),
     } // factor
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Deflate the bidiagonal matrix by iteratively turning superdiagonal elements
+    /** Deflate the bidiagonal matrix by iteratively turning super-diagonal elements
      *  to zero. Then return the vector of singular values (i.e., the main diagonal).
      */
     def deflate (): VectorD =
@@ -173,7 +173,7 @@ class SVD3 (b: BidMatrixD, vt: MatrixD = new MatrixD (0, 0),
         if (go) {                                          // loop exited due to iteration limit
             val nz = countNonzeroElements ()
             if (nz > 0) {
-                println ("deflate: failed to converge - " + nz + " nonzero elements in superdiagonal")
+                println ("deflate: failed to converge - " + nz + " nonzero elements in super-diagonal")
                 return null
             } // if
         } // if
@@ -187,7 +187,7 @@ class SVD3 (b: BidMatrixD, vt: MatrixD = new MatrixD (0, 0),
     } // deflate
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Deflate the bidiagonal matrix by iteratively turning superdiagonal elements
+    /** Deflate the bidiagonal matrix by iteratively turning super-diagonal elements
      *  to zero. Then return the vector of singular values and the matrices of
      *  singular vectors.
      */
@@ -226,7 +226,7 @@ class SVD3 (b: BidMatrixD, vt: MatrixD = new MatrixD (0, 0),
     } // deflate_2by2 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Count the number of nonzero elemennts in the superdiagonal.  Call if the
+    /** Count the number of nonzero elements in the super-diagonal.  Call if the
      *  maximum number of iterations exceeded, failure to converge
      */
     def countNonzeroElements (): Int =
@@ -252,8 +252,8 @@ class SVD3 (b: BidMatrixD, vt: MatrixD = new MatrixD (0, 0),
     } // trace
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Find diagonal block (ll, m) of matrix to work on, returning the lower
-     *  index ll.  Also decrements upper index m, if needed. e(j) must be zero
+    /** Find diagonal block '(ll, m)' of matrix to work on, returning the lower
+     *  index 'll'.  Also decrements upper index 'm,' if needed.  'e(j)' must be zero
      *  before and after the block.
      */
     private def findBlock (): Int =
@@ -384,7 +384,7 @@ class SVD3 (b: BidMatrixD, vt: MatrixD = new MatrixD (0, 0),
     } // computeShift
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Take one QR step to push a super-diagonal element toward zero.
+    /** Take one 'QR' step to push a super-diagonal element toward zero.
      *  @param ll     the lower index
      *  @param shift  the amount of shift
      *  @param idir   the direction, t2b or b2t
@@ -407,7 +407,7 @@ class SVD3 (b: BidMatrixD, vt: MatrixD = new MatrixD (0, 0),
     } // take_QRstep
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Chase bulge from top to bottom.  Save cosines and sines for later singular
+    /** Chase bulge from top to bottom.  Save cos's and'sin's for later singular
      *  vector updates.
      *  @param ll  the lower index
      */
@@ -441,7 +441,7 @@ class SVD3 (b: BidMatrixD, vt: MatrixD = new MatrixD (0, 0),
     } // zeroShiftQR_t2b
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Chase bulge from bottom to top.  Save cosines and sines for later singular
+    /** Chase bulge from bottom to top.  Save cos's and sin's for later singular
      *  vector updates.
      *  @param ll  the lower index
      */
@@ -475,8 +475,8 @@ class SVD3 (b: BidMatrixD, vt: MatrixD = new MatrixD (0, 0),
     } // zeroShiftQR_b2t
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Using nonzero shift, chase bulge from top to bottom.  Save cosines and
-     *  sines for later singular vector updates
+    /** Using nonzero shift, chase bulge from top to bottom.  Save cos's and
+     *  sin's for later singular vector updates
      *  @param ll     the lower index
      *  @param shift  the amount of shift
      */
@@ -519,8 +519,8 @@ class SVD3 (b: BidMatrixD, vt: MatrixD = new MatrixD (0, 0),
     } // shiftedQR_t2b
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Using nonzero shift, chase bulge from bottom to top.  Save cosines and
-     *  sines for later singular vector updates
+    /** Using nonzero shift, chase bulge from bottom to top.  Save cos's and
+     *  sin's for later singular vector updates
      *  @param ll     the lower index
      *  @param shift  the amount of shift
      */
@@ -581,8 +581,8 @@ class SVD3 (b: BidMatrixD, vt: MatrixD = new MatrixD (0, 0),
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sort the singular values into decreasing order.  Selection sort is used
-     *  to mimize the swapping of singular vectors.  If only sorting singular
-     *  values use 'sort2' that uses quicksort.
+     *  to minimize the swapping of singular vectors.  If only sorting singular
+     *  values use 'sort2' that uses 'quicksort'.
      */
     private def sortValues ()
     {

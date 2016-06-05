@@ -82,7 +82,7 @@ class BidMatrixI (val d1: Int)
     def copy (): BidMatrixI = new BidMatrixI (_dg, _sd)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create an m-by-n matrix with all elements intialized to zero.
+    /** Create an m-by-n matrix with all elements initialized to zero.
      *  @param m  the number of rows
      *  @param n  the number of columns
      */
@@ -418,7 +418,7 @@ class BidMatrixI (val d1: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' bidiagonal matrix and matrix 'b'.
-     *  @param b  the matrix to add (requires leDimensions)
+     *  @param b  the matrix to add (requires 'leDimensions')
      */
     def + (b: MatriI): BidMatrixI = 
     {
@@ -451,7 +451,7 @@ class BidMatrixI (val d1: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' bidiagonal matrix and matrix 'b'.
-     *  @param b  the matrix to add (requires leDimensions)
+     *  @param b  the matrix to add (requires 'leDimensions')
      */
     def += (b: MatriI): BidMatrixI =
     {
@@ -485,7 +485,7 @@ class BidMatrixI (val d1: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' bidiagonal matrix subtract matrix 'b'.
-     *  @param b  the matrix to subtract (requires leDimensions)
+     *  @param b  the matrix to subtract (requires 'leDimensions')
      */
     def - (b: MatriI): BidMatrixI = 
     {
@@ -518,7 +518,7 @@ class BidMatrixI (val d1: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' bidiagonal bidiagonal matrix subtract in-place matrix 'b'.
-     *  @param b  the matrix to subtract (requires leDimensions)
+     *  @param b  the matrix to subtract (requires 'leDimensions')
      */
     def -= (b: MatriI): BidMatrixI =
     {
@@ -561,7 +561,7 @@ class BidMatrixI (val d1: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' bidiagonal matrix by matrix 'b'.  Requires 'b' to have
-     *  type BidMatrixI, but returns a more general type of matrix.
+     *  type `BidMatrixI`, but returns a more general type of matrix.
      *  @param b  the matrix to multiply by
      */
     def * (b: BidMatrixI): MatrixI = 
@@ -618,7 +618,7 @@ class BidMatrixI (val d1: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the dot product of 'this' matrix and vector 'u', by conceptually
-     *  transposing 'this' matrix and then multiplying by 'u' (ie., 'a dot u = a.t * u').
+     *  transposing 'this' matrix and then multiplying by 'u' (i.e., 'a dot u = a.t * u').
      *  @param u  the vector to multiply by (requires same first dimensions)
      */
     def dot (u: VectoI): VectorI =
@@ -633,7 +633,7 @@ class BidMatrixI (val d1: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' bidiagonal matrix by vector 'u' to produce another matrix
-     *  '(a_ij * u_j)'.
+     *  'a_ij * u_j'.
      *  @param u  the vector to multiply by
      */
     def ** (u: VectoI): BidMatrixI = 
@@ -643,7 +643,7 @@ class BidMatrixI (val d1: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' bidiagonal matrix by vector 'u' to produce another
-     *  matrix '(a_ij * u_j)'.
+     *  matrix 'a_ij * u_j'.
      *  @param u  the vector to multiply by
      */
     def **= (u: VectoI): BidMatrixI =
@@ -697,7 +697,7 @@ class BidMatrixI (val d1: Int)
     def solve (b: VectoI): VectorI =
     {
         val d = _dg                           // diagonal
-        val e = _sd                           // superdiagonal
+        val e = _sd                           // super-diagonal
 
         val x = new VectorI (d1)
         x(n) = b(n) / d(n)
@@ -706,7 +706,7 @@ class BidMatrixI (val d1: Int)
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' (see lud above).
+    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
      *  @param lu  the lower and upper triangular matrices
      *  @param b   the constant vector
      */
@@ -738,7 +738,7 @@ class BidMatrixI (val d1: Int)
     } // diag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Form a matrix '[Ip, this, Iq]' where Ir is a r-by-r identity matrix, by
+    /** Form a matrix '[Ip, this, Iq]' where Ir is a 'r-by-r' identity matrix, by
      *  positioning the three matrices 'Ip', 'this' and 'Iq' along the diagonal.
      *  Fill the rest of matrix with zeros.
      *  @param p  the size of identity matrix Ip
@@ -794,7 +794,7 @@ class BidMatrixI (val d1: Int)
     def inverse: MatriI =
     {
         val d = _dg                           // diagonal
-        val e = _sd                           // augmented superdiagonal
+        val e = _sd                           // augmented super-diagonal
 
         val b = new MatrixI (d1, d1)
         for (i <- 0 until d1) b(i, i) = 1 / d(i)
@@ -830,7 +830,7 @@ class BidMatrixI (val d1: Int)
      *  FIX: need a more robust algorithm for computing nullspace (@see Fac_QR.scala).
      *  FIX: remove the 'n = m+1' restriction.
      *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
-     *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
+     *  @see /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
     def nullspace: VectorI =
     {
@@ -849,7 +849,7 @@ class BidMatrixI (val d1: Int)
      *  FIX: need a more robust algorithm for computing nullspace (@see Fac_QR.scala).
      *  FIX: remove the 'n = m+1' restriction.
      *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
-     *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
+     *  @see /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
     def nullspace_ip (): VectorI =
     {
@@ -871,7 +871,7 @@ class BidMatrixI (val d1: Int)
     def sum: Int = _dg.sum + _sd.sum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the abs sum of 'this' bidiagonal matrix, i.e., the sum of the absolute
+    /** Compute the 'abs' sum of 'this' bidiagonal matrix, i.e., the sum of the absolute
      *  value of its elements.  This is useful for comparing matrices '(a - b).sumAbs'.
      */
     def sumAbs: Int = _dg.sumAbs + _sd.sumAbs
@@ -908,8 +908,8 @@ class BidMatrixI (val d1: Int)
     def upperT: MatrixI = { val c = new MatrixI (dim1, dim1); c.setDiag (_dg); c.setDiag (_sd, 1); c }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check whether 'this' matrix is bidiagonal (has non-zreo elements only in
-     *  main diagonal and superdiagonal).
+    /** Check whether 'this' matrix is bidiagonal (has non-zero elements only in
+     *  main diagonal and super-diagonal).
      */
     override def isBidiagonal: Boolean = true
 
@@ -925,8 +925,8 @@ class BidMatrixI (val d1: Int)
     def isRectangular: Boolean = true
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check whether 'this' matrix is bidiagonal (has non-zreo elements only in
-     *  main diagonal and superdiagonal).
+    /** Check whether 'this' matrix is bidiagonal (has non-zero elements only in
+     *  main diagonal and super-diagonal).
      */
     override def isTridiagonal: Boolean = false
 
@@ -1009,7 +1009,7 @@ object BidMatrixI extends Error
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a matrix and assign values from the Scala `Vector` of vectors 'u'.
-     *  Assumes vectors are columwise.
+     *  Assumes vectors are column-wise.
      *  @param u  the Vector of vectors to assign
      */
     def apply (u: Vector [VectoI]): BidMatrixI =

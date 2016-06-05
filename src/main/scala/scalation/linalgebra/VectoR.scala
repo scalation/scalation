@@ -39,7 +39,7 @@ trait VectoR
      */
     val range = 0 until dim
 
-    /** Format String used for printing vector values (change using setFormat)
+    /** Format String used for printing vector values (change using 'setFormat')
      *  Ex: "%d,\t", "%.6g,\t" or "%12.6g,\t"
      */
     protected var fString = "%s,\t"
@@ -170,14 +170,14 @@ trait VectoR
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  a new vector.
-     *  @param p  the predicate (Boolean function) to apply
+     *  @param p  the predicate (`Boolean` function) to apply
      */
 //  def filter (p: Real => Boolean): VectoR
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  the index positions.
-     *  @param p  the predicate (Boolean function) to apply
+     *  @param p  the predicate (`Boolean` function) to apply
      */
     def filterPos (p: Real => Boolean): IndexedSeq [Int]
 
@@ -599,10 +599,9 @@ trait VectoR
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compare 'this' vector with vector 'b'.
      *  @param b  the other vector
-     *
-    private def tryCompareTo [B >: VectoR] (b: B)
-        (implicit view_1: (B) => PartiallyOrdered [B]): Option [Int]
      */
+//  private def tryCompareTo [B >: VectoR] (b: B)
+//      (implicit view_1: (B) => PartiallyOrdered [B]): Option [Int]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Override equals to determine whether 'this' vector equals vector 'b..
@@ -617,7 +616,7 @@ trait VectoR
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the format to the 'newFormat' (e.g., "%.6g,\t" or "%12.6g,\t").
-     *  @param  newFormat  the new format String
+     *  @param newFormat  the new format String
      */
     def setFormat (newFormat: String) { fString = newFormat }
 

@@ -33,7 +33,7 @@ class Fac_Cholesky [MatT <: MatriD] (a: MatT)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor matrix 'a' into the product of 'l' and 'l.t', returning the lower
-     *  triangular matrix 'l' from the Cholesky Fractorization 'a = l * l.t'
+     *  triangular matrix 'l' from the Cholesky Factorization 'a = l * l.t'
      *  where 'l.t' is the transpose.  It uses the Cholesky–Banachiewicz algorithm.
      *  @see introcs.cs.princeton.edu/java/95linear
      */
@@ -58,7 +58,7 @@ class Fac_Cholesky [MatT <: MatriD] (a: MatT)
     def factor2 (): MatriD =  { if (raw) factor1 (); l.t }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Use the lower triangular matrix 'l' from the Cholesky Fractorization to
+    /** Use the lower triangular matrix 'l' from the Cholesky Factorization to
      *  solve a system of equations 'a * x = b'. Return the solution x using
      *  forward and backward substitution.
      *  @param b  the constant vector

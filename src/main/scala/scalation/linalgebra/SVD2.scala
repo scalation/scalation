@@ -14,7 +14,7 @@ package scalation.linalgebra
 import math.sqrt
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `SVD2` class performs Single Value Decompositions (SVDs) using the `Eigen`
+/** The `SVD2` class performs Single Value Decomposition 'SVD' using the `Eigen`
  *  class.  For a direct, more robust algorithm that is less sensitive to round-off errors,
  *  @see the `SVD` class.
  *  @param a  the matrix to be deflated/decomposed

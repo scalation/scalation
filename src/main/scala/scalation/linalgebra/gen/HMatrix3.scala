@@ -37,7 +37,7 @@ class HMatrix3 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
      */
     private val hmat = Array.ofDim [Array [T]] (dim1, dim2)
 
-    /** Format string used for printing vector values (change using setFormat)
+    /** Format string used for printing vector values (change using 'setFormat')
      */
     protected var fString = "%g,\t"
 
@@ -48,7 +48,7 @@ class HMatrix3 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the format to the 'newFormat'.
-     *  @param  newFormat  the new format string
+     *  @param newFormat  the new format string
      */
     def setFormat (newFormat: String) { fString = newFormat }
 
@@ -130,7 +130,7 @@ class HMatrix3 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' hypermatrix and hypermatrix 'b'.
-     *  @param b  the hypermatirx to add (requires leDimensions)
+     *  @param b  the hypermatrix to add (requires 'leDimensions')
      */
     def + (b: HMatrix3 [T]): HMatrix3 [T] =
     {
@@ -145,7 +145,7 @@ class HMatrix3 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' hypermatrix subtract hypermatrix 'b'.
-     *  @param b  the hypermatirx to add (requires leDimensions)
+     *  @param b  the hypermatrix to add (requires 'leDimensions')
      */
     def - (b: HMatrix3 [T]): HMatrix3 [T] =
     {
@@ -160,7 +160,7 @@ class HMatrix3 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check whether the dimensions of 'this' hypermatrix are less than or equal to
-     *  (le) those of the other hypermatrix 'b'.
+     *  'le' those of the other hypermatrix 'b'.
      *  @param b  the other matrix
      */
     def leDimensions (b: HMatrix3 [T]): Boolean =
@@ -202,7 +202,7 @@ class HMatrix3 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HMatrix3Test` object is used to test the `HMatrix3` class, in cases
- *  where the 3rd dimension is fixed (i.e., for cuboidic 3-dimesional hypermatrices).
+ *  where the 3rd dimension is fixed (i.e., for cuboidic 3-dimensional hypermatrices).
  *  > run-main scalation.linalgebra.gen.HMatrix3Test
  */
 object HMatrix3Test extends App
@@ -268,7 +268,7 @@ object HMatrix3Test2 extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HMatrix3Test3` object is used to test the `HMatrix3` class, in cases
- *  where the 3rd dimension is fixed (i.e., for cuboidic 3-dimesional hypermatrices).
+ *  where the 3rd dimension is fixed (i.e., for cuboidic 3-dimensional hypermatrices).
  *  Same as `HMatrix3Test`, but using `Double` rather than `Int`.
  *  > run-main scalation.linalgebra.gen.HMatrix3Test3
  */

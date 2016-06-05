@@ -47,7 +47,7 @@ object SparseMatrixC
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a matrix and assign values from the Scala `Vector` of vectors 'u'.
-     *  Assumes vectors are columwise.
+     *  Assumes vectors are column-wise.
      *  @param u  the Vector of vectors to assign
      */
     def apply (u: Vector [VectoC]): SparseMatrixC =
@@ -92,11 +92,11 @@ object SparseMatrixC
 import SparseMatrixC.eye
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `SparseMatrixC` class stores and operates on Matrices of Complexs.  Rather
+/** The `SparseMatrixC` class stores and operates on Matrices of `Complex`s.  Rather
  *  than storing the matrix as a 2 dimensional array, it is stored as an array
  *  of sorted-linked-maps, which record all the non-zero values for each particular
  *  row, along with their j-index as (j, v) pairs.
- *  Note: _npp versions of methods are not appropriate for sparse matrices
+ *  Note: '_npp' versions of methods are not appropriate for sparse matrices
  *       (i.e., always use partial pivoting).
  *  @param d1  the first/row dimension
  *  @param d2  the second/column dimension
@@ -143,7 +143,7 @@ class SparseMatrixC (val d1: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a 'dim1' by 'dim2' sparse matrix and assign each element the value 'x'.
      *  @param dim1  the row dimension
-     *  @param dim2  the column dimesion
+     *  @param dim2  the column dimension
      *  @param x     the scalar value to assign
      */
     def this (dim1: Int, dim2: Int, x: Complex)
@@ -165,7 +165,7 @@ class SparseMatrixC (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Construct a sparse matrix and assign values from matrix 'b'.
-     *  @param b   the matrix of values to assign
+     *  @param b  the matrix of values to assign
      */
     def this (b: SparseMatrixC)
     {
@@ -174,8 +174,8 @@ class SparseMatrixC (val d1: Int,
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a sparse matrix and assign values from dense matrix (MatrixC) 'b'.
-     *  @param b   the matrix of values to assign
+    /** Construct a sparse matrix and assign values from dense matrix `MatrixC` 'b'.
+     *  @param b  the matrix of values to assign
      */
     def this (b: MatrixC)
     {
@@ -184,31 +184,30 @@ class SparseMatrixC (val d1: Int,
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a sparse matrix and assign values from (SymTriMatrixC) matrix 'b'.
-     *  @param b   the matrix of values to assign
-     *
-    def this (b: SymTriMatrixC)
-    {
-        this (b.d1, b.d1)
-        v(0)(0) = b.dg(0)
-        v(0)(1) = b.sd(0)
-        for (i <- 1 until dim1-1) {
-            v(i)(i-1) = b.sd(i-1)
-            v(i)(i)   = b.dg(i)
-            v(i)(i+1) = b.sd(i)
-        } // for
-        v(dim1-1)(dim1-2) = b.sd(dim1-2)
-        v(dim1-1)(dim1-1) = b.dg(dim1-1)
-    } // constructor
+    /** Construct a sparse matrix and assign values from `SymTriMatrixC` matrix 'b'.
+     *  @param b  the matrix of values to assign
      */
+//  def this (b: SymTriMatrixC)
+//  {
+//      this (b.d1, b.d1)
+//      v(0)(0) = b.dg(0)
+//      v(0)(1) = b.sd(0)
+//      for (i <- 1 until dim1-1) {
+//          v(i)(i-1) = b.sd(i-1)
+//          v(i)(i)   = b.dg(i)
+//          v(i)(i+1) = b.sd(i)
+//      } // for
+//      v(dim1-1)(dim1-2) = b.sd(dim1-2)
+//      v(dim1-1)(dim1-1) = b.dg(dim1-1)
+//  } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a clone of 'this' m-by-n sparse matrix.
+    /** Create a clone of 'this' 'm-by-n' sparse matrix.
      */
     def copy (): SparseMatrixC = new SparseMatrixC (dim1, dim2, v.clone ())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create an m-by-n sparse matrix with all elements intialized to zero.
+    /** Create an 'm-by-n' sparse matrix with all elements initialized to zero.
      *  @param m  the number of rows
      *  @param n  the number of columns
      */
@@ -266,7 +265,7 @@ class SparseMatrixC (val d1: Int,
     /** Set 'this' sparse matrix's row at the 'i'-th index position to the 
      *  sorted-linked-map 'u'.
      *  @param i  the row index
-     *  @param u  the sorted-linked-map of non-zreo values to assign
+     *  @param u  the sorted-linked-map of non-zero values to assign
      */
     def update (i: Int, u: RowMap) { v(i) = u }
 
@@ -514,7 +513,7 @@ class SparseMatrixC (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' sparse matrix and sparse matrix 'b'.
-     *  @param b  the matrix to add (requires sameCrossDimensions)
+     *  @param b  the matrix to add (requires 'sameCrossDimensions')
      */
     def + (b: SparseMatrixC): SparseMatrixC =
     {
@@ -525,9 +524,9 @@ class SparseMatrixC (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' sparse matrix and matrix 'b'. 'b' may be any subtype of `MatriC`.
-     *  Note, subtypes of MatriC should also implement a more efficient version,
+     *  Note, subtypes of `MatriC` should also implement a more efficient version,
      *  e.g., `def + (b: SparseMatrixC): SparseMatrixC`.
-     *  @param b  the matrix to add (requires sameCrossDimensions)
+     *  @param b  the matrix to add (requires 'sameCrossDimensions')
      */
     def + (b: MatriC): SparseMatrixC =
     {
@@ -561,7 +560,7 @@ class SparseMatrixC (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' sparse matrix and sparse matrix 'b'.
-     *  @param b  the matrix to add (requires sameCrossDimensions)
+     *  @param b  the matrix to add (requires 'sameCrossDimensions')
      */
     def += (b: SparseMatrixC): SparseMatrixC =
     {
@@ -571,7 +570,7 @@ class SparseMatrixC (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' sparse matrix and matrix 'b'.
-     *  @param b  the matrix to add (requires sameCrossDimensions)
+     *  @param b  the matrix to add (requires 'sameCrossDimensions')
      */
     def += (b: MatriC): SparseMatrixC =
     {
@@ -600,8 +599,8 @@ class SparseMatrixC (val d1: Int,
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' sparse matrix substract matrix 'b'.
-     *  @param b  the sparse matrix to subtract (requires sameCrossDimensions)
+    /** From 'this' sparse matrix subtract matrix 'b'.
+     *  @param b  the sparse matrix to subtract (requires 'sameCrossDimensions')
      */
     def - (b: SparseMatrixC): SparseMatrixC =
     {
@@ -611,8 +610,8 @@ class SparseMatrixC (val d1: Int,
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' sparse matrix substract matrix 'b'.
-     *  @param b  the matrix to subtract (requires sameCrossDimensions)
+    /** From 'this' sparse matrix subtract matrix 'b'.
+     *  @param b  the matrix to subtract (requires 'sameCrossDimensions')
      */
     def - (b: MatriC): SparseMatrixC =
     {
@@ -645,8 +644,8 @@ class SparseMatrixC (val d1: Int,
     } // -
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' sparse matrix substract in-place sparse matrix 'b'.
-     *  @param b  the sparse matrix to subtract (requires sameCrossDimensions)
+    /** From 'this' sparse matrix subtract in-place sparse matrix 'b'.
+     *  @param b  the sparse matrix to subtract (requires 'sameCrossDimensions')
      */
     def -= (b: SparseMatrixC): SparseMatrixC =
     {
@@ -655,8 +654,8 @@ class SparseMatrixC (val d1: Int,
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' sparse matrix substract in-place matrix 'b'.
-     *  @param b  the matrix to subtract (requires sameCrossDimensions)
+    /** From 'this' sparse matrix subtract in-place matrix 'b'.
+     *  @param b  the matrix to subtract (requires 'sameCrossDimensions')
      */
     def -= (b: MatriC): SparseMatrixC =
     {
@@ -688,7 +687,7 @@ class SparseMatrixC (val d1: Int,
     /** Multiply 'this' sparse matrix by sparse matrix 'b', by performing a merge
      *  operation on the rows on 'this' sparse matrix and the transpose of the
      *  'b' matrix.
-     *  @param b  the matrix to multiply by (requires sameCrossDimensions)
+     *  @param b  the matrix to multiply by (requires 'sameCrossDimensions')
      */
     def * (b: SparseMatrixC): SparseMatrixC =
     {
@@ -729,7 +728,7 @@ class SparseMatrixC (val d1: Int,
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' sparse matrix by dense matrix 'b'.
-     *  @param b  the matrix to multiply by (requires sameCrossDimensions)
+     *  @param b  the matrix to multiply by (requires 'sameCrossDimensions')
      */
     def * (b: MatriC): SparseMatrixC =
     {
@@ -776,7 +775,7 @@ class SparseMatrixC (val d1: Int,
     /** Multiply in-place 'this' sparse matrix by sparse matrix 'b', by performing a
      *  merge operation on the rows on 'this' sparse matrix and the transpose of
      *  the 'b' matrix.
-     *  @param b  the matrix to multiply by (requires square and sameCrossDimensions)
+     *  @param b  the matrix to multiply by (requires square and 'sameCrossDimensions')
      */
     def *= (b: SparseMatrixC): SparseMatrixC =
     {
@@ -788,7 +787,7 @@ class SparseMatrixC (val d1: Int,
             var ea: LinkedEntry[Int, Complex] = null
             var eb: LinkedEntry[Int, Complex] = null
             val temp = new RowMap ()  
-            for (e <- v(i)) temp(e._1) = e._2     // copy a new SortedLinkedHashMap
+            for (e <- v(i)) temp(e._1) = e._2     // copy a new `SortedLinkedHashMap`
             for (j <- range2) {
                 ea = temp.getFirstEntry ()
                 eb = bt.v(j).getFirstEntry ()
@@ -819,7 +818,7 @@ class SparseMatrixC (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' sparse matrix by dense matrix 'b'.
-     *  @param b  the matrix to multiply by (requires square and sameCrossDimensions)
+     *  @param b  the matrix to multiply by (requires square and 'sameCrossDimensions')
      */
     def *= (b: MatriC): SparseMatrixC =
     {
@@ -850,7 +849,7 @@ class SparseMatrixC (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the dot product of 'this' matrix and vector 'u', by first transposing
-     *  'this' matrix and then multiplying by 'u' (ie., 'a dot u = a.t * u').
+     *  'this' matrix and then multiplying by 'u' (i.e., 'a dot u = a.t * u').
      *  @param u  the vector to multiply by (requires same first dimensions)
      */
     def dot (u: VectoC): VectorC =
@@ -869,7 +868,7 @@ class SparseMatrixC (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the dot product of 'this' matrix and matrix 'b', by first transposing
-     *  'this' matrix and then multiplying by 'b' (ie., 'a dot b = a.t * b').
+     *  'this' matrix and then multiplying by 'b' (i.e., 'a dot b = a.t * b').
      *  @param b  the matrix to multiply by (requires same first dimensions)
      */
     def dot (b: MatriC): SparseMatrixC =
@@ -894,7 +893,7 @@ class SparseMatrixC (val d1: Int,
      *  multiplication algorithm.  Both matrices ('this' and 'b') must be square.
      *  Although the algorithm is faster than the traditional cubic algorithm,
      *  its requires more memory and is often less stable (due to round-off errors).
-     *  FIX:  could be make more efficient using a virtual slice (vslice) method.
+     *  FIX:  could be make more efficient using a virtual slice 'vslice' method.
      *  @see http://en.wikipedia.org/wiki/Strassen_algorithm
      *  @param b  the matrix to multiply by (it has to be a square matrix)
      */
@@ -936,7 +935,7 @@ class SparseMatrixC (val d1: Int,
     } // times_s
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply 'this' sparse matrix by vector 'u' to produce another matrix '(a_ij * u_j)'.
+    /** Multiply 'this' sparse matrix by vector 'u' to produce another matrix 'a_ij * u_j'.
      *  @param u  the vector to multiply by
      */
     def ** (u: VectoC): SparseMatrixC =
@@ -948,7 +947,7 @@ class SparseMatrixC (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' sparse matrix by vector 'u' to produce another matrix
-     *  (a_ij * u_j)
+     *  'a_ij * u_j'.
      *  @param u  the vector to multiply by
      */
     def **= (u: VectoC): SparseMatrixC =
@@ -1008,8 +1007,8 @@ class SparseMatrixC (val d1: Int,
     } // max
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Find the maximum element in SortedLinkHashMap 'u' (RowMap).
-     *  @param u  the SortedLinkHashMap to be searched
+    /** Find the maximum element in `SortedLinkHashMap` 'u' `RowMap`.
+     *  @param u  the `SortedLinkHashMap` to be searched
      */
     private def getMaxVal (u: RowMap): Complex =
     {
@@ -1033,8 +1032,8 @@ class SparseMatrixC (val d1: Int,
     } // min
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Find the minimum element in SortedLinkHashMap 'u' (RowMap).
-     *  @param u  the SortedLinkHashMap to be searched
+    /** Find the minimum element in `SortedLinkHashMap` 'u' `RowMap`.
+     *  @param u  the `SortedLinkHashMap` to be searched
      */
     private def getMinVal (u: RowMap): Complex =
     {
@@ -1065,7 +1064,7 @@ class SparseMatrixC (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Decompose 'this' sparse matrix into the product of lower and upper triangular
-     *  matrices '(l, u)' using the LU Decomposition algorithm.  This version uses
+     *  matrices '(l, u)' using the 'LU' Decomposition algorithm.  This version uses
      *  partial pivoting.
      */
     def lud: Tuple2 [SparseMatrixC, SparseMatrixC] =
@@ -1092,7 +1091,7 @@ class SparseMatrixC (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Decompose in-place 'this' sparse matrix into the product of lower and upper
-     *  triangular matrices '(l, u)' using the LU Decomposition algorithm.
+     *  triangular matrices '(l, u)' using the 'LU' Decomposition algorithm.
      *  This version uses partial pivoting.
      */
     def lud_ip (): Tuple2 [SparseMatrixC, SparseMatrixC] =
@@ -1150,7 +1149,7 @@ class SparseMatrixC (val d1: Int,
     } // swap
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' (see lud above).
+    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
      *  @param l  the lower triangular matrix
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
@@ -1173,7 +1172,7 @@ class SparseMatrixC (val d1: Int,
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' (see lud above).
+    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
      *  @param lu  the lower and upper triangular matrices
      *  @param b   the constant vector
      */
@@ -1204,7 +1203,7 @@ class SparseMatrixC (val d1: Int,
     } // diag
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Form a matrix '[Ip, this, Iq]' where Ir is a r-by-r identity matrix, by
+    /** Form a matrix '[Ip, this, Iq]' where 'Ir' is a 'r-by-r' identity matrix, by
      *  positioning the three matrices 'Ip', 'this' and 'Iq' along the diagonal.
      *  @param p  the size of identity matrix Ip
      *  @param q  the size of identity matrix Iq
@@ -1223,7 +1222,7 @@ class SparseMatrixC (val d1: Int,
     } // diag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the kth diagonal of this matrix.  Assumes 'dim2 >= dim1'.
+    /** Get the 'k'th diagonal of this matrix.  Assumes 'dim2 >= dim1'.
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
     def getDiag (k: Int = 0): VectorC =
@@ -1235,7 +1234,7 @@ class SparseMatrixC (val d1: Int,
     } // getDiag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the kth diagonal of this matrix to the vector 'u'.  Assumes 'dim2 >= dim1'.
+    /** Set the 'k'th diagonal of this matrix to the vector 'u'.  Assumes 'dim2 >= dim1'.
      *  @param u  the vector to set the diagonal to
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
@@ -1252,7 +1251,7 @@ class SparseMatrixC (val d1: Int,
     def setDiag (x: Complex) { for (i <- range1) this(i, i) = x }
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Invert 'this' sparse matrix (requires a squareMatrix) not using partial pivoting.
+    /** Invert 'this' sparse matrix (requires a 'squareMatrix') not using partial pivoting.
      */
     def inverse_npp: SparseMatrixC =
     {
@@ -1284,7 +1283,7 @@ class SparseMatrixC (val d1: Int,
     } // inverse_npp
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Invert 'this' sparse matrix (requires a squareMatrix) using partial pivoting.
+    /** Invert 'this' sparse matrix (requires a 'squareMatrix') using partial pivoting.
      */
     def inverse: SparseMatrixC =
     {
@@ -1318,8 +1317,8 @@ class SparseMatrixC (val d1: Int,
     } // inverse
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Invert in-place 'this' sparse matrix (requires a squareMatrix).  This version uses
-     *  partial pivoting.
+    /** Invert in-place 'this' sparse matrix (requires a 'squareMatrix').  This version
+     *  uses partial pivoting.
      */
     def inverse_ip (): SparseMatrixC =
     {
@@ -1351,7 +1350,7 @@ class SparseMatrixC (val d1: Int,
     } // inverse_ip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Use Guass-Jordan reduction on 'this' sparse matrix to make the left part embed
+    /** Use Gauss-Jordan reduction on 'this' sparse matrix to make the left part embed
      *  an identity matrix.  A constraint on this m by n matrix is that n >= m.
      *  It can be used to solve 'a * x = b': augment 'a' with 'b' and call reduce.
      *  Takes '[a | b]' to '[I | x]'.
@@ -1380,7 +1379,7 @@ class SparseMatrixC (val d1: Int,
     } // reduce
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Use Guass-Jordan reduction in-place on 'this' sparse matrix to make the left part
+    /** Use Gauss-Jordan reduction in-place on 'this' sparse matrix to make the left part
      *  embed an identity matrix.  A constraint on this m by n matrix is that n >= m.
      *  It can be used to solve 'a * x = b': augment 'a' with 'b' and call reduce.
      *  Takes '[a | b]' to '[I | x]'.
@@ -1432,7 +1431,7 @@ class SparseMatrixC (val d1: Int,
      *  FIX: need a more robust algorithm for computing nullspace (@see Fac_QR.scala).
      *  FIX: remove the 'n = m+1' restriction.
      *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
-     *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
+     *  @see /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
     def nullspace: VectorC =
     {
@@ -1455,7 +1454,7 @@ class SparseMatrixC (val d1: Int,
      *  FIX: need a more robust algorithm for computing nullspace (@see Fac_QR.scala).
      *  FIX: remove the 'n = m+1' restriction.
      *  @see http://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces
-     *  /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
+     *  @see /solving-ax-0-pivot-variables-special-solutions/MIT18_06SCF11_Ses1.7sum.pdf
      */
     def nullspace_ip (): VectorC =
     {
@@ -1492,8 +1491,8 @@ class SparseMatrixC (val d1: Int,
     } // sum
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the abs sum of this matrix, i.e., the sum of the absolute value
-     *  of its elements.  This is useful for comparing matrices (a - b).sumAbs
+    /** Compute the 'abs' sum of this matrix, i.e., the sum of the absolute value
+     *  of its elements.  This is useful for comparing matrices '(a - b).sumAbs'.
      */
     def sumAbs: Complex =
     {

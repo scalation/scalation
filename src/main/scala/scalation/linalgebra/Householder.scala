@@ -20,8 +20,8 @@ import scalation.math.double_exp
 object Householder
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute a Householder vector v and its corresponding scalar b,  where
-     *  P = I - b * v * v.t is an orthogonal matrix and Px = ||x|| * e_1.
+    /** Compute a Householder vector 'v' and its corresponding scalar 'b',  where
+     *  'P = I - b * v * v.t' is an orthogonal matrix and 'Px = ||x|| * e_1'.
      *  @see Algorithm 5.1.1 in Matrix Computations.
      *  @param x  the vector to create the Householder vector from
      */
@@ -43,7 +43,7 @@ object Householder
     } // house
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Householder unit vector u, where P = I - b * u * u.t is an
+    /** Compute the Householder unit vector 'u', where 'P = I - b * u * u.t' is an
      *  orthogonal matrix.
      *  @see www.math.siu.edu/matlab/tutorial4.pdf
      *  @param x  the vector to create the unit Householder vector from
@@ -56,7 +56,7 @@ object Householder
     } // houseV
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Householder reflector matrix h = I - 2*u*u.t.
+    /** Compute the Householder reflector matrix 'h = I - 2*u*u.t'.
      *  @see www.math.siu.edu/matlab/tutorial4.pdf
      *  @param x  the vector to create the Householder reflector from
      */

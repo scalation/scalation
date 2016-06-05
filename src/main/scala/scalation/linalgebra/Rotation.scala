@@ -44,13 +44,13 @@ object Rotation
     /** Rotate vectors 'x' and 'y' using cosine 'cs' and sine 'sn'.
      *
      *  @see BLAS SUBROUTINE DROT (N, DX, INCX, DY, INCY, C, S)
-     *  restriction:  INCX = INCY = 1
+     *  restriction:  'INCX = INCY = 1'
      *
-     *  @param n     the number of elements involved in rotation
-     *  @param x     the first vector
-     *  @param y     the second vector
-     *  @param cs    the cosine for the rotation
-     *  @param sn    the sine for the rotation
+     *  @param n   the number of elements involved in rotation
+     *  @param x   the first vector
+     *  @param y   the second vector
+     *  @param cs  the cosine for the rotation
+     *  @param sn  the sine for the rotation
      */
     def rot (n: Int, x: VectorD, y: VectorD, cs: Double, sn: Double)
     {
@@ -66,14 +66,14 @@ object Rotation
     /** Rotate column vectors with indices 'jx' and 'jy' using cosine 'cs' and sine 'sn'.
      *
      *  @see BLAS SUBROUTINE DROT (N, DX, INCX, DY, INCY, C, S)
-     *  restriction:  INCX = INCY = 1
+     *  restriction:  'INCX = INCY = 1'
      *
-     *  @param n     the number of elements involved in rotation
-     *  @param a     the matrix containing the columns to be rotated 
-     *  @param jx    the index for the first column vector
-     *  @param jy    the index for the second column vector
-     *  @param cs    the cosine for the rotation
-     *  @param sn    the sine for the rotation
+     *  @param n   the number of elements involved in rotation
+     *  @param a   the matrix containing the columns to be rotated 
+     *  @param jx  the index for the first column vector
+     *  @param jy  the index for the second column vector
+     *  @param cs  the cosine for the rotation
+     *  @param sn  the sine for the rotation
      */
     def rotCol (n: Int, a: MatriD, jx: Int, jy: Int, cs: Double, sn: Double)
     {
@@ -151,16 +151,16 @@ object Rotation
     /** Rotate the vectors in matrix 'a'.
      *
      * @see LAPACK SUBROUTINE DLASR (SIDE, PIVOT, DIRECT, M, N, C, S, A, LDA)
-     * restriction:  PIVOT = 'v'
+     * restriction:  'PIVOT = v'
      *
      * @param left      whether to apply rotation from the left (true) or right (false)
      * @param forward   whether to loop in the forward (true) or backward (false) direction
      * @param m         the relevant number of rows
      * @param n         the relevant number of columns
-     * @param cs        the array of cosines
-     * @param ics       the index offset for the array of cosines
-     * @param sn        the array of sines
-     * @param isn       the index offset for the array of sines
+     * @param cs        the array of cos's
+     * @param ics       the index offset for the array of cos's
+     * @param sn        the array of sin's
+     * @param isn       the index offset for the array of sin's
      * @param a         the matrix to rotate
      */
     def rotateV (left: Boolean, forward: Boolean, m: Int, n: Int,

@@ -169,14 +169,14 @@ class VectorD (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  a new vector.
-     *  @param p  the predicate (Boolean function) to apply
+     *  @param p  the predicate (`Boolean` function) to apply
      */
     override def filter (p: Double => Boolean): VectorD = VectorD (v.filter (p))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  the index positions.
-     *  @param p  the predicate (Boolean function) to apply
+     *  @param p  the predicate (`Boolean` function) to apply
      */
     def filterPos (p: Double => Boolean): IndexedSeq [Int] =
     {
@@ -764,15 +764,14 @@ class VectorD (val dim: Int,
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of distinct elements in 'this' vector.
-     *
-    def distinct: Int =
-    {
-        var count = 1
-        val us = new VectorD (this); us.sort ()                // sorted vector
-        for (i <- 1 until dim if us(i) != us(i-1)) count += 1
-        count
-    } // distinct
      */
+//  def distinct: Int =
+//  {
+//      var count = 1
+//      val us = new VectorD (this); us.sort ()                // sorted vector
+//      for (i <- 1 until dim if us(i) != us(i-1)) count += 1
+//      count
+//  } // distinct
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return a new vector consisting of the distinct elements from 'this' vector.
@@ -791,7 +790,7 @@ class VectorD (val dim: Int,
     def contains (x: Double): Boolean = v contains x
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Reverse the order of the elemnets in 'this' vector.
+    /** Reverse the order of the elements in 'this' vector.
      */
     def reverse (): VectorD = new VectorD (dim, v.reverse)
 
@@ -882,9 +881,9 @@ class VectorD (val dim: Int,
 object VectorD
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `VectorD` from one or more values (repeated values Double*).
-     *  @param x   the first Double number
-     *  @param xs  the rest of the Double numbers
+    /** Create a `VectorD` from one or more values (repeated values `Double`*).
+     *  @param x   the first `Double` number
+     *  @param xs  the rest of the `Double` numbers
      */
     def apply (x: Double, xs: Double*): VectorD =
     {
@@ -895,8 +894,8 @@ object VectorD
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `VectorD` from a sequence/array of Doubles.
-     *  @param xs  the sequence/array of the Double numbers
+    /** Create a `VectorD` from a sequence/array of `Double`s.
+     *  @param xs  the sequence/array of the `Double` numbers
      */
     def apply (xs: Seq [Double]): VectorD =
     {

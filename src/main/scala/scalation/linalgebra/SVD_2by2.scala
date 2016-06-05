@@ -28,7 +28,7 @@ import scalation.math.ExtremeD.EPSILON
  *  @see fortranwiki.org/fortran/show/svd
 
  *  @param f  the first diagonal element
- *  @param g  the superdiagonal element
+ *  @param g  the super-diagonal element
  *  @param h  the second diagonal element
  */
 class SVD_2by2 (f: Double, g: Double, h: Double)
@@ -180,7 +180,7 @@ class SVD_2by2 (f: Double, g: Double, h: Double)
     } // deflateV
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Correct signs of singular values ssMin and ssMax.
+    /** Correct signs of singular values 'ssMin' and 'ssMax'.
      *  @param pmax
      */
     private def correctSigns (pmax: Int): Tuple2 [Double, Double] =

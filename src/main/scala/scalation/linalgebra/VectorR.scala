@@ -169,14 +169,14 @@ class VectorR (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  a new vector.
-     *  @param p  the predicate (Boolean function) to apply
+     *  @param p  the predicate (`Boolean` function) to apply
      */
     override def filter (p: Real => Boolean): VectorR = VectorR (v.filter (p))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  the index positions.
-     *  @param p  the predicate (Boolean function) to apply
+     *  @param p  the predicate (`Boolean` function) to apply
      */
     def filterPos (p: Real => Boolean): IndexedSeq [Int] =
     {
@@ -764,15 +764,14 @@ class VectorR (val dim: Int,
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of distinct elements in 'this' vector.
-     *
-    def distinct: Int =
-    {
-        var count = 1
-        val us = new VectorR (this); us.sort ()                // sorted vector
-        for (i <- 1 until dim if us(i) != us(i-1)) count += 1
-        count
-    } // distinct
      */
+//  def distinct: Int =
+//  {
+//      var count = 1
+//      val us = new VectorR (this); us.sort ()                // sorted vector
+//      for (i <- 1 until dim if us(i) != us(i-1)) count += 1
+//      count
+//  } // distinct
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return a new vector consisting of the distinct elements from 'this' vector.
@@ -791,7 +790,7 @@ class VectorR (val dim: Int,
     def contains (x: Real): Boolean = v contains x
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Reverse the order of the elemnets in 'this' vector.
+    /** Reverse the order of the elements in 'this' vector.
      */
     def reverse (): VectorR = new VectorR (dim, v.reverse)
 
@@ -882,9 +881,9 @@ class VectorR (val dim: Int,
 object VectorR
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `VectorR` from one or more values (repeated values Real*).
-     *  @param x   the first Real number
-     *  @param xs  the rest of the Real numbers
+    /** Create a `VectorR` from one or more values (repeated values `Real`*).
+     *  @param x   the first `Real` number
+     *  @param xs  the rest of the `Real` numbers
      */
     def apply (x: Real, xs: Real*): VectorR =
     {
@@ -895,8 +894,8 @@ object VectorR
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `VectorR` from a sequence/array of Reals.
-     *  @param xs  the sequence/array of the Real numbers
+    /** Create a `VectorR` from a sequence/array of `Real`s.
+     *  @param xs  the sequence/array of the `Real` numbers
      */
     def apply (xs: Seq [Real]): VectorR =
     {

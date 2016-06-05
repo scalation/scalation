@@ -206,19 +206,21 @@ case class PermutedVecI (x: VectorI, stream: Int = 0)
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RandomVecD` class generates a random vector of doubles.
  *  Ex: (3.0, 2.0, 0.0, 4.0, 1.0) has 'dim' = 5 and 'max' = 4.
- *  @param dim      the dimension/size of the vector (number of elements)
- *  @param max      generate integers in the range min (inclusive) to max (inclusive)
- *  @param min      generate integers in the range min (inclusive) to max (inclusive)
- *  @param density  sparsity basis = 1 - density
- *  @param stream   the random number stream
+ *  @param dim        the dimension/size of the vector (number of elements)
+ *  @param max        generate integers in the range min (inclusive) to max (inclusive)
+ *  @param min        generate integers in the range min (inclusive) to max (inclusive)
+ *  @param density    sparsity basis = 1 - density
+ *  @param runLength  the maximum run length
+ *  @param stream     the random number stream
  */
-case class RandomVecD (dim: Int = 10, max: Double = 20.0, min: Double = 0.0, density: Double = 1.0,
-                       stream: Int = 0)
+case class RandomVecD (dim: Int = 10, max: Double = 20.0, min: Double = 0.0,
+                       density: Double = 1.0, runLength: Int = 10, stream: Int = 0)
      extends VariateVec (stream)
 {
     private val mu  = (max - min) / 2.0                 // mean
     private val rng = Uniform (0.0, max, stream)        // random Double generator
     private val rn  = Random (stream)                   // random number generator
+    private val ri  = Randi0 (runLength, stream)        // random integer for repetition
     
     def mean: VectorD = { val mv = new VectorD (dim); mv.set (mu); mv }
 
@@ -230,6 +232,18 @@ case class RandomVecD (dim: Int = 10, max: Double = 20.0, min: Double = 0.0, den
     {
         VectorD (for (i <- 0 until dim) yield if (rn.gen < density) rng.gen else 0.0)
     } // gen
+
+    def repgen: VectorD =
+    {
+        val v   = new VectorD (dim)
+        var cnt = 0
+        while (cnt < dim) {
+            val x   = rng.gen                    // value
+            val rep = ri.igen                    // repetition 
+            for (j <- 0 until rep if cnt < dim)  { v(cnt) = x; cnt += 1}
+        } // while
+        v
+    } // repgen
 
 } // RandomVecD class
 

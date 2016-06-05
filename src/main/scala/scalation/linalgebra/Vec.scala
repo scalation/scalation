@@ -16,7 +16,7 @@ import scalation.stat.{vectorC2StatVector, vectorD2StatVector, vectorI2StatVecto
                        vectorL2StatVector, vectorQ2StatVector, vectorR2StatVector}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Vec` trait establishes a common base type for all vectors (e.g., VectorD).
+/** The `Vec` trait establishes a common base type for all vectors (e.g., `VectorD`).
  */
 trait Vec
 {
@@ -125,7 +125,7 @@ object Vec
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter vector 'x' based on predicate 'p', returning a new vector.
      *  @param x  the vector to filter
-     *  @param p  the predicate (Boolean function) to apply
+     *  @param p  the predicate ('Boolean' function) to apply
      */
     def filter [T: ClassTag: Numeric] (x: Vec, p: T => Boolean): Vec =
     {
@@ -144,7 +144,7 @@ object Vec
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter vector 'x' based on predicate 'p', returning the positions in the vector.
      *  @param x  the vector to filter
-     *  @param p  the predicate (Boolean function) to apply
+     *  @param p  the predicate ('Boolean' function) to apply
      */
     def filterPos [T: ClassTag: Numeric] (x: Vec, p: T => Boolean): Seq [Int] =
     {

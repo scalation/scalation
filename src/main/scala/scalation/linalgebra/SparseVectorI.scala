@@ -23,7 +23,7 @@ import scalation.util.SortingI.{iqsort, qsort2}
 /** The `SparseVectorI` class stores and operates on Numeric Vectors of base type `Int`.
  *  It follows the framework of `gen.VectorN [T]` and is provided for performance.
  *  @param dim_  the dimension/size of the vector
- *  @param v     the SortedLinkedHashMap used to store vector elements
+ *  @param v     the `SortedLinkedHashMap` used to store vector elements
  */
 class SparseVectorI (val dim_ : Int,
            protected var v:     SparseVectorI.RowMap = null)
@@ -205,7 +205,7 @@ class SparseVectorI (val dim_ : Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  a new vector.
-     *  @param p  the predicate (Boolean function) to apply
+     *  @param p  the predicate (`Boolean` function) to apply
      */
     override def filter (p: Int => Boolean): SparseVectorI =
     { 
@@ -215,7 +215,7 @@ class SparseVectorI (val dim_ : Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Filter the elements of 'this' vector based on the predicate 'p', returning
      *  the index positions.
-     *  @param p  the predicate (Boolean function) to apply
+     *  @param p  the predicate (`Boolean` function) to apply
      */
     def filterPos (p: Int => Boolean): IndexedSeq [Int] =
     {
@@ -779,7 +779,7 @@ class SparseVectorI (val dim_ : Int,
     def contains (x: Int): Boolean = v.values.exists (_ == x)
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Reverse the order of the elemnets in 'this' vector.
+    /** Reverse the order of the elements in 'this' vector.
      */
     def reverse (): SparseVectorI = 
     {        
@@ -787,7 +787,7 @@ class SparseVectorI (val dim_ : Int,
     } // reverse
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine whether 'this' vector is in sorted (accending) order.
+    /** Determine whether 'this' vector is in sorted (ascending) order.
      */
     def isSorted: Boolean = (new SortingI (this().toArray)).isSorted
     
