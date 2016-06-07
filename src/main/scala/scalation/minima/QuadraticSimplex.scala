@@ -8,8 +8,8 @@
 
 package scalation.minima
 
-import math.abs
-import util.control.Breaks.{breakable, break}
+import scala.math.abs
+import scala.util.control.Breaks.{breakable, break}
 
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.util.Error

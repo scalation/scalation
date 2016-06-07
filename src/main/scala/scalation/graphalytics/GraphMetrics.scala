@@ -8,8 +8,8 @@
 
 package scalation.graphalytics
 
-import collection.immutable.{Set => SET}
-import collection.mutable.{ArrayBuffer, Queue}
+import scala.collection.immutable.{Set => SET}
+import scala.collection.mutable.{ArrayBuffer, Queue}
 
 import scalation.util.time
 

@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import math.{exp, log}
+import scala.math.{exp, log}
 
 import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.math.FunctionS2S

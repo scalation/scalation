@@ -12,7 +12,7 @@ package scalation.linalgebra
 
 import java.lang.Math.copySign
 
-import math.{abs, sqrt}
+import scala.math.{abs, sqrt}
 
 import scalation.linalgebra.MatrixD.eye
 import scalation.math.double_exp

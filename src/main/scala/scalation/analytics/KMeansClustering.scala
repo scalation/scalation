@@ -8,8 +8,8 @@
 
 package scalation.analytics
 
-import util.control.Breaks.{breakable, break}
-import collection.mutable.Set
+import scala.collection.mutable.Set
+import scala.util.control.Breaks.{breakable, break}
 
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.random.Randi

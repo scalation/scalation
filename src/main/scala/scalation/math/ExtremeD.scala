@@ -10,7 +10,7 @@ package scalation.math
 
 import java.lang.Double
 
-import math.abs
+import scala.math.abs
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ExtremeD` object contains constants representing extreme values for
@@ -99,7 +99,7 @@ object ExtremeDTest extends App
 {
     import java.lang.Double.{doubleToRawLongBits, toHexString}
     import java.lang.Long
-    import math.sqrt
+    import scala.math.sqrt
     import ExtremeD._
 
     println ("----------------------------------------------------------------")

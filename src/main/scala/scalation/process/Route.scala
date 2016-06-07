@@ -8,7 +8,7 @@
 
 package scalation.process
 
-import math.{abs, hypot}
+import scala.math.{abs, hypot}
 
 import scalation.animation.CommandType._
 import scalation.random.{Discrete, Variate}

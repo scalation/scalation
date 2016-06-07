@@ -8,9 +8,9 @@
 
 package scalation.math
 
-import math.floor
 import scala.language.implicitConversions
-import util.control.Breaks.{breakable, break}
+import scala.math.floor
+import scala.util.control.Breaks.{breakable, break}
 
 import scalation.math.{root => lroot}
 

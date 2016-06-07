@@ -8,7 +8,7 @@
 
 package scalation.dynamics
 
-import math.{abs, E, pow, round}
+import scala.math.{abs, E, pow, round}
 
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.plot.Plot

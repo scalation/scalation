@@ -9,6 +9,7 @@
 package scalation.linalgebra.gen
 
 import scala.reflect.ClassTag
+
 import scalation.linalgebra.VectorI
 import scalation.util.Error
 

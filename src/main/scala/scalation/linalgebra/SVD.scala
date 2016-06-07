@@ -15,7 +15,7 @@
 
 package scalation.linalgebra
 
-import math.abs
+import scala.math.abs
 
 import scalation.linalgebra.Givens.{givens, givensRo, givensRoT, givensColUpdate, givensRowUpdate}
 import scalation.linalgebra.MatrixD.eye

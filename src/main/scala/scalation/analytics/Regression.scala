@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import math.{abs, log, pow, sqrt}
+import scala.math.{abs, log, pow, sqrt}
 
 import scalation.linalgebra.{Fac_Cholesky, Fac_QR, Factorization, MatriD, MatrixD, VectoD, VectorD}
 import scalation.math.double_exp

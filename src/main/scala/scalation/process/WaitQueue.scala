@@ -8,7 +8,7 @@
 
 package scalation.process
 
-import collection.mutable.{ListBuffer, Queue}
+import scala.collection.mutable.{ListBuffer, Queue}
 
 import scalation.animation.CommandType._
 import scalation.scala2d.Rectangle

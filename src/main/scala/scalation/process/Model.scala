@@ -10,7 +10,7 @@ package scalation.process
 
 import java.util.concurrent.Semaphore
 
-import collection.mutable.{HashMap, ListBuffer, PriorityQueue}
+import scala.collection.mutable.{HashMap, ListBuffer, PriorityQueue}
 
 import scalation.animation.{AnimateCommand, DgAnimator}
 import scalation.animation.CommandType._

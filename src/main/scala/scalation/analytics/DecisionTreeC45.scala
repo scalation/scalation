@@ -9,10 +9,10 @@
 
 package scalation.analytics
 
-import collection.mutable.{MutableList, Queue}
-import math.{ceil, floor}
-import util.control.Breaks._
-import util.Sorting
+import scala.collection.mutable.{MutableList, Queue}
+import scala.math.{ceil, floor}
+import scala.util.control.Breaks._
+import scala.util.Sorting
 
 import scalation.linalgebra.{MatrixI, VectorD, VectoD, VectorI}
 import scalation.util.Error

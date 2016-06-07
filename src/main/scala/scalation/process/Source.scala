@@ -10,8 +10,8 @@ package scalation.process
 
 import java.util.concurrent.ConcurrentLinkedQueue 
 
-import collection.mutable.ListBuffer
-import util.control.Breaks.{break, breakable}
+import scala.collection.mutable.ListBuffer
+import scala.util.control.Breaks.{break, breakable}
 
 import scalation.animation.CommandType._
 import scalation.random.Variate

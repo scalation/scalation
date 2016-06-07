@@ -12,7 +12,7 @@
 package scalation.graphalytics.mutable
 
 import scala.collection.mutable.{ArrayStack, Queue}
-import collection.mutable.{Set => SET}
+import scala.collection.mutable.{Set => SET}
 
 import LabelType.{TLabel, TLabel_DEFAULT}
 

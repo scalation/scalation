@@ -8,8 +8,8 @@
 
 package scalation.linalgebra.gen
 
-import collection.mutable.LinkedEntry
-import reflect.ClassTag
+import scala.collection.mutable.LinkedEntry
+import scala.reflect.ClassTag
 
 import scalation.math.oneIf
 import scalation.util.{Error, SortedLinkedHashMap}

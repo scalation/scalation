@@ -8,8 +8,8 @@
 
 package scalation.minima
 
-import collection.mutable.HashSet
-import math.max
+import scala.collection.mutable.HashSet
+import scala.math.max
 
 import scalation.linalgebra.VectorI
 

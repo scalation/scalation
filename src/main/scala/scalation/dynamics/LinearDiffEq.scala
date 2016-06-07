@@ -8,7 +8,7 @@
 
 package scalation.dynamics
 
-import math.exp
+import scala.math.exp
 
 import scalation.linalgebra.{Eigenvalue, Eigenvector, MatrixD, VectorD}
 import scalation.plot.Plot

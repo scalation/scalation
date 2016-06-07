@@ -7,11 +7,12 @@
  */
 
 // U N D E R   D E V E L O P M E N T
+
 // FIX: needs improved optimization
 
 package scalation.analytics
 
-import math.{exp, pow}
+import scala.math.{exp, pow}
 
 import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.minima.QuasiNewton

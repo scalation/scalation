@@ -8,8 +8,8 @@
 
 package scalation.stat
 
-import collection.mutable.ListBuffer
-import math.sqrt
+import scala.collection.mutable.ListBuffer
+import scala.math.sqrt
 
 import scalation.math.ExtremeD
 import scalation.random.{Quantile, Uniform}

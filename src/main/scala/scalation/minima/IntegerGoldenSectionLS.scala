@@ -8,8 +8,8 @@
 
 package scalation.minima
 
-import math.{abs, ceil, floor, max, pow, round, sqrt}
-import util.control.Breaks.{breakable, break}
+import scala.math.{abs, ceil, floor, max, pow, round, sqrt}
+import scala.util.control.Breaks.{breakable, break}
 
 import scalation.calculus.Calculus.{gradient, gradientD}
 import scalation.linalgebra.VectorD

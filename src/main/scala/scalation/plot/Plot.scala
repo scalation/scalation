@@ -8,7 +8,7 @@
 
 package scalation.plot
 
-import math.{ceil, floor, min, pow, round}
+import scala.math.{ceil, floor, min, pow, round}
 
 import scalation.linalgebra.VectoD
 import scalation.scala2d.{Panel, VizFrame}

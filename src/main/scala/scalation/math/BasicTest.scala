@@ -8,7 +8,7 @@
 
 package scalation.math
 
-import math.log10
+import scala.math.log10
 
 import ExtremeD.{EPSILON, MIN_NORMAL}
 

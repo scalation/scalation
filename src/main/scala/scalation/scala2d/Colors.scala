@@ -8,7 +8,7 @@
 
 package scalation.scala2d
 
-import util.Random
+import scala.util.Random
  
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Colors` convenience object defines numerous common colors.

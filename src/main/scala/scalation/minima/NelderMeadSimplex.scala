@@ -11,8 +11,8 @@
 
 package scalation.minima
 
-import math.{abs, max, pow}
-import util.control.Breaks.{breakable, break}
+import scala.math.{abs, max, pow}
+import scala.util.control.Breaks.{breakable, break}
 
 import scalation.calculus.Calculus.FunctionV2S
 import scalation.linalgebra.VectorD

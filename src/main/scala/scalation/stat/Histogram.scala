@@ -8,7 +8,7 @@
 
 package scalation.stat
 
-import math.{ceil, floor, min, round}
+import scala.math.{ceil, floor, min, round}
 
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.random.{Normal, Uniform}

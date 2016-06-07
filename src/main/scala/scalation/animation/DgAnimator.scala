@@ -11,8 +11,8 @@ package scalation.animation
 import java.awt.Font
 import java.util.concurrent.ConcurrentLinkedQueue 
 
-import math.round
-import util.control.Breaks.{breakable, break}
+import scala.math.round
+import scala.util.control.Breaks.{breakable, break}
 
 import scalation.animation.CommandType._
 import scalation.scala2d.{Panel, VizFrame}

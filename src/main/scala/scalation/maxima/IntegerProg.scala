@@ -8,8 +8,8 @@
 
 package scalation.maxima
 
-import math.{abs, ceil, floor, round}
-import util.control.Breaks.{breakable, break}
+import scala.math.{abs, ceil, floor, round}
+import scala.util.control.Breaks.{breakable, break}
 
 import scalation.linalgebra.{MatrixD, VectorD}
 

@@ -8,8 +8,8 @@
 
 package scalation.animation
 
-import math.abs
-import collection.mutable.{HashSet, ListBuffer}
+import scala.collection.mutable.{HashSet, ListBuffer}
+import scala.math.abs
 
 import scalation.animation.Counter.{nextE, nextN, nextT}
 import scalation.scala2d.{CurvilinearShape, Ellipse, QCurve, Rectangle, R2}

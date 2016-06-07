@@ -8,7 +8,7 @@
 
 package scalation.process
 
-import math.{abs, floor}
+import scala.math.{abs, floor}
 
 import scalation.animation.CommandType._
 import scalation.linalgebra.VectorD

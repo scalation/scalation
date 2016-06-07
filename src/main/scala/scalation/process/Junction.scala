@@ -8,7 +8,7 @@
 
 package scalation.process
 
-import collection.mutable.ListBuffer
+import scala.collection.mutable.ListBuffer
 
 import scalation.animation.CommandType._
 import scalation.random.Variate

@@ -11,7 +11,7 @@
 
 package scalation.analytics
 
-import math.{exp, log}
+import scala.math.{exp, log}
 
 import scalation.linalgebra.{MatrixD, VectorD, VectoD, VectorI}
 import scalation.minima.QuasiNewton

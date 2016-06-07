@@ -13,7 +13,7 @@
 
 package scalation.random
 
-import math.{ceil, E, exp, floor, log, Pi, pow, round, sqrt}
+import scala.math.{ceil, E, exp, floor, log, Pi, pow, round, sqrt}
 
 import scalation.linalgebra.VectorD
 import scalation.math.double_exp

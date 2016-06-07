@@ -8,7 +8,7 @@
 
 package scalation.state
 
-import math.{abs, cos, Pi, sin}
+import scala.math.{abs, cos, Pi, sin}
 
 import scalation.animation.{AnimateCommand, DgAnimator}
 import scalation.animation.CommandType._

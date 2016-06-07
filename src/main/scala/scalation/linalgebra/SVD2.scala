@@ -11,7 +11,7 @@
 
 package scalation.linalgebra
 
-import math.sqrt
+import scala.math.sqrt
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVD2` class performs Single Value Decomposition 'SVD' using the `Eigen`

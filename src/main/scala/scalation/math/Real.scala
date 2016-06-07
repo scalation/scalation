@@ -10,9 +10,9 @@ package scalation.math
 
 //import annotation.strictfp
 
-import language.implicitConversions
-import math.log10
-import util.control.Breaks.{break, breakable}
+import scala.language.implicitConversions
+import scala.math.log10
+import scala.util.control.Breaks.{break, breakable}
 
 import ExtremeD.MAX_VALUE
 
@@ -726,7 +726,7 @@ object Real
  */
 object RealTest extends App
 {
-    import util.Sorting.quickSort
+    import scala.util.Sorting.quickSort
 
     val a = Real (10.0)
     val b = Real (6.0)

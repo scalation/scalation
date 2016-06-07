@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import math.abs
+import scala.math.abs
 
 import scalation.linalgebra.{MatrixI, VectorD, VectorI}
 import scalation.linalgebra.gen.HMatrix4

@@ -10,7 +10,7 @@
 
 package scalation.analytics
 
-import math.pow
+import scala.math.pow
 
 import scalation.linalgebra.{Fac_Cholesky, Fac_QR, MatrixD, VectoD, VectorD}
 import scalation.plot.Plot

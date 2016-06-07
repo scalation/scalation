@@ -8,7 +8,7 @@
 
 package scalation.util
 
-import io.StdIn.readLine
+import scala.io.StdIn.readLine
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Replace` object is used to replace pattern pat1 with pat2.  It reads from

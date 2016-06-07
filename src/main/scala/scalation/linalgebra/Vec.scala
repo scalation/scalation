@@ -8,7 +8,7 @@
 
 package scalation.linalgebra
 
-import reflect.ClassTag
+import scala.reflect.ClassTag
 
 import scalation.math.{Complex, Rational, Real}
 import scalation.math.StrO.StrNum

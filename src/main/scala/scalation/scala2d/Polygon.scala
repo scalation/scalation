@@ -8,7 +8,7 @@
 
 package scalation.scala2d
 
-import math.{cos, Pi, sin}
+import scala.math.{cos, Pi, sin}
 
 import scalation.scala2d.Colors._
 import scalation.scala2d.Constants._

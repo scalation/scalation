@@ -8,8 +8,8 @@
 
 package scalation.linalgebra.gen
 
-import math.{max, min}
-import reflect.ClassTag
+import scala.math.{max, min}
+import scala.reflect.ClassTag
 
 import scalation.util.Error
 

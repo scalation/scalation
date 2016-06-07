@@ -8,7 +8,7 @@
 
 package scalation.event
 
-import collection.mutable.{ListBuffer, PriorityQueue}
+import scala.collection.mutable.{ListBuffer, PriorityQueue}
 
 import scalation.animation.{AnimateCommand, DgAnimator}
 import scalation.animation.CommandType._

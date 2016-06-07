@@ -8,7 +8,7 @@
 
 package scalation.maxima
 
-import util.control.Breaks.{breakable, break}
+import scala.util.control.Breaks.{breakable, break}
 
 import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.util.Error

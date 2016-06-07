@@ -12,7 +12,7 @@ package scalation.graphalytics
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.{Set => SET}
-//import collection.mutable.{HashSet => SET}
+//import scala.collection.mutable.{HashSet => SET}
 
 import LabelType.TLabel
 

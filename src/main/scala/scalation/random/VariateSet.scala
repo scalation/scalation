@@ -8,8 +8,8 @@
 
 package scalation.random
 
-import math.round
-import collection.mutable.Set
+import scala.collection.mutable.Set
+import scala.math.round
 
 import scalation.util.Error
 

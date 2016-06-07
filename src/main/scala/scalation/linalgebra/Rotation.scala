@@ -12,7 +12,7 @@
 
 package scalation.linalgebra
 
-import math.{abs, log, max, sqrt}
+import scala.math.{abs, log, max, sqrt}
 
 import scalation.math.double_exp
 import scalation.math.ExtremeD.{EPSILON, MIN_NORMAL}

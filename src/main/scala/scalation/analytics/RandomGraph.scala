@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import math.abs
+import scala.math.abs
 
 import scalation.linalgebra.MatrixD
 import scalation.random.Bernoulli

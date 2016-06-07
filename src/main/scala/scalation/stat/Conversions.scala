@@ -8,7 +8,7 @@
 
 package scalation.stat
 
-import language.implicitConversions
+import scala.language.implicitConversions
 
 import scalation.linalgebra.mem_mapped.{VectorC, VectorD, VectorI, VectorL, VectorQ, VectorR, VectorS}
 

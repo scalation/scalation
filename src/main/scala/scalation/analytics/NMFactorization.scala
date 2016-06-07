@@ -8,8 +8,9 @@
 
 package scalation.analytics
 
+import scala.math.{ceil, min}
+
 import scalation.linalgebra.MatrixD
-import math.{ceil, min}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NMFactorization` class factors a matrix 'v' into two non negative matrices 

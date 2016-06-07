@@ -11,11 +11,11 @@
 
 package scalation.maxima
 
-import java.util.ArrayDeque   // use Java since ArrayDeque is faster than Scala's Queue
+import java.util.ArrayDeque     // use Java since `ArrayDeque` is faster than Scala's `Queue`
 
-import Double.PositiveInfinity
-import math.{max, min}
-import util.control.Breaks.{breakable, break}
+import scala.Double.PositiveInfinity
+import scala.math.{max, min}
+import scala.util.control.Breaks.{breakable, break}
 
 import scalation.linalgebra.MatrixD
 

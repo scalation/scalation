@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import math.{ceil, floor}
+import scala.math.{ceil, floor}
 
 import scalation.linalgebra.{MatrixD, VectorD, VectoD, VectorI}
 import scalation.random.Normal

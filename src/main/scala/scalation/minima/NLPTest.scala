@@ -8,7 +8,7 @@
 
 package scalation.minima
 
-import math.pow
+import scala.math.pow
 
 import scalation.calculus.Calculus.FunctionV2S
 import scalation.linalgebra.VectorD

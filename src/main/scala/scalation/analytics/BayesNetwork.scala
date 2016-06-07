@@ -10,7 +10,7 @@
 
 package scalation.analytics
 
-import math.round
+import scala.math.round
 
 import scalation.linalgebra.{MatrixI, VectorI, VectorD}
 import scalation.util.Error

@@ -236,7 +236,7 @@ object CalculusTest extends App
 object CalculusTest2 extends App
 {
     import Calculus._
-    import math.{abs, cos, sin}
+    import scala.math.{abs, cos, sin}
 
     def f (x: Double): Double = sin (x)      // the function
 

@@ -8,7 +8,7 @@
 
 package scalation.scala2d
 
-import math.{abs, pow, sqrt}
+import scala.math.{abs, pow, sqrt}
 
 import scalation.scala2d.Colors._
 import scalation.scala2d.QCurve.{calcControlPoint, distance}

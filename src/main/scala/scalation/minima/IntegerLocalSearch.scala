@@ -8,7 +8,7 @@
 
 package scalation.minima
 
-import math.max
+import scala.math.max
 
 import scalation.linalgebra.VectorI
 

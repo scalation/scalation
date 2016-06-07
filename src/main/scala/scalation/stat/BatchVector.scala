@@ -8,7 +8,7 @@
 
 package scalation.stat
 
-import math.{abs, cos}
+import scala.math.{abs, cos}
 
 import scalation.linalgebra.VectorD
 import scalation.random.Random

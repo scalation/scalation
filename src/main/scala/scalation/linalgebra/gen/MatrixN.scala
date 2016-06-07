@@ -8,8 +8,8 @@
 
 package scalation.linalgebra.gen
 
-import math.{abs, BigDecimal}
-import reflect.ClassTag
+import scala.math.{abs, BigDecimal}
+import scala.reflect.ClassTag
 
 import scalation.linalgebra.VectorD
 import scalation.math.oneIf

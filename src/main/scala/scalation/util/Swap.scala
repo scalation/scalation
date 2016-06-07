@@ -8,7 +8,7 @@
 
 package scalation.util 
 
-import collection.mutable.ArrayBuffer
+import scala.collection.mutable.ArrayBuffer
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Swap` class provides a method to swap elements in an `Array` or `ArrayBuffer`.

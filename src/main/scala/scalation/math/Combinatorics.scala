@@ -8,7 +8,7 @@
 
 package scalation.math
 
-import math.{abs, asin, E, exp, floor, log, Pi, sin, sqrt}
+import scala.math.{abs, asin, E, exp, floor, log, Pi, sin, sqrt}
 
 import scalation.util.Error
 

@@ -12,8 +12,8 @@
 
 package scalation.linalgebra
 
-import math.{abs, signum, sqrt}
-import util.control.Breaks.{breakable, break}
+import scala.math.{abs, signum, sqrt}
+import scala.util.control.Breaks.{breakable, break}
 
 import scalation.linalgebra.Householder.house
 import scalation.linalgebra.MatrixD.{eye, outer}

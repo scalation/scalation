@@ -8,7 +8,7 @@
 
 package scalation.stat
 
-import math.{log, sqrt}
+import scala.math.{log, sqrt}
 
 import scalation.linalgebra.VectorD
 

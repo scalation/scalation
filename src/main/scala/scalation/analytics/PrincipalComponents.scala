@@ -10,10 +10,9 @@
 
 package scalation.analytics
 
-import util.control.Breaks.{breakable, break}
+import scala.util.control.Breaks.{breakable, break}
 
-import scalation.linalgebra.{Eigenvalue, Eigenvector}
-import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.linalgebra.{Eigenvalue, Eigenvector, MatrixD, VectorD}
 import scalation.linalgebra.MatrixD.outer
 import scalation.util.Error
 

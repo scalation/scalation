@@ -14,12 +14,13 @@
  */
 
 // U N D E R   D E V E L O P M E N T
+
 // FIX Q and P incorrected permuted
 
 package scalation.linalgebra
 
-import math.{abs, max, min, sqrt}
-import util.control.Breaks.{break, breakable}
+import scala.math.{abs, max, min, sqrt}
+import scala.util.control.Breaks.{break, breakable}
 
 import scalation.linalgebra.Rotation._
 import scalation.math.{double_exp, sign}

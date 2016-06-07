@@ -12,8 +12,8 @@
 
 package scalation.dynamics
 
-import math.sqrt
-import util.control.Breaks.{breakable, break}
+import scala.math.sqrt
+import scala.util.control.Breaks.{breakable, break}
 
 import scalation.calculus.Calculus._
 import scalation.linalgebra.{MatrixD, VectorD}

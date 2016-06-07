@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import collection.mutable.ListBuffer
+import scala.collection.mutable.ListBuffer
 
 import scalation.linalgebra.{MatrixI, VectorD, VectorI}
 import scalation.linalgebra.gen.HMatrix3

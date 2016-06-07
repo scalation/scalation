@@ -9,7 +9,7 @@
 package scalation.math
 
 import scala.language.implicitConversions
-import math.{acos, cos, max, min, sin, signum}
+import scala.math.{acos, cos, max, min, sin, signum}
 
 import Complex._
 

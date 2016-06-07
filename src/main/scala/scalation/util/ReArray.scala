@@ -3,51 +3,50 @@
  *  @version  1.0
  *  @date     Mon May 23 5:10:20 EDT 2016
  *  @see      LICENSE (MIT style license file).
+ *
+ *  @see      github.com/scala/scala/blob/v2.11.8/src/library/scala/collection/mutable/ResizableArray.scala
  */
 
 package scalation.util
 
 import scala.Array.newBuilder
-import scala.collection.generic.{CanBuildFrom, GenericCompanion, GenericTraversableTemplate, SeqFactory}
-import scala.collection.mutable.{ArrayBuffer, ArrayBuilder, Builder, IndexedSeqOptimized, ResizableArray}
+import scala.collection.generic.{GenericCompanion, GenericTraversableTemplate}
+import scala.collection.mutable.IndexedSeqOptimized
 import scala.compat.Platform
-import scala.math.max
 import scala.reflect.ClassTag
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The ReArray class provides an implementation of dynamic arrays.
- *  @param _length the initial size of the array
- *  @param _array  the initial array
- *  @see   github.com/scala/scala/blob/v2.11.8/src/library/scala/collection/mutable/ResizableArray.scala
- *  Newly added functions : shiftLeft, shiftLeft2, shiftRight, shiftRight2 and expand                                                   
- *  Modified functions         : reduceToSize: Modified for performance reasons. Instead of decrementing 
- *                                                      the size by 1 in a while loop we update the size0 variable 
- *                                                      to the reduced size directly.
- *  
- *                                                companion   : Modified to return null as it is not required by our implementation. The 
- *                                                                             ReArray object does not extend SeqFactory and thus the implementation of 
- *                                                                            newBuilder[A] is absent.
- *                                                   
- *                                                   update             : Modified to catch the `IndexOutOfBoundsException' and automatically 
- *                                                                               expand the array.
- *                                                   
- *                                                 constructor : Modified to take in the initial length and a normal Array. By doing 
- *                                                                               this we can easily convert an object of type Array to a ReArray as 
- *                                                                               the internal `array` is changed from `AnyRef` to type `A'.
- *                                                      
- *  Modified variables    :    array: The type is changed to 'A' from AnyRef. This helps in assigning an Array[A] 
- *                                                               to a ReArray[A]. The initial value is changed to check if _aray is null.
- *                                                  
- *                                                size0: The initial value is changed to take care if _array is null.
+/** The `ReArray` class provides an implementation of mutable, resizable/dynamic arrays.  It is based
+ *  on Scala's `ResizableArray` trait with additions and modifications.  Preliminary testing has
+ *  shown it to be faster than its competition: `ArrayList` and `ArrayBuffer`.
+ *-------------------------------------------------------------------------------------------
+ *  Added methods:     'shiftLeft', 'shiftLeft2', 'shiftRight', 'shiftRight2' and 'expand'.                                                   
+ *-------------------------------------------------------------------------------------------
+ *  Modified methods:  'reduceToSize':  modified for performance reasons; instead of decreasing the size0 by 1 in
+ *                                      a while loop and setting elements to null, it just decrements the size0 variable.
+ *                                      FIX:  possible minor memory leak
+ *                     'companion':     modified to return null as it is not required by our implementation;
+ *                                      the `ReArray` object does not extend `SeqFactory` and thus 'newBuilder [A]' is absent. 
+ *                     'update':        modified to catch the `IndexOutOfBoundsException' and automatically expand the array.
+ *                     'constructor':   modified to take in the initial length and a normal `Array`; by doing this we can
+ *                                      easily convert an object of type `Array` to a `ReArray` as the internal 'array' is
+ *                                      changed from `AnyRef` to type `A'.
+ *-------------------------------------------------------------------------------------------
+ *  Modified variables:  'array':       the type is changed to `A` from `AnyRef`; this helps in assigning an `Array [A]` 
+ *                                      to a `ReArray [A]`; the initial value is changed to check if '_array' is null.
+ *                       'size0':       the initial value is changed to take care if '_array' is null.
+ *-------------------------------------------------------------------------------------------
+ *  @param _length  the initial size of the array, defaults to zero
+ *  @param _array   the initial array, if any
  */
 class ReArray [A] (_length: Int = 0, _array: Array [A] = null) (implicit arg0: ClassTag [A])
       extends IndexedSeq [A] with GenericTraversableTemplate [A, ReArray] with IndexedSeqOptimized [A, ReArray [A]]
 { 
-    /** Set the internal array of ReArray.
+    /** Set the internal array of `ReArray`.
      */
     protected var array: Array [A]  = if (_array == null) new Array [A] (math.max (initialSize, 1)) else _array
     
-    /** Set the size of ReArray.  
+    /** Set the size of `ReArray`.
      */
     protected var size0: Int = if (_array == null) _length else _array.length
     
@@ -59,12 +58,12 @@ class ReArray [A] (_length: Int = 0, _array: Array [A] = null) (implicit arg0: C
     override def companion: GenericCompanion [ReArray] = null
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the initial size of the ReAray.
+    /** Return the initial size of the `ReArray`.
      */
     protected def initialSize: Int = math.max (16, _length);
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the length of 'this' ReArray.
+    /** Return the length of 'this' `ReArray`.
      */
     def length: Int = size0
 
@@ -79,12 +78,12 @@ class ReArray [A] (_length: Int = 0, _array: Array [A] = null) (implicit arg0: C
     } // apply
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the internal array of the ReArray. 
+    /** Return the internal array of the `ReArray.` 
      */
     def apply (): Array [A] = array
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Iterate over the ReArray element by element.
+    /** Iterate over the `ReArray` element by element.
      *  @param f  the function to apply 
      */
     override def foreach [U] (f: A => U)
@@ -250,10 +249,10 @@ object ReArray
     def apply [A: ClassTag] (a: Array [A]): ReArray [A] = new ReArray [A] (a.length, a)
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a ReArray  of type `A` and dimension 'n' with its values determined
+    /** Create a `ReArray` of type `A` and dimension 'n' with its values determined
      *  by the 'elem' function.
-     *  @param n     the size of the ReArray
-     *  @param elem  function giving the elements for the ReArray
+     *  @param n     the size of the `ReArray`
+     *  @param elem  function giving the elements for the `ReArray`
      */
     def fill [A] (n: Int)(elem: ⇒ A)(implicit arg0: ClassTag [A]): ReArray [A] =  
     {   
@@ -265,8 +264,8 @@ object ReArray
     } // fill
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a ReArray with dimension 'n'.
-     *  @param n  the size of the ReArray 
+    /** Create a `ReArray` with dimension 'n'.
+     *  @param n  the size of the `ReArray`
      */
     def ofDim [A: ClassTag] (n: Int): ReArray [A] = new ReArray [A] (n) 
 

@@ -8,8 +8,8 @@
 
 package scalation.math
 
-import collection.immutable.StringOps
-import language.implicitConversions
+import scala.collection.immutable.StringOps
+import scala.language.implicitConversions
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StrO` object is used to represent and operate on string numbers.
@@ -306,7 +306,7 @@ object StrO
 object StrNumTest extends App
 {
     import StrO._
-    import util.Sorting.quickSort
+    import scala.util.Sorting.quickSort
 
     val s1 = StrNum ("test1,test2")
 //  val s2: StrNum = StrNum ("test3,test4")

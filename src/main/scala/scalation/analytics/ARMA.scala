@@ -4,6 +4,7 @@
  *  @version 1.2
  *  @date    Sat Jan 12 20:12:12 EST 2013
  *  @see     LICENSE (MIT style license file).
+ *
  *  @see     http://en.wikipedia.org/wiki/Autoregressive%E2%80%93moving-average_model
  *  @see     http://www.emu.edu.tr/mbalcilar/teaching2007/econ604/lecture_notes.htm
  *  @see     http://www.stat.berkeley.edu/~bartlett/courses/153-fall2010
@@ -14,7 +15,7 @@
 
 package scalation.analytics
 
-import math.min
+import scala.math.min
 
 import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.math.double_exp

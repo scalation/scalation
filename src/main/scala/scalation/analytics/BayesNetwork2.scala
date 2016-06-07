@@ -8,9 +8,9 @@
 
 package scalation.analytics
 
-import math.{abs, log}
-import collection.mutable
-import util.control.Breaks.{break, breakable}
+import scala.math.{abs, log}
+import scala.collection.mutable
+import scala.util.control.Breaks.{break, breakable}
 
 import scalation.linalgebra.{MatrixI, VectorD, VectorI}
 import scalation.linalgebra.gen.HMatrix5

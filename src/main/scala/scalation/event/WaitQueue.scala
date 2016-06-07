@@ -8,7 +8,7 @@
 
 package scalation.event
 
-import collection.mutable.Queue
+import scala.collection.mutable.Queue
 
 import scalation.stat.{Statistic, TimeStatistic}
 

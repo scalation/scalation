@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import math.log
+import scala.math.log
 
 import scalation.linalgebra.{MatrixD, VectorD, VectorI}
 import scalation.random.ProbabilityVec

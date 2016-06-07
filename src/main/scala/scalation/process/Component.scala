@@ -8,7 +8,7 @@
 
 package scalation.process
 
-import collection.mutable.ListBuffer
+import scala.collection.mutable.ListBuffer
 
 import scalation.stat.{Statistic, TimeStatistic}
 import scalation.util.{Identifiable, Locatable}

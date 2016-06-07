@@ -8,7 +8,7 @@
 
 package scalation
 
-import language.implicitConversions
+import scala.language.implicitConversions
 
 import scalation.linalgebra.{VectorC, VectorD, VectorI, VectorL, VectorQ, VectorR}
 

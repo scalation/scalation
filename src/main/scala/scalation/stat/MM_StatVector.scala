@@ -8,7 +8,7 @@
 
 package scalation.stat
 
-import math.{ceil, sqrt}
+import scala.math.{ceil, sqrt}
 
 import scalation.linalgebra.mem_mapped.{VectorD, VectorI}
 import scalation.math.double_exp

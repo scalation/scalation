@@ -16,7 +16,7 @@
 
 package scalation.minima
 
-import math.{abs, max, pow}
+import scala.math.{abs, max, pow}
 
 import scalation.calculus.Calculus.{FunctionV2S, gradient, gradientD}
 import scalation.linalgebra.{MatrixD, VectorD}

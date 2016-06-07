@@ -8,10 +8,10 @@
 
 package scalation.math
 
-import collection.mutable.{IndexedSeq, ArrayBuffer}
-import math.{floor, sqrt}
-import util.control.Breaks.{breakable, break}
-import util.Random
+import scala.collection.mutable.{IndexedSeq, ArrayBuffer}
+import scala.math.{floor, sqrt}
+import scala.util.control.Breaks.{breakable, break}
+import scala.util.Random
 
 import scalation.util.Swap.swap
 

@@ -8,7 +8,7 @@
 
 package scalation.stat
 
-import collection.mutable.ListBuffer
+import scala.collection.mutable.ListBuffer
 
 import scalation.scala2d.{Frame, ScrollPane, Table}
 

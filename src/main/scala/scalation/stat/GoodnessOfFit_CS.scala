@@ -13,7 +13,7 @@
 
 package scalation.stat
 
-import math.{floor, log, round, sqrt}
+import scala.math.{floor, log, round, sqrt}
 
 import scalation.linalgebra.VectorD
 import scalation.random.{Quantile, Variate}

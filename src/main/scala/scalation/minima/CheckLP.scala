@@ -14,7 +14,7 @@
 
 package scalation.minima
 
-import math.abs
+import scala.math.abs
 
 import scalation.linalgebra.{MatriD, VectoD}
 import scalation.util.Error

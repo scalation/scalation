@@ -8,8 +8,8 @@
 
 package scalation.util
 
-import collection.mutable.ResizableArray
-import math.random
+import scala.collection.mutable.ResizableArray
+import scala.math.random
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PQItem` trait should be mixed in for items going on a `PQueue`.

@@ -8,8 +8,8 @@
  
 package scalation.analytics
 
-import collection.mutable.{Set, ListBuffer}
-import util.control.Breaks.{breakable, break}
+import scala.collection.mutable.{Set, ListBuffer}
+import scala.util.control.Breaks.{breakable, break}
 
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.util.Error

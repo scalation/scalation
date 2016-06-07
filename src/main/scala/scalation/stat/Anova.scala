@@ -8,7 +8,7 @@
 
 package scalation.stat
 
-import math.pow
+import scala.math.pow
 
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.random.Quantile

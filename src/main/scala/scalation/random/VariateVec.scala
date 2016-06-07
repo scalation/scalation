@@ -8,7 +8,7 @@
 
 package scalation.random
 
-import math.{abs, exp, Pi, round, sqrt}
+import scala.math.{abs, exp, Pi, round, sqrt}
 
 import scalation.linalgebra.{Fac_Cholesky, MatrixD, VectorD, VectorI}
 import scalation.math.Combinatorics.{choose, fac}

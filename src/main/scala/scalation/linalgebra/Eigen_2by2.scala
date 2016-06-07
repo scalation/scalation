@@ -9,7 +9,7 @@
 
 package scalation.linalgebra
 
-import math.sqrt
+import scala.math.sqrt
 
 import scalation.util.Error
 

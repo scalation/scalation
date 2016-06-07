@@ -10,8 +10,8 @@
 
 package scalation.analytics
 
-import collection.mutable.ListMap
-import util.control.Breaks.{breakable, break}
+import scala.collection.mutable.ListMap
+import scala.util.control.Breaks.{breakable, break}
 
 import scalation.linalgebra.{MatrixD, VectorD}
 //import scalation.linalgebra.SparseMatrixD

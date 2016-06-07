@@ -8,10 +8,10 @@
 
 package scalation.util
 
-import util.control.Breaks.{breakable, break}
+import scala.util.control.Breaks.{breakable, break}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `TestBreak` object provides an example of how to use "breaks" in Scala.
+/** The `TestBreak` object provides an example of how to use 'breaks' in Scala.
  *  @see http://daily-scala.blogspot.com/2010/04/breaks.html
  *  @see http://www.scala-lang.org/archives/downloads/distrib/files/nightly/docs/library/scala/util/control/Breaks.html
  */
@@ -22,5 +22,5 @@ object TestBreak extends App
         println ("i = " + i)
     }} // for
 
-} // TestBreak
+} // TestBreak object
 

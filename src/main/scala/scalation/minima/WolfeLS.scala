@@ -11,7 +11,7 @@
 
 package scalation.minima
 
-import math.{abs, pow}
+import scala.math.{abs, pow}
 
 import scalation.calculus.Calculus.derivative
 import scalation.linalgebra.VectorD

@@ -8,9 +8,9 @@
 
 package scalation.minima
 
-import collection.mutable.ArrayBuffer
-import math.{abs, ceil, floor, max, round, sqrt}
-import util.control.Breaks.{breakable, break}
+import scala.collection.mutable.ArrayBuffer
+import scala.math.{abs, ceil, floor, max, round, sqrt}
+import scala.util.control.Breaks.{breakable, break}
 
 import scalation.calculus.Calculus.FunctionV2S
 import scalation.linalgebra.VectorD

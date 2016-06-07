@@ -8,14 +8,14 @@
 
 package scalation.process
 
-import collection.mutable.ListBuffer
+import scala.collection.mutable.ListBuffer
+import scala.util.control.Breaks.{breakable, break}
 
 import scalation.animation.CommandType._
 import scalation.random.Variate
 import scalation.scala2d.{Ellipse, Rectangle}
 import scalation.scala2d.Colors._
 import scalation.util.Monitor.trace
-import util.control.Breaks.{breakable, break}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Gate` class models the operation of gate that can open and shut.

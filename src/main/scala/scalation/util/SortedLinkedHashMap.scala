@@ -10,8 +10,8 @@
 
 package scalation.util
 
-import collection.mutable.LinkedHashMap
-import util.Random
+import scala.collection.mutable.LinkedHashMap
+import scala.util.Random
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SortedLinkedHashMap` class extends the scala `LinkedHashMap` class.

@@ -9,7 +9,7 @@
 
 package scalation.linalgebra
 
-import io.Source.fromFile
+import scala.io.Source.fromFile
 
 import scalation.math.Real.{abs => ABS, _}
 

@@ -8,7 +8,7 @@
 
 package scalation.linalgebra.gen
 
-import reflect.ClassTag
+import scala.reflect.ClassTag
 
 import scalation.util.Error
 

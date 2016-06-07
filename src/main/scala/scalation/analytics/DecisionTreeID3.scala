@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import math.{ceil, floor}
+import scala.math.{ceil, floor}
 import scala.collection.mutable.HashMap
 
 import scalation.linalgebra.{MatrixI, VectorD, VectorI}
