@@ -237,11 +237,13 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     {
         val c = new HMatrix5 [T] (dim1, dim2)
         for (i <- range1; j <- range2) {
-            val k = dim_3(i, j)
-            val l = dim_4(i, j, k)
-            val m = dim_5(i,j,k,l)
-            c.alloc (i, j, k, l, m)
-            c.hmat(i)(j)(k)(l)(m) = hmat(i)(j)(k)(l)(m) + b.hmat(i)(j)(k)(l)(m)
+            val kk = dim_3(i, j)
+            val ll = dim_4(i, j, kk)
+            val mm = dim_5(i, j, kk, ll)
+            c.alloc (i, j, kk, ll, mm)
+            for (k <- 0 until kk; l <- 0 until ll; m <- 0 until mm) {
+                c.hmat(i)(j)(k)(l)(m) = hmat(i)(j)(k)(l)(m) + b.hmat(i)(j)(k)(l)(m)
+            } // for
         } // for
         c
     } // +
@@ -254,11 +256,13 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     {
         val c = new HMatrix5 [T] (dim1, dim2)
         for (i <- range1; j <- range2) {
-            val k = dim_3(i, j)
-            val l = dim_4(i, j, k)
-            val m = dim_5(i,j,k,l)
-            c.alloc (i, j, k, l, m)
-            c.hmat(i)(j)(k)(l)(m) = hmat(i)(j)(k)(l)(m) - b.hmat(i)(j)(k)(l)(m)
+            val kk = dim_3(i, j)
+            val ll = dim_4(i, j, kk)
+            val mm = dim_5(i, j, kk, ll)
+            c.alloc (i, j, kk, ll, mm)
+            for (k <- 0 until kk; l <- 0 until ll; m <- 0 until mm) {
+                c.hmat(i)(j)(k)(l)(m) = hmat(i)(j)(k)(l)(m) - b.hmat(i)(j)(k)(l)(m)
+            } // for
         } // for
         c
     } // -

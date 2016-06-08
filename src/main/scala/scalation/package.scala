@@ -29,6 +29,11 @@ package object scalation
      */
     val DATA_DIR = envOrElse ("SCALATION_HOME", ".") + ⁄ + "data" + ⁄
 
+    /** File system path for log (log/file output) directory
+     *  Use 'SCALATION_HOME' environment variable or else current directory "."
+     */
+    val LOG_DIR = envOrElse ("SCALATION_HOME", ".") + ⁄ + "log" + ⁄
+
     /** File system path for memory mapped files directory
      *  Use 'SCALATION_HOME' environment variable or else current directory "."
      */
@@ -56,6 +61,7 @@ package scalation
     object scalationTest extends App
     {
         println ("DATA_DIR       = " + DATA_DIR)
+        println ("LOG_DIR        = " + LOG_DIR)
         println ("MEM_MAPPED_DIR = " + MEM_MAPPED_DIR)
         println ("SRC_DIR        = " + SRC_DIR)
         println ("STORE_DIR      = " + STORE_DIR)

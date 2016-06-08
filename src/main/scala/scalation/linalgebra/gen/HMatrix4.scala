@@ -201,10 +201,10 @@ class HMatrix4 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     {
         val c = new HMatrix4 [T] (dim1, dim2)
         for (i <- range1; j <- range2) {
-            val k = dim_3(i, j)
-            val l = dim_4(i, j, k)
-            c.alloc (i, j, k, l)
-            c.hmat(i)(j)(k)(l) = hmat(i)(j)(k)(l) + b.hmat(i)(j)(k)(l)
+            val kk = dim_3(i, j)
+            val ll = dim_4(i, j, kk)
+            c.alloc (i, j, kk, ll)
+            for (k <- 0 until kk; l <- 0 until ll) c.hmat(i)(j)(k)(l) = hmat(i)(j)(k)(l) + b.hmat(i)(j)(k)(l)
         } // for
         c
     } // +
@@ -217,10 +217,10 @@ class HMatrix4 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     {
         val c = new HMatrix4 [T] (dim1, dim2)
         for (i <- range1; j <- range2) {
-            val k = dim_3(i, j)
-            val l = dim_4(i, j, k)
-            c.alloc (i, j, k, l)
-            c.hmat(i)(j)(k)(l) = hmat(i)(j)(k)(l) - b.hmat(i)(j)(k)(l)
+            val kk = dim_3(i, j)
+            val ll = dim_4(i, j, kk)
+            c.alloc (i, j, kk, ll)
+            for (k <- 0 until kk; l <- 0 until ll) c.hmat(i)(j)(k)(l) = hmat(i)(j)(k)(l) - b.hmat(i)(j)(k)(l)
         } // for
         c
     } // -
