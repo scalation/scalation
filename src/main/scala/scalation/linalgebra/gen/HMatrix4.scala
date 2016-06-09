@@ -116,12 +116,13 @@ class HMatrix4 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     def dim_3 (i: Int, j: Int): Int = hmat(i)(j).length
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the size of the 4th dimension for the given 'i', 'j', and 'k'.
+    /** Return the size of the 4th dimension for the given 'i' and 'j',
+     *  and optionally 'k'.
      *  @param i  1st dimension index of the hypermatrix
      *  @param j  2nd dimension index of the hypermatrix
      *  @param k  3rd dimension index of the hypermatrix
      */
-    def dim_4 (i: Int, j: Int, k: Int): Int = hmat(i)(j)(k).length
+    def dim_4 (i: Int, j: Int, k: Int = 0): Int = hmat(i)(j)(k).length
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Allocate a 2D array for the 3rd and 4th dimensions of the hypermatrix
@@ -201,13 +202,25 @@ class HMatrix4 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     {
         val c = new HMatrix4 [T] (dim1, dim2)
         for (i <- range1; j <- range2) {
-            val kk = dim_3(i, j)
-            val ll = dim_4(i, j, kk)
+            val (kk, ll) = (dim_3(i, j), dim_4(i, j))
             c.alloc (i, j, kk, ll)
             for (k <- 0 until kk; l <- 0 until ll) c.hmat(i)(j)(k)(l) = hmat(i)(j)(k)(l) + b.hmat(i)(j)(k)(l)
         } // for
         c
     } // +
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add (in-place) 'this' hypermatrix and hypermatrix 'b'.
+     *  @param b  the hypermatrix to add (requires 'leDimensions')
+     */
+    def += (b: HMatrix4 [T]): HMatrix4 [T] =
+    {
+        for (i <- range1; j <- range2) {
+            val (kk, ll) = (dim_3(i, j), dim_4(i, j))
+            for (k <- 0 until kk; l <- 0 until ll) hmat(i)(j)(k)(l) += b.hmat(i)(j)(k)(l)
+        } // for
+        this
+    } // +=
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' hypermatrix subtract hypermatrix 'b'.
@@ -217,13 +230,25 @@ class HMatrix4 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     {
         val c = new HMatrix4 [T] (dim1, dim2)
         for (i <- range1; j <- range2) {
-            val kk = dim_3(i, j)
-            val ll = dim_4(i, j, kk)
+            val (kk, ll) = (dim_3(i, j), dim_4(i, j))
             c.alloc (i, j, kk, ll)
             for (k <- 0 until kk; l <- 0 until ll) c.hmat(i)(j)(k)(l) = hmat(i)(j)(k)(l) - b.hmat(i)(j)(k)(l)
         } // for
         c
     } // -
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** From 'this' hypermatrix subtract (in-place) hypermatrix 'b'.
+     *  @param b  the hypermatrix to add (requires 'leDimensions')
+     */
+    def -= (b: HMatrix4 [T]): HMatrix4 [T] =
+    {
+        for (i <- range1; j <- range2) {
+            val (kk, ll) = (dim_3(i, j), dim_4(i, j))
+            for (k <- 0 until kk; l <- 0 until ll) hmat(i)(j)(k)(l) -= b.hmat(i)(j)(k)(l)
+        } // for
+        this
+    } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Check whether the dimensions of 'this' hypermatrix are less than or equal to
