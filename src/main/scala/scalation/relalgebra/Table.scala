@@ -132,6 +132,11 @@ trait Table
     def rows: Int
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the range of index values for the relation.
+     */
+    def indices: Range = 0 until rows
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Project onto the columns with the given column names.
      *  @param cName  the names of the columns to project onto
      */

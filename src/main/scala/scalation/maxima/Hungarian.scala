@@ -33,22 +33,23 @@ import scalation.linalgebra.MatrixD
  */
 class Hungarian (cost: MatrixD)
 {
-    private val NA = -1                    // Not Assigned
-    private val NO = -2                    // None Possible
-    private val m  = cost.dim1             // m workers (x-nodes)
-    private val n  = cost.dim2             // n jobs (y-nodes)
+    private val DEBUG = true                            // debug flag
+    private val NA    = -1                              // Not Assigned
+    private val NO    = -2                              // None Possible
+    private val m     = cost.dim1                       // m workers (x-nodes)
+    private val n     = cost.dim2                       // n jobs (y-nodes)
 
-    private val r_m      = 0 until m                 // range for workers
-    private val r_n      = 0 until n                 // range for jobs
-    private val lx       = Array [Double] (m)        // labels of x-nodes (workers)
-    private val ly       = Array [Double] (n)        // labels of y-nodes (jobs)
-    private val slack    = Array [Double] (n)        // slack(y) = lx(x) + lx(y) - cost(x, y)
-    private val slackX   = Array [Int] (n)           // slackX(y) = x-node for computing slack(y)
-    private val xy       = Array.fill(m) { NA }      // xy(x) = y-node matched with x
-    private val yx       = Array.fill(n) { NA }      // yx(y) = x-node matched with y
-    private val qu       = new ArrayDeque [Int] (m)  // queue for Breadth First Search (BFS)
-    private val maxMatch = min (n, m)                // maximum number of matches needed
-    private var nMatch   = 0                         // number of nodes in current matching
+    private val r_m      = 0 until m                    // range for workers
+    private val r_n      = 0 until n                    // range for jobs
+    private val lx       = Array.ofDim [Double] (m)     // labels of x-nodes (workers)
+    private val ly       = Array.ofDim [Double] (n)     // labels of y-nodes (jobs)
+    private val slack    = Array.ofDim [Double] (n)     // slack(y) = lx(x) + lx(y) - cost(x, y)
+    private val slackX   = Array.ofDim [Int] (n)        // slackX(y) = x-node for computing slack(y)
+    private val xy       = Array.fill (m)(NA)           // xy(x) = y-node matched with x
+    private val yx       = Array.fill (n)(NA)           // yx(y) = x-node matched with y
+    private val qu       = new ArrayDeque [Int] (m)     // queue for Breadth First Search (BFS)
+    private val maxMatch = min (n, m)                   // maximum number of matches needed
+    private var nMatch   = 0                            // number of nodes in current matching
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Initialize cost labels for x-nodes by setting them to the largest cost
@@ -57,6 +58,7 @@ class Hungarian (cost: MatrixD)
      */
     private def initLabels ()
     {
+        if (DEBUG) { println ("lx   = " + lx.deep); println ("cost = " + cost) }
         for (x <- r_m; y <- r_n) lx(x) = max (lx(x), cost(x, y))
     } // initLabels
 
@@ -190,10 +192,34 @@ class Hungarian (cost: MatrixD)
             println ("cost (" + x + ", " + xy(x) + ") = " + cost(x, xy(x)))
         } // for
         println ("------------------------------------")
-        return total
+        total
     } // solve
 
 } // Hungarian class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Hungarian` companion object supplies factory methods to create a cost
+ *  matrix and build a `Hungarian` object suitable to solving an assignment problem.
+ */
+object Hungarian
+{
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build build a `Hungarian` object suitable to solving an assignment problem.
+     *  Any edges not in the map will be assigned zero cost (least value since
+     *  maximizing).
+     *  @param m   the size of the set of x-nodes
+     *  @param n   the size of the set of y-nodes
+     *  @param xy  the map of positive edge costs connecting x_i to y_j 
+     */
+    def apply (m: Int, n: Int, xy: Map [(Int, Int), Double]): Hungarian =
+    {
+       val c = new MatrixD (m, n)
+       for ((k, v) <- xy) c(k._1, k._2) = v
+       new Hungarian (c)
+    } // apply
+
+} // Hungarian object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -231,4 +257,20 @@ object HungarianTest extends App
     println ("optimal cost4 = " + (new Hungarian (cost4).solve ()))
 
 } // HungarianTest object
+
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `HungarianTest2` object is used to test the `Hungarian` class.
+ *  > run-main scalation.maxima.HungarianTest2
+ */
+object HungarianTest2 extends App
+{
+    val xy = Map ((0, 0) -> 1.0, (0, 1) -> 4.0, (0, 2) -> 5.0, (0, 3) -> 2.0,
+                  (1, 0) -> 5.0, (1, 1) -> 7.0, (1, 2) -> 6.0, (1, 3) -> 2.0,
+                  (2, 0) -> 5.0, (2, 1) -> 8.0, (2, 2) -> 8.0, (2, 3) -> 9.0)
+    val ap = Hungarian (3, 4, xy)
+    println ("optimal cost = " + ap.solve ())
+
+} // HungarianTest2 object
 

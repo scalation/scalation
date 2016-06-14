@@ -47,6 +47,11 @@ class EasyWriter (project: String, filename: String, private var toFile: Boolean
     def println (s: String) { if (toFile) pw.println (s) else Console.println (s) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Print/write a newline ('\n').
+     */
+    def println () { if (toFile) pw.println ("") else Console.println () }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Write the character buffer.
      *  @param cbuf  the character buffer
      *  @param off   the offset in 'cbuf' to starting writing

@@ -924,10 +924,59 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
     def toVectorD (colPos: Int): VectorD = Vec.toDouble (col(colPos))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert the 'colName' column of 'this' relation into a vector of doubles.
+     *  @param colName  the column name to use for the vector
+     */
+    def toVectorD (colName: String): VectorD = Vec.toDouble (col(colMap(colName)))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert the 'colPos' column of 'this' relation into a vector of integers.
      *  @param colPos  the column position to use for the vector
      */
     def toVectorI (colPos: Int): VectorI = Vec.toInt (col(colPos))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert the 'colName' column of 'this' relation into a vector of integers.
+     *  @param colName  the column name to use for the vector
+     */
+    def toVectorI (colName: String): VectorI = Vec.toInt (col(colMap(colName)))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert the 'colPos' column of 'this' relation into a vector of integers.
+     *  @param colPos  the column position to use for the vector
+     */
+    def toVectorS (colPos: Int): VectorS = col(colPos).asInstanceOf [VectorS]
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert the 'colName' column of 'this' relation into a vector of integers.
+     *  @param colName  the column name to use for the vector
+     */
+    def toVectorS (colName: String): VectorS = col(colMap(colName)).asInstanceOf [VectorS]
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert the given columns within 'this' relation to a map: 'keyColPos' -> 'valColPos'.
+     *  @param keyColPos  the key column positions 
+     *  @param valColPos  the value column positions 
+     */
+    def toMap (keyColPos: Seq [Int], valColPos: Int): Map [Seq [Any], Any] =
+    {
+        val map = Map [Seq [Any], Any] ()
+        for (i <- indices) {
+            val tuple = row(i)
+            map += keyColPos.map (tuple(_)) -> tuple(valColPos)
+        } // for
+        map
+    } // toMap
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert the given columns within 'this' relation to a map: 'keyColName' -> 'valColName'.
+     *  @param keyColName  the key column names
+     *  @param valColname  the value column names
+     */
+    def toMap (keyColName: Seq [String], valColName: String): Map [Seq [Any], Any] = 
+    {
+        toMap (keyColName.map (colMap(_)), colMap(valColName))
+    } // toMap
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Save 'this' relation in a file using serialization.
@@ -946,6 +995,7 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
     def writeCSV (fileName: String)
     {
         val out = new PrintWriter (DATA_DIR + fileName)
+        out.println (colName.toString.drop (5).dropRight (1))
         for (i <- 0 until rows) out.println (row(i).toString.drop (7).dropRight (1))
         out.close
     } // writeCSV
