@@ -19,6 +19,15 @@ trait Error
      */
 //  private val className = getClass.getSimpleName ()
 
+    /** Use `EasyWriter` to make it easy to switch from standard out to a (log) file
+     */
+//  private val ew = new EasyWriter ("util", "error")
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Toggle output destination from default of (log) file to standard output. etc.
+     */
+//  def toggle () { ew.toggle () }
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show the flaw by printing the error message.
      *  @param method   the method where the error occurred
@@ -26,7 +35,8 @@ trait Error
      */
     final def flaw (method: String, message: String)
     {
-//      println ("ERROR @ " + className + "." + method +  ": " + message)
+//      ew.println ("ERROR @ " + className + "." + method +  ": " + message)
+//      ew.println ("ERROR @ " + method +  ": " + message)
         println ("ERROR @ " + method +  ": " + message)
     } // flaw
 

@@ -17,6 +17,15 @@ object Monitor
      */
     private var tracing = true 
 
+    /** Use `EasyWriter` to make it easy to switch from standard out to a (log) file
+     */
+    private val ew = new EasyWriter ("util", "monitor")
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Toggle output destination from default of (log) file to standard output. etc.
+     */
+    def toggle () { ew.toggle () }
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Turn tracing off.
      */
@@ -38,9 +47,9 @@ object Monitor
     {
         if (tracing) {
             if (whom == null) {
-                println ("+ " + who.me + " " + what + " at time " + when + ".")
+                ew.println ("+ " + who.me + " " + what + " at time " + when + ".")
             } else {
-                println ("+ " + who.me + " " + what + " " + whom.me + " at time " + when + ".")
+                ew.println ("+ " + who.me + " " + what + " " + whom.me + " at time " + when + ".")
             } // if
         } // if
     } // trace
