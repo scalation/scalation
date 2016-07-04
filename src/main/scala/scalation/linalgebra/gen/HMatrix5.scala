@@ -10,13 +10,21 @@ package scalation.linalgebra.gen
 
 import scala.reflect.ClassTag
 
-import scalation.linalgebra.VectorI
+import scalation.linalgebra.{VectoI, VectorI}
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HMatrix5` class is a simple implementation of a 5-dimensional hypermatrix.
  *  The first two dimensions must be fixed and known, while the third, fourth and fifth
  *  dimensions may be dynamically allocated by the user.
+ *-----------------------------------------------------------------------------
+ *  For Bayes classifier the convention is as follows:
+ *  dimension 1: possible values for class c (e.g., k = 2 => 0, 1 )
+ *  dimension 2: indicator for first feature x_j (e.g., n = 3 => x_0, x_1, x_3)
+ *  dimension 3: possible values for x_j OR indicator for second feature y_j
+ *  dimension 4: possible values for x_j's 1st parent OR possible values for x_j
+ *  dimension 5: possible values for x_j's 2st parent OR possible values for y_j
+ *-----------------------------------------------------------------------------
  *  @param dim1  size of the 1st dimension of the hypermatrix
  *  @param dim2  size of the 2nd dimension of the hypermatrix
  */
@@ -33,7 +41,7 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
 
     /** Multi-dimensional array storage for hypermatrix
      */
-    private val hmat = Array.ofDim [Array[Array[Array [T]]]] (dim1, dim2)
+    private val hmat = Array.ofDim [Array [Array [Array [T]]]] (dim1, dim2)
 
     /** Format string used for printing vector values (change using 'setFormat')
      */
@@ -109,9 +117,8 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     } // aux constructor
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Construct a 5-dimensional hypermatrix, where the 3rd dimension is fixed
-     *  as well, and the 4th and 5th dimensions vary only with the 3rd dimension.
-     *  varies only with the 4th.
+    /** Construct a 5-dimensional hypermatrix, where the 3rd dimension is fixed as
+     *  well, and the 4th varies with 2nd and 5th dimensions varies the 3rd dimension.
      *  @param dim1   size of the 1st dimension of the hypermatrix
      *  @param dim2   size of the 2nd dimension of the hypermatrix
      *  @param dim3   size of the 3rd dimension of the hypermatrix
@@ -121,9 +128,9 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     def this (dim1: Int, dim2: Int, dim3: Int, dims4: Array [Int], dims5: Array [Int]) =
     {
         this (dim1, dim2, dim3)
-        if (dims4.length != dim3) flaw ("constructor", "wrong number of elements for 4th dimension")
+        if (dims4.length != dim2) flaw ("constructor", "wrong number of elements for 4th dimension")
         if (dims5.length != dim3) flaw ("constructor", "wrong number of elements for 5th dimension")
-        for (i <- range1; j <- range2; k <- 0 until dim3) hmat(i)(j)(k) = Array.ofDim [T] (dims4(k), dims5(k))
+        for (i <- range1; j <- range2; k <- 0 until dim3) hmat(i)(j)(k) = Array.ofDim [T] (dims4(j), dims5(k))
     } // aux constructor
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -202,7 +209,7 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
      *  @param vc4   value count array giving sizes for 4th dimension based on j
      *  @param vc5   value count array giving sizes for 5th dimension based on j
      */
-    def alloc (vc3: VectorI, vc4: VectorI, vc5: VectorI)
+    def alloc (vc3: VectoI, vc4: VectoI, vc5: VectoI)
     {
         if (vc3.size != dim2) flaw ("alloc", "Dimensions mismatch")
         for (i <- range1; j <- range2) hmat(i)(j) = Array.ofDim [T] (vc3(j), vc4(j), vc5(j))
@@ -227,7 +234,7 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
      *  @param m  5th dimension index of the hypermatrix
      *  @param v  the value to be updated at the above position in the hypermatrix
      */
-    def update (i: Int, j: Int, k: Int, l: Int,m: Int, v: T) = hmat(i)(j)(k)(l)(m) = v
+    def update (i: Int, j: Int, k: Int, l: Int, m: Int, v: T) = hmat(i)(j)(k)(l)(m) = v
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' hypermatrix and hypermatrix 'b'.

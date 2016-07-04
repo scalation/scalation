@@ -7,17 +7,17 @@
  *  @see     http://en.wikipedia.org/wiki/C4.5_algorithm
  */
 
-package scalation.analytics
+package scalation.analytics.classifier
 
 import scala.collection.mutable.{MutableList, Queue}
 import scala.math.{ceil, floor}
-import scala.util.control.Breaks._
+import scala.util.control.Breaks.{break, breakable}
 import scala.util.Sorting
 
-import scalation.linalgebra.{MatrixI, VectorD, VectoD, VectorI}
+import scalation.linalgebra.{MatriI, MatrixI, VectoD, VectorD, VectoI, VectorI}
 import scalation.util.Error
 
-import Probability.entropy
+import scalation.analytics.Probability.entropy
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DecisionTreeC45` class implements a Decision Tree classifier using the
@@ -34,8 +34,8 @@ import Probability.entropy
  *  @param cn      the names for all classes
  *  @param vc      the value count array indicating number of distinct values per feature
  */
-class DecisionTreeC45 (val x: MatrixI, val y: VectorI, fn: Array [String], isCont: Array [Boolean],
-                       k: Int, cn: Array [String], private var vc: VectorI = null)
+class DecisionTreeC45 (val x: MatriI, val y: VectoI, fn: Array [String], isCont: Array [Boolean],
+                       k: Int, cn: Array [String], private var vc: VectoI = null)
       extends ClassifierInt (x, y, fn, k, cn)
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -90,7 +90,7 @@ class DecisionTreeC45 (val x: MatrixI, val y: VectorI, fn: Array [String], isCon
      *  @param cont   indicates whether is calculating continuous feature
      *  @param thres  threshold for continuous feature
      */
-    def frequency (fCol: VectorI, value: Int, cont: Boolean = false, thres: Double = 0):
+    def frequency (fCol: VectoI, value: Int, cont: Boolean = false, thres: Double = 0):
                    Tuple2 [Double, VectorD] =
     {
         val prob  = new VectorD (k)        // probability vector for a given feature and value
@@ -308,7 +308,7 @@ class DecisionTreeC45 (val x: MatrixI, val y: VectorI, fn: Array [String], isCon
      *  by following a decision path from the root to a leaf.
      *  @param z  the data vector to classify (purely discrete features)
      */
-    def classify (z: VectorI): Tuple2 [Int, String] =
+    def classify (z: VectoI): Tuple2 [Int, String] =
     {
         if(DEBUG) println ("classify: purely discrete features\n")
 
@@ -381,8 +381,8 @@ object DecisionTreeC45
      *  @param cn      the names for all classes
      *  @param vc      the value count array indicating number of distinct values per feature
      */
-    def apply (xy: MatrixI, fn: Array [String], isCont: Array [Boolean], k: Int, cn: Array [String],
-              vc: VectorI = null) =
+    def apply (xy: MatriI, fn: Array [String], isCont: Array [Boolean], k: Int, cn: Array [String],
+              vc: VectoI = null) =
     {
         new DecisionTreeC45 (xy(0 until xy.dim1, 0 until xy.dim2-1), xy.col(xy.dim2-1), fn, isCont, k, cn, vc)
     } // apply

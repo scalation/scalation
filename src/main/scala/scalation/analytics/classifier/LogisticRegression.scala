@@ -9,10 +9,11 @@
 
 // FIX: needs improved optimization
 
-package scalation.analytics
+package scalation.analytics.classifier
 
 import scala.math.{exp, log}
 
+import scalation.analytics.LogisticFunction
 import scalation.linalgebra.{MatrixD, VectorD, VectoD, VectorI}
 import scalation.minima.QuasiNewton
 import scalation.plot.Plot
@@ -205,7 +206,7 @@ class LogisticRegression (x: MatrixD, y: VectorI, fn: Array [String], cn: Array 
  *  @see www.cookbook-r.com/Statistical_analysis/Logistic_regression/
  *  Answer: b = (-8.8331, 0.4304),
  *          n_dev = 43.860, r_dev = 25.533, aci = 29.533, pseudo_rSq = 0.4178
- *  > run-main scalation.analytics.LogisticRegressionTest
+ *  > run-main scalation.analytics.classifier.LogisticRegressionTest
  */
 object LogisticRegressionTest extends App
 {
@@ -279,7 +280,7 @@ object LogisticRegressionTest extends App
 /** The `LogisticRegressionTest` object tests the `LogisticRegression` class.
  *  @see statmaster.sdu.dk/courses/st111/module03/index.html
  *  @see www.stat.wisc.edu/~mchung/teaching/.../GLM.logistic.Rpackage.pdf
- *  > run-main scalation.analytics.LogisticRegressionTest2
+ *  > run-main scalation.analytics.classifier.classifier.LogisticRegressionTest2
  */
 object LogisticRegressionTest2 extends App
 {

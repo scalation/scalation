@@ -59,7 +59,7 @@ import GoodnessOfFit_CS._
  *      (O_i - E_i)^2 / E_i
  *  <p>
  *  where O_i and E_i are the observed and expected counts for interval 'i', respectively.
- *  @param d          the sample data points
+ *  @param d          the sample data points/vector
  *  @param dmin       the minimum value for d
  *  @param dmax       the maximum value for d
  *  @param intervals  the number of intervals for the data's histogram
@@ -82,7 +82,7 @@ class GoodnessOfFit_CS (d: VectorD, dmin: Double, dmax: Double, intervals: Int =
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform a Chi-square goodness of fit test, matching the histogram of the
-     *  given data d with the random variable's probability function pf (pdf).
+     *  given data 'd' with the random variable's probability function 'pf' (pdf).
      *  @param rv   the random variate to test
      *  @param met  the discrepancy metric to use (defaults to pearson)
      */
@@ -113,6 +113,79 @@ class GoodnessOfFit_CS (d: VectorD, dmin: Double, dmax: Double, intervals: Int =
         println ("\nchi2 = " + chi2 + " : chi2(0.95, " + nz + ") = " + cutoff)
         chi2 <= cutoff
     } // fit
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform a Chi-square goodness of fit test, matching the histograms of the
+     *  given data 'd' with an alternative data-set/vector 'd2'.
+     *  @param d2   the alternate data set
+     *  @param met  the discrepancy metric to use (defaults to pearson)
+     */
+    def fit2 (d2: VectorD, met: Metric = pearson): Boolean =
+    {
+        println ("-------------------------------------------------------------")
+        println ("Test goodness of fit for two data-sets/vectors")
+        println ("-------------------------------------------------------------")
+
+        var x    = 0.0            // x coordinate
+        var o    = 0.0            // observed value: height of histogram
+        var e    = 0.0            // expected value: height of histogram 2
+        var chi2 = 0.0            // ChiSquare statistic
+        var nz   = 0              // number of nonzero intervals
+
+        val histo2 = new Array [Int] (intervals)                     // histogram 2
+        for (i <- 0 until n) {
+            val j = floor ((d2(i) - dmin) * ratio).toInt
+            if (0 <= j && j < intervals) histo2(j) += 1              // add to count for interval j
+            else println ("lost value = " + d2(i))
+        } // for
+
+        for (j <- 0 until intervals) {
+            x = j / ratio + dmin
+            o = histo(j)
+            e = histo2(j)
+            if (e >= 4) { chi2 += met (o, e); nz += 1 }              // big enough
+            println ("\thisto (" + x + ") = " + o + " : " + e + " ")
+        } // for
+
+        nz -= 1                              // degrees of freedom (dof) is one less
+        if (nz < 2)  flaw ("fit", "insufficient degrees of freedom")
+        if (nz > 49) nz = 49
+        val cutoff = Quantile.chiSquareInv (0.95, nz)
+        println ("\nchi2 = " + chi2 + " : chi2(0.95, " + nz + ") = " + cutoff)
+        chi2 <= cutoff
+    } // fit2
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform a Chi-square goodness of fit test, matching the counts of the
+     *  given data 'd' with an alternative data-set/vector 'd2'.
+     *  @param d2   the alternate data set
+     *  @param met  the discrepancy metric to use (defaults to pearson)
+     */
+    def fit3 (d2: VectorD, met: Metric = pearson): Boolean =
+    {
+        println ("-------------------------------------------------------------")
+        println ("Test goodness of fit for two count-based data-sets/vectors")
+        println ("-------------------------------------------------------------")
+
+        var o    = 0.0            // observed value: count for d
+        var e    = 0.0            // expected value: count for d2
+        var chi2 = 0.0            // ChiSquare statistic
+        var nz   = 0              // number of nonzero intervals
+
+        for (j <- d.indices) {
+            o = d(j)
+            e = d2(j)
+            if (e >= 4) { chi2 += met (o, e); nz += 1 }              // big enough
+            println (s"($j) = $o : $e")
+        } // for
+
+        nz -= 1                              // degrees of freedom (dof) is one less
+        if (nz < 2)  flaw ("fit", "insufficient degrees of freedom")
+        if (nz > 49) nz = 49
+        val cutoff = Quantile.chiSquareInv (0.95, nz)
+        println ("\nchi2 = " + chi2 + " : chi2(0.95, " + nz + ") = " + cutoff)
+        chi2 <= cutoff
+    } // fit3
 
 } // GoodnessOfFit_CS class
 

@@ -1,17 +1,20 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  John Miller, Hao Peng
+/** @author  John Miller, Hao Peng, Zhe Jin
  *  @version 1.2
  *  @date    Mon Jul 27 01:27:00 EDT 2015
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics
+package scalation.analytics.classifier
 
 import scala.math.abs
+import scala.util.control.Breaks.{break, breakable}
 
-import scalation.linalgebra.{MatrixI, VectorD, VectorI}
+import scalation.linalgebra.{MatriI, MatrixI, VectorD, VectoI, VectorI}
 import scalation.linalgebra.gen.HMatrix4
+import scalation.relalgebra.Relation
+import scalation.util.time
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `AugSelNaiveBayes` class implements an Integer-Based Tree Augmented Selective
@@ -35,33 +38,33 @@ import scalation.linalgebra.gen.HMatrix4
  *  @param me     use m-estimates (me == 0 => regular MLE estimates)
  *  @param thres  the correlation threshold between 2 features for possible parent-child relationship
  */
-class AugSelNaiveBayes (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Array [String],
-                        private var fset: Array [Boolean] = null, private var vc: VectorI = null,
+class AugSelNaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
+                        private var fset: Array [Boolean] = null, private var vc: VectoI = null,
                         me: Int = 3, thres: Double = 0.3)
-        extends ClassifierInt (x, y, fn, k, cn)
+        extends BayesClassifier (x, y, fn, k, cn)
 {
-    private val DEBUG = true                           // debug flag
-    private val TOL   = 0.1                            // tolerance indicating negligible improvement adding features
-    private val cor   = calcCorrelation                // feature correlation matrix
-    private val par   = new VectorI (n)                // allocate the parent vector
-    private val vcp = new VectorI(n)                   // value count for the parent
+    private val DEBUG  = false                          // debug flag
+    private val TOL    = 0.01                           // tolerance indicating negligible improvement adding features
+    private val cor    = calcCorrelation                // feature correlation matrix
+    private val parent = new VectorI (n)                // allocate the parent vector
+    private val vcp    = new VectorI(n)                 // value count for the parent
 
-    private val popC  = new VectorI (k)                // frequency counts for classes 0, ..., k-1
-    private val probC = new VectorD (k)                // probabilities for classes 0, ..., k-1
-    private val popX  = new HMatrix4 [Int] (k, n)      // conditional frequency counts for variable/feature j
-    private val probX = new HMatrix4 [Double] (k, n)   // conditional probabilities for variable/feature j
+    private val popC  = new VectorI (k)                 // frequency counts for classes 0, ..., k-1
+    private val probC = new VectorD (k)                 // probabilities for classes 0, ..., k-1
+    private val popX  = new HMatrix4 [Int] (k, n)       // conditional frequency counts for variable/feature j
+    private val probX = new HMatrix4 [Double] (k, n)    // conditional probabilities for variable/feature j
 
-    if (vc == null) vc = vc_default                    // set to default for binary data (2)
-    if (fset == null) fset = Array.fill (n) (true)     // set to default, all features included 
-    computeParent ()                                   // initialize the parent of each feature
-    computeVcp ()                                      // initialize the value count of each parent feature
+    if (vc == null) vc = vc_fromData                    // set to default for binary data (2)
+    if (fset == null) fset = Array.fill (n) (true)      // set to default, all features included
+    computeParent ()                                    // initialize the parent of each feature
+    computeVcp ()                                       // initialize the value count of each parent feature
 
     popX.alloc (fset, vc, vcp)
     probX.alloc (fset, vc, vcp)
  
     if (DEBUG) {
         println ("feature set fset   = " + fset.deep)
-        println ("parents par        = " + par)
+        println ("parents parent        = " + parent)
         println ("value count vc     = " + vc)
         println ("value count vcp    = " + vcp)
         println ("correlation matrix = " + cor)
@@ -69,43 +72,43 @@ class AugSelNaiveBayes (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: 
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the parent of each feature based on the correlation matrix.
-      *  Feature x_i is only a possible candidate for parent of feature x_j if i < j.
-      */
+     *  Feature x_i is only a possible candidate for parent of feature x_j if i < j.
+     */
     def computeParent ()
     {
-        par(0) = -1                       // feature 0 has no parents
+        parent(0) = -1                       // feature 0 has no parents
         for (i <- 1 until n) {
             if (fset(i)) {
                 val correl = cor(i).map ((x: Double) => abs (x))
                 for (a <- 0 until i if !fset(a)) correl(a) = 0
-                par(i) = if (correl.max () > thres) correl.argmax ()
+                parent(i) = if (correl.max () > thres) correl.argmax ()
                 else                           -1
-            } else par(i) = -1
+            } else parent(i) = -1
         } // for
     } // computeParent
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the value count of each parent feature based on the parent vector.
-      */
+     */
     def computeVcp ()
     {
         //set default value count to 1
         vcp.set(1)
-        for (j <- 0 until n if (fset(j) && par(j) > -1)) vcp(j) = vc(par(j))
-    }
+        for (j <- 0 until n if (fset(j) && parent(j) > -1)) vcp(j) = vc(parent(j))
+    } // computeVcp
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the frequencies for 'y' having class 'i' and 'x' for cases 0, 1, ...
      *  @param testStart  starting index of test region (inclusive)
      *  @param testEnd    ending index of test region (exclusive)
      */
-    def frequencies (testStart: Int, testEnd: Int)
+    private def frequencies (testStart: Int, testEnd: Int)
     {
         for (l <- 0 until m if l < testStart || l >= testEnd) {     // l = lth row of data matrix x
             val i = y(l)                                            // get the class
             popC(i) += 1                                            // increment ith class
             for (j <- 0 until n if fset(j)) {
-                if (par(j) > -1) popX(i, j, x(l, j), x(l, par(j))) += 1
+                if (parent(j) > -1) popX(i, j, x(l, j), x(l, parent(j))) += 1
                 else             popX(i, j, x(l, j), 0) += 1
             } // for
         } // for
@@ -132,7 +135,7 @@ class AugSelNaiveBayes (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: 
 
             for (j <- 0 until n if fset(j)) {                           // for each feature j in fset
                 val me_vc = me / vc(j).toDouble
-                for (xj <- 0 until vc(j); xp <- 0 until vcp(j)) {       // for each value for feature j: xj, par(j): xp
+                for (xj <- 0 until vc(j); xp <- 0 until vcp(j)) {       // for each value for feature j: xj, parent(j): xp
                     probX(i, j, xj, xp) = (popX(i, j, xj, xp) + me_vc) / (pci + me)
                 } // for
             } // for
@@ -149,13 +152,13 @@ class AugSelNaiveBayes (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: 
      *  (0, ..., k-1) with the highest relative posterior probability.
      *  @param z  the data vector to classify
      */
-    def classify (z: VectorI): (Int, String) =
+    def classify (z: VectoI): (Int, String) =
     {
         val prob = new VectorD(k)
         for (i <- 0 until k) {
             prob(i) = probC(i) // P(C = i)                                   // P(C = i)
             for (j <- 0 until n if fset(j)) {
-                prob(i) *= (if (par(j) > -1) probX(i, j, z(j), z(par(j)))    // P(X_j = z_j | C = i), parent
+                prob(i) *= (if (parent(j) > -1) probX(i, j, z(j), z(parent(j)))    // P(X_j = z_j | C = i), parent
                             else             probX(i, j, z(j), 0))           // P(X_j = z_j | C = i), no parent
             } //for
         } // for
@@ -183,17 +186,18 @@ class AugSelNaiveBayes (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build the Augmented Selective Naive Bayes classier model by using backward-elimination
      *  Selective algorithm. Limited dependencies between variables/features are also supported.
-     *  @param fold  the number of fold used in cross-validation
+     *  @param testStart  the start of the test region
+     *  @param testEnd    the end of the test region
      */
-    def buildModel (fold: Int = 5)
+    def buildModel (testStart: Int = 0, testEnd: Int = 0): (Array [Boolean], DAG) =
     {
         for (j <- 0 until n) fset(j) = true     // set the feature set to all features included
         //initialize the model using n-fold cross validation and obtaining the accuracy without removing any features
-        var accuracy = crossValidate (fold)
+        var accuracy = crossValidate ()
         if (DEBUG) println ("Initial accuracy with no feature removed: " + accuracy)
 
         //keep removing one feature at a time until no more feature should be removed
-        while (true) {
+        breakable{ while (true) {
             var accuracyDiff = 0.0
             var minDiff = 1.0
             var toRemove = 0
@@ -202,7 +206,7 @@ class AugSelNaiveBayes (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: 
             for (j <- 0 until n if fset(j)) {
                 if (DEBUG) println ("Test by temporarily removing feature " + j)
                 fset(j) = false
-                accuracyDiff = accuracy - crossValidate (fold)
+                accuracyDiff = accuracy - crossValidate ()
                 if (accuracyDiff <= minDiff) { minDiff = accuracyDiff; toRemove = j }
                 fset(j) = true
             } // for
@@ -213,18 +217,21 @@ class AugSelNaiveBayes (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: 
                 if (DEBUG) println ("Feature " + toRemove + " has been removed from the model.")
                 fset(toRemove) = false
                 if (DEBUG) println ("Re-train model by removing feature " + toRemove)
-                crossValidate (fold)
+                crossValidate ()
                 if (DEBUG) println ("The new accuracy is " + accuracy + " after removing feature " + toRemove)
             } else {
                 if (DEBUG) println ("No more features to removed: Re-train the model without removing any features")
-                crossValidate (fold)
+                crossValidate ()
                 if (DEBUG) {
-                    println ("Final par  = " + par)
+                    println ("Final parent  = " + parent)
                     println ("Final fset = " + fset.deep)
                 } // if
-                return
+                break
             } // if
-        } // while
+        }} // while
+        computeParent()
+        val pp: Traversable[Array[Int]] =for(p <- parent) yield Array(p)
+        (fset, new DAG(pp.toArray))
     } // buildModel class
 
 } // AugSelNaiveBayes class
@@ -246,8 +253,8 @@ object AugSelNaiveBayes
      *  @param me     use m-estimates (me == 0 => regular MLE estimates)
      *  @param thres  the correlation threshold between 2 features for possible parent-child relationship
      */
-    def apply (xy: MatrixI, fn: Array [String], k: Int, cn: Array [String],
-               fset: Array [Boolean] = null, vc: VectorI = null, me: Int = 3, thres: Double = 0.3) =
+    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
+               fset: Array [Boolean] = null, vc: VectoI = null, me: Int = 3, thres: Double = 0.3) =
     {
         new AugSelNaiveBayes (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn,
                               fset, vc, me, thres)
@@ -260,7 +267,7 @@ object AugSelNaiveBayes
 /** The `AugSelNaiveBayesTest` object is used to test the `AugSelNaiveBayes` class.
  *  Classify whether a car is more likely to be stolen (1) or not (1).
  *  @see www.inf.u-szeged.hu/~ormandi/ai2/06-AugSelNaiveBayes-example.pdf
- *  > run-main scalation.analytics.AugSelNaiveBayes
+ *  > run-main scalation.analytics.classifier.AugSelNaiveBayesTest
  */
 object AugSelNaiveBayesTest extends App
 {
@@ -308,7 +315,7 @@ object AugSelNaiveBayesTest extends App
 /** The `AugSelNaiveBayesTest2` object is used to test the `AugSelNaiveBayes` class.
  *  Given whether a person is Fast and/or Strong, classify them as making C = 1
  *  or not making C = 0 the football team.
- *  > run-main scalation.analytics.AugSelNaiveBayes2
+ *  > run-main scalation.analytics.classifier.AugSelNaiveBayesTest2
  */
 object AugSelNaiveBayesTest2 extends App
 {
@@ -337,7 +344,7 @@ object AugSelNaiveBayesTest2 extends App
 
     // train the classifier ---------------------------------------------------
     // asnb.train ()
-    asnb.buildModel (3)
+    asnb.buildModel ()
 
     // test sample ------------------------------------------------------------
     val z = VectorI (1, 0)                       // new data vector to classify
@@ -347,4 +354,32 @@ object AugSelNaiveBayesTest2 extends App
     asnb.crossValidate ()
 
 } // AugSelNaiveBayesTest2 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `AugSelNaiveBayesTest3` object is used to test the `AugSelNaiveBayes` class.
+  *  > run-main scalation.analytics.classifier.AugSelNaiveBayesTest3
+  */
+object AugSelNaiveBayesTest3 extends App
+{
+    val filename = BASE_DIR + "breast-cancer.arff"
+    var data = Relation (filename, -1, null)
+    val xy = data.toMatriI2 (null)
+    val fn = data.colName.toArray
+    val cn = Array ("p", "e")            // class names
+    println ("---------------------------------------------------------------")
+    val k  = 2
+
+    /*
+    println ("---------------------------------------------------------------")
+    println ("D A T A   M A T R I X")
+    println ("xy = " + xy)
+    */
+
+    val anb =  AugSelNaiveBayes(xy, fn, k, cn,null,null) // create the classifier
+
+    anb.train ()
+    anb.crossValidate()
+
+} // AugSelNaiveBayesTest3 object
 

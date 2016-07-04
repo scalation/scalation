@@ -4,10 +4,11 @@
  *  @version 1.2
  *  @date    Mon Mar  3 14:39:17 EST 2014
  *  @see     LICENSE (MIT style license file).
- *  @see     http://fbim.fh-regensburg.de/~saj39122/Diplomarbeiten/Miklos/Papers/Keerthi%20improvement%20on%20SMO.pdf
+ *
+ *  @see     fbim.fh-regensburg.de/~saj39122/Diplomarbeiten/Miklos/Papers/Keerthi%20improvement%20on%20SMO.pdf
  */
 
-package scalation.analytics
+package scalation.analytics.classifier
 
 import scala.collection.mutable.Set
 import scala.math.abs
@@ -119,12 +120,12 @@ class SupportVectorMachine (x: MatrixD, y: VectorI, fn: Array [String] = Array (
      *  -1 means it belongs to the negative class.
      *  @param z  the vector to classify
      */
-//    def classify (z: VectorI): Tuple2 [Int, String] =
-//    {
-//        val zd = new VectorD (z.dim)
-//        for (j <- 0 until z.dim) zd(j) = z(j).toDouble
-//        classify (zd)
-//    } // classify
+//  def classify (z: VectorI): Tuple2 [Int, String] =
+//  {
+//      val zd = new VectorD (z.dim)
+//      for (j <- 0 until z.dim) zd(j) = z(j).toDouble
+//      classify (zd)
+//  } // classify
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset or re-initialize the frequency tables and the probability tables.
@@ -323,7 +324,7 @@ class SupportVectorMachine (x: MatrixD, y: VectorI, fn: Array [String] = Array (
             else i1 = i_Up
         } // if
         
-        takeStep(i1, i2)
+        takeStep (i1, i2)
     } // checkExample
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -336,18 +337,19 @@ class SupportVectorMachine (x: MatrixD, y: VectorI, fn: Array [String] = Array (
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SupportVectorMachineTest` is used to test the `SupportVectorMachine` class.
+ *  > run-main scalation.analytics.classifier.SupportVectorMachineTest
  */
 object SupportVectorMachineTest extends App
 {
     // Test 1
-    val x = new MatrixD ((4, 2), 1.0, 2.0,    // 4 data points
+    val x = new MatrixD ((4, 2), 1.0, 2.0,            // 4 data points
                                  2.0, 1.0,
                                  2.0, 3.0,
                                  3.0, 2.0)
-    val y = VectorI (-1, -1, 1, 1)            // classification of points
+    val y = VectorI (-1, -1, 1, 1)                    // classification of points
     val z = VectorD (4.0, 3.0)
     
-    val svm   = new SupportVectorMachine (x, y)               // create optimizer
+    val svm   = new SupportVectorMachine (x, y)       // create optimizer
     svm.train ()
     println (svm)
     println ("classify (" + z + ") = " + svm.classify (z))

@@ -8,6 +8,7 @@
 
 package scalation.analytics
 
+import scalation.analytics.classifier.LogisticRegression
 import scalation.linalgebra.{MatrixD, VectorD, VectorI}
 import scalation.linalgebra.VectorD.one
 

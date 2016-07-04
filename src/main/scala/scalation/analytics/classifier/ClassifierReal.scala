@@ -6,9 +6,9 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics
+package scalation.analytics.classifier
 
-import scalation.linalgebra.{MatriD, MatrixD, VectorD, VectorI}
+import scalation.linalgebra.{MatriD, MatrixD, VectorD, VectoI, VectorI}
 import scalation.stat.vectorD2StatVector
 import scalation.util.Error
 
@@ -21,7 +21,7 @@ import scalation.util.Error
  *  @param k   the number of classes
  *  @param cn  the names for all classes
  */
-abstract class ClassifierReal (x: MatriD, y: VectorI, fn: Array [String], k: Int, cn: Array [String])
+abstract class ClassifierReal (x: MatriD, y: VectoI, fn: Array [String], k: Int, cn: Array [String])
          extends Classifier with Error
 {
     /** the number of data vectors in training-set (# rows)
@@ -55,7 +55,7 @@ abstract class ClassifierReal (x: MatriD, y: VectorI, fn: Array [String], k: Int
      *  class it belongs to, by first converting it to a vector of doubles.
      *  @param z  the vector to classify
      */
-    def classify (z: VectorI): Tuple2 [Int, String] =
+    def classify (z: VectoI): Tuple2 [Int, String] =
     {
         val zd = new VectorD (z.dim)
         for (j <- 0 until z.dim) zd(j) = z(j).toDouble

@@ -6,11 +6,11 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics
+package scalation.analytics.classifier
 
 import scala.math.round
 
-import scalation.linalgebra.{MatriD, MatrixD, MatrixI, VectoD, VectorD, VectorI}
+import scalation.linalgebra.{MatriD, MatrixD, MatriI, MatrixI, VectoD, VectoI, VectorI}
 import scalation.stat.vectorD2StatVector
 import scalation.util.{Error, getFromURL_File}
 
@@ -23,7 +23,7 @@ import scalation.util.{Error, getFromURL_File}
  *  @param k   the number of classes
  *  @param cn  the names for all classes
  */
-abstract class ClassifierInt (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Array [String])
+abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String])
          extends Classifier with Error
 {
     /** the number of data vectors in training/test-set (# rows)
@@ -56,6 +56,17 @@ abstract class ClassifierInt (x: MatrixI, y: VectorI, fn: Array [String], k: Int
     /** Return default values for binary input data (value count 'vc' set to 2).
      */
     def vc_default: VectorI = { val vc = new VectorI (n); vc.set (2); vc }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return value counts calculated from the input data.
+     *  May wish to call 'shiftToZero' before calling this method.
+     */
+    def vc_fromData: VectorI = VectorI (for (j <- x.range2) yield x.col(j).max() + 1)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Shift the 'x' Matrix so that the minimum value for each column equals zero.
+     */
+    def shiftToZero () { x -= VectorI (for (j <- x.range2) yield x.col(j).min()) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a new continuous data vector 'z', determine which class it belongs
@@ -97,15 +108,31 @@ abstract class ClassifierInt (x: MatrixI, y: VectorI, fn: Array [String], k: Int
         correct / mm.toDouble
     } // test
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Test the quality of the training with a test-set and return the fraction
+     *  of correct classifications.
+     *  @param itest  indices of the instances considered test data
+     */
+    override def test (itest: VectorI): Double =
+    {
+        var correct = 0
+        for (i <- itest if classify (x(i))._1 == y(i)) correct += 1
+        correct / itest.dim.toDouble
+    } // test
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Calculate the correlation matrix for the feature vectors 'fea'.
      *  If the correlations are too high, the independence assumption may be dubious.
      */
     def calcCorrelation: MatriD =
     {
-        val fea = for (j <- 0 until n) yield x.col(j).toDouble
+        val fea = for (j <- 0 until n) yield  x.col(j).toDouble.toDense
         val cor = new MatrixD (n, n)
-        for (j1 <- 0 until n; j2 <- 0 until j1) cor(j1, j2) = fea(j1) corr fea(j2)
+        for (j1 <- 0 until n; j2 <- 0 until j1) {
+//          println ("fea (j1) = " + fea(j1))
+//          println ("fea (j2) = " + fea(j2))
+            cor(j1, j2) = fea(j1) corr fea(j2)
+        } // for
         cor
     } // calcCorrelation
 

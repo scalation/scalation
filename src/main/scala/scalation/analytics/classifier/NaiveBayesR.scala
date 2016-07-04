@@ -6,7 +6,7 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics
+package scalation.analytics.classifier
 
 import scala.math.{ceil, floor}
 
@@ -145,9 +145,10 @@ class NaiveBayesR (x: MatrixD, y: VectorI, fn: Array [String], k: Int, cn: Array
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `NaiveBayesRTest` object is used to test the 'NaiveBayesR' class.
+/** The `NaiveBayesRTest` object is used to test the `NaiveBayesR` class.
  ** Ex: Classify whether a person is male (M) or female (F) based on the measured features.
- *  @see http://en.wikipedia.org/wiki/Naive_Bayes_classifier
+ *  @see en.wikipedia.org/wiki/Naive_Bayes_classifier
+ *  > run-main scalation.analytics.classifier.NaiveBayesRTest
  */
 object NaiveBayesRTest extends App
 {

@@ -6,13 +6,9 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics
+package scalation.analytics.classifier
 
-import scala.util.control.Breaks.{breakable, break}
-import scala.collection.mutable.Set
-
-import scalation.linalgebra.{MatrixD, VectorD, VectoD, VectorI}
-import scalation.util.Error
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectoI, VectorI}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KNN_Classifier` class is used to classify a new vector 'z' into one of
@@ -30,8 +26,7 @@ import scalation.util.Error
  *  @param cn   the names for all classes
  *  @param knn  the number of nearest neighbors to consider
  */
-class KNN_Classifier (x: MatrixD, y: VectorI, fn: Array [String], k: Int, cn: Array [String],
-                      knn: Int = 3)
+class KNN_Classifier (x: MatriD, y: VectoI, fn: Array [String], k: Int, cn: Array [String], knn: Int = 3)
       extends ClassifierReal (x, y, fn, k, cn)
 {
     private val DEBUG      = true                                        // debug flag

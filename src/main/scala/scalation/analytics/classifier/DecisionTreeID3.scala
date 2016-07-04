@@ -6,15 +6,14 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics
+package scalation.analytics.classifier
 
 import scala.math.{ceil, floor}
 import scala.collection.mutable.HashMap
 
-import scalation.linalgebra.{MatrixI, VectorD, VectorI}
+import scalation.analytics.Probability.entropy
+import scalation.linalgebra.{MatriI, MatrixI, VectorD, VectoI, VectorI}
 import scalation.util.Error
-
-import Probability.entropy
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DecisionTreeID3` class implements a Decision Tree classifier using the
@@ -30,8 +29,8 @@ import Probability.entropy
  *  @param cn  the names for all classes
  *  @param vc  the value count array indicating number of distinct values per feature
  */
-class DecisionTreeID3 (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Array [String],
-                      private var vc: VectorI = null)
+class DecisionTreeID3 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
+                      private var vc: VectoI = null)
       extends ClassifierInt (x, y, fn, k, cn)
 {
     abstract class Node
@@ -159,7 +158,7 @@ class DecisionTreeID3 (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: A
      *  by following a decision path from the root to a leaf.
      *  @param z  the data vector to classify
      */
-    def classify (z: VectorI): Tuple2 [Int, String] =
+    def classify (z: VectoI): Tuple2 [Int, String] =
     {
         var n = tree
         for (i <- 0 until z.dim) {
@@ -195,7 +194,7 @@ object DecisionTreeID3
      *  @param cn  the names for all classes
      *  @param vc  the value count array indicating number of distinct values per feature
      */
-    def apply (xy: MatrixI, fn: Array [String], k: Int, cn: Array [String], vc: VectorI = null) =
+    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String], vc: VectoI = null) =
     {
         new DecisionTreeID3 (xy(0 until xy.dim1, 0 until xy.dim2-1), xy.col(xy.dim2-1), fn, k, cn, vc)
     } // apply

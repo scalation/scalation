@@ -138,6 +138,36 @@ case class NormalVec (mu: VectorD, cov: MatrixD, stream: Int = 0)
 
 } // NormalVec class
 
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/**
+ */
+case class Dir (alpha: VectorD, stream: Int = 0)
+{
+    import scalation.math.Combinatorics.gammaF
+
+    private val a_sum = alpha.sum
+
+    def mean: VectorD = alpha / a_sum
+
+    def pf (z: VectorD): Double =
+    {
+        var prod = 1.0
+        for (i <- alpha.range) {
+            val a_i = alpha(i)
+            prod *= (z(i) ~^ (a_i-1.0)) / gammaF (a_i)
+        } // for
+        prod * gammaF (a_sum)
+    } // pf
+
+    def gen: VectorD =
+    {
+        null                 // FIX - to be implemented
+    } // gen
+
+    def igen: VectorI = gen.toInt
+
+} // Dir class
+
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PermutedVecD` class generates random permutations of a vector of doubles.

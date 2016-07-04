@@ -10,7 +10,7 @@ package scalation.linalgebra.gen
 
 import scala.reflect.ClassTag
 
-import scalation.linalgebra.VectorI
+import scalation.linalgebra.{VectoI, VectorI}
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -156,7 +156,7 @@ class HMatrix4 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
      *  @param vc3   value count array giving sizes for 3rd dimension based on j
      *  @param vc4   value count array giving sizes for 4th dimension based on j
      */
-    def alloc (vc3: VectorI, vc4: VectorI)
+    def alloc (vc3: VectoI, vc4: VectoI)
     {
         if (vc3.size != dim2) flaw ("alloc", "Dimensions mismatch")
         for (i <- range1; j <- range2) hmat(i)(j) = Array.ofDim [T] (vc3(j), vc4(j))
@@ -169,7 +169,7 @@ class HMatrix4 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
      *  @param vc3   value count array giving sizes for 3rd dimension based on j
      *  @param vc4   value count array giving sizes for 4th dimension based on j
      */
-    def alloc (jset: Array [Boolean], vc3: VectorI, vc4: VectorI)
+    def alloc (jset: Array [Boolean], vc3: VectoI, vc4: VectoI)
     {
         if (vc3.size != dim2) flaw ("alloc", "Dimensions mismatch")
         for (i <- range1; j <- range2 if jset(j)) hmat(i)(j) = Array.ofDim [T] (vc3(j), vc4(j))

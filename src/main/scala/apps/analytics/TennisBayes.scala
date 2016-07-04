@@ -8,7 +8,7 @@
 
 package apps.analytics
 
-import scalation.analytics.NaiveBayes
+import scalation.analytics.classifier.NaiveBayes
 import scalation.linalgebra.{MatrixI, VectorI}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

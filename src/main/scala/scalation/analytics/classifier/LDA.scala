@@ -6,9 +6,9 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics
+package scalation.analytics.classifier
 
-import scalation.linalgebra.{MatrixD, VectorD, VectoD, VectorI}
+import scalation.linalgebra.{MatrixD, VectoD, VectorD, VectoI, VectorI}
 import scalation.stat.StatVector.{cov, mean}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -18,7 +18,7 @@ import scalation.stat.StatVector.{cov, mean}
  *  @param y   the training/test classification vector, where y_i = class for row i of the matrix x
  *  @param fn  the names for all features/variables
  */
-class LDA (x: MatrixD, y: VectorI, fn: Array [String])
+class LDA (x: MatrixD, y: VectoI, fn: Array [String])
       extends ClassifierReal (x, y, fn, 2, Array ("no", "yes"))
 {
     private val DEBUG = true
@@ -37,7 +37,7 @@ class LDA (x: MatrixD, y: VectorI, fn: Array [String])
     private val sig1 = cov (x1)
 
     private var c = 0.5
-    private var w: VectorD = null
+    private var w: VectoD = null
 
     if (DEBUG) {
         println ("mu0  = " + mu0)
@@ -78,7 +78,7 @@ class LDA (x: MatrixD, y: VectorI, fn: Array [String])
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `LDATest` is used to test the `LDA` class.
  *  @see people.revoledu.com/kardi/tutorial/LDA/Numerical%20Example.html
- *  > run-main scalation.analytics.LDATest
+ *  > run-main scalation.analytics.classifier.LDATest
  */
 object LDATest extends App
 {

@@ -13,6 +13,7 @@ fork := true
 
 // scalacOptions += "-feature"
 // scalacOptions += "-unchecked"
+scalacOptions += "-deprecation"
 
 scalacOptions += "-Yopt:l:classpath"            // optimize
 scalacOptions += "-Yopt-warnings"

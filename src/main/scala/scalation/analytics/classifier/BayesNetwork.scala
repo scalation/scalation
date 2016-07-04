@@ -8,19 +8,9 @@
 
 // U N D E R   D E V E L O P M E N T
 
-package scalation.analytics
+package scalation.analytics.classifier
 
-import scala.math.round
-
-import scalation.linalgebra.{MatrixI, VectorI, VectorD}
-import scalation.util.Error
-
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The 'DAG' class provides a data structure for storing directed acyclic graphs.
- *  @param par  records the parents for each node in the graph
- */
-class DAG (val par: Array [Array [Int]])
-
+import scalation.linalgebra.{MatriI, MatrixI, VectorD, VectoI, VectorI}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BayesNetwork` class implements a Bayesian Network Classifier.  It
@@ -31,6 +21,7 @@ class DAG (val par: Array [Array [Int]])
  *  dependencies are specified using a Directed Acyclic Graph 'DAG'.  Nodes
  *  are conditionally dependent on their parents only.  Conditional probability
  *  are recorded in tables.  Training is achieved by ...
+ *-----------------------------------------------------------------------------
  *  @param x      the integer-valued training/test data vectors stored as rows of a matrix
  *  @param y      the training/test classification vector, where y_i = class for row i of the matrix x
  *  @param fn     the names for all factors
@@ -39,11 +30,18 @@ class DAG (val par: Array [Array [Int]])
  *  @param dag    the directed acyclic graph specifying conditional dependencies
  *  @param table  the array of tables recording conditional probabilities
  */
-class BayesNetwork (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Array [String],
+class BayesNetwork (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
                     dag: DAG = null, table: Array [Map [Int, Double]] = null)
-      extends ClassifierInt (x, y, fn, k, cn)
+      extends BayesClassifier (x, y, fn, k, cn)
 {
     private val DEBUG = true                 // debug flag
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build a model.  FIX - implement
+     *  @param testStart  the start of the test region
+     *  @param testEnd    the end of the test region
+     */
+    def buildModel (testStart: Int, testEnd: Int): (Array [Boolean], DAG) = ???
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Joint Probability 'JP' of vector 'x'  ('z' concatenate outcome).
@@ -53,7 +51,7 @@ class BayesNetwork (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arra
     def jp (x: VectorI): Double =
     {
         var prod = 1.0
-        for (i <- 0 until x.dim) prod *= cp (i, x.select (dag.par (i)) ++ x(i))
+        for (i <- 0 until x.dim) prod *= cp (i, x.select(dag.parent (i)) ++ x(i))
         prod
     } // jp
 
@@ -84,7 +82,7 @@ class BayesNetwork (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arra
      *  number (0, ..., k-1) with the highest relative posterior probability.
      *  @param z  the data vector to classify
      */
-    override def classify (z: VectorI): Tuple2 [Int, String] =
+    override def classify (z: VectoI): Tuple2 [Int, String] =
     {
         val prob = new VectorD (k)
         val x    = new VectorI (z.dim + 1)
@@ -123,6 +121,7 @@ class BayesNetwork (x: MatrixI, y: VectorI, fn: Array [String], k: Int, cn: Arra
 /** The `BayesNetworkTest` object is used to test the `BayesNetwork` class.
  *  Ex: Classify whether a person has a Back Ache.
  *  @see www.eng.tau.ac.il/~bengal/BN.pdf
+ *  > run-main sclation.analytics.classifier.BayesNetworkTest
  */
 object BayesNetworkTest extends App
 {

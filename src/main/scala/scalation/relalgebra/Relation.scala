@@ -152,12 +152,47 @@ object Relation
     def apply (fileName: String, name: String, colName: Seq [String], key: Int,
                domain: String): Relation =
     {
-        var eSep   = ","
+        val eSep   = ","
         val lines  = getFromURL_File (fileName)
         val newCol = Vector.fill [Vec] (colName.length)(null)
         val r3     = Relation (name, colName, newCol, key, domain)
         for (ln <- lines) r3.add (r3.row (ln.split (eSep), domain))
         r3
+    } // apply
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Read the relation with the given 'name' into memory loading its columns
+     *  with data from the '.arff' file named 'fileName'.
+     *  @param fileName  the file name of the data file
+     *  @param key       the column number for the primary key (< 0 => no primary key)
+     *  @param domain    an optional string indicating domains for columns (e.g., 'SD' = 'StrNum', 'Double')
+     */
+    def apply (fileName: String, key: Int, domain: String): Relation =
+    {
+        val eSep = "[, ]"
+        val lines = getFromURL_File (fileName)
+        var name: String = null
+        var colBuffer: Array [ArrayBuffer [String]] = null
+        var colName = ArrayBuffer [String]()
+        var newCol: Vector [Vec] = null
+        var foundData = false
+        for (ln <- lines) {
+            if (ln.indexOf("%") == 0) {
+                // skip comment
+            } else if (ln.indexOf ("@relation") == 0) {
+                name = ln.split (eSep)(1)
+            } else if (ln.indexOf ("@attribute") == 0) {
+                colName += ln.split(eSep)(1)
+            } else if (ln.indexOf ("@data") == 0) {
+                foundData = true
+                colBuffer = Array.ofDim (colName.length)
+                for (i <- colBuffer.indices) colBuffer (i) = new ArrayBuffer ()
+            } else if (foundData) {
+                val values = ln.split (eSep)
+                values.indices.foreach (i => { colBuffer (i) += values (i) })
+            } // if
+        } // for
+        Relation (name, colName, colBuffer.indices.map (i => VectorS (colBuffer(i).toArray)).toVector, key, domain)        
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -896,6 +931,34 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
         case BIDIAGONAL      => BidMatrixI (colVec)
         } // match
     } // toMatriI
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' relation into a matrix of integers.  It will convert
+     *  doubles and strings to integers.
+     *  <p>
+     *       in the regression equation: 'xb = y' create matrix 'xy'
+     *  <p>
+     *  @param colPos  the column positions to use for the matrix
+     *  @param kind    the kind of matrix to create
+     */
+    def toMatriI2 (colPos: Seq [Int] = null, kind: MatrixKind = DENSE): MatriI =
+    {
+        import Converter._
+        val cp = if (colPos == null) Seq.range(0, cols) else colPos
+        val colVec = for (x <- pi (cp).col) yield {
+                         try {
+                             Vec.toInt (x)
+                         } catch { 
+                             case num: NumberFormatException => mapToInt (x.asInstanceOf [VectorS])._1
+                         } // try
+                     } // for
+        kind match {
+        case DENSE           => MatrixI (colVec)
+        case SPARSE          => SparseMatrixI (colVec)
+        case SYM_TRIDIAGONAL => SymTriMatrixI (colVec)
+        case BIDIAGONAL      => BidMatrixI (colVec)
+        } // match
+    } // toMatriI2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' relation into a matrix of integers and a vector of integers.

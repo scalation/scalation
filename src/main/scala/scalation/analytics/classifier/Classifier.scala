@@ -6,15 +6,17 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics
+package scalation.analytics.classifier
 
-import scalation.linalgebra.{VectoD, VectorI}
+import java.util.Random
+
+import scalation.linalgebra.{VectoD, VectoI, VectorI}
+import scalation.random.RandomVecI
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Classifier` trait provides a common framework for several classifiers.
  *  A classifier is for bounded responses.  When the number of distinct responses
  *  cannot be bounded by some integer 'k', a predictor should be used.
-
  */
 trait Classifier
 {
@@ -24,6 +26,12 @@ trait Classifier
      *  @param testEnd   End of test region. (exclusive)
      */
     def train (testStart: Int, testEnd: Int)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a set of data vectors and their classifications, build a classifier.
+     *  @param itrain indices of the instances considered train data
+     */
+    def train (itrain: Array [Int]){}
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier, i.e., calculate statistics and create conditional
@@ -36,7 +44,7 @@ trait Classifier
     /** Given a new discrete data vector z, determine which class it belongs to.
      *  @param z  the vector to classify
      */
-    def classify (z: VectorI): Tuple2 [Int, String]
+    def classify (z: VectoI): Tuple2 [Int, String]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a new continuous data vector z, determine which class it belongs to.
@@ -53,6 +61,13 @@ trait Classifier
     def test (testStart: Int, testEnd: Int): Double
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Test the quality of the training with a test-set and return the fraction
+     *  of correct classifications.
+     *  @param itest indices of the instances considered test data
+     */
+    def test (itest: VectorI): Double = 0.0
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /**  Reset the frequency and probability tables.
      */
     def reset ()
@@ -65,9 +80,6 @@ trait Classifier
      */
     def crossValidate (nx: Int = 5): Double =
     {
-        println ("------------------------------------------------------------")
-        println ("cross-validation:")
-
         val testSize = size / nx
         var sum      = 0.0
 
@@ -75,16 +87,41 @@ trait Classifier
             val testStart = i * testSize
             val testEnd   = testStart + testSize
             reset ()
-//          println (s"testStart = $testStart, testEnd = $testEnd, testSize = $testSize)
             train (testStart, testEnd)
             sum += test (testStart, testEnd)
         } // for
 
         val avg = sum / nx.toDouble
-        println ("Average accuracy = " + avg)
-        println ("------------------------------------------------------------")
+//      println ("Average accuracy = " + avg)
+//      println ("------------------------------------------------------------")
         avg
     } // crossValidate
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Test the accuracy of the classified results by cross-validation, returning
+     *  the accuracy.  The "test data" starts at 'testStart' and ends at 'testEnd',
+     *  the rest of the data is "training data'.
+     *  @param nx  number of crosses and cross-validations (defaults to 5x).
+     */
+    def crossValidateRand (nx: Int = 5): Double =
+    {
+        val testSize = size / nx
+        var sum      = 0.0
+        val rng = new Random ()
+        val rvg = RandomVecI (testSize, size-1, stream = rng.nextInt (1000) )
+        for (i <- 0 until nx) {
+            val itest = rvg.igen
+            reset ()
+            val itrain = Array.range (0, size) diff itest()
+            train (itrain)
+            sum += test (itest)
+        } // for
+
+        val avg = sum / nx.toDouble
+//      println ("Average accuracy = " + avg)
+//      println ("------------------------------------------------------------")
+        avg
+    } // crossValidateRand
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Size of the feature set.
