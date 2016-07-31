@@ -28,13 +28,13 @@ import RegTechnique._
  *      b  =  x_pinv * y
  *  <p>
  *  where 'x_pinv' is the pseudo-inverse.
- *  @see http://psych.colorado.edu/~carey/Courses/PSYC5741/handouts/GLM%20Theory.pdf
+ *  @see psych.colorado.edu/~carey/Courses/PSYC5741/handouts/GLM%20Theory.pdf
  *  @param t          the treatment/categorical variable vector
  *  @param y          the response vector
  *  @param levels     the number of treatment levels (1, ... levels)
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class ANOVA (t: VectorI, y: VectorD, levels: Int, technique: RegTechnique = Fac_QR)
+class ANOVA (t: VectorI, y: VectorD, levels: Int, technique: RegTechnique = QR)
       extends Predictor with Error
 {
     if (t.dim != y.dim) flaw ("constructor", "dimensions of t and y are incompatible")

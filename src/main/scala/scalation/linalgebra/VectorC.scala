@@ -33,7 +33,7 @@ class VectorC (val dim: Int,
     if (v == null) {
         v = Array.ofDim [Complex] (dim)
     } else if (dim != v.length) {
-        flaw ("constructor", "dimension is wrong")
+        flaw ("constructor", "vector dimension is wrong: dim " + dim + " != v.length " + v.length)
     } // if
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -730,7 +730,7 @@ class VectorC (val dim: Int,
      *  @param x  the given element
      *  @param e  the ending index (exclusive) for the search
      */
-    def indexOf (x: Int, e: Int = dim): Int =
+    def indexOf (x: Complex, e: Int = dim): Int =
     {
         for (i <- 0 until e if v(i) == x) return i; -1
     } // indexOf

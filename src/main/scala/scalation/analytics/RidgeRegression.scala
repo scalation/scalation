@@ -12,7 +12,7 @@ package scalation.analytics
 
 import scala.math.pow
 
-import scalation.linalgebra.{Fac_Cholesky, Fac_QR, MatrixD, VectoD, VectorD}
+import scalation.linalgebra._
 import scalation.plot.Plot
 import scalation.util.{Error, time}
 
@@ -34,9 +34,9 @@ import RegTechnique._
  *  <p>
  *  where 'x_pinv' is the pseudo-inverse.  Three techniques are provided:
  *  <p>
- *      'Fac_QR'         // QR Factorization: slower, more stable (default)
- *      'Fac_Cholesky'   // Cholesky Factorization: faster, less stable (reasonable choice)
- *      'Inverse'        // Inverse/Gaussian Elimination, classical textbook technique (outdated)
+ *      'QR'         // QR Factorization: slower, more stable (default)
+ *      'Cholesky'   // Cholesky Factorization: faster, less stable (reasonable choice)
+ *      'Inverse'    // Inverse/Gaussian Elimination, classical textbook technique (outdated)
  *  <p>
  *  @see statweb.stanford.edu/~tibs/ElemStatLearn/
  *  @param x          the centered input/design m-by-n matrix NOT augmented with a first column of ones
@@ -58,16 +58,18 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
     private var rBarSq     = -1.0                               // Adjusted R-squared
     private var fStat      = -1.0                               // F statistic (quality of fit)
 
+    type Fac_QR = Fac_QR_H [MatrixD]                            // change as needed
+
     private val fac = technique match {                         // select the factorization technique
-        case Fac_QR       => new Fac_QR (x)                     // QR Factorization
-        case Fac_Cholesky => new Fac_Cholesky (x.t * x)         // Cholesky Factorization
-        case _            => null                               // don't factor, use inverse
+        case QR       => new Fac_QR (x)                         // QR Factorization
+        case Cholesky => new Fac_Cholesky (x.t * x)             // Cholesky Factorization
+        case _        => null                                   // don't factor, use inverse
     } // match
 
     private val x_pinv = technique match {                      // pseudo-inverse of x
-        case Fac_QR       => val (q, r) = fac.factor (); r.inverse * q.t
-        case Fac_Cholesky => fac.factor (); null                // don't compute it directly
-        case _            => (xtx).inverse * x.t                // classic textbook technique
+        case QR       => val (q, r) = fac.factor12 (); r.inverse * q.t
+        case Cholesky => fac.factor (); null                    // don't compute it directly
+        case _        => (xtx).inverse * x.t                    // classic textbook technique
     } // match
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

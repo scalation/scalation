@@ -9,34 +9,50 @@
 package scalation.linalgebra
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Factorization` trait the template for classes implementing various forms
+/** The `Factorization` trait is the template for classes implementing various forms
  *  of matrix factorization.
  */
 trait Factorization
 {
-    protected var raw = true       // whether the matrix has yet to be factored
+    /** Flag indicating whether the matrix has been factored
+     */
+    protected var factored = false
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Factor a matrix into the product of two matrices, e.g., 'a = l * u',
-     *  returning both the first and second matrices.
+    /** Factor a matrix into the product of two matrices without returning the
+     *  two factored matrices.  Allows for example skipping the computation of the
+     *  Q matrix in QR factorization when it is not needed, e.g., for regression.
+     *  Class implementing the 'factor' method should set 'factored = true'.
      */
-    def factor (): Tuple2 [MatriD, MatriD]
+    def factor ()
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the two factored matrices.
+     */
+    def factors: (MatriD, MatriD)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Factor a matrix into the product of two matrices, e.g., 'a = l * l.t' or
+     *  a = q * r, returning both the first and second matrices.
+     */
+    def factor12 (): (MatriD, MatriD) = { if (! factored) factor (); factors }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor a matrix into the product of two matrices, e.g., 'a = l * l.t',
      *  returning only the first matrix.
      */
-    def factor1 (): MatriD
+    def factor1 (): MatriD = { if (! factored) factor (); factors._1 }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor a matrix into the product of two matrices, e.g., 'a = l * l.t',
      *  returning only the second matrix.
      */
-    def factor2 (): MatriD
+    def factor2 (): MatriD = { if (! factored) factor (); factors._2 }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve a system of equations, e,g., 'a * x = b' for 'x', using the factored
      *  matrices, by first performing forward substitution and then backward substitution.
+     *  Must factor before calling 'solve'.
      *  @param b  the constant vector
      */
     def solve (b: VectoD): VectoD

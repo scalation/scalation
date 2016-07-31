@@ -1,3 +1,3 @@
 
-wc */*/*.scala */*/*/*.scala */*/*/*/*.scala
+wc */*.scala */*/*.scala */*/*/*.scala */*/*/*/*.scala
 

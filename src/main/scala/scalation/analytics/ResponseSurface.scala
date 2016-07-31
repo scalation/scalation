@@ -26,7 +26,7 @@ import RegTechnique._
  *  @param cubic      the order of the surface (defaults to quadratic, else cubic)
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, technique: RegTechnique = Fac_QR)
+class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, technique: RegTechnique = QR)
       extends Predictor with Error
 {
     if (x_.dim1 != y.dim) flaw ("constructor", "the sizes of x_ and y are not compatible")

@@ -42,7 +42,7 @@ import RegTechnique._
  *  @param w          the weight vector
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class Regression_WLS (x: MatrixD, y: VectorD, private var w: VectoD = null, technique: RegTechnique = Fac_QR)
+class Regression_WLS (x: MatrixD, y: VectorD, private var w: VectoD = null, technique: RegTechnique = QR)
       extends Predictor with Error
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")

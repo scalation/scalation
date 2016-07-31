@@ -1286,7 +1286,7 @@ class RleVectorS (val dim: Int,
      *  @param x  the given element
      *  @param e  the ending index (exclusive) for the search
      */
-    def indexOf (x: Int, e: Int = dim): Int =
+    def indexOf (x: StrNum, e: Int = dim): Int =
     {
         for (i <- crange if v(i).startPos + v(i).count - 1 < e &&  v(i).value == x) {
             return v(i).startPos

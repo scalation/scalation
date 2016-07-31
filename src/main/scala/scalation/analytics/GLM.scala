@@ -34,7 +34,7 @@ import RegTechnique._
 trait GLM
 {
     protected var add_1     = true       // by default, prepend a column of all ones to the design matrix
-    protected var technique = Fac_QR     // by default, use QR Factorization for
+    protected var technique = QR         // by default, use QR Factorization for
                                          // the regression technique used to solve for b in x.t*x*b = x.t*y
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

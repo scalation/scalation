@@ -1078,6 +1078,23 @@ class MatrixD (val d1: Int,
     } // swap
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve for 'x' using back substitution in the equation 'u*x = y' where
+     *  'this' matrix ('u') is upper triangular (see 'lud' above).
+     *  @param y  the constant vector
+     */
+    def bsolve (y: VectoD): VectorD =
+    {
+        val x = new VectorD (dim2)                   // vector to solve for
+        for (k <- x.dim - 1 to 0 by -1) {            // solve for x in u*x = y
+            val u_k = v(k)
+            var sum = 0.0
+            for (j <- k + 1 until dim2) sum += u_k(j) * x(j)
+            x(k) = (y(k) - sum) / v(k)(k)
+        } // for
+        x
+    } // bsolve
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for x in the equation l*u*x = b (see lud above).
      *  @param l  the lower triangular matrix
      *  @param u  the upper triangular matrix
@@ -1085,16 +1102,14 @@ class MatrixD (val d1: Int,
      */
     def solve (l: MatriD, u: MatriD, b: VectoD): VectorD =
     {
-        val y  = new VectorD (l.dim2)
+        val y = new VectorD (l.dim2)                 // forward substitution
         for (k <- 0 until y.dim) {                   // solve for y in l*y = b
-            y(k) = b(k) - (l(k) dot y)
+            val l_k = l(k)
+            var sum = 0.0
+            for (j <- 0 until k) sum += l_k(j) * y(j)
+            y(k) = b(k) - sum
         } // for
-
-        val x = new VectorD (u.dim2)
-        for (k <- x.dim - 1 to 0 by -1) {            // solve for x in u*x = y
-            x(k) = (y(k) - (u(k) dot x)) / u(k, k)
-        } // for
-        x
+        u.bsolve (y).asInstanceOf [VectorD]
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

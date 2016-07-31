@@ -10,8 +10,8 @@ package scalation.analytics.par
 
 import math.pow
 
-import scalation.linalgebra.VectoD
-import scalation.linalgebra.par.{Fac_Cholesky, Fac_QR, MatrixD, VectorD}
+import scalation.linalgebra.{Fac_QR_H, VectoD}
+import scalation.linalgebra.par._
 import scalation.plot.Plot
 import scalation.util.{Error, time}
 
@@ -42,7 +42,7 @@ import scalation.analytics.RegTechnique._
  *  @param y          the response vector
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
+class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = QR)
       extends Predictor with Error
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
@@ -56,16 +56,18 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = Fac_QR)
     private var rBarSq     = -1.0                              // Adjusted R-squared
     private var fStat      = -1.0                              // F statistic (quality of fit)
 
+    type Fac_QR = Fac_QR_H [MatrixD]                           // change as needed
+
     private val fac = technique match {                        // select the factorization technique
-        case Fac_QR       => new Fac_QR (x)                    // QR Factorization
-        case Fac_Cholesky => new Fac_Cholesky (x.t * x)        // Cholesky Factorization
-        case _            => null                              // don't factor, use inverse
+        case QR       => new Fac_QR (x)                        // QR Factorization
+        case Cholesky => new Fac_Cholesky (x.t * x)            // Cholesky Factorization
+        case _        => null                                  // don't factor, use inverse
     } // match
 
     private val x_pinv = technique match {                      // pseudo-inverse of x
-        case Fac_QR       => val (q, r) = fac.factor (); r.inverse * q.t
-        case Fac_Cholesky => fac.factor (); null                // don't compute it directly
-        case _            => (x.t * x).inverse * x.t            // classic textbook technique
+        case QR       => val (q, r) = fac.factor12 (); r.inverse * q.t
+        case Cholesky => fac.factor (); null                    // don't compute it directly
+        case _        => (x.t * x).inverse * x.t                // classic textbook technique
     } // match
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -242,7 +244,7 @@ object RegressionTest2 extends App
 
     println ("-------------------------------------------------")
     println ("Fit the parameter vector b using Cholesky Factorization")
-    rg = new Regression (x, y, Fac_Cholesky)         // use Cholesky Factorization
+    rg = new Regression (x, y, Cholesky)             // use Cholesky Factorization
     rg.train ()
     println ("fit = " + rg.fit)
     println ("predict (" + z + ") = " + rg.predict (z))

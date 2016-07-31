@@ -49,6 +49,32 @@ package object scalation
      */
     val STORE_DIR = envOrElse ("SCALATION_HOME", ".") + ⁄ + "store" + ⁄
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the default parallelism level (number of threads to use) for an
+     *  arbitrary block of code: 'parallel (n) { block }' when running parallel tasks.
+     *  Then restore the old parallelism level.
+     *  @see stackoverflow.com/questions/17865823/how-do-i-set-the-default-number-of-threads
+        @see -for-scala-2-10-parallel-collections/18574345
+     *  @param n  number of threads
+     */
+    def setParallelism [A] (n: Int)(block: => A): A =
+    {
+        import java.util.concurrent.ForkJoinPool
+        import scala.collection._
+
+        val n_old = (new ForkJoinPool).getParallelism
+        println (s"Channge parallelism level from $n_old to $n")
+
+        val parPkgObj = parallel.`package`
+        val defaultTaskSupport = parPkgObj.getClass.getDeclaredFields.find{ _.getName == "defaultTaskSupport" }.get
+
+        defaultTaskSupport.setAccessible (true)
+        defaultTaskSupport.set (parPkgObj, new parallel.ForkJoinTaskSupport (new ForkJoinPool (n)))
+        val ret = block
+        defaultTaskSupport.set (parPkgObj, new parallel.ForkJoinTaskSupport (new ForkJoinPool (n_old)))
+        ret
+    } // setParallelism
+
 } // scalation package object 
 
 

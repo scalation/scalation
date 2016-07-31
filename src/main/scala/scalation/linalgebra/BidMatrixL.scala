@@ -691,6 +691,13 @@ class BidMatrixL (val d1: Int)
     def min (e: Int = dim1): Long = _dg(0 until e).min() min _sd(0 until e).min()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve for 'x' using back substitution in the equation 'u*x = y' where
+     *  'this' matrix ('u') is upper triangular (see 'lud' above).
+     *  @param y  the constant vector
+     */
+    def bsolve (y: VectoL): VectorL = solve (y)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' bidiagonal matrix.
      *  @param b  the constant vector
      */

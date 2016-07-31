@@ -38,7 +38,7 @@ import scalation.analytics.RegTechnique._
  *  @param levels     the number of treatment levels (1, ... levels)
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class ANCOVA (x_ : MatrixD, t: VectorI, y: VectorD, levels: Int, technique: RegTechnique = Fac_QR)
+class ANCOVA (x_ : MatrixD, t: VectorI, y: VectorD, levels: Int, technique: RegTechnique = QR)
       extends Predictor with Error
 {
     if (x_.dim1 != y.dim) flaw ("constructor", "dimensions of x_ and y are incompatible")

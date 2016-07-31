@@ -1043,6 +1043,11 @@ class SymTriMatrixD (val d1: Int)
         throw new NoSuchMethodException ("lud_ip not implemented since result may not be SymTriMatrix")
     } // lud_ip
 
+    def bsolve (y: VectoD): VectorD =
+    {
+        throw new NoSuchMethodException ("bsolve not implemented since upper triangular is symmetric")
+    } // bsolve
+
     def inverse_ip (): SymTriMatrixD = 
     {
         throw new NoSuchMethodException ("inverse_ip not implemented since result may not be SymTriMatrix")

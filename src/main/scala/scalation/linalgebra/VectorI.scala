@@ -33,7 +33,7 @@ class VectorI (val dim: Int,
     if (v == null) {
         v = Array.ofDim [Int] (dim)
     } else if (dim != v.length) {
-        flaw ("constructor", "dimension is wrong")
+        flaw ("constructor", "vector dimension is wrong: dim " + dim + " != v.length " + v.length)
     } // if
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

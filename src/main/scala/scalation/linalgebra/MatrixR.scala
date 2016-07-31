@@ -203,6 +203,7 @@ class MatrixR (d1: Int,
      */
     def slice (from: Int, end: Int): MatrixR =
     {
+        if (from >= end) return new MatrixR (0, 0)
         new MatrixR (end - from, dim2, v.slice (from, end))
     } // slice
 
@@ -213,6 +214,7 @@ class MatrixR (d1: Int,
      */
     def sliceCol (from: Int, end: Int): MatrixR =
     {
+        if (from >= end) return new MatrixR (0, 0)
         val c = new MatrixR (dim1, end - from)
         for (i <- c.range1; j <- c.range2) c.v(i)(j) = v(i)(j + from)
         c
@@ -227,6 +229,7 @@ class MatrixR (d1: Int,
      */
     def slice (r_from: Int, r_end: Int, c_from: Int, c_end: Int): MatrixR = 
     {
+        if (r_from >= r_end || c_from >= c_end) return new MatrixR (0, 0)
         val c = new MatrixR (r_end - r_from, c_end - c_from)
         for (i <- c.range1; j <- c.range2) c.v(i)(j) = v(i + r_from)(j + c_from)
         c
@@ -734,7 +737,7 @@ class MatrixR (d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' matrix by matrix 'b' without first transposing 'b'.
-     *  If b and this reference the same matrix (b == this), a copy of the this
+     *  If 'b' and 'this' reference the same matrix 'b == this', a copy of the 'this'
      *  matrix is made.
      *  @param b  the matrix to multiply by (requires square and 'sameCrossDimensions')
      */
@@ -756,6 +759,31 @@ class MatrixR (d1: Int,
     } // times_ip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Pre-multiply in-place 'this' ('a') matrix by matrix 'b', starting with column 'd'.
+     *  <p>
+     *      a(d:m, d:n) = b a(d:m, d:n)
+     *  <p>
+     *  @param b  the matrix to pre-multiply by 'this' (requires square and 'sameCrossDimensions')
+     *  @param d  the column to start with
+     */
+    def times_ip_pre (b: MatrixR, d: Int = 0)
+    {
+        val d1_d = dim1 - d
+        if (! b.isSquare)   flaw ("times_ip_pre", "matrix 'b' must be square")
+        if (d1_d != b.dim2) flaw ("times_ip_pre", "matrix * matrix - incompatible cross dimensions")
+
+        for (j <- d until dim2) {
+            val col_j = new VectorR (d1_d)                 // save jth column so not overwritten
+            for (i <- d until dim1) col_j(i-d) = v(i)(j)
+            for (i <- d until dim1) {
+                var sum = _0
+                for (k <- 0 until d1_d) sum += col_j(k) * b.v(i-d)(k)
+                v(i)(j) = sum
+            } // for
+        } // for
+    } // times_ip_pre
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' matrix by matrix 'b' using 'dot' product (concise solution).
      *  @param b  the matrix to multiply by (requires 'sameCrossDimensions')
      */
@@ -769,7 +797,7 @@ class MatrixR (d1: Int,
     } // times_d
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply 'this' matrix by matrix b using the Strassen matrix multiplication
+    /** Multiply 'this' matrix by matrix 'b' using the Strassen matrix multiplication
      *  algorithm.  Both matrices ('this' and 'b') must be square.  Although the
      *  algorithm is faster than the traditional cubic algorithm, its requires
      *  more memory and is often less stable (due to round-off errors).
@@ -1021,6 +1049,23 @@ class MatrixR (d1: Int,
     } // partialPivoting
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve for 'x' using back substitution in the equation 'u*x = y' where
+     *  'this' matrix ('u') is upper triangular (see 'lud' above).
+     *  @param y  the constant vector
+     */
+    def bsolve (y: VectoR): VectorR =
+    {
+        val x = new VectorR (dim2)                   // vector to solve for
+        for (k <- x.dim - 1 to 0 by -1) {            // solve for x in u*x = y
+            val u_k = v(k)
+            var sum = _0
+            for (j <- k + 1 until dim2) sum += u_k(j) * x(j)
+            x(k) = (y(k) - sum) / v(k)(k)
+        } // for
+        x
+    } // bsolve
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
      *  @param l  the lower triangular matrix
      *  @param u  the upper triangular matrix
@@ -1028,16 +1073,14 @@ class MatrixR (d1: Int,
      */
     def solve (l: MatriR, u: MatriR, b: VectoR): VectorR =
     {
-        val y  = new VectorR (l.dim2)
+        val y = new VectorR (l.dim2)                 // forward substitution
         for (k <- 0 until y.dim) {                   // solve for y in l*y = b
-            y(k) = b(k) - (l(k) dot y)
+            val l_k = l(k)
+            var sum = _0
+            for (j <- 0 until k) sum += l_k(j) * y(j)
+            y(k) = b(k) - sum
         } // for
-
-        val x = new VectorR (u.dim2)
-        for (k <- x.dim - 1 to 0 by -1) {            // solve for x in u*x = y
-            x(k) = (y(k) - (u(k) dot x)) / u(k, k)
-        } // for
-        x
+        u.bsolve (y).asInstanceOf [VectorR]
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1426,7 +1469,7 @@ class MatrixR (d1: Int,
     override def toString: String = 
     {
         var sb = new StringBuilder ("\nMatrixR(")
-        if (dim1 == 0) return sb.append (")").mkString
+        if (dim1 == 0 || dim2 == 0) return sb.append (")").mkString
         for (i <- range1) {
             for (j <- range2) {
                 sb.append (fString.format (v(i)(j)))
@@ -1509,6 +1552,7 @@ object MatrixR extends Error
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create an 'm-by-n' identity matrix I (ones on main diagonal, zeros elsewhere).
      *  If 'n' is <= 0, set it to 'm' for a square identity matrix.
+     *  FIX: store as a diagonal matrix.
      *  @param m  the row dimension of the matrix
      *  @param n  the column dimension of the matrix (defaults to 0 => square matrix)
      */

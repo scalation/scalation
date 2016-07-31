@@ -63,7 +63,7 @@ object TempRegression extends App
 
     println ("-------------------------------------------------")
     println ("Fit the parameter vector b using Cholesky Factorization")
-    time { rg = new Regression (x, y, Fac_Cholesky) }          // use Cholesky Factorization
+    time { rg = new Regression (x, y, Cholesky) }             // use Cholesky Factorization
     time { rg.train () }
     println ("full model: fit = " + rg.fit)
     println ("predict (" + z + ") = " + rg.predict (z))

@@ -91,7 +91,7 @@ class Eigenvalue (a: MatrixD)
         for (l <- 0 until ITERATIONS) {                // minor iterations
             val s     = g(n - 1, n - 1)                // the shift parameter
             val eye_g = eye (g.dim1)
-            val (qq, rr) = (new Fac_QR (g - eye_g * s)).factor ()
+            val (qq, rr) = (new Fac_QR_H (g - eye_g * s)).factor12 ()
             g = rr.asInstanceOf [MatrixD] * qq.asInstanceOf [MatrixD] + eye_g * s      // FIX
         } // for
 
@@ -270,7 +270,7 @@ class Eigenvector (a: MatrixD, _e: VectorD = null)
         println ("a_Ie = " + a_Ie)
         val c_a_Ie = a_Ie.clean (TOL)
         println ("c_a_Ie = " + c_a_Ie)
-        val qr = new Fac_QR (c_a_Ie)
+        val qr = new Fac_QR_H (c_a_Ie)
         qr.factor ()
         val eVec = qr.nullspaceV (e.zero (m))
         println ("+++ eigenvector for eigenvalue " + e(i) + " = " + eVec)
@@ -290,7 +290,7 @@ class Eigenvector (a: MatrixD, _e: VectorD = null)
 //          breakable { for (k <- 0 until ITERATIONS) {
 //              val a_Ie = a - ident * e(i)      // form matrix: [a - Ie]
 //              println ("a_Ie = " + a_Ie)
-//              val qr = new Fac_QR (a_Ie)
+//              val qr = new Fac_QR_H (a_Ie)
 //              qr.factor ()
 //              val y = qr.solve (y_k)           // solve [a - Ie]y = y_k
 //              y_l   = y / y.norm               // normalize

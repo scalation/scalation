@@ -8,9 +8,12 @@
 
 package scalation.analytics.classifier.par
 
+import java.util.concurrent.ForkJoinPool
+
 import scala.collection.mutable.{Map, Set => SET}
 import scala.collection.parallel.ForkJoinTaskSupport
 import scala.math.min
+
 import scalation.graphalytics.Pair
 import scalation.graphalytics.mutable.LabelType.TLabel
 import scalation.graphalytics.mutable.{MGraph, MinSpanningTree}
@@ -112,7 +115,7 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
             } // for
 
             val temprange = (0 until endworkers).par
-            temprange.tasksupport = new ForkJoinTaskSupport (new scala.concurrent.forkjoin.ForkJoinPool (endworkers))
+            temprange.tasksupport = new ForkJoinTaskSupport (new ForkJoinPool (endworkers))
             for (w <- temprange) {
                 for (i <- w * (size) until min ((w + 1) * size, m)) {
                     countCw (w)(y (i)) += 1

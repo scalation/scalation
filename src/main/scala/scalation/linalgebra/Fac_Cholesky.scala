@@ -32,30 +32,23 @@ class Fac_Cholesky [MatT <: MatriD] (a: MatT)
     if (! a.isSymmetric) flaw ("constructor", "matrix a must be symmetric")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Factor matrix 'a' into the product of 'l' and 'l.t', returning the lower
-     *  triangular matrix 'l' from the Cholesky Factorization 'a = l * l.t'
-     *  where 'l.t' is the transpose.  It uses the Cholesky–Banachiewicz algorithm.
+    /** Factor matrix 'a' into the product of 'l' and 'l.t' using Cholesky
+     *  Factorization 'a = l * l.t', where 'l.t' is 'l's transpose.
+     *  It uses the Cholesky–Banachiewicz algorithm.
      *  @see introcs.cs.princeton.edu/java/95linear
      */
-    def factor1 (): MatriD =
+    def factor ()
     {
         for (i <- 0 until n; j <- 0 to i) {
             val diff = a(i, j) - (l(i) dot l(j))
             l(i, j)  = if (i == j) sqrt (diff) else  diff / l(j, j)
         } // for
-        raw = false                                      // factoring completed
-        l
-    } // factor1
+    } // factor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Factor matrix 'a' into the product of 'l' and 'l.t', returning both.
+    /** Return both the lower triangular matrix 'l' and its transpose 'l.t'.
      */
-    def factor (): Tuple2 [MatriD, MatriD] = { if (raw) factor1 (); (l, l.t) }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Factor matrix 'a' into the product of 'l' and 'l.t', returning l.t.
-     */
-    def factor2 (): MatriD =  { if (raw) factor1 (); l.t }
+    def factors: (MatriD, MatriD) = (l, l.t)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Use the lower triangular matrix 'l' from the Cholesky Factorization to
@@ -95,7 +88,7 @@ object Fac_CholeskyTest extends App
 
     val chol = new Fac_Cholesky (a)
     println ("a = " + a)
-    println ("factor1  = " + chol.factor1 ())
+    println ("factor   = " + chol.factor ())
     println ("solve    = " + chol.solve (b))
 
     val lu = a.lud

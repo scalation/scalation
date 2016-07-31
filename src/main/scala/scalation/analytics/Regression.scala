@@ -10,7 +10,7 @@ package scalation.analytics
 
 import scala.math.{abs, log, pow, sqrt}
 
-import scalation.linalgebra.{Fac_Cholesky, Fac_QR, Factorization, MatriD, MatrixD, VectoD, VectorD}
+import scalation.linalgebra._
 import scalation.math.double_exp
 import scalation.plot.Plot
 import scalation.random.CDF.studentTCDF
@@ -23,7 +23,7 @@ import scalation.util.Unicode.sub
 object RegTechnique extends Enumeration
 {
     type RegTechnique = Value
-    val Fac_QR, Fac_Cholesky, Inverse = Value
+    val QR, Cholesky, Inverse = Value
     
 } // RegTechnique
 
@@ -43,16 +43,16 @@ import RegTechnique._
  *  <p>
  *  where 'x_pinv' is the pseudo-inverse.  Three techniques are provided:
  *  <p>
- *      'Fac_QR'         // QR Factorization: slower, more stable (default)
- *      'Fac_Cholesky'   // Cholesky Factorization: faster, less stable (reasonable choice)
- *      'Inverse'        // Inverse/Gaussian Elimination, classical textbook technique (outdated)
+ *      'QR'         // QR Factorization: slower, more stable (default)
+ *      'Cholesky'   // Cholesky Factorization: faster, less stable (reasonable choice)
+ *      'Inverse'    // Inverse/Gaussian Elimination, classical textbook technique (outdated)
  *  <p>
  *  @see see.stanford.edu/materials/lsoeldsee263/05-ls.pdf
  *  @param x          the input/design m-by-n matrix augmented with a first column of ones
  *  @param y          the response vector
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: RegTechnique = Fac_QR)
+class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: RegTechnique = QR)
       extends Predictor with Error
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
@@ -73,16 +73,18 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
     private var t: VectoD      = _                             // t statistics for each x_j
     private var p: VectoD      = _                             // p values for each x_j
 
+    type Fac_QR = Fac_QR_H [MatT]                              // change as needed
+
     private val fac = technique match {                        // select the factorization technique
-        case Fac_QR       => new Fac_QR (x)                    // QR Factorization
-        case Fac_Cholesky => new Fac_Cholesky (x.t * x)        // Cholesky Factorization
-        case _            => null                              // don't factor, use inverse
+        case QR       => new Fac_QR (x)                        // QR Factorization
+        case Cholesky => new Fac_Cholesky (x.t * x)            // Cholesky Factorization
+        case _        => null                                  // don't factor, use inverse
     } // match
 
     private val x_pinv = technique match {                     // pseudo-inverse of x
-        case Fac_QR       => val (q, r) = fac.factor (); r.inverse * q.t
-        case Fac_Cholesky => fac.factor (); null               // don't compute it directly
-        case _            => (x.t * x).inverse * x.t           // classic textbook technique
+        case QR       => val (q, r) = fac.factor12 (); r.inverse * q.t
+        case Cholesky => fac.factor (); null                   // don't compute it directly
+        case _        => (x.t * x).inverse * x.t               // classic textbook technique
     } // match
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -314,7 +316,7 @@ object RegressionTest2 extends App
 
     println ("-------------------------------------------------")
     println ("Fit the parameter vector b using Cholesky Factorization")
-    rg = new Regression (x, y, Fac_Cholesky)         // use Cholesky Factorization
+    rg = new Regression (x, y, Cholesky)             // use Cholesky Factorization
     rg.train ()
     println ("fit = " + rg.fit)
     println ("predict (" + z + ") = " + rg.predict (z))

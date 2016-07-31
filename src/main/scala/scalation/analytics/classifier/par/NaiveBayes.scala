@@ -8,8 +8,11 @@
 
 package scalation.analytics.classifier.par
 
+import java.util.concurrent.ForkJoinPool
+
 import scala.collection.parallel.ForkJoinTaskSupport
 import scala.math.min
+
 import scalation.linalgebra._
 import scalation.linalgebra.gen.HMatrix3
 import scalation.relalgebra.Relation
@@ -87,7 +90,7 @@ class NaiveBayes(x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
         } // for
 
         var temprange = (0 until endworkers).par
-        temprange.tasksupport = new ForkJoinTaskSupport (new scala.concurrent.forkjoin.ForkJoinPool (endworkers))
+        temprange.tasksupport = new ForkJoinTaskSupport (new ForkJoinPool (endworkers))
         for(w <- temprange) {
             for (l <- w * (size) until min((w+1)*size,m) if l < testStart || l >= testEnd) {
                 // l = lth row of data matrix x

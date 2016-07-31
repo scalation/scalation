@@ -697,7 +697,7 @@ class VectorD (val dim: Int,
      *  @param x  the given element
      *  @param e  the ending index (exclusive) for the search
      */
-    def indexOf (x: Int, e: Int = dim): Int =
+    def indexOf (x: Double, e: Int = dim): Int =
     {
         for (i <- 0 until e if v(i) == x) return i; -1
     } // indexOf

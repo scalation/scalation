@@ -60,7 +60,7 @@ object ExtremeD
     /** Default tolerance should be much larger than the "machine epsilon".
      *  Application dependent => redefine as needed per application.
      */
-    val TOL = 100.0 * EPSILON
+    val TOL = 1000.0 * EPSILON
 
     /** Special value representing negative infinity: 1111111111110...0
      *  Ex: -1.0 / 0.0

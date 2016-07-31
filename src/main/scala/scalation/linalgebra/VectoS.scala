@@ -533,7 +533,7 @@ trait VectoS
      *  @param x  the given element
      *  @param e  the ending index (exclusive) for the search
      */
-    def indexOf (x: Int, e: Int = dim): Int
+    def indexOf (x: StrNum, e: Int = dim): Int
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find and return index of first element satisfying predicate 'p', or

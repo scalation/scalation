@@ -35,7 +35,7 @@ import scalation.analytics.RegTechnique._
 trait GLM
 {
     protected var add_1     = true       // by default, prepend a column of all ones to the design matrix
-    protected var technique = Fac_QR     // by default, use QR Factorization for
+    protected var technique = QR         // by default, use QR Factorization for
                                          // the regression technique used to solve for b in x.t*x*b = x.t*y
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -48,7 +48,7 @@ trait GLM
     /** Explicitly set the regression technique to use.
      *  @param _technique  the value to set technique to
      */
-    def setTechnique (_technique: RegTechnique = Fac_QR) { technique = _technique }
+    def setTechnique (_technique: RegTechnique = QR) { technique = _technique }
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Multiple Linear Regression model.

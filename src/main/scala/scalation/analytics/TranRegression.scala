@@ -41,7 +41,7 @@ import RegTechnique._
  *  @param transform  the transformation function (defaults to log)
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class TranRegression (x: MatrixD, y: VectorD, transform: FunctionS2S = log, technique: RegTechnique = Fac_QR)
+class TranRegression (x: MatrixD, y: VectorD, transform: FunctionS2S = log, technique: RegTechnique = QR)
       extends Predictor with Error
 {
     if (x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")

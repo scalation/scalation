@@ -1146,6 +1146,22 @@ class SparseMatrixD (val d1: Int,
     } // swap
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve for 'x' using back substitution in the equation 'u*x = y' where
+     *  'this' matrix ('u') is upper triangular (see 'lud' above).
+     *  @param y  the constant vector
+     */
+    def bsolve (y: VectoD): VectorD =
+    {
+        val x = new VectorD (dim2)                   // vector to solve for
+        for (k <- x.dim - 1 to 0 by -1) {            // solve for x in u*x = y
+            var sum = 0.0
+            for (j <- k + 1 until dim2) sum += this(k, j) * x(j)
+            x(k) = (y(k) - sum) / this(k, k)
+        } // for
+        x
+    } // bsolve
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for x in the equation l*u*x = b (see lud above).
      *  @param l  the lower triangular matrix
      *  @param u  the upper triangular matrix
@@ -1156,16 +1172,10 @@ class SparseMatrixD (val d1: Int,
         val y = new VectorD (l.dim2)       
         for (k <- 0 until y.dim) {                   // solve for y in l*y = b
             var sum = 0.0
-            for (j <- 0 until k) sum = sum + l(k, j) * y(j)
+            for (j <- 0 until k) sum += l(k, j) * y(j)
             y(k) = b(k) - sum
         } // for
-        val x = new VectorD (u.dim2)
-        for (k <- x.dim - 1 to 0 by -1) {            // solve for x in u*x = y
-            var sum = 0.0
-            for (j <- k + 1 until u.dim2) sum = sum + u(k, j) * x(j)
-            x(k) = (y(k) - sum) / u(k, k)
-        } // for
-        x
+        u.bsolve (y).asInstanceOf [VectorD]
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -12,8 +12,8 @@ package scalation.analytics.par
 
 import math.pow
 
-import scalation.linalgebra.VectoD
-import scalation.linalgebra.par.{Fac_Cholesky, Fac_QR, MatrixD, VectorD}
+import scalation.linalgebra.{Fac_QR_H, VectoD}
+import scalation.linalgebra.par._
 import scalation.plot.Plot
 import scalation.util.{Error, time}
 
@@ -60,16 +60,18 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
     private var rBarSq     = -1.0                               // Adjusted R-squared
     private var fStat      = -1.0                               // F statistic (quality of fit)
 
+    type Fac_QR = Fac_QR_H [MatrixD]                            // change as needed
+
     private val fac = technique match {                         // select the factorization technique
-        case Fac_QR       => new Fac_QR (x)                     // QR Factorization
-        case Fac_Cholesky => new Fac_Cholesky (x.t * x)         // Cholesky Factorization
-        case _            => null                               // don't factor, use inverse
+        case QR       => new Fac_QR (x)                         // QR Factorization
+        case Cholesky => new Fac_Cholesky (x.t * x)             // Cholesky Factorization
+        case _        => null                                   // don't factor, use inverse
     } // match
 
     private val x_pinv = technique match {                      // pseudo-inverse of x
-        case Fac_QR       => val (q, r) = fac.factor (); r.inverse * q.t
-        case Fac_Cholesky => fac.factor (); null                // don't compute it directly
-        case _            => (xtx).inverse * x.t                // classic textbook technique
+        case QR       => val (q, r) = fac.factor12 (); r.inverse * q.t
+        case Cholesky => fac.factor (); null                    // don't compute it directly
+        case _        => (xtx).inverse * x.t                    // classic textbook technique
     } // match
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

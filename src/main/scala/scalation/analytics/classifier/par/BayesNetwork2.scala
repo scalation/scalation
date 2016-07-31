@@ -8,9 +8,12 @@
 
 package scalation.analytics.classifier.par
 
+import java.util.concurrent.ForkJoinPool
+
 import scala.collection.parallel.ForkJoinTaskSupport
 import scala.math.abs
 import scala.util.control.Breaks.{break, breakable}
+
 import scalation.analytics.classifier.{BayesMetrics, ClassifierInt, TabuFeatures}
 import scalation.linalgebra._
 import scalation.linalgebra.gen.HMatrix5
@@ -42,25 +45,26 @@ class BayesNetwork2 (x: MatriI, y: VectoI, fn: Array [String], private var vc: V
                      cn: Array [String], thres: Double = 0.3, me: Int = 3)
     extends ClassifierInt (x, y, fn, k, cn) with BayesMetrics
 {
-    private val DEBUG = false                        // debug flag
-    private var g_cor = calcCorrelation              // feature correlation matrix
+    private val DEBUG       = false                    // debug flag
+    private val PARALLELISM = 12                       // parallelism level
+    private var g_cor       = calcCorrelation          // feature correlation matrix
     // transform cor into a full matrix from the lower triangular matrix
     for (j1 <- 0 until n; j2 <- 0 until j1) g_cor (j2, j1) = g_cor (j1, j2)
 
-    private val maxRandomRestarts = 10               // maximum number of random restarts
-    private var g_parent = new MatrixI (n, 2)        // vector holding the parent for each feature/variable
-    private var g_vcp1 = new VectorI (n)             // value count for parent1
-    private var g_vcp2 = new VectorI (n)             // value count for parent2
+    private val maxRandomRestarts = 10                 // maximum number of random restarts
+    private var g_parent = new MatrixI (n, 2)          // vector holding the parent for each feature/variable
+    private var g_vcp1 = new VectorI (n)               // value count for parent1
+    private var g_vcp2 = new VectorI (n)               // value count for parent2
 
     private val g_permutedVec = PermutedVecI (VectorI.range (0, n), ranStream)
     private var g_featureOrder = g_permutedVec.igen
     if (DEBUG) println ("Feature Order = " + g_featureOrder)
-    private var g_tabu = new TabuFeatures ()        // the tabu list used in feature swapping
+    private var g_tabu = new TabuFeatures ()           // the tabu list used in feature swapping
 
-    private var g_popC = new VectorI (k)            // frequency counts for classes 0, ..., k-1
-    private var g_probC = new VectorD (k)           // probabilities for classes 0, ..., k-1
-    private var g_popX = new HMatrix5[Int](k, n)    // conditional frequency counts for variable/feature j: xj
-    private var g_probX = new HMatrix5[Double](k, n)// conditional probabilities for variable/feature j: xj
+    private var g_popC  = new VectorI (k)              // frequency counts for classes 0, ..., k-1
+    private var g_probC = new VectorD (k)              // probabilities for classes 0, ..., k-1
+    private var g_popX  = new HMatrix5 [Int](k, n)     // conditional frequency counts for variable/feature j: xj
+    private var g_probX = new HMatrix5 [Double](k, n)  // conditional probabilities for variable/feature j: xj
 
     val t_parent = computeParent (g_parent, g_cor, g_featureOrder)
     g_parent = t_parent
@@ -346,23 +350,23 @@ class BayesNetwork2 (x: MatriI, y: VectoI, fn: Array [String], private var vc: V
     def buildModel (testStart: Int = 0, testEnd: Int = 0)
     {
         var temprange = (0 until maxRandomRestarts).par
-        temprange.tasksupport = new ForkJoinTaskSupport (new scala.concurrent.forkjoin.ForkJoinPool (4))
-        println ("threads num = " + 4)
+        temprange.tasksupport = new ForkJoinTaskSupport (new ForkJoinPool (PARALLELISM))
+        println ("threads num = " + PARALLELISM)
         for (counter <- temprange) {
             //initialize the model
-            var b_parent = new MatrixI (n, 2)                 // vector holding the parent for each feature/variable
-            var b_vcp1 = new VectorI (n)                      // value count for parent1
-            var b_vcp2 = new VectorI (n)                       // value count for parent2
+            var b_parent = new MatrixI (n, 2)                   // vector holding the parent for each feature/variable
+            var b_vcp1  = new VectorI (n)                       // value count for parent1
+            var b_vcp2  = new VectorI (n)                       // value count for parent2
 
             val permutedVec = PermutedVecI (VectorI.range (0, n), ranStream)
             var b_featureOrder: VectorI = permutedVec.igen
             b_parent = computeParent (b_parent, g_cor, b_featureOrder)
 
-            var b_tabu = new TabuFeatures ()                   // the tabu list used in feature swapping
-            var b_popC = new VectorI (k)                       // frequency counts for classes 0, ..., k-1
-            var b_probC = new VectorD (k)                      // probabilities for classes 0, ..., k-1
-            var b_popX = new HMatrix5[Int](k, n)               // conditional frequency counts for variable/feature j: xj
-            var b_probX = new HMatrix5[Double](k, n)           // conditional probabilities for variable/feature j: xj
+            var b_tabu  = new TabuFeatures ()                   // the tabu list used in feature swapping
+            var b_popC  = new VectorI (k)                       // frequency counts for classes 0, ..., k-1
+            var b_probC = new VectorD (k)                       // probabilities for classes 0, ..., k-1
+            var b_popX  = new HMatrix5 [Int](k, n)              // conditional frequency counts for variable/feature j: xj
+            var b_probX = new HMatrix5 [Double](k, n)           // conditional probabilities for variable/feature j: xj
 
             val (t_vcp12, t_vcp22) = computeVcp (b_vcp1, b_vcp2, b_parent)
             b_vcp1 = t_vcp12
@@ -424,11 +428,11 @@ class BayesNetwork2 (x: MatriI, y: VectoI, fn: Array [String], private var vc: V
                             val bfeatureOrder2 = testSwapping (toSwap - 1, localAIC, 0, b_featureOrder, b_popC, b_popX, b_probC, b_probX, b_vcp1, b_vcp2, b_parent)
                             b_featureOrder = bfeatureOrder2
 
-                        }
+                        } // if
                         if (toSwap + 2 < n && b_tabu.notInTaboo (b_featureOrder (toSwap + 1), b_featureOrder (toSwap + 2))) {
                             val bfeatureOrder3 = testSwapping (toSwap + 1, localAIC, 1, b_featureOrder, b_popC, b_popX, b_probC, b_probX, b_vcp1, b_vcp2, b_parent)
                             b_featureOrder = bfeatureOrder3
-                        }
+                        } // if
 
                         if (localAIC.min () < localMin) {
                             localMin = localAIC.min

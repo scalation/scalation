@@ -10,7 +10,7 @@ package scalation.linalgebra.par
 
 import math.sqrt
 
-import scalation.linalgebra.{Factorization, VectoD}
+import scalation.linalgebra.{Factorization, MatriD, VectoD}
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -36,28 +36,25 @@ class Fac_Cholesky (a: MatrixD)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor matrix 'a' into the product of 'l' and 'l.t', returning the lower
      *  triangular matrix 'l' from the Cholesky Fractorization 'a = l * l.t'
-     *  where 'l.t' is the transpose.  It uses the Cholesky–Banachiewicz algorithm.
+     *  and 'l.t' its transpose.  It uses the Cholesky–Banachiewicz algorithm.
      *  @see introcs.cs.princeton.edu/java/95linear
      */
-    def factor1 (): MatrixD =
+    def factor ()
     {
+        if (factored) return
+
         for (i <- 0 until n; j <- 0 to i) {
             val diff = a(i, j) - (l(i) dot l(j))
             l(i, j)  = if (i == j) sqrt (diff) else  diff / l(j, j)
         } // for
-        raw = false                   // factoring completed
-        l
-    } // factor1
+
+        factored = true
+    } // factor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Factor matrix 'a' into the product of 'l' and 'l.t', returning both.
+    /** Return both the lower triangular matrix 'l' and its transpose 'l.t'.
      */
-    def factor (): Tuple2 [MatrixD, MatrixD] = { if (raw) factor1 (); (l, l.t) }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Factor matrix 'a' into the product of 'l' and 'l.t', returning l.t.
-     */
-    def factor2 (): MatrixD =  { if (raw) factor1 (); l.t }
+    def factors: (MatriD, MatriD) = (l, l.t)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Use the lower triangular matrix 'l' from the Cholesky Fractorization to

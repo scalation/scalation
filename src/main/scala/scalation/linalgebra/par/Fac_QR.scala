@@ -8,7 +8,7 @@
 
 package scalation.linalgebra.par
 
-import scalation.linalgebra.{Factorization, VectoD}
+import scalation.linalgebra.{Factorization, MatriD, VectoD}
 import scalation.math.double_exp
 import scalation.util.Error
 
@@ -39,8 +39,10 @@ class Fac_QR (a: MatrixD)
     /** Factor matrix 'a' into the product of two matrices, 'a = q * r', returning
      *  both the orthogonal 'q' matrix and the right upper triangular 'r' matrix.
      */
-    def factor (): Tuple2 [MatrixD, MatrixD] =
+    def factor ()
     {
+        if (factored) return
+
         for (j <- 0 until n) {                // for each column j
             val _norm = q.col(j).norm         // norm of the jth column
             r(j, j) = _norm
@@ -54,40 +56,21 @@ class Fac_QR (a: MatrixD)
              } // if
 
          } // for
-         raw = false                          // factoring completed
-         (q, r)
+
+         factored = true
     } // factor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the first factor, i.e., orthogonal 'q' matrix.
+    /** Return both the orthogonal 'q' matrix and the right upper triangular 'r' matrix.
      */
-    def factor1 (): MatrixD = { if (raw) factor (); q }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the second factor, i.e., the right upper triangular 'r' matrix.
-     */
-    def factor2 (): MatrixD = { if (raw) factor (); r }
+    def factors: (MatriD, MatriD) = (q, r)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in 'a*x = b' using the QR Factorization 'a = q*r' via
      *  'r*x = q.t * b'.
      *  @param  b the constant vector
      */
-    def solve (b: VectoD): VectoD = backSub (r, q.t * b)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform backward substitution to solve for 'x' in 'r*x = b'.
-     *  @param  r  the right upper triangular matrix
-     *  @param  b  the constant vector
-     */
-    def backSub (r: MatrixD, b: VectorD): VectorD =
-    {
-        val x = new VectorD (n)                   // vector to solve for
-        for (k <- n-1 to 0 by -1) {               // solve for x in r*x = b
-            x(k) = (b(k) - (r(k) dot x)) / r(k, k)
-        } // for
-        x
-    } // backSub
+    def solve (b: VectoD): VectoD = r.bsolve (q.t * b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the nullspace of matrix 'a: { x | a*x = 0 }' using QR Factorization
@@ -98,7 +81,7 @@ class Fac_QR (a: MatrixD)
     def nullspace (rank: Int): MatrixD = 
     {
         flaw ("nullspace", "method has bugs - so do not use")
-        (new Fac_QR (a.t)).factor1 ().slice (0, n, rank, n)       // last n - rank columns
+        (new Fac_QR (a.t)).factor1.asInstanceOf [MatrixD].slice (0, n, rank, n)       // last n - rank columns
     } // nullspace
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -129,7 +112,7 @@ object Fac_QRTest extends App
      def test (a: MatrixD)
      {
          val qr = new Fac_QR (a)               // for factoring a into q * r
-         val (q, r) = qr.factor ()             // (q orthogonal, r upper triangular)
+         val (q, r) = qr.factor12 ()           // (q orthogonal, r upper triangular)
          val ns = qr.nullspaceV                // ns is a point in the nullscpace
     
          println ("--------------------------------------------------------")

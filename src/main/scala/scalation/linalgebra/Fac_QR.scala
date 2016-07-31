@@ -2,162 +2,97 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Zhaochong Liu
  *  @version 1.2
- *  @date    Sun Jan 20 13:01:21 EST 2013
+ *  @date    Sun Jul 24 13:39:21 EDT 2016
  *  @see     LICENSE (MIT style license file).
  */
 
 package scalation.linalgebra
 
-import scalation.math.double_exp
+import scala.math.min
+
 import scalation.util.Error
 
 import MatrixD.eye
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Fac_QR` class provides methods to factor an 'm-by-n' matrix 'a' into the
- *  product of two matrices:
+/** The `Fac_QR` abstarct class provides base methods to factor an 'm-by-n' matrix 'aa'
+ *  into the product of two matrices:
  *  <p>
  *      'q' - an 'm-by-n' orthogonal matrix and
  *      'r' - an 'n-by-n' right upper triangular matrix
  *  <p>
- *  such that 'a = q * r'.  It uses Householder orthogonalization.
- *  @see 5.1 and 5.2 in Matrix Computations
- *  @see QRDecomposition.java in Jama
- *  @see http://www.stat.wisc.edu/~larget/math496/qr.html
- *  @param a  the matrix to be factor into q and r
+ *  such that 'aa = q * r'.
+ *------------------------------------------------------------------------------
+ *  @param aa     the matrix to be factor into q and r
+ *  @param needQ  flag indicating whether a full q matrix is needed
  */
-class Fac_QR [MatT <: MatriD] (a: MatT)
-      extends Factorization with Error
+abstract class Fac_QR [MatT <: MatriD] (aa: MatT, needQ: Boolean = true)
+         extends Factorization with Error
 {
-    private val m  = a.dim1                   // the number of rows in matrix a
-    private val n  = a.dim2                   // the number of columns in matrix a
-    private val aa = a.copy ()                // a copy of matrix a
-    private val q  = eye (m, n)               // the orthogonal q matrix
-    private val r  = a.zero (n, n)            // for right upper triangular r matrix
+    protected val m = aa.dim1                            // the number of rows in matrix aa
+    protected val n = aa.dim2                            // the number of columns in matrix aa
+    protected val p = min (m, n)                         // the smallest dimension
+    protected val r = aa.zero (n, n)                     // the right upper triangular r matrix
+    protected val q = if (needQ) eye (m, n) else null    // the orthogonal q matrix
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the first factor, i.e., orthogonal 'q' matrix.
+    /** Return both the orthogonal 'q' matrix and the right upper triangular 'r' matrix.
      */
-    def factor1 (): MatriD = { if (raw) factor (); q }
+    def factors: (MatriD, MatriD) = (q, r)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the second factor, i.e., the right upper triangular 'r' matrix.
+    /** Compute values for the full 'q' matrix.
      */
-    def factor2 (): MatriD = { if (raw) factor (); r }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Factor matrix 'a' into the product of two matrices, 'a = q * r', returning
-     *  both the orthogonal 'q' matrix and the right upper triangular 'r' matrix.
-     *  This algorithm uses Householder orthogonalization.
-     *  @see 5.1 and 5.2 in Matrix Computations
-     *  @see QRDecomposition.java in Jama
-     */
-    def factor (): Tuple2 [MatriD, MatriD] = 
-    {
-        for (k <- 0 until n) {                                  // for each column k
-            var _norm = aa.col(k, k).norm                       // norm of the kth column
-            if (! (_norm =~ 0.0)) {
-                if (aa(k, k) < 0.0) _norm = -_norm              // make k-th Householder vector
-                for (i <- k until m) aa(i, k) /= _norm
-                aa(k, k) += 1.0
-                for (j <- k + 1 until n) {                      // transform remaining columns
-                    var s = 0.0
-                    for (i <- k until m) s +=  aa(i, k) * aa(i, j)
-                    s = -s / aa(k, k)
-                    for (i <- k until m) aa(i, j) += s * aa(i, k)
-                } // for
-            } // if
-            r(k, k) = -_norm
-        } // for
-        raw = false                                             // factoring completed
-   
-        for (i <- 0 until n; j <- i + 1 until n) r(i, j) = aa(i, j)
-
-        for (k <- n-1 to 0 by -1; j <- k until n) {             // form the q matrix
-            if (! (aa(k, k) =~ 0.0)) {
-                var s = 0.0
-                for (i <- k until m) s += q(i, j) * aa(i, k)
-                s = -s / aa(k, k)
-                for (i <- k until m) q(i, j) += s * aa(i, k)
-            } // if
-         } // for
-         (q, r)
-    } // factor
+    def computeQ ()
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in 'a*x = b' using the 'QR' Factorization 'a = q*r' via
-     *  'r*x = q.t * b'.
-     *  @param  b the constant vector
+    /** Solve for 'x' in 'aa*x = b' using the QR Factorization 'aa = q*r' via
+     *  'r*x = q.t * b'.  Requires calculating 'q' matrix first.
+     *  @param  y the constant vector
      */
-    def solve (b: VectoD): VectoD = backSub (r, q.t * b)
+    def solve (b: VectoD): VectoD = r.bsolve (q.t * b) 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform backward substitution to solve for 'x' in 'r*x = b'.
-     *  @param  r  the right upper triangular matrix
-     *  @param  b  the constant vector
-     */
-    def backSub (r: MatriD, b: VectoD): VectoD =
-    {
-        val x = b.zero (n)                        // vector to solve for
-        for (k <- n-1 to 0 by -1) {               // solve for x in r*x = b
-            x(k) = (b(k) - (r(k) dot x)) / r(k, k)
-        } // for
-        x
-    } // backSub
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the nullspace of matrix 'a: { x | a*x = 0 }' using 'QR' Factorization
-     *  'q*r*x = 0'.  Gives a basis of dimension 'n' - rank for the nullspace
+    /** Compute the nullspace of matrix 'a: { x | a*x = 0 }' using QR Factorization
+     *  'q*r*x = 0'.  Gives a basis of dimension 'n - rank' for the nullspace
      *  @param rank  the rank of the matrix (number of linearly independent row vectors)
-     *  FIX: should work, but it does not
      */
-    def nullspace (rank: Int): MatriD = 
-    {
-        flaw ("nullspace", "method has bugs - so do not use")
-        (new Fac_QR (a.t)).factor1 ().slice (0, n, rank, n)       // last n - rank columns
-    } // nullspace
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the nullspace of matrix 'a: { x | a*x = 0 }' using 'QR' Factorization
-     *  'q*r*x = 0'.  Gives only one vector in the nullspace.
-     *  @param x  a vector with the correct dimension
-     */
-    def nullspaceV (x: VectoD): VectoD =
-    {
-        x(n-1) = 1.0                                 // vector to solve for
-        val b = x.zero (n)                           // new rhs as -r_i,n-1          
-        for (i <- 0 until n) b(i) = -r(i, n-1)
-        val rr = r.slice (0, n, 0, n-1)              // drop last column
-        for (k <- n-2 to 0 by -1) {                  // solve for x in rr*x = b
-            x(k) = (b(k) - (rr(k) dot x)) / rr(k, k)
-        } // for
-        x
-    } // nullspaceV
+    def nullspace (rank: Int): MatriD
 
 } // Fac_QR class
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Fac_QRTest` object is used to test the `Fac_QR` class.
- *  @see http://www.ee.ucla.edu/~vandenbe/103/lectures/qr.pdf
+/** The `Fac_QRTest` object is used to test the `Fac_QR` classes.
+ *  @see www.ee.ucla.edu/~vandenbe/103/lectures/qr.pdf
+ *  @see www.math.usm.edu/lambers/mat610/sum10/lecture9.pdf
+ *  FIX: the 'nullspaceV' function need to be fixed.
  *  > run-main scalation.linalgebra.Fac_QRTest
  */
 object Fac_QRTest extends App
 {
-    def test (a: MatrixD)
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Test the correctness of the QR Factorization.
+     *  @param a   the matrix to factor
+     *  @param qr  the QR Factorization class/algorithm to use
+     *  @param nm  the name of test case/matrix
+     */
+    def test (nm: String, a: MatrixD, qr: Fac_QR [MatrixD])
     {
-        val qr = new Fac_QR (a)               // for factoring a into q * r
-        val (q, r) = qr.factor ()             // (q orthogonal, r upper triangular)
-        val xn = new VectorD (a.dim2)
-        val ns = qr.nullspaceV (xn)           // ns is a point in the nullspace
-    
-        println ("--------------------------------------------------------")
-        println ("a    = " + a)
-        println ("q    = " + q)
-        println ("r    = " + r)
-        println ("ns   = " + ns)
-        println ("q*r  = " + (q*r))       // check that q*r  = a
-        println ("a*ns = " + (a*ns))      // check that a*ns = 0
+        println ("-" * 60)
+        val (q, r) = qr.factor12 ()                      // (q orthogonal, r upper triangular)
+        val prod   = q * r                               // product of q * r
+        val r_est  = r.rank (true)                       // estimated rank
+        val ns     = qr.nullspace (r_est)                // ns is a basis for the nullscpace
+
+        println (nm + "   = " + a)                        // original matrix
+        println ("q    = " + q)                          // orthogonal matrix
+        println ("r    = " + r)                          // right upper triangular matrix
+        println ("r_est  = " + r_est)                    // rank
+        println ("q*r  = " + prod)                       // product q * r
+        println ("eq   = " + (a == prod))                // check that q * r  = a
+        println ("ns   = " + ns)                         // nullspace
+        println ("a*ns = " + (a * ns))                   // check that a * ns = 0
     } // test
 
     val a1 = new MatrixD ((4, 3), 9.0,  0.0, 26.0,
@@ -168,7 +103,7 @@ object Fac_QRTest extends App
     val a2 = new MatrixD ((2, 2), 2.0,  1.0,
                                  -4.0, -2.0)
 
-    val a3 = new MatrixD ((3, 3), 2.0,  1.0,  1.0,
+    val a3 = new MatrixD ((3, 3), 0.0,  1.0,  1.0,
                                  -5.0, -2.0, -2.0,
                                  -5.0, -2.0, -2.0)
 
@@ -177,10 +112,108 @@ object Fac_QRTest extends App
                                    2.0, 0.0, 1.0, -7.0,
                                    2.0, 0.0, 1.0, -7.0)
 
-    test (a1)
-    test (a2)
-    test (a3)
-    test (a4)
+    val a5 = new MatrixD ((5, 3), 0.8147, 0.0975, 0.1576,
+                                  0.9058, 0.2785, 0.9706,
+                                  0.1270, 0.5469, 0.9572,
+                                  0.9134, 0.9575, 0.4854,
+                                  0.6324, 0.9649, 0.8003)
+
+//  since m < n, use Fac_LQ instead
+//  val a6 = new MatrixD ((2, 4), 1.0, 2.0, 3.0, 4.0,
+//                                5.0, 6.0, 7.0, 8.0)
+
+    println ("*" * 60)
+    println ("Fac_QRTest: Fac_QR_H")
+    test ("a1", a1, new Fac_QR_H (a1))
+    test ("a2", a2, new Fac_QR_H (a2))
+    test ("a3", a3, new Fac_QR_H (a3))
+    test ("a4", a4, new Fac_QR_H (a4))
+    test ("a5", a5, new Fac_QR_H (a5))
+
+    println ("*" * 60)
+    println ("Fac_QRTest: Fac_QR_H2")
+    test ("a1", a1, new Fac_QR_H2 (a1))
+    test ("a2", a2, new Fac_QR_H2 (a2))
+    test ("a3", a3, new Fac_QR_H2 (a3))
+    test ("a4", a4, new Fac_QR_H2 (a4))
+    test ("a5", a5, new Fac_QR_H2 (a5))
+
+    println ("*" * 60)
+    println ("Fac_QRTest: Fac_QR_H3")
+    test ("a1", a1, new Fac_QR_H3 (a1))
+    test ("a2", a2, new Fac_QR_H3 (a2))
+    test ("a3", a3, new Fac_QR_H3 (a3))
+    test ("a4", a4, new Fac_QR_H3 (a4))
+    test ("a5", a5, new Fac_QR_H3 (a5))
+
+    println ("*" * 60)
+    println ("Fac_QRTest: Fac_QR_RR")
+    test ("a1", a1, new Fac_QR_RR (a1))
+    test ("a2", a2, new Fac_QR_RR (a2))
+    test ("a3", a3, new Fac_QR_RR (a3))
+    test ("a4", a4, new Fac_QR_RR (a4))
+    test ("a5", a5, new Fac_QR_RR (a5))
+
+    println ("*" * 60)
+    println ("Fac_QRTest: Fac_QR_MGS")
+    test ("a1", a1, new Fac_QR_MGS (a1))
+    test ("a2", a2, new Fac_QR_MGS (a2))
+    test ("a3", a3, new Fac_QR_MGS (a3))
+    test ("a4", a4, new Fac_QR_MGS (a4))
+    test ("a5", a5, new Fac_QR_MGS (a5))
 
 } // Fac_QRTest object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Fac_QRTest2` object is used to test the correctness of the 'solve' method
+ *  in the `Fac_QR` classes.
+ *  > run-main scalation.linalgebra.Fac_QRTest2
+ */
+object Fac_QRTest2 extends App
+{
+    // 20 data points:      Constant      x_1     x_2    x_3      x_4
+    //                                    Age  Weight    Dur   Stress
+    val x = new MatrixD ((20, 5), 1.0,   47.0,   85.4,   5.1,    33.0,
+                                  1.0,   49.0,   94.2,   3.8,    14.0,
+                                  1.0,   49.0,   95.3,   8.2,    10.0,
+                                  1.0,   50.0,   94.7,   5.8,    99.0,
+                                  1.0,   51.0,   89.4,   7.0,    95.0,
+                                  1.0,   48.0,   99.5,   9.3,    10.0,
+                                  1.0,   49.0,   99.8,   2.5,    42.0,
+                                  1.0,   47.0,   90.9,   6.2,     8.0,
+                                  1.0,   49.0,   89.2,   7.1,    62.0,
+                                  1.0,   48.0,   92.7,   5.6,    35.0,
+                                  1.0,   47.0,   94.4,   5.3,    90.0,
+                                  1.0,   49.0,   94.1,   5.6,    21.0,
+                                  1.0,   50.0,   91.6,  10.2,    47.0,
+                                  1.0,   45.0,   87.1,   5.6,    80.0,
+                                  1.0,   52.0,  101.3,  10.0,    98.0,
+                                  1.0,   46.0,   94.5,   7.4,    95.0,
+                                  1.0,   46.0,   87.0,   3.6,    18.0,
+                                  1.0,   46.0,   94.5,   4.3,    12.0,
+                                  1.0,   48.0,   90.5,   9.0,    99.0,
+                                  1.0,   56.0,   95.7,   7.0,    99.0)
+    //  response BP
+    val y = VectorD (105.0, 115.0, 116.0, 117.0, 112.0, 121.0, 121.0, 110.0, 110.0, 114.0,
+                     114.0, 115.0, 114.0, 106.0, 125.0, 114.0, 106.0, 113.0, 110.0, 122.0)
+
+//  println ("model: y = b_0 + b_1*x1 + b_2*x_ + b3*x3 + b4*x42")
+    println ("model: y = b₀ + b₁∙x₁ + b₂∙x₂ + b₃∙x₃ + b₄∙x₄")
+    println ("x = " + x)
+    println ("y = " + y)
+
+    val qr = new Fac_QR_H (x)
+    qr.factor ()
+    println ("b1 = " + qr.solve (y))                       // compute the b vector by using 'solve' of 'Fac_QR_H'
+
+    val qr2 =  new Fac_QR_H2 (x)
+    qr2.factor ()
+    println ("b2 = " + qr2.solve (y))                      // compute the b vector by using 'solve' of 'Fac_QR_H2'
+
+    val qr3 =  new Fac_QR_H3 (x)
+    qr3.factor ()
+    println ("b3 = " + qr3.solve (y))                      // compute the b vector by using 'solve' of 'Fac_QR_H3'
+
+} // Fac_QRTest2 object
 

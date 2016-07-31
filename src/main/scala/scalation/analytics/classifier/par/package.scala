@@ -11,6 +11,6 @@ package object par
 {
     /** The relative path for base directory
      */
-    val BASE_DIR = DATA_DIR + "classifier" + ⁄ + "analytics" + ⁄
+    val BASE_DIR = DATA_DIR + "analytics" + ⁄ + "classifier" + ⁄
 }
 

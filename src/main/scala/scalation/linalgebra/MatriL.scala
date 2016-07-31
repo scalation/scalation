@@ -511,6 +511,13 @@ trait MatriL
     def lud_ip (): Tuple2 [MatriL, MatriL]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve for 'x' using back substitution in the equation 'u*x = y' where
+     *  'this' matrix ('u') is upper triangular (see 'lud' above).
+     *  @param y  the constant vector
+     */
+    def bsolve (y: VectoL): VectoL
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
      *  @param l  the lower triangular matrix
      *  @param u  the upper triangular matrix
@@ -535,15 +542,16 @@ trait MatriL
     /** Determine the rank of 'this' m-by-n matrix by taking the upper triangular
      *  matrix 'u' from the 'LU' Decomposition and counting the number of non-zero
      *  diagonal elements.  Implementing classes may override this method with
-     *  a better one (e.g., 'SVD' or Rank Revealing 'QR').
+     *  a better one (e.g., using 'SVD' or Rank Revealing 'QR').
      *  @see http://en.wikipedia.org/wiki/Rank_%28linear_algebra%29
+     *  @param upper  flag indicating whether this matrix is already upper triangular
      */
-    def rank: Int =
+    def rank (upper: Boolean = false): Int =
     {
         val max   = if (dim1 < dim2) dim1 else dim2      // rank <= min (m, n)
-        val u     = lud._2                               // upper triangular matrix
+        val u     = if (upper) this else lud._2          // upper triangular matrix
         var count = 0
-        for (i <- 0 until max if ! (u(i, i) =~ 0l)) count += 1
+        for (i <- 0 until max if u(i, i) !=~ 0l) count += 1
         count
     } // rank
 

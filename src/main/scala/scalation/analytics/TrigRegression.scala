@@ -37,7 +37,7 @@ import RegTechnique._
  *  @param w          the base displacement angle in radians
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class TrigRegression (t: VectorD, y: VectorD, k: Int, w: Double = Pi, technique: RegTechnique = Fac_QR)
+class TrigRegression (t: VectorD, y: VectorD, k: Int, w: Double = Pi, technique: RegTechnique = QR)
       extends Predictor with Error
 {
     if (t.dim != y.dim) flaw ("constructor", "dimensions of t and y are incompatible")

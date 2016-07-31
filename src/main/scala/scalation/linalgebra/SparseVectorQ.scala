@@ -707,7 +707,7 @@ class SparseVectorQ (val dim_ : Int,
      *  @param x  the given element
      *  @param e  the ending index (exclusive) for the search
      */
-    def indexOf (x: Int, e: Int = dim): Int =
+    def indexOf (x: Rational, e: Int = dim): Int =
     {        
         if (x =~ 0.0) { for (i <- range if this(i) =~ 0.0) return i; -1 }
         for (x <- v if (x._1 < e && x._2 == x)) return x._1; -1 

@@ -8,8 +8,11 @@
 
 package scalation.analytics.classifier.par
 
+import java.util.concurrent.ForkJoinPool
+
 import scala.collection.mutable.ListBuffer
 import scala.collection.parallel.ForkJoinTaskSupport
+
 import scalation.linalgebra._
 import scalation.linalgebra.gen.HMatrix3
 import scalation.relalgebra.Relation
@@ -39,9 +42,10 @@ class SelNaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array
                     me: Int = 3, var fset: ListBuffer [Int] = null, private var vc: VectoI = null )
       extends BayesClassifier (x, y, fn, k, cn)
 {
-    private val DEBUG = false                             // debug flag
-    private val TOL   = 0.01                              // tolerance indicating negligible improvement adding features
-    private val cor   = calcCorrelation                   // feature correlation matrix
+    private val DEBUG       = false                       // debug flag
+    private val PARALLELISM = 12                          // parallelism level
+    private val TOL         = 0.01                        // tolerance indicating negligible improvement adding features
+    private val cor         = calcCorrelation             // feature correlation matrix
 
     private val popC  = new VectorI (k)                   // frequency counts for classes 0, ..., k-1
     private val probC = new VectorD (k)                   // probabilities for classes 0, ..., k-1
@@ -130,8 +134,8 @@ class SelNaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array
         var jmax = -1
         val tempfeatures = Array.range (0, n).diff(fset)
         var temprange = (0 until tempfeatures.size).par
-        temprange.tasksupport = new ForkJoinTaskSupport (new scala.concurrent.forkjoin.ForkJoinPool (8))
-        println("threads num = " + 8)
+        temprange.tasksupport = new ForkJoinTaskSupport (new ForkJoinPool (PARALLELISM))
+        println("threads num = " + PARALLELISM)
         for (j <- temprange) {
             var tempfset = fset.clone ()
             tempfset += tempfeatures (j)
