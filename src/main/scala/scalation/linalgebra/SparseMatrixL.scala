@@ -317,7 +317,7 @@ class SparseMatrixL (val d1: Int,
     } // set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' Sparse`MatrixL` into a `MatrixI`.
+    /** Convert 'this' `SparseMatrixL` into a `MatrixI`.
      */
     def toInt: MatrixI =
     {

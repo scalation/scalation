@@ -12,10 +12,11 @@ import scala.collection.mutable.{Map, Set => SET}
 
 import scalation.graphalytics.Pair
 import scalation.graphalytics.mutable.{MGraph, MinSpanningTree}
-import scalation.graphalytics.mutable.LabelType.TLabel
 import scalation.linalgebra.{MatrixD, MatriI, MatrixI, VectorD, VectoI, VectorI}
 import scalation.linalgebra.gen.{HMatrix3, HMatrix4, HMatrix5}
 import scalation.relalgebra.Relation
+
+import BayesClassifier.me_default
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TANBayes` class implements an Integer-Based Tree Augmented Naive Bayes
@@ -37,7 +38,7 @@ import scalation.relalgebra.Relation
  *  @param thres  the correlation threshold between 2 features for possible parent-child relationship
  */
 class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-                thres: Double = 0.3, me: Int = 3, private var vc: VectoI = null)
+                thres: Double = 0.3, me: Int = me_default, private var vc: VectoI = null)
       extends BayesClassifier (x, y, fn, k, cn)
 {
     private val DEBUG  = false // debug flag
@@ -86,7 +87,7 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
         val countXYC = new HMatrix5 [Double] (k, n, n, vc.toArray, vc.toArray)   // countXYC count the number where X=x,Y=y,C=c
         val countXC  = new HMatrix3 [Double] (k, n, vc.toArray)                  // countXC count the number where X=x,C=c
         val ch       = Array.ofDim[SET[Int]] (n)
-        val elabel   = Map [Pair, TLabel] ()
+        val elabel   = Map [Pair, Double] ()
 //      parent(0)    = -1                                                        // feature 0 does not have a parent
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -252,9 +253,10 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'z', classify it returning the class number
      *  (0, ..., k-1) with the highest relative posterior probability.
+     *  Return the best class, its name and its relative probability.
      *  @param z  the data vector to classify
      */
-    def classify (z: VectoI): (Int, String) =
+    def classify (z: VectoI): (Int, String, Double) =
     {
         val prob = new VectorD (k)
         for (i <- 0 until k) {
@@ -264,9 +266,9 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
                 else probX(i, j, z(j), 0))               // P(X_j = z_j | C = i), no parent
             } // for
         } // for
-        if (DEBUG) println("prob = " + prob)
-        val best = prob.argmax ()           // class with the highest relative posterior probability
-        (best, cn(best))                    // return the best class and its name
+        if (DEBUG) println ("prob = " + prob)
+        val best = prob.argmax ()             // class with the highest relative posterior probability
+        (best, cn(best), prob(best))          // return the best class, its name and its probability
     } // classify
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -305,7 +307,7 @@ object TANBayes
      *  @param thres  the correlation threshold between 2 features for possible parent-child relationship
      */
     def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
-               thres: Double = 0.3, me: Int = 3, vc: VectoI = null) =
+               thres: Double = 0.3, me: Int = me_default, vc: VectoI = null) =
     {
         new TANBayes (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn,
                       thres, me, vc)

@@ -143,9 +143,10 @@ class NaiveBayes(x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'z', classify it returning the class number
      *  (0, ..., k-1) with the highest relative posterior probability.
+     *  Return the best class, its name and its relative probability.
      *  @param z  the data vector to classify
      */
-    def classify (z: VectoI): Tuple2 [Int, String] =
+    def classify (z: VectoI): (Int, String, Double) =
     {
         val prob = new VectorD (k)
         for (i <- 0 until k) {
@@ -153,8 +154,8 @@ class NaiveBayes(x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
             for (j <- 0 until n) prob (i) *= probX (i, j, z(j))    // P(X_j = z_j | C = i)
         } // for
         if (DEBUG) println ("prob = " + prob)
-        val best = prob.argmax ()             // class with the highest relative posterior probability
-        (best, cn(best))                      // return the best class and its name
+        val best = prob.argmax ()              // class with the highest relative posterior probability
+        (best, cn(best), prob(best))           // return the best class, its name and its probaility
     } // classify
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

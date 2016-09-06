@@ -47,7 +47,7 @@ class DAG (val parent: Array [Array [Int]])
  *  `BayesNetwork2`    - Ordering-based Bayesian Network with k = 2
  */
 abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String])
-    extends ClassifierInt(x, y, fn, k, cn) with BayesMetrics
+         extends ClassifierInt (x, y, fn, k, cn) with BayesMetrics
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build the model with feature order and selection

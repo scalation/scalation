@@ -17,6 +17,8 @@ import scalation.random.PermutedVecI
 import scalation.random.RNGStream.ranStream
 import scalation.relalgebra.Relation
 
+import BayesClassifier.me_default
+
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BayesNetwork2` class implements an Integer-Based Bayesian Network Classifier,
  *  which is a commonly used such classifier for discrete input data.  Each node is
@@ -38,7 +40,7 @@ import scalation.relalgebra.Relation
  *  @param thres the correlation threshold between 2 features for possible parent-child relationship
  */
 class BayesNetwork2 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-                     private var vc: VectoI = null, thres: Double = 0.3, me: Int = 3)
+                     private var vc: VectoI = null, thres: Double = 0.3, me: Int = me_default)
       extends BayesClassifier (x, y, fn, k, cn)
 {
     private val DEBUG = false                                           // debug flag
@@ -365,9 +367,10 @@ class BayesNetwork2 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'z', classify it returning the class number
      *  (0, ..., k-1) with the highest relative posterior probability.
+     *  Return the best class, its name and its realtive probability
      *  @param z the data vector to classify
      */
-    def classify (z: VectoI): (Int, String) =
+    def classify (z: VectoI): (Int, String, Double) =
     {
         val prob = new VectorD(k)
         for (i <- 0 until k) {
@@ -379,8 +382,8 @@ class BayesNetwork2 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array
             } // for
         } // for
         if (DEBUG) println("prob = " + prob)
-        val best = prob.argmax() // class with the highest relative posterior probability
-        (best, cn(best)) // return the best class and its name
+        val best = prob.argmax()                // class with the highest relative posterior probability
+        (best, cn(best), prob(best))            // return the best class, its name and its probability
     } // classify
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -397,7 +400,7 @@ class BayesNetwork2 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array
 object BayesNetwork2
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a 'BayesNetwork2 object, passing 'x' and 'y' together in one table.
+    /** Create a `BayesNetwork2 object, passing 'x' and 'y' together in one table.
      *  @param xy    the data vectors along with their classifications stored as rows of a matrix
      *  @param fn    the names of the features
      *  @param k     the number of classes
@@ -406,7 +409,7 @@ object BayesNetwork2
      *  @param thres the correlation threshold between 2 features for possible parent-child relationship
      */
     def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
-              vc: VectoI = null, thres: Double = 0.3, me: Int = 3) =
+              vc: VectoI = null, thres: Double = 0.3, me: Int = me_default) =
     {
         new BayesNetwork2 (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn,
                            vc, thres, me)

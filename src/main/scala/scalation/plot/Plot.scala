@@ -10,7 +10,7 @@ package scalation.plot
 
 import scala.math.{ceil, floor, min, pow, round}
 
-import scalation.linalgebra.VectoD
+import scalation.linalgebra.{VectoD, VectoI}
 import scalation.scala2d.{Panel, VizFrame}
 import scalation.scala2d.{Ellipse, Line}
 import scalation.scala2d.Colors._
@@ -32,6 +32,26 @@ class Plot (x: VectoD, y: VectoD, z: VectoD = null, _title: String = "Plot y vs.
     setVisible (true)
 
 } // Plot class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Plot` companion object provides factory methods for creating plots.
+ */
+object Plot
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a plot object from integer vectors.
+     *  @param x       the x vector of data values (horizontal)
+     *  @param y       the y vector of data values (primary vertical)
+     *  @param z       the z vector of data values (secondary vertical) to compare with y
+     *  @param _title  the title of the plot
+     */
+    def apply (x: VectoI, y: VectoI, z: VectoI = null, _title: String)
+    {
+        new Plot (x.toDouble, y.toDouble, if (z == null) null else z.toDouble, _title)
+    } // aux. constructor
+
+} // Plot object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

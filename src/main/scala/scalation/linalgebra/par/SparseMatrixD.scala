@@ -39,6 +39,7 @@ class SparseMatrixD (val d1: Int,
 
   def copy(): scalation.linalgebra.MatriD = ???
   def zero(m: Int,n: Int): scalation.linalgebra.MatriD = ???
+  def toInt: scalation.linalgebra.MatriI = ???
   def toDense: scalation.linalgebra.MatriD = ???
   def lowerT: scalation.linalgebra.MatriD = ???
   def upperT: scalation.linalgebra.MatriD = ???

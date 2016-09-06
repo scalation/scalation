@@ -19,7 +19,7 @@ import scala.math.max
  *  @param center    the vertex picked as the center of the ball
  *  @param radius    the radius of the ball
  */
-class Ball (srcGraph: Graph, val center: Int, radius: Int) 
+class Ball [TLabel] (srcGraph: Graph [TLabel], val center: Int, radius: Int) 
 {
     val nodesInBall = SET [Int] ()                            // vertices in this ball
     val borderNodes = SET [Int] ()                            // border vertices of this ball

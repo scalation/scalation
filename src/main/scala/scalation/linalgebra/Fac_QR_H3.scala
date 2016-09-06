@@ -2,7 +2,7 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Zhaochong Liu
  *  @version 1.2
- *  @date    Sat Jul 23 22:30:06 EDT 2016
+ *  @date    Sat Jul 30 22:53:47 EDT 2016
  *  @see     LICENSE (MIT style license file).
  */
 

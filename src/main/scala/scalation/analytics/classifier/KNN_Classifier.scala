@@ -74,15 +74,16 @@ class KNN_Classifier (x: MatriD, y: VectoI, fn: Array [String], k: Int, cn: Arra
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a new point/vector 'z', determine which class it belongs to (i.e.,
      *  the class getting the most votes from its 'knn' nearest neighbors.
+     *  Return the best class, its name and its votes
      *  @param z  the vector to classify
      */
-    def classify (z: VectoD): Tuple2 [Int, String] =
+    def classify (z: VectoD): (Int, String, Double) =
     {
         kNearest (z)                                         // set top-knn to knn nearest
         for (i <- 0 until knn) count(y(topK(i)._1)) += 1     // tally per class
         println ("count = " + count)
         val best = count.argmax ()                           // class with maximal count
-        (best, cn(best))                                     // return the best class and its name
+        (best, cn(best), count(best))                        // return the best class, its name and its votes
     } // classify
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -53,9 +53,10 @@ abstract class ClassifierReal (x: MatriD, y: VectoI, fn: Array [String], k: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a new discrete (integer-valued) data vector 'z', determine which
      *  class it belongs to, by first converting it to a vector of doubles.
+     *  Return the best class, its name and its relative probability
      *  @param z  the vector to classify
      */
-    def classify (z: VectoI): Tuple2 [Int, String] =
+    def classify (z: VectoI): (Int, String, Double) =
     {
         val zd = new VectorD (z.dim)
         for (j <- 0 until z.dim) zd(j) = z(j).toDouble

@@ -14,8 +14,6 @@ package scalation.graphalytics.mutable
 import scala.collection.mutable.{ArrayStack, Queue}
 import scala.collection.mutable.{Set => SET}
 
-import LabelType.{TLabel, TLabel_DEFAULT}
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphDFS` performs Depth First Search (DFS) or Breadth First Search (BFS)
  *  on a Directed Graph.  The class currently supports three predicates:
@@ -24,7 +22,7 @@ import LabelType.{TLabel, TLabel_DEFAULT}
  *  @param g    the directed graph to search
  *  @param bfs  switch from DFS to BFS, if bfs flag is true (defaults to false)
  */
-class GraphDFS (g: Graph, bfs: Boolean = false)
+class GraphDFS [TLabel] (g: Graph [TLabel], bfs: Boolean = false)
 {
     type STACK = ArrayStack [Int]
     type QUEUE = Queue [Int]
@@ -33,7 +31,7 @@ class GraphDFS (g: Graph, bfs: Boolean = false)
     private val go    = Array.ofDim [Boolean] (g.size)            // go (unvisited) flags
     private var qu    = if (bfs) new STACK ()                     // vertex FIFO queue for BFS
                         else     new QUEUE ()                     // or stack (LIFO queue) for DFS
-    private var lab   = TLabel_DEFAULT                            // label to find
+    private var lab: TLabel = _                                   // label to find
     private var dest  = -1                                        // destination vertex to reach
 
     def pred1 (j: Int): Boolean = g.label(j) == lab               // predicate to find label
@@ -186,7 +184,7 @@ object GraphDFSTest extends App
     /** Test the 'find', 'reach' and 'strongComps' methods.
      *  @param gs  the graph search to test
      */
-    def test (gs: GraphDFS)
+    def test (gs: GraphDFS [Int])
     {
         println ("Test find method")
         for (lab <- 0 to 14) {

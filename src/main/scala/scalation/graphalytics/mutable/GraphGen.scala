@@ -10,18 +10,24 @@ package scalation.graphalytics.mutable
 
 import scala.collection.mutable.Queue
 import scala.collection.mutable.{Set => SET}
-import scala.math.pow
+import scala.reflect.ClassTag
 
-import scalation.linalgebra.VectorI
-import scalation.random.{Randi0, Random, RandomSet}
-
-import LabelType.TLabel
+import scalation.random._
+import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `GraphGen` object is used to build random graph with various characteristics.
+/** The `GraphGen` object is used to build random graphs with various characteristics.
+ *  Needs to generate vertex labels of various types including `Int`, `Double`,
+ *  `String`, `VectorD` based on the `TLabel` type.
+ *  @param typeSelector  the variable for type matches (work around for generic erasure)
  */
-object GraphGen
+class GraphGen [TLabel: ClassTag] (typeSelector: TLabel)
+       extends Error
 {
+    /** Random number stream to use (0 to 999)
+     */
+    private val stream = 0
+
     /** Random number generator in interval (0, 1)
      */
     private val ran = Random ()
@@ -33,6 +39,25 @@ object GraphGen
     /** Random set generator
      */
     private val rsg = RandomSet ()
+
+    /** Random label generator for the `TLabel` type parameter
+     */
+    private var rlg: Variate = _
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the Random Variate Generator, using the one based on the `TLabel` type.
+     *  @param nLabs  the number of labels to generate
+     */
+    def setVariate (nLabs: Int)
+    { 
+        typeSelector match {
+        case _: Int     => rlg = Randi (1, nLabs, stream)
+        case _: Double  => rlg = Randi (1, nLabs, stream)
+        case _: String  => rlg = RandomWord (nLabs, stream = stream)
+//      case _: VectorD => rlg = RandomVecD (nLabs, stream)
+        case _          => flaw ("setVariate", "label type not supported")
+        } // match
+    } // setVariate
 
     //------------------------------------------------------------------------
     // Methods generating random graphs where the number of outgoing edges (the degree)
@@ -50,7 +75,7 @@ object GraphGen
      *  @param name      the name of the graph
      */
     def genRandomGraph (size: Int, nLabels: Int, avDegree: Int, inverse: Boolean = false,
-                        name: String = "g"): Graph =
+                        name: String = "g"): Graph [TLabel] =
     {
         val ch = Array.ofDim [SET [Int]] (size)
         for (i <- ch.indices) {
@@ -71,9 +96,9 @@ object GraphGen
      *  @param name      the name of the graph
      */
     def genRandomConnectedGraph (size: Int, nLabels: Int, avDegree: Int, inverse: Boolean = false,
-                                 name: String = "g"): Graph =
+                                 name: String = "g"): Graph [TLabel] =
     {
-        var g: Graph = null
+        var g: Graph [TLabel] = null
         do g = genRandomGraph (size, nLabels, avDegree, inverse, name) while (! g.isConnected)
         g
     } // genRandomConnectedGraph
@@ -88,7 +113,7 @@ object GraphGen
      *  @param name      the name of the graph
      */
     def genRandomGraph_PowLabels (size: Int, nLabels: Int, avDegree: Int, inverse: Boolean = false,
-                                  name: String = "g"): Graph =
+                                  name: String = "g"): Graph [TLabel] =
     {
         val ch = Array.ofDim [SET [Int]] (size)
         for (i <- ch.indices) {
@@ -115,11 +140,12 @@ object GraphGen
      *  @param name       the name of the graph
      */
     def genPowerLawGraph (size: Int, nLabels: Int, maxDegree: Int, distPow: Double,
-                          inverse: Boolean = false, name: String = "g"): Graph =
+                          inverse: Boolean = false, name: String = "g"): Graph [TLabel] =
     {
+        val powLaw = PowerLaw (0, maxDegree, distPow)
         val ch = Array.ofDim [SET [Int]] (size)
         for (i <- ch.indices) {
-            val degree = powInt (0, maxDegree, distPow)            // out degree
+            val degree = powLaw.igen                               // out degree
             ch(i)      = rsg.igen (degree, size - 1, i)            // children of vertex i
         } // for
         val label = randDistLabels (size, nLabels)
@@ -137,11 +163,12 @@ object GraphGen
      *  @param name       the name of the graph
      */
     def genPowerLawGraph_PowLabels (size: Int, nLabels: Int, maxDegree: Int, distPow: Double,
-                                    inverse: Boolean = false, name: String = "g"): Graph =
+                                    inverse: Boolean = false, name: String = "g"): Graph [TLabel] =
     {
+        val powLaw = PowerLaw (0, maxDegree, distPow)
         val ch = Array.ofDim [SET [Int]] (size)
         for (i <- ch.indices) {
-            val degree = powInt (0, maxDegree, distPow)            // out degree
+            val degree = powLaw.igen                               // out degree
             ch(i)      = rsg.igen (degree, size - 1, i)            // children of vertex i
         } // for
         val label = powDistLabels (size, nLabels, distPow)
@@ -164,8 +191,8 @@ object GraphGen
      *  @param inverse   whether to create inverse adjacency (parents)
      *  @param name      the name of the graph
      */
-    def genBFSQuery (size: Int, avDegree: Int, g: Graph, inverse: Boolean = false,
-                     name: String = "g"): Graph =
+    def genBFSQuery (size: Int, avDegree: Int, g: Graph [TLabel], inverse: Boolean = false,
+                     name: String = "g"): Graph [TLabel] =
     {
         val maxRestarts = 5000
         var nRestarts   = 0
@@ -228,65 +255,69 @@ object GraphGen
     //------------------------------------------------------------------------
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Returns an array with labels distributed between 0 and 'nLabels - 1'.
+    /** Returns an array with labels distributed between 1 and 'nLabels'.
      *  based on a uniform distribution.
      *  @param size     the number of vertices
      *  @param nLabels  the number of labels
      */
     private def randDistLabels (size: Int, nLabels: Int): Array [TLabel] =
     {
-        Array.ofDim [TLabel] (size).map ( x => rng.iigen (nLabels - 1).asInstanceOf [TLabel])
+        setVariate (nLabels)                                                                // set rlg
+        typeSelector match {
+        case _: Int     => Array.ofDim (size).map (_ => rlg.igen.asInstanceOf [TLabel])     // for `Int`
+        case _: Double  => Array.ofDim (size).map (_ => rlg.gen.asInstanceOf [TLabel])      // for `Double`
+        case _: String  => Array.ofDim (size).map (_ => rlg.sgen.asInstanceOf [TLabel])     // for `String`
+//      case _: VectorD => // implement                                                     // for `VectorD`
+        case _          => { flaw ("randDistLabels", "label type not supported"); null.asInstanceOf [Array [TLabel]] }
+        } // match
     } // randDistLabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Returns an array with labels distributed between 0 and 'nLabels - 1'.
+    /** Returns an array with labels distributed between 1 and 'nLabels'.
      *  based on a power law distribution.
+     *  FIX: 'nLabels' not valid to `Double` and `String` and check correctness of `PowerLaw`.
+     *  FIX: for `String` would like something like `RandomWord`.
      *  @param size     the number of vertices
      *  @param nLabels  the number of labels
      *  @param pow      the power/exponent
      */
     private def powDistLabels (size: Int, nLabels: Int, pow: Double): Array [TLabel] =
     {
-        Array.ofDim [TLabel] (size).map ( x => powInt (0, nLabels, pow).asInstanceOf [TLabel])
+        val powLaw = PowerLaw (1.0, nLabels + 1.0, pow, stream)
+        typeSelector match {
+        case _: Int     => Array.ofDim (size).map (_ => powLaw.igen.asInstanceOf [TLabel])
+        case _: Double  => Array.ofDim (size).map (_ => powLaw.gen.asInstanceOf [TLabel])
+        case _: String  => Array.ofDim (size).map (_ => powLaw.sgen.asInstanceOf [TLabel])
+//      case _: VectorD => // implement
+        case _          => { flaw ("powDistLabels", "label type not supported"); null.asInstanceOf [Array [TLabel]] }
+        } // match
     } // powDistLabels
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Returns a random integer between min and max with a frequency determined
-     *  by a power law distribution.
-     *  @param min      the minimum value
-     *  @param max      the maximum value
-     *  @param distPow  the power distribution
-     */
-    private def powInt (min: Int, max: Int, distPow: Double): Int =
-    {
-        val exp = distPow + 1.0
-        max - 1 - pow (( (pow (max, exp) - pow (min, exp)) * ran.gen + pow (min, exp) ),
-                       (1.0 / exp)).toInt
-    } // powInt
 
 } // GraphGen class
 
-import GraphGen._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphGenTest` object is used to test the `GraphGen` class for building
  *  random graphs where a vertex's degree is uniformly distributed.
+ *  This work build graphs with `Int` vertex labels.
  *  > run-main scalation.graphalytics.mutable.GraphGenTest
  */
 object GraphGenTest extends App
 {
+    val gGen = new GraphGen [Int] (0)
+
     println ("GraphGenTest: test genRandomGraph")
     (1 to 5).foreach { _ =>
-        val g = genRandomGraph (4, 100, 1)
+        val g = gGen.genRandomGraph (4, 100, 1)
         g.printG ()
         println ("CONNECTED?  " + g.isConnected)
     } // foreach
 
     println ("GraphGenTest: test genRandomConnectedGraph")
-    (1 to 5).foreach { _ => genRandomConnectedGraph (4, 100, 1).printG () }
+    (1 to 5).foreach { _ => gGen.genRandomConnectedGraph (4, 100, 1).printG () }
 
     println ("GraphGenTest: test geneRandomGraph_PowLabels")
-    val g1 = genRandomGraph_PowLabels (200, 50, 2)
+    val g1 = gGen.genRandomGraph_PowLabels (200, 50, 2)
     g1.printG ()
     println (s"g1.labelMap = ${g1.labelMap}")
  
@@ -295,45 +326,105 @@ object GraphGenTest extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphGenTest2` object is used to test the `GraphGen` class for building
- *  power law graphs.
+ *  random graphs where a vertex's degree is uniformly distributed.
+ *  This work build graphs with `Double` vertex labels.
  *  > run-main scalation.graphalytics.mutable.GraphGenTest2
  */
 object GraphGenTest2 extends App
 {
-    println ("GraphGenTest2: test genPowerLawGraph")
-    val g2 = genPowerLawGraph (50, 10, 10, 2.1)
-    g2.printG ()
-    g2.ch.sortBy (_.size).foreach { println(_) }
+    val gGen = new GraphGen [Double] (0.0)
 
-    println ("GraphGenTest2: test genPowerLawGraph_PowLabels")
-    val g3 = genPowerLawGraph_PowLabels (50, 10, 10, 2.1)
-    g3.printG ()
-    g3.ch.sortBy (_.size).foreach { println(_) }
-    println (s"g3.labelMap = ${g3.labelMap}")
+    println ("GraphGenTest: test genRandomGraph")
+    (1 to 5).foreach { _ =>
+        val g = gGen.genRandomGraph (4, 100, 1)
+        g.printG ()
+        println ("CONNECTED?  " + g.isConnected)
+    } // foreach
+
+    println ("GraphGenTest2: test genRandomConnectedGraph")
+    (1 to 5).foreach { _ => gGen.genRandomConnectedGraph (4, 100, 1).printG () }
+
+    println ("GraphGenTest2: test geneRandomGraph_PowLabels")
+    val g1 = gGen.genRandomGraph_PowLabels (200, 50, 2)
+    g1.printG ()
+    println (s"g1.labelMap = ${g1.labelMap}")
 
 } // GraphGenTest2
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `GraphGenTest3` object is used to test the `GraphGen` class for extracting
- *  query graphs from data graphs.
+/** The `GraphGenTest3` object is used to test the `GraphGen` class for building
+ *  random graphs where a vertex's degree is uniformly distributed.
+ *  This work build graphs with `String` vertex labels.
  *  > run-main scalation.graphalytics.mutable.GraphGenTest3
  */
 object GraphGenTest3 extends App
 {
-    println ("GraphGenTest3: test genRandomGraph")
+    val gGen = new GraphGen [String] ("0")
+
+    println ("GraphGenTest: test genRandomGraph")
+    (1 to 5).foreach { _ =>
+        val g = gGen.genRandomGraph (4, 100, 1)
+        g.printG ()
+        println ("CONNECTED?  " + g.isConnected)
+    } // foreach
+
+    println ("GraphGenTest3: test genRandomConnectedGraph")
+    (1 to 5).foreach { _ => gGen.genRandomConnectedGraph (4, 100, 1).printG () }
+
+    println ("GraphGenTest3: test geneRandomGraph_PowLabels")
+    val g1 = gGen.genRandomGraph_PowLabels (200, 50, 2)
+    g1.printG ()
+    println (s"g1.labelMap = ${g1.labelMap}")
+
+} // GraphGenTest3
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphGenTest4` object is used to test the `GraphGen` class for building
+ *  power law graphs.
+ *  > run-main scalation.graphalytics.mutable.GraphGenTest4
+ */
+object GraphGenTest4 extends App
+{
+    val gGen = new GraphGen [Int] (0)
+
+    println ("GraphGenTest4: test genPowerLawGraph")
+    val g2 = gGen.genPowerLawGraph (50, 10, 10, 2.1)
+    g2.printG ()
+    g2.ch.sortBy (_.size).foreach { println(_) }
+
+    println ("GraphGenTest4: test genPowerLawGraph_PowLabels")
+    val g3 = gGen.genPowerLawGraph_PowLabels (50, 10, 10, 2.1)
+    g3.printG ()
+    g3.ch.sortBy (_.size).foreach { println(_) }
+    println (s"g3.labelMap = ${g3.labelMap}")
+
+} // GraphGenTest4
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphGenTest5` object is used to test the `GraphGen` class for extracting
+ *  query graphs from data graphs.
+ *  > run-main scalation.graphalytics.mutable.GraphGenTest5
+ */
+object GraphGenTest5 extends App
+{
+    val gGen = new GraphGen [Int] (0)
+
+    println ("GraphGenTest5: test genRandomGraph")
     val nVertices = 10000
     val nLabels   =    10
     val avDegree  =    16     
-    var g = genRandomGraph (nVertices, nLabels, avDegree)
+    var g = gGen.genRandomGraph (nVertices, nLabels, avDegree)
     println ("done generating data graph")
     println ("g.size    = " + g.size)
     println ("g.nEdges  = " + g.nEdges)
     println ("av degree = " + g.nEdges / g.size.toDouble)
 
-    println ("GraphGenTest3: test genBFSQuery")
+    println ("GraphGenTest5: test genBFSQuery")
     (1 to 5).foreach { _ =>
-        var q = genBFSQuery (20, 3, g)
+        var q = gGen.genBFSQuery (20, 3, g)
         q.printG ()
         println ("q.size    = " + q.size)
         println ("q.nEdges  = " + q.nEdges)
@@ -341,5 +432,5 @@ object GraphGenTest3 extends App
     } // foreach
     println ("done")
 
-} // GraphGenTest3
+} // GraphGenTest5
 

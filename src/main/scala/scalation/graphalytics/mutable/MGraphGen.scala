@@ -11,17 +11,16 @@ package scalation.graphalytics.mutable
 import scala.collection.mutable.{Map, Queue}
 import scala.collection.mutable.{Set => SET}
 import scala.math.pow
+import scala.reflect.ClassTag
 import scala.util.Random
 
 import scalation.linalgebra.VectorI
 import scalation.random.RandomVecI
 
-import LabelType.TLabel
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphGen` object is used to build random graph with various characteristics.
  */
-object MGraphGen
+class MGraphGen [TLabel: ClassTag]
 {
     /** Random number generator
      */
@@ -48,7 +47,7 @@ object MGraphGen
      *  @param name      the name of the graph
      */
     def genRandomGraph (size: Int, nLabels: Int, eLabels: Int, avDegree: Int, inverse: Boolean = false,
-                        name: String = "g"): MGraph =
+                        name: String = "g"): MGraph [TLabel] =
     {
         val ch = Array.ofDim [SET [Int]] (size)
         for (i <- ch.indices) {                                    // for each vertex i
@@ -72,9 +71,9 @@ object MGraphGen
      *  @param name      the name of the graph
      */
     def genRandomConnectedGraph (size: Int, nLabels: Int, eLabels: Int, avDegree: Int, inverse: Boolean = false,
-                                 name: String = "g"): MGraph =
+                                 name: String = "g"): MGraph [TLabel] =
     {
-        var g: MGraph = null
+        var g: MGraph [TLabel] = null
         do g = genRandomGraph (size, nLabels, eLabels, avDegree, inverse, name) while (! g.isConnected)
         g
     } // genRandomConnectedGraph
@@ -89,7 +88,7 @@ object MGraphGen
      *  @param name      the name of the graph
      */
     def genRandomGraph_PowLabels (size: Int, nLabels: Int, avDegree: Int, inverse: Boolean = false,
-                                  name: String = "g"): MGraph =
+                                  name: String = "g"): MGraph [TLabel] =
     {
         val ch = Array.ofDim [SET [Int]] (size)
         for (i <- ch.indices) {                                          // each vertex i
@@ -118,7 +117,7 @@ object MGraphGen
      *  @param name       the name of the graph
      */
     def genPowerLawGraph (size: Int, nLabels: Int, maxDegree: Int, distPow: Double,
-                          inverse: Boolean = false, name: String = "g"): MGraph =
+                          inverse: Boolean = false, name: String = "g"): MGraph [TLabel] =
     {
         val ch = Array.ofDim [SET [Int]] (size)
         for (i <- ch.indices) {                                          // each vertex i
@@ -141,7 +140,7 @@ object MGraphGen
      *  @param name       the name of the graph
      */
     def genPowerLawGraph_PowLabels (size: Int, nLabels: Int, maxDegree: Int, distPow: Double,
-                                    inverse: Boolean = false, name: String = "g"): MGraph =
+                                    inverse: Boolean = false, name: String = "g"): MGraph [TLabel] =
     {
         val ch = Array.ofDim [SET [Int]] (size)
         for (i <- ch.indices) {                                          // each vertex i
@@ -169,8 +168,8 @@ object MGraphGen
      *  @param inverse   whether to create inverse adjacency (parents)
      *  @param name      the name of the graph
      */
-    def genBFSQuery (size: Int, avDegree: Int, g: MGraph, inverse: Boolean = false,
-                     name: String = "g"): MGraph =
+    def genBFSQuery (size: Int, avDegree: Int, g: MGraph [TLabel], inverse: Boolean = false,
+                     name: String = "g"): MGraph [TLabel] =
     {
         val maxRestarts = 5000
         var nRestarts   = 0
@@ -238,7 +237,7 @@ object MGraphGen
      *  @param inverse  whether to create inverse adjacency (parents)
      *  @param name     the name of the graph
      */
-    def extractSubgraph (size: Int, g: MGraph, inverse: Boolean = false, name: String = "g"): MGraph =
+    def extractSubgraph (size: Int, g: MGraph [TLabel], inverse: Boolean = false, name: String = "g"): MGraph [TLabel] =
     {
         val maxRestarts = 5000
         var nRestarts   = 0
@@ -379,7 +378,6 @@ object MGraphGen
 
 } // MGraphGen class
 
-import MGraphGen._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The 'MGraphGenTest' object is used to test the 'MGraphGen' class for building
@@ -388,18 +386,20 @@ import MGraphGen._
  */
 object MGraphGenTest extends App
 {
+    val mgGen = new MGraphGen [Int]
+
     println ("MGraphGenTest: test genRandomGraph")
     (1 to 5).foreach { _ =>
-        val g = genRandomGraph (4, 100, 5, 1)
+        val g = mgGen.genRandomGraph (4, 100, 5, 1)
         g.printG ()
         println ("CONNECTED?  " + g.isConnected)
     } // foreach
 
     println ("MGraphGenTest: test genRandomConnectedGraph")
-    (1 to 5).foreach { _ => genRandomConnectedGraph (4, 100, 5, 1).printG () }
+    (1 to 5).foreach { _ => mgGen.genRandomConnectedGraph (4, 100, 5, 1).printG () }
 
     println ("MGraphGenTest: test geneRandomGraph_PowLabels")
-    val g1 = genRandomGraph_PowLabels (200, 50, 2)
+    val g1 = mgGen.genRandomGraph_PowLabels (200, 50, 2)
     g1.printG ()
     println (s"g1.labelMap = ${g1.labelMap}")
  
@@ -413,13 +413,15 @@ object MGraphGenTest extends App
  */
 object MGraphGenTest2 extends App
 {
+    val mgGen = new MGraphGen [Int]
+
     println ("MGraphGenTest2: test genPowerLawGraph")
-    val g2 = genPowerLawGraph (50, 10, 10, 2.1)
+    val g2 = mgGen.genPowerLawGraph (50, 10, 10, 2.1)
     g2.printG ()
     g2.ch.sortBy (_.size).foreach { println(_) }
 
     println ("MGraphGenTest2: test genPowerLawGraph_PowLabels")
-    val g3 = genPowerLawGraph_PowLabels (50, 10, 10, 2.1)
+    val g3 = mgGen.genPowerLawGraph_PowLabels (50, 10, 10, 2.1)
     g3.printG ()
     g3.ch.sortBy (_.size).foreach { println (_) }
     println (s"g3.labelMap = ${g3.labelMap}")
@@ -434,11 +436,13 @@ object MGraphGenTest2 extends App
  */
 object MGraphGenTest3 extends App
 {
+    val mgGen = new MGraphGen [Int]
+
     val nVertices = 10000
     val nLabels   =    10
     val eLabels   =     5
     val avDegree  =    16
-    val g = genRandomGraph (nVertices, nLabels, eLabels, avDegree)
+    val g = mgGen.genRandomGraph (nVertices, nLabels, eLabels, avDegree)
     println ("done generating data graph")
     println ("g.size    = " + g.size)
     println ("g.nEdges  = " + g.nEdges)
@@ -446,7 +450,7 @@ object MGraphGenTest3 extends App
 
     println ("MGraphGenTest3: test genBFSQuery")
     (1 to 5).foreach { _ =>
-        val q = genBFSQuery (25, 3, g)
+        val q = mgGen.genBFSQuery (25, 3, g)
         q.printG ()
         println ("q.size    = " + q.size)
         println ("q.nEdges  = " + q.nEdges)

@@ -15,7 +15,6 @@ import scala.collection.parallel.ForkJoinTaskSupport
 import scala.math.min
 
 import scalation.graphalytics.Pair
-import scalation.graphalytics.mutable.LabelType.TLabel
 import scalation.graphalytics.mutable.{MGraph, MinSpanningTree}
 import scalation.linalgebra._
 import scalation.linalgebra.gen.{HMatrix3, HMatrix4, HMatrix5}
@@ -42,7 +41,7 @@ import scalation.relalgebra.Relation
  */
 class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
                 thres: Double = 0.3, me: Int = 3, private var vc: VectoI = null)
-    extends BayesClassifier (x, y, fn, k, cn)
+      extends BayesClassifier (x, y, fn, k, cn)
 {
     private val DEBUG  = false                               // debug flag
     private val cor    = calcCorrelation                     // feature correlation matrix
@@ -90,8 +89,8 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
         var countXYC = new HMatrix5 [Double] (n, n, k, vc.toArray, vc.toArray)   // countXYC count the number where X=x,Y=y,C=c
         var countXC  = new HMatrix3 [Double] (k, n, vc.toArray)                  // countXC count the number where X=x,C=c
 
-        val ch = Array.ofDim [SET[Int]](n)
-        val elabel = Map [Pair, TLabel]()
+        val ch = Array.ofDim [SET[Int]] (n)
+        val elabel = Map [Pair, Double] ()
 //      parent(0) = -1                                                           // feature 0 does not have a parent
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -228,10 +227,11 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'z', classify it returning the class number
-     * (0, ..., k-1) with the highest relative posterior probability.
-     * @param z  the data vector to classify
+     *  (0, ..., k-1) with the highest relative posterior probability.
+     *  Return the best class, its name and its relative probability.
+     *  @param z  the data vector to classify
      */
-    def classify (z: VectoI): (Int, String) =
+    def classify (z: VectoI): (Int, String, Double) =
     {
         val prob = new VectorD (k)
         for (i <- 0 until k) {
@@ -244,7 +244,7 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
         } // for
         if (DEBUG) println ("prob = " + prob)
         val best = prob.argmax ()                      // class with the highest relative posterior probability
-        (best, cn (best))                              // return the best class and its name
+        (best, cn (best), prob(best))                  // return the best class, its name and its probability
     } // classify
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

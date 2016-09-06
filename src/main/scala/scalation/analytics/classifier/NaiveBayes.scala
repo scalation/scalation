@@ -11,7 +11,9 @@ package scalation.analytics.classifier
 import scalation.linalgebra.{MatriI, VectoI, VectorD, VectorI}
 import scalation.linalgebra.gen.HMatrix3
 import scalation.relalgebra.Relation
-import scalation.util.time
+import scalation.util.{banner, time}
+
+import BayesClassifier.me_default
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NaiveBayes` class implements an Integer-Based Naive Bayes Classifier,
@@ -33,26 +35,27 @@ import scalation.util.time
  *  @param me  use m-estimates (me == 0 => regular MLE estimates)
  */
 class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-                  private var vc: VectoI = null, me: Int = 0)
-    extends BayesClassifier (x, y, fn, k, cn)
+                  private var vc: VectoI = null, me: Int = me_default)
+      extends BayesClassifier (x, y, fn, k, cn)
 {
-    private val DEBUG = false                              // debug flag
-    private val cor = calcCorrelation                      // feature correlation matrix
+    private val DEBUG = true                               // debug flag
+    private val cor   = calcCorrelation                    // feature correlation matrix
 
-    private val popC  = new VectorI (k)                    // frequency counts for classes 0, ..., k-1
-    private val probC = new VectorD (k)                    // probabilities for classes 0, ..., k-1
-    private val popX  = new HMatrix3 [Int] (k, n)          // conditional frequency counts for variable/feature j
-    private val probX = new HMatrix3 [Double] (k, n)       // conditional probabilities for variable/feature j
+    private val f_C  = new VectorI (k)                     // frequency counts for class yi
+    private val f_CX = new HMatrix3 [Int] (k, n)           // frequency counts for class yi & feature xj
+
+    private var p_C: VectorD = _                           // prior probabilities for class yi
+    private val p_X_C = new HMatrix3 [Double] (k, n)       // conditional probabilities for feature xj given class yi
 
     if (vc == null) {
-        shiftToZero; vc = vc_fromData                     // set to default for binary data (2)
+        shiftToZero; vc = vc_fromData                      // set value counts from data
     } // if
-    popX.alloc (vc().toArray)
-    probX.alloc (vc().toArray)
+    f_CX.alloc (vc().toArray)
+    p_X_C.alloc (vc().toArray)
 
     if (DEBUG) {
-        println ("value count vc     = " + vc)
-        println ("correlation matrix = " + cor)
+        println ("distinct value count vc = " + vc)
+        println ("correlation matrix      = " + cor)
     } // if
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -66,7 +69,18 @@ class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
     } // buildModel
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Count the frequencies for 'y' having class 'i' and value 'x' for cases 0, 1, ...
+    /** Increment frequency counters based on the 'i'th row of the data matrix.
+     *  @param i  the index for current data row
+     */
+    private def increment (i: Int)
+    {
+        val yi   = y(i)                                       // get the class for ith row
+        f_C(yi) += 1                                          // increment frequency for class yi
+        for (j <- 0 until n) f_CX(yi, j, x(i, j)) += 1        // increment frequency for class yi and all X-features
+    } // increment
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Count the frequencies for 'y' having class 'yi' and value 'x' for cases 0, 1, ...
      *  Only the test region from 'testStart' to 'testEnd' is skipped, the rest is
      *  training data.
      *  @param testStart  starting index of test region (inclusive) used in cross-validation
@@ -74,19 +88,29 @@ class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
      */
     private def frequencies (testStart: Int, testEnd: Int)
     {
-        for (l <- 0 until m if l < testStart || l >= testEnd) {
-            // l = lth row of data matrix x
-            val i = y(l)                                                   // get the class
-            popC(i) += 1                                                   // increment ith class
-            for (j <- 0 until n) {
-                // println ("i="+i+"    j=" + j + "     x(l,j)=" +   x(l,j))
-                popX(i, j, x(l, j)) += 1                                   // increment ith class, jth feature, x value
-            } // for
-        } // for
+        if (DEBUG) banner ("frequencies (testStart, testEnd)")
+        for (i <- 0 until m if i < testStart || i >= testEnd) increment (i)
 
         if (DEBUG) {
-            println ("popC = " + popC)                                     // #(C = i)
-            println ("popX = " + popX)                                     // #(X_j = x & C = i)
+            println ("f_C  = " + f_C)                         // #(C = yi)
+            println ("f_CX = " + f_CX)                        // #(C = yi & X_j = x)
+        } // if
+    } // frequencies
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Count the frequencies for 'y' having class 'yi' and value 'x' for cases 0, 1, ...
+     *  Only the test region from 'testStart' to 'testEnd' is skipped, the rest is
+     *  training data.
+     *  @param itrain  indices of the instances considered train data
+     */
+    private def frequencies (itrain: Array [Int])
+    {
+        if (DEBUG) banner ("frequencies (itrain)")
+        for (i <- itrain) increment (i)
+
+        if (DEBUG) {
+            println ("f_C  = " + f_C)                         // #(C = yi)
+            println ("f_CX = " + f_CX)                        // #(C = yi & X_j = x)
         } // if
     } // frequencies
 
@@ -96,51 +120,12 @@ class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
      *  @param testStart  starting index of test region (inclusive) used in cross-validation.
      *  @param testEnd    ending index of test region (exclusive) used in cross-validation.
      */
-    def train(testStart: Int, testEnd: Int)
+    def train (testStart: Int, testEnd: Int)
     {
         frequencies (testStart, testEnd)                      // compute frequencies skipping test region
-
-        for (i <- 0 until k) {
-            // for each class i
-            val pci = popC(i).toDouble                        // population of class i
-            probC(i) = pci / md                               // probability of class i
-
-            for (j <- 0 until n) {                            // for each feature j
-                val me_vc = me / vc(j).toDouble
-                for (xj <- 0 until vc(j)) {                   // for each value for feature j: xj
-                    probX(i, j, xj) = (popX(i, j, xj) + me_vc) / (pci + me)
-                } // for
-            } // for
-        } // for
-
-        if (DEBUG) {
-            println ("probC = " + probC) // P(C = i)
-            println ("probX = " + probX) // P(X_j = x | C = i)
-        } // if
+        if (DEBUG) banner ("train (testStart, testEnd)")
+        train2 ()
     } // train
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Count the frequencies for 'y' having class 'i' and value 'x' for cases 0, 1, ...
-     *  Only the test region from 'testStart' to 'testEnd' is skipped, the rest is
-     *  training data.
-     *  @param itrain indices of the instances considered train data
-     */
-    private def frequencies (itrain: Array[Int])
-    {
-        for (l <- itrain) {                                   // l = lth row of data matrix x
-            val i = y(l)                                      // get the class
-            popC(i) += 1                                      // increment ith class
-            for (j <- 0 until n) {
-                // println("i="+i+"    j=" + j + "     x(l,j)=" +   x(l,j))
-                popX(i, j, x(l, j)) += 1                      // increment ith class, jth feature, x value
-            } // for
-        } // for
-
-        if (DEBUG) {
-            println ("popC = " + popC)                        // #(C = i)
-            println ("popX = " + popX)                        // #(X_j = x & C = i)
-        } // if
-    } // frequencies
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier by computing the probabilities for C, and the
@@ -150,40 +135,46 @@ class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
     override def train (itrain: Array [Int])
     {
         frequencies (itrain)                                  // compute frequencies skipping test region
+        if (DEBUG) banner ("train (itrain)")
+        train2 ()
+    } // train
 
-        for (i <- 0 until k) {                                // for each class i
-            val pci = popC(i).toDouble                        // population of class i
-            probC(i) = pci / md                               // probability of class i
-
-            for (j <- 0 until n) {                            // for each feature j
-                val me_vc = me / vc(j).toDouble
-                for (xj <- 0 until vc(j)) {                   // for each value for feature j: xj
-                    probX(i, j, xj) = (popX(i, j, xj) + me_vc) / (pci + me)
-                } // for
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the classifier by computing the probabilities for C, and the
+     *  conditional probabilities for X_j.
+     */
+    private def train2 ()
+    {
+        p_C = f_C.toDouble / md                               // prior probability for class yi
+        for (i <- 0 until k; j <- 0 until n) {                // for each class yi & feature xj
+            val me_vc = me / vc(j).toDouble
+            for (xj <- 0 until vc(j)) {                       // for each value for feature j: xj
+                p_X_C(i, j, xj) = (f_CX(i, j, xj) + me_vc) / (f_C(i) + me)
             } // for
         } // for
 
         if (DEBUG) {
-            println ("probC = " + probC)                      // P(C = i)
-            println ("probX = " + probX)                      // P(X_j = x | C = i)
+            println ("p_C   = " + p_C)                        // P(C = yi)
+            println ("p_X_C = " + p_X_C)                      // P(X_j = x | C = yi)
         } // if
-    } // train
+    } // train2
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'z', classify it returning the class number
      *  (0, ..., k-1) with the highest relative posterior probability.
+     *  Return the best class, its name and its relative probability.
      *  @param z  the data vector to classify
      */
-    def classify(z: VectoI): Tuple2 [Int, String] =
+    def classify (z: VectoI): (Int, String, Double) =
     {
-        val prob = new VectorD(k)
+        if (DEBUG) banner ("classify (z)")
+        val prob = new VectorD (p_C)
         for (i <- 0 until k) {
-            prob(i) = probC(i) // P(C = i)
-            for (j <- 0 until n) prob(i) *= probX(i, j, z(j)) // P(X_j = z_j | C = i)
+            for (j <- 0 until n) prob(i) *= p_X_C(i, j, z(j))   // P(X_j = z_j | C = i)
         } // for
-        if (DEBUG) println("prob = " + prob)
-        val best = prob.argmax()                // class with the highest relative posterior probability
-        (best, cn(best))                        // return the best class and its name
+        if (DEBUG) println ("prob = " + prob)
+        val best = prob.argmax ()                    // class with the highest relative posterior probability
+        (best, cn(best), prob(best))                 // return the best class and its name
     } // classify
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -192,10 +183,10 @@ class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
      */
     def reset ()
     {
-        popC.set (0)
-        probC.set (0)
-        popX.set (0)
-        probX.set (0)
+        f_C.set (0)
+        f_CX.set (0)
+        p_C.set (0)
+        p_X_C.set (0)
     } // reset
 
 } // NaiveBayes class
@@ -207,17 +198,17 @@ class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
 object NaiveBayes
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a 'NaiveBayes` object, passing 'x' and 'y' together in one matrix.
+    /** Create a `NaiveBayes` object, passing 'x' and 'y' together in one matrix.
      *  @param xy  the data vectors along with their classifications stored as rows of a matrix
      *  @param fn  the names of the features
      *  @param k   the number of classes
      *  @param vc  the value count (number of distinct values) for each feature
      *  @param me  use m-estimates (me == 0 => regular MLE estimates)
      */
-    def apply(xy: MatriI, fn: Array[String], k: Int, cn: Array[String],
-              vc: VectoI = null, me: Int = 3) = {
-        new NaiveBayes(xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn,
-            vc, me)
+    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
+               vc: VectoI = null, me: Int = me_default) =
+    {
+        new NaiveBayes (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn, vc, me)
     } // apply
 
 } // NaiveBayes object
@@ -235,20 +226,21 @@ object NaiveBayesTest extends App
     // x0: Color:   Red (1), Yellow (0)
     // x1: Type:    SUV (1), Sports (0)
     // x2: Origin:  Domestic (1), Imported (0)
-    // features:                x0 x1 x2
-    val x = new MatrixI((10, 3), 1, 0, 1, // data matrix
-                                 1, 0, 1,
-                                 1, 0, 1,
-                                 0, 0, 1,
-                                 0, 0, 0,
-                                 0, 1, 0,
-                                 0, 1, 0,
-                                 0, 1, 1,
-                                 1, 1, 0,
-                                 1, 0, 0)
+    // x3: Mpg:     High (1), Low (0)
+    // features:                 x0 x1 x2 x3
+    val x = new MatrixI ((10, 4), 1, 0, 1, 1,               // data matrix
+                                  1, 0, 1, 0,
+                                  1, 0, 1, 1,
+                                  0, 0, 1, 1,
+                                  0, 0, 0, 1,
+                                  0, 1, 0, 0,
+                                  0, 1, 0, 0,
+                                  0, 1, 1, 1,
+                                  1, 1, 0, 0,
+                                  1, 0, 0, 0)
 
     val y  = VectorI (1, 0, 1, 0, 1, 0, 1, 0, 0, 1)         // classification vector: 0(No), 1(Yes))
-    val fn = Array ("Color", "Type", "Origin")              // feature/variable names
+    val fn = Array ("Color", "Type", "Origin", "Mpg")       // feature/variable names
     val cn = Array ("No", "Yes")                            // class names
 
     println ("x = " + x)
@@ -261,12 +253,12 @@ object NaiveBayesTest extends App
     nb.train()
 
     // test sample ------------------------------------------------------------
-    val z1 = VectorI (1, 0, 1) // existing data vector to classify
-    val z2 = VectorI (1, 1, 1) // new data vector to classify
-    println ("classify (" + z1 + ") = " + nb.classify(z1) + "\n")
-    println ("classify (" + z2 + ") = " + nb.classify(z2) + "\n")
+    val z1 = VectorI (1, 0, 1, 1)                           // existing data vector to classify
+    val z2 = VectorI (1, 1, 1, 0)                           // new data vector to classify
+    println ("classify (" + z1 + ") = " + nb.classify (z1) + "\n")
+    println ("classify (" + z2 + ") = " + nb.classify (z2) + "\n")
 
-    nb.crossValidateRand ()                                  // cross validate the classifier
+//  nb.crossValidateRand ()                                 // cross validate the classifier
 
 } // NaiveBayesTest object
 
@@ -284,16 +276,16 @@ object NaiveBayesTest2 extends App
     // x1: Strong
     // y:  Classification (No/0, Yes/1)
     // features:                 x0 x1  y
-    val xy = new MatrixI((10, 3), 1, 1, 1,
-                                  1, 1, 1,
-                                  1, 0, 1,
-                                  1, 0, 1,
-                                  1, 0, 0,
-                                  0, 1, 0,
-                                  0, 1, 0,
-                                  0, 1, 1,
-                                  0, 0, 0,
-                                  0, 0, 0)
+    val xy = new MatrixI ((10, 3), 1, 1, 1,
+                                   1, 1, 1,
+                                   1, 0, 1,
+                                   1, 0, 1,
+                                   1, 0, 0,
+                                   0, 1, 0,
+                                   0, 1, 0,
+                                   0, 1, 1,
+                                   0, 0, 0,
+                                   0, 0, 0)
 
     val fn = Array ("Fast", "Strong")                     // feature names
     val cn = Array ("No", "Yes")                          // class names
@@ -304,13 +296,13 @@ object NaiveBayesTest2 extends App
     val nb = NaiveBayes (xy, fn, 2, cn, null, 0)          // create the classifier
 
     // train the classifier ---------------------------------------------------
-    nb.train()
+    nb.train ()
 
     // test sample ------------------------------------------------------------
     val z = VectorI (1, 0)                                // new data vector to classify
     println ("classify (" + z + ") = " + nb.classify (z) + "\n")
 
-    nb.crossValidate()                                    // cross validate the classifier
+    nb.crossValidate ()                                   // cross validate the classifier
 
 } // NaiveBayesTest2 object
 

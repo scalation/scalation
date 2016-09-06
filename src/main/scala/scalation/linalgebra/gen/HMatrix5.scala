@@ -203,6 +203,20 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     } // alloc
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Allocate all elements of the 4th and 5th dimensions of the hypermatrix,
+     *  where the 4th and 5th(?) dimensions only vary with the 2nd dimension.
+     *  FIX:  clean up and regualrize all the 'alloc' methods.
+     *  @param dims4  array of sizes of the 4th dimension of the hypermatrix
+     *  @param dims5  array of sizes of the 5th dimension of the hypermatrix
+     */
+    def alloc2 (dims4: Array [Int], dims5: Array [Int])
+    {
+        if (dims4.length != dim2) flaw ("alloc", "wrong number of elements for 4th dimension")
+//      if (dims5.length != dim2) flaw ("alloc", "wrong number of elements for 5th dimension")
+        for (i <- range1; j <- range2; k <- 0 until hmat(i)(j).length) hmat(i)(j)(k) = Array.ofDim [T] (dims4(j), dims5(j))
+    } // alloc2
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Allocate the 3rd to 5th dimensions of the hypermatrix based on the given
      *  value counts for the dimensions.
      *  @param vc3   value count array giving sizes for 3rd dimension based on j

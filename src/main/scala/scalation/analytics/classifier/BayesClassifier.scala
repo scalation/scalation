@@ -44,6 +44,12 @@ class DAG (val parent: Array [Array [Int]])
  *  `TANBayes`         - Tree Augmented Naive Bayes classifier
  *  `SelTAN`           - Selective Tree Augmented Naive Bayes classifier
  *  `BayesNetwork2`    - Ordering-based Bayesian Network with k = 2
+ *-----------------------------------------------------------------------------
+ *  @param x   the integer-valued data vectors stored as rows of a matrix
+ *  @param y   the class vector, where y(l) = class for row l of the matrix x, x(l)
+ *  @param fn  the names for all features/variables
+ *  @param k   the number of classes
+ *  @param cn  the names for all classes
  */
 abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String])
          extends ClassifierInt (x, y, fn, k, cn) with BayesMetrics
@@ -84,6 +90,11 @@ abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int
  */
 object BayesClassifier
 {
+    /** The default value for m-estimates (me == 0 => regular MLE estimates)
+     *                                     me == 1 => no divide by 0, close to MLE estimates)
+     */
+    val me_default = 1
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Naive Bayes classification model.
      *  @param x   the integer-valued data vectors stored as rows of a matrix
@@ -391,7 +402,7 @@ object BayesClassifierTest extends App
     test (BayesClassifier (xy, fn, k, cn, null, null, 1),      "Selective Naive Bayes")
     test (BayesClassifier (xy, fn, k, cn, null, 1, 0.3),       "Augmented Naive Bayes")
     test (BayesClassifier (xy, fn, k, cn, null, null, 1, 0.3), "Augmented Selective Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, 0.3, 1, null),       "Tree Augmented Naive Bayes classifier")
+    test (BayesClassifier (xy, fn, k, cn, 0.3, 1, null),       "Tree Augmented Naive Bayes")
     test (BayesClassifier (xy, fn, k, cn, null, 0.3, 1, null), "Tree Augmented Selective Naive Bayes")
     test (BayesClassifier (xy, fn, k, cn, null, 0.3, 1),       "Bayesian Network 2")
 

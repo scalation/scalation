@@ -10,11 +10,11 @@ package scalation.graphalytics.mutable
 
 import scala.collection.mutable.{Map, Set => SET}
 //import scala.collection.mutable.PriorityQueue
+
 import scalation.graphalytics.{Tree, TreeNode}
 import scalation.math.ExtremeD.{MAX_VALUE, MIN_VALUE}
+import scalation.graphalytics.mutable.{ExampleMGraphD => EX_GRAPH}
 import scalation.util.PriorityQueue
-
-import LabelType._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MinSpanningTree` class is used to build minimum cost spanning trees
@@ -25,7 +25,7 @@ import LabelType._
  *  @param min         whether to to create a minimum (true) or maximum (false) spanning tree
  *  @param undirected  whether the graph is already undirected
  */
-class MinSpanningTree (g: MGraph, min: Boolean = true, undirected: Boolean = true)
+class MinSpanningTree (g: MGraph [Double], min: Boolean = true, undirected: Boolean = true)
       extends Error
 {
     private val DEBUG = false                          // debug flag
@@ -52,7 +52,7 @@ class MinSpanningTree (g: MGraph, min: Boolean = true, undirected: Boolean = tru
     def span (): Tree =
     {
         val pred = makeITree ()                                     // make an inverted tree
-        val el   = Array.ofDim [TLabel] (pred.length)               // copy elabel value from g into a pred elabel array
+        val el   = Array.ofDim [Double] (pred.length)               // copy elabel value from g into a pred elabel array
         for (i <- 1 until el.length) el(i) = g.elabel(pred(i), i)   // skipping root node (0)
         stree = Tree (pred, el, 3.5, "st")                          // build spanning tree from pred array
         stree
@@ -65,7 +65,7 @@ class MinSpanningTree (g: MGraph, min: Boolean = true, undirected: Boolean = tru
      *  @param idx  the index of a node
      *  @param key  the ordering key (based on cost) for a node
      */
-    case class Elem (idx: Int, key: TLabel)
+    case class Elem (idx: Int, key: Double)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The `NodeOrder` object defines the order of node indices based on
@@ -99,7 +99,7 @@ class MinSpanningTree (g: MGraph, min: Boolean = true, undirected: Boolean = tru
     def makeITree (): Array [Int] =
     {
         val pred = Array.fill (size)(-1)                                 // predecessor node array
-        key(0)   = TLabel_DEFAULT                                        // start at the root (node index 0)
+        key(0)   = null.asInstanceOf [Double]                            // start at the root (node index 0)
         pred(0)  = -1                                                    // it has no predecessor/parent
         while (qu.nonEmpty) {                                            // until all vertices in spanning tree
             if (DEBUG) qu.printInOrder
@@ -128,7 +128,7 @@ class MinSpanningTree (g: MGraph, min: Boolean = true, undirected: Boolean = tru
  */
 object MinSpanningTreeTest extends App
 {
-    val g = MGraph.g2
+    val g = EX_GRAPH.g2
     g.printG ()
 
     val st = new MinSpanningTree (g)
@@ -154,7 +154,7 @@ object MinSpanningTreeTest2 extends App
                                SET (4, 5),                  // ch(3)
                                SET (),                      // ch(4)
                                SET ()),                     // ch(5)
-                               Array.fill (6)(-1),          // vertex labels
+                               Array.fill (6)(-1.0),        // vertex labels
                         Map ((0, 1) -> 1.0,                 // edge labels
                              (0, 3) -> 10.0,
                              (0, 4) -> 3.0,
@@ -190,7 +190,7 @@ object MinSpanningTreeTest3 extends App
                                SET (4, 5),                  // ch(3)
                                SET (),                      // ch(4)
                                SET ()),                     // ch(5)
-                               Array.fill (6)(-1),          // vertex labels
+                               Array.fill (6)(-1.0),        // vertex labels
                         Map ((0, 1) -> 1.0,                 // edge labels
                              (0, 3) -> 10.0,
                              (0, 4) -> 3.0,

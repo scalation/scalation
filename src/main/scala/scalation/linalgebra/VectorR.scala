@@ -15,6 +15,7 @@ import scala.util.Sorting.quickSort
 import scalation.math.Real.{abs => ABS, max => MAX, _}
 
 import scalation.math.Real
+import scalation.math.ExtremeD.TOL
 import scalation.util.Error
 import scalation.util.SortingR
 import scalation.util.SortingR.{iqsort, qsort2}
@@ -762,6 +763,20 @@ class VectorR (val dim: Int,
         count
     } // countPos
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Clean values in 'this' vector at or below the threshold 'thres' by setting
+     *  them to zero.  Iterative algorithms give approximate values and if very close
+     *  to zero, may throw off other calculations, e.g., in computing eigenvectors.
+     *  @param thres     the cutoff threshold (a small value)
+     *  @param relative  whether to use relative or absolute cutoff
+     */
+    def clean (thres: Double = TOL, relative: Boolean = true): VectorR =
+    {
+        val s = if (relative) mag else _1              // use vector magnitude or 1
+        for (i <- range) if (ABS (v(i)) <= thres * s) v(i) = _0
+        this
+    } // clean
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of distinct elements in 'this' vector.
      */
@@ -788,6 +803,18 @@ class VectorR (val dim: Int,
      *  @param x  the element to be checked
      */
     def contains (x: Real): Boolean = v contains x
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether any of the elements in 'x' are contained in 'this' vector.
+     *  @param x  the vector of elements to be checked
+     */
+    def containsAny (x: VectorR): Boolean = (v intersect x.v).length != 0
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the intersection of vectors 'this' and 'x'.
+     *  @param x  the other vector
+     */
+    def intersect (x: VectorR): VectorR = VectorR (v intersect x.v)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reverse the order of the elements in 'this' vector.
@@ -849,7 +876,12 @@ class VectorR (val dim: Int,
 
         if (! b.isInstanceOf [VectoR]) return false
         val bb = b.asInstanceOf [VectoR]
-        for (i <- range if v(i) !=~ bb(i)) return false               // within TOL
+        if (dim != bb.dim) return false
+        val vm = mag                                // maximum magnitude element in vector
+        for (i <- range) {
+//          if (v(i) !=~ bb(i)) return false                             // stricter
+            if (v(i) !=~ bb(i) && v(i) + vm !=~ bb(i) + vm) return false
+        } // for
         true
     } // equals
 
@@ -943,6 +975,18 @@ object VectorR
         } // for
         c
     } // apply
+
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a `VectorR` with 'n' elements and fill it with the value 'x'.
+     *  @param n  the number of elements
+     *  @param x  the value to assign to all elements
+     */
+    def fill (n: Int)(x: Real): VectorR =
+    {
+        val c = new VectorR (n)
+        c.set (x)
+        c
+    } // fill
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a one vector (all elements are one) of length 'size'.

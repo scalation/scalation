@@ -17,7 +17,6 @@ import scalation.analytics.LogisticFunction
 import scalation.linalgebra.{MatrixD, VectorD, VectoD, VectorI}
 import scalation.minima.QuasiNewton
 import scalation.plot.Plot
-import scalation.util.Error
 
 import LogisticFunction.sigmoid
 
@@ -37,7 +36,7 @@ import LogisticFunction.sigmoid
  *  @param cn  the names for both classes
  */
 class LogisticRegression (x: MatrixD, y: VectorI, fn: Array [String], cn: Array [String] = Array ("no", "yes"))
-      extends ClassifierReal (x, y, fn, 2, cn) with Error
+      extends ClassifierReal (x, y, fn, 2, cn)
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
 
@@ -132,12 +131,13 @@ class LogisticRegression (x: MatrixD, y: VectorI, fn: Array [String], cn: Array 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Classify the value of y = f(z) by evaluating the formula y = sigmoid (b dot z).
+     *  Return the best class, its name and FIX.
      *  @param z  the new vector to classify
      */
-    def classify (z: VectoD): Tuple2 [Int, String] =
+    def classify (z: VectoD): (Int, String, Double) =
     {
         val c = if (sigmoid (b dot z) > 0.5) 1 else 0
-        (c, cn(c))
+        (c, cn(c), -1.0)                                    // Fix - need metric
     } // classify
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -145,7 +145,7 @@ class LogisticRegression (x: MatrixD, y: VectorI, fn: Array [String], cn: Array 
      *  for an integer vector.
      *  @param z  the new integer vector to classify
      */
-//  def classify (z: VectorI): Tuple2 [Int, String] = classify (z.toDouble)
+//  def classify (z: VectorI): (Int, String, Double) = classify (z.toDouble)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset or re-initialize the frequency tables and the probability tables.

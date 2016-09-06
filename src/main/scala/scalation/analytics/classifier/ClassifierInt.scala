@@ -64,6 +64,13 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int, 
     def vc_fromData: VectorI = VectorI (for (j <- x.range2) yield x.col(j).max() + 1)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return value counts calculated from the input data.
+     *  May wish to call 'shiftToZero' before calling this method.
+     *  @param rg  the range of columns to be considered
+     */
+    def vc_fromData2 (rg: Range): VectorI = VectorI (for (j <- rg) yield x.col(j).max() + 1)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Shift the 'x' Matrix so that the minimum value for each column equals zero.
      */
     def shiftToZero () { x -= VectorI (for (j <- x.range2) yield x.col(j).min()) }
@@ -71,9 +78,10 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int, 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a new continuous data vector 'z', determine which class it belongs
      *  to, by first rounding it to an integer-valued vector.
+     *  Return the best class, its name and its relative probability
      *  @param z  the vector to classify
      */
-    def classify (z: VectoD): Tuple2 [Int, String] =
+    def classify (z: VectoD): (Int, String, Double) =
     {
         val zi = new VectorI (z.dim)
         for (j <- 0 until z.dim) zi(j) = (round (z(j))).toInt
@@ -132,6 +140,26 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int, 
 //          println ("fea (j1) = " + fea(j1))
 //          println ("fea (j2) = " + fea(j2))
             cor(j1, j2) = fea(j1) corr fea(j2)
+        } // for
+        cor
+    } // calcCorrelation
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Calculate the correlation matrix for the feature vectors of Z (Level 3)
+     *  and those of X (level 2).
+     *  If the correlations are too high, the independence assumption may be dubious.
+     *  @param zrg  the range of Z-columns
+     *  @param xrg  the range of X-columns
+     */
+    def calcCorrelation2 (zrg: Range, xrg: Range): MatriD =
+    {
+        val zfea = for (j <- zrg) yield  x.col(j).toDouble.toDense
+        val xfea = for (j <- xrg) yield  x.col(j).toDouble.toDense
+        val cor = new MatrixD (zfea.size, xfea.size)
+        for (j1 <- 0 until cor.dim1; j2 <- 0 until cor.dim2) {
+            //println ("fea (j1) = " + fea(j1))
+            //println ("fea (j2) = " + fea(j2))
+            cor(j1, j2) = zfea(j1) corr xfea(j2)
         } // for
         cor
     } // calcCorrelation

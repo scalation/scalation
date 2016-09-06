@@ -12,6 +12,8 @@ import scala.math.log
 import scalation.linalgebra.VectoI
 import scalation.linalgebra.gen.HMatrix5
 
+import BayesClassifier.me_default
+
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BayesMetrics` trait provides scoring methods.
  */
@@ -26,7 +28,7 @@ trait BayesMetrics
      *  @param k     the number of classes
      *  @param me    the m-estimate value
      */
-    def logLikelihood (vc: VectoI, vcp1: VectoI, vcp2: VectoI, popX: HMatrix5 [Int], k: Int, me: Int = 3): Double =
+    def logLikelihood (vc: VectoI, vcp1: VectoI, vcp2: VectoI, popX: HMatrix5 [Int], k: Int, me: Int = me_default): Double =
     {
         var ll = 0.0
         // loop through all features, and all parent configurations
@@ -51,7 +53,7 @@ trait BayesMetrics
      *  @param k     the number of classes
      *  @param me    the m-estimate value
      */
-    def aic (vc: VectoI, vcp1: VectoI, vcp2: VectoI, popX: HMatrix5 [Int], k: Int, me: Int = 3): Double =
+    def aic (vc: VectoI, vcp1: VectoI, vcp2: VectoI, popX: HMatrix5 [Int], k: Int, me: Int = me_default): Double =
     {
         var sum = 0.0
         for (j <- 0 until vc.dim) sum += (vc(j) - 1) * (vcp1(j) * vcp2(j))

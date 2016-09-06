@@ -80,17 +80,18 @@ class BayesNetwork (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given an integer-valued data vector 'z', classify it returning the class
      *  number (0, ..., k-1) with the highest relative posterior probability.
+     *  Return the best class, its name and its relative probability
      *  @param z  the data vector to classify
      */
-    override def classify (z: VectoI): Tuple2 [Int, String] =
+    override def classify (z: VectoI): (Int, String, Double) =
     {
         val prob = new VectorD (k)
         val x    = new VectorI (z.dim + 1)
         for (i <- 0 until z.dim) x(i) = z(i)
         for (c <- 0 until k) { x(z.dim) = c; prob(c) = jp (x) }
-        println ("prob = " + prob)
-        val best = prob.argmax ()           // class with the highest relative posterior probability
-        (best, cn(best))                    // return the best class and its name
+        if (DEBUG) println ("prob = " + prob)
+        val best = prob.argmax ()              // class with the highest relative posterior probability
+        (best, cn(best), prob(best))           // return the best class, its name and its probability
     } // classify
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

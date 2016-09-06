@@ -14,15 +14,16 @@ import java.io.PrintWriter
 import scala.collection.mutable.Map
 import scala.collection.mutable.{Set => SET}
 import scala.io.Source.fromFile
+import scala.reflect.ClassTag
 
-import LabelType.{TLabel, toTLabel}
-import MGraphIO.EXT
+import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphIO` class is used to write multi-digraphs to a file.
  *  @param g  the multi-digraph to write
  */
-class MGraphIO (g: MGraph)
+class MGraphIO [TLabel: ClassTag] (g: MGraph [TLabel])
+      extends Error
 {
     private val DEBUG = true                                     // debug flag
 
@@ -97,6 +98,7 @@ class MGraphIO (g: MGraph)
  *  is used for reading graphs from files or graph databases.
  */
 object MGraphIO
+       extends Error
 {
     /** The standard file extension for digraphs
      */
@@ -121,6 +123,22 @@ object MGraphIO
     } // makeTuple
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert a string into a label according to the type `TLabel`.
+     *  @param s  the string to convert
+     */
+    def toLabel [TLabel] (s: String): TLabel =
+    {
+        val t: TLabel = null.asInstanceOf [TLabel]
+        t match {
+        case _: Int     => s.toInt.asInstanceOf [TLabel]
+        case _: Double  => s.toDouble.asInstanceOf [TLabel]
+        case _: String  => s.asInstanceOf [TLabel]
+//      case _: VectorD => VectorD (s.split (","))
+        case _          => { flaw ("toLabel", "label type not supported"); null.asInstanceOf [TLabel] }
+        } // match
+    } // toLabel
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Read a multi-digraph from a file based on the format used by 'print' and 'write':
      *  <p>
      *      MGraph (<name>, <inverse>, <nVertices>
@@ -133,7 +151,7 @@ object MGraphIO
      *  @param ext   the standard file extension for graph
      *  @param sep   the character separating the values (e.g., ',', ' ', '\t')
      */
-    def apply (name: String, base: String = BASE_DIR, ext: String = EXT, sep: Char = ','): MGraph =
+    def apply [TLabel: ClassTag] (name: String, base: String = BASE_DIR, ext: String = EXT, sep: Char = ','): MGraph [TLabel] =
     {
         val gFile  = base + name + ext                             // relative path-name for file
         val l      = fromFile (gFile).getLines.toArray             // get the lines from gFile
@@ -146,14 +164,14 @@ object MGraphIO
 
         for (i <- ch.indices) {
             val li   = l(i+1).split (sep).map (_.trim)             // line i (>0) splits into i, label, ch
-            label(i) = toTLabel (li(1))                            // make vertex label
+            label(i) = toLabel (li(1))                             // make vertex label
             ch(i)    = makeSet (li.slice (2, li.length) )          // make ch set
         } // for
         for (i <- n+1 until l.length-1) {
             val li  = l(i).split ("->").map (_.trim)               // line i (>n) splits into (u, v) -> elabel
-            elabel += makeTuple (li(0).split (sep)) -> toTLabel (li(1))
+            elabel += makeTuple (li(0).split (sep)) -> toLabel (li(1))
         } // for
-        new MGraph (ch, label, elabel, l0(1) == "true", l0(0))
+        new MGraph [TLabel] (ch, label, elabel, l0(1) == "true", l0(0))
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -167,16 +185,16 @@ object MGraphIO
      *  @param eFile  the file the edges (to create adjacency sets)
      *  @param inverse   whether to store inverse adjacency sets (parents)
      */
-    def read2Files (lFile: String, eFile: String, inverse: Boolean = false): MGraph =
+    def read2Files [TLabel: ClassTag] (lFile: String, eFile: String, inverse: Boolean = false): MGraph [TLabel] =
     {
-        val lLines = fromFile (lFile).getLines               // get the lines from lFile
-        val label  = lLines.map (x => toTLabel (x.trim)).toArray    // make the label array
-        val eLines = fromFile (eFile).getLines               // get the lines from eFile
-        val ch     = eLines.map ( line =>                    // make the adj array
+        val lLines = fromFile (lFile).getLines                     // get the lines from lFile
+        val label  = lLines.map (x => toLabel (x.trim)).toArray    // make the label array
+        val eLines = fromFile (eFile).getLines                     // get the lines from eFile
+        val ch     = eLines.map ( line =>                          // make the adj array
             if (line.trim != "") line.split (" ").map (x => x.trim.toInt).toSet.asInstanceOf [SET [Int]]
             else SET [Int] ()
         ).toArray
-        new MGraph (ch, label)
+        new MGraph [TLabel] (ch, label, null)                 // FIX: elabels?
     } // read2Files
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -185,24 +203,23 @@ object MGraphIO
      *  @param eFile     the file the edges (to create adjacency sets)
      *  @param inverse   whether to store inverse adjacency sets (parents)
      */
-    def read2PajekFile (lFile: String, eFile: String, inverse: Boolean = false): MGraph =
+    def read2PajekFile [TLabel: ClassTag] (lFile: String, eFile: String, inverse: Boolean = false): MGraph [TLabel] =
     {
-        val lLines = fromFile (lFile).getLines               // get the lines from lFile
-        val label  = lLines.map (x => toTLabel (x.trim)).toArray
+        val lLines = fromFile (lFile).getLines                     // get the lines from lFile
+        val label  = lLines.map (x => toLabel (x.trim)).toArray
         val ch     = Array.ofDim [SET [Int]] (label.size)
         for (i <- ch.indices) ch(i) = SET [Int] ()
-        val eLines = fromFile (eFile).getLines               // get the lines from eFile
+        val eLines = fromFile (eFile).getLines                     // get the lines from eFile
         for (line <- eLines) {
             val splitL = line.split (" ").map (_.trim)
             val adjs   = splitL.slice (1, splitL.length).map(_.trim.toInt).toSet
             ch(splitL(0).toInt-1) ++= adjs
         } // for
-        new MGraph (ch, label)
+        new MGraph [TLabel] (ch, label, null)                // FIX: elabels?
     } // read2PajekFile
 
-} // MGraphIO object
+} // MGraphIO class
 
-import MGraphGen._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphIOTest` object is used to test the `MGraphIO` class and object.
@@ -210,6 +227,8 @@ import MGraphGen._
  */
 object MGraphIOTest extends App
 {
+    val mgGen = new MGraphGen [Int]
+
     val name     = "ran_graph"    // the name of the graph
     val size     = 50             // size of the graph
     val nLabels  = 10             // number of distinct vertex labels
@@ -219,15 +238,16 @@ object MGraphIOTest extends App
 
     // Create a random graph and print it out
 
-    val ran_graph = genRandomGraph (size, nLabels, eLabels, avDegree, inverse, "ran_graph")
+    val ran_graph = mgGen.genRandomGraph (size, nLabels, eLabels, avDegree, inverse, "ran_graph")
     println (s"ran_graph = $ran_graph")
     ran_graph.printG (false)
     ran_graph.printG ()
 
     // Write the graph to a file
 
+    val mgIO = new MGraphIO (ran_graph)
     println ("start writing graph to " + name)
-    (new MGraphIO (ran_graph)).write ()
+    mgIO.write ()
     println ("end writing graph to " + name)
 
     // Read the file to create a new identical graph

@@ -11,12 +11,13 @@ package scalation.graphalytics.mutable
 import scala.collection.mutable.{Map, Queue}
 
 import scalation.graphalytics.{Tree, TreeNode}
+import scalation.graphalytics.mutable.{ExampleGraphD => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SpanningTree` class is used to build spanning trees from graphs.
  *  @param g  the digraph to build the spanning tree from
  */
-class SpanningTree (g: Graph)
+class SpanningTree (g: Graph [Double])
       extends Error
 {
     private val DEBUG = true                           // debug flag
@@ -81,7 +82,7 @@ class SpanningTree (g: Graph)
  */
 object SpanningTreeTest extends App
 {
-    val g = Graph.g2
+    val g = EX_GRAPH.g2
     g.printG ()
 
     val st = new SpanningTree (g)

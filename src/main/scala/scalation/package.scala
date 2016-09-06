@@ -43,6 +43,7 @@ package object scalation
      *  Use 'SCALATION_HOME' environment variable or else current directory "."
      */
     val SRC_DIR = envOrElse ("SCALATION_HOME", ".") + ⁄ + "src" + ⁄
+    val SRC_SCALA_DIR = SRC_DIR + ⁄ + "main" + ⁄ + "scala" + ⁄
 
     /** File system path for database storage directory
      *  Use 'SCALATION_HOME' environment variable or else current directory "."

@@ -9,6 +9,7 @@
 package scalation.graphalytics.mutable
 
 import scala.collection.mutable.{Set => SET}
+import scala.reflect.ClassTag
 
 import scalation.graphalytics.TrafficLight._
 
@@ -26,7 +27,7 @@ object Cycle
     /** Determine whether the directed graph contains a cycle.
      *  @param g  the graph in which to check for cycles
      */
-    def hasCycle (g: Graph): Boolean = 
+    def hasCycle [TLabel: ClassTag] (g: Graph [TLabel]): Boolean = 
     {
         val color = Array.fill (g.size)(G_N)    // traffic light colors: GreeN, YelloW, ReD
 
@@ -63,7 +64,8 @@ object CycleTest extends App
      */
     val pg1 = new Graph (Array (SET (1, 2),        // edges from 0:  0 -> 1, 0 -> 2
                                 SET (2),           // edges from 1:  1 -> 2
-                                SET [Int] ()))     // edges from 2:  no such edges
+                                SET [Int] ()),     // edges from 2:  no such edges
+                                null.asInstanceOf [Array [Double]])
     println ("Precedence Graph pg1: --------------------------------------------")
     pg1.printG ()
     println ("pg1 has cycle? = " + hasCycle (pg1))
@@ -72,7 +74,8 @@ object CycleTest extends App
      */
     val pg2 = new Graph (Array (SET (1, 2),        // edges from 0:  0 -> 1, 0 -> 2
                                 SET (2),           // edges from 1:  1 -> 2
-                                SET (0)))          // edges form 2:  2 -> 0
+                                SET (0)),          // edges form 2:  2 -> 0
+                                null.asInstanceOf [Array [Double]])
     println ("Precedence Digraph pg2: --------------------------------------------")
     pg2.printG ()
     println ("pg2 has cycle? = " + hasCycle (pg2))

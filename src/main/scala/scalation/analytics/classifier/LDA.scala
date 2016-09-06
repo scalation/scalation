@@ -70,7 +70,10 @@ class LDA (x: MatrixD, y: VectoI, fn: Array [String])
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /**
      */
-    def classify (z: VectoD): (Int, String) = if ((w dot z) > c) (1, "yes") else (0, "no")
+    def classify (z: VectoD): (Int, String, Double) =
+    {
+        if ((w dot z) > c) (1, "yes", 1.0) else (0, "no", 0.0)
+    } // classify
 
 } // LDA class
 

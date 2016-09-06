@@ -46,7 +46,7 @@ case class Block (_id: Int)
  *  points and biconnected components, respectively.
  *  @param g_  the graph whose cut points/blocks are sought
  */
-case class BiconnectedComp (g_ : Graph)
+case class BiconnectedComp [TLabel] (g_ : Graph [TLabel])
 {
     private val DEBUG  = true                           // debug flag
     private val g      = g_.clone.makeUndirected ()     // the undirected version of g_
@@ -202,7 +202,7 @@ object BiconnectedCompTest extends App
                               SET (8),           // edges from 7
                               SET (9),           // edges from 8
                               SET ()),           // edges from 9
-                      Array.fill (10)(0))        // vertex labels
+                      Array.fill (10)(0.0))      // vertex labels
     g.printG ()
     println ("-" * 60)
 
@@ -239,8 +239,9 @@ object BiconnectedCompTest2 extends App
                                SET (13),            // ch(12)
                                SET (14),            // ch(13)
                                SET ()),             // ch(14)
-                        Array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14),   // vertex labels
-                        false, "g1")                                                // inverse, name
+                        Array (0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0,
+                               8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0),        // vertex labels
+                        false, "g1")                                           // inverse, name
 
 //  val mg1 = MGraph (g1, Map ((0, 1)   -> 2.0,     // edge labels
 //                             (0, 8)   -> 2.0,

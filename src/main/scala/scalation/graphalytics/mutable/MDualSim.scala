@@ -13,6 +13,7 @@ package scalation.graphalytics.mutable
 import scala.collection.mutable.Map
 import scala.collection.mutable.{Set => SET}
 
+import scalation.graphalytics.mutable.{ExampleMGraphD => EX_GRAPH}
 import scalation.util.time
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -22,7 +23,7 @@ import scalation.util.time
  *  @param g  the data graph  G(V, E, l)
  *  @param q  the query graph Q(U, D, k)
  */
-class MDualSim (g: MGraph, q: MGraph)
+class MDualSim [TLabel] (g: MGraph [TLabel], q: MGraph [TLabel])
       extends GraphMatcher (g, q)
 {
     private val DEBUG = true                                     // debug flag
@@ -54,7 +55,7 @@ class MDualSim (g: MGraph, q: MGraph)
 
                 for (v <- phi(u)) {                               // for each v in g image of u
 //                  val v_c = g.ch(v)                                          // don't filter on edge labels
-                    val v_c = g.ch(v).filter (g.elabel (v, _) == elab_u2u_c)   // filter on edge labels
+                    val v_c = g.ch(v).filter (elab_u2u_c == g.elabel (v, _))   // filter on edge labels
                     if (DEBUG) println (s"v = $v, v_c = $v_c, phi_u_c = " + phi(u_c))
 
                     val phiInt = v_c & phi(u_c)                   // children of v contained in phi(u_c)
@@ -91,31 +92,30 @@ object MDualSimTest extends App
                                SET (0),                    // ch(2)
                                SET (4),                    // ch(3)
                                SET ()),                    // ch(4)
-                        Array (11, 10, 11, 11, 11),
-                        Map ((1, 0) -> -1,
-                             (1, 2) -> -1,
-                             (1, 3) -> -1,
-                             (1, 4) -> -1,
-                             (2, 0) -> -1,
-                             (3, 4) -> -2))                 // change from -1 to -2 filter out vertices
+                        Array (11.0, 10.0, 11.0, 11.0, 11.0),
+                        Map ((1, 0) -> -1.0,
+                             (1, 2) -> -1.0,
+                             (1, 3) -> -1.0,
+                             (1, 4) -> -1.0,
+                             (2, 0) -> -1.0,
+                             (3, 4) -> -2.0))               // change from -1 to -2 filter out vertices
 
     val q = new MGraph (Array (SET (1, 2),                  // ch(0)
                                SET (),                      // ch(1)
                                SET (1)),                    // ch(2)
-                        Array (10, 11, 11),
-                        Map ((0, 1) -> -1,
-                             (0, 2) -> -1,
-                             (2, 1) -> -1))
+                        Array (10.0, 11.0, 11.0),
+                        Map ((0, 1) -> -1.0,
+                             (0, 2) -> -1.0,
+                             (2, 1) -> -1.0))
     g.printG ()
     q.printG ()
 
-    val matcher = new MDualSim (g, q)                   // Graph Simulation Pattern Matcher
-    val phi     = time { matcher.mappings () }             // time the matcher
-    matcher.showMappings (phi)                             // display results
+    val matcher = new MDualSim (g, q)                       // Graph Simulation Pattern Matcher
+    val phi     = time { matcher.mappings () }              // time the matcher
+    matcher.showMappings (phi)                              // display results
 
 } // MDualSimTest object
 
-import GraphGen._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualSimTest2` object is used to test the `MDualSim` class.

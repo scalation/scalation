@@ -10,7 +10,7 @@ package scalation.random
 
 import scala.math.{abs, exp, Pi, round, sqrt}
 
-import scalation.linalgebra.{MatrixD, MatrixI}
+import scalation.linalgebra.{Fac_Cholesky, MatriD, MatrixD, MatrixI}
 import scalation.math.double_exp
 import scalation.util.Error
 
@@ -64,6 +64,20 @@ abstract class VariateMat (stream: Int = 0)
 
 } // VariateMat class
 
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `VariateMat` companion object provides a method to add correlation to
+ *  a matrix.
+ */
+object VariateMat
+{
+    def corTransform (x: MatrixD, cov: MatrixD): MatriD =
+    {
+        val fac1 = new Fac_Cholesky (cov).factor1 ()           // LL^t = Cov
+        fac1 * x                                               // LX
+    } // corTransform
+
+} // VariateMat
+
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RandomMatD` class generates a random matrix of doubles.
@@ -74,12 +88,12 @@ abstract class VariateMat (stream: Int = 0)
  *  @param density  sparsity basis = 1 - density
  *  @param stream   the random number stream
  */
-case class RandomMatD (dim1: Int = 10, dim2: Int = 10, max: Double = 20.0, min: Double = 0.0,
+case class RandomMatD (dim1: Int = 5, dim2: Int = 10, max: Double = 20.0, min: Double = 0.0,
                        density: Double = 1.0, stream: Int = 0)
      extends VariateMat (stream)
 {
-    private val mu   = (min + max) / 2.0                             // mean
-    private val rvec = RandomVecD (dim2, max, min, density, stream)  // random vector generator
+    private val mu   = (min + max) / 2.0                                      // mean
+    private val rvec = RandomVecD (dim2, max, min, density, stream = stream)  // random vector generator
     
     def mean: MatrixD = { val mv = new MatrixD (dim1, dim2); mv.set (mu); mv }
 
@@ -104,12 +118,29 @@ case class RandomMatD (dim1: Int = 10, dim2: Int = 10, max: Double = 20.0, min: 
  */
 object VariateMatTest extends App
 {
+     import scalation.plot.Plot
+     import VariateMat.corTransform
+
      var rvm: VariateMat = null                                // variate matrix
 
      println ("Test: RandomMatD random matrix generation --------------------")
-     rvm = RandomMatD ()                              // random matrix generator
+     rvm = RandomMatD (2, 100)                                 // random matrix generator
      println ("mean = " + rvm.mean)
-     for (k <- 0 until 30) println (rvm.gen)
+     for (k <- 0 until 10) println (rvm.gen)
+
+     val cor = new MatrixD ((2, 2), 1.0, 0.9,                  // covariance/correlation matrix
+                                    0.9, 1.0)
+
+     println ("Test: RandomMatD random correlated matrix generation --------------------")
+     val x = rvm.gen
+     println ("x = " + x)
+     val z = corTransform (x, cor)
+     println ("z = " + z)
+     val xx = x.toInt
+     val zz = z.toInt
+
+     Plot (xx(0), xx(1), null, "x uncorrelated")
+     Plot (zz(0), zz(1), null, "z correlated")
 
 } // VariateMatTest object
 

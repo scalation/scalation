@@ -41,16 +41,18 @@ trait Classifier
     def train () { train (0, 0) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given a new discrete data vector z, determine which class it belongs to.
+    /** Given a new discrete data vector z, determine which class it belongs to,
+     *  returning the best class, its name and its relative probability.
      *  @param z  the vector to classify
      */
-    def classify (z: VectoI): Tuple2 [Int, String]
+    def classify (z: VectoI): (Int, String, Double)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given a new continuous data vector z, determine which class it belongs to.
+    /** Given a new continuous data vector z, determine which class it belongs to,
+     *  returning the best class, its name and its relative probability.
      *  @param z  the vector to classify
      */
-    def classify (z: VectoD): Tuple2 [Int, String]
+    def classify (z: VectoD): (Int, String, Double)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the quality of the training with a test-set and return the fraction

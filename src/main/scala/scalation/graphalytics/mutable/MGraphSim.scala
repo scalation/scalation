@@ -14,6 +14,7 @@ import scala.collection.mutable.Map
 import scala.collection.mutable.{Set => SET}
 //import scala.collection.mutable.{HashSet => SET}
 
+import scalation.graphalytics.mutable.{ExampleMGraphD => EX_GRAPH}
 import scalation.util.time
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -23,8 +24,8 @@ import scalation.util.time
  *  @param g  the data graph  G(V, E, l)
  *  @param q  the query graph Q(U, D, k)
  */
-class MGraphSim (g: MGraph, q: MGraph)
-      extends GraphMatcher (g, q)
+class MGraphSim (g: MGraph [Double], q: MGraph [Double])
+      extends GraphMatcher [Double] (g, q)
 {
     private val DEBUG = true                                      // debug flag
 
@@ -92,22 +93,22 @@ object MGraphSimTest extends App
                                SET (0),                      // ch(2)
                                SET (4),                      // ch(3)
                                SET ()),                      // ch(4)
-                        Array (11, 10, 11, 11, 11),
-                        Map ((1, 0) -> -1,
-                             (1, 2) -> -1,
-                             (1, 3) -> -1,
-                             (1, 4) -> -1,
-                             (2, 0) -> -1,
-                             (3, 4) -> -2),                  // change from -1 to -2 filter out vertices
+                        Array (11.0, 10.0, 11.0, 11.0, 11.0),
+                        Map ((1, 0) -> -1.0,
+                             (1, 2) -> -1.0,
+                             (1, 3) -> -1.0,
+                             (1, 4) -> -1.0,
+                             (2, 0) -> -1.0,
+                             (3, 4) -> -2.0),                // change from -1 to -2 filter out vertices
                              false, "g")
 
     val q = new MGraph (Array (SET (1, 2),                   // ch(0)
                                SET (),                       // ch(1)
                                SET (1)),                     // ch(2)
-                        Array (10, 11, 11),
-                        Map ((0, 1) -> -1,
-                             (0, 2) -> -1,
-                             (2, 1) -> -1),
+                        Array (10.0, 11.0, 11.0),
+                        Map ((0, 1) -> -1.0,
+                             (0, 2) -> -1.0,
+                             (2, 1) -> -1.0),
                              false, "g")
 
     println (s"g.checkEdges   = ${g.checkEdges}")

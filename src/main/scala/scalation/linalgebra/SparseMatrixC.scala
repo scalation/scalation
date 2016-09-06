@@ -317,7 +317,7 @@ class SparseMatrixC (val d1: Int,
     } // set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' Sparse`MatrixC` into a `MatrixI`.
+    /** Convert 'this' `SparseMatrixC` into a `MatrixI`.
      */
     def toInt: MatrixI =
     {

@@ -28,7 +28,7 @@ object BoundedTreeWidthChains
      *  @param g      the maximum scoring graph of bounded treewidth
      *  @param order  the topological ordering of vertices and blocks
      */
-    def learnChain (g: MGraph, order: (Array [Int], Array [Int])): Array [Pair] =
+    def learnChain (g: MGraph [Double], order: (Array [Int], Array [Int])): Array [Pair] =
     {
         Array ((0, 1))                             // FIX - to be implemented
     } // learnChain
@@ -39,7 +39,7 @@ object BoundedTreeWidthChains
      *  @param g   the maximum scoring graph of bounded treewidth
      *  @param mp  the triangulated moralized graph of g
      */
-    def edgeUpdate (g: MGraph, mp: MGraph, e: Pair)
+    def edgeUpdate (g: MGraph [Double], mp: MGraph [Double], e: Pair)
     {
                                             // FIX - to be implemented
     } // edgeUpdate

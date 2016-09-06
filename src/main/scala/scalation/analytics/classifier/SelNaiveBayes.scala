@@ -14,6 +14,8 @@ import scalation.linalgebra.{MatriI, MatrixI, VectorD, VectoI, VectorI}
 import scalation.linalgebra.gen.HMatrix3
 import scalation.relalgebra.Relation
 
+import BayesClassifier.me_default
+
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SelNaiveBayes` class implements an Integer-Based Naive Bayes Classifier,
  *  which is a commonly used such classifier for discrete input data.  The
@@ -36,12 +38,12 @@ import scalation.relalgebra.Relation
  *  @param me    use m-estimates (me == 0 => regular MLE estimates)
  */
 class SelNaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-                     var fset: ListBuffer [Int] = null, private var vc: VectoI = null, me: Int = 3)
+                     var fset: ListBuffer [Int] = null, private var vc: VectoI = null, me: Int = me_default)
       extends BayesClassifier (x, y, fn, k, cn)
 {
     private val DEBUG = false                         // debug flag
-    private val TOL = 0.01                            // tolerance indicating negligible improvement adding features
-    private val cor = calcCorrelation                 // feature correlation matrix
+    private val TOL   = 0.01                          // tolerance indicating negligible improvement adding features
+    private val cor   = calcCorrelation               // feature correlation matrix
 
     private val popC  = new VectorI (k)               // frequency counts for classes 0, ..., k-1
     private val probC = new VectorD (k)               // probabilities for classes 0, ..., k-1
@@ -229,9 +231,10 @@ class SelNaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'z', classify it returning the class number
      *  (0, ..., k-1) with the highest relative posterior probability.
+     *  Return the best class, its name and its relative probability
      *  @param z  the data vector to classify
      */
-    def classify (z: VectoI): (Int, String) =
+    def classify (z: VectoI): (Int, String, Double) =
     {
         val prob = new VectorD(k)
         for (i <- 0 until k) {
@@ -240,7 +243,7 @@ class SelNaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array
         } // for
         if (DEBUG) println ("prob = " + prob)
         val best = prob.argmax ()                 // class with the highest relative posterior probability
-        (best, cn(best))                          // return the best class and its name
+        (best, cn(best), prob(best))              // return the best class and its name
     } // classify
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -274,7 +277,7 @@ object SelNaiveBayes
      *  @param me    use m-estimates (me == 0 => regular MLE estimates)
      */
     def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
-               fset: ListBuffer[Int], vc: VectoI = null, me: Int = 3) =
+               fset: ListBuffer[Int], vc: VectoI = null, me: Int = me_default) =
     {
         new SelNaiveBayes (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn,
                            fset, vc, me)

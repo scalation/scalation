@@ -175,6 +175,11 @@ trait MatriI
     def set (i: Int, u: VectoI, j: Int = 0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `MatriI` into a `MatriI`.
+     */
+    def toInt: MatriI
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' matrix to a dense matrix.
      */
     def toDense: MatriI

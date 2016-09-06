@@ -13,10 +13,11 @@ import scala.util.control.Breaks.{break, breakable}
 
 import scalation.graphalytics.Pair
 import scalation.graphalytics.mutable.{MGraph, MinSpanningTree}
-import scalation.graphalytics.mutable.LabelType.TLabel
 import scalation.linalgebra.{MatrixD, MatriI, MatrixI, VectorD, VectoI, VectorI}
 import scalation.linalgebra.gen.{HMatrix3, HMatrix4, HMatrix5}
 import scalation.relalgebra.Relation
+
+import BayesClassifier.me_default
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SelTAN` class implements an Integer-Based Tree Augmented Selective
@@ -41,7 +42,7 @@ import scalation.relalgebra.Relation
  *  @param thres  the correlation threshold between 2 features for possible parent-child relationship
  */
 class SelTAN (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String], private var fset: Array [Boolean] = null,
-              thres: Double = 0.3, me: Int = 3, private var vc: VectoI = null)
+              thres: Double = 0.3, me: Int = me_default, private var vc: VectoI = null)
       extends BayesClassifier (x, y, fn, k, cn)
 {
     private val DEBUG  = false                          // debug flag
@@ -81,7 +82,7 @@ class SelTAN (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Strin
         val countXYC = new HMatrix5 [Double] (k, n, n, vc.toArray, vc.toArray)   // countXYC count the number where X=x,Y=y,C=c
         val countXC  = new HMatrix3 [Double] (k, n, vc.toArray)                  // countXC count the number where X=x,C=c
         val ch       = Array.ofDim [SET [Int]] (n)
-        val elabel   = Map [Pair, TLabel] ()
+        val elabel   = Map [Pair, Double] ()
 //      parent(0)    = -1                                                        // feature 0 does not have a parent
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -245,9 +246,10 @@ class SelTAN (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Strin
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'z', classify it returning the class number
      *  (0, ..., k-1) with the highest relative posterior probability.
+     *  Return the best class, its name and its realtive probability.
      *  @param z  the data vector to classify
      */
-    def classify (z: VectoI): (Int, String) =
+    def classify (z: VectoI): (Int, String, Double) =
     {
         val prob = new VectorD(k)
         for (i <- 0 until k) {
@@ -258,8 +260,8 @@ class SelTAN (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Strin
             } //for
         } // for
         if (DEBUG) println ("prob = " + prob)
-        val best = prob.argmax ()            // class with the highest relative posterior probability
-        (best, cn(best))                     // return the best class and its name
+        val best = prob.argmax ()             // class with the highest relative posterior probability
+        (best, cn(best), prob(best))          // return the best class, its name and its probability
     } // classify
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -338,7 +340,7 @@ class SelTAN (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Strin
 object SelTAN
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a 'SelTAN object, passing 'x' and 'y' together in one table.
+    /** Create a `SelTAN object, passing 'x' and 'y' together in one table.
      *  @param xy     the data vectors along with their classifications stored as rows of a matrix
      *  @param fn     the names of the features/variables
      *  @param k      the number of classes
@@ -349,7 +351,7 @@ object SelTAN
      *  @param thres  the correlation threshold between 2 features for possible parent-child relationship
      */
     def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
-               fset: Array [Boolean] = null, thres: Double = 0.3, me: Int = 3, vc: VectoI = null) =
+               fset: Array [Boolean] = null, thres: Double = 0.3, me: Int = me_default, vc: VectoI = null) =
     {
         new SelTAN (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn,
                     fset, thres, me, vc)

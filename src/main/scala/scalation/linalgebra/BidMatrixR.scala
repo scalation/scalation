@@ -247,6 +247,11 @@ class BidMatrixR (val d1: Int)
     } // set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `BidMatrixR` into a `BidMatrixI`.
+     */
+    def toInt: BidMatrixI = new BidMatrixI (_dg.toInt, _sd.toInt)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' tridiagonal matrix to a dense matrix.
      */
     def toDense: MatrixR =

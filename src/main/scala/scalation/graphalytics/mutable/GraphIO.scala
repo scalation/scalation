@@ -13,15 +13,16 @@ import java.io.PrintWriter
 
 import scala.collection.mutable.{Set => SET}
 import scala.io.Source.fromFile
+import scala.reflect.ClassTag
 
-import GraphIO.EXT
-import LabelType.{TLabel, toTLabel}
+import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphIO` class is used to write digraphs to a file.
  *  @param g  the digraph to write
  */
-class GraphIO (g: Graph)
+class GraphIO [TLabel: ClassTag] (g: Graph [TLabel])
+      extends Error
 {
     private val DEBUG = true                                     // debug flag
 
@@ -89,16 +90,16 @@ class GraphIO (g: Graph)
 
 } // GraphIO class
 
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphIO` object is the companion object to the `GraphIO` class and
  *  is used for reading digraphs from files.
  */
 object GraphIO
+       extends Error
 {
     /** The standard file extension for digraphs
      */
-    val EXT = ".dig"
+    private val EXT = ".dig"
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given an array of integers as strings, make the corresponding set.
@@ -108,6 +109,22 @@ object GraphIO
     {
         if (eStrArr(0) == "") SET [Int] () else SET (eStrArr.map (_.toInt): _*)
     } // makeSet
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert a string into a label according to the type `TLabel`.
+     *  @param s  the string to convert
+     */
+    def toLabel [TLabel] (s: String): TLabel =
+    {
+        val t: TLabel = null.asInstanceOf [TLabel]
+        t match {
+        case _: Int     => s.toInt.asInstanceOf [TLabel]
+        case _: Double  => s.toDouble.asInstanceOf [TLabel]
+        case _: String  => s.asInstanceOf [TLabel]
+//      case _: VectorD => VectorD (s.split (","))
+        case _          => { flaw ("toLabel", "label type not supported"); null.asInstanceOf [TLabel] }
+        } // match
+    } // toLabel
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Read a digraph from a file based on the format used by 'print' and 'write':
@@ -122,7 +139,7 @@ object GraphIO
      *  @param ext   the standard file extension for graph
      *  @param sep   the character separating the values (e.g., ',', ' ', '\t')
      */
-    def apply (name: String, base: String = BASE_DIR, ext: String = EXT, sep: Char = ','): Graph =
+    def apply [TLabel: ClassTag] (name: String, base: String = BASE_DIR, ext: String = EXT, sep: Char = ','): Graph [TLabel] =
     {
         val gFile = base + name + ext                             // relative path-name for file
         val l     = fromFile (gFile).getLines.toArray             // get the lines from gFile
@@ -134,7 +151,7 @@ object GraphIO
 
         for (i <- ch.indices) {
             val li   = l(i+1).split (sep).map (_.trim)            // line i (>0) splits into i, label, ch
-            label(i) = toTLabel (li(1))                           // make vertex label
+            label(i) = toLabel (li(1))                            // make vertex label
             ch(i)    = makeSet (li.slice (2, li.length))          // make ch set
         } // for
         new Graph (ch, label, l0(1) == "true", l0(0))
@@ -151,10 +168,10 @@ object GraphIO
      *  @param eFile  the file the edges (to create adjacency sets)
      *  @param inverse   whether to store inverse adjacency sets (parents)
      */
-    def read2Files (lFile: String, eFile: String, inverse: Boolean = false): Graph =
+    def read2Files [TLabel: ClassTag] (lFile: String, eFile: String, inverse: Boolean = false): Graph [TLabel] =
     {
         val lLines = fromFile (lFile).getLines                    // get the lines from lFile
-        val label  = lLines.map (x => toTLabel (x.trim)).toArray         // make the label array
+        val label  = lLines.map (x => toLabel (x.trim)).toArray   // make the label array
         val eLines = fromFile (eFile).getLines                    // get the lines from eFile
         val ch     = eLines.map ( line =>                         // make the adj array
             if (line.trim != "") line.split (" ").map (x => x.trim.toInt).toSet.asInstanceOf [SET [Int]]
@@ -169,10 +186,10 @@ object GraphIO
      *  @param eFile     the file the edges (to create adjacency sets)
      *  @param inverse   whether to store inverse adjacency sets (parents)
      */
-    def read2PajekFile (lFile: String, eFile: String, inverse: Boolean = false): Graph =
+    def read2PajekFile [TLabel: ClassTag] (lFile: String, eFile: String, inverse: Boolean = false): Graph [TLabel] =
     {
         val lLines = fromFile (lFile).getLines               // get the lines from lFile
-        val label  = lLines.map (x => toTLabel (x.trim)).toArray
+        val label  = lLines.map (x => toLabel (x.trim)).toArray
         val ch     = Array.ofDim [SET [Int]] (label.size)
         for (i <- ch.indices) ch(i) = SET [Int] ()
         val eLines = fromFile (eFile).getLines               // get the lines from eFile
@@ -186,7 +203,6 @@ object GraphIO
 
 } // GraphIO object
 
-import GraphGen._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphIOTest` object is used to test the `GraphIO` class and object.
@@ -194,6 +210,8 @@ import GraphGen._
  */
 object GraphIOTest extends App
 {
+    val gGen = new GraphGen [Double] (0.0)
+
     val name     = "ran_graph"    // the name of the graph
     val size     = 50             // size of the graph
     val nLabels  = 10             // number of distinct vertex labels
@@ -202,15 +220,16 @@ object GraphIOTest extends App
 
     // Create a random graph and print it out
 
-    val ran_graph = genRandomGraph (size, nLabels, avDegree, inverse, "ran_graph")
+    val ran_graph = gGen.genRandomGraph (size, nLabels, avDegree, inverse, "ran_graph")
     println (s"ran_graph = $ran_graph")
     ran_graph.printG (false)
     ran_graph.printG ()
 
     // Write the graph to a file
 
+    val gIO = new GraphIO [Double] (ran_graph)
     println ("start writing graph to " + name)
-    (new GraphIO (ran_graph)).write ()
+    gIO.write ()
     println ("end writing graph to " + name)
 
     // Read the file to create a new identical graph

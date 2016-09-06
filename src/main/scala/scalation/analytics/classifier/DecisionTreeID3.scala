@@ -156,18 +156,19 @@ class DecisionTreeID3 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Arr
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a data vector z, classify it returning the class number (0, ..., k-1)
      *  by following a decision path from the root to a leaf.
+     *  Return the best class, its name and FIX.
      *  @param z  the data vector to classify
      */
-    def classify (z: VectoI): Tuple2 [Int, String] =
+    def classify (z: VectoI): (Int, String, Double) =
     {
         var n = tree
         for (i <- 0 until z.dim) {
             n match { 
                 case FeatureNode (f, branches) => n = branches (z(f))
-                case LeafNode (y) => { val best = y; return (best, cn(best)) } 
+                case LeafNode (y) => { val best = y; return (best, cn(best), -1.0) }   // FIX - need metric
             } // match
         } // for
-        (-1, "?")
+        (-1, "?", -1.0)          // FIX - need metric
     } // classify
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -187,7 +188,7 @@ class DecisionTreeID3 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Arr
 object DecisionTreeID3
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a 'DecisionTreeID3` object, passing 'x' and 'y' together in one table.
+    /** Create a `DecisionTreeID3` object, passing 'x' and 'y' together in one table.
      *  @param xy  the data vectors along with their classifications stored as rows of a matrix
      *  @param fn  the names for all features/variables
      *  @param k   the number of classes

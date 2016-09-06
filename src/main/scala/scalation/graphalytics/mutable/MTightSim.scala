@@ -11,9 +11,11 @@ package scalation.graphalytics.mutable
 import scala.collection.mutable.{ListBuffer, Map, HashMap, MutableList, Stack}
 import scala.collection.mutable.{Set => SET}
 import scala.math.pow
+import scala.reflect.ClassTag
 import scala.util.control.Breaks.{break, breakable}
 import scala.util.Random
 
+import scalation.graphalytics.mutable.{ExampleMGraphD => EX_GRAPH}
 import scalation.stat.Statistic
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -23,10 +25,9 @@ import scalation.stat.Statistic
  *  @param q  the query graph Q(U, D, k)
  *  @param g  the data graph  G(V, E, l)
  */
-class MTightSim (g: MGraph, q: MGraph) 
+class MTightSim [TLabel: ClassTag] (g: MGraph [TLabel], q: MGraph [TLabel]) 
       extends GraphMatcher (g, q)
 {
-
     private val listOfDistinctReducedSet = new ListBuffer [SET [String]] ()   // contains total number of matches 
                                                                               // after post processing
     private val mapOfBallWithSize = Map [Int, Long] ()                        // contains balls left after
@@ -80,7 +81,7 @@ class MTightSim (g: MGraph, q: MGraph)
         val newGraph   = filterGraph (phi)                              // if doing strong sim more than once, must clone g
         val prunedSize = phi.clone.flatten.toSet.size                   // size of feasible matches after strict simulation
         val qDiameter  = qmet.rad                                       // get the query diameter
-        val balls      = HashMap [Int, Ball] ()                      // map of balls: center -> ball               
+        val balls      = HashMap [Int, Ball [TLabel]] ()                // map of balls: center -> ball               
         val matches    = HashMap [Int, Array [SET [Int]]] ()            // map of matches in balls: center -> match
         val qCenter    = selectivityCriteria (qmet)                     // selected center for query graph
         val gCenters   = phi(qCenter)                                   // set of mapped data graph centers 
@@ -91,7 +92,7 @@ class MTightSim (g: MGraph, q: MGraph)
         println (s"gCenters = $gCenters")
 
         for (center <- gCenters) {                                      // for each mapped data graph center
-            val ball = new Ball (newGraph, center, qDiameter)        // create a new ball for that center vertex
+            val ball = new Ball (newGraph, center, qDiameter)           // create a new ball for that center vertex
             ballSum += ball.nodesInBall.size                            // calculate ball size
             val mat  = dualFilter (phi.clone, ball)                     // perform dual filter on the ball
             println (s"center = $center, mat = ${mat.deep}")
@@ -119,7 +120,7 @@ class MTightSim (g: MGraph, q: MGraph)
      *  are part of feasible matches after performing initial dual simulation.
      *  @param phi  mappings from a query vertex u_q to { graph vertices v_g }
      */ 
-    def filterGraph (phi: Array [SET [Int]]): MGraph = 
+    def filterGraph (phi: Array [SET [Int]]): MGraph [TLabel] = 
     {
         val nodesInSimset = phi.flatten.toSet                     // get all the vertices of feasible matches
         for (i <- 0 until dataSize) g.ch(i) &= nodesInSimset      // prune via intersection            
@@ -138,7 +139,7 @@ class MTightSim (g: MGraph, q: MGraph)
      *  @param phi  mappings from a query vertex u_q to { graph vertices v_g }
      *  @param ball the Ball B(Graph, Center, Radius)
      */ 
-    def dualFilter (phi: Array [SET [Int]], ball: Ball): Array [SET [Int]] = 
+    def dualFilter (phi: Array [SET [Int]], ball: Ball [TLabel]): Array [SET [Int]] = 
     {
         for (v <- phi.indices) phi(v) &= ball.nodesInBall         // project simset onto ball
         val filterSet = new Stack [(Int, Int)] ()
@@ -224,7 +225,7 @@ class MTightSim (g: MGraph, q: MGraph)
      *  @param balls           mappings from a center vertex to the Ball B(Graph, Center, Radius)
      *  @param matchCenters    set of all vertices which are considered as center
      */
-    def calculateTotalEdges (g: MGraph, balls: HashMap [Int, Ball], matchCenters: SET [Int]): Int = 
+    def calculateTotalEdges (g: MGraph [TLabel], balls: HashMap [Int, Ball [TLabel]], matchCenters: SET [Int]): Int = 
     {
         val distinctEdges = SET [String] ()
         for (vert_id <- 0 until g.ch.length; if balls.keySet.contains (vert_id)) { 
@@ -238,7 +239,7 @@ class MTightSim (g: MGraph, q: MGraph)
      *  on the  balls left after post-processing.
      *  @param balls  mappings from a center vertex to the Ball B(Graph, Center, Radius)
      */
-    def calculateBallDiameterMetrics (balls: HashMap [Int, Ball]): Statistic =
+    def calculateBallDiameterMetrics (balls: HashMap [Int, Ball [TLabel]]): Statistic =
     {
         val ballStats = new Statistic ()
         for (vert_id <- listOfMatchedBallVertices) ballStats.tally (balls.get (vert_id).get.getBallDiameter)
@@ -251,7 +252,7 @@ class MTightSim (g: MGraph, q: MGraph)
      *  highest ratio.
      *  @param centr the array of vertices whose eccentricity is equal to the radius
      */
-    def selectivityCriteria (qmet: GraphMetrics): Int =
+    def selectivityCriteria (qmet: GraphMetrics [TLabel]): Int =
     {
         var index = 0
         var max   = 0.0
@@ -271,8 +272,8 @@ class MTightSim (g: MGraph, q: MGraph)
  */
 object MTightSimTest extends App 
 {
-    val g = MGraph.g1p
-    val q = MGraph.q1p
+    val g = EX_GRAPH.g1p
+    val q = EX_GRAPH.q1p
 
     println (s"g.checkEdges = ${g.checkEdges}")
     g.printG ()
@@ -290,8 +291,8 @@ object MTightSimTest extends App
  */
 object MTightSimTest2 extends App 
 {
-    val g = MGraph.g2p
-    val q = MGraph.q2p
+    val g = EX_GRAPH.g2p
+    val q = EX_GRAPH.q2p
 
     println (s"g.checkEdges = ${g.checkEdges}")
     g.printG ()
@@ -310,8 +311,8 @@ object MTightSimTest2 extends App
  */
 object MTightSimTest3 extends App 
 {
-    val g = MGraphIO ("gfile")
-    val q = MGraphIO ("qfile")
+    val g = MGraphIO [Double] ("gfile")
+    val q = MGraphIO [Double] ("qfile")
 
     println (s"q.checkEdges = ${q.checkEdges}")
     q.printG ()

@@ -26,7 +26,7 @@ object TopSort
      *  @see en.wikipedia.org/wiki/Topological_sorting
      *  @param g  the directed graph
      */
-    def topSort (g: Graph): Array [Int] =
+    def topSort (g: Graph [Double]): Array [Int] =
     {
         val n       = g.size                                // the number of vetices in g
         val color   = Array.fill (n)(G_N)                   // traffic light: GreeN, YelloW or ReD
@@ -73,7 +73,8 @@ object TopSortTest extends App
      */
     val pg1 = new Graph (Array (SET (1, 2),        // edges from 0:  0 -> 1, 0 -> 2
                                 SET (2),           // edges from 1:  1 -> 2
-                                SET [Int] ()))     // edges from 2:  no such edges
+                                SET [Int] ()),     // edges from 2:  no such edges
+                        null.asInstanceOf [Array [Double]])
     println ("Precedence Graph pg1: --------------------------------------------")
     pg1.printG ()
     println ("pg1 order = " + topSort (pg1).deep)
@@ -82,7 +83,8 @@ object TopSortTest extends App
      */
     val pg2 = new Graph (Array (SET (1, 2),        // edges from 0:  0 -> 1, 0 -> 2
                                 SET (2),           // edges from 1:  1 -> 2
-                                SET (0)))          // edges form 2:  2 -> 0
+                                SET (0)),          // edges form 2:  2 -> 0
+                        null.asInstanceOf [Array [Double]])
     println ("Precedence Digraph pg2: --------------------------------------------")
     pg2.printG ()
     println ("pg2 order = " + topSort (pg2).deep)

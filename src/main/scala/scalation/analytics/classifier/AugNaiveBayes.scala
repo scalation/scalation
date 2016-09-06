@@ -15,6 +15,8 @@ import scalation.linalgebra.gen.HMatrix4
 import scalation.relalgebra.Relation
 import scalation.util.time
 
+import BayesClassifier.me_default
+
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `AugNaiveBayes` class implements an Integer-Based Tree Augmented Naive Bayes
  *  Classifier,  which is a commonly used such classifier for discrete input data.
@@ -35,8 +37,8 @@ import scalation.util.time
  *  @param thres  the correlation threshold between 2 features for possible parent-child relationship
  */
 class AugNaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-                     private var vc: VectoI = null, me: Int = 3, thres: Double = 0.3)
-        extends BayesClassifier (x, y, fn, k, cn)
+                     private var vc: VectoI = null, me: Int = me_default, thres: Double = 0.3)
+      extends BayesClassifier (x, y, fn, k, cn)
 {
     private val DEBUG  = false                          // debug flag
     private val cor    = calcCorrelation                // feature correlation matrix
@@ -203,9 +205,10 @@ class AugNaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'z', classify it returning the class number
      *  (0, ..., k-1) with the highest relative posterior probability.
+     *  Return the best class, its name and its real;tive probability.
      *  @param z  the data vector to classify
      */
-    def classify (z: VectoI): (Int, String) =
+    def classify (z: VectoI): (Int, String, Double) =
     {
         val prob = new VectorD (k)
         for (i <- 0 until k) {
@@ -216,8 +219,8 @@ class AugNaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array
             } // for
         } // for
         if (DEBUG) println ("prob = " + prob)
-        val best = prob.argmax ()             // class with the highest relative posterior probability
-        (best, cn(best))                      // return the best class and its name
+        val best = prob.argmax ()                   // class with the highest relative posterior probability
+        (best, cn(best), prob(best))                // return the best class, its name and its probability
     } // classify
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -242,7 +245,7 @@ class AugNaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array
 object AugNaiveBayes
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a 'AugNaiveBayes object, passing 'x' and 'y' together in one table.
+    /** Create a `AugNaiveBayes object, passing 'x' and 'y' together in one table.
      *  @param xy     the data vectors along with their classifications stored as rows of a matrix
      *  @param fn     the names of the features
      *  @param k      the number of classes
@@ -251,7 +254,7 @@ object AugNaiveBayes
      *  @param thres  the correlation threshold between 2 features for possible parent-child relationship
      */
     def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
-               vc: VectoI = null, me: Int = 3, thres: Double = 0.3) =
+               vc: VectoI = null, me: Int = me_default, thres: Double = 0.3) =
     {
         new AugNaiveBayes (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn,
                            vc, me, thres)

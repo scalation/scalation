@@ -10,7 +10,7 @@
  *  @see www.math.iit.edu/~fass/477577_Chapter_12.pdf
  *  @see Handbook of Linear Algrbra, Chapter 45
  *  @see cs.fit.edu/~dmitra/SciComp/11Spr/SVD-Presentation-Updated2.ppt
- *  @see http://www.cs.utexas.edu/users/inderjit/public_papers/HLA_SVD.pdf
+ *  @see www.cs.utexas.edu/users/inderjit/public_papers/HLA_SVD.pdf
  */
 
 package scalation.linalgebra
@@ -21,12 +21,12 @@ import scalation.linalgebra.Givens.{givens, givensRo, givensRoT, givensColUpdate
 import scalation.linalgebra.MatrixD.eye
 import scalation.math.double_exp
 import scalation.math.ExtremeD.EPSILON
-import scalation.util.Error
+import scalation.util.{banner, Error, sline}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVD` class is used to compute the Singular Value Decomposition 'SVD' of
  *  matrix 'aa' using the Golub-Kahan-Reinsch Algorithm.
- *  Decompose matrix 'aa' into the product of three matrices:
+ *  Factor/decompose matrix 'aa' into the product of three matrices:
  *  <p>
  *      aa = uu * a * vv.t
  *  <p>
@@ -36,26 +36,29 @@ import scalation.util.Error
  *        (RIGHT SINGULAR VECTORS) and
  *        'a' is a diagonal matrix of square roots of eigenvalues of 'aa.t * aa' & 'aa * aa.t'
  *        (SINGULAR VALUES).
+ *  FIX: need to reorder so singular values are in decreasing order.
+ *  FIX: make the singular values positive
+ *------------------------------------------------------------------------------
  *  @param aa  the m-by-n matrix to deflate/decompose (algorithm requires m >= n)
  */
 class SVD (aa: MatrixD)
       extends SVDecomp with Error
 {
-    private val DEBUG      = false                // debug flag
-    private val m          = aa.dim1              // number of rows
-    private val n          = aa.dim2              // number of columns
+    private val DEBUG = false                     // debug flag
+    private val m     = aa.dim1                   // number of rows
+    private val n     = aa.dim2                   // number of columns
 
-    if (n > m) flaw ("constructor", "SVD requires m >= n")
+    if (n > m) flaw ("constructor", "SVD implementation requires m >= n")
 
-    private var a           = new MatrixD (aa)    // work on modifiable copy of aa (will hold singular values)
+    private var a           = aa.copy             // work on modifiable copy of aa (will hold singular values)
     private var uu: MatrixD = null                // left orthogonal matrix  uu = u_1 * ... u_k
     private var s:  VectorD = null                // vector of singular values (main diagonal of a after deflation)
     private var vv: MatrixD = null                // right orthogonal matrix vv = v_1 * ... v_k
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Factor matrix 'aa' into the product of a matrix of left singular vectors 'uu',
+    /** Factor matrix 'a' into the product of a matrix of left singular vectors 'uu',
      *  a vector of singular values 's' and a matrix of right singular vectors 'vv'
-     *  such that 'aa = uu ** s * vv.t'.
+     *  such that 'a = uu ** s * vv.t'.
      */
     def factor (): Tuple3 [MatrixD, VectorD, MatrixD] =
     {
@@ -74,9 +77,7 @@ class SVD (aa: MatrixD)
     } // factor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Deflate matrix 'aa' and decompose it using a Singular Value Decomposition
-     *  'SVD' algorithm.
-     *  Deflate matrix 'aa' forming a diagonal matrix consisting of singular
+    /** Deflate matrix 'a' forming a diagonal matrix consisting of singular
      *  values and return the singular values in vector 's'.  Also return the
      *  singular vector matrices 'uu' and 'vv'.
      *  @see Matrix Computation: Algorithm 8.6.2 SVD Algorithm.
@@ -251,19 +252,56 @@ object SVD
                              b22*b23,  b23*b23 + b33*b33) 
     } // trailing
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Test the SVD Factorization algorithm on matrix 'a' by factoring the matrix
+     *  into a left matrix u, a vector s, and a right matrix v.  Then multiply back
+     *  to recover the original matrix.
+     *  @param a     the given matrix to factor
+     *  @param name  the name of the test case
+     */
+    def test (a: MatrixD, name: String)
+    {
+        banner (name)
+        println ("original matrix a = " + a)
+
+        val svd       = new SVD (a)                              // Singular Value Decomposition object
+        val (u, s, v) = svd.factor ()                            // factor matrix a
+        println (sline () + "svd.factor: (u, s, v) = " + (u, s, v))
+        val prod = u ** s * v.t                                  // compute the product
+        println (sline () + "check: u ** s * v.t = " + prod)     // should equal the original a matrix
+        assert (prod == a)
+    } // test
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Test the SVD Factorization algorithm on a bidiagonalization of matrix 'a', factoring
+     *  it into a left matrix 'uu', bidiagonal matrix 'bb', and right matrix 'vv'.
+     *  Then multiply back to recover the original matrix.
+     *  @param a     the given matrix to bidiagonalize and then factor
+     *  @param name  the name of the test case
+     */
+    def testBid (aa: MatrixD, name: String)
+    {
+        val a   = aa.copy                                        // make a copy of aa
+        val bid = new Bidiagonal (a)                             // Householder Bidiagonalization
+        val (uu, bb, vv) = bid.bidiagonalize ()                  // bidiagonalize a
+        println (sline () + "bid.bidiagonalize: (uu, bb, vv) = " + (uu, bb, vv))
+        test (bb, name)
+    } // testBid
+
 } // SVD object
 
+import SVD.{test, testBid}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDTest` object is used to test the `SVD` class starting with a matrix that
  *  is already in bidiagonal form and gives eigenvalues of 28, 18 for the first step.
- *  @see http://ocw.mit.edu/ans7870/18/18.06/javademo/SVD/
+ *  @see ocw.mit.edu/ans7870/18/18.06/javademo/SVD/
  *  > run-main scalation.linalgebra.SVDTest
  */
 object SVDTest extends App
 {
-    val bb = new MatrixD ((2, 2), 1.00,  2.00,
-                                  0.00,  2.00)
+    val a  = new MatrixD ((2, 2), 1.00,  2.00,                // original matrix
+                                  0.00,  2.00)                // 2 by 2, bidiagonal
 
     val u_ = new MatrixD ((2, 2), 0.75, -0.66,
                                   0.66,  0.75)
@@ -274,101 +312,107 @@ object SVDTest extends App
     val v_ = new MatrixD ((2, 2), 0.26, -0.97,
                                   0.97,  0.26)
 
-    println ("svd: (u_, b_, v_) = " + (u_, b_, v_))  // answer from Web page
-    println ("u_b_v_.t = " + u_ * b_ * v_.t)         // should equal the original bb
+    println ("svd: (u_, b_, v_) = " + (u_, b_, v_))           // answer from Web page
+    println ("u_b_v_.t = " + u_ * b_ * v_.t)                  // should equal the original a
     
-/*
-    val bb = new MatrixD ((3, 3), 3.0, 5.0, 0.0,     // original bidiagonal matrix
-                                  0.0, 1.0, 4.0,
-                                  0.0, 0.0, 2.0)
-*/
-    println ("----------------------------------------")
-    println ("SVDTest")
-    println ("----------------------------------------")
-    println ("bb = " + bb)
-    println ("----------------------------------------")
-
-    val svd = new SVD (bb)                            // Singular Value Decomposition
-    val (u, s, v) = svd.factor ()                     // factor bb
-    println ("svd.factor: (u, s, v) = " + (u, s, v))
-
-    println ("u ** s * v.t = " + (u ** s * v.t))       // should equal the original bb
+    test (a, "SVDTest")
 
 } // SVDTest object
 
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDTest2` is used to test the `SVD` class.
  *  Answer: singular values = (3.82983, 1.91368, 0.81866)
+ *  > run-main scalation.linalgebra.SVDTest2
  */
 object SVDTest2 extends App
 {
-    import MatrixD.eye
-
-    val bb = new MatrixD ((3, 3), 1.0, 1.0, 0.0,
-                                  0.0, 2.0, 2.0,
+    val bb = new MatrixD ((3, 3), 1.0, 1.0, 0.0,              // original matrix
+                                  0.0, 2.0, 2.0,              // 3 by 3, bidiagonal
                                   0.0, 0.0, 3.0)
 
-    println ("----------------------------------------")
-    println ("SVDTest2")
-    println ("----------------------------------------")
-    println ("bb = " + bb)
-    println ("----------------------------------------")
+    test (bb, "SVDTest2")
 
-    val svd = new SVD (bb)                            // Singular Value Decomposition
-    val (u, s, v) = svd.factor ()                     // factor bb
-    println ("svd.factor: (u, s, v) = " + (u, s, v))
-
-    println ("u ** s * v.t = " + (u ** s * v.t))      // should equal the original bb
-
-} // SVDTest2
+} // SVDTest2 object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `SVDTest3` object is used to test the `SVD` class starting with a general
- *  matrix.
+/** The `SVDTest3` object is used to test the `SVD` class starting with general
+ *  (i.e., not bidiagonalized) matrices.  All probelems for which m >= n from
+ *  the following Webspage are tried.
  *  @see www.mathstat.uottawa.ca/~phofstra/MAT2342/SVDproblems.pdf
+ *  @see mysite.science.uottawa.ca/phofstra/MAT2342/SVDproblems.pdf
+ *  > run-main scalation.linalgebra.SVDTest3
  */
 object SVDTest3 extends App
 {
-/*
-    val a = new MatrixD ((3, 2), 1.0, 2.0,           // original matrix
-                                 2.0, 2.0,
-                                 2.0, 1.0)
-*/
-    val a = new MatrixD ((4, 4), 0.9501, 0.8913, 0.8214, 0.9218,
-                                 0.2311, 0.7621, 0.4447, 0.7382,
-                                 0.6068, 0.4565, 0.6154, 0.1763,
-                                 0.4860, 0.0185, 0.7919, 0.4057)
-/*
-    val a = new MatrixD ((4, 3), 1.0,  2.0,  3.0,
-                                 4.0,  5.0,  6.0,
-                                 7.0,  8.0,  9.0,
-                                10.0, 11.0, 12.0)
-*/
-    println ("a = " + a)
+    import scala.math.sqrt
 
-    val bid = new Bidiagonal (a)                         // Householder Bidiagonalization
-    val (uu, bb, vv) = bid.bidiagonalize ()              // bidiagonalize a
-    println ("bid.bidiagonalize: (uu, bb, vv) = " + (uu, bb, vv))
+    val a2 = new MatrixD ((2, 2), 1.0, 2.0,                   // original matrix, problem 2
+                                  2.0, 1.0)                   // 2 by 2
 
-    val svd = new SVD (bb)                               // Singular Value Decomposition
-    val (u, s, v) = svd.factor ()                        // factor bb
-    println ("svd.factor: (u, s, v) = " + (u, s, v))
-    println ("u ** s * v.t = " + (u ** s * v.t))         // should equal the original a
+    testBid (a2, "SVDTest3_2b")                               // test the bidiagonalized matrix
+    test (a2, "SVDTest3_2")                                   // test the original matrix
+
+    val a3 = new MatrixD ((3, 3), 0.0,     1.0, 1.0,          // original matrix, problem 3
+                                  sqrt(2), 2.0, 0.0,          // 3 by 3
+                                  0.0,     1.0, 1.0)
+
+//  testBid (a3, "SVDTest3_3b")                               // test the bidiagonalized matrix - FIX - fails
+    test (a3, "SVDTest3_3")                                   // test the original matrix
 
 } // SVDTest3 object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `SVDTest4` object is used to test the `SVD` companion object.
+/** The `SVDTest4` object is used to test the `SVD` class starting with a general
+ *  matrix.
+ *  > run-main scalation.linalgebra.SVDTest4
  */
 object SVDTest4 extends App
 {
+    val a = new MatrixD ((4, 4), 0.9501, 0.8913, 0.8214, 0.9218,     // original matrix
+                                 0.2311, 0.7621, 0.4447, 0.7382,     // 4 by 4
+                                 0.6068, 0.4565, 0.6154, 0.1763,
+                                 0.4860, 0.0185, 0.7919, 0.4057)
+
+    testBid (a, "SVDTest34")                                  // test the bidiagonalized matrix
+    test (a, "SVDTest4")                                      // test the original matrix
+
+} // SVDTest4 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SVDTest5` is used to test the `SVD` class on a larger test problem.
+ *  @see www.maths.manchester.ac.uk/~peterf/MATH48062/math48062%20Calculating%20and%20using%20the%20svd%20of%20a%20matrix.pdf
+ *  FIX: this example does not work.
+ *  > run-main scalation.linalgebra.SVDTest5
+ */
+object SVDTest5 extends App
+{
+    val a = new MatrixD ((5, 3), 0.44444444,  0.3333333, -1.3333333,    // original matrix
+                                 0.41111111, -0.3166667, -0.3333333,    // 5 by 3
+                                -0.18888889,  0.4833333, -0.3333333,
+                                -0.03333333, -0.6500000,  1.0000000,
+                                -0.63333333,  0.1500000,  1.0000000)
+
+    testBid (a, "SVDTest5b")                                  // test the bidiagonalized matrix
+    test (a, "SVDTest5")                                      // test the original matrix
+
+} // SVDTest5 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SVDTest6` object is used to test the `SVD` companion object's computation
+ *  of trailing submatrices.
+ *  > run-main scalation.linalgebra.SVDTest6
+ */
+object SVDTest6 extends App
+{
     import SVD.trailing
 
-    val b = new MatrixD ((4, 4), 1.0, 5.0, 0.0, 0.0,    // the bidiagonal matrix
-                                 0.0, 2.0, 6.0, 0.0,
+    val b = new MatrixD ((4, 4), 1.0, 5.0, 0.0, 0.0,          // bidiagonal matrix
+                                 0.0, 2.0, 6.0, 0.0,          // 4 by 4
                                  0.0, 0.0, 3.0, 7.0,
                                  0.0, 0.0, 0.0, 4.0)
     val n = b.dim2
@@ -376,5 +420,5 @@ object SVDTest4 extends App
     println ("trailing b.t * b = " + trailing (b))
     println ("check: " + (b.t * b)(n-2 to n, n-2 to n))
 
-} // SVDTest4 object
+} // SVDTest6 object
 

@@ -94,5 +94,23 @@ package object util
       else                fromFile (DATA_DIR + path).getLines
     } // getFromURL_File
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Make a string for use in printing a line of '-'s.
+     *  @param n  the number of '-'s to use
+     */
+    def sline (n: Int = 60): String = "-" * 60 + "\n"
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Print a banner, i.e., a string in a box.
+     *  @param str  the string to put in the banner
+     */
+    def banner (str: String)
+    {
+        val len = str.size + 4
+        println ("-" * len)
+        println ("| " + str + " |")
+        println ("-" * len)
+    } // banner
+
 } // util package object 
 

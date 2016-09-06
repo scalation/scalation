@@ -2,7 +2,7 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Zhaochong Liu
  *  @version 1.2
- *  @date    Sun Jul 24 13:39:21 EDT 2016
+ *  @date    Sat Jul 30 22:53:47 EDT 2016
  *  @see     LICENSE (MIT style license file).
  */
 
@@ -62,39 +62,8 @@ abstract class Fac_QR [MatT <: MatriD] (aa: MatT, needQ: Boolean = true)
 } // Fac_QR class
 
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Fac_QRTest` object is used to test the `Fac_QR` classes.
- *  @see www.ee.ucla.edu/~vandenbe/103/lectures/qr.pdf
- *  @see www.math.usm.edu/lambers/mat610/sum10/lecture9.pdf
- *  FIX: the 'nullspaceV' function need to be fixed.
- *  > run-main scalation.linalgebra.Fac_QRTest
- */
-object Fac_QRTest extends App
+object Fac_QR
 {
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Test the correctness of the QR Factorization.
-     *  @param a   the matrix to factor
-     *  @param qr  the QR Factorization class/algorithm to use
-     *  @param nm  the name of test case/matrix
-     */
-    def test (nm: String, a: MatrixD, qr: Fac_QR [MatrixD])
-    {
-        println ("-" * 60)
-        val (q, r) = qr.factor12 ()                      // (q orthogonal, r upper triangular)
-        val prod   = q * r                               // product of q * r
-        val r_est  = r.rank (true)                       // estimated rank
-        val ns     = qr.nullspace (r_est)                // ns is a basis for the nullscpace
-
-        println (nm + "   = " + a)                        // original matrix
-        println ("q    = " + q)                          // orthogonal matrix
-        println ("r    = " + r)                          // right upper triangular matrix
-        println ("r_est  = " + r_est)                    // rank
-        println ("q*r  = " + prod)                       // product q * r
-        println ("eq   = " + (a == prod))                // check that q * r  = a
-        println ("ns   = " + ns)                         // nullspace
-        println ("a*ns = " + (a * ns))                   // check that a * ns = 0
-    } // test
-
     val a1 = new MatrixD ((4, 3), 9.0,  0.0, 26.0,
                                  12.0,  0.0, -7.0,
                                   0.0,  4.0,  4.0,
@@ -122,6 +91,44 @@ object Fac_QRTest extends App
 //  val a6 = new MatrixD ((2, 4), 1.0, 2.0, 3.0, 4.0,
 //                                5.0, 6.0, 7.0, 8.0)
 
+} // Fac_QR object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Fac_QRTest` object is used to test the `Fac_QR` classes.
+ *  @see www.ee.ucla.edu/~vandenbe/103/lectures/qr.pdf
+ *  @see www.math.usm.edu/lambers/mat610/sum10/lecture9.pdf
+ *  FIX: the 'nullspaceV' function need to be fixed.
+ *  > run-main scalation.linalgebra.Fac_QRTest
+ */
+object Fac_QRTest extends App
+{
+    import Fac_QR._
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Test the correctness of the QR Factorization.
+     *  @param a   the matrix to factor
+     *  @param qr  the QR Factorization class/algorithm to use
+     *  @param nm  the name of test case/matrix
+     */
+    def test (nm: String, a: MatrixD, qr: Fac_QR [MatrixD])
+    {
+        println ("-" * 60)
+        val (q, r) = qr.factor12 ()                      // (q orthogonal, r upper triangular)
+        val prod   = q * r                               // product of q * r
+        val r_est  = r.rank (true)                       // estimated rank
+        val ns     = qr.nullspace (r_est)                // ns is a basis for the nullscpace
+
+        println (nm + "    = " + a)                      // original matrix
+        println ("q     = " + q)                         // orthogonal matrix
+        println ("r     = " + r)                         // right upper triangular matrix
+        println ("r_est = " + r_est)                     // rank
+        println ("q*r   = " + prod)                      // product q * r
+        println ("eq    = " + (a == prod))               // check that q * r  = a
+        println ("ns    = " + ns)                        // nullspace
+        println ("a*ns  = " + (a * ns))                  // check that a * ns = 0
+    } // test
+
     println ("*" * 60)
     println ("Fac_QRTest: Fac_QR_H")
     test ("a1", a1, new Fac_QR_H (a1))
@@ -147,7 +154,7 @@ object Fac_QRTest extends App
     test ("a5", a5, new Fac_QR_H3 (a5))
 
     println ("*" * 60)
-    println ("Fac_QRTest: Fac_QR_RR")
+    println ("Fac_QRTest: Fac_QR_RR")         // reordering causes a != qr, use 'test' in `Fac_QR_RR`
     test ("a1", a1, new Fac_QR_RR (a1))
     test ("a2", a2, new Fac_QR_RR (a2))
     test ("a3", a3, new Fac_QR_RR (a3))

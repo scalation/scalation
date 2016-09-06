@@ -109,9 +109,9 @@ class SupportVectorMachine (x: MatrixD, y: VectorI, fn: Array [String] = Array (
      *  -1 means it belongs to the negative class.
      *  @param z  the vector to classify
      */
-    def classify (z: VectoD): Tuple2 [Int, String] =
+    def classify (z: VectoD): (Int, String, Double) =
     {
-        if ((w dot z) >= b) (1, "+") else (-1, "-")
+        if ((w dot z) >= b) (1, "+", -1.0) else (-1, "-", -1.0)   // FIX - need metric
     } // classify
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

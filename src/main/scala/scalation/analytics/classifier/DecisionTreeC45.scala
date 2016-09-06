@@ -306,9 +306,10 @@ class DecisionTreeC45 (val x: MatriI, val y: VectoI, fn: Array [String], isCont:
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a data vector z, classify it returning the class number (0, ..., k-1)
      *  by following a decision path from the root to a leaf.
+     *  Return the best class, its name and its FIX.
      *  @param z  the data vector to classify (purely discrete features)
      */
-    def classify (z: VectoI): Tuple2 [Int, String] =
+    def classify (z: VectoI): (Int, String, Double) =
     {
         if(DEBUG) println ("classify: purely discrete features\n")
 
@@ -327,15 +328,16 @@ class DecisionTreeC45 (val x: MatriI, val y: VectoI, fn: Array [String], isCont:
 
         println ("classify step-" + step + ": " + nd + "\n")
         val best = nd.decision
-        (best, cn(best))
+        (best, cn(best), -1.0)               // FIX - need ranking metric
     } // classify
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a data vector z, classify it returning the class number (0, ..., k-1)
      *  by following a decision path from the root to a leaf.
+     *  Return the best class, it ane and FIX.
      *  @param z  the data vector to classify (some continuous features)
      */
-    override def classify (z: VectoD): Tuple2 [Int, String] =
+    override def classify (z: VectoD): (Int, String, Double) =
     {
         if(DEBUG) println ("classify: some continuous features\n")
 
@@ -353,7 +355,7 @@ class DecisionTreeC45 (val x: MatriI, val y: VectoI, fn: Array [String], isCont:
 
         println ("classify step-" + step + ": " + nd + "\n")
         val best = nd.decision
-        (best, cn(best))
+        (best, cn(best), -1.0)          // FIX - need metric
     } // classify
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -373,7 +375,7 @@ class DecisionTreeC45 (val x: MatriI, val y: VectoI, fn: Array [String], isCont:
 object DecisionTreeC45
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a 'DecisionTreeID3` object, passing 'x' and 'y' together in one table.
+    /** Create a `DecisionTreeID3` object, passing 'x' and 'y' together in one table.
      *  @param xy  the data vectors along with their classifications stored as rows of a matrix
      *  @param fn      the names for all features/variables
      *  @param isCont  `Boolean` value to indicate whether according feature is continuous

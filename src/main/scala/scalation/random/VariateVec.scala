@@ -95,7 +95,7 @@ case class ProbabilityVec (n: Int, d: Double = 0.5, stream: Int = 0)
         z / z.sum
      } // gen
     
-    def igen: VectorI = gen.toInt
+    override def igen: VectorI = gen.toInt
      
 } // ProbabilityVec class
 
@@ -137,6 +137,7 @@ case class NormalVec (mu: VectorD, cov: MatrixD, stream: Int = 0)
     def igen: VectorI = gen.toInt
 
 } // NormalVec class
+
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /**

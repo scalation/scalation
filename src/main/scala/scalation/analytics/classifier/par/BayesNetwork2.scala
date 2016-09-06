@@ -538,9 +538,10 @@ class BayesNetwork2 (x: MatriI, y: VectoI, fn: Array [String], private var vc: V
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'z', classify it returning the class number
      *  (0, ..., k-1) with the highest relative posterior probability.
+     *  Return the best class, its name and its relative probability.
      *  @param z  the data vector to classify
      */
-    def classify (z: VectoI): (Int, String) =
+    def classify (z: VectoI): (Int, String, Double) =
     {
         val g_prob = new VectorD (k)
         for (i <- 0 until k) {
@@ -555,7 +556,7 @@ class BayesNetwork2 (x: MatriI, y: VectoI, fn: Array [String], private var vc: V
         } // for
         if (DEBUG) println ("prob = " + g_prob)
         val best = g_prob.argmax ()                 // class with the highest relative posterior probability
-        (best, cn (best))                           // return the best class and its name
+        (best, cn(best), g_prob(best))              // return the best class, its name and its probability
     } // classify
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

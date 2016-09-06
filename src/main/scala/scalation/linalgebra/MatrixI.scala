@@ -16,6 +16,7 @@ import scala.io.Source.fromFile
 import scala.math.{abs => ABS}
 
 import scalation.math.{int_exp, oneIf}
+import scalation.math.ExtremeD.TOL
 import scalation.util.{Error, PackageInfo}
 
 import MatrixI.eye
@@ -23,6 +24,9 @@ import MatrixI.eye
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MatrixI` class stores and operates on Numeric Matrices of type `Int`.
  *  This class follows the `gen.MatrixN` framework and is provided for efficiency.
+ *  Caveat:  Only works for rectangular matrices.  For matrix-like structures
+ *  based on jagged arrays, where the second dimension varies,
+ *  @see `scalation.linalgebra.gen.HMatrix2`
  *  @param d1  the first/row dimension
  *  @param d2  the second/column dimension
  *  @param v   the 2D array used to store matrix elements
@@ -75,7 +79,7 @@ class MatrixI (d1: Int,
      *  @param dim  the (row, column) dimensions
      *  @param u    the repeated values
      */
-    def this (dim: Tuple2 [Int, Int], u: Int*)
+    def this (dim: (Int, Int), u: Int*)
     {
         this (dim._1, dim._2)
         for (i <- range1; j <- range2) v(i)(j) = u(i * dim2 + j)
@@ -849,8 +853,9 @@ class MatrixI (d1: Int,
      */
     def ** (u: VectoI): MatrixI =
     {
-        val c = new MatrixI (dim1, dim2)
-        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j) * u(j)
+        val dm = math.min (dim2, u.dim)
+        val c  = new MatrixI (dim1, dm)
+        for (i <- range1; j <- c.range2) c.v(i)(j) = v(i)(j) * u(j)
         c
     } // **
 
@@ -860,6 +865,7 @@ class MatrixI (d1: Int,
      */
     def **= (u: VectoI): MatrixI =
     {
+        if (dim2 > u.dim) flaw ("**=", "vector u not large enough")
         for (i <- range1; j <- range2) v(i)(j) = v(i)(j) * u(j)
         this
     } // **=
@@ -951,7 +957,7 @@ class MatrixI (d1: Int,
      *  matrices '(l, u)' using the 'LU' Factorization algorithm.  This version uses
      *  no partial pivoting.
      */
-    def lud_npp: Tuple2 [MatrixI, MatrixI] =
+    def lud_npp: (MatrixI, MatrixI) =
     {
         val l = new MatrixI (dim1, dim2)    // lower triangular matrix
         val u = new MatrixI (this)          // upper triangular matrix (a copy of this)
@@ -967,7 +973,7 @@ class MatrixI (d1: Int,
                 for (j <- u.range2) u.v(k)(j) = u.v(k)(j) - mul * u.v(i)(j)
             } // for
         } // for
-        Tuple2 (l, u)
+        (l, u)
     } // lud_npp
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -975,7 +981,7 @@ class MatrixI (d1: Int,
      *  matrices '(l, u)' using the 'LU' Factorization algorithm.  This version uses
      *  partial pivoting.
      */
-    def lud: Tuple2 [MatrixI, MatrixI] =
+    def lud: (MatrixI, MatrixI) =
     {
         val l = new MatrixI (dim1, dim2)         // lower triangular matrix
         val u = new MatrixI (this)               // upper triangular matrix (a copy of this)
@@ -995,7 +1001,7 @@ class MatrixI (d1: Int,
                 for (j <- u.range2) u.v(k)(j) = u.v(k)(j) - mul * u.v(i)(j)
             } // for
         } // for
-        Tuple2 (l, u)
+        (l, u)
     } // lud
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1003,7 +1009,7 @@ class MatrixI (d1: Int,
      *  matrices '(l, u)' using the 'LU' Factorization algorithm.  This version uses
      *  partial pivoting.
      */
-    def lud_ip (): Tuple2 [MatrixI, MatrixI] =
+    def lud_ip (): (MatrixI, MatrixI) =
     {
         val l = new MatrixI (dim1, dim2)         // lower triangular matrix
         val u = this                             // upper triangular matrix (this)
@@ -1023,7 +1029,7 @@ class MatrixI (d1: Int,
                 for (j <- u.range2) u.v(k)(j) = u.v(k)(j) - mul * u.v(i)(j)
             } // for
         } // for
-        Tuple2 (l, u)
+        (l, u)
     } // lud_ip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1088,7 +1094,7 @@ class MatrixI (d1: Int,
      *  @param lu  the lower and upper triangular matrices
      *  @param b   the constant vector
      */
-    def solve (lu: Tuple2 [MatriI, MatriI], b: VectoI): VectorI = solve (lu._1, lu._2, b)
+    def solve (lu: (MatriI, MatriI), b: VectoI): VectorI = solve (lu._1, lu._2, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'l*u*x = b' where 'l = this'.  Requires
@@ -1144,33 +1150,35 @@ class MatrixI (d1: Int,
     } // diag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the 'k'th diagonal of 'this' matrix.  Assumes 'dim2 >= dim1'.
+    /** Get the 'k'th diagonal of 'this' matrix.
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
     def getDiag (k: Int = 0): VectorI =
     {
-        val c  = new VectorI (dim1 - math.abs (k))
-        val (j, l) = (math.max (-k, 0), math.min (dim1-k, dim1))
+        val dm = math.min (dim1, dim2)
+        val c  = new VectorI (dm - math.abs (k))
+        val (j, l) = (math.max (-k, 0), math.min (dm-k, dm))
         for (i <- j until l) c(i-j) = v(i)(i+k)
         c
     } // getDiag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the 'k'th diagonal of 'this' matrix to the vector 'u'.  Assumes 'dim2 >= dim1'.
+    /** Set the 'k'th diagonal of 'this' matrix to the vector 'u'.
      *  @param u  the vector to set the diagonal to
      *  @param k  how far above the main diagonal, e.g., (-1, 0, 1) for (sub, main, super)
      */
     def setDiag (u: VectoI, k: Int = 0)
     { 
-        val (j, l) = (math.max (-k, 0), math.min (dim1-k, dim1))
+        val dm = math.min (dim1, dim2)
+        val (j, l) = (math.max (-k, 0), math.min (dm-k, dm))
         for (i <- j until l) v(i)(i+k) = u(i-j)
     } // setDiag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the main diagonal of 'this' matrix to the scalar 'x'.  Assumes 'dim2 >= dim1'.
+    /** Set the main diagonal of 'this' matrix to the scalar 'x'.
      *  @param x  the scalar to set the diagonal to
      */
-    def setDiag (x: Int) { for (i <- range1) v(i)(i) = x }
+    def setDiag (x: Int) { for (i <- 0 until math.min (dim1, dim2)) v(i)(i) = x }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Invert 'this' matrix (requires a square matrix) and does not use partial pivoting.
@@ -1324,7 +1332,7 @@ class MatrixI (d1: Int,
      *  @param thres     the cutoff threshold (a small value)
      *  @param relative  whether to use relative or absolute cutoff
      */
-    def clean (thres: Double, relative: Boolean = true): MatrixI =
+    def clean (thres: Double = TOL, relative: Boolean = true): MatrixI =
     {
         val s = if (relative) mag else 1              // use matrix magnitude or 1
         for (i <- range1; j <- range2) if (ABS (v(i)(j)) <= thres * s) v(i)(j) = 0
@@ -1504,7 +1512,7 @@ class MatrixI (d1: Int,
 object MatrixI extends Error
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a matrix and assign values from the array of vectors 'u'.
+    /** Create a matrix and assign values from a sequence/array of vectors 'u'.
      *  @param u           the sequence/array of vectors to assign
      *  @param columnwise  whether the vectors are treated as column or row vectors
      */
@@ -1532,6 +1540,23 @@ object MatrixI extends Error
         val u_dim = u(0).dim
         val x = new MatrixI (u_dim, u.length)
         for (j <- 0 until u.length) x.setCol (j, u(j))        // assign column vectors
+        x
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a symmetric matrix from repeated values in a lower triangular form.
+     *  @param dim  the (row, column) dimensions
+     *  @param u    the repeated values
+     */
+    def apply (dim: (Int, Int), u: Int*): MatrixI =
+    {
+        val x = new MatrixI (dim._1, dim._2)
+        var k = 0
+        for (i <- 0 until dim._1; j <- 0 to i) {
+            x.v(i)(j) = u(k)
+            x.v(j)(i) = u(k)
+            k += 1
+        } // for
         x
     } // apply
 

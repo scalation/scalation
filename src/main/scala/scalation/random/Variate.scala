@@ -82,6 +82,12 @@ abstract class Variate (stream: Int = 0)
         else           { flaw ("igen", "should not be invoked on continuous RV's"); 0 }
     } // igen
 
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine the next random string for the particular distribution.
+     *  For better random strings, overide this method.
+     */
+    def sgen: String = "s" + "%g".format (gen)
+
 } // Variate class
 
 
@@ -323,7 +329,7 @@ case class Discrete (dist: VectoD = VectorD (.2, .2, .2, .2, .2), x: VectorD = n
  *  @param f       the array of time-based functions 
  *  @param stream  the random number stream
  */
-case class DiscreteF (f: Array [FunctionS2S], stream: Int = 0)
+case class DiscreteF (f: Array [FunctionS2S] = Array ((x: Double) => x), stream: Int = 0)
      extends Variate (stream)
 {
     _discrete = true
@@ -827,6 +833,37 @@ case class Poisson (mu: Double = 2.0, stream: Int = 0)
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This class generates `PowerLaw` random variates:  'cx^-y' for 'x in [a, b]'.
+ *  This continuous RV models power-law distributions.
+ *  @see http://mathworld.wolfram.com/RandomNumber.html
+ *  @param a       the minimum value parameter
+ *  @param b       the maximum value parameter
+ *  @param y       the power parameter to be used
+ *  @param stream  the random number stream
+ */
+case class PowerLaw (a: Double = 1.0, b: Double = 10.0, y: Double = 2.1, stream: Int = 0)
+     extends Variate (stream)
+{
+    if (a >= b)  flaw ("constructor", "requires parameter a < b")
+    if (y < 1.0) flaw ("constructor", "parameter y must be >= 1.0")
+
+    private val exp  = 1.0 - y                            // exponent
+    private val a_up = a~^exp
+    private val b_up = b~^exp
+    private val diff = b~^exp - a_up
+    private val root = 1.0 / exp.toDouble
+    private val c    = exp / diff                         // coefficient
+
+    val mean = c * (b*b_up - a*a_up) / (exp + 1.0)
+
+    def pf (z: Double): Double = if (z >= a && z <= b) c * z~^(-y) else 0.0
+
+    def gen: Double = (diff * r.gen  + a_up) ~^ root
+
+} // PowerLaw class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class generates `Randi` random variates (random integers: a, ..., b).
  *  This discrete RV models equi-probable integral outcomes.
  *  @see http://www.math.uah.edu/stat/special/UniformDiscrete.html
@@ -882,6 +919,7 @@ case class Randi0 (b: Int = 5, stream: Int = 0)
     def iigen (bb: Int): Int = floor ((bb + 1) * r.gen).toInt
 
 } // Randi0
+
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This class generates `Randi0` random variates (random integers: 0, ..., b).
@@ -1265,6 +1303,7 @@ object VariateTest extends App
                               ChiSquare (),
                               Dice (),
                               Discrete (),
+                              DiscreteF (),
                               Erlang (),
                               Exponential (),
                               Fisher (),
@@ -1278,8 +1317,10 @@ object VariateTest extends App
                               Normal (),
                               Pareto (),
                               Poisson (),
+                              PowerLaw (),
                               Randi (),
                               Randi0 (),
+                              RandiU0 (),
                               Sharp (),
                               StudentT (),
                               Trapezoidal (),

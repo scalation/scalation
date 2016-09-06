@@ -34,8 +34,8 @@ import scalation.util.{PackageInfo, getFromURL_File, time}
  */
 object PokerBayes extends App with PackageInfo
 {
-//  val fname = getDataPath + "poker-hand-training-true.data"     // 25010 instances
-    val fname = getDataPath + "poker-hand-testing.data"           // 1000000 instances
+    val fname = getDataPath + "poker-hand-training-true.data"     // 25010 instances
+//  val fname = getDataPath + "poker-hand-testing.data"           // 1000000 instances - download if needed
 
     val ROWS = 1000000                                            // number of instances
     val COLS = 11                                                 // 10 for x, 1 for y

@@ -10,6 +10,7 @@ package scalation.graphalytics.mutable
 
 import scala.collection.mutable.{ArrayBuffer, Queue}
 import scala.collection.mutable.{Set => SET}
+import scala.reflect.ClassTag
 
 import scalation.util.time
 
@@ -21,7 +22,7 @@ import scalation.util.time
  *  @param g            the graph whose metrics are sought
  *  @param isUndirected indicates whether the graph is undirected
  */
-class GraphMetrics (val g: Graph, isUndirected: Boolean = true)
+class GraphMetrics [TLabel: ClassTag] (val g: Graph [TLabel], isUndirected: Boolean = true)
 {
     private val DEBUG = false                        // debug flag
     private val n     = g.size                       // number of vertices in g

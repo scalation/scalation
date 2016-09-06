@@ -2,7 +2,7 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 1.2
- *  @date    Sun Jan 20 13:01:21 EST 2013
+ *  @date    Sat Jul 30 22:53:47 EDT 2016
  *  @see     LICENSE (MIT style license file).
  */
 

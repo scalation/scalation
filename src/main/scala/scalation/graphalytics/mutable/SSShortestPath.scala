@@ -15,8 +15,6 @@ import scala.collection.mutable.{Set => SET}
 import scalation.linalgebra.{MatriD, MatrixD, SparseMatrixD, VectoD, VectorD, VectorI}
 import scalation.linalgebra.SparseMatrixD.RowMap
 
-import LabelType.TLabel
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SSShortestPath` class is used to solve shortest path problems for graphs
  *  stored in matrices.  It solves the Single-Source Shortest Path 'SSSP' problem
@@ -117,7 +115,7 @@ object SSShortestPath
      *  @param hasV_Weight  whether vertices carry weights or not (0.0)
      *  @param hasE_Weight  whether edges carry specific weights or just unit weights (1.0)
      */
-    def apply (g: MGraph, s: Int, hasV_Weight: Boolean = false, hasE_Weight: Boolean = true): SSShortestPath =
+    def apply (g: MGraph [Double], s: Int, hasV_Weight: Boolean = false, hasE_Weight: Boolean = true): SSShortestPath =
     {
         val n = g.size
         val c = new MatrixD (n, n)                             // cost/weight matrix
@@ -177,16 +175,16 @@ object SSShortestPathTest2 extends App
                                SET (0, 3),                       // ch(1)
                                SET (0, 1, 3),                    // ch(2)
                                SET (1, 2)),                      // ch(3)
-                        Array (10, 11, 12, 13),                  // for A, B, C, D
-                        Map ((0, 1) -> 65,
-                             (0, 2) -> 46,
-                             (1, 0) -> 39,
-                             (1, 3) -> 14,
-                             (2, 0) -> 46,
-                             (2, 1) -> 37,
-                             (2, 3) -> 21,
-                             (3, 1) -> 19,
-                             (3, 2) -> 15),
+                        Array (10.0, 11.0, 12.0, 13.0),                  // for A, B, C, D
+                        Map ((0, 1) -> 65.0,
+                             (0, 2) -> 46.0,
+                             (1, 0) -> 39.0,
+                             (1, 3) -> 14.0,
+                             (2, 0) -> 46.0,
+                             (2, 1) -> 37.0,
+                             (2, 3) -> 21.0,
+                             (3, 1) -> 19.0,
+                             (3, 2) -> 15.0),
                         false, "g")
 
     g.checkEdges
@@ -203,7 +201,7 @@ object SSShortestPathTest2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SSShortestPathTest3` object is used to test the `SSShortestPath` class.
  *  Input is in the form of graphs (`MGraph`).  This test case requires
- *  `Tlabel` in `LabelType` to be `VectorD`.  Should be commented out otherwise.
+ *  `Tlabel` to be `VectorD`.  Should be commented out otherwise.
  *  @see thescipub.com/PDF/jcssp.2013.377.382.pdf (Fig. 1)
  *  > run-main scalation.graphalytics.mutable.SSShortestPathTest3
  */

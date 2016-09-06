@@ -270,7 +270,7 @@ class HMatrix4 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
      *  @param x  the value to set all elements to
      */
     def set (x: T) = { for (i <- range1; j <- range2; k <- 0 until dim_3 (i, j);
-                            l <-0 until dim_4(i, j, dim_3(i, j))) hmat(i)(j)(k)(l) = x }
+                            l <-0 until dim_4(i, j)) hmat(i)(j)(k)(l) = x }
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Clear (make null) all contents in the 3rd and 4th dimensions of the hypermatrix.

@@ -12,11 +12,11 @@ import scala.collection.mutable.{ArrayBuffer, Map}
 import scala.collection.mutable.{Set => SET}
 //import scala.collection.mutable.{HashSet => SET}
 import scala.math.ceil
+import scala.reflect.ClassTag
 
+import scalation.graphalytics.mutable.{ExampleGraphD => EX_GRAPH}
 import scalation.linalgebra.VectorI
 import scalation.random.Randi0
-
-import LabelType.TLabel
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Partition` class is used to partition large directed graphs.
@@ -38,7 +38,7 @@ import LabelType.TLabel
  *----------------------------------------------------------------------------
  *  @param g  the directed graph to partition
  */
-class Partition (g: Graph)
+class Partition [TLabel: ClassTag] (g: Graph [TLabel])
 {
     private val DEBUG    = true                                  // debug flag
     private val MAX_ITER = 10                                    // maximum number of iterations
@@ -107,9 +107,9 @@ class Partition (g: Graph)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Form subgraphs 'gi's from the original graph 'g'
      */
-    def formGraphs (): ArrayBuffer [Graph] =
+    def formGraphs (): ArrayBuffer [Graph [TLabel]] =
     {
-        val parts = ArrayBuffer [Graph] ()
+        val parts = ArrayBuffer [Graph [TLabel]] ()
         var i     = 0
         for (sg <- partMap.values) {                             // for each subgraph sg
             if (DEBUG) println (s"formGraph: sg = $sg")
@@ -126,8 +126,8 @@ class Partition (g: Graph)
             } // for
 
 // FIX - the next line fails when inverse is true
-//          val gi = new Graph (ch2, lab2, g.inverse, g.name + "_" + i, vid2)
-            val gi = new Graph (ch2, lab2, false, g.name + "_" + i, vid2)
+//          val gi = new Graph [TLabel] (ch2, lab2, g.inverse, g.name + "_" + i, vid2)
+            val gi = new Graph [TLabel] (ch2, lab2, false, g.name + "_" + i, vid2)
             parts += gi
             i = i + 1
         }  // for
@@ -188,7 +188,7 @@ class Partition (g: Graph)
 object PartitionTest extends App
 {
     println ("TEST random partitioning")
-    val g  = Graph.g2p
+    val g  = EX_GRAPH.g2p
     val dp = new Partition (g)
     dp.group_ran (4)
     dp.partition ()
@@ -216,7 +216,7 @@ object PartitionTest extends App
 object PartitionTest2 extends App
 {
     println ("TEST ordered partitioning")
-    val g  = Graph.g2p
+    val g  = EX_GRAPH.g2p
     val dp = new Partition (g)
     dp.group_ord (4)
     dp.partition ()
@@ -244,7 +244,7 @@ object PartitionTest2 extends App
 object PartitionTest3 extends App
 {
     println ("TEST label propagation for partitioning")
-    val g  = Graph.g2p
+    val g  = EX_GRAPH.g2p
     val dp = new Partition (g)
     dp.group_lp (4)
     dp.partition ()

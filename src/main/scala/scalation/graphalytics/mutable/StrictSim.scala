@@ -11,9 +11,11 @@ package scalation.graphalytics.mutable
 import scala.collection.mutable.{ListBuffer, Map, HashMap, MutableList, Stack}
 import scala.collection.mutable.{Set => SET}
 import scala.math.pow
+import scala.reflect.ClassTag
 import scala.util.control.Breaks.{break, breakable}
 import scala.util.Random
 
+import scalation.graphalytics.mutable.{ExampleGraphD => EX_GRAPH}
 import scalation.stat.Statistic
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -23,7 +25,7 @@ import scalation.stat.Statistic
  *  @param q  the query graph Q(U, D, k)
  *  @param g  the data graph  G(V, E, l)
  */
-class StrictSim (g: Graph, q: Graph) 
+class StrictSim [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel]) 
       extends GraphMatcher (g, q)
 {
     private val listOfDistinctReducedSet = new ListBuffer [SET [String]] ()   // contains total number of matches 
@@ -79,14 +81,14 @@ class StrictSim (g: Graph, q: Graph)
         val newGraph   = filterGraph (phi)                              // if doing strong sim more than once, must clone g
         val prunedSize = phi.clone.flatten.toSet.size                   // size of feasible matches after strict simulation
         val qDiameter  = qmet.diam                                      // get the query diameter
-        val balls      = HashMap [Int, Ball] ()                      // map of balls: center -> ball               
+        val balls      = HashMap [Int, Ball [TLabel]] ()                // map of balls: center -> ball               
         val matches    = HashMap [Int, Array [SET [Int]]] ()            // map of matches in balls: center -> match
         val gCenters   = (0 until q.size).flatMap(phi(_))               // set of mapped data graph centers
 	val bCenters   = SET [Int] ()                                   // set of centers for all balls
         var ballSum    = 0
 
         for (center <- gCenters) {                                      // for each mapped data graph center
-            val ball = new Ball (newGraph, center, qDiameter)        // create a new ball for that center vertex
+            val ball = new Ball (newGraph, center, qDiameter)           // create a new ball for that center vertex
             ballSum += ball.nodesInBall.size                            // calculate ball size
             val mat  = dualFilter (phi.clone, ball)                     // perform dual filter on the ball
             println (s"center = $center, mat = ${mat.deep}")
@@ -114,7 +116,7 @@ class StrictSim (g: Graph, q: Graph)
      *  are part of feasible matches after performing initial dual simulation.
      *  @param phi  mappings from a query vertex u_q to { graph vertices v_g }
      */ 
-    def filterGraph (phi: Array [SET [Int]]): Graph = 
+    def filterGraph (phi: Array [SET [Int]]): Graph [TLabel] = 
     {
         val nodesInSimset = phi.flatten.toSet                     // get all the vertices of feasible matches
         for (i <- 0 until dataSize) g.ch(i) &= nodesInSimset      // prune via intersection            
@@ -133,7 +135,7 @@ class StrictSim (g: Graph, q: Graph)
      *  @param phi  mappings from a query vertex u_q to { graph vertices v_g }
      *  @param ball the Ball B(Graph, Center, Radius)
      */ 
-    def dualFilter (phi: Array [SET [Int]], ball: Ball): Array [SET [Int]] = 
+    def dualFilter (phi: Array [SET [Int]], ball: Ball [TLabel]): Array [SET [Int]] = 
     {
         for (v <- phi.indices) phi(v) &= ball.nodesInBall         // project simset onto ball
         val filterSet = new Stack [(Int, Int)] ()
@@ -219,7 +221,7 @@ class StrictSim (g: Graph, q: Graph)
      *  @param balls           mappings from a center vertex to the Ball B(Graph, Center, Radius)
      *  @param matchCenters    set of all vertices which are considered as center
      */
-    def calculateTotalEdges (g: Graph, balls: HashMap [Int, Ball], matchCenters: SET [Int]): Int = 
+    def calculateTotalEdges (g: Graph [TLabel], balls: HashMap [Int, Ball [TLabel]], matchCenters: SET [Int]): Int = 
     {
         val distinctEdges = SET [String] ()
         for (vert_id <- 0 until g.ch.length; if balls.keySet.contains (vert_id)) { 
@@ -233,7 +235,7 @@ class StrictSim (g: Graph, q: Graph)
      *  on the balls left after post-processing.
      *  @param balls  mappings from a center vertex to the Ball 'B(Graph, Center, Radius)'
      */
-    def calculateBallDiameterMetrics (balls: HashMap [Int, Ball]): Statistic =
+    def calculateBallDiameterMetrics (balls: HashMap [Int, Ball [TLabel]]): Statistic =
     {
         val ballStats = new Statistic ()
         for (vert_id <- listOfMatchedBallVertices) ballStats.tally (balls.get (vert_id).get.getBallDiameter)
@@ -246,7 +248,7 @@ class StrictSim (g: Graph, q: Graph)
      *  highest ratio.
      *  @param centr the array of vertices whose eccentricity is equal to the radius
      */
-    def selectivityCriteria (qmet: GraphMetrics): Int =
+    def selectivityCriteria (qmet: GraphMetrics [TLabel]): Int =
     {
         var index = 0
         var max   = 0.0
@@ -266,8 +268,8 @@ class StrictSim (g: Graph, q: Graph)
  */
 object StrictSimTest extends App 
 {
-    val g = Graph.g1p
-    val q = Graph.q1p
+    val g = EX_GRAPH.g1p
+    val q = EX_GRAPH.q1p
 
     println (s"g.checkEdges = ${g.checkEdges}")
     g.printG ()
@@ -285,8 +287,8 @@ object StrictSimTest extends App
  */
 object StrictSimTest2 extends App 
 {
-    val g = Graph.g2p
-    val q = Graph.q2p
+    val g = EX_GRAPH.g2p
+    val q = EX_GRAPH.q2p
 
     println (s"g.checkEdges = ${g.checkEdges}")
     g.printG ()
@@ -305,8 +307,8 @@ object StrictSimTest2 extends App
  */
 object StrictSimTest3 extends App 
 {
-    val g = GraphIO ("gfile")
-    val q = GraphIO ("qfile")
+    val g = GraphIO [Double] ("gfile")
+    val q = GraphIO [Double] ("qfile")
 
     println (s"q.checkEdges = ${q.checkEdges}")
     q.printG ()

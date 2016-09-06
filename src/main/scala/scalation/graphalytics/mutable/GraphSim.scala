@@ -12,6 +12,9 @@ package scalation.graphalytics.mutable
 
 import scala.collection.mutable.{Set => SET}
 //import scala.collection.mutable.{HashSet => SET}
+import scala.reflect.ClassTag
+
+import scalation.graphalytics.mutable.{ExampleGraphD => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSim` class provides a second implementation for Simple Graph
@@ -20,7 +23,7 @@ import scala.collection.mutable.{Set => SET}
  *  @param g  the data graph  G(V, E, l)
  *  @param q  the query graph Q(U, D, k)
  */
-class GraphSim (g: Graph, q: Graph)
+class GraphSim [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel])
       extends GraphMatcher (g, q)
 {
     private val DEBUG = true                                  // debug flag
@@ -77,8 +80,8 @@ class GraphSim (g: Graph, q: Graph)
  */
 object GraphSimTest extends App
 {
-    val g = Graph.g1
-    val q = Graph.q1
+    val g = EX_GRAPH.g1
+    val q = EX_GRAPH.q1
 
     println (s"g.checkEdges = ${g.checkEdges}")
     g.printG ()
@@ -96,8 +99,8 @@ object GraphSimTest extends App
  */
 object GraphSimTest2 extends App
 {
-    val g = Graph.g2
-    val q = Graph.q2
+    val g = EX_GRAPH.g2
+    val q = EX_GRAPH.q2
 
     println (s"g.checkEdges = ${g.checkEdges}")
     g.printG ()
@@ -108,7 +111,6 @@ object GraphSimTest2 extends App
 
 } // GraphSimTest2 object
 
-import GraphGen._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSimTest3` object is used to test the `GraphSim` class.
@@ -116,14 +118,16 @@ import GraphGen._
  */
 object GraphSimTest3 extends App
 {
+    val gGen = new GraphGen [Double] (0.0)
+
     val gSize     = 1000           // size of the data graph
     val qSize     =   10           // size of the query graph
     val nLabels   =  100           // number of distinct labels
     val gAvDegree =    5           // average vertex out degree for data graph
     val qAvDegree =    2           // average vertex out degree for query graph
 
-    val g = genRandomGraph (gSize, nLabels, gAvDegree, false, "g")
-    val q = genBFSQuery (qSize, qAvDegree, g, false, "q")
+    val g = gGen.genRandomGraph (gSize, nLabels, gAvDegree, false, "g")
+    val q = gGen.genBFSQuery (qSize, qAvDegree, g, false, "q")
 
     println (s"q.checkEdges = ${q.checkEdges}")
     q.printG ()

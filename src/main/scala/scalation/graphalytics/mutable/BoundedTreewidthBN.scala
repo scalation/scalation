@@ -27,7 +27,7 @@ import BoundedTreeWidthChains._
  *  @param g_in  the input directed graph (FIX: training data)
  *  @param kMax  the maximum allowed treewidth
  */
-class BoundedTreeWidthBN (g_in: MGraph, kMax: Int)
+class BoundedTreeWidthBN (g_in: MGraph [Double], kMax: Int)
       extends Error
 {
     val DEBUG = true                                        // debug flag
@@ -43,7 +43,7 @@ class BoundedTreeWidthBN (g_in: MGraph, kMax: Int)
      *  tree, add score improving edges, so long as the 'kMax' bound on the graph's
      *  treewidth is not exceeded.  This corresponds to Algorithm 1 in the paper.
      */
-    def learnBN (): MGraph =
+    def learnBN (): MGraph [Double] =
     {
         val tr = stree.span ()                              // create a maximum scoring spanning tree
         if (DEBUG) { tr.printTree; tr.aniTree }
@@ -74,7 +74,7 @@ class BoundedTreeWidthBN (g_in: MGraph, kMax: Int)
      *  @param mp  the triangulated moralized graph
      *  @param k   the current treewidth
      */
-    def addEdgesGreedily (g: MGraph, mp: MGraph, k: Int)
+    def addEdgesGreedily (g: MGraph [Double], mp: MGraph [Double], k: Int)
     {
         while (k < kMax) {
             val (i, j) = findbestEdge (g, mp, k)            // find best remaining edge
@@ -92,7 +92,7 @@ class BoundedTreeWidthBN (g_in: MGraph, kMax: Int)
      *  @param mp  the triangulated moralized graph
      *  @param k   the current treewidth
      */
-    def findbestEdge (g: MGraph, mp: MGraph, k: Int): Pair =
+    def findbestEdge (g: MGraph [Double], mp: MGraph [Double], k: Int): Pair =
     {
         (-1, -1)                                   // FIX - to be implemented
     } // findbestEdge
@@ -108,7 +108,7 @@ class BoundedTreeWidthBN (g_in: MGraph, kMax: Int)
      *  @param g   the graph built up from the spanning tree
      *  @param mp  the triangulated moralized graph
      */
-    def orderVertices (g: MGraph, mp: MGraph): (Array [Int], Array [Int]) =
+    def orderVertices (g: MGraph [Double], mp: MGraph [Double]): (Array [Int], Array [Int]) =
     {
         (TopSort.topSort (g), blockSort (mp))
     } // orderVertices
@@ -117,7 +117,7 @@ class BoundedTreeWidthBN (g_in: MGraph, kMax: Int)
     /** Order the blocks in the graph.
      *  @param mp  the triangulated moralized graph
      */
-    def blockSort (mp: MGraph): Array [Int] =
+    def blockSort (mp: MGraph [Double]): Array [Int] =
     {
         null
     } // blockSort
@@ -126,7 +126,7 @@ class BoundedTreeWidthBN (g_in: MGraph, kMax: Int)
     /** Compute the size of the largest clique in the graph.
      *  @param mp  the triangulated moralized graph whose maximum clique size is sought
      */
-    def maxCliqueSize (mp: MGraph): Int =
+    def maxCliqueSize (mp: MGraph [Double]): Int =
     {
         1                                            // FIX - to be implemented
     } // maxCliqueSize
@@ -146,7 +146,7 @@ object BoundedTreeWidthBNTest extends App
                                   SET (4, 5),                  // ch(3)
                                   SET (),                      // ch(4)
                                   SET ()),                     // ch(5)
-                                  Array.fill (6)(-1),          // vertex labels
+                                  Array.fill (6)(-1.0),        // vertex labels
                            Map ((0, 1) -> 1.0,                 // edge labels
                                 (0, 3) -> 10.0,
                                 (0, 4) -> 3.0,

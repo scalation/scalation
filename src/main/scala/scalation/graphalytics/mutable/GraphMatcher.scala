@@ -21,7 +21,7 @@ import scalation.util.time
  *  @param g  the data graph  G(V, E, l) with vertices v in V
  *  @param q  the query graph Q(U, D, k) with vertices u in U
  */
-abstract class GraphMatcher (g: Graph, q: Graph)
+abstract class GraphMatcher [TLabel] (g: Graph [TLabel], q: Graph [TLabel])
 {
     protected val qRange     = 0 until q.size     // range for query vertices
     protected val CHECK      = 1024               // check progress after this many matches

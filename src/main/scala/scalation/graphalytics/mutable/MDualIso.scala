@@ -10,7 +10,9 @@ package scalation.graphalytics.mutable
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.{Set => SET}
+import scala.reflect.ClassTag
 
+import scalation.graphalytics.mutable.{ExampleMGraphD => EX_GRAPH}
 import scalation.util.time
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -19,7 +21,7 @@ import scalation.util.time
  *  @param g  the data graph  G(V, E, l)
  *  @param q  the query graph Q(U, D, k)
  */
-class MDualIso (g: MGraph, q: MGraph)
+class MDualIso [TLabel: ClassTag] (g: MGraph [TLabel], q: MGraph [TLabel])
       extends GraphMatcher (g, q)
 {
     private val duals        = new MDualSim (g, q)         // object for Dual Simulation algorithm
@@ -135,8 +137,8 @@ class MDualIso (g: MGraph, q: MGraph)
  */
 object MDualIsoTest extends App
 {
-    val g = MGraph.g1
-    val q = MGraph.q1
+    val g = EX_GRAPH.g1
+    val q = EX_GRAPH.q1
 
     println (s"g.checkEdges = ${g.checkEdges}")
     g.printG ()
@@ -157,8 +159,8 @@ object MDualIsoTest extends App
  */
 object MDualIsoTest2 extends App
 {
-    val g = MGraph.g2
-    val q = MGraph.q2
+    val g = EX_GRAPH.g2
+    val q = EX_GRAPH.q2
 
     println (s"g.checkEdges = ${g.checkEdges}")
     g.printG ()
@@ -172,7 +174,6 @@ object MDualIsoTest2 extends App
 
 } // MDualIsoTest2
 
-import MGraphGen._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualIsoTest3` object is used to test the `MDualIso` class.
@@ -180,6 +181,8 @@ import MGraphGen._
  */
 object MDualIsoTest3 extends App
 {
+    val mgGen = new MGraphGen [Double]
+
     val gSize     = 1000         // size of the data graph
     val qSize     =   10         // size of the query graph
     val nLabels   =  100         // number of distinct vertex labels
@@ -187,8 +190,8 @@ object MDualIsoTest3 extends App
     val gAvDegree =    5         // average vertex out degree for data graph
     val qAvDegree =    2         // average vertex out degree for query graph
 
-    val g = genRandomGraph (gSize, nLabels, eLabels, gAvDegree, false, "g")
-    val q = genBFSQuery (qSize, qAvDegree, g, false, "q")
+    val g = mgGen.genRandomGraph (gSize, nLabels, eLabels, gAvDegree, false, "g")
+    val q = mgGen.genBFSQuery (qSize, qAvDegree, g, false, "q")
 
     println (s"q.checkEdges = ${q.checkEdges}")
     q.printG ()
