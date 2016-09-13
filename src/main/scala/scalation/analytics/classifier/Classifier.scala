@@ -22,16 +22,16 @@ trait Classifier
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a set of data vectors and their classifications, build a classifier.
-     *  @param testStart Beginning of test region. (inclusive)
-     *  @param testEnd   End of test region. (exclusive)
+     *  @param testStart  the beginning of test region (inclusive).
+     *  @param testEnd    the end of test region (exclusive).
      */
     def train (testStart: Int, testEnd: Int)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a set of data vectors and their classifications, build a classifier.
-     *  @param itrain indices of the instances considered train data
+     *  @param itrain  the indices of the instances considered train data
      */
-    def train (itrain: Array [Int]){}
+    def train (itrain: Array [Int]) {}
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier, i.e., calculate statistics and create conditional
@@ -57,15 +57,15 @@ trait Classifier
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the quality of the training with a test-set and return the fraction
      *  of correct classifications.
-     *  @param testStart Beginning of test region. (inclusive)
-     *  @param testEnd   End of test region. (exclusive)
+     *  @param testStart  the beginning of test region (inclusive).
+     *  @param testEnd    the end of test region (exclusive).
      */
     def test (testStart: Int, testEnd: Int): Double
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the quality of the training with a test-set and return the fraction
      *  of correct classifications.
-     *  @param itest indices of the instances considered test data
+     *  @param itest  the indices of the instances considered test data
      */
     def test (itest: VectorI): Double = 0.0
 
@@ -78,7 +78,7 @@ trait Classifier
     /** Test the accuracy of the classified results by cross-validation, returning
      *  the accuracy.  The "test data" starts at 'testStart' and ends at 'testEnd',
      *  the rest of the data is "training data'.
-     *  @param nx  number of crosses and cross-validations (defaults to 5x).
+     *  @param nx  the number of crosses and cross-validations (defaults to 5x).
      */
     def crossValidate (nx: Int = 5): Double =
     {
@@ -103,7 +103,7 @@ trait Classifier
     /** Test the accuracy of the classified results by cross-validation, returning
      *  the accuracy.  The "test data" starts at 'testStart' and ends at 'testEnd',
      *  the rest of the data is "training data'.
-     *  @param nx  number of crosses and cross-validations (defaults to 5x).
+     *  @param nx  the number of crosses and cross-validations (defaults to 5x).
      */
     def crossValidateRand (nx: Int = 5): Double =
     {
@@ -126,7 +126,7 @@ trait Classifier
     } // crossValidateRand
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Size of the feature set.
+    /** Return the size of the feature set.
      */
     def size: Int
     
