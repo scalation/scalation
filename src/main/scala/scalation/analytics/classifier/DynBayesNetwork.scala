@@ -16,7 +16,7 @@ import scalation.random.ProbabilityVec
 // U N D E R   D E V E L O P M E N T
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `DynBayesNetwork` classes provides Dynamic Bayesian Network (DBN) models.
+/** The `DynBayesNetwork` class provides Dynamic Bayesian Network (DBN) models.
  */
 class DynBayesNetwork
       extends Classifier

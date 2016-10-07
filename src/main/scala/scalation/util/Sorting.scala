@@ -19,8 +19,13 @@ import scala.util.Random
  *  <p>
  *  Direct methods are faster, but modify the array, while indirect methods
  *  are slower, but do not modify the array.  This class is generic.
- *  @see `SortingD` for a version of this class specialized for Doubles.
- *  @see `SortingI` for a version of this class specialized for Ints.
+ *  @see `SortingC` for a version of this class specialized for `Complex`.
+ *  @see `SortingD` for a version of this class specialized for `Double`.
+ *  @see `SortingI` for a version of this class specialized for `Int`.
+ *  @see `SortingL` for a version of this class specialized for `Long`.
+ *  @see `SortingQ` for a version of this class specialized for `Rational`.
+ *  @see `SortingR` for a version of this class specialized for `Real`.
+ *  @see `SortingS` for a version of this class specialized for `StrNum`.
  *  @param a  the array to operate on
  */
 class Sorting [T <% Ordered[T]] (a: Array [T])
