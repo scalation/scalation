@@ -2,7 +2,7 @@
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 1.2
- *  @date    Mon Jan 28 17:18:16 EST 2013
+ *  @date    Sat Oct  8 12:37:32 EDT 2016
  *  @see     LICENSE (MIT style license file).
  *
  *  @see en.wikipedia.org/wiki/Romberg%27s_method
@@ -19,6 +19,8 @@ import scalation.util.banner
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Integral` object provides implementations for five basic integration methods:
  *  <p>
+ *      ∫f(x)dx on interval [a, b]
+ *  <p>
  *      trap      - trapezoidal method - linear
  *      simpson   - Simpson method     - quadratic
  *      simpson38 - 3/8 Simpson method - cubic
@@ -30,7 +32,7 @@ import scalation.util.banner
  */
 object Integral
 {
-    private val DEBUG  = true                              // debug flag
+    private val DEBUG  = false                             // debug flag
     private val ITER   = 8                                 // default iterations for Romberg
     private val ITMAX  = 20                                // maximum iterations for Romberg
     private val SUBDIV = 96                                // default subdivisions for Newton-Cotes
@@ -53,7 +55,7 @@ object Integral
      *  @param f   the function to be integrated
      *  @param sd  the number of subdivision (intervals) of [a, b]
      */
-    def trap (a: Double, b: Double, f: Double => Double, sd: Int = SUBDIV): Double =
+    def trap (a: Double, b: Double, f: FunctionS2S, sd: Int = SUBDIV): Double =
     {
         var x = a
         val dx = (b - a) / sd
@@ -85,7 +87,7 @@ object Integral
      *  @param f   the function to be integrated
      *  @param sd  the number of subdivision (intervals) of [a, b]
      */
-    def simpson38 (a: Double, b: Double, f: Double => Double, sd: Int = SUBDIV): Double =
+    def simpson38 (a: Double, b: Double, f: FunctionS2S, sd: Int = SUBDIV): Double =
     {
         var x = a
         val dx = (b - a) / sd
@@ -101,7 +103,7 @@ object Integral
      *  @param f   the function to be integrated
      *  @param sd  the number of subdivision (intervals) of [a, b]
      */
-    def boole (a: Double, b: Double, f: Double => Double, sd: Int = SUBDIV): Double =
+    def boole (a: Double, b: Double, f: FunctionS2S, sd: Int = SUBDIV): Double =
     {
         var x = a
         val dx = (b - a) / sd
@@ -120,7 +122,7 @@ object Integral
      *  @param f     the function to be integrated
      *  @param iter  the number of iterative steps
      */
-    def romberg (a: Double, b: Double, f: Double => Double, iter: Int = ITER): Double =
+    def romberg (a: Double, b: Double, f: FunctionS2S, iter: Int = ITER): Double =
     {
         val t = Array.ofDim [Double] (iter, iter)         // 2D array
 
@@ -135,6 +137,14 @@ object Integral
     } // romberg
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Integrate ∫f(x)dx on interval [a, b] using the default method.
+     *  @param a     the start of the integration interval
+     *  @param b     the end of the integration interval
+     *  @param f     the function to be integrated
+     */
+    def ∫ (on: (Double, Double), f: FunctionS2S): Double = romberg (on._1, on._2, f)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test each of the numerical integrators:  ∫f(x)dx on interval [a, b].
      *  @param a    the start of the integration interval
      *  @param b    the end of the integration interval
@@ -142,7 +152,7 @@ object Integral
      *  @param ans  the answer to the integration problem, if known (for % error)
      *  @param sd   the number of subdivision (intervals) of [a, b]
      */
-    def test (a: Double, b: Double, f: Double => Double, ans: Double, sd: Int = SUBDIV)
+    def test (a: Double, b: Double, f: FunctionS2S, ans: Double, sd: Int = SUBDIV)
     {
         val itrap = trap (a, b, f, sd)
         val isimp = simpson (a, b, f, sd)
@@ -218,7 +228,7 @@ object IntegralTest2 extends App
 {
     banner ("integral of 'a exp (-(x-b)^2/(2c^2)'")
     val gf  = new GaussianFunc (1.0, 0.0, 1.0)
-    val ans = 0.842700792949715                     // erf (1)
+    val ans = 0.85562439189214880
     Integral.test (0.0, 1.0, gf.gaussianf, ans)
 
 } // IntegralTest2 object

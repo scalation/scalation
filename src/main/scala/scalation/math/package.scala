@@ -198,5 +198,5 @@ package object math
      */
     def sec (x: Double): Double = 1.0 / sin (x)
 
-} // match package object 
+} // math package object 
 
