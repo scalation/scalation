@@ -11,7 +11,7 @@ package scalation.maxima
 import scala.math.{abs, max, pow, sqrt}
 import scala.util.control.Breaks.{breakable, break}
 
-import scalation.calculus.Calculus.{gradient, gradientD}
+import scalation.calculus.Differential.{gradient, gradientD}
 import scalation.linalgebra.VectorD
 import scalation.math.FunctionS2S
 

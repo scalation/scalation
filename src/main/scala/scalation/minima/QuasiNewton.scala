@@ -18,7 +18,7 @@ package scalation.minima
 
 import scala.math.{abs, max, pow}
 
-import scalation.calculus.Calculus.{FunctionV2S, gradient, gradientD}
+import scalation.calculus.Differential.{FunctionV2S, gradient, gradientD}
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.linalgebra.MatrixD.{eye, outer}
 import scalation.math.ExtremeD.MAX_VALUE

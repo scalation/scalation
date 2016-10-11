@@ -14,10 +14,10 @@ import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.math.FunctionS2S
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Calculus` object contains function for computing derivatives, gradients
+/** The `Differential` object contains function for computing derivatives, gradients
  *  vectors and Jacobian matrices.
  */
-object Calculus
+object Differential
 {
     type FunctionV2S  = VectorD => Double      // function of a vector - VectorD
     type FunctionV_2S = VectoD  => Double      // function of a vector - VectoD  - base trait
@@ -25,16 +25,6 @@ object Calculus
     private var h  = 1E-6      // default step size used for estimating derivatives
     private var h2 = h + h     // twice the step size
     private var hh = h * h     // step size squared
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Zero function.
-     */
-    def _0f (x: Double): Double = 0.0
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** One function.
-     */
-    def _1f (x: Double): Double = 1.0
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset the step size from its default step size to one more suitable for
@@ -190,15 +180,16 @@ object Calculus
         sum
     } // laplacian
 
-} // Calculus object
+} // Differential object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `CalculusTest` object is used to test the `Calculus` object.
+/** The `DifferentialTest` object is used to test the `Differential` object.
+ *  > run-main scalation.calculus.DifferentialTest2
  */
-object CalculusTest extends App
+object DifferentialTest extends App
 {
-    import Calculus._
+    import Differential._
 
     def g (y: Double): Double = 2.0 * (y - 3.0) * (y - 3.0)
 
@@ -224,18 +215,19 @@ object CalculusTest extends App
     val fa = Array [FunctionV2S] (f1, f2)
     println ("jacobian  fa(" + x + ") = " + jacobian (fa, x))
 
-} // CalculusTest object
+} // DifferentialTest object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `CalculusTest2` object is used to test the `Calculus` object showing trade-offs
- *  of using  1-sided and 2-sided derivative approximations as well as different
- *  values for h.
+/** The `DifferentialTest2` object is used to test the `Differential` object showing
+ *  trade-offs of using  1-sided and 2-sided derivative approximations as well as
+ *  different values for h.
  *  @see http://www.rose-hulman.edu/~bryan/lottamath/diffgrad.pdf
+ *  > run-main scalation.calculus.DifferentialTest2
  */
-object CalculusTest2 extends App
+object DifferentialTest2 extends App
 {
-    import Calculus._
+    import Differential._
     import scala.math.{abs, cos, sin}
 
     def f (x: Double): Double = sin (x)      // the function
@@ -255,5 +247,5 @@ object CalculusTest2 extends App
         println ()
     } // for
 
-} // CalculusTest2 object
+} // DifferentialTest2 object
 

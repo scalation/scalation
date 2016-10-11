@@ -10,7 +10,7 @@ package scalation.minima
 
 import scala.math.pow
 
-import scalation.calculus.Calculus.FunctionV2S
+import scalation.calculus.Differential.FunctionV2S
 import scalation.linalgebra.VectorD
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

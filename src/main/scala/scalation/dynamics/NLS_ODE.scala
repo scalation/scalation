@@ -15,7 +15,7 @@
 package scalation.dynamics
 
 import scalation.analytics.Predictor
-import scalation.calculus.Calculus.FunctionV_2S
+import scalation.calculus.Differential.FunctionV_2S
 import scalation.linalgebra.{VectoD, VectorD}
 import scalation.linalgebra.VectorD.one
 import scalation.minima.QuasiNewton

@@ -11,7 +11,7 @@ package scalation.minima
 import scala.math.{abs, ceil, floor, max, pow, round, sqrt}
 import scala.util.control.Breaks.{breakable, break}
 
-import scalation.calculus.Calculus.{gradient, gradientD}
+import scalation.calculus.Differential.{gradient, gradientD}
 import scalation.linalgebra.VectorD
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

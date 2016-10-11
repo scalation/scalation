@@ -26,5 +26,15 @@ package object calculus
      */
     implicit def functionS2S2Hilbert (f: FunctionS2S) = new Hilbert (f)
 
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Zero function.
+     */
+    def _0f (x: Double): Double = 0.0
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** One function.
+     */
+    def _1f (x: Double): Double = 1.0
+
 } // calculus package object
 

@@ -15,7 +15,7 @@ package scalation.dynamics
 import scala.math.sqrt
 import scala.util.control.Breaks.{breakable, break}
 
-import scalation.calculus.Calculus._
+import scalation.calculus.Differential._
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.linalgebra.MatrixD.eye
 

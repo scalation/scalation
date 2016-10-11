@@ -10,7 +10,7 @@ package scalation.analytics
 
 import scala.math.pow
 
-import scalation.calculus.Calculus.FunctionV2S
+import scalation.calculus.Differential.FunctionV2S
 import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.math.double_exp
 import scalation.minima.QuasiNewton

@@ -11,7 +11,7 @@ package scalation.minima
 import scala.math.abs
 import scala.util.control.Breaks.{breakable, break}
 
-import scalation.calculus.Calculus.derivative
+import scalation.calculus.Differential.derivative
 import scalation.math.FunctionS2S
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

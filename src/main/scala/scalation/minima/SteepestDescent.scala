@@ -10,7 +10,7 @@ package scalation.minima
 
 import scala.math.{abs, max, pow}
 
-import scalation.calculus.Calculus.{FunctionV2S, gradient, gradientD}
+import scalation.calculus.Differential.{FunctionV2S, gradient, gradientD}
 import scalation.linalgebra.VectorD
 import scalation.util.Error
 

@@ -13,7 +13,7 @@ import scala.util.control.Breaks.{breakable, break}
 
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.random.Randi
-import scalation.util.Error
+import scalation.util.{banner, Error}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KMeansClustering` class cluster several vectors/points using k-means
@@ -31,6 +31,7 @@ class KMeansClustering (x: MatrixD, k: Int, s: Int = 0, primary: Boolean = true)
 {
     if (k >= x.dim1) flaw ("constructor", "k must be less than the number of vectors")
 
+    private val DEBUG    = true                          // debug flag
     private val MAX_ITER = 200                           // the maximum number of iterations
     private val cent     = new MatrixD (k, x.dim2)       // the k centroids of clusters
     private val clustr   = Array.ofDim [Int] (x.dim1)    // assignment of vectors to clusters
@@ -53,8 +54,8 @@ class KMeansClustering (x: MatrixD, k: Int, s: Int = 0, primary: Boolean = true)
      */
     def assign ()
     {
-        val ran = new Randi (0, k - 1, s)                // for random integers: 0, ..., k-1
-        for (i <- 0 until x.dim1) clustr(i) = ran.igen   // randomly assign to a cluster
+        val ran = new Randi (0, k - 1, s)              // for random integers: 0, ..., k-1
+        for (i <- x.range1) clustr(i) = ran.igen       // randomly assign to a cluster
     } // assign
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -64,7 +65,7 @@ class KMeansClustering (x: MatrixD, k: Int, s: Int = 0, primary: Boolean = true)
     def reassign (): Boolean =
     {
         var done = true                                // done indicates no changes
-        for (i <- 0 until x.dim1) {
+        for (i <- x.range1) {
             val v = x(i)                               // let v be the ith vector
             for (c <- 0 until k) {
                 val newDist = distance (v, cent(c))    // calc distance to centroid c
@@ -84,13 +85,13 @@ class KMeansClustering (x: MatrixD, k: Int, s: Int = 0, primary: Boolean = true)
      */
     def pickCentroids ()
     {
-        val ran  = new Randi (0, x.dim1 - 1, s)     // for random integers: 0, ..., x.dim1-1
-        val iSet = Set [Int] ()                     // set of integers already generated
+        val ran  = new Randi (0, x.dim1 - 1, s)        // for random integers: 0, ..., x.dim1-1
+        val iSet = Set [Int] ()                        // set of integers already generated
         for (c <- 0 until k) {
-            var i = ran.igen                        // generate a random integer
-            while (iSet contains i) i = ran.igen    // do not allow repeats
-            iSet   += i                             // add to set of generated integers
-            cent(c) = x(i)                          // let centroid c be the ith vector
+            var i = ran.igen                           // generate a random integer
+            while (iSet contains i) i = ran.igen       // do not allow repeats
+            iSet   += i                                // add to set of generated integers
+            cent(c) = x(i)                             // let centroid c be the ith vector
         } // for
     } // pickCentroids
 
@@ -99,11 +100,12 @@ class KMeansClustering (x: MatrixD, k: Int, s: Int = 0, primary: Boolean = true)
      */
     def calcCentroids ()
     {
-        val cx = new MatrixD (k, x.dim2)    // to hold sum of vectors for each cluster
-        val cs = new VectorD (k)            // to hold number of vectors in each cluster
-        for (i <- 0 until x.dim1) {
-            cx(clustr(i)) += x(i)           // add the next vector in cluster
-            cs(clustr(i)) += 1.0            // add 1 to number in cluster
+        val cx = new MatrixD (k, x.dim2)               // to hold sum of vectors for each cluster
+        val cs = new VectorD (k)                       // to hold number of vectors in each cluster
+        for (i <- x.range1) {
+            val ci  = clustr(i)                        // x(i) currently assigned to cluster ci
+            cx(ci)  = cx(ci) + x(i)                    // add the next vector in cluster
+            cs(ci) += 1.0                              // add 1 to number in cluster
         } // for
         for (c <- 0 until k) cent(c) = cx(c) / cs(c)   // divide to get averages/means
     } // calcCentroids
@@ -115,40 +117,42 @@ class KMeansClustering (x: MatrixD, k: Int, s: Int = 0, primary: Boolean = true)
     def cluster (): Array [Int] =
     {
         if (primary) {
-            assign ()                                // randomly assign points to clusters
-            calcCentroids ()                         // calculate the initial centroids
+            assign ()                                  // randomly assign points to clusters
+            calcCentroids ()                           // calculate the initial centroids
         } else {
-            pickCentroids ()                         // alt., pick points for initial centroids 
+            pickCentroids ()                           // alt., pick points for initial centroids 
         } // if
-        println ("(" + 0 + ") clustr = " + clustr)
-        println ("(" + 0 + ") cent  = " + cent)
+        println ("(" + 0 + ") clustr = " + clustr.deep)
+        println ("(" + 0 + ") cent   = " + cent)
 
         breakable { for (l <- 1 to MAX_ITER) {
-            if (reassign ()) break                   // reassign points to clusters (no change => break)
-            calcCentroids ()                         // re-calculate the centroids
-            println ("(" + l + ") clustr = " + clustr)
-            println ("(" + l + ") cent  = " + cent)
+            if (reassign ()) break                     // reassign points to clusters (no change => break)
+            calcCentroids ()                           // re-calculate the centroids
+            if (DEBUG) {
+                println ("(" + l + ") clustr = " + clustr.deep)
+                println ("(" + l + ") cent   = " + cent)
+            } // if
         }} // for   
-        clustr                                       // return the cluster assignment vector
+        clustr                                         // return the cluster assignment vector
     } // cluster
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given a new point/vector y, determine which cluster it belongs to (i.e.,
-     *  the cluster whose centroid it is closest to.
+    /** Given a new point/vector 'y', determine which cluster it belongs to,
+     *  i.e., the cluster whose centroid it is closest to.
      *  @param y  the vector to classify
      */
     def classify (y: VectorD): Int =
     {
-        var dist = distance (y, cent(0))          // calc distance to centroid 0
-        var clus = 0                              // assign y to cluster 0
+        var dist = distance (y, cent(0))               // calc distance to centroid 0
+        var clus = 0                                   // assign y to cluster 0
         for (c <- 1 until k) {
-            val newDist = distance (y, cent(c))   // calc distance to centroid c
-            if (newDist < dist) {                 // is it closer than old distance
-                dist = newDist                    // make it the new distance
-                clus = c                          // assign y to cluster c
+            val newDist = distance (y, cent(c))        // calc distance to centroid c
+            if (newDist < dist) {                      // is it closer than old distance
+                dist = newDist                         // make it the new distance
+                clus = c                               // assign y to cluster c
             } // if
         } // for
-        clus                                      // return cluster y belongs to
+        clus                                           // return cluster y belongs to
     } // classify
 
 } // KMeansClustering class
@@ -156,6 +160,7 @@ class KMeansClustering (x: MatrixD, k: Int, s: Int = 0, primary: Boolean = true)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KMeansClusteringTest` object is used to test the `KMeansClustering` class.
+ *  > run-main scalation.analytics.KMeansClusteringTest
  */
 object KMeansClusteringTest extends App
 {
@@ -171,8 +176,9 @@ object KMeansClusteringTest extends App
     println ("----------------------------------------------------")
 
     for (s <- 0 to 4) {                         // test with different random streams
+        banner ("KMeansClustering for stream s = " + s)
         val cl = new KMeansClustering (v, 3, s)                 
-        println ("--- final cluster = " + cl.cluster () + "\n")
+        println ("--- final cluster = " + cl.cluster ().deep + "\n")
         println ("--- classify " + y + " = " + cl.classify (y) + "\n")
     } // for
 

@@ -13,7 +13,7 @@ package scalation.minima
 
 import scala.math.{abs, pow}
 
-import scalation.calculus.Calculus.derivative
+import scalation.calculus.Differential.derivative
 import scalation.linalgebra.VectorD
 import scalation.math.FunctionS2S
 
