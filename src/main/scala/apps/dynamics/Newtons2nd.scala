@@ -9,7 +9,7 @@
 package apps.dynamics
 
 import scala.math.{cos, sin, Pi}
-import util.control.Breaks.{breakable, break}
+import scala.util.control.Breaks.{breakable, break}
 
 import scalation.dynamics.{DormandPrince, RungeKutta}
 import scalation.dynamics.Derivatives.Derivative

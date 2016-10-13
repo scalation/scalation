@@ -9,8 +9,8 @@
 
 package scalation.linalgebra.mem_mapped
 
-import collection.Traversable
-import util.Sorting.quickSort
+import scala.collection.Traversable
+import scala.util.Sorting.quickSort
 
 import scalation.math.StrO.{abs => ABS, max => MAX, _}
 

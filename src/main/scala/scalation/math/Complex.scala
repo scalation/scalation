@@ -426,7 +426,7 @@ object Complex
  */
 object ComplexTest extends App
 {
-    import util.Sorting.quickSort
+    import scala.util.Sorting.quickSort
 
     val c = Complex (2.0, 3.0)
     val d = Complex (4.0, 5.0)

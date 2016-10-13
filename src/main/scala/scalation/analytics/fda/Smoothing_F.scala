@@ -48,7 +48,7 @@ class Smoothing_F (y: VectorD, t: VectorD, n: Int = 2)
     {
         form_phi ()
 //      c = (phi.t * phi).inverse * phi.t * y            // solution without smoothness
-        val lambda = 0.1                                 // smoothness parameter
+        val lambda = 0.5                                 // smoothness parameter
         val rrg = new RidgeRegression (phi, y, lambda)   
         rrg.train ()
         c = rrg.coefficient

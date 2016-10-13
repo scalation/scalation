@@ -1,6 +1,6 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  John Miller
+/** @author  John Miller, Michael Cotterell
  *  @version 1.2
  *  @date    Thu Sep 22 21:45:58 EDT 2016
  *  @see     LICENSE (MIT style license file).
@@ -13,7 +13,9 @@ package scalation.analytics.fda
 
 import scala.math.max
 
-import scalation.linalgebra.VectorD
+import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.math.double_exp
+import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `B_Spline` class provides B-Spline basis functions for various orders 'm',
@@ -24,14 +26,16 @@ import scalation.linalgebra.VectorD
  *  @see open.uct.ac.za/bitstream/item/16664/thesis_sci_2015_essomba_rene_franck.pdf?sequence=1
  *-----------------------------------------------------------------------------
  *  @param ττ    the time-points of the original knots in the time dimension
- *  @param mMax  the maximum order, allowing splines orders from 1 to nMax
+ *  @param mMax  the maximum order, allowing splines orders from 1 to mMax
  */
 class B_Spline (ττ: VectorD, mMax: Int = 4)
+      extends Error
 {
     private val DEBUG = true                                 // debug flag
     private val l     = ττ.dim - 1                           // the number of intervals
-    private val τ     = ττ ++ VectorD.fill (mMax-1)(ττ(l))   // augment on right to avoid index error
+    private val τ     = VectorD.fill (mMax)(ττ(0)) ++ ττ ++ VectorD.fill (mMax)(ττ(l))   // augment to accomodate knots
 
+    if (mMax < 1 || mMax > 10) flaw ("constructor", "B_Spline order restricted to 1 thru 10")
     if (DEBUG) println ("τ = " + τ)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -41,61 +45,88 @@ class B_Spline (ττ: VectorD, mMax: Int = 4)
      */
     def b1 (j: Int, t: Double): Double =
     {
-        val k = max (0, j)                                   // no negative indices
+        val k = j + mMax - 1                                    // index shift
         if (τ(k) <= t && t < τ(k+1)) 1.0 else 0.0
     } // b_1
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Order two 'm = 2' B-Spline basis functions (linear functions).
-     *  @param j  indicates which spline function: 0 to l-2 
+     *  @param j  indicates which spline function
      *  @param t  the time parameter
      */
     def b2 (j: Int, t: Double): Double =
     {
-        val k = max (0, j)
-        (t - τ(k)) / (τ(k+1) - τ(k)) * b1 (k, t) +
-        (τ(k+2) - t) / (τ(k+2) - τ(k+1)) * b1 (k+1, t)
+        if (mMax < 2) flaw ("b2", s"mMax = $mMax can't be less than m = 2")
+        val k  = j + mMax - 2                                   // index shift
+        val d1 = τ(k+1) - τ(k)
+        val d2 = τ(k+2) - τ(k+1)
+        val a  = if (d1 =~ 0.0) 0.0 else ((t  -  τ(k)) / d1) * bb1 (k, t)
+        val b  = if (d2 =~ 0.0) 0.0 else ((τ(k+2) - t) / d2) * bb1 (k+1, t)
+        a + b
     } // b2
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Order three 'm = 3' B-Spline basis functions (quadratic functions).
-     *  @param j  indicates which spline function: 0 to l-3
+     *  @param j  indicates which spline function
      *  @param t  the time parameter
      */
     def b3 (j: Int, t: Double): Double =
     {
-        val k = max (0, j)
-        (t - τ(k)) / (τ(k+2) - τ(k)) * b2 (k, t) +
-        (τ(k+3) - t) / (τ(k+3) - τ(k+1)) * b2 (k+1, t)
+        if (mMax < 3) flaw ("b3", s"mMax = $mMax can't be less than m = 3")
+        val k  = j + mMax - 3                                   // index shift
+        val d1 = τ(k+2) - τ(k)
+        val d2 = τ(k+3) - τ(k+1)
+        val a  = if (d1 =~ 0.0) 0.0 else ((t  -  τ(k)) / d1) * bb (2)(k, t)
+        val b  = if (d2 =~ 0.0) 0.0 else ((τ(k+3) - t) / d2) * bb (2)(k+1, t)
+        a + b
     } // b3
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Order four 'm = 4' B-Spline basis functions (cubic functions).
-     *  @param j  indicates which spline function: 0 to l-4
+     *  FIX: missing first interesting spline, see B_SplineTest
+     *  @param j  indicates which spline function
      *  @param t  the time parameter
      */
     def b4 (j: Int, t: Double): Double =
     {
-        val k = max (0, j)
-        (t - τ(k)) / (τ(k+3) - τ(k)) * b3 (k, t) +
-        (τ(k+4) - t) / (τ(k+4) - τ(k+1)) * b3 (k+1, t)
+        if (mMax < 4) flaw ("b4", s"mMax = $mMax can't be less than m = 4")
+        val k  = j + mMax - 4                                   // index shift
+        val d1 = τ(k+3) - τ(k)
+        val d2 = τ(k+4) - τ(k+1)
+        val a  = if (d1 =~ 0.0) 0.0 else ((t  -  τ(k)) / d1) * bb (3)(k, t)
+        val b  = if (d1 =~ 0.0) 0.0 else ((τ(k+4) - t) / d2) * bb (3)(k+1, t)
+        a + b
     } // b4
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Order 'm' B-Spline basis functions (general recurrence).
      *  @param m  the order of the spline function (degree = order - 1)
-     *  @param j  indicates which spline function: 0 to l-m
+     *  @param j  indicates which spline function
      *  @param t  the time parameter
      */
     def bb (m: Int)(j: Int, t: Double): Double =
     {
-        val k = max (0, j)
-        if (m == 1) return  b1 (k, t)
-
+        if (mMax < m) flaw ("bb", s"mMax = $mMax can't be less than m = $m")
+        val k = j
+        if (m == 1) return bb1 (k, t)
         val km = k + m
-        (t - τ(k)) / (τ(km-1) - τ(k)) * bb (m-1)(k, t) +
-        (τ(km) - t) / (τ(km) - τ(k+1)) * bb (m-1)(k+1, t)
+        val d1 = τ(km-1) - τ(k)
+        val d2 = τ(km) - τ(k+1)
+        val a  = if (d1 =~ 0.0) 0.0 else ((t  - τ(k)) / d1) * bb (m-1)(k, t)
+        val b  = if (d2 =~ 0.0) 0.0 else ((τ(km) - t) / d2) * bb (m-1)(k+1, t)
+        a + b
     } // bb
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Order one 'm = 1' B-Spline basis functions (flat functions).
+     *  This version does not shift the index (used in recurrence).
+     *  @param k  indicates which spline function 0 to l-1
+     *  @param t  the time parameter
+     */
+    private def bb1 (k: Int, t: Double): Double =
+    {
+        if (τ(k) <= t && t < τ(k+1)) 1.0 else 0.0
+    } // bb_1
 
 } // B_Spline class
 
@@ -114,16 +145,16 @@ object B_SplineTest extends App
     val bs = new B_Spline (τ, mM)                            // B-Spline generator
     val n  = 100                                             // number of time-points for plotting
     val t  = VectorD.range (0, n)                            // time-points for plotting
-    val k  = 0                                               // index for initial B-Spline
 
     //-------------------------------------------------------------------------
     // order 1 B-Splines (flat functions, degree 0)
 
-    val y1 = new VectorD (n)                                 // vector to hold initial B-Spline
-    val y2 = new VectorD (n)                                 // vector to hold next B-Spline
+    val y1 = new VectorD (n)
+    val y2 = new VectorD (n)
+    val k = 1
 
     for (i <- 0 until n) {                                   // order 1 B-Splines
-        y1(i) = bs.b1 (k, i)                                 // initial B-Spline
+        y1(i) = bs.b1 (k, i)                                 // first "interesting" B-Spline
         y2(i) = bs.b1 (k+1, i)                               // next B-Spline
     } // for
     new Plot (t, y1, y2, "B-Spline order " + 1)
@@ -131,11 +162,11 @@ object B_SplineTest extends App
     //-------------------------------------------------------------------------
     // order 2 B-Splines (linear functions, degree 1)
 
-    val y3 = new VectorD (n)                                 // vector to hold initial B-Spline
-    val y4 = new VectorD (n)                                 // vector to hold next B-Spline
+    val y3 = new VectorD (n)
+    val y4 = new VectorD (n)
 
     for (i <- 0 until n) {                                   // order 2 B-Splines
-        y3(i) = bs.b2 (k, i)                                 // initial B-Spline
+        y3(i) = bs.b2 (k, i)                                 // first "interesting" B-Spline
         y4(i) = bs.b2 (k+1, i)                               // next B-Spline
     } // for
     new Plot (t, y3, y4, "B-Spline order " + 2)
@@ -143,11 +174,11 @@ object B_SplineTest extends App
     //-------------------------------------------------------------------------
     // order 3 B-Splines (quadratic functions, degree 2)
 
-    val y5 = new VectorD (n)                                 // vector to hold initial B-Spline
-    val y6 = new VectorD (n)                                 // vector to hold next B-Spline
+    val y5 = new VectorD (n)
+    val y6 = new VectorD (n)
 
     for (i <- 0 until n) {                                   // order 3 B-Splines
-        y5(i) = bs.b3 (k, i)                                 // initial B-Spline
+        y5(i) = bs.b3 (k, i)                                 // first "interesting" B-Spline
         y6(i) = bs.b3 (k+1, i)                               // next B-Spline
     } // for
     new Plot (t, y5, y6, "B-Spline order " + 3)
@@ -155,11 +186,11 @@ object B_SplineTest extends App
     //-------------------------------------------------------------------------
     // order 4 B-Splines (cubic functions, degree 3)
 
-    val y7 = new VectorD (n)                                 // vector to hold initial B-Spline
-    val y8 = new VectorD (n)                                 // vector to hold next B-Spline
+    val y7 = new VectorD (n)
+    val y8 = new VectorD (n)
 
     for (i <- 0 until n) {                                   // order 4 B-Splines
-        y7(i) = bs.b4 (k, i)                                 // initial B-Spline
+        y7(i) = bs.b4 (k, i)                                 // first "interesting" B-Spline
         y8(i) = bs.b4 (k+1, i)                               // next B-Spline
     } // for
     new Plot (t, y7, y8, "B-Spline order " + 4)
@@ -179,7 +210,42 @@ object B_SplineTest2 extends App
     val mM = 4                                               // maximum order to test
     val τ  = VectorD (0.0, 20.0, 40.0, 60.0, 80.0, 100.0)    // knot time-points
     val bs = new B_Spline (τ, mM)                            // B-Spline generator
-    val n  = 100                                              // number of time-points for plotting
+    val n  = 100                                             // number of time-points for plotting
+    val t  = VectorD.range (0, n)                            // time-points for plotting
+
+    for (m <- 1 to mM) {
+
+        //---------------------------------------------------------------------
+        // order m B-Splines (polynomial functions)
+
+        val y1 = new VectorD (n)
+        val y2 = new VectorD (n)
+
+        for (i <- 0 until n) {
+            y1(i) = bs.bb (m)(mM-m+1, i)                     // first "interesting" B-Spline
+            y2(i) = bs.bb (m)(mM-m+2, i)                     // next B-Spline
+        } // for
+        new Plot (t, y1, y2, "B-Spline order " + m)
+
+   } // for
+
+} // B_SplineTest2 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `B_SplineTest2` object is used to test the `B_Spline` class.
+ *  It tests the B-Spline functions using the general recurrence and plots
+ *  several basis functions using `PlotM`.
+ *  > run-main scalation.analytics.fda.B_SplineTest3
+ */
+object B_SplineTest3 extends App
+{
+    import scalation.plot.PlotM
+
+    val mM = 4                                               // maximum order to test
+    val τ  = VectorD (0.0, 20.0, 40.0, 60.0, 80.0, 100.0)    // knot time-points
+    val bs = new B_Spline (τ, mM)                            // B-Spline generator
+    val n  = 100                                             // number of time-points for plotting
     val t  = VectorD.range (0, n)                            // time-points for plotting
     val k  = 0                                               // index for initial B-Spline
 
@@ -188,16 +254,14 @@ object B_SplineTest2 extends App
         //---------------------------------------------------------------------
         // order m B-Splines (polynomial functions)
 
-        val y1 = new VectorD (n)                             // vector to hold initial B-Spline
-        val y2 = new VectorD (n)                             // vector to hold next B-Spline
+      val y = new MatrixD (τ.dim + mM, n)                    // matrix to hold initial B-Splines
 
-        for (i <- 0 until n) {
-            y1(i) = bs.bb (m)(k, i)                          // initial B-Spline
-            y2(i) = bs.bb (m)(k+1, i)                        // next B-Spline
-        } // for
-        new Plot (t, y1, y2, "B-Spline order " + m)
+      for (i <- 0 until n; j <- 0 until y.dim1) {
+          y(j, i) = bs.bb (m)(k+j, i)
+      } // for
+      new PlotM (t, y, null, "B-Spline order " + m)
 
    } // for
 
-} // B_SplineTest2 object
+} // B_SplineTest3 object
 

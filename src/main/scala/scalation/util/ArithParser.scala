@@ -11,7 +11,7 @@
 
 package scalation.util
 
-import util.parsing.combinator.JavaTokenParsers
+import scala.util.parsing.combinator.JavaTokenParsers
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ArithParser` trait illustrates how to use Scala's Parser Combinators.

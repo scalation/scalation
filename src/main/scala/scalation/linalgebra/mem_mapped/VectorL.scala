@@ -9,10 +9,10 @@
 
 package scalation.linalgebra.mem_mapped
 
-import collection.Traversable
-import util.Sorting.quickSort
+import scala.collection.Traversable
+import scala.util.Sorting.quickSort
 
-import math.{abs => ABS, max => MAX, sqrt}
+import scala.math.{abs => ABS, max => MAX, sqrt}
 
 import scalation.math.long_exp
 import scalation.linalgebra.{VectorI => VectorII}
