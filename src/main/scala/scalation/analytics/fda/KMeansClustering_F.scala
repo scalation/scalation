@@ -19,10 +19,12 @@ import scalation.util.banner
 /** The `KMeansClustering_F` class provides a simple form of k-means clustering
  *  that simply smoothes the data and then appliers `KMeansClustering`.
  *  @param x  the vectors/points to be clustered stored as rows of a matrix
+ *  @param t  the time points
+ *  @param τ  the time points for knots
  *  @param k  the number of clusters to make
  *  @param s  the random number stream (to vary the clusters made)
  */
-class KMeansClustering_F (x: MatrixD, t: VectorD, k: Int, s: Int = 0)
+class KMeansClustering_F (x: MatrixD, t: VectorD, τ: VectorD, k: Int, s: Int = 0)
       extends Clusterer
 {
     private val DEBUG = true                          // debug flag
@@ -57,10 +59,11 @@ class KMeansClustering_F (x: MatrixD, t: VectorD, k: Int, s: Int = 0)
     private def smooth ()
     {
         for (i <- x.range1) {                         // for each vector/row in matrix x
-            val frg = new Smoothing_F (x(i), t, t.dim-3)
-            val c = frg.train ()
+//          val moo = new Smoothing_F (x(i), t, t.dim-3)
+            val moo = new Smoothing_F (x(i), t, τ)
+            val c   = moo.train ()
             if (DEBUG) println ("c = " + c)
-            for (j <- x.range2) xs(i, j) = frg.predict (t(j))
+            for (j <- x.range2) xs(i, j) = moo.predict (t(j))
         } // for
     } // smooth
 
@@ -91,7 +94,7 @@ object KMeansClustering_FTest extends App
 
     for (s <- 0 to 4) {                         // test with different random streams
         banner ("KMeansClustering_F for stream s = " + s)
-        val cl = new KMeansClustering_F (x, t, 3, s)                 
+        val cl = new KMeansClustering_F (x, t, t, 3, s)                 
         println ("--- final cluster = " + cl.cluster ().deep + "\n")
         println ("--- classify " + y + " = " + cl.classify (y) + "\n")
     } // for
