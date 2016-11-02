@@ -73,11 +73,15 @@ class StatVector (val self: VectorD)
     /** Compute Pearson's correlation of 'self' vector with vector 'y'.
      *  @param y  the other vector
      */
-    def corr (y: VectorD): Double = cov (y) / sqrt (self.variance * y.variance)
+    def corr (y: VectorD): Double =
+    {
+        val c = cov (y) / sqrt (self.variance * y.variance)
+        if (c.isNaN) if (self == y) 1.0 else 0.0 else c
+    } // corr
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the population Pearson's correlation of 'self' vector with vector 'y'.
-     *  Should only difference from 'corr' due to round-off errors.
+     *  Note:  should only differ from 'corr' due to round-off errors and NaN issue.
      *  @param y  the other vector
      */
     def pcorr (y: VectorD): Double = pcov (y) / sqrt (self.pvariance * y.pvariance)
@@ -208,10 +212,14 @@ object StatVector
     /** Return the mean vector containing the means of each column of matrix 'x'.
      *  @param x  the matrix whose column means are sought
      */
-    def mean (x: MatrixD): VectorD =
-    {
-        VectorD (for (j <- 0 until x.dim2) yield x.col(j).mean)
-    } // mean
+    def mean (x: MatrixD): VectorD = VectorD (for (j <- x.range2) yield x.col(j).mean)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Center the input matrix 'x' to zero mean, column-wise, by subtracting the mean.
+     *  @param x     the input matrix to center
+     *  @param mu_x  the vector of column means of matrix x
+     */
+    def center (x: MatrixD, mu_x: VectorD): MatrixD = x - mu_x
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the sample covariance matrix for the columns of matrix 'x'.
@@ -234,7 +242,8 @@ object StatVector
     } // pcov
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the sample correlation matrix for the columns of matrix 'x'.
+    /** Return the correlation matrix for the columns of matrix 'x'.
+     *  Note:  sample vs. population results in essentailly the same values.
      *  @param x  the matrix whose column columns correlations are sought
      */
     def corr (x: MatrixD): MatrixD =
@@ -242,10 +251,11 @@ object StatVector
         val covv = cov (x)                               // sample covariance matrix
         val cor  = eye (covv.dim1)                       // correlation matrix
 
-        for (i <- 0 until covv.dim1) {
+        for (i <- covv.range1) {
             val var_i = covv (i, i)                      // variance of column i
             for (j <- 0 until i) {
-                cor(i, j) = covv (i, j) / sqrt (var_i *  covv (j, j))
+                cor(i, j) = covv (i, j) / sqrt (var_i * covv (j, j))
+                if (cor(i, j).isNaN) cor(i, j) = if (x(i) == x(j)) 1.0 else 0.0
                 cor(j, i) = cor (i, j)
             } // for
         } // for
@@ -347,17 +357,26 @@ object StatVectorTest3 extends App
                                  3.9, 2.0, 0.58,
                                  4.3, 2.1, 0.62,
                                  4.1, 2.2, 0.63)
+
+    val mu = mean (x)
+    val cx = center (x, mu)
                                  
     println ("-" * 60)
-    println (s"mean ($x) = ${mean (x)}")             // mean vector
+    println (s"x           = $x}")                   // x matrix
     println ("-" * 60)
-    println (s"cov ($x)  = ${cov (x)}")              // sample covariance matrix
+    println (s"mean (x)    = $mu")                   // mean vector
     println ("-" * 60)
-    println (s"pcov ($x) = ${pcov (x)}")             // population covariance matrix
+    println (s"cov (x)     = ${cov (x)}")            // sample covariance matrix
     println ("-" * 60)
-    println (s"corr ($x) = ${corr (x)}")             // correlation matrix
+    println (s"pcov (x)    = ${pcov (x)}")           // population covariance matrix
     println ("-" * 60)
-                            
+    println (s"corr (x)    = ${corr (x)}")           // sample correlation matrix
+    println ("-" * 60)
+    println (s"center (x)  = $cx")                   // mean centered
+    println ("-" * 60)
+    println (s"cx + mu - x = ${cx + mu - x}")        // difference
+    println ("-" * 60)
+
 } // StatVectorTest3 object
 
 
@@ -380,14 +399,23 @@ object StatVectorTest4 extends App
                                  40.1, 10.0, 18.6, 174.5,
                                  45.9, 12.0, 20.4, 185.7)
 
+    val mu = mean (x)
+    val cx = center (x, mu)
+
     println ("-" * 60)
-    println (s"mean ($x) = ${mean (x)}")             // mean vector
+    println (s"x           = $x}")                   // x matrix
     println ("-" * 60)
-    println (s"cov ($x)  = ${cov (x)}")              // sample covariance matrix
+    println (s"mean (x)    = $mu")                   // mean vector
     println ("-" * 60)
-    println (s"pcov ($x) = ${pcov (x)}")             // population covariance matrix
+    println (s"cov (x)     = ${cov (x)}")            // sample covariance matrix
     println ("-" * 60)
-    println (s"corr ($x) = ${corr (x)}")             // correlation matrix
+    println (s"pcov (x)    = ${pcov (x)}")           // population covariance matrix
+    println ("-" * 60)
+    println (s"corr (x)    = ${corr (x)}")           // correlation matrix
+    println ("-" * 60)
+    println (s"center (x)  = $cx")                   // mean centered
+    println ("-" * 60)
+    println (s"cx + mu - x = ${cx + mu - x}")        // difference
     println ("-" * 60)
 
 } // StatVectorTest4 object

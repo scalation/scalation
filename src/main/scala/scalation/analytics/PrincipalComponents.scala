@@ -4,16 +4,18 @@
  *  @version 1.2
  *  @date    Mon Mar 25 14:58:13 EDT 2013
  *  @see     LICENSE (MIT style license file).
- *  @see     http://www.predict.ws/H_principle/SvanteHarald.htm
- *  @see     http://folk.uio.no/henninri/pca_module/pca_nipals.pdf
+
+ *  @see www.predict.ws/H_principle/SvanteHarald.htm
+ *  @see folk.uio.no/henninri/pca_module/pca_nipals.pdf
  */
 
 package scalation.analytics
 
 import scala.util.control.Breaks.{breakable, break}
 
-import scalation.linalgebra.{Eigenvalue, Eigenvector, MatrixD, VectorD}
+import scalation.linalgebra.{Eigenvalue, Eigenvector, MatrixD, VectoD, VectorD}
 import scalation.linalgebra.MatrixD.outer
+import scalation.stat.StatVector.{center, mean}
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -29,55 +31,40 @@ class PrincipalComponents (x: MatrixD)
 {
     if (! x.isRectangular) flaw ("constructor", "x matrix must be rectangular")
 
+    private val DEBUG    = true                              // debug flag
     private val MAX_ITER = 200                               // the maximum number of iterations
     private val EPSILON  = 1E-8                              // a value close to zero
     private val M        = x.dim1                            // the number of data points (rows)
     private val MR       = M.toDouble                        // M as a real number
     private val N        = x.dim2                            // the number of variables (columns)
-    private val mu       = meanCenter ()                     // the mean vector
-    private val cov      = computeCov ()                     // the covariance matrix
+    private val mu       = mean (x)                          // the mean vector (column means)
+    private val xc       = center (x, mu)                    // center x (shift mean to zero)
+    private val cov      = (xc dot xc) / (MR - 1.0)          // the covariance matrix (from mean zero data)
     private val eigenVal = (new Eigenvalue (cov)).getE       // the eigenvalues of cov
     private val eigenVec = computeEigenVectors (eigenVal)    // the eigenvectors for cov
 
     private var featureMat: MatrixD = null                   // the feature matrix
     private var reducedMat: MatrixD = null                   // the reduced matrix
 
-    println ("mu = " + mu)
-    println ("zero-meaned x = " + x)
-    println ("cov = " + cov)
-    println ("eigenVal = " + eigenVal)
-    println ("eigenVec = " + eigenVec)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Center the data about the means (i.e., subtract the means) and return
-     *  the mean vector (i.e., the mean for each variable/dimension).
-     */
-    def meanCenter (): VectorD =
-    {
-        val mu  = new VectorD (N)                              // the mean vector
-        for (j <- 0 until N) mu(j) = x.col(j).sum / MR         // compute means
-        for (i <- 0 until M; j <- 0 until N) x(i, j) -= mu(j)  // subtract the means
-        mu
-    } // meanCenter
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Assuming mean centered data, compute the covariance matrix.
-     */
-    def computeCov (): MatrixD =
-    {
-        val cov = new MatrixD (N, N)                           // the covariance matrix
-        for (i <- 0 until N; j <- i until N) {
-            cov(i, j) = (x.col(i) dot x.col(j)) / (MR - 1.0)
-            if (i != j) cov(j, i) = cov(i, j)
-        } // for
-        cov
-    } // computeCov
+    if (DEBUG) {
+        println ("-" * 60)
+        println ("mu = " + mu)
+        println ("-" * 60)
+        println ("zero-meaned x = " + x)
+        println ("-" * 60)
+        println ("cov = " + cov)
+        println ("-" * 60)
+        println ("eigenVal = " + eigenVal)
+        println ("-" * 60)
+        println ("eigenVec = " + eigenVec)
+        println ("-" * 60)
+    } // if
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the unit eigenvectors for the covariance matrix.
      *  @param eVal  the vector of eigenvalues for the covariance matrix
      */
-    def computeEigenVectors (eVal: VectorD): MatrixD =
+    private def computeEigenVectors (eVal: VectorD): MatrixD =
     {
         val eigenVec = (new Eigenvector (cov, eigenVal)).getV                 // the eigenvectors for cov
         for (j <- 0 until N) eigenVec.setCol (j, eigenVec.col(j).normalizeU)  // want unit vectors
@@ -110,14 +97,15 @@ class PrincipalComponents (x: MatrixD)
      *  by the inverse (via transpose) of the feature matrix and then adding back
      *  the means.
      */
-    def recover (): MatrixD = reducedMat * featureMat.t + mu
+    def recover: MatrixD = reducedMat * featureMat.t + mu
 
 } // PrincipalComponents class
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PrincipalComponentsTest` object is used to test the `PrincipalComponents` class.
- *  @see http://www.ce.yildiz.edu.tr/personal/songul/file/1097/principal_components.pdf
+ *  @see www.ce.yildiz.edu.tr/personal/songul/file/1097/principal_components.pdf
+ *  > run-main scalation.analytics.PrincipalComponentsTest
  */
 object PrincipalComponentsTest extends App
 {
@@ -132,10 +120,14 @@ object PrincipalComponentsTest extends App
                                   1.5, 1.6,
                                   1.1, 0.9)
 
-    val pca = new PrincipalComponents (x)           // perform Principal Component Analysis (PCA)
+    val pca = new PrincipalComponents (x)            // perform Principal Component Analysis (PCA)
+    println ("-" * 60)
     println ("pc          = " + pca.findPCs (1))     // find 1 Principal Components
+    println ("-" * 60)
     println ("reduced   x = " + pca.reduce)          // the reduce data (lower dimensionality)
+    println ("-" * 60)
     println ("recovered x = " + pca.recover)         // the approximately recovered data
+    println ("-" * 60)
 
 } // PrincipalComponentsTest
 
@@ -149,10 +141,10 @@ object PrincipalComponentsTest extends App
      */
 //  def solve (i: Int): Tuple2 [VectorD, VectorD] =
 //  {
-//      var t  = x.col (i)          // the scores for PC_i, initialized to i-th column of x
-//      var p  = new VectorD (1)    // the loadings for PC_i
-//      var tt = new VectorD (1)    // saved value for t (the old t)
-//      var dt = new VectorD (1)    // the difference between t and tt
+//      var t  = x.col (i)                    // the scores for PC_i, initialized to i-th column of x
+//      var p  = new VectorD (1)              // the loadings for PC_i
+//      var tt = new VectorD (1)              // saved value for t (the old t)
+//      var dt = new VectorD (1)              // the difference between t and tt
 //
 //      breakable { for (k <- 1 to MAX_ITER) {
 //          p  = (e * t) / t.normSq           // project x onto t to find the corresponding loading p
@@ -162,7 +154,7 @@ object PrincipalComponentsTest extends App
 //          dt = t - tt                       // calculate dt as the difference between previous and current scores
 //          if (i > 1 && dt.norm > EPSILON) break  // check for the convergence
 //      }} // for
-//      e = e - outer (t, p)                   // remove the estimated PC_i component from e
+//      e = e - outer (t, p)                  // remove the estimated PC_i component from e
 //      (t, p)
 //  } // solve
 

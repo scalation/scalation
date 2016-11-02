@@ -11,10 +11,8 @@
 
 package scalation.analytics.fda
 
-// U N D E R   D E V E L O P M E N T
-
-import scalation.linalgebra.VectorD
-import scalation.math.FunctionS2S
+import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.math.Functions
 import scalation.stat.vectorD2StatVector
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -23,10 +21,8 @@ import scalation.stat.vectorD2StatVector
  */
 object StatFunction
 {
-    type Functions =  Array [FunctionS2S]
-
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the mean vector containing the cross-sectional means over the time points
+    /** Return the mean vector containing the cross-sectional means over the time points.
      *  @param xa  the array of functions
      *  @param t   the vector of time points
      */
@@ -36,9 +32,56 @@ object StatFunction
         VectorD (for (i <- t.indices) yield sf(t(i)).mean)
     } // mean
 
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert the array of functions 'xa' with time points 't' into a matrix.
+     *  @param xa  the array of functions
+     *  @param t   the vector of time points
+     */
+    def toMatrix (xa: Functions, t: VectorD): MatrixD =
+    {
+        val sf = new StatFunction (xa)
+        MatrixD (for (i <- t.indices) yield sf(t(i)))
+    } // toMatrix
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the sample covariance matrix for the functions over the time points.
+     *  @param xa  the array of functions
+     *  @param t   the vector of time points
+     */
+    def cov (xa: Functions, t: VectorD): MatrixD =
+    {
+        val sf = new StatFunction (xa)
+        MatrixD ((t.dim, t.dim),
+                (for (i <- t.indices; j <- t.indices) yield sf(t(i)).cov (sf(t(j)))) :_*)
+    } // cov
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the population covariance matrix for the functions over the time points.
+     *  @param xa  the array of functions
+     *  @param t   the vector of time points
+     */
+    def pcov (xa: Functions, t: VectorD): MatrixD =
+    {
+        val sf = new StatFunction (xa)
+        MatrixD ((t.dim, t.dim),
+                (for (i <- t.indices; j <- t.indices) yield sf(t(i)).pcov (sf(t(j)))) :_*)
+    } // pcov
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the correlation matrix for the functions over the time points.
+     *  Note:  sample vs. population results in essentailly the same values.
+     *  @param xa  the array of functions
+     *  @param t   the vector of time points
+     */
+    def corr (xa: Functions, t: VectorD): MatrixD =
+    {
+        val sf = new StatFunction (xa)
+        MatrixD ((t.dim, t.dim),
+                (for (i <- t.indices; j <- t.indices) yield sf(t(i)).corr (sf(t(j)))) :_*)
+    } // corr
+
 } // StatFunction
 
-import StatFunction.Functions
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StatFunction` class takes an array of functions 'xa' and provides an
@@ -105,24 +148,33 @@ object StatFunctionTest extends App
 object StatFunctionTest2 extends App
 {
     import scalation.plot.PlotM
-    import scalation.linalgebra.MatrixD
 
     val x0 = (t: Double) => 2 * t                    // first function
     val x1 = (t: Double) => t * t                    // second function
     val xa = Array (x0, x1)                          // array of functions
 
-    val t = VectorD.range (0, 49) / 50.0             // time points
+    val t  = VectorD.range (0, 49) / 50.0            // time points
     val f0 = t.map (xa(0)(_))                        // points for function 1
     val f1 = t.map (xa(1)(_))                        // points for function 2
     val means = StatFunction.mean (xa, t)            // points for mean function
 
     val mat = new MatrixD (3, t.dim)
-    mat(0) = f0
-    mat(1) = f1
-    mat(2) = means
+    mat(0)  = f0
+    mat(1)  = f1
+    mat(2)  = means
     println ("t   = " + t)
     println ("mat = " + mat)
     new PlotM (t, mat, Array ("means vs. time"))
+
+    val t2 = t.slice (0, 10)
+
+    println ("-" * 60)
+    println ("cov matrix  = " + StatFunction.cov (xa, t2))       // sample covariance matrix
+    println ("-" * 60)
+    println ("pcov matrix = " + StatFunction.pcov (xa, t2))      // population covariance matrix
+    println ("-" * 60)
+    println ("corr matrix = " + StatFunction.corr (xa, t2))      // correlation matrix
+    println ("-" * 60)
 
 } // StatFunctionTest2 object
 

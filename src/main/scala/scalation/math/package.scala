@@ -25,9 +25,13 @@ import math.ExtremeD.{MIN_NORMAL, EPSILON, TOL}    // smallest full precision, m
  */
 package object math
 {
-    /** type definition for a function of a scalar (f: Double => Double) 
+    /** The type definition for a function of a scalar (f: Double => Double) 
      */
     type FunctionS2S = Double => Double
+
+    /** The type definition for an array of scalar functions
+     */
+    type Functions = Array [FunctionS2S]
 
     /** The natural log of 2
      */

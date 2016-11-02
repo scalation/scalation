@@ -11,9 +11,7 @@
 
 package scalation.analytics.fda
 
-import scala.math.max
-
-import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.linalgebra.VectorD
 import scalation.math.double_exp
 import scalation.util.Error
 
@@ -240,6 +238,7 @@ object B_SplineTest2 extends App
  */
 object B_SplineTest3 extends App
 {
+    import scalation.linalgebra.MatrixD
     import scalation.plot.PlotM
 
     val mM = 4                                               // maximum order to test

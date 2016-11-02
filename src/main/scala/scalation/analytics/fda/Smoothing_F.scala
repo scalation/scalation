@@ -15,7 +15,7 @@ package scalation.analytics.fda
 
 import scalation.analytics.RidgeRegression
 import scalation.linalgebra.{MatrixD, VectoD, VectorD}
-import scalation.plot.Plot
+import scalation.plot.{FPlot, Plot}
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -103,7 +103,7 @@ object Smoothing_FTest extends App
     val y   = t.map ((x: Double) => 3.0 + 2.0 * x * x + normal.gen)
 
     for (ord <- 2 to 6) {
-        val τ   = VectorD.range (0, 20 + ord) / 20.0
+        val τ  = VectorD.range (0, 20 + ord) / 20.0
         val fr = new Smoothing_F (y, t, τ, ord)
         val c  = fr.train ()
 
@@ -114,4 +114,28 @@ object Smoothing_FTest extends App
     } // for
 
 } // Smoothing_FTest object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Smoothing_FTest2` is used to test the `Smoothing_F` class.
+ *  > run-main scalation.analytics.fda.Smoothing_FTest2
+ */
+object Smoothing_FTest2 extends App
+{
+    import scalation.random.Normal
+
+    val normal = Normal ()
+    val t  = VectorD.range (0, 100) / 100.0
+    val t2 = VectorD.range (0, 1000) / 1000.0
+    val y  = t.map ((x: Double) => 3.0 + 2.0 * x * x + normal.gen)
+
+    for (ord <- 2 to 6) {
+        val τ  = VectorD.range (0, 20 + ord) / 20.0
+        val fr = new Smoothing_F (y, t, τ, ord)
+        val c  = fr.train ()
+        println (s"y = $y \nt = $t \nc = $c")
+        new FPlot (t, y, t2, fr.predict, s"B-Spline Fit: ord = $ord")
+    } // for
+
+} // Smoothing_FTest2 object
 

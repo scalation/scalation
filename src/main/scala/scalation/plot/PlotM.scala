@@ -117,7 +117,7 @@ class PlotM (x: VectoD, y: MatriD, var label: Array [String] = null,
                 val y_i = y(i)
                 val color = randomColor (i)
                 g2d.setPaint (color)
-                g2d.drawString (label(i), offset * (i + 2), frameH - 20)
+                if (i < label.length) g2d.drawString (label(i), offset * (i + 2), frameH - 20)
 
                 for (j <- 0 until x.dim) {
                     val xx = round ((x(j) - minX) * (frameW - 2 * offset).asInstanceOf [Double])

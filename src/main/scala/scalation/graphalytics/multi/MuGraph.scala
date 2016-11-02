@@ -2,13 +2,13 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Matthew Saltz
  *  @version 1.2
- *  @date    Wed May 13 14:58:25 EDT 2015
+ *  @date    Tue Nov  1 19:12:16 EDT 2016
  *  @see     LICENSE (MIT style license file).
  *
- *  Multi-Graph 'MGraph' Data Structure Using Mutable Sets
+ *  Multi-Graph 'MuGraph' Data Structure Using Mutable Sets
  */
 
-package scalation.graphalytics.mutable
+package scalation.graphalytics.multi
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.{Set => SET}
@@ -16,10 +16,11 @@ import scala.collection.mutable.{Set => SET}
 import scala.reflect.ClassTag
 
 import scalation.graphalytics.{Pair, Tree}
+import scalation.graphalytics.mutable.{Graph, MGraph, MGraphGen}
 import scalation.graphalytics.mutable.{ExampleGraphD => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `MGraph` class stores vertex/edge-labeled multi-directed graphs using
+/** The `MuGraph` class stores vertex/edge-labeled multi-directed graphs using
  *  an adjacency set 'ch' representation, e.g., 'ch = { {1, 2}, {0}, {1} }' means
  *  that the graph has the following edges { (0, 1), (0, 2), (1, 0), (2, 1) }.
  *  Optionally, inverse adjacency via the 'pa' array can be stored at the cost
@@ -31,9 +32,9 @@ import scalation.graphalytics.mutable.{ExampleGraphD => EX_GRAPH}
  *  @param inverse  whether to store inverse adjacency sets (parents)
  *  @param name     the name of the multi-digraph
  */
-class MGraph [TLabel: ClassTag] (ch:      Array [SET [Int]],
-                                 label:   Array [TLabel] = Array.ofDim (0),
-                             val elabel:  Map [Pair, TLabel] = Map (),
+class MuGraph [TLabel: ClassTag] (ch:     Array [SET [Int]],
+                                 label:   Array [TLabel],
+                             val elabel:  Map [Pair, Vector [TLabel]],
                                  inverse: Boolean = false,
                                  name:    String = "g")
       extends Graph [TLabel] (ch, label, inverse, name) with Cloneable
@@ -41,7 +42,7 @@ class MGraph [TLabel: ClassTag] (ch:      Array [SET [Int]],
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Clone (make a deep copy) of 'this' multi-digraph.
      */
-    override def clone: MGraph [TLabel] =
+    override def clone: MuGraph [TLabel] =
     {
         val ch2    = Array.ofDim [SET [Int]] (ch.length)
         val label2 = Array.ofDim [TLabel] (ch.length)
@@ -49,7 +50,7 @@ class MGraph [TLabel: ClassTag] (ch:      Array [SET [Int]],
             ch2(i) = SET (ch(i).toArray: _*)
             label2(i) = label(i)
         } // for
-        new MGraph (ch2, label2, elabel.clone, inverse, name)
+        new MuGraph (ch2, label2, elabel.clone, inverse, name)
     } // clone
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -70,7 +71,7 @@ class MGraph [TLabel: ClassTag] (ch:      Array [SET [Int]],
      *  sure that for every edge 'u -> v', there is a 'v -> u' edge and that
      *  they have same edge label.
      */
-    override def makeUndirected (): MGraph [TLabel] =
+    override def makeUndirected (): MuGraph [TLabel] =
     {
         super.makeUndirected ()
         val edges = elabel.clone.keys
@@ -84,7 +85,7 @@ class MGraph [TLabel: ClassTag] (ch:      Array [SET [Int]],
      */
     override def toString: String =
     {
-        s"MGraph (ch.length = ${ch.length}, label.length = ${label.length}" +
+        s"MuGraph (ch.length = ${ch.length}, label.length = ${label.length}" +
         s"elabel.size = ${elabel.size}, inverse = $inverse, name = $name)"
     } // toString
 
@@ -105,88 +106,116 @@ class MGraph [TLabel: ClassTag] (ch:      Array [SET [Int]],
      */
     override def printG (clip: Boolean = true)
     {
-        println (s"MGraph ($name, $inverse, $size")
+        println (s"MuGraph ($name, $inverse, $size")
         for (i <- ch.indices) println (toLine (i))
         for ((k, v) <- elabel) println (s"$k -> $v")
         println (")")
     } // printG
 
-} // MGraph class
+} // MuGraph class
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `MGraph` companion object provides builder methods and example query
+/** The `MuGraph` companion object provides builder methods and example query
  *  multi-digraphs.
  */
-object MGraph
+object MuGraph
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build an `MGraph` from a `Graph`.
-     *  @param gr    the base `Graph` for building the `MGraph`
+    /** Build an `MuGraph` from a `Graph`.
+     *  @param gr    the base `Graph` for building the `MuGraph`
      *  @param eLab  the edge labels
      *  @param name  the name for the new multi-digraph
      */
-    def apply [TLabel: ClassTag] (gr: Graph [TLabel], eLab: Map [Pair, TLabel], name: String): MGraph [TLabel] =
+    def apply [TLabel: ClassTag] (gr: Graph [TLabel], eLab: Map [Pair, Vector [TLabel]], name: String): MuGraph [TLabel] =
     {
-        new MGraph (gr.ch, gr.label, eLab, gr.inverse, name)
+        new MuGraph (gr.ch, gr.label, eLab, gr.inverse, name)
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build an `MGraph` from a `Tree`.
-     *  @param tree     the base `Tree` for building the `MGraph`
+    /** Build an `MuGraph` from a `MGraph`.
+     *  @param mgr   the base `MGraph` for building the `MuGraph`
+     *  @param name  the name for the new multi-digraph
+     */
+    def apply [TLabel: ClassTag] (mgr: MGraph [TLabel], name: String): MuGraph [TLabel] =
+    {
+        new MuGraph (mgr.ch, mgr.label, ν(mgr.elabel), mgr.inverse, name)
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build an `MuGraph` from a `Tree`.
+     *  @param tree     the base `Tree` for building the `MuGraph`
      *  @param name     the name for the new multi-digraph
      *  @param inverse  whether to add parent references
      */
-    def apply (tree: Tree, name: String = "t", inverse: Boolean = false): MGraph [Double] =
+    def apply (tree: Tree, name: String = "t", inverse: Boolean = false): MuGraph [Double] =
     {
-        MGraph (Graph (tree, name, inverse), tree.labelMap, name)
+        MuGraph (Graph (tree, name, inverse), ν (tree.labelMap), name)
     } // apply
 
-} // MGraph object
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Vectorize the label.
+     *  @param label  the un-vectorized label
+     */
+    def ν [TLabel: ClassTag] (label: TLabel): Vector [TLabel] = Vector (label)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Vectorize the label map.
+     *  @param labelMap  the un-vectorized label map
+     */
+    def ν [TLabel: ClassTag] (labelMap: Map [Pair, TLabel]): Map [Pair, Vector [TLabel]] =
+    {
+        val vmap = Map [Pair, Vector [TLabel]] ()
+        for ((k, v) <- labelMap) vmap += k -> Vector (v)
+        vmap
+    } // ν
+
+} // MuGraph object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `MGraphTest` object is used to test the `MGraph` class using examples
- *  from the `ExampleMGraphI` object, which contains multi-digraphs whose vertex
+/** The `MuGraphTest` object is used to test the `MuGraph` class using examples
+ *  from the `ExampleMuGraphI` object, which contains multi-digraphs whose vertex
  *  and edge labels are of type `Int`.
- *  > run-main scalation.graphalytics.mutable.MGraphTest
- */
-object MGraphTest extends App
+ *  > run-main scalation.graphalytics.mutable.MuGraphTest
+ *
+object MuGraphTest extends App
 {
-    import ExampleMGraphI._
+    import ExampleMuGraphI._
 
     g1.printG ()
     q1.printG ()
     g2.printG ()
     q2.printG ()
 
-} // MGraphTest
+} // MuGraphTest
+ */
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `MGraphTest2` object is used to test the `MGraph` class using examples
- *  from the `ExampleMGraphD` object, which contains multi-digraphs whose vertex
+/** The `MuGraphTest2` object is used to test the `MuGraph` class using examples
+ *  from the `ExampleMuGraphD` object, which contains multi-digraphs whose vertex
  *  and edge labels are of type `Double`.
- *  > run-main scalation.graphalytics.mutable.MGraphTest2
+ *  > run-main scalation.graphalytics.mutable.MuGraphTest2
  */
-object MGraphTest2 extends App
+object MuGraphTest2 extends App
 {
-    import ExampleMGraphD._
+    import ExampleMuGraphD._
 
     g1.printG ()
     q1.printG ()
     g2.printG ()
     q2.printG ()
 
-} // MGraphTest2
+} // MuGraphTest2
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `MGraphTest3` object is used to test the `MGraph` class using a
+/** The `MuGraphTest3` object is used to test the `MuGraph` class using a
  *  randomly generated multi-digraph.
- *  > run-main scalation.graphalytics.mutable.MGraphTest3
+ *  > run-main scalation.graphalytics.mutable.MuGraphTest3
  */
-object MGraphTest3 extends App
+object MuGraphTest3 extends App
 {
     val mgGen = new MGraphGen [Double]
 
@@ -197,7 +226,8 @@ object MGraphTest3 extends App
     private val inverse   = false      // whether inverse adjacency is used (parents)
     private val name      = "gr"       // name of the graph
 
-    mgGen.genRandomGraph (nVertices, nLabels, eLabels, outDegree, inverse, name).printG ()
+    val mGraph = mgGen.genRandomGraph (nVertices, nLabels, eLabels, outDegree, inverse, name)
+    MuGraph (mGraph, "mu" + name).printG ()
 
-} // MGraphTest3
+} // MuGraphTest3
 
