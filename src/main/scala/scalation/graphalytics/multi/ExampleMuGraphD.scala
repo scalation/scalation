@@ -28,24 +28,36 @@ object ExampleMuGraphD
     // Simple data and query multi-digraphs.
     // -----------------------------------------------------------------------
 
+    val schema1 = Map (10.0 -> "user",
+                       11.0 -> "user",
+                       -1.0 -> "knows",
+                       -2.0 -> "employes")
+
     // data multi-digraph g1 -------------------------------------------------
 
-    val g1 = MuGraph (EX_GRAPH.g1,
-                      Map ((1, 0) -> ν(-1.0),
-                           (1, 2) -> ν(-1.0),
-                           (1, 3) -> ν(-1.0),
-                           (1, 4) -> ν(-1.0),
-                           (2, 0) -> ν(-1.0),
-                           (3, 4) -> ν(-2.0)),                // change from -1 to -2 filter out vertices
-                      "g1")
+    val g1 = new MuGraph (Array (SET (),                          // ch(0)
+                                 SET (0, 2, 3, 4),                // ch(1)
+                                 SET (0),                         // ch(2)
+                                 SET (4),                         // ch(3)
+                                 SET ()),                         // ch(4)
+                          Array (11.0, 10.0, 11.0, 11.0, 11.0),   // vertex labels
+                          Map ((1, 0) -> ν(-1.0),                 // edge labels
+                               (1, 2) -> ν(-1.0),
+                               (1, 3) -> ν(-1.0),
+                               (1, 4) -> ν(-1.0),
+                               (2, 0) -> ν(-1.0)),
+                          false, "g1", schema1)                   // inverse, name, schema
 
     // query multi-digraph q1 ------------------------------------------------
 
-    val q1 = MuGraph (EX_GRAPH.q1,
-                      Map ((0, 1) -> ν(-1.0),
-                           (0, 2) -> ν(-1.0),
-                           (2, 1) -> ν(-1.0)),
-                      "q1")
+    val q1 = new MuGraph (Array (SET (1, 2),                      // ch(0)
+                                 SET (),                          // ch(1)
+                                 SET (1)),                        // ch(2)
+                          Array (10.0, 11.0, 11.0),               // vertex labels
+                          Map ((0, 1) -> ν(-1.0),                 // edge labels
+                               (0, 2) -> ν(-1.0),
+                               (2, 1) -> ν(-1.0)),
+                          false, "q1", schema1)                   // inverse, name
 
     val g1p = new MuGraph (g1.ch, g1.label, g1.elabel, true, g1.name)    // with parents
     val q1p = new MuGraph (q1.ch, q1.label, q1.elabel, true, q1.name)    // with parents

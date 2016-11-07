@@ -1,18 +1,17 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  John Miller, Matthew Saltz
+/** @author  John Miller, Matthew Saltz, Supriya Ramireddy
  *  @version 1.2
- *  @date    Tue Nov  1 19:12:16 EDT 2016
+ *  @date    Sun Nov  6 16:04:08 EST 2016
  *  @see     LICENSE (MIT style license file).
  *
- *  Multi-Graph 'MuGraph' Simulation Using Mutable Sets
+ *  Multi-Graph 'MuGraph' Dual Simulation Using Mutable Sets
  */
 
 package scalation.graphalytics.multi
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.{Set => SET}
-//import scala.collection.mutable.{HashSet => SET}
 
 import scalation.graphalytics.mutable.GraphMatcher
 import scalation.graphalytics.multi.{ExampleMuGraphD => EX_GRAPH}
@@ -21,78 +20,79 @@ import scalation.util.time
 import MuGraph.ν
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `MuGraphSim` class provides a second implementation for Simple Graph
- *  Simulation.  It differ from `GraphSim` in the looping order in the main for-loop
- *  and early termination when 'phi(u)' is empty.
+/** The `MuDualSim` class provides an implementation for Dual Graph Simulation
+ *  for multi-graphs.
+ *  It differs from `DualSim` by not using inverse adjacency sets ('pa') in
+ *  order to save space.
  *  @param g  the data graph  G(V, E, l)
  *  @param q  the query graph Q(U, D, k)
  */
-class MuGraphSim (g: MuGraph [Double], q: MuGraph [Double])
-      extends GraphMatcher [Double] (g, q)
+class MuDualSim [TLabel] (g: MuGraph [TLabel], q: MuGraph [TLabel])
+      extends GraphMatcher (g, q)
 {
-    private val DEBUG = true                                      // debug flag
+    private val DEBUG = true                                     // debug flag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Apply the Graph Simulation pattern matching algorithm to find the mappings
+    /** Apply the Dual Graph Simulation pattern matching algorithm to find the mappings
      *  from the query graph 'q' to the data graph 'g'.  These are represented by a
      *  multi-valued function 'phi' that maps each query graph vertex 'u' to a
      *  set of data graph vertices '{v}'.
      */
-    def mappings (): Array [SET [Int]] = saltzGraphSim (feasibleMates ())
+    def mappings (): Array [SET [Int]] = saltzDualSim (feasibleMates ())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given the mappings 'phi' produced by the 'feasibleMates' method,
-     *  eliminate mappings 'u -> v' when v's children fail to match u's.
+     *  eliminate mappings 'u -> v' when (1) v's children fail to match u's
+     *  or (2) v's parents fail to match u's.
      *  @param phi  array of mappings from a query vertex u to { graph vertices v }
      */
-    def saltzGraphSim (phi: Array [SET [Int]]): Array [SET [Int]] =
+    def saltzDualSim (phi: Array [SET [Int]]): Array [SET [Int]] =
     {
         var alter = true
-        while (alter) {                                           // check for matching children
+        while (alter) {                                            // check for matching children/parents
             alter = false
 
-            for (u <- qRange; u_c <- q.ch(u)) {                   // for each u in q and its children u_c
+            for (u <- qRange; u_c <- q.ch(u)) {                    // for each u in q and its children u_
                 if (DEBUG) { println (s"for u = $u, u_c = $u_c"); showMappings (phi) }
-                val elab_u2u_c = q.elabel ((u, u_c))              // edge label in q for (u, u_c)
-                val phi_u_c = phi(u_c)
-                val v_rem   = SET [Int] ()                        // vertices to be removed
+                val newPhi = SET [Int] ()                          // subset of phi(u_c) having a parent in phi(u)
+                val elab_u2u_c = q.elabel ((u, u_c))               // edge label in q for (u, u_c)
 
-                for (v <- phi(u)) {                               // for each v in g image of u
+                for (v <- phi(u)) {                                // for each v in g image of u
 //                  val v_c = g.ch(v)                                                // don't filter on edge labels
-//                  val v_c = g.ch(v).filter (elab_u2u_c == g.elabel (v, _))         // filter on edge labels with ==
-                    val v_c = g.ch(v).filter (elab_u2u_c subsetOf g.elabel (v, _))   // filter on edge labels with subset
-                    if (DEBUG) println (s"v = $v, v_c = $v_c, phi_u_c = $phi_u_c")
+//                  val v_c = g.ch(v).filter (elab_u2u_c == g.elabel (v, _))         // filter on edge labels, using ==
+                    val v_c = g.ch(v).filter (elab_u2u_c subsetOf g.elabel (v, _))   // filter on edge labels, using subset
+                    if (DEBUG) println (s"v = $v, v_c = $v_c, phi_u_c = " + phi(u_c))
 
-                    if ((v_c & phi_u_c).isEmpty) {                // v must have a child in phi(u_c)
-//                      phi(u) -= v                               // if not, remove vertex v from phi(u)
-//                      if (phi(u).isEmpty) return phi            // no match for vertex u => no overall match
-                        v_rem += v
+                    val phiInt = v_c & phi(u_c)                    // children of v contained in phi(u_c)
+                    if (phiInt.isEmpty) {
+                        phi(u) -= v                                // remove vertex v from phi(u)
+                        if (phi(u).isEmpty) return phi             // no match for vertex u => no overall match
                         alter = true
                     } // if
-                    if (! v_rem.isEmpty) {
-                        if (DEBUG) println (s"v_rem = $v_rem from phi($u)")
-                        phi(u) --= v_rem                          // remove vertices in v_rem from phi(u)
-                        v_rem.clear ()
-                        if (phi(u).isEmpty) return phi            // no match for vertex u => no overall match
-                    } // if
+                    // build newPhi to contain only those vertices in phi(u_c) which also have a parent in phi(u)
+                    newPhi ++= phiInt
                 } // for
 
+                if (newPhi.isEmpty) return phi                     // empty newPhi => no match
+                if (newPhi.size < phi(u_c).size) alter = true      // since newPhi is smaller than phi(u_c)
+
+                if (SELF_LOOPS && u_c == u) phi(u_c) &= newPhi else phi(u_c) = newPhi
             } // for
 
         } // while
         phi
-    } // saltzGraphSim
+    } // saltzDualSim
 
-} // MuGraphSim class
+} // MuDualSim class
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `MuGraphSimTest` object is used to test the `MuGraphSim` class.
- *  > run-main scalation.graphalytics.multi.MuGraphSimTest
+/** The `MuDualSimTest` object is used to test the `MuDualSim` class.
+ *  run-main scalation.graphalytics.multi.MuDualSimTest
  */
-object MuGraphSimTest extends App
+object MuDualSimTest extends App
 {
-    val g = new MuGraph (Array (SET (1, 3),                      // ch(0)
+    val g = new MuGraph (Array (SET (1,3),                       // ch(0)
                                 SET (2),                         // ch(1)
                                 SET (),                          // ch(2)
                                 SET (),                          // ch(3)
@@ -103,16 +103,16 @@ object MuGraphSimTest extends App
                               (0, 3) -> ν(-1.0),
                               (1, 2) -> ν(-1.0),
                               (4, 2) -> ν(-1.0),
-                              (5, 4) -> ν(-1.0, -2.0)),          // change from -1 to -2 filter out vertices
-                         false, "g")
+                              (5, 4) -> ν(-1.0)),                // change from -1 to -2 filter out vertices
+                              false, "g")
 
     val q = new MuGraph (Array (SET (1),                         // ch(0)
                                 SET (2),                         // ch(1)
                                 SET ()),                         // ch(2)
                          Array (10.0, 11.0, 11.0),
-                         Map ((0, 1) -> ν(-1.0, -2.0),
+                         Map ((0, 1) -> ν(-1.0,-2.0),
                               (1, 2) -> ν(-1.0)),
-                         false, "g")
+                              false, "q")
 
     println (s"g.checkEdges   = ${g.checkEdges}")
     println (s"g.checkElabels = ${g.checkElabels}")
@@ -121,18 +121,18 @@ object MuGraphSimTest extends App
     println (s"q.checkElabels = ${q.checkElabels}")
     q.printG ()
 
-    val matcher = new MuGraphSim (g, q)                          // Graph Simulation Pattern Matcher
+    val matcher = new MuDualSim (g, q)                           // Graph Simulation Pattern Matcher
     val phi     = time { matcher.mappings () }                   // time the matcher
     matcher.showMappings (phi)                                   // display results
 
-} // MuGraphSimTest object
+} // MuDualSimTest object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `MuGraphSimTest2` object is used to test the `MuGraphSim` class.
- *  > run-main scalation.graphalytics.multi.MuGraphSimTest2
+/** The `MuDualSimTest2` object is used to test the `MuDualSim` class.
+ *  run-main scalation.graphalytics.multi.MuDualSimTest2
  */
-object MuGraphSimTest2 extends App
+object MuDualSimTest2 extends App
 {
     val g = new MuGraph (Array (SET (),                          // ch(0)
                                 SET (0, 2, 3, 4),                // ch(1)
@@ -164,18 +164,18 @@ object MuGraphSimTest2 extends App
     println (s"q.checkElabels = ${q.checkElabels}")
     q.printG ()
 
-    val matcher = new MuGraphSim (g, q)                          // Graph Simulation Pattern Matcher
+    val matcher = new MuDualSim (g, q)                           // Graph Simulation Pattern Matcher
     val phi     = time { matcher.mappings () }                   // time the matcher
     matcher.showMappings (phi)                                   // display results
 
-} // MuGraphSimTest2 object
+} // MuDualSimTest2 object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `MuGraphSimTest3` object is used to test the `MuGraphSim` class.
- *  > run-main scalation.graphalytics.multi.MuGraphSimTest3
+/** The `MuDualSimTest3` object is used to test the `MuDualSim` class.
+ *  run-main scalation.graphalytics.multi.MuDualSimTest3
  */
-//object MuGraphSimTest3 extends App
+//object MuDualSimTest3 extends App
 //{
 //    val gSize     = 1000         // size of the data graph
 //    val qSize     =   10         // size of the query graph
@@ -183,16 +183,14 @@ object MuGraphSimTest2 extends App
 //    val gAvDegree =    5         // average vertex out degree for data graph
 //    val qAvDegree =    2         // average vertex out degree for query graph
 //
-//    val g = GraphGen.genRandomGraph (gSize, nLabels, gAvDegree, false, "g")
-//    val q = GraphGen.genBFSQuery (qSize, qAvDegree, g, false, "q")
-//
-//    println (s"q.checkEdges   = " + q.checkEdges)
-//    println (s"q.checkElabels = " + q.checkElabels)
 //    q.printG ()
 //
-//    val matcher = new MuGraphSim (g, q)                  // Graph Simulation Pattern Matcher
-//    val phi     = time { matcher.mappings () }           // time the matcher
-//    matcher.showMappings (phi)                           // show results
+//    val g = genRandomGraph (gSize, nLabels, gAvDegree, false, "g")
+//    val q = genBFSQuery (qSize, qAvDegree, g, false, "q")
 //
-//} // MuGraphSimTest3 object
+//    val matcher = new MuDualSim (g, q)                     // Dual Graph Simulation Pattern Matcher
+//    val phi     = time { matcher.mappings () }             // time the matcher
+//    matcher.showMappings (phi)                             // display results
+//
+//} // MuDualSimTest3 object
 

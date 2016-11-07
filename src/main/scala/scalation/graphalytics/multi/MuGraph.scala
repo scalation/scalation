@@ -28,17 +28,33 @@ import scalation.graphalytics.mutable.{ExampleGraphD => EX_GRAPH}
  *----------------------------------------------------------------------------
  *  @param ch       the array of child (adjacency) vertex sets (outgoing edges)
  *  @param label    the array of vertex labels
- *  @param elabel   the map of edge labels
+ *  @param elabel   the map of edge labels: (u, v) -> edge label
  *  @param inverse  whether to store inverse adjacency sets (parents)
  *  @param name     the name of the multi-digraph
+ *  @param schema   optional schema - map of label types: label -> label type
  */
 class MuGraph [TLabel: ClassTag] (ch:     Array [SET [Int]],
                                  label:   Array [TLabel],
-                             val elabel:  Map [Pair, Vector [TLabel]],
+                             val elabel:  Map [Pair, SET [TLabel]],
                                  inverse: Boolean = false,
-                                 name:    String = "g")
+                                 name:    String = "g",
+                                 schema:  Map [TLabel, String] = null)
       extends Graph [TLabel] (ch, label, inverse, name) with Cloneable
 {
+    /** Map from schema label type to set of labels
+     */
+    val schemaMap = if (schema == null) null else buildSchemaMap
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build the schame map: type to set of labels
+     */
+    def buildSchemaMap: Map [String, SET [TLabel]] =
+    {
+        val schMap = Map [String, SET [TLabel]] ()
+        for ((lab, typ) <- schema) schMap += typ -> SET (lab)   // FIX
+        schMap
+    } // buildSchemaMap
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Clone (make a deep copy) of 'this' multi-digraph.
      */
@@ -127,7 +143,7 @@ object MuGraph
      *  @param eLab  the edge labels
      *  @param name  the name for the new multi-digraph
      */
-    def apply [TLabel: ClassTag] (gr: Graph [TLabel], eLab: Map [Pair, Vector [TLabel]], name: String): MuGraph [TLabel] =
+    def apply [TLabel: ClassTag] (gr: Graph [TLabel], eLab: Map [Pair, SET [TLabel]], name: String): MuGraph [TLabel] =
     {
         new MuGraph (gr.ch, gr.label, eLab, gr.inverse, name)
     } // apply
@@ -154,19 +170,19 @@ object MuGraph
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Vectorize the label.
-     *  @param label  the un-vectorized label
+    /** Collect the label(s) into a set.
+     *  @param label  the given label(s)
      */
-    def ν [TLabel: ClassTag] (label: TLabel): Vector [TLabel] = Vector (label)
+    def ν [TLabel: ClassTag] (label: TLabel*): SET [TLabel] = SET (label:_*)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Vectorize the label map.
-     *  @param labelMap  the un-vectorized label map
+    /** Collect the labels in the map into sets.
+     *  @param labelMap  the initial label map
      */
-    def ν [TLabel: ClassTag] (labelMap: Map [Pair, TLabel]): Map [Pair, Vector [TLabel]] =
+    def ν [TLabel: ClassTag] (labelMap: Map [Pair, TLabel]): Map [Pair, SET [TLabel]] =
     {
-        val vmap = Map [Pair, Vector [TLabel]] ()
-        for ((k, v) <- labelMap) vmap += k -> Vector (v)
+        val vmap = Map [Pair, SET [TLabel]] ()
+        for ((k, v) <- labelMap) vmap += k -> SET (v)
         vmap
     } // ν
 
