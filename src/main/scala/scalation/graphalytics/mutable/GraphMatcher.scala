@@ -73,13 +73,15 @@ abstract class GraphMatcher [TLabel] (g: Graph [TLabel], q: Graph [TLabel])
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the Graph Pattern Matcher.
-     *  @param  the name of graph pattern matcher
+     *  @param name  the name of graph pattern matcher
+     *  @param ans   the correct answer
      */
-    def test (name: String)
+    def test (name: String, ans: Array [SET [Int]] = null)
     {
         val phi = time { mappings () }                     // time the matcher
         println (s"$name ---------------------------------------------------")
         showMappings (phi)                                 // display results
+        if (ans != null) for (i <- phi.indices) assert (phi(i) == ans(i))
     } // test
 
 } // GraphMatcher abstract class

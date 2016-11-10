@@ -17,7 +17,6 @@ import scala.reflect.ClassTag
 
 import scalation.graphalytics.{Pair, Tree}
 import scalation.graphalytics.mutable.{Graph, MGraph, MGraphGen}
-import scalation.graphalytics.mutable.{ExampleGraphD => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuGraph` class stores vertex/edge-labeled multi-directed graphs using
@@ -27,11 +26,11 @@ import scalation.graphalytics.mutable.{ExampleGraphD => EX_GRAPH}
  *  of nearly doubling the storage requirements.
  *----------------------------------------------------------------------------
  *  @param ch       the array of child (adjacency) vertex sets (outgoing edges)
- *  @param label    the array of vertex labels
+ *  @param label    the array of vertex labels: v -> vertex label
  *  @param elabel   the map of edge labels: (u, v) -> edge label
  *  @param inverse  whether to store inverse adjacency sets (parents)
  *  @param name     the name of the multi-digraph
- *  @param schema   optional schema - map of label types: label -> label type
+ *  @param schema   optional schema: map from label to label type
  */
 class MuGraph [TLabel: ClassTag] (ch:     Array [SET [Int]],
                                  label:   Array [TLabel],
@@ -43,15 +42,16 @@ class MuGraph [TLabel: ClassTag] (ch:     Array [SET [Int]],
 {
     /** Map from schema label type to set of labels
      */
-    val schemaMap = if (schema == null) null else buildSchemaMap
+    val schemaMap = if (schema == null) null else buildSchemaMap (schema)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build the schame map: type to set of labels
+    /** Build the schema map from label type to set of labels.
+     *  @param schema  the schema - map of label types: label -> label type
      */
-    def buildSchemaMap: Map [String, SET [TLabel]] =
+    def buildSchemaMap (schema: Map [TLabel, String]): Map [String, SET [TLabel]] =
     {
         val schMap = Map [String, SET [TLabel]] ()
-        for ((lab, typ) <- schema) schMap += typ -> SET (lab)   // FIX
+        for ((lab, typ) <- schema) schMap += typ -> (schMap.getOrElse (typ, SET ()) + lab)
         schMap
     } // buildSchemaMap
 

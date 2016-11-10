@@ -15,8 +15,6 @@ import scala.collection.mutable.{Set => SET}
 //import scala.collection.mutable.{HashSet => SET}
 
 import scalation.graphalytics.mutable.GraphMatcher
-import scalation.graphalytics.multi.{ExampleMuGraphD => EX_GRAPH}
-import scalation.util.time
 
 import MuGraph.ν
 
@@ -98,7 +96,7 @@ object MuGraphSimTest extends App
                                 SET (),                          // ch(3)
                                 SET (2),                         // ch(4)
                                 SET (4)),                        // ch(5)
-                         Array (10.0, 11.0, 11.0, 11.0, 11.0,10.0),
+                         Array (10.0, 11.0, 11.0, 11.0, 11.0, 10.0),
                          Map ((0, 1) -> ν(-1.0, -2.0, -3.0),
                               (0, 3) -> ν(-1.0),
                               (1, 2) -> ν(-1.0),
@@ -122,8 +120,7 @@ object MuGraphSimTest extends App
     q.printG ()
 
     val matcher = new MuGraphSim (g, q)                          // Graph Simulation Pattern Matcher
-    val phi     = time { matcher.mappings () }                   // time the matcher
-    matcher.showMappings (phi)                                   // display results
+    matcher.test ("MuGraphSim")
 
 } // MuGraphSimTest object
 
@@ -134,28 +131,11 @@ object MuGraphSimTest extends App
  */
 object MuGraphSimTest2 extends App
 {
-    val g = new MuGraph (Array (SET (),                          // ch(0)
-                                SET (0, 2, 3, 4),                // ch(1)
-                                SET (0),                         // ch(2)
-                                SET (4),                         // ch(3)
-                                SET ()),                         // ch(4)
-                         Array (11.0, 10.0, 11.0, 11.0, 11.0),
-                         Map ((1, 0) -> ν(-1.0),
-                              (1, 2) -> ν(-1.0),
-                              (1, 3) -> ν(-1.0),
-                              (1, 4) -> ν(-1.0),
-                              (2, 0) -> ν(-1.0),
-                              (3, 4) -> ν(-2.0)),                // change from -1 to -2 filter out vertices
-                              false, "g")
+    import scalation.graphalytics.multi.{ExampleMuGraphD => EX_GRAPH}
+    import MatchAnswers._
 
-    val q = new MuGraph (Array (SET (1, 2),                      // ch(0)
-                                SET (),                          // ch(1)
-                                SET (1)),                        // ch(2)
-                         Array (10.0, 11.0, 11.0),
-                         Map ((0, 1) -> ν(-1.0),
-                              (0, 2) -> ν(-1.0),
-                              (2, 1) -> ν(-1.0)),
-                              false, "q")
+    val g = EX_GRAPH.g2p
+    val q = EX_GRAPH.q2p
 
     println (s"g.checkEdges   = ${g.checkEdges}")
     println (s"g.checkElabels = ${g.checkElabels}")
@@ -165,8 +145,7 @@ object MuGraphSimTest2 extends App
     q.printG ()
 
     val matcher = new MuGraphSim (g, q)                          // Graph Simulation Pattern Matcher
-    val phi     = time { matcher.mappings () }                   // time the matcher
-    matcher.showMappings (phi)                                   // display results
+    matcher.test("MuGraphSim", shift (graphSim))
 
 } // MuGraphSimTest2 object
 
@@ -175,24 +154,47 @@ object MuGraphSimTest2 extends App
 /** The `MuGraphSimTest3` object is used to test the `MuGraphSim` class.
  *  > run-main scalation.graphalytics.multi.MuGraphSimTest3
  */
-//object MuGraphSimTest3 extends App
-//{
-//    val gSize     = 1000         // size of the data graph
-//    val qSize     =   10         // size of the query graph
-//    val nLabels   =  100         // number of distinct labels
-//    val gAvDegree =    5         // average vertex out degree for data graph
-//    val qAvDegree =    2         // average vertex out degree for query graph
-//
-//    val g = GraphGen.genRandomGraph (gSize, nLabels, gAvDegree, false, "g")
-//    val q = GraphGen.genBFSQuery (qSize, qAvDegree, g, false, "q")
-//
-//    println (s"q.checkEdges   = " + q.checkEdges)
-//    println (s"q.checkElabels = " + q.checkElabels)
-//    q.printG ()
-//
-//    val matcher = new MuGraphSim (g, q)                  // Graph Simulation Pattern Matcher
-//    val phi     = time { matcher.mappings () }           // time the matcher
-//    matcher.showMappings (phi)                           // show results
-//
-//} // MuGraphSimTest3 object
+object MuGraphSimTest3 extends App
+{
+    import scalation.graphalytics.multi.{ExampleMuGraphD => EX_GRAPH}
+
+    val g = EX_GRAPH.g1p
+    val q = EX_GRAPH.q1p
+
+    println (s"g.checkEdges   = ${g.checkEdges}")
+    println (s"g.checkElabels = ${g.checkElabels}")
+    g.printG ()
+    println (s"q.checkEdges   = ${q.checkEdges}")
+    println (s"q.checkElabels = ${q.checkElabels}")
+    q.printG ()
+
+    val matcher = new MuGraphSim (g, q)                          // Graph Simulation Pattern Matcher
+    matcher.test ("MuGraphSim")
+
+} // MuGraphSimTest3 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `MuGraphSimTest4` object is used to test the `MuGraphSim` class.
+ *  > run-main scalation.graphalytics.multi.MuGraphSimTest4
+ */
+object MuGraphSimTest4 extends App
+{
+    val gSize     = 1000         // size of the data graph
+    val qSize     =   10         // size of the query graph
+    val nLabels   =  100         // number of distinct labels
+    val gAvDegree =    5         // average vertex out degree for data graph
+    val qAvDegree =    2         // average vertex out degree for query graph
+
+    val g = null.asInstanceOf [MuGraph [Double]] // GraphGen.genRandomGraph (gSize, nLabels, gAvDegree, false, "g")        // FIX
+    val q = null.asInstanceOf [MuGraph [Double]] // GraphGen.genBFSQuery (qSize, qAvDegree, g, false, "q")                 // FIX
+
+    println (s"q.checkEdges   = " + q.checkEdges)
+    println (s"q.checkElabels = " + q.checkElabels)
+    q.printG ()
+
+    val matcher = new MuGraphSim (g, q)                          // Graph Simulation Pattern Matcher
+    matcher.test ("MuGraphSim")
+
+} // MuGraphSimTest4 object
 

@@ -14,8 +14,6 @@ import scala.collection.mutable.Map
 import scala.collection.mutable.{Set => SET}
 
 import scalation.graphalytics.mutable.GraphMatcher
-import scalation.graphalytics.multi.{ExampleMuGraphD => EX_GRAPH}
-import scalation.util.time
 
 import MuGraph.ν
 
@@ -88,7 +86,7 @@ class MuDualSim [TLabel] (g: MuGraph [TLabel], q: MuGraph [TLabel])
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuDualSimTest` object is used to test the `MuDualSim` class.
- *  run-main scalation.graphalytics.multi.MuDualSimTest
+ *  > run-main scalation.graphalytics.multi.MuDualSimTest
  */
 object MuDualSimTest extends App
 {
@@ -98,7 +96,7 @@ object MuDualSimTest extends App
                                 SET (),                          // ch(3)
                                 SET (2),                         // ch(4)
                                 SET (4)),                        // ch(5)
-                         Array (10.0, 11.0, 11.0, 11.0, 11.0,10.0),
+                         Array (10.0, 11.0, 11.0, 11.0, 11.0, 10.0),
                          Map ((0, 1) -> ν(-1.0, -2.0, -3.0),
                               (0, 3) -> ν(-1.0),
                               (1, 2) -> ν(-1.0),
@@ -121,41 +119,23 @@ object MuDualSimTest extends App
     println (s"q.checkElabels = ${q.checkElabels}")
     q.printG ()
 
-    val matcher = new MuDualSim (g, q)                           // Graph Simulation Pattern Matcher
-    val phi     = time { matcher.mappings () }                   // time the matcher
-    matcher.showMappings (phi)                                   // display results
+    val matcher = new MuDualSim (g, q)                           // Dual Graph Simulation Pattern Matcher
+    matcher.test ("MuDualSim")
 
 } // MuDualSimTest object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuDualSimTest2` object is used to test the `MuDualSim` class.
- *  run-main scalation.graphalytics.multi.MuDualSimTest2
+ *  > run-main scalation.graphalytics.multi.MuDualSimTest2
  */
 object MuDualSimTest2 extends App
 {
-    val g = new MuGraph (Array (SET (),                          // ch(0)
-                                SET (0, 2, 3, 4),                // ch(1)
-                                SET (0),                         // ch(2)
-                                SET (4),                         // ch(3)
-                                SET ()),                         // ch(4)
-                         Array (11.0, 10.0, 11.0, 11.0, 11.0),
-                         Map ((1, 0) -> ν(-1.0),
-                              (1, 2) -> ν(-1.0),
-                              (1, 3) -> ν(-1.0),
-                              (1, 4) -> ν(-1.0),
-                              (2, 0) -> ν(-1.0),
-                              (3, 4) -> ν(-2.0)),                // change from -1 to -2 filter out vertices
-                              false, "g")
+    import scalation.graphalytics.multi.{ExampleMuGraphD => EX_GRAPH}
+    import MatchAnswers._
 
-    val q = new MuGraph (Array (SET (1, 2),                      // ch(0)
-                                SET (),                          // ch(1)
-                                SET (1)),                        // ch(2)
-                         Array (10.0, 11.0, 11.0),
-                         Map ((0, 1) -> ν(-1.0),
-                              (0, 2) -> ν(-1.0),
-                              (2, 1) -> ν(-1.0)),
-                              false, "q")
+    val g = EX_GRAPH.g2p
+    val q = EX_GRAPH.q2p
 
     println (s"g.checkEdges   = ${g.checkEdges}")
     println (s"g.checkElabels = ${g.checkElabels}")
@@ -164,18 +144,41 @@ object MuDualSimTest2 extends App
     println (s"q.checkElabels = ${q.checkElabels}")
     q.printG ()
 
-    val matcher = new MuDualSim (g, q)                           // Graph Simulation Pattern Matcher
-    val phi     = time { matcher.mappings () }                   // time the matcher
-    matcher.showMappings (phi)                                   // display results
+    val matcher = new MuDualSim (g, q)                           // Dual Graph Simulation Pattern Matcher
+    matcher.test ("MuDualSim", shift (dualSim))
 
 } // MuDualSimTest2 object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuDualSimTest3` object is used to test the `MuDualSim` class.
- *  run-main scalation.graphalytics.multi.MuDualSimTest3
+ *  > run-main scalation.graphalytics.multi.MuDualSimTest3
  */
-//object MuDualSimTest3 extends App
+object MuDualSimTest3 extends App
+{
+    import scalation.graphalytics.multi.{ExampleMuGraphD => EX_GRAPH}
+
+    val g = EX_GRAPH.g1p
+    val q = EX_GRAPH.q1p
+
+    println (s"g.checkEdges   = ${g.checkEdges}")
+    println (s"g.checkElabels = ${g.checkElabels}")
+    g.printG ()
+    println (s"q.checkEdges   = ${q.checkEdges}")
+    println (s"q.checkElabels = ${q.checkElabels}")
+    q.printG ()
+
+    val matcher = new MuDualSim (g, q)                           // Dual Graph Simulation Pattern Matcher
+    matcher.test ("MuDualSim")
+
+} // MuDualSimTest3 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `MuDualSimTest4` object is used to test the `MuDualSim` class.
+ *  > run-main scalation.graphalytics.multi.MuDualSimTest4
+ */
+//object MuDualSimTest4 extends App
 //{
 //    val gSize     = 1000         // size of the data graph
 //    val qSize     =   10         // size of the query graph
@@ -192,5 +195,5 @@ object MuDualSimTest2 extends App
 //    val phi     = time { matcher.mappings () }             // time the matcher
 //    matcher.showMappings (phi)                             // display results
 //
-//} // MuDualSimTest3 object
+//} // MuDualSimTest4 object
 
