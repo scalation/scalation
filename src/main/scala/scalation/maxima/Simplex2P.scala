@@ -90,7 +90,7 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
      */
     def enteringMin () = t(M).firstPos (jj)          // minimization mode
     def enteringMax () = t(M).firstNeg (jj)          // maximization mode
-    private var entering: () => Int = enteringMin    // start the function in minimization mode
+    private var entering: Function0 [Int] = () => enteringMin    // start the function in minimization mode
 
     private val checker = new CheckLP (a, b, c)      // checker determines if the LP solution is correct
 
@@ -215,7 +215,7 @@ class Simplex2P (a: MatrixD, b: VectorD, c: VectorD)
         } // if
 
         println ("solve2P: Phase II --------------------------------------------")
-        entering = enteringMax            // change to maximization mode
+        entering = () => enteringMax      // change to maximization mode
         solve ()                          // solve the phase II problem for final solution
         x = primal; y = dual; f = objective
         println ("solve2P: Phase II solution x = " + x + ", f = " + f)

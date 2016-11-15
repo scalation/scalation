@@ -8,7 +8,7 @@
 
 package scalation.graphalytics.multi
 
-import scala.collection.mutable.{ListBuffer, Map, HashMap, MutableList, Stack}
+import scala.collection.mutable.{ArrayStack, ListBuffer, Map, HashMap, MutableList}
 import scala.collection.mutable.{Set => SET}
 import scala.reflect.ClassTag
 import scala.util.control.Breaks.{break, breakable}
@@ -138,7 +138,7 @@ class MuStrictSim [TLabel: ClassTag] (g: MuGraph [TLabel], q: MuGraph [TLabel])
     def dualFilter (phi: Array [SET [Int]], ball: Ball [TLabel]): Array [SET [Int]] = 
     {
         for (v <- phi.indices) phi(v) &= ball.nodesInBall         // project simset onto ball
-        val filterSet = new Stack [(Int, Int)] ()
+        val filterSet = new ArrayStack [(Int, Int)] ()
         var filtered  = false
         for (u <- phi.indices; v <- phi(u) if ball.borderNodes contains v) {
             filtered = false                                      // filtering ball based on child relationship
@@ -177,7 +177,7 @@ class MuStrictSim [TLabel: ClassTag] (g: MuGraph [TLabel], q: MuGraph [TLabel])
         } // for
 
         // Finding max perfect subgraph
-        val stack = new Stack [Int] ()
+        val stack = new ArrayStack [Int] ()
         val visited = SET (ball.center)
         stack.push (ball.center)
         while (! stack.isEmpty) {

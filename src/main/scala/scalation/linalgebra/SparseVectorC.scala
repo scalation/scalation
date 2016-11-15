@@ -868,7 +868,7 @@ class SparseVectorC (val dim_ : Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Must also override hashCode for 'this' vector to be compatible with equals.
      */
-    override def hashCode: Int = v.hashCode
+    override def hashCode (): Int = v.hashCode
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' sparse vector to a dense vector.
@@ -1012,7 +1012,7 @@ object SparseVectorC
  */
 object SparseVectorCTest extends App
 {   
-    var x: SparseVectorC = null
+    var x: SparseVectorC = _
     var y: SparseVectorC = null
 
     for (l <- 1 to 4) {

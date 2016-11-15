@@ -868,7 +868,7 @@ class SparseVectorI (val dim_ : Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Must also override hashCode for 'this' vector to be compatible with equals.
      */
-    override def hashCode: Int = v.hashCode
+    override def hashCode (): Int = v.hashCode
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' sparse vector to a dense vector.

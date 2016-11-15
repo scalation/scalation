@@ -888,7 +888,7 @@ class VectorR (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Must also override hashCode for 'this' vector to be compatible with equals.
      */
-    override def hashCode: Int = v.deep.hashCode
+    override def hashCode (): Int = v.deep.hashCode
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' vector to a String.

@@ -586,7 +586,7 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
     {
         val colPos = colMap (cName)
         val c = col(colPos)
-        for (i <- 0 until c.size if Vec(c, i) == matchStr) Vec(c, i) = func ()
+        for (i <- 0 until c.size if Vec(c, i) == matchStr) Vec(c, i) = func
     } // update
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

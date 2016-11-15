@@ -1481,7 +1481,7 @@ class MatrixD (d1: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Must also override hashCode for 'this' matrix to be compatible with equals.
      */
-    override def hashCode: Int = v.deep.hashCode
+    override def hashCode (): Int = v.deep.hashCode
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' real (double precision) matrix to a string.

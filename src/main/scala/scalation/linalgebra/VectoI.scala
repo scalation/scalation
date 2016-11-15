@@ -612,7 +612,7 @@ trait VectoI
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Must also override hashCode for 'this' vector to be compatible with equals.
      */
-    override def hashCode: Int
+    override def hashCode (): Int
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the format to the 'newFormat' (e.g., "%.6g,\t" or "%12.6g,\t").

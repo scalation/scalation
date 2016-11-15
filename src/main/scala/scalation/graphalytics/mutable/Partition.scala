@@ -96,10 +96,10 @@ class Partition [TLabel: ClassTag] (g: Graph [TLabel])
     {
         if (DEBUG) println (s"partition: ilabel = $ilabel")
         var part = 0
-        for (i <- ilabel.indices) {                               // put vertex into map based on ilabel
-            val iset = partMap.getOrElse (ilabel(i), null)
-            if (iset == null) partMap += ilabel(i) -> SET (i)
-            else              iset += i
+        for (i <- 0 until 10) { // ilabel.dim) {                           // put vertex into map based on ilabel
+//            val iset = partMap.getOrElse (ilabel(i), null)
+//            if (iset == null) partMap += ilabel(i) -> SET (i)
+//            else              iset += i
         } // for
         if (DEBUG) println (s"partition: partMap = $partMap")
     } // partition

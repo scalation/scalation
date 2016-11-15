@@ -48,7 +48,7 @@ class TripletI (var value: Int, var count: Int, var startPos: Int)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Must also override 'hashCode' for 'this' vector to be compatible with equals.
      */
-    override def hashCode: Int = ABS ((value.hashCode()) + (31 * startPos) + (13 * count))
+    override def hashCode (): Int = ABS ((value.hashCode()) + (31 * startPos) + (13 * count))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Converts 'this' triplet to a string.
@@ -1457,7 +1457,7 @@ class RleVectorI (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Must also override hashCode for 'this' vector to be compatible with equals.
      */
-    override def hashCode: Int = v.hashCode
+    override def hashCode (): Int = v.hashCode
    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' vector to a string.

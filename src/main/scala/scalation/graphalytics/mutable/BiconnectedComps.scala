@@ -12,7 +12,7 @@
 
 package scalation.graphalytics.mutable
 
-import scala.collection.mutable.{ArrayBuffer, Stack}
+import scala.collection.mutable.{ArrayBuffer, ArrayStack}
 import scala.collection.mutable.{Set => SET}
 import scala.math.min
 
@@ -106,7 +106,7 @@ case class BiconnectedComp [TLabel] (g_ : Graph [TLabel])
      */
     def findBlocks (): ArrayBuffer [Block] =
     {
-        val stack  = Stack [Pair] ()                    // edge stack
+        val stack  = ArrayStack [Pair] ()               // edge stack
         val depth  = Array.ofDim [Int](n)               // vertex depth
         val low    = Array.fill (n)(-1)                 // array of vertex low-points
         val parent = Array.fill(n)(-1)                  // array of vertex parents

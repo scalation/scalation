@@ -50,7 +50,7 @@ object MissingValues
     def replaceMissingValues (xy: Table, ignore: Seq [Int], missingCol: String, missingStr: String = "?"): Table =
     {
         val (mMean, mStddev) = estimateStats (xy, missingCol, missingStr)
-        def est () = (mMean + (rng.gen-0.5)*mStddev).toString               // FIX - use a better estimation technique
+        val est: Function0 [String] = () => (mMean + (rng.gen-0.5)*mStddev).toString            // FIX - use a better estimation technique
 
         val keep = (0 until xy.cols) diff ignore
         val xy2 = xy.pi (keep).asInstanceOf [Relation]

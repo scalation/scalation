@@ -15,7 +15,7 @@
 
 package scalation.minima
 
-import scala.collection.mutable.{ArrayBuffer, Stack}
+import scala.collection.mutable.{ArrayBuffer, ArrayStack}
 import scala.util.control.Breaks.{breakable, break}
 
 import scalation.linalgebra.{MatriD, VectoD, VectorD, VectorI}
@@ -111,7 +111,7 @@ object Ftran
     val Hend    = new VectorI (m+1)
     val Hindex  = new VectorI (m+1)
 
-    val stack   = new Stack [Tuple2 [Int, Int]] ()
+    val stack   = new ArrayStack [Tuple2 [Int, Int]] ()
     val list    = ArrayBuffer [Int] ()
     val visited = Array.ofDim [Int] (m+1)
 
