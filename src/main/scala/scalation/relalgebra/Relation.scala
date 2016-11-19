@@ -39,6 +39,19 @@ import TableObj._
 object Relation
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an unpopulated relation.
+     *  @param name     the name of the relation
+     *  @param key      the column number for the primary key (< 0 => no primary key)
+     *  @param domain   an optional string indicating domains for columns (e.g., 'SD' = 'StrNum', 'Double') 
+     *  @param colName  the names of columns
+     */
+    def apply (name: String, key: Int, domain: String, colName: String*): Relation =
+    {
+        val n = colName.length
+        Relation (name, colName, Vector.fill [Vec] (n)(null), key, domain)
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a relation from a sequence of row/tuples.  These rows must be converted
      *  to columns.
      *  @param name     the name of the relation
@@ -349,9 +362,10 @@ import Relation._
  *  @param col      the Scala Vector of columns making up the columnar relation
  *  @param key      the column number for the primary key (< 0 => no primary key)
  *  @param domain   an optional string indicating domains for columns (e.g., 'SD' = 'StrNum', 'Double')
+ *  @param fKeys    an optional sequence of foreign keys - Seq (column name, ref table name, ref column position)
  */
 case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
-                     key: Int = 0, domain: String = null)
+                     key: Int = 0, domain: String = null, var fKeys: Seq [(String, String, Int)] = null)
      extends Table with Error
 {
     if (colName.length != col.length) flaw ("constructor", "incompatible sizes for 'colName' and 'col'")
@@ -840,11 +854,12 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
      */
     def show ()
     {
-        val wid = 18                                             // column width
-        val rep = wid * colName.length                           // repetition = width * # columns
+        val wid    = 18                                             // column width
+        val rep    = wid * colName.length                           // repetition = width * # columns
+        val title  = s"| Relation name = $name, key-column = $key "
 
         println (s"|-${"-"*rep}-|")
-        println (s"  Relation name = $name, key-column = $key")
+        println (title + " "*(rep-title.length) + "   |")
         println (s"|-${"-"*rep}-|")
         print ("| "); for (cn <- colName) print (s"%${wid}s".format (cn)); println (" |")
         println (s"|-${"-"*rep}-|")
@@ -853,6 +868,23 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
         } // for
         println (s"|-${"-"*rep}-|")
     } // show
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Show 'this' relation's foreign keys.
+     */
+    def showFk ()
+    {
+        val wid    = 18                                            // column width
+        val rep    = wid * colName.length                          // repetition = width * # columns
+        val title  = s"| Relation name = $name, foreign keys = "
+        val fkline = s"| $fKeys "
+
+        println (s"|-${"-"*rep}-|")
+        println (title + " "*(rep-title.length) + "   |")
+        println (s"|-${"-"*rep}-|")
+        println (fkline + " "*(rep-fkline.length) + "   |")
+        println (s"|-${"-"*rep}-|")
+    } // showFk
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' relation into a matrix of doubles, e.g., 

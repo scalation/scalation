@@ -39,6 +39,10 @@ abstract class Variate (stream: Int = 0)
      */
     protected val r = Random (stream)
 
+    /** Allow (lax) calling 'igen' on continuous distributions
+     */
+    private val LAX = true
+
     /** Indicates whether the distribution is discrete or continuous (default)
      */
     protected var _discrete = false
@@ -78,8 +82,8 @@ abstract class Variate (stream: Int = 0)
      */
     def igen: Int =
     {
-        if (_discrete) round (gen).toInt
-        else           { flaw ("igen", "should not be invoked on continuous RV's"); 0 }
+        if (LAX || _discrete) round (gen).toInt
+        else { flaw ("igen", "should not be invoked on continuous RV's"); 0 }
     } // igen
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

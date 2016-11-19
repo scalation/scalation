@@ -398,7 +398,7 @@ object MGraphGenTest extends App
     println ("MGraphGenTest: test genRandomConnectedGraph")
     (1 to 5).foreach { _ => mgGen.genRandomConnectedGraph (4, 100, 5, 1).printG () }
 
-    println ("MGraphGenTest: test geneRandomGraph_PowLabels")
+    println ("MGraphGenTest: test genRandomGraph_PowLabels")
     val g1 = mgGen.genRandomGraph_PowLabels (200, 50, 2)
     g1.printG ()
     println (s"g1.labelMap = ${g1.labelMap}")

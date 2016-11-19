@@ -316,7 +316,7 @@ object GraphGenTest extends App
     println ("GraphGenTest: test genRandomConnectedGraph")
     (1 to 5).foreach { _ => gGen.genRandomConnectedGraph (4, 100, 1).printG () }
 
-    println ("GraphGenTest: test geneRandomGraph_PowLabels")
+    println ("GraphGenTest: test genRandomGraph_PowLabels")
     val g1 = gGen.genRandomGraph_PowLabels (200, 50, 2)
     g1.printG ()
     println (s"g1.labelMap = ${g1.labelMap}")
@@ -344,7 +344,7 @@ object GraphGenTest2 extends App
     println ("GraphGenTest2: test genRandomConnectedGraph")
     (1 to 5).foreach { _ => gGen.genRandomConnectedGraph (4, 100, 1).printG () }
 
-    println ("GraphGenTest2: test geneRandomGraph_PowLabels")
+    println ("GraphGenTest2: test genRandomGraph_PowLabels")
     val g1 = gGen.genRandomGraph_PowLabels (200, 50, 2)
     g1.printG ()
     println (s"g1.labelMap = ${g1.labelMap}")
@@ -372,7 +372,7 @@ object GraphGenTest3 extends App
     println ("GraphGenTest3: test genRandomConnectedGraph")
     (1 to 5).foreach { _ => gGen.genRandomConnectedGraph (4, 100, 1).printG () }
 
-    println ("GraphGenTest3: test geneRandomGraph_PowLabels")
+    println ("GraphGenTest3: test genRandomGraph_PowLabels")
     val g1 = gGen.genRandomGraph_PowLabels (200, 50, 2)
     g1.printG ()
     println (s"g1.labelMap = ${g1.labelMap}")

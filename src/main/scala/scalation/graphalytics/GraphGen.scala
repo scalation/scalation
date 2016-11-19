@@ -345,7 +345,7 @@ object GraphGenTest extends App
         g.printG ()
     } // foreach
 
-    println ("GraphGenTest: test geneRandomGraph_PowLabels")
+    println ("GraphGenTest: test genRandomGraph_PowLabels")
     val g1 = genRandomGraph_PowLabels (200, 50, 2)
     g1.printG ()
     println (s"g1.labelMap = ${g1.labelMap}")

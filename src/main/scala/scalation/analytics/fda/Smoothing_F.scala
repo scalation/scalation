@@ -27,17 +27,19 @@ import scalation.util.Error
  *  where 'x' is the signal, 'ε' is the noise, 'c' is a coefficient vector and
  *  'Φ(t)' is a vector of basis functions. 
  *-----------------------------------------------------------------------------
- *  @param y    the data points/vector
+ *  @param y    the (raw) data points/vector
  *  @param t    the data time points/vector
  *  @param τ    the time points/vector for the knots
  *  @param n    the number of basis functions to use
  *  @param ord  the order (degree+1) of B-Splines (2, 3, 4, 5 or 6)
  */
-class Smoothing_F (y: VectorD, t: VectorD, τ: VectorD, ord: Int = 4)
+class Smoothing_F (y: VectorD, t: VectorD, private var τ: VectorD = null, ord: Int = 4)
       extends Error
 {
     private val DEBUG = true                   // debug flag
+    private val GAP   = 5                      // gap between time points and knots
     private val m     = t.dim                  // number of data time points
+    if (τ == null) τ  = makeKnots
     private val n     = τ.dim                  // number of time points for the knots
 
     if (y.dim != m) flaw ("constructor", "require # data points == # data time points")
@@ -49,6 +51,8 @@ class Smoothing_F (y: VectorD, t: VectorD, τ: VectorD, ord: Int = 4)
     private val bs = new B_Spline (τ, ord)     // use B-Spline basis functions
 
     if (DEBUG) println (s"m = $m, n = $n")
+
+    def makeKnots: VectorD = VectorD.range (0, (m/GAP + ord)) / (m/GAP.toDouble)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the model, i.e., determine the optimal cofficients 'c' for the
@@ -80,6 +84,12 @@ class Smoothing_F (y: VectorD, t: VectorD, τ: VectorD, ord: Int = 4)
     } // predict
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Predict the y-values at all time points in vector 'tv'.
+     *  @param tv  the given vector of time points
+     */
+    def predict (tv: VectorD): VectorD = tv.map (predict (_))
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Form the phi matrix by evaluating the basis functions at the time points.
      */
     private def form_phi ()
@@ -98,19 +108,20 @@ object Smoothing_FTest extends App
 {
     import scalation.random.Normal
 
-    val normal = Normal ()
-    val t   = VectorD.range (0, 100) / 100.0
-    val y   = t.map ((x: Double) => 3.0 + 2.0 * x * x + normal.gen)
+    val normal = Normal ()                                           // normal random variate generator
+    val t = VectorD.range (0, 100) / 100.0                           // time points
+    val y = t.map ((x: Double) => 3.0 + 2.0 * x * x + normal.gen)    // raw data points
 
     for (ord <- 2 to 6) {
-        val τ  = VectorD.range (0, 20 + ord) / 20.0
-        val fr = new Smoothing_F (y, t, τ, ord)
-        val c  = fr.train ()
+//      val τ   = VectorD.range (0, 20 + ord) / 20.0                 // time points for knots
+        val τ   = null                                               // let `Smoothing_F` nake the knots
+        val moo = new Smoothing_F (y, t, τ, ord)                     // smoother
+        val c   = moo.train ()                                       // train -> set coefficients
 
         println (s"y = $y \nt = $t \nc = $c")
 
-        val yp = VectorD (for (i <- t.indices) yield fr.predict (t(i)))
-        new Plot (t, y, yp, s"B-Spline Fit: ord = $ord")
+        val x = moo.predict (t)                                      // predict for all time points
+        new Plot (t, y, x, s"B-Spline Fit: ord = $ord")
     } // for
 
 } // Smoothing_FTest object
@@ -130,11 +141,13 @@ object Smoothing_FTest2 extends App
     val y  = t.map ((x: Double) => 3.0 + 2.0 * x * x + normal.gen)
 
     for (ord <- 2 to 6) {
-        val τ  = VectorD.range (0, 20 + ord) / 20.0
-        val fr = new Smoothing_F (y, t, τ, ord)
-        val c  = fr.train ()
+        val τ   = VectorD.range (0, 20 + ord) / 20.0
+        val moo = new Smoothing_F (y, t, τ, ord)
+        val c   = moo.train ()
+
         println (s"y = $y \nt = $t \nc = $c")
-        new FPlot (t, y, t2, fr.predict, s"B-Spline Fit: ord = $ord")
+
+        new FPlot (t, y, t2, moo.predict, s"B-Spline Fit: ord = $ord")
     } // for
 
 } // Smoothing_FTest2 object

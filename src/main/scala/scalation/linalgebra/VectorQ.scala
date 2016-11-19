@@ -209,6 +209,17 @@ class VectorQ (val dim: Int,
     } // select
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Select a subset of elements of 'this' vector corresponding to a 'basis'.
+     *  @param basis  the set of index positions (e.g., 0, 2, 5)
+     */
+    def select (basis: VectoI): VectorQ =
+    {
+        val c = new VectorQ (basis.dim)
+        for (i <- c.range) c.v(i) = v(basis(i))
+        c
+    } // select
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate 'this' vector and vector' b'.
      *  @param b  the vector to be concatenated (any kind)
      */

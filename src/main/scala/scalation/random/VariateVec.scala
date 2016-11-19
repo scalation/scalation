@@ -10,9 +10,10 @@ package scalation.random
 
 import scala.math.{abs, exp, Pi, round, sqrt}
 
-import scalation.linalgebra.{Fac_Cholesky, MatrixD, VectorD, VectorI}
-import scalation.math.Combinatorics.{choose, fac}
+import scalation.linalgebra.{Fac_Cholesky, MatrixD, VectorD, VectorI, VectorS}
 import scalation.math.double_exp
+import scalation.math.Combinatorics.{choose, fac}
+import scalation.math.ExtremeD.NaN
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -295,7 +296,10 @@ case class RandomVecI (dim: Int = 10, max: Int = 20, min: Int = 10, skip: Int = 
 {
     _discrete = true
 
-    if (unique && max < dim-1) flaw ("constructor", "requires max >= dim-1")
+    if (unique && max < dim-1) {
+        flaw ("constructor", "requires max >= dim-1")
+        throw new IllegalArgumentException ("max too small")
+    } // if
 
     private val mu  = (max - min) / 2.0                 // mean
     private val rng = Randi0 (max, stream)              // random integer generator
@@ -318,6 +322,43 @@ case class RandomVecI (dim: Int = 10, max: Int = 20, min: Int = 10, skip: Int = 
     } // igen
 
 } // RandomVecI class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RandomVecS` class generates a random vector of integers.
+ *  Ex: (3, 2, 0, 4, 1) has 'dim' = 5 and 'max' = 4.
+ *  @param dim     the dimension/size of the vector (number of elements)
+ *  @param unique  whether the strings must be unique
+ *  @param stream  the random number stream
+ */
+case class RandomVecS (dim: Int = 10, unique: Boolean = true, stream: Int = 0)
+     extends VariateVec (stream)
+{
+    _discrete = true
+
+    private val mu  = NaN                               // mean
+    private val rng = RandomStr (stream = stream)       // random string generator
+
+    def mean: VectorD =  { val mv = new VectorD (dim); mv.set (mu); mv }
+
+    def pf (z: VectorD): Double = NaN
+
+    def gen: VectorD = sgen.toDouble
+
+    def igen: VectorI = sgen.toInt
+
+    def sgen: VectorS =
+    {
+        val y   = new VectorS (dim)
+        var str = ""
+        for (i <- 0 until dim) {
+            do str = rng.sgen while (unique && i > 0 && (y.slice (0, i) contains str))
+            y(i) = str
+        } // for
+        y
+    } // sgen
+
+} // RandomVecS class
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -397,6 +438,11 @@ object VariateVecTest extends App
 
      println ("Test: RandomVecI random vector generation --------------------")
      rvv = RandomVecI ()                             // random vector generator
+     println ("mean = " + rvv.mean)
+     for (k <- 0 until 30) println (rvv.igen)
+
+     println ("Test: RandomVecS random vector generation --------------------")
+     rvv = RandomVecS ()                             // random vector generator
      println ("mean = " + rvv.mean)
      for (k <- 0 until 30) println (rvv.igen)
 

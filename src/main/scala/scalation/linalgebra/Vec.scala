@@ -55,6 +55,25 @@ object Vec
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the 'i'th element of vector 'x'.
+     *  @param x  the vector to access
+     *  @param i  the index position 
+     */
+    def apply (x: Vec, iv: VectorI): Vec =
+    {
+        x match {
+        case _: VectorC => x.asInstanceOf [VectorC].select (iv)
+        case _: VectorD => x.asInstanceOf [VectorD].select (iv)
+        case _: VectorI => x.asInstanceOf [VectorI].select (iv)
+        case _: VectorL => x.asInstanceOf [VectorL].select (iv)
+        case _: VectorQ => x.asInstanceOf [VectorQ].select (iv)
+        case _: VectorR => x.asInstanceOf [VectorR].select (iv)
+        case _: VectorS => x.asInstanceOf [VectorS].select (iv)
+        case _  =>  println ("apply: vector type not supported"); null
+        } // match
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Update the 'i'th element of vector 'x'.
      *  @param x  the vector to update
      *  @param i  the index position
