@@ -1012,7 +1012,7 @@ object SparseVectorC
  */
 object SparseVectorCTest extends App
 {   
-    var x: SparseVectorC = _
+    var x: SparseVectorC = null
     var y: SparseVectorC = null
 
     for (l <- 1 to 4) {

@@ -185,6 +185,19 @@ class VectorQ (val dim: Int,
     } // filterPos
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Filter the elements of 'this' vector based on the binary predicate 'p',
+     *  returning the index positions.
+     *  @param v2  the other vector to compare with
+     *  @param p   the binary predicate (Boolean function, between two elements) to apply
+     */
+    def filterPos2 (v2: VectoQ, p: (Rational, Rational) => Boolean): IndexedSeq [(Int, Int)] =
+    {
+        var result = IndexedSeq [(Int, Int)] ()
+        for (i <- range; j <- v2.range if p(v(i), v2(j))) result = result :+ (i, j)
+        result
+    } // filterPos2
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Map the elements of 'this' vector by applying the mapping function 'f'.
      *  @param f  the function to apply
      */
@@ -199,7 +212,7 @@ class VectorQ (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select a subset of elements of 'this' vector corresponding to a 'basis'.
-     *  @param basis  the set of index positions (e.g., 0, 2, 5)
+     *  @param basis  the set/array of index positions (e.g., 0, 2, 5)
      */
     def select (basis: Array [Int]): VectorQ =
     {
@@ -210,7 +223,7 @@ class VectorQ (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select a subset of elements of 'this' vector corresponding to a 'basis'.
-     *  @param basis  the set of index positions (e.g., 0, 2, 5)
+     *  @param basis  the set/vector of index positions (e.g., 0, 2, 5)
      */
     def select (basis: VectoI): VectorQ =
     {
@@ -888,9 +901,9 @@ class VectorQ (val dim: Int,
         if (! b.isInstanceOf [VectoQ]) return false
         val bb = b.asInstanceOf [VectoQ]
         if (dim != bb.dim) return false
-        val vm = mag                                // maximum magnitude element in vector
+        val vm = if (dim > 0) mag else _1                             // maximum magnitude element in vector
         for (i <- range) {
-//          if (v(i) !=~ bb(i)) return false                             // stricter
+//          if (v(i) !=~ bb(i)) return false                            // stricter
             if (v(i) !=~ bb(i) && v(i) + vm !=~ bb(i) + vm) return false
         } // for
         true

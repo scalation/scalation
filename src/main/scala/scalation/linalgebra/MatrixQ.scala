@@ -316,6 +316,18 @@ class MatrixQ (d1: Int,
 //  } // t
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Transpose, in-place, 'this' matrix (columns => rows).
+     *  FIX: may wish to use algorithm with better data locality.
+     */
+    def tip (): MatrixQ =
+    {
+        for (i <- 1 until dim1; j <- 0 until i) {
+            val t = v(i)(j); v(i)(j) = v(j)(i); v(j)(i) = t     // swap elements
+        } // for
+        this
+    } // tip
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate (row) vector 'u' and 'this' matrix, i.e., prepend 'u' to 'this'.
      *  @param u  the vector to be prepended as the new first row in new matrix
      */
@@ -1778,6 +1790,7 @@ object MatrixQTest extends App with PackageInfo
 
     println ("z            = " + z)
     println ("z.t          = " + z.t)
+    println ("z.tip        = " + z.tip); z.tip   // restore back
     println ("z.lud        = " + lu)
     println ("z.lud_npp    = " + lu2)
     println ("z.solve      = " + z.solve (lu._1, lu._2, b))

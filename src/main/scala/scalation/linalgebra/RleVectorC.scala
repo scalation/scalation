@@ -142,8 +142,7 @@ object RleVectorC
  *  @param dim  the dimension/size of the vector (uncompressed data)
  *  @param v    the 1D array used to store vector elements
  */   
-class RleVectorC (val dim: Int,   
-                  protected var v: ReArray [TripletC] = null)  
+class RleVectorC (val dim: Int, protected var v: ReArray [TripletC] = null)  
       extends VectoC
 {      
     if (v == null) {
@@ -540,7 +539,7 @@ class RleVectorC (val dim: Int,
         } // match       
     } // +
     
-     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'this' vector and vector 'b'.
      *  @param b  the vector to add (same kind, more efficient)
      */
@@ -611,11 +610,11 @@ class RleVectorC (val dim: Int,
      *  vector.
      *  @param b  the vector to add
      */
-    def += (b: VectoC): VectoC = { 
-      for (i <- range) 
-        this(i) += b(i); 
+    def += (b: VectoC): VectoC =
+    { 
+        for (i <- range) this(i) += b(i)
         this 
-      } // +=
+    } // +=
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' vector and vector 'b' and return the compressed 
@@ -694,7 +693,7 @@ class RleVectorC (val dim: Int,
         } // match       
     } // -
     
-     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract vector 'b'.
      *  @param b  the vector to subtract (same kind, more efficient)
      */
@@ -1473,7 +1472,7 @@ class RleVectorC (val dim: Int,
         sb.replace (sb.length-2, sb.length-1, ")").mkString
     } // toString   
      
-} // RleVectorC
+} // RleVectorC class
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

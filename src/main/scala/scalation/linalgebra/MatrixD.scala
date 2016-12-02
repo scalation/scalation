@@ -317,7 +317,7 @@ class MatrixD (d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Transpose, in-place, 'this' matrix (columns => rows).
-     *  FIX: use algorithm with better data locality.
+     *  FIX: may wish to use algorithm with better data locality.
      */
     def tip (): MatrixD =
     {
