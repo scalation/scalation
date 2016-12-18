@@ -39,7 +39,7 @@ class PrincipalComponents (x: MatrixD)
     private val N        = x.dim2                            // the number of variables (columns)
     private val mu       = mean (x)                          // the mean vector (column means)
     private val xc       = center (x, mu)                    // center x (shift mean to zero)
-    private val cov      = (xc dot xc) / (MR - 1.0)          // the covariance matrix (from mean zero data)
+    private val cov      = (xc mdot xc) / (MR - 1.0)         // the covariance matrix (from mean zero data)
     private val eigenVal = (new Eigenvalue (cov)).getE       // the eigenvalues of cov
     private val eigenVec = computeEigenVectors (eigenVal)    // the eigenvectors for cov
 

@@ -642,6 +642,93 @@ class SymTriMatrixL (val d1: Int)
     def dot (u: VectoL): VectorL = this * u
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product of 'this' matrix with matrix 'b' to produce a vector.
+     *  @param b  the second matrix of the dot product
+     */
+    def dot (b: SymTriMatrixL): VectorL = 
+    {
+        if (dim1 != b.dim1) flaw ("dot", "matrix dot matrix - incompatible first dimensions")
+        if (dim1 == 1) return VectorL (_dg(0) * b._dg(0))
+        
+        var c = new VectorL (dim2)
+        c(0)  = _dg(0) * b._dg(0) + _sd(0) * b._sd(0)
+        for (i <- 1 until dim1-1) c(i) = _sd(i-1) * b.sd(i-1) + _dg(i) * b._dg(i) + _sd(i) * b.sd(i)
+        c(dim1-1) = _dg(dim1-1) * b._dg(dim1-1) + _sd(dim1-2) * b._sd(dim1-2)
+        c
+    } // dot 
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product of 'this' matrix with matrix 'b' to produce a vector.
+     *  @param b  the second matrix of the dot product
+     */
+    def dot (b: MatriL): VectorL = 
+    {
+        if (dim1 != b.dim1) flaw ("dot", "matrix dot matrix - incompatible first dimensions")
+        if (dim1 == 1) return VectorL (_dg(0) * b(0, 0))
+        
+        var c = new VectorL (dim2)
+        c(0) = _dg(0) * b(0, 0) + _sd(0) * b(1, 0)
+        for (i <- 1 until dim1 - 1) c(i) = _sd(i-1) * b(i-1, i) + _dg(i) * b(i, i) + _sd(i) * b(i+1, i)
+        c(dim1-1) = _dg(dim1-1) * b(dim1-1, dim1-1) + _sd(dim1-2) * b(dim1-2, dim1-1)
+        c
+    } // dot 
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the matrix dot product of 'this' matrix with matrix 'b' to produce a matrix.
+     *  @param b  the second matrix of the dot product
+     */
+    def mdot (b: SymTriMatrixL): MatrixL = 
+    {
+        if (dim1 != b.dim1) flaw ("mdot", "matrix mdot matrix - incompatible first dimensions")
+        
+        val c = new MatrixL (dim2, b.dim2)           
+        if (dim1 == 1) {
+            c(0, 0) = _dg(0) * b._dg(0)
+            return c
+        } // if
+        c(0, 0) = _dg(0) * b._dg(0) + _sd(0) * b._sd(0)
+        c(1, 0) = _sd(0) * b._dg(0) + _dg(1) * b._sd(0)
+        c(0, 1) = _dg(0) * b._sd(0) + _sd(0) * b._dg(1)
+        if (dim1 == 2) {
+            c(1, 1) = _dg(1) * b._dg(1) + _sd(0) * b._sd(0)
+            return c
+        } // if
+        c(1, 1) = _dg(1) * b._dg(1) + _sd(0) * b._sd(0) + _sd(1) * b._sd(1)
+        for (i <- 2 until dim1) {
+            c(i, i)   = if (i != dim1-1) _sd(i-1) * b._sd(i-1) + _dg(i) * b._dg(i) + _sd(i) * b._sd(i)
+                        else             _sd(i-1) * b._sd(i-1) + _dg(i) * b._dg(i)
+            c(i-1, i) = _dg(i - 1) * b._sd(i-1) + _sd(i - 1) * b._dg(i)
+            c(i-2, i) = _sd(i - 2) * b._sd(i-1)
+            c(i, i-1) = _sd(i - 1) * b._dg(i-1) + _dg(i) * b._sd(i-1)
+            c(i, i-2) = _sd(i - 1) * b._sd(i-2)
+        } // for
+        c
+    } // mdot
+ 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the matrix dot product of 'this' matrix with matrix 'b' to produce a matrix.
+     *  @param b  the second matrix of the dot product
+     */
+    def mdot (b: MatriL): MatrixL = 
+    {
+        if (dim1 != b.dim1) flaw ("mdot", "matrix mdot matrix - incompatible first dimensions")
+        
+        var c = new MatrixL (dim2, b.dim2)
+        if (dim1 == 1) {
+            for (j <- 0 until b.dim2) c(0, j) = _dg(0) * b(0, j)
+            return c
+        } // if
+        for (j <- 0 until b.dim2) {
+            c(0, j) = _dg(0) * b(0, j) + _sd(0) * b(1, j)
+            for (i <- 1 until dim1 - 1) {
+                c(i, j) = _sd(i-1) * b(i-1, j) + _dg(i) * b(i, j) + _sd(i) * b(i+1, j)
+            } // for
+            c(dim1-1, j) = _dg(dim1-1) * b(dim1-1, j) + _sd(dim1-2) * b(dim1-2, j)
+        } // for 
+        c
+    } // mdot
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' tridiagonal matrix by vector 'u' to produce another matrix
      *  'a_ij * u_j'.
      *  @param u  the vector to multiply by

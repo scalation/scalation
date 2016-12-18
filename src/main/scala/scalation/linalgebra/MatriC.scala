@@ -451,6 +451,21 @@ trait MatriC
     def dot (u: VectoC): VectoC
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product of 'this' matrix and matrix 'b' that results in a vector,
+     *  by taking the dot product for each column 'j' of both matrices.
+     *  @see www.mathworks.com/help/matlab/ref/dot.html
+     *  @param b  the matrix to multiply by (requires same first dimensions)
+     */
+    def dot (b: MatriC): VectoC
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the matrix dot product of 'this' matrix and matrix 'b', by first transposing
+     *  'this' matrix and then multiplying by 'b' (i.e., 'a dot b = a.t * b').
+     *  @param b  the matrix to multiply by (requires same first dimensions)
+     */
+    def mdot (b: MatriC): MatriC
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the maximum element in 'this' matrix.
      *  @param e  the ending row index (exclusive) for the search
      */

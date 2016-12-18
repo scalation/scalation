@@ -1077,47 +1077,21 @@ class RleVectorC (val dim: Int, protected var v: ReArray [TripletC] = null)
      *  with compressed vector 'b'.
      *  @param b  the other vector
      */
-    def dot(x: RleVectorC) : Complex = 
+    def dot (x: RleVectorC): Complex =
     {
-        var sum = _0       
-        var (i, j) = (0, 0) 
-        var (a, b) = (v(i).count, x.v(j).count)
-        var currCount, minInterval = 0  
-        var tempSum = _0
-      
-        while (currCount < dim) {
-            if (a == b) {  
-                tempSum = ( v(i).value * x.v(j).value ) * a
-                sum += tempSum
-                currCount += a
-                if (currCount < dim) {
-                    i += 1 ; j +=1 ;
-                    a = v(i).count ; b = x.v(j).count
-                } // if
-            } else {   
-                minInterval =  MIN (a, b)      
-                if (minInterval == b) {    
-                tempSum = (v(i).value * x.v(j).value) * b
-                sum += tempSum
-                a = a - b;
-                currCount += b            
-                if (currCount < dim) {
-                    j += 1
-                    b = x.v(j).count
-                } // if              
-           } else {  
-                 tempSum = (v(i).value * x.v(j).value) * a
-                 sum += tempSum
-                 b = b - a
-                 currCount += a
-                 if (currCount < dim) {
-                     i += 1
-                     a = v(i).count
-                 } // if           
-             } // if 
-          } // if         
-      } // while
-      sum
+        var (i, j)     =  (0, 0)
+        var (a, b)     =  (v(0).count, x.v(0).count)
+        var currCount  =  MIN (a, b)
+        var sum        =  (v(0).value * x.v(0).value) * currCount
+        var totalCount = currCount
+        while (totalCount < dim) {
+            if (a == currCount) { i += 1; a = v(i).count   } else a -= currCount
+            if (b == currCount) { j += 1; b = x.v(j).count } else b -= currCount
+            currCount = MIN (a, b)
+            sum += (v(i).value * x.v(j).value) * currCount
+            totalCount += currCount
+        } // while
+        sum
     } // dot
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1136,7 +1110,7 @@ class RleVectorC (val dim: Int, protected var v: ReArray [TripletC] = null)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Manhattan norm (1-norm) of 'this' vector.
      */  
-    def norm1: Complex = v.foldLeft (_0) ((s, a) => s + (ABS (a.value) * a.count)) 
+    def norm1: Complex = v.foldLeft (_0) ((s, a) => s + (ABS (a.value) * a.count))
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the maximum element in 'this' compressed vector.
@@ -1144,11 +1118,10 @@ class RleVectorC (val dim: Int, protected var v: ReArray [TripletC] = null)
      */
     def max (e: Int = dim): Complex =
     {
+        if (e <= 0) flaw ("max", "the ending index e can't be negative")
         var x = v(0).value
-        for (i <- 1 until csize if v(i).startPos + v(i).count - 1 < e && v(i).value > x) {
-            x = v(i).value 
-        } // for
-        x   
+        for (i <- 1 until csize if v(i).startPos < e && v(i).value > x) x = v(i).value
+        x
     } // max
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1157,16 +1130,16 @@ class RleVectorC (val dim: Int, protected var v: ReArray [TripletC] = null)
      *  @param b  the other vector
      */
     def max (b: VectoC): VectoC =
-    {         
+    {
         val c = new VectorC (dim)
         var k = 0
-        for (i <- crange) {        
+        for (i <- crange) {
             for (j <- 0 until v(i).count) {
-                c(k) =  if (b(k) > v(i).value) b(k) else v(i).value
+                c(k) = if (b(k) > v(i).value) b(k) else v(i).value
                 k += 1
             } // for
-        }  // for       
-        c     
+        } // for
+        c
     } // max
       
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1174,11 +1147,10 @@ class RleVectorC (val dim: Int, protected var v: ReArray [TripletC] = null)
      *  @param e  the ending index (exclusive) for the search
      */
     def min (e: Int = dim): Complex =
-    {       
+    {
+        if (e <= 0) flaw ("min", "the ending index e can't be negative")
         var x = v(0).value
-        for (i <- 1 until csize if v(i).startPos + v(i).count - 1 < e && v(i).value < x) {
-            x = v(i).value                                   
-        } // for
+        for (i <- 1 until csize if v(i).startPos < e && v(i).value < x) x = v(i).value
         x
     } // min
       
@@ -1187,16 +1159,16 @@ class RleVectorC (val dim: Int, protected var v: ReArray [TripletC] = null)
      *  @param b  the other vector
      */
     def min (b: VectoC): VectoC =
-    {         
+    {
         val c = new VectorC (dim)
         var k = 0
-        for (i <- crange) {        
+        for (i <- crange) {
             for (j <- 0 until v(i).count) {
-                c(k) =  if (b(k) < v(i).value) b(k) else v(i).value
+                c(k) = if (b(k) < v(i).value) b(k) else v(i).value
                 k += 1
             } // for
-        }  // for        
-        c     
+        }  // for
+        c
     } // min
        
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1204,12 +1176,12 @@ class RleVectorC (val dim: Int, protected var v: ReArray [TripletC] = null)
      *  @param e  the ending index (exclusive) for the search
      */
     def argmax (e: Int = dim): Int =
-    {    
+    {
         var j = 0
         var temp = v(0).value
         for (i <- 1 until csize if v(i).startPos + v(i).count - 1 < e && v(i).value > temp) {
             temp = v(i).value; j = v(i).startPos
-        } // for         
+        } // for
         j
     } // argmax
        
@@ -1223,7 +1195,7 @@ class RleVectorC (val dim: Int, protected var v: ReArray [TripletC] = null)
         var temp = v(0).value
         for (i <- 1 until csize if v(i).startPos + v(i).count - 1 < e && v(i).value < temp) {
             temp = v(i).value; j = v(i).startPos
-        } // for        
+        } // for
         j
     } // argmin
      
@@ -1238,7 +1210,7 @@ class RleVectorC (val dim: Int, protected var v: ReArray [TripletC] = null)
         for (i <- 1 until csize if v(i).startPos + v(i).count - 1 < e && v(i).value < temp) {
             temp = v(i).value; j = v(i).startPos
         } // for
-        if (temp < _0) j else -1    
+        if (temp < _0) j else -1
     } // argminNeg
   
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1251,8 +1223,8 @@ class RleVectorC (val dim: Int, protected var v: ReArray [TripletC] = null)
         var temp = v(0).value
         for (i <- 1 until csize if v(i).startPos + v(i).count - 1 < e && v(i).value > temp) {
             temp = v(i).value; j = v(i).startPos
-        } // for       
-        if (temp > _0) j else -1        
+        } // for
+        if (temp > _0) j else -1
     } // argmaxPos
         
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

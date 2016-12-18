@@ -713,13 +713,63 @@ class MatrixR (d1: Int,
     } // dot
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the dot product of 'this' matrix and matrix 'b', by first transposing
+    /** Compute the dot product of 'this' matrix and matrix 'b' that results in a vector,
+     *  by taking the dot product for each column 'j' of both matrices.
+     *  @see www.mathworks.com/help/matlab/ref/dot.html
+     *  @param b  the matrix to multiply by (requires same first dimensions)
+     */
+    def dot (b: MatriR): VectorR =
+    {
+        if (dim1 != b.dim1) flaw ("dot", "matrix dot matrix - incompatible first dimensions")
+        val c = new VectorR (dim2)
+        for (i <- range1; j <- range2) c(j) += v(i)(j) * b(i, j)
+        c
+    } // dot
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product of 'this' matrix and matrix 'b' that results in a vector,
+     *  by taking the dot product for each column 'j' of both matrices.
+     *  @see www.mathworks.com/help/matlab/ref/dot.html
+     *  @param b  the matrix to multiply by (requires same first dimensions)
+     */
+    def dot (b: MatrixR): VectorR =
+    {
+        if (dim1 != b.dim1) flaw ("dot", "matrix dot matrix - incompatible first dimensions")
+        val c = new VectorR (dim2)
+        for (i <- range1; j <- range2) c(j) += v(i)(j) * b.v(i)(j)
+        c
+    } // dot
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the matrix dot product of 'this' matrix and matrix 'b', by first transposing
      *  'this' matrix and then multiplying by 'b' (i.e., 'a dot b = a.t * b').
      *  @param b  the matrix to multiply by (requires same first dimensions)
      */
-    def dot (b: MatrixR): MatrixR =
+    def mdot (b: MatriR): MatrixR =
     {
-        if (dim1 != b.dim1) flaw ("dot", "matrix dot matrix - incompatible first dimensions")
+        if (dim1 != b.dim1) flaw ("mdot", "matrix mdot matrix - incompatible first dimensions")
+
+        val c = new MatrixR (dim2, b.dim2)
+        val at = this.t                         // transpose the 'this' matrix
+        for (i <- range2) {
+            val at_i = at.v(i)                  // ith row of 'at' (column of 'a')
+            for (j <- b.range2) {
+                var sum = _0
+                for (k <- range1) sum += at_i(k) * b(k, j)
+                c.v(i)(j) = sum
+            } // for
+        } // for
+        c
+    } // mdot
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the matrix dot product of 'this' matrix and matrix 'b', by first transposing
+     *  'this' matrix and then multiplying by 'b' (i.e., 'a dot b = a.t * b').
+     *  @param b  the matrix to multiply by (requires same first dimensions)
+     */
+    def mdot (b: MatrixR): MatrixR =
+    {
+        if (dim1 != b.dim1) flaw ("mdot", "matrix mdot matrix - incompatible first dimensions")
 
         val c = new MatrixR (dim2, b.dim2)
         val at = this.t                         // transpose the 'this' matrix
@@ -732,7 +782,7 @@ class MatrixR (d1: Int,
             } // for
         } // for
         c
-    } // dot
+    } // mdot
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' matrix by matrix 'b' without first transposing 'b'.
@@ -904,22 +954,19 @@ class MatrixR (d1: Int,
     } // /=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Raise 'this' matrix to the 'p'th power (for some integer 'p' >= 2).
-     *  Caveat: should be replace by a divide and conquer algorithm.
+    /** Raise 'this' matrix to the 'p'th power (for some integer 'p' >= 1) using
+     *  a divide and conquer algorithm.
      *  @param p  the power to raise 'this' matrix to
      */
     def ~^ (p: Int): MatrixR =
     {
-        if (p < 2)      flaw ("~^", "p must be an integer >= 2")
+        if (p < 1)      flaw ("~^", "p must be an integer >= 1")
         if (! isSquare) flaw ("~^", "only defined on square matrices")
 
-        val c = new MatrixR (dim1, dim1)
-        for (i <- range1; j <- range1) {
-            var sum = _0
-            for (k <- range1) sum += v(i)(k) * v(k)(j)
-            c.v(i)(j) = sum
-        } // for
-        if (p > 2) c ~^ (p-1) else c
+        if (p == 2)          this * this
+        else if (p == 1)     this
+        else if (p % 2 == 1) this * this ~^ (p - 1)
+        else { val c = this ~^ (p / 2); c * c }
     } // ~^
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -928,8 +975,9 @@ class MatrixR (d1: Int,
      */
     def max (e: Int = dim1): Real =
     {
+        if (e <= 0) flaw ("max", "ending row index e can't be negative")
         var x = v(0)(0)
-        for (i <- 1 until e; j <- range2 if v(i)(j) > x) x = v(i)(j)
+        for (i <- 0 until e; j <- range2 if v(i)(j) > x) x = v(i)(j)
         x
     } // max
 
@@ -939,8 +987,9 @@ class MatrixR (d1: Int,
      */
     def min (e: Int = dim1): Real =
     {
+        if (e <= 0) flaw ("max", "ending row index e can't be negative")
         var x = v(0)(0)
-        for (i <- 1 until e; j <- range2 if v(i)(j) < x) x = v(i)(j)
+        for (i <- 0 until e; j <- range2 if v(i)(j) < x) x = v(i)(j)
         x
     } // min
 
@@ -1167,10 +1216,11 @@ class MatrixR (d1: Int,
      */
     def getDiag (k: Int = 0): VectorR =
     {
-        val dm = math.min (dim1, dim2)
-        val c  = new VectorR (dm - math.abs (k))
-        val (j, l) = (math.max (-k, 0), math.min (dm-k, dm))
-        for (i <- j until l) c(i-j) = v(i)(i+k)
+        var i, j = 0
+        val vs = if (k >= 0) { j =  k; math.min (dim1, dim2 - k) }
+                 else        { i = -k; math.min (dim1 + k, dim2) }
+        val c  = new VectorR (vs)
+        for (l <- c.indices) { c(l) = v(i)(j); i += 1; j += 1 }
         c
     } // getDiag
 
@@ -1386,7 +1436,7 @@ class MatrixR (d1: Int,
      */
     def nullspace_ip (): VectorR =
     {
-        if (dim2 != dim1 + 1) flaw ("nullspace", "requires n (columns) = m (rows) + 1")
+        if (dim2 != dim1 + 1) flaw ("nullspace_ip", "requires n (columns) = m (rows) + 1")
 
         reduce_ip ()
         col(dim2 - 1) * -_1 ++ _1

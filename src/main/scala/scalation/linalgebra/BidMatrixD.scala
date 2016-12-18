@@ -637,6 +637,56 @@ class BidMatrixD (val d1: Int)
     } // dot
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the dot product of 'this' matrix with matrix 'b' to produce a vector.
+     *  @param b  the second matrix of the dot product
+     */
+    def dot (b: MatriD): VectorD = 
+    {
+        if (dim1 != b.dim1) flaw ("dot", "matrix dot matrix - incompatible first dimensions")
+
+        val c = new VectorD (d1)
+        c(0)  = _dg(0) * b(0, 0)
+        for (i <- 1 until d1) c(i) = _sd(i-1) * b(i-1, i) + _dg(i) * b(i, i)
+        c
+    } // dot
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the matrix dot product of 'this' matrix with matrix 'b' to produce a matrix.
+     *  @param b  the second matrix of the dot product
+     */
+    def mdot (b: BidMatrixD): MatrixD = 
+    {     
+        if (dim1 != b.dim1) flaw ("mdot", "matrix mdot matrix - incompatible first dimensions")
+        
+        val c = new MatrixD (dim2, b.dim2)           
+        c(0, 0) = _dg(0) * b._dg(0)    
+        for (i <- 1 until dim1) {
+            c(i, i)   = _dg(i) * b._dg(i) + _sd(i-1) * b._sd(i-1)
+            c(i-1, i) = _dg(i-1) * b._sd(i-1)  
+            c(i, i-1) = _sd(i-1) * b._dg(i-1)
+        } // for
+        c
+    } // mdot
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the matrix dot product of 'this' matrix with matrix 'b' to produce a matrix.
+     *  @param b  the second matrix of the dot product
+     */
+    def mdot (b: MatriD): MatrixD =
+    {
+        if (dim1 != b.dim1) flaw ("mdot", "matrix mdot matrix - incompatible first dimensions")
+        
+        val c = new MatrixD (dim2, b.dim2)           
+        for (j <- 0 until b.dim2) {
+            c(0, j) = _dg(0) * b(0, j)
+            for (i <- 1 until dim1) {
+                c(i, j) = _sd(i-1) * b(i-1, j) + _dg(i) * b(i, j)
+            } // for
+        } // for       
+        c
+    } // mdot
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' bidiagonal matrix by vector 'u' to produce another matrix
      *  'a_ij * u_j'.
      *  @param u  the vector to multiply by

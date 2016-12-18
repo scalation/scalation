@@ -45,6 +45,8 @@ class MatrixD (val d1: Int,
   def toDense: scalation.linalgebra.MatriD = ???
   def lowerT: scalation.linalgebra.MatriD = ???
   def upperT: scalation.linalgebra.MatriD = ???
+  def dot(b: scalation.linalgebra.MatriD): scalation.linalgebra.VectoD = ???
+  def mdot(b: scalation.linalgebra.MatriD): scalation.linalgebra.MatriD = ???
 
 //  val processors  = Runtime.getRuntime ().availableProcessors ()
     val granularity = (pow ((dim1 max dim2), 0.5)).toInt

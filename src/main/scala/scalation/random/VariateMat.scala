@@ -10,7 +10,7 @@ package scalation.random
 
 import scala.math.{abs, exp, Pi, round, sqrt}
 
-import scalation.linalgebra.{Fac_Cholesky, MatriD, MatrixD, MatrixI}
+import scalation.linalgebra._
 import scalation.math.double_exp
 import scalation.util.Error
 
@@ -62,7 +62,20 @@ abstract class VariateMat (stream: Int = 0)
      */
     def igen: MatrixI
 
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine the next random Rle matrix for the particular distribution.
+     *  Repetition based upon runLength is used to create column vectors.
+     */
+    def rlegenc: RleMatrixD
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine the next random Rle matrix for the particular distribution.
+     *  Repetition based upon runLength is used to create row vectors.
+     */
+    def rlegenr: RleMatrixD
+
 } // VariateMat class
+
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VariateMat` companion object provides a method to add correlation to
@@ -76,7 +89,7 @@ object VariateMat
         fac1 * x                                               // LX
     } // corTransform
 
-} // VariateMat
+} // VariateMat object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -94,6 +107,7 @@ case class RandomMatD (dim1: Int = 5, dim2: Int = 10, max: Double = 20.0, min: D
 {
     private val mu   = (min + max) / 2.0                                      // mean
     private val rvec = RandomVecD (dim2, max, min, density, stream = stream)  // random vector generator
+    private val rlev = RandomVecD (dim1, max, min, density, stream = stream)  // random RLE vector generator
     
     def mean: MatrixD = { val mv = new MatrixD (dim1, dim2); mv.set (mu); mv }
 
@@ -107,6 +121,20 @@ case class RandomMatD (dim1: Int = 5, dim2: Int = 10, max: Double = 20.0, min: D
         for (i <- mat.range1) mat(i) = rvec.gen
         mat
     } // gen
+
+    def rlegenc: RleMatrixD =
+    {
+        val rleMat = new RleMatrixD (dim1, dim2)
+        for (i <- rleMat.range2) rleMat.setCol (i, RleVectorD (rlev.repgen))
+        rleMat
+    } // rlegenc
+
+    def rlegenr: RleMatrixD =
+    {
+        val rleMat = new RleMatrixD (dim1, dim2)
+        for (i <- rleMat.range1) rleMat(i) = RleVectorD (rvec.repgen)
+        rleMat
+    } // rlegenr
 
 } // RandomMatD class
 

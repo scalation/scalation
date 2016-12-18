@@ -867,13 +867,22 @@ class SparseMatrixL (val d1: Int,
     } // dot
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the dot product of 'this' matrix and matrix 'b', by first transposing
+    /** Compute the dot product of 'this' matrix with matrix 'b' to produce a vector.
+     *  @param b  the second matrix of the dot product
+     */
+    def dot (b: MatriL): VectorL =
+    {
+        throw new NoSuchMethodException ("matrix dot matrix - dot not implemented")
+    } // dot
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the matrix dot product of 'this' matrix and matrix 'b', by first transposing
      *  'this' matrix and then multiplying by 'b' (i.e., 'a dot b = a.t * b').
      *  @param b  the matrix to multiply by (requires same first dimensions)
      */
-    def dot (b: MatriL): SparseMatrixL =
+    def mdot (b: MatriL): SparseMatrixL =
     {
-        if (dim1 != b.dim1) flaw ("dot", "matrix dot matrix - incompatible first dimensions")
+        if (dim1 != b.dim1) flaw ("mdot", "matrix mdot matrix - incompatible first dimensions")
 
         val c = new SparseMatrixL (dim2, b.dim2)
         val at = this.t                         // transpose the 'this' matrix
@@ -886,8 +895,8 @@ class SparseMatrixL (val d1: Int,
             } // for
         } // for
         c
-    } // dot
-    
+    } // mdot
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' sparse matrix by sparse matrix 'b' using the Strassen matrix
      *  multiplication algorithm.  Both matrices ('this' and 'b') must be square.

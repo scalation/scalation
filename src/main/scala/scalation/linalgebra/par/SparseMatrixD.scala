@@ -43,6 +43,8 @@ class SparseMatrixD (val d1: Int,
   def toDense: scalation.linalgebra.MatriD = ???
   def lowerT: scalation.linalgebra.MatriD = ???
   def upperT: scalation.linalgebra.MatriD = ???
+  def dot(b: scalation.linalgebra.MatriD): scalation.linalgebra.VectoD = ???
+  def mdot(b: scalation.linalgebra.MatriD): scalation.linalgebra.MatriD = ???
     
     /** Store the matrix as an array of sorted-linked-maps {(j, v)}
      *  where j is the second index and v is value to store
