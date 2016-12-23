@@ -152,6 +152,44 @@ object Relation
         Relation (name, colName, colBuffer.indices.map (i => VectorS (colBuffer(i).toArray)).toVector, key, domain)
     } // apply
 
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Read the relation with the given 'name' into memory loading its columns
+     *  with data from the CSV file named 'fileName'.  In this version, the column
+     *  names are read from the first line of the file.
+     *  @param fileName  the file name of the data file
+     *  @param name      the name of the relation
+     *  @param key       the column number for the primary key (< 0 => no primary key)
+     *  @param domain    an optional string indicating domains for columns (e.g., 'SD' = 'StrNum', 'Double')
+     *  @param eSep      the element separation string/regex (e.g., "," ";" " +")
+     */
+    def apply (fileName: String, name: String, domain: String, key: Int, eSep: String): Relation =
+    {
+        var first = true
+        val lines = getFromURL_File (fileName)
+        var colBuffer: Array [ArrayBuffer [String]] = null
+        var colName: Seq [String] = null
+        var newCol: Vector [Vec] = null
+
+        for (ln <- lines) {
+            if (first) {
+                colName   = ln.split (eSep)
+                colBuffer = Array.ofDim (colName.length)
+                for (i <- colBuffer.indices) colBuffer(i) = new ArrayBuffer ()
+                first = false
+            } else {
+                val values = ln.split (eSep)
+                values.indices.foreach (i => { colBuffer(i) += values(i) })
+            } // if
+        } // for
+
+        Relation (name, colName, colBuffer.indices.map (i =>
+            domain(i) match {
+            case 'D' => VectorD (colBuffer(i).toArray)
+            case 'I' => VectorI (colBuffer(i).toArray)
+            case 'S' => VectorS (colBuffer(i).toArray)
+            }).toVector, key, domain)
+    } // apply
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Read the relation with the given 'name' into memory loading its columns
      *  with data from the CSV file named 'fileName'.  This version assumes
@@ -864,7 +902,12 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
         print ("| "); for (cn <- colName) print (s"%${wid}s".format (cn)); println (" |")
         println (s"|-${"-"*rep}-|")
         for (i <- 0 until rows) {
-            print ("| "); for (cv <- row(i)) print (s"%${wid}s".format (cv)); println (" |")
+            print ("| ")
+            for (cv <- row(i)) {
+                if (cv.isInstanceOf [Double]) print (s"%${wid}g".format (cv))
+                else                          print (s"%${wid}s".format (cv))
+            } // for
+            println (" |")
         } // for
         println (s"|-${"-"*rep}-|")
     } // show
@@ -902,6 +945,7 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
         case SPARSE          => SparseMatrixD (colVec)
         case SYM_TRIDIAGONAL => SymTriMatrixD (colVec)
         case BIDIAGONAL      => BidMatrixD (colVec)
+        case COMPRESSED      => RleMatrixD (colVec)
         } // match
     } // toMatriD
 
@@ -922,6 +966,7 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
         case SPARSE          => (SparseMatrixD (colVec), Vec.toDouble (col(colPosV)))
         case SYM_TRIDIAGONAL => (SymTriMatrixD (colVec), Vec.toDouble (col(colPosV)))
         case BIDIAGONAL      => (BidMatrixD (colVec), Vec.toDouble (col(colPosV)))
+        case COMPRESSED      => (RleMatrixD (colVec), Vec.toDouble (col(colPosV)))
         } // match
     } // toMatriDD
 
@@ -942,6 +987,7 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
         case SPARSE          => (SparseMatrixD (colVec), Vec.toInt (col(colPosV)))
         case SYM_TRIDIAGONAL => (SymTriMatrixD (colVec), Vec.toInt (col(colPosV)))
         case BIDIAGONAL      => (BidMatrixD (colVec), Vec.toInt (col(colPosV)))
+        case COMPRESSED      => (RleMatrixD (colVec), Vec.toInt (col(colPosV)))
         } // match
     } // toMatriDI
 
@@ -961,6 +1007,7 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
         case SPARSE          => SparseMatrixI (colVec)
         case SYM_TRIDIAGONAL => SymTriMatrixI (colVec)
         case BIDIAGONAL      => BidMatrixI (colVec)
+        case COMPRESSED      => RleMatrixI (colVec)
         } // match
     } // toMatriI
 
@@ -989,6 +1036,7 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
         case SPARSE          => SparseMatrixI (colVec)
         case SYM_TRIDIAGONAL => SymTriMatrixI (colVec)
         case BIDIAGONAL      => BidMatrixI (colVec)
+        case COMPRESSED      => RleMatrixI (colVec)
         } // match
     } // toMatriI2
 
@@ -1009,6 +1057,7 @@ case class Relation (name: String, colName: Seq [String], var col: Vector [Vec],
         case SPARSE          => (SparseMatrixI (colVec), Vec.toInt (col(colPosV)))
         case SYM_TRIDIAGONAL => (SymTriMatrixI (colVec), Vec.toInt (col(colPosV)))
         case BIDIAGONAL      => (BidMatrixI (colVec), Vec.toInt (col(colPosV)))
+        case COMPRESSED      => (RleMatrixI (colVec), Vec.toInt (col(colPosV)))
         } // match
     } // toMatriII
 
@@ -1356,4 +1405,41 @@ object RelationTest4 extends App
     println ("vec = " + vec)
 
 } // RelationTest4 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RelationTest5` object tests the interoperability between Relations and Matrices.
+ *  > run-main scalation.relalgebra.RelationTest5
+ */
+object RelationTest5 extends App 
+{
+    val sales_item1 =  Relation ("Sales_Item1", Seq ("Date", "FL", "GA", "NC", "SC"),
+                                  Seq (Vector[Any] ("20130101", 10, 5, 5, 4),
+                                       Vector[Any] ("20130102", 20, 30, 40, 25),
+                                       Vector[Any] ("20130103", 8, 6, 9, 9),
+                                       Vector[Any] ("20130104", 6, 7, 9, 10),
+                                       Vector[Any] ("20130105", 4, 7, 9, 10)),
+                                  0,"SIIII")
+                              
+                      
+    val price_item1 =  Relation ("Price_Item1", Seq ("Date", "FL", "GA", "NC", "SC"),
+                                  Seq (Vector[Any] ("20130101", 1.6, 1.6, 1.5, 1.3),
+                                       Vector[Any] ("20130102", 1.6, 1.6, 1.5, 1.2),
+                                       Vector[Any] ("20130103", 1.5, 1.6, 1.5, 1.4),
+                                       Vector[Any] ("20130104", 1.4, 1.7, 1.5, 1.4),
+                                       Vector[Any] ("20130105", 1.4, 1.7, 1.4, 1.4)),
+                                 0,"SDDDD")
+    val revenue     =  Relation ("Revenue", -1, null, "Item", "FL", "GA", "NC", "SC")
+    
+    sales_item1.show()
+    price_item1.show()
+    
+    val x = sales_item1.toMatriD (1 to 4, COMPRESSED)
+    val y = price_item1.toMatriD (1 to 4, COMPRESSED)
+    val z = x dot y 
+    revenue.add ("Item1" +: z().toVector)
+    
+    revenue.show ()
+    
+} // RelationTest5
 

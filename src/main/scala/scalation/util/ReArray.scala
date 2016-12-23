@@ -44,7 +44,7 @@ class ReArray [A] (_length: Int = 0, _array: Array [A] = null) (implicit arg0: C
 { 
     /** Set the internal array of `ReArray`.
      */
-    protected var array: Array [A]  = if (_array == null) new Array [A] (math.max (initialSize, 1)) else _array
+    protected var array: Array [A] = if (_array == null) new Array [A] (math.max (initialSize, 1)) else _array
     
     /** Set the size of `ReArray`.
      */
@@ -69,12 +69,12 @@ class ReArray [A] (_length: Int = 0, _array: Array [A] = null) (implicit arg0: C
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the element at the 'i'-th index position.
-     *  @param idx  the index position
+     *  @param i  the index position
      */
-    def apply (idx: Int) =
+    def apply (i: Int) =
     {
-        if (idx >= size0) throw new IndexOutOfBoundsException (idx.toString)
-        array(idx).asInstanceOf [A]
+        if (i >= size0) throw new IndexOutOfBoundsException (i.toString)
+        array(i).asInstanceOf [A]
     } // apply
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -129,13 +129,14 @@ class ReArray [A] (_length: Int = 0, _array: Array [A] = null) (implicit arg0: C
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Swap two elements of this array.
-     *  @param a  the first element
-     *  @param b  the second element
+     *  @param i  the first element
+     *  @param j  the second element
      */
-    protected def swap (a: Int, b: Int) {
-        val h = array(a)
-        array(a) = array(b)
-        array(b) = h
+    protected def swap (i: Int, j: Int)
+    {
+        val h    = array(i)
+        array(i) = array(j)
+        array(j) = h
     } // swap
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -243,8 +244,8 @@ class ReArray [A] (_length: Int = 0, _array: Array [A] = null) (implicit arg0: C
 object ReArray 
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `ReArray` from an Array.
-     *  @param a  the Array to be converted
+    /** Create a `ReArray` from an `Array`.
+     *  @param a  the `Array` to be converted
      */
     def apply [A: ClassTag] (a: Array [A]): ReArray [A] = new ReArray [A] (a.length, a)
     

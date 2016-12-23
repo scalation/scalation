@@ -1573,6 +1573,8 @@ class MatrixC (d1: Int,
  */
 object MatrixC extends Error
 {
+    private val PROGRESS = 200000                            // give feedback at progress count
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a matrix and assign values from a sequence/array of vectors 'u'.
      *  @param u           the sequence/array of vectors to assign
@@ -1632,7 +1634,28 @@ object MatrixC extends Error
         val lines  = fromFile (fileName).getLines.toArray         // get the lines from file
         val (m, n) = (lines.length, lines(0).split (sp).length)
         val x      = new MatrixC (m, n)
-        for (i <- 0 until m) x(i) = VectorC (lines(i).split (sp))
+        for (i <- x.range1) {
+            x(i) = VectorC (lines(i).split (sp))
+            if ((i+1) % PROGRESS == 0) println (s"Read 6 rows ...")
+        } // for
+        x
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a matrix by reading from a text file, e.g., a CSV file.
+     *  @param fileName  the name of file holding the data
+     *  @param skip      the initial number of lines to skip
+     */
+    def apply (fileName: String, skip: Int): MatrixC =
+    {
+        val sp     = ','                                          // character separating the values
+        val lines  = fromFile (fileName).getLines.toArray         // get the lines from file
+        val (m, n) = (lines.length-skip, lines(0).split (sp).length)
+        val x      = new MatrixC (m, n)
+        for (i <- x.range1) {
+            x(i) = VectorC (lines(i+skip).split (sp))
+            if ((i+1) % PROGRESS == 0) println (s"Read 6 rows ...")
+        } // for
         x
     } // apply
 

@@ -81,9 +81,9 @@ object Query
     {
         val s = SET [Int] ()
         if (triple._1.isInstanceOf [String])
-            if (hasWildcards (triple._1.asInstanceOf [String]))      s += 1
-            else if (hasWildcards (triple._2.asInstanceOf [String])) s += 2
-            else if (hasWildcards (triple._3.asInstanceOf [String])) s += 3
+            if (hasWildcards (triple._1))      s += 1
+            else if (hasWildcards (triple._2)) s += 2
+            else if (hasWildcards (triple._3)) s += 3
         s
     } // hasWildcard
 
@@ -164,4 +164,52 @@ object QueryTest2 extends App
     } // for
 
 } // QueryTest2 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `QueryTest3` object is used to test the `Query` class.  It converts
+ *  a sequence of triples into a graph.
+ *  > run-main scalation.graphalytics.mutable.QueryTest3
+ */
+object QueryTest3 extends App
+{
+    import Query._
+
+//  val g = ReadCSVFile.readCSV ()
+
+    // Original
+    val q = Query (("The Three Musketeers", "WrittenBy", "Alexandre Dumas"),
+                   ("In Search of Lost Time", "WrittenBy", "Marcel Proust")).buildGraph ()
+
+    // Wildcards
+//  val q = Query (("T_e Thr_e Muske%", "WrittenB_", "Ale_andre Du%"),
+//                 ("In Sear_h of Lost T%", "Wri%", "Mar_el Prou%")).buildGraph ()
+
+    // Regex
+//  val q = Query (("The [A-Z][a-z]+ Musketeers\\.r", "[a-z][A-Z]+\\.r", "Alexandre [A-Z][a-z]+\\.r"),
+//                 ("In [A-Z][a-z]+ of Lost Time\\.r", "[a-z][A-Z]+\\.r", "Marcel [A-Z][a-z]+\\.r")).buildGraph ()
+
+    // Variable
+//  val q = Query (("The Three Musketeers", "?x", "?author"),
+//                 ("?Book", "?x", "Marcel Proust")).buildGraph ()
+
+//  val q = Query (("?Book", "?x", "Alexandre Dumas")).buildGraph ()
+
+    // Edges
+//  val q = Query (("The Three Musketeers", "Wri_ten%", "Alexandre Dumas")).buildGraph ()
+//  val q = Query (("The Three Musketeers", "[a-z][A-Z]+\\.r", "Alexandre Dumas")).buildGraph ()
+//  val q = Query (("The Three Musketeers", "?x", "Alexandre Dumas")).buildGraph ()
+
+    q.printG ()
+//  g.printG ()
+
+//  val res = VariableQuery.variableMatching (g, q, s)
+//  (new MDualSimWRV (g, q)).test ("MDualSimWRV")
+//  (new GraphSim (g, q)).test ("GraphSim")
+//  (new DualSim (g, q)).test ("DualSim")
+
+     // Edges
+//   (new MDualSimWRV (g, q)).test ("MDualSimWRV")
+
+} // QueryTest3 object
 

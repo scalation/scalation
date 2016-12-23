@@ -8,9 +8,10 @@
 
 package apps.analytics
 
+import scalation.analytics.BASE_DIR
 import scalation.analytics.classifier.{AugNaiveBayes, NaiveBayes}
 import scalation.linalgebra.{MatrixI, VectorI}
-import scalation.util.{PackageInfo, getFromURL_File, time}
+import scalation.util.{getFromURL_File, time}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PokerBayes` object is a sample application that uses the `NaiveBayes`
@@ -32,9 +33,9 @@ import scalation.util.{PackageInfo, getFromURL_File, time}
  *  @see archive.ics.uci.edu/ml/datasets/Poker+Hand
  *  > run-main apps.analytics.PokerBayes
  */
-object PokerBayes extends App with PackageInfo
+object PokerBayes extends App
 {
-    val fname = getDataPath + "poker-hand-training-true.data"     // 25010 instances
+    val fname = BASE_DIR + "poker-hand-training-true.data"        // 25010 instances
 //  val fname = getDataPath + "poker-hand-testing.data"           // 1000000 instances - download if needed
 
     val ROWS = 1000000                                            // number of instances

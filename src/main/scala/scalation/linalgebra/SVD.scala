@@ -269,6 +269,7 @@ object SVD
         println (sline () + "svd.factor: (u, s, v) = " + (u, s, v))
         val prod = u ** s * v.t                                  // compute the product
         println (sline () + "check: u ** s * v.t = " + prod)     // should equal the original a matrix
+        println ("a - prod = " + (a - prod))
         assert (prod == a)
     } // test
 
@@ -376,19 +377,37 @@ object SVDTest4 extends App
                                  0.6068, 0.4565, 0.6154, 0.1763,
                                  0.4860, 0.0185, 0.7919, 0.4057)
 
-    testBid (a, "SVDTest34")                                  // test the bidiagonalized matrix
+//  testBid (a, "SVDTest34")                                  // test the bidiagonalized matrix
     test (a, "SVDTest4")                                      // test the original matrix
 
 } // SVDTest4 object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `SVDTest5` is used to test the `SVD` class on a larger test problem.
- *  @see www.maths.manchester.ac.uk/~peterf/MATH48062/math48062%20Calculating%20and%20using%20the%20svd%20of%20a%20matrix.pdf
- *  FIX: this example does not work.
+/** The `SVDTest5` is used to test the `SVD` class on a problem where the matrix
+ *  is not a square matrix.
  *  > run-main scalation.linalgebra.SVDTest5
  */
 object SVDTest5 extends App
+{
+    val a = new MatrixD ((3, 2), 4, 5,    // original matrix
+                                 6, 7,    // 3 by 2
+                                 9, 8)
+
+
+//  testBid (a, "SVDTest5b")                                  // test the bidiagonalized matrix
+    test (a, "SVDTest5")                                      // test the original matrix
+
+} // SVDTest5 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SVDTest5` is used to test the `SVD` class on a larger test problem.
+ *  @see www.maths.manchester.ac.uk/~peterf/MATH48062/math48062%20Calculating%20and%20using%20the%20svd%20of%20a%20matrix.pdf
+ *  FIX: this example does not work, in the sense that is does not converge to 'TOL'.
+ *  > run-main scalation.linalgebra.SVDTest6
+ */
+object SVDTest6 extends App
 {
     val a = new MatrixD ((5, 3), 0.44444444,  0.3333333, -1.3333333,    // original matrix
                                  0.41111111, -0.3166667, -0.3333333,    // 5 by 3
@@ -396,18 +415,18 @@ object SVDTest5 extends App
                                 -0.03333333, -0.6500000,  1.0000000,
                                 -0.63333333,  0.1500000,  1.0000000)
 
-    testBid (a, "SVDTest5b")                                  // test the bidiagonalized matrix
-    test (a, "SVDTest5")                                      // test the original matrix
+//  testBid (a, "SVDTest6b")                                  // test the bidiagonalized matrix
+    test (a, "SVDTest6")                                      // test the original matrix
 
-} // SVDTest5 object
+} // SVDTest6 object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDTest6` object is used to test the `SVD` companion object's computation
  *  of trailing submatrices.
- *  > run-main scalation.linalgebra.SVDTest6
+ *  > run-main scalation.linalgebra.SVDTest7
  */
-object SVDTest6 extends App
+object SVDTest7 extends App
 {
     import SVD.trailing
 
@@ -420,5 +439,5 @@ object SVDTest6 extends App
     println ("trailing b.t * b = " + trailing (b))
     println ("check: " + (b.t * b)(n-2 to n, n-2 to n))
 
-} // SVDTest6 object
+} // SVDTest7 object
 

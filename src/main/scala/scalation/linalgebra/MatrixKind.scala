@@ -16,7 +16,7 @@ package scalation.linalgebra
 object MatrixKind extends Enumeration
 {
         type MatrixKind = Value
-        val DENSE, SPARSE, SYM_TRIDIAGONAL, BIDIAGONAL = Value
+        val DENSE, SPARSE, SYM_TRIDIAGONAL, BIDIAGONAL, COMPRESSED = Value
 
-} // MatrixKind
+} // MatrixKind object
  

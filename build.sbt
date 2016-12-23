@@ -16,6 +16,7 @@ fork := true
 // Scala options
 
 scalacOptions += "-deprecation"
+scalacOptions += "-feature"
 scalacOptions += "-Xfatal-warnings"
 scalacOptions += "-opt:l:classpath"             // optimize
 scalacOptions += "-opt-warnings"

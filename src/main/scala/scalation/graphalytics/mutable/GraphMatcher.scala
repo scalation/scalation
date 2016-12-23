@@ -13,7 +13,8 @@ package scalation.graphalytics.mutable
 import scala.collection.mutable.{Set => SET}
 //import scala.collection.mutable.{HashSet => SET}
 
-import scalation.util.time
+import scalation.util.{time, Wildcard}
+import scalation.util.Wildcard.hasWildcards
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphMatcher` abstract class serves as a template for implementing
@@ -23,7 +24,8 @@ import scalation.util.time
  */
 abstract class GraphMatcher [TLabel] (g: Graph [TLabel], q: Graph [TLabel])
 {
-    protected val qRange     = 0 until q.size     // range for query vertices
+    protected val qRange     = 0 until q.size     // range for query graph vertices
+    protected val gRange     = 0 until g.size     // range for data graph vertices
     protected val CHECK      = 1024               // check progress after this many matches
     protected val LIMIT      = 1E7                // quit after too many matches
     protected val SELF_LOOPS = false              // whether the directed graph has self-loops
@@ -59,6 +61,27 @@ abstract class GraphMatcher [TLabel] (g: Graph [TLabel], q: Graph [TLabel])
         phi
 //      q.label.map (u_label => g.getVerticesWithLabel (u_label).clone)
     } // feasibleMates
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an initial array of feasible mappings 'phi' from each query
+     *  vertex 'u' to the corresponding set of data graph vertices '{v}' whose
+     *  label matches 'u's.
+     *  This version handles query graph labels that have wildcards.
+     */
+    def feasibleMatesW (): Array [SET [Int]] =
+    {
+        val phi = Array.ofDim [SET [Int]] (q.size)
+        for (u <- qRange) {                                                // iterate thru query graph
+            if (hasWildcards (q.label(u))) {                                  // iterate thru data graph, FIX - need faster approach
+                val qLabelW = new Wildcard (q.label(u).asInstanceOf [String])
+                phi(u) = SET [Int] ()
+                for (v <- gRange if qLabelW =~ g.label(v).asInstanceOf [String]) phi(u) += v
+            } else {                                                       // use index
+                phi(u) = g.labelMap (q.label(u)).clone
+            } // if
+        } // for
+        phi
+    } // feasibleMatesW
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show the mappings between a query graph vertex u and a set of data

@@ -742,7 +742,7 @@ trait MatriD
     def isBidiagonal: Boolean =
     {
         for (i <- range1; j <- range2) {
-            if ((i != j || i != j+1) && this(i, j) =~ 0.0) return false
+            if (i != j && i != j+1 && this(i, j) !=~ 0.0) return false
         } // for
         true
     } // isBidiagonal
@@ -786,7 +786,7 @@ trait MatriD
     def isTridiagonal: Boolean =
     {
         for (i <- range1; j <- range2) {
-            if (ABS (i-j) > 1 && ! (this(i, j) =~ 0.0)) return false
+            if (ABS (i-j) > 1 && this(i, j) !=~ 0.0) return false
         } // for
         true
     } // isTridiagonal

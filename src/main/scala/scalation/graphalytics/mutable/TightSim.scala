@@ -4,6 +4,8 @@
  *  @version 1.2
  *  @date    Thu Nov 25 11:28:31 EDT 2013
  *  @see     LICENSE (MIT style license file).
+ *
+ *  Tight Simulation Using Mutable Sets
  */
 
 package scalation.graphalytics.mutable
@@ -58,7 +60,7 @@ class TightSim [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel])
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Merged mapping results, the union over all balls. 
      */
-    def merge (matches: HashMap [Int, Array [SET [Int]]]): Array [SET [Int]] =
+    def merge (matches: Map [Int, Array [SET [Int]]]): Array [SET [Int]] =
     { 
          val phi_all = Array.ofDim [SET [Int]] (querySize)
          for (i <- 0 until querySize) phi_all (i) = SET [Int] ()
@@ -225,7 +227,7 @@ class TightSim [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel])
      *  @param balls           mappings from a center vertex to the Ball B(Graph, Center, Radius)
      *  @param matchCenters    set of all vertices which are considered as center
      */
-    def calculateTotalEdges (g: Graph [TLabel], balls: HashMap [Int, Ball [TLabel]], matchCenters: SET [Int]): Int = 
+    def calculateTotalEdges (g: Graph [TLabel], balls: Map [Int, Ball [TLabel]], matchCenters: SET [Int]): Int = 
     {
         val distinctEdges = SET [String] ()
         for (vert_id <- 0 until g.ch.length; if balls.keySet.contains (vert_id)) { 
@@ -239,7 +241,7 @@ class TightSim [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel])
      *  on the  balls left after post-processing.
      *  @param balls  mappings from a center vertex to the Ball B(Graph, Center, Radius)
      */
-    def calculateBallDiameterMetrics (balls: HashMap [Int, Ball [TLabel]]): Statistic =
+    def calculateBallDiameterMetrics (balls: Map [Int, Ball [TLabel]]): Statistic =
     {
         val ballStats = new Statistic ()
         for (vert_id <- listOfMatchedBallVertices) ballStats.tally (balls.get (vert_id).get.getBallDiameter)

@@ -5,7 +5,7 @@
  *  @date    Wed May 13 14:58:25 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *
- *  Multi-Graph 'MGraph' Dual Simulation Using Mutable Sets
+ *  `MGraph` Dual Simulation Using Mutable Sets
  */
 
 package scalation.graphalytics.mutable
@@ -27,7 +27,8 @@ import scalation.util.Wildcard.hasWildcards
 class MDualSimW [TLabel] (g: MGraph [TLabel], q: MGraph [TLabel])
       extends GraphMatcher (g, q)
 {
-    private val DEBUG = true                                     // debug flag
+    private val DEBUG   = true                                   // debug flag
+    private val NO_EDGE = false                                  // ignore edge labels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Apply the Dual Graph Simulation pattern matching algorithm to find the mappings
@@ -46,37 +47,35 @@ class MDualSimW [TLabel] (g: MGraph [TLabel], q: MGraph [TLabel])
     def saltzDualSim (phi: Array [SET [Int]]): Array [SET [Int]] =
     {
         var alter = true
-        while (alter) {                                           // check for matching children/parents
+        while (alter) {                                                                         // check for matching children/parents
             alter = false
 
-            for (u <- qRange; u_c <- q.ch(u)) {                   // for each u in q and its children u_
+            for (u <- qRange; u_c <- q.ch(u)) {                                                 // for each u in q and its children u_
                 if (DEBUG) { println (s"for u = $u, u_c = $u_c"); showMappings (phi) }
-                val newPhi = SET [Int] ()                         // subset of phi(u_c) having a parent in phi(u)
-                val elab_u2u_c = q.elabel ((u, u_c))              // edge label in q for (u, u_c)
-                val hasWild    = elab_u2u_c.isInstanceOf [String] && hasWildcards (elab_u2u_c.asInstanceOf [String])
+                val newPhi     = SET [Int] ()                                                   // subset of phi(u_c) having a parent in phi(u)
+                val elab_u2u_c = q.elabel ((u, u_c))                                            // edge label in q for (u, u_c)
+                val hasWild    = hasWildcards (elab_u2u_c)
                 val wlab_u2u_c = if (hasWild) new Wildcard (elab_u2u_c.asInstanceOf [String]) else null.asInstanceOf [Wildcard]
 
-                for (v <- phi(u)) {                               // for each v in g image of u
-//                  val v_c = g.ch(v)                                                                    // don't filter on edge labels
-                    val v_c = if (hasWild)
-                                  g.ch(v).filter (wlab_u2u_c =~ g.elabel (v, _).asInstanceOf [String])   // filter on edge labels using wildcards
-                              else 
-                                  g.ch(v).filter (elab_u2u_c == g.elabel (v, _))                         // filter on edge labels
+                for (v <- phi(u)) {                                                             // for each v in g's image of u
+                    val v_c = if (NO_EDGE)      g.ch(v)                                         // don't filter on edge labels
+                              else if (hasWild) g.ch(v).filter (wlab_u2u_c =~ g.elabel (v, _))  // filter on edge labels using wildcards
+                              else              g.ch(v).filter (elab_u2u_c == g.elabel (v, _))  // filter on edge labels
 
                     if (DEBUG) println (s"v = $v, v_c = $v_c, phi_u_c = " + phi(u_c))
 
-                    val phiInt = v_c & phi(u_c)                   // children of v contained in phi(u_c)
+                    val phiInt = v_c & phi(u_c)                                                 // children of v contained in phi(u_c)
                     if (phiInt.isEmpty) {
-                        phi(u) -= v                               // remove vertex v from phi(u)
-                        if (phi(u).isEmpty) return phi            // no match for vertex u => no overall match
+                        phi(u) -= v                                                             // remove vertex v from phi(u)
+                        if (phi(u).isEmpty) return phi                                          // no match for vertex u => no overall match
                         alter = true
                     } // if
                     // build newPhi to contain only those vertices in phi(u_c) which also have a parent in phi(u)
                     newPhi ++= phiInt
                 } // for
 
-                if (newPhi.isEmpty) return phi                     // empty newPhi => no match
-                if (newPhi.size < phi(u_c).size) alter = true      // since newPhi is smaller than phi(u_c)
+                if (newPhi.isEmpty) return phi                                                  // empty newPhi => no match
+                if (newPhi.size < phi(u_c).size) alter = true                                   // since newPhi is smaller than phi(u_c)
 
                 if (SELF_LOOPS && u_c == u) phi(u_c) &= newPhi else phi(u_c) = newPhi
             } // for
