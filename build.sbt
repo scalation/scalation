@@ -8,7 +8,7 @@ organization := "scalation"
 
 version := "1.2"
 
-scalaVersion := "2.12.0"
+scalaVersion := "2.12.1"
 
 fork := true
 

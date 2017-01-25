@@ -11,6 +11,7 @@
  *  @see Handbook of Linear Algrbra, Chapter 45
  *  @see cs.fit.edu/~dmitra/SciComp/11Spr/SVD-Presentation-Updated2.ppt
  *  @see www.cs.utexas.edu/users/inderjit/public_papers/HLA_SVD.pdf
+ *  @see people.duke.edu/~hpgavin/SystemID/References/Golub+Reinsch-NM-1970.pdf
  */
 
 package scalation.linalgebra
@@ -67,7 +68,8 @@ class SVD (aa: MatrixD)
             val (u, b, v) = bid.bidiagonalize ()  // turn a into a bidiagonal matrix
             uu = u; a = b; vv = v
         } else {
-            uu = eye (m); vv = eye (n)
+            // uu = eye (m); vv = eye (n)
+            uu = eye (m, n); vv = eye (n)
         } // if
         if (DEBUG) println ("factor: bidiagonal a = " + a)
         deflate ()                                // deflate the superdiagonal

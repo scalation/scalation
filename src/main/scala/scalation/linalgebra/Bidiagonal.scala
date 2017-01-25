@@ -27,12 +27,13 @@ import scalation.util.Error
 class Bidiagonal (private var a: MatrixD)
       extends Error
 {
-    private val m = a.dim1         //  the number of rows
-    private val n = a.dim2         //  the number of columns
+    private val m = a.dim1         // the number of rows
+    private val n = a.dim2         // the number of columns
 
     if (n > m) flaw ("constructor", "Bidiagonal requires m >= n")
 
     private val u = eye (m)        // initialize left orthogonal matrix to m-by-m identity matrix
+    //private val u = eye (m, n)     // initialize left orthogonal matrix to m-by-n identity matrix
     private val v = eye (n)        // initialize right orthogonal matrix to n-by-n identity matrix
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -63,7 +64,7 @@ class Bidiagonal (private var a: MatrixD)
         (u, a, v)
     } // bidiagonalize
 
-} // Bidiagonal
+} // Bidiagonal class
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -79,11 +80,14 @@ object BidiagonalTest extends App
                                  7.0,  8.0,  9.0,
                                 10.0, 11.0, 12.0)
     println ("a = " + a)
+    val aa = a.copy ()                                // save a copy of a
 
     val bid = new Bidiagonal (a)                      // Householder bidiagonalization
     val (u, b, v) = bid.bidiagonalize ()              // bidiagonalize a
     println ("(u, b, v) = " + (u, b, v))
-    println ("ubv.t = " + u * b * v.t)                // should equal the original a
+    val prod = u * b * v.t                            // compute product
+    println ("ubv.t = " + prod)                       // should equal the original a
+    assert (aa == prod)
 
 } // BidiagonalTest object
 
