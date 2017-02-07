@@ -45,6 +45,28 @@ class MuGraph [TLabel: ClassTag] (ch:     Array [SET [Int]],
     val schemaMap = if (schema == null) null else buildSchemaMap (schema)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the children of vertex 'u' that are connected via an edge labelled
+     *  'elab'.
+     *  @param u     the source vertex
+     *  @param elab  the edge label
+     */
+    def children (u: Int, elab: TLabel): SET [Int] =
+    {
+        for (v <- ch(u) if elabel((u, v)) contains elab) yield v
+    } // children
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the parents of vertex 'v' that are connected via an edge labelled
+     *  'elab'.  Requires the parents 'pa' to be added (@see `Graph`).
+     *  @param v     the destination vertex
+     *  @param elab  the edge label
+     */
+    def parents (v: Int, elab: TLabel): SET [Int] =
+    {
+        for (u <- pa(v) if elabel((u, v)) contains elab) yield u
+    } // children
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build the schema map from label type to set of labels.
      *  @param schema  the schema - map of label types: label -> label type
      */

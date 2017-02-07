@@ -39,7 +39,7 @@ class LinearDiffEq (a: MatrixD, y0: VectorD)
 
      /** Vector of eigenvalues
       */
-     private val e = (new Eigenvalue (a)).getE
+     private val e = (new Eigenvalue (a)).getE ()
 
      /** Matrix of eigenvectors
       */

@@ -1488,6 +1488,11 @@ class MatrixD (d1: Int,
     } // sumLower
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a normalized version of 'this' matrix.
+      */
+    def normalizeU: MatrixD = MatrixD (for (j <- range2) yield col(j).normalizeU)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the determinant of 'this' matrix.  The value of the determinant
      *  indicates, among other things, whether there is a unique solution to a
      *  system of linear equations (a nonzero determinant).

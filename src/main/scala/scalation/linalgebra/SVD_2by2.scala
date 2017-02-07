@@ -23,10 +23,10 @@ import scalation.math.ExtremeD.EPSILON
  *  bidiagonal 2-by-2 matrices.
  *  <p>
  *      [ f g ]
-        [ 0 h ]
+ *      [ 0 h ]
  *  <p>
  *  @see fortranwiki.org/fortran/show/svd
-
+ *
  *  @param f  the first diagonal element
  *  @param g  the super-diagonal element
  *  @param h  the second diagonal element
@@ -45,11 +45,10 @@ class SVD_2by2 (f: Double, g: Double, h: Double)
     /** Factor matrix 'a' forming a diagonal matrix consisting of singular
      *  values and return the singular values in a vector.
      */
-    def factor (): Tuple3 [MatrixD, VectorD, MatrixD] =
+    override def factor (): Tuple3 [MatrixD, VectorD, MatrixD] =
     {
         (null, null, null)                                  // FIX 
     } // factor
-
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the two singular values (smallest first) for the bidiagonal 2-by-2

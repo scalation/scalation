@@ -62,7 +62,7 @@ import scalation.math.ExtremeD.{EPSILON, MIN_NORMAL, TOL}
  *  @param u   the left orthogonal matrix from b = bidiagonalize (a)
  */
 class SVD3 (b: BidMatrixD, vt: MatrixD = new MatrixD (0, 0),
-                          u:  MatrixD = new MatrixD (0, 0))
+                           u:  MatrixD = new MatrixD (0, 0))
       extends SVDecomp
 {
     private val DEBUG   = true                         // debug flag
@@ -132,7 +132,7 @@ class SVD3 (b: BidMatrixD, vt: MatrixD = new MatrixD (0, 0),
     /** Factor matrix 'a' forming a diagonal matrix consisting of singular
      *  values and return the singular values in a vector.
      */
-    def factor (): Tuple3 [MatrixD, VectorD, MatrixD] =
+    override def factor (): Tuple3 [MatrixD, VectorD, MatrixD] =
     {
         (null, null, null)                                  // FIX
     } // factor

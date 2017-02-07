@@ -2,21 +2,17 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 1.2
- *  @date    Sun Jan 22 15:18:51 EST 2017
+ *  @date    Thu Feb 14 14:06:00 EST 2013
  *  @see     LICENSE (MIT style license file).
  *
- *  @see Matrix Computations:  Algorithm 5.4.2 Householder Bidiagonalization
- *
- *  Translated from the following Algol code:
- *  @see people.duke.edu/~hpgavin/SystemID/References/Golub+Reinsch-NM-1970.pdf
+ *  This version based pseudo-code from Matrix Computations:
+ *  Algorithm 5.4.2 Householder Bidiagonalization
  */
 
 package scalation.linalgebra
 
-import math.{abs, sqrt}
-
 import scalation.linalgebra.Householder.house
-import scalation.math.ExtremeD.TOL
+import scalation.linalgebra.MatrixD.{eye, outer}
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -29,134 +25,55 @@ import scalation.util.Error
  *  <p>
  *  where matrix 'b' is bidiagonal, i.e, it will only have non-zero elements on
  *  its main diagonal and  its super-diagonal (the diagonal above the main).
+ *  <p>
+ *      u is an m-by-n matrix
+ *      b is an n-by-n matrix (bidiagonal - FIX: use `BidMatrixD`)
+ *      v is an n-by-n matrix
+ *  <p>
  *------------------------------------------------------------------------------
- *  @param a  the m-by-n matrix to bidiagonalize
+ *  @param a       the m-by-n matrix to bidiagonalize
+ *  @param m_by_n  whether the u matrix is to be m-by-n (true) or (m-by-m) false
  */
-class Bidiagonal2 (a: MatrixD)
+class Bidiagonal2 (private var a: MatrixD, m_by_n: Boolean = true)
       extends Error
 {
-    private val m = a.dim1                    // the number of rows in matrix a
-    private val n = a.dim2                    // the number of columns in matrix a
+    private val m = a.dim1         // the number of rows
+    private val n = a.dim2         // the number of columns
 
     if (n > m) flaw ("constructor", "Bidiagonal2 requires m >= n")
 
-    private val u = a.copy ()                 // initialize left orthogonal matrix to m-by-n matrix
-    private val v = new MatrixD (n, n)        // initialize right orthogonal matrix to n-by-n matrix
-    private val e = new VectorD (n)           // super-diagonal for b
-    private val q = new VectorD (n)           // main diagonal for b
-    private val b = new MatrixD (n, n)        // n-by-n matrix from e and q diagonals
+    private val u = eye (m)        // initialize left orthogonal matrix to m-by-m identity matrix
+//  private val u = eye (m, n)     // initialize left orthogonal matrix to m-by-n identity matrix
+    private val v = eye (n)        // initialize right orthogonal matrix to n-by-n identity matrix
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Use the Householder Bidiagonalization Algorithm to compute orthogonal
      *  matrices 'u' and 'v' such that 'u.t * a * v = b' where matrix 'b' is bidiagonal.
      *  This implementation computes 'b' in-place overwriting matrix 'a'.
+     *  @see Matrix Computations:  Algorithm 5.4.2 Householder Bidiagonalization
      */
-    def bidiagonalize (): (MatrixD, MatrixD, MatrixD) =
+    def bidiagonalize (): Tuple3 [MatrixD, MatrixD, MatrixD] =
     {
-        var f, g, h, s, x, y = 0.0
-        var l = 0
+        for (j <- 0 until n) {
+            val (vu, bu) = house (a(j until m, j))                   // Householder (vector vu, scalar bu)
+            val hu = eye (m-j) - outer (vu, vu * bu)                 // Householder matrix hu
+            a(j until m, j until n) = hu * a(j until m, j until n)   // zero column j below main diagonal
+//          for (i <- j+1 until m) a(i, j) = vu(i-j)                 // save key part of Householder vector vu
+            u *= hu.diag (j)                                         // multiply u by Householder matrix hu
 
-        for (i <- 0 until n) {
-
-            l = i + 1; e(i) = g; s = 0.0
-            for (j <- i until m) s += u(j, i) * u(j, i)
-            if (s < TOL) g = 0.0
-            else {
-                f = u(i, i); g = if (f < 0.0) sqrt (s) else -sqrt (s)
-                h = f * g - s; u(i, i) = f - g
-                for (j <- l until n) {
-                    s = 0.0
-                    for (k <- i until m) s += u(k, i) * u(k, j)
-                    f = s / h
-                    for (k <- i until m) u(k, j) += f * u(k, i)
-                } // for
+            if (j < n-2) {
+                val (vv, bv) = house (a(j, j+1 until n))                     // Householder (vector vv, scalar bv)
+                val hv = eye (n-j-1) - outer (vv, vv * bv)                   // Householder matrix hv
+                a(j until m, j+1 until n) = a(j until m, j+1 until n) * hv   // zero row j past super-diagonal
+//              for (k <- j+2 until n) a(j, k) = vv(k-j-1)                   // save key part of Householder vector vv
+                v *= hv.diag (j+1)                                           // multiply v by Householder matrix hv
             } // if
-
-            q(i) = g; s = 0.0
-            for (j <- l until n) s += u(i, j) * u(i, j)
-            if (s < TOL) g = 0.0
-            else {
-                f = u(i, i+1); g = if (f < 0) sqrt (s) else -sqrt(s)
-                h = f * g - s; u(i, i+1) = f - g
-                for (j <- l until n) e(j) = u(i, j) / h
-                for (j <- l until m) {
-                    s = 0.0
-                    for (k <- l until n) s += u(j, k) * u(i, k)
-                    for (k <- l until n) u(j, k) += s * e(k)
-                } // for
-            } // if
-            y = abs (q(i)) + abs (e(i)); if (y > x) x = y
         } // for
- 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Accumulate right-hand side transformations to create 'v' matrix.
-         */
-        def transformRHS ()
-        {
-            for (i <- n-1 to 0 by -1) {
 
-                if (g != 0.0) {
-                    h = u(i, i+1) * g
-                    for (j <- l until n) v(j, i) = u(i, j) / h
-                    for (j <- l until n) {
-                        s = 0.0
-                        for (k <- l until n) s += u(i, k) * v(k, j)
-                        for (k <- l until n) v(k, j) += s * v(k, i)
-                    } // for
-                } // if
-                for (j <- l until n) { v(i, j) = 0.0; v(j, i) = 0.0 }
-                v(i, i) = 1.0; g = e(i); l = i
-
-            } // for
-        } // transformRHS
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Accumulate left-hand side transformations to update 'u' matrix.
-         */
-        def transformLHS ()
-        {
-            for (i <- n-1 to 0 by -1) {
-
-                l = i + 1; g = q(i)
-                for (j <- l until n) u(i, j) = 0.0
-                if (g != 0.0) {
-                    h = u(i, i) * g
-                    for (j <- l until n) {
-                        s = 0.0
-                        for (k <- l until m) s += u(k, i) * u(k, j)
-                        f = s / h
-                        for (k <- i until m) u(k, j) += f * u(k, i)
-                    } // for
-                    for (j <- i until m) u(j, i) /= g
-                } else {
-                    for (j <- i until m) u(j, i) = 0.0
-                } // if
-                u(i, i) += 1.0
-
-            } // for
-        } // transformLHS
-
-        transformRHS ()
-        transformLHS ()
-        b.setDiag (e.slice (1, n), 1)           // super-diagonal
-        b.setDiag (q)                           // main diagonal
-        (u, b, v)                               // return the three matrices
-
+        for (i <- 0 until m; j <- 0 until n if j != i && j != i+1) a(i, j) = 0.0  // clean matrix off diagonals
+        if (m_by_n) (u.sliceCol (0, n), a.slice (0, n), v)
+        else        (u, a, v)
     } // bidiagonalize
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Test whether the product of factorization equals the orginal matrix.
-     */
-    def test ()
-    {
-        val prod = u * b * v.t                  // compute the product of the three matrices
-
-        println (s"u    = $u")
-        println (s"b    = $b")
-        println (s"v    = $v")
-        println (s"prod = $prod")
-        assert (a == prod)
-    } // test
 
 } // Bidiagonal2 class
 
@@ -174,10 +91,40 @@ object Bidiagonal2Test extends App
                                  7.0,  8.0,  9.0,
                                 10.0, 11.0, 12.0)
     println ("a = " + a)
+    val aa = a.copy ()                                // save a copy of a
 
     val bid = new Bidiagonal2 (a)                     // Householder bidiagonalization
-    bid.bidiagonalize ()                              // bidiagonalize a
-    bid.test ()                                       // test the product u * b * v.t
+    val (u, b, v) = bid.bidiagonalize ()              // bidiagonalize a
+    println ("(u, b, v) = " + (u, b, v))
+    val prod = u * b * v.t                            // compute product
+    println ("ubv.t = " + prod)                       // should equal the original a
+    assert (aa == prod)
 
 } // Bidiagonal2Test object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Bidiagonal2Test2` object is used to test the `Bidiagonal2` class.
+ *  bidiagonalization answer = [ (21.8, -.613), (12.8, 2.24, 0.) ]
+ *  This version produces an 'm-by-m u' matrix.
+ *  @see books.google.com/books?isbn=0801854148  (p. 252)
+ *  > run-main scalation.linalgebra.Bidiagonal2Test2
+ */
+object Bidiagonal2Test2 extends App
+{
+    val a = new MatrixD ((4, 3), 1.0,  2.0,  3.0,     // orginal matrix
+                                 4.0,  5.0,  6.0,
+                                 7.0,  8.0,  9.0,
+                                10.0, 11.0, 12.0)
+    println ("a = " + a)
+    val aa = a.copy ()                                // save a copy of a
+
+    val bid = new Bidiagonal2 (a, false)              // Householder bidiagonalization
+    val (u, b, v) = bid.bidiagonalize ()              // bidiagonalize a
+    println ("(u, b, v) = " + (u, b, v))
+    val prod = u * b * v.t                            // compute product
+    println ("ubv.t = " + prod)                       // should equal the original a
+    assert (aa == prod)
+
+} // Bidiagonal2Test2 object
 

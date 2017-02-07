@@ -43,13 +43,13 @@ trait Eigen
 class Hessenburg (a: MatrixD)
       extends Eigen with Error
 {
-    private val (m, n) = (a.dim1, a.dim2)   // size of matrix
-    private var h = new MatrixD (a)         // Hessenburg h matrix
+    private val (m, n) = (a.dim1, a.dim2)               // size of matrix
+    private var h = new MatrixD (a)                     // Hessenburg h matrix
 
     if (m != n) flaw ("constructor", "must have m == n")
 
-    for (j <- 0 until n) {                           // for each column j
-        val x  = h.col(j, j)                         // jth column from jth position
+    for (j <- 0 until n) {                              // for each column j
+        val x  = h.col(j, j)                            // jth column from jth position
         val u  = x + x.oneAt (0) * x.norm * (if (x(0) < 0.0) -1.0 else 1.0)
         val pp = eye (n-j) - outer (u, u) * (2.0 / u.normSq)
         val p  = eye (j) diag pp
@@ -77,30 +77,31 @@ class Hessenburg (a: MatrixD)
 class Eigenvalue (a: MatrixD)
       extends Eigen with Error
 {
-    private val ITERATIONS = 12                // max iterations: increase --> more precision, but slower
-    private val (m, n) = (a.dim1, a.dim2)      // size of matrix
-    private val e      = new VectorD (m)       // vector of eigenvalues
+    private val ITERATIONS = 12                         // max iterations: increase --> more precision, but slower
+    private val (m, n) = (a.dim1, a.dim2)               // size of matrix
+    private val e      = new VectorD (m)                // vector of eigenvalues
 
     if (m != n) flaw ("constructor", "must have m == n")
-    var g = (new Hessenburg (a)).getH                  // convert g matrix to Hessenburg form
-    var converging = true                              // still converging, has not converged yet
-    var lastE      = Double.PositiveInfinity           // save an eigenvalue from last iteration
 
-    for (k <- 0 until ITERATIONS if converging) {      // major iterations
+    var g = (new Hessenburg (a)).getH                   // convert g matrix to Hessenburg form
+    var converging = true                               // still converging, has not converged yet
+    var lastE      = Double.PositiveInfinity            // save an eigenvalue from last iteration
+
+    for (k <- 0 until ITERATIONS if converging) {       // major iterations
         converging = true
-        for (l <- 0 until ITERATIONS) {                // minor iterations
-            val s     = g(n - 1, n - 1)                // the shift parameter
+        for (l <- 0 until ITERATIONS) {                 // minor iterations
+            val s     = g(n - 1, n - 1)                 // the shift parameter
             val eye_g = eye (g.dim1)
             val (qq, rr) = (new Fac_QR_H (g - eye_g * s)).factor12 ()
             g = rr.asInstanceOf [MatrixD] * qq.asInstanceOf [MatrixD] + eye_g * s      // FIX
         } // for
 
-        for (i <- 0 until n) e(i) = g(i, i)            // extract eigenvalues from diagonal
-        val e0 = e(0)                                  // consider one eigenvalue
-        if (abs ((lastE - e0) / e0) < TOL) {           // relative error
-            converging = false                         // end major iterations
+        for (i <- 0 until n) e(i) = g(i, i)             // extract eigenvalues from diagonal
+        val e0 = e(0)                                   // consider one eigenvalue
+        if (abs ((lastE - e0) / e0) < TOL) {            // relative error
+            converging = false                          // end major iterations
         } else {
-            lastE = e0                                 // save this eigenvalue
+            lastE = e0                                  // save this eigenvalue
         } // if
 
         if (DEBUG) {
@@ -112,9 +113,15 @@ class Eigenvalue (a: MatrixD)
     } // for
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the eigenvalue e vector.
+    /** Reorder the eigenvalue vector 'e' in non-increasing order.
+      */
+    def reorder () { e.sort2 () }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get the eigenvalue 'e' vector.
+     *  @param order  whether to order the eigenvalues in non-increasing order
      */
-    def getE: VectorD = e
+    def getE (order: Boolean = true): VectorD = { if (order) reorder() ; e }
 
 } // Eigenvalue class
 
@@ -133,7 +140,8 @@ class HouseholderT (a: MatrixD)
 
     if (a.dim1 != a.dim2) flaw ("constructor", "must have m == n")
     if (! a.isSymmetric)  flaw ("constructor", "matrix a must be symmetric")
-    val n = a.dim1 - 1                          // the last index
+
+    val n = a.dim1 - 1                                  // the last index
     for (k <- 0 to n - 2) {
         val ts    = a.col(k).slice (k+1, n+1)
         val v_b   = house (ts)
@@ -152,7 +160,7 @@ class HouseholderT (a: MatrixD)
     t(n, n)     = a(n, n)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the Householder Tridiagonal matrix.
+    /** Get the Householder Tridiagonal matrix 't'.
      */
     def getT: SymTriMatrixD = t
 
@@ -175,8 +183,8 @@ object SymmetricQRstep
      */
     def qRStep (t: SymTriMatrixD, p: Int, q: Int) = 
     {
-        val n   = t.dg.dim - q - 1               // the last index
-        val d   = (t.dg(n-1) - t.dg(n)) / 2.0    // Wilkinson shift
+        val n   = t.dg.dim - q - 1                      // the last index
+        val d   = (t.dg(n-1) - t.dg(n)) / 2.0           // Wilkinson shift
         val t2  = t.sd(n-1) * t.sd(n-1)
         val d2  = t.dg(n) - t2 / (d + signum (d) * sqrt (d * d + t2))
         var g   = t.dg(0) - d2 
@@ -220,12 +228,14 @@ class EigenvalueSym (a: MatrixD)
      */
     private var d: SymTriMatrixD = null
 
-    val m = a.dim1                            // number of rows
+    val m = a.dim1                                      // number of rows
+
     if (m != a.dim2)     flaw ("constructor", "must have m == n")
     if (! a.isSymmetric) flaw ("constructor", "matrix a must be symmetric")
-    var p = 0                                 // the row index
-    var q = 0                                 // the column index
-    d = (new HouseholderT (a)).getT           // make symmetric tridiagonal matrix
+
+    var p = 0                                           // the row index
+    var q = 0                                           // the column index
+    d = (new HouseholderT (a)).getT                     // make symmetric tridiagonal matrix
 
     while (q < m) {
         for (i <- 0 to m-2 if abs (d(i, i+1)) <= TOL) d(i, i+1) = 0.0   // clean d
@@ -236,9 +246,9 @@ class EigenvalueSym (a: MatrixD)
     } // while
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the eigenvalue e vector.
+    /** Get the eigenvalue 'e' vector.
      */
-    def getE: VectorD = d.dg     // the diagonal of the tridiagonal matrix
+    def getE: VectorD = d.dg           // the diagonal of the tridiagonal matrix
 
 } // EigenvalueSym
 
@@ -262,48 +272,50 @@ class Eigenvector (a: MatrixD, _e: VectorD = null)
     if (a.dim2 != m) flaw ("constructor", "must have m == n")
     private val v = new MatrixD (m, m)                     // eigenvectors matrix (each row)
     private val ident = eye (m)                            // identity matrix
-    private val e = if (_e == null) (new Eigenvalue (a)).getE else _e
+    private val e = if (_e == null) (new Eigenvalue (a)).getE () else _e
 
     // find eigenvectors using nullspace calculation
     for (i <- 0 until m) {                                 // compute eigenvector for i-th eigenvalue
-        val a_Ie = (a - ident * e(i))                      // .clean (TOL)
-        println ("a_Ie = " + a_Ie)
+        val a_Ie   = (a - ident * e(i))                    // a - Ie
         val c_a_Ie = a_Ie.clean (TOL)
-        println ("c_a_Ie = " + c_a_Ie)
+
+        if (DEBUG) println (s"a_Ie = $a_Ie \nc_a_Ie = $c_a_Ie")
+
         val qr = new Fac_QR_H (c_a_Ie)
         qr.factor ()
         val eVec = qr.nullspaceV (e.zero (m))
         println ("+++ eigenvector for eigenvalue " + e(i) + " = " + eVec)
         val mat = a_Ie.slice (1, m)
-        println ("mat = " + mat)
+        if (DEBUG) println ("mat = " + mat)
         val eVec2 = mat.nullspace
         println ("--- eigenvector for eigenvalue " + e(i) + " = " + eVec2)
-        v.setCol (i, eVec)
+//      v.setCol (i, eVec)
+        v.setCol (i, eVec2)
     } // for
 
         // find eigenvectors using inverse iteration (also improves eigenvalues)
         // @see http://home.iitk.ac.in/~dasgupta/MathBook/lmastertrans.pdf (p. 130)
-//      var y_k = new VectorD (m); y_k.set (1./m.toDouble)   // old estimate of eigenvector
+//      var y_k = new VectorD (m); y_k.set (1./m.toDouble)      // old estimate of eigenvector
 //      var y_l: VectorD = null                                 // new estimate of eigenvector
 //
-//      for (i <- 0 until m) {               // compute eigenvector for i-th eigenvalue
+//      for (i <- 0 until m) {                     // compute eigenvector for i-th eigenvalue
 //          breakable { for (k <- 0 until ITERATIONS) {
-//              val a_Ie = a - ident * e(i)      // form matrix: [a - Ie]
-//              println ("a_Ie = " + a_Ie)
+//              val a_Ie = a - ident * e(i)        // form matrix: [a - Ie]
+//              f (DEBUG) println ("a_Ie = " + a_Ie)
 //              val qr = new Fac_QR_H (a_Ie)
 //              qr.factor ()
-//              val y = qr.solve (y_k)           // solve [a - Ie]y = y_k
-//              y_l   = y / y.norm               // normalize
-//              e(i) += 1.0 / (y_k dot y)        // improve the eigenvalue
+//              val y = qr.solve (y_k)             // solve [a - Ie]y = y_k
+//              y_l   = y / y.norm                 // normalize
+//              e(i) += 1.0 / (y_k dot y)          // improve the eigenvalue
 //              if ((y_l - y_k).norm < TOL) break
-//              y_k = y_l                        // update the eigenvector
+//              y_k = y_l                          // update the eigenvector
 //          }} // for
 //          println ("eigenvector for eigenvalue " + e(i) + " = " + y_l)
 //          v.setCol (i, y_l)
 //      } // for
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Get the eigenvector v matrix.
+    /** Get the eigenvector 'v' matrix.
      */
     def getV: MatrixD = v 
 
@@ -317,12 +329,15 @@ class Eigenvector (a: MatrixD, _e: VectorD = null)
  */
 object EigenTest extends App
 {
+    import scalation.util.Banner.banner
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** For matrix a, find Hessenburg matrix, eigenvalues and eigenvectors.
      */
-    def test (a: MatrixD)
+    def test (a: MatrixD, name: String)
     {
-        val e = (new Eigenvalue (a)).getE
+        banner (name)
+        val e = (new Eigenvalue (a)).getE ()
         val v = (new Eigenvector (a, e)).getV
 
         println ("----------------------------------------------------------")
@@ -330,7 +345,7 @@ object EigenTest extends App
         println ("e = " + e)
         println ("v = " + v)
 
-        for (i <- 0 until v.dim1) {     // check that a * v_i = e_i * v_i
+        for (i <- 0 until v.dim1) {             // check that a * v_i = e_i * v_i
             println ("a * v_i - v_i * e_i = " + (a * v.col(i) - v.col(i) * e(i)))
         } // for
     } // test
@@ -340,14 +355,14 @@ object EigenTest extends App
     val b = new MatrixD ((3, 3), -149.0, -50.0, -154.0,            // 3-by-3 matrix
                                   537.0, 180.0,  546.0,
                                   -27.0,  -9.0,  -25.0)
-    test (b)
+    test (b, "matrix b")
 
     // @see http://www.math.hmc.edu/calculus/tutorials/eigenstuff/eigenstuff.pdf
     // should give e = (1., -3., -3.)
     val c = new MatrixD ((3, 3), 5.0,  8.0,  16.0,                  // 3-by-3 matrix
                                  4.0,  1.0,   8.0,
                                 -4.0, -4.0, -11.0)
-    test (c)
+    test (c, "matrix c")
 
 } // EigenTest object
 

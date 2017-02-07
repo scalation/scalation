@@ -107,7 +107,7 @@ class ExpRegression (x: MatrixD, nonneg: Boolean, y: VectorD)
      *  e.g., (b_0, b_1, b_2) dot (1, z_1, z_2).
      *  @param z  the new vector to predict
      */
-    def predict (z: VectoD): Double = b dot z
+    def predict (z: VectoD): Double = exp (b dot z)
 
 } // ExpRegression class
 
