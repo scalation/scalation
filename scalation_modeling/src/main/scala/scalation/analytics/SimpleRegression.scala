@@ -58,7 +58,8 @@ class SimpleRegression (x: MatrixD, y: VectorD)
         b(1) = (m * sxy - sx * sy) / (m * ssx - sx*sx)     // slope
         b(0) = (sy - b(1) * sx) / m                        // intercept
 
-        val e   = y - x * b                        // residual/error vector
+        e = y - x * b                              // residual/error vector
+        sseF ()                                    // compute and save sum of squared errors
         diagnose (y, e)
     } // train
 
@@ -67,9 +68,8 @@ class SimpleRegression (x: MatrixD, y: VectorD)
      *  @param yy  the response vector
      *  @param e   the residual/error vector
      */
-    def diagnose (yy: VectorD, e: VectorD)
+    private def diagnose (yy: VectoD, e: VectoD)
     {
-        val sse  = e dot e                                 // residual/error sum of squares
         val sst  = (yy dot yy) - yy.sum~^2.0 / m           // total sum of squares
         val ssr  = sst - sse                               // regression sum of squares
         rSquared = ssr / sst                               // coefficient of determination
@@ -93,11 +93,61 @@ class SimpleRegression (x: MatrixD, y: VectorD)
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `SimpleRegressionTest` object to test `SimpleRegression` class:
- *  'y = b dot x = (b_0, b_1) dot (1, x_1)'.
- *  @see http://www.analyzemath.com/statistics/linear_regression.html
+/** The `SimpleRegression` companion object provides a simple factory method
+ *  for building simple regression linear regression models.
+ */
+object SimpleRegression
+{
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a Simple Linear Regression model, automatically prepending the
+     *  column of ones (form matrix from two column vectors [ 1 x ]).
+     *  @param x  the input/design m-by-1 vector
+     *  @param y  the response m-vector
+     */
+    def apply (x: VectorD, y: VectorD): SimpleRegression =
+    {
+        new SimpleRegression (MatrixD.form_cw (1.0, x), y)
+    } // apply
+
+} // SimpleRegression object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SimpleRegressionTest` object to test the `SimpleRegression` class:
+ *  <p>
+ *      y = b0 + b1 * x
+ *  <p>
+ *  > run-main scalation.analytics.SimpleRegressionTest
  */
 object SimpleRegressionTest extends App
+{
+    // 4 data points:
+    val x = VectorD (1, 2, 3, 4)
+    val y = VectorD (1, 3, 3, 4)
+
+    println ("x = " + x)
+    println ("y = " + y)
+
+    val rg = SimpleRegression (x, y)
+    rg.train ()
+
+    println ("coefficient = " + rg.coefficient)
+    println ("sse         = " + rg.sseF ())
+    println ("            = " + rg.fitLabels)
+    println ("fit         = " + rg.fit)
+
+} // SimpleRegressionTest object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SimpleRegressionTest2` object to test the `SimpleRegression` class:
+ *  <p>
+ *      y = b dot x = (b_0, b_1) dot (1, x_1).
+ *  <p>
+ *  @see http://www.analyzemath.com/statistics/linear_regression.html
+ *  > run-main scalation.analytics.SimpleRegressionTest2
+ */
+object SimpleRegressionTest2 extends App
 {
     // 5 data points:       constant  x_1
     val x = new MatrixD ((5, 2), 1.0, 0.0,          // x 5-by-2 matrix
@@ -112,7 +162,11 @@ object SimpleRegressionTest extends App
 
     val rg = new SimpleRegression (x, y)
     rg.train ()
-    println ("fit = " + rg.fit)
+
+    println ("coefficient = " + rg.coefficient)
+    println ("sse         = " + rg.sseF ())
+    println ("            = " + rg.fitLabels)
+    println ("fit         = " + rg.fit)
 
     val z  = VectorD (1.0, 5.0)               // predict y for one point
     val yp = rg.predict (z)
@@ -123,17 +177,18 @@ object SimpleRegressionTest extends App
 
     new Plot (x.col(1), y, yyp)
 
-} // SimpleRegressionTest object
+} // SimpleRegressionTest2 object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `SimpleRegressionTest2` object to test `SimpleRegression` class:
+/** The `SimpleRegressionTest3` object to test the `SimpleRegression` class:
  *  <p>
- *  y = b dot x = b_0 + b_1*x_1.
+ *      y = b dot x = b_0 + b_1*x_1.
  *  <p>
  *  @see http://mathbits.com/mathbits/tisection/Statistics2/linear.htm
+ *  > run-main scalation.analytics.SimpleRegressionTest3
  */
-object SimpleRegressionTest2 extends App
+object SimpleRegressionTest3 extends App
 {
     // 20 data points: just x_1 coordinate
     val x1 = VectorD (  4.0,   9.0,  10.0,  14.0,   4.0,   7.0,  12.0,  22.0,   1.0,   3.0,
@@ -145,9 +200,14 @@ object SimpleRegressionTest2 extends App
     println ("y  = " + y)
 
     val x  = MatrixD.form_cw (1.0, x1)       // form matrix x from vector x1
+
     val rg = new SimpleRegression (x, y)
     rg.train ()
-    println ("fit = " + rg.fit)
+
+    println ("coefficient = " + rg.coefficient)
+    println ("sse         = " + rg.sseF ())
+    println ("            = " + rg.fitLabels)
+    println ("fit         = " + rg.fit)
 
     val z  = VectorD (1.0, 15.0)             // predict y for one point
     val yp = rg.predict (z)
@@ -158,5 +218,5 @@ object SimpleRegressionTest2 extends App
     
     new Plot (x1, y, yyp)
 
-} // SimpleRegressionTest2 object
+} // SimpleRegressionTest3 object
 

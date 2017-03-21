@@ -79,7 +79,7 @@ class NonLinRegression (x: MatrixD, y: VectorD,
      *  @param yy  the response vector
      *  @param e   the residual/error vector (not used directly)
      */
-    def diagnose (yy: VectorD, e: VectorD)
+    private def diagnose (yy: VectorD, e: VectorD)
     {
         val sse    = sseF (b.asInstanceOf [VectorD])            // residual/error sum of squares - FIX
         val sst    = (yy dot yy) - yy.sum~^2.0 / m.toDouble     // total sum of squares

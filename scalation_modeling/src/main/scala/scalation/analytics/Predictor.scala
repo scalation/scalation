@@ -24,7 +24,11 @@ trait Predictor
 
     /** Residual/error vector [e_0, e_1, ... e_m-1]
      */
-    protected var e: VectoD = _
+    protected var e: VectoD = null
+
+    /** Sum of squared errors
+     */
+    protected var sse: Double = -1.0
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a set of data vectors 'x's and their corresponding responses 'y's,
@@ -43,6 +47,11 @@ trait Predictor
     def residual: VectoD = e
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the sum of squared errors.  Compute 'sse' if not done already.
+     */
+    def sseF (): Double = { if (sse < 0.0) sse = e dot e; sse }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit including 'rSquared'.
      */
     def fit: VectoD
@@ -50,7 +59,7 @@ trait Predictor
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the fit.  Override when necessary.
      */
-    def fitLabels: Array [String] = Array ("rSquared", "rBarSq", "fStat")
+    def fitLabels: Seq [String] = Seq ("rSquared", "rBarSq", "fStat")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a new continuous data vector z, predict the y-value of f(z).

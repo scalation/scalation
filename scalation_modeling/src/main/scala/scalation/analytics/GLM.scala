@@ -10,7 +10,7 @@ package scalation.analytics
 
 import scalation.math.FunctionS2S
 import scalation.linalgebra.{MatrixD, VectorD, VectorI}
-import scalation.linalgebra.MatrixD.++
+import scalation.linalgebra.MatrixD.++^
 import scalation.linalgebra.VectorD.one
 
 import RegTechnique._
@@ -39,13 +39,13 @@ trait GLM
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Simple Linear Regression model, automatically prepending the
-     *  column of ones.
+     *  column of ones (form matrix from two column vectors [ 1 x ]).
      *  @param x  the input/design m-by-1 vector
      *  @param y  the response m-vector
      */
     def apply (x: VectorD, y: VectorD): SimpleRegression =
     {
-        new SimpleRegression (++ (one (x.dim), x), y)
+        new SimpleRegression (++^ (one (x.dim), x), y)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

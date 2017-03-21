@@ -62,7 +62,6 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
     private val k        = x.dim2 - 1                          // number of variables (k = n-1)
     private val m        = x.dim1.toDouble                     // number of data points (rows)
     private val r_df     = (m-1.0) / (m-k-1.0)                 // ratio of degrees of freedom
-    private var sse      = 0.0                                 // sum of squared errors
     private var rSquared = -1.0                                // coefficient of determination (quality of fit)
     private var rBarSq   = -1.0                                // Adjusted R-squared
     private var fStat    = -1.0                                // F statistic (quality of fit)
@@ -113,6 +112,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
         b = if (x_pinv == null) fac.solve (yy).asInstanceOf [VecT]   // FIX
             else x_pinv * yy                                    // parameter vector [b_0, b_1, ... b_k]
         e  = yy - x * b                                         // residual/error vector
+        sseF ()                                                 // compute and save sum of squared errors
         diagnose (yy, e)
     } // train
 
@@ -121,9 +121,8 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
      *  @param yy  the response vector
      *  @param e   the residual/error vector
      */
-    def diagnose (yy: VectoD, e: VectoD)
+    private def diagnose (yy: VectoD, e: VectoD)
     {
-        sse      = e dot e                                       // residual/error sum of squares
         val sst  = (yy dot yy) - yy.sum~^2.0 / m                 // total sum of squares
         val ssr  = sst - sse                                     // regression sum of squares
         rSquared = ssr / sst                                     // coefficient of determination
