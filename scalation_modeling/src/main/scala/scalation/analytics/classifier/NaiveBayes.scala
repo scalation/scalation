@@ -12,7 +12,7 @@ package scalation.analytics.classifier
 
 import scala.math.log
 
-import scalation.linalgebra.{MatriI, VectoI, VectorD, VectorI}
+import scalation.linalgebra.{MatriI, MatrixI, VectorD, VectoI, VectorI}
 import scalation.linalgebra.gen.HMatrix3
 import scalation.random.PermutedVecI
 import scalation.random.RNGStream.ranStream
@@ -89,7 +89,7 @@ class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
     {
 //      frequencies (testStart, testEnd)                      // compute frequencies skipping test region
         frequenciesQ ((testStart until testEnd).toArray)      // compute frequencies skipping test region
-        if (DEBUG) banner ("train (testStart, testEnd)")
+        if (DEBUG) banner (s"train (testStart = $testStart, testEnd = $testEnd)")
         train2 ()
     } // train
 
@@ -242,7 +242,7 @@ class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
 
         for (itest <- itestA) {
             reset ()
-            trainQ (itest ().asInstanceOf [Array [Int]])
+            trainQ (itest ().array)
             sum += test (itest)
         } // for
 
@@ -273,7 +273,6 @@ object NaiveBayes
 
 } // NaiveBayes object
 
-import scalation.linalgebra.MatrixI
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NaiveBayesTest` object is used to test the `NaiveBayes` class.
@@ -308,9 +307,7 @@ object NaiveBayesTest extends App
     println ("---------------------------------------------------------------")
 
     val nb = new NaiveBayes (x, y, fn, 2, cn)               // create the classifier            
-
-    // train the classifier ---------------------------------------------------
-    nb.train ()
+    nb.train ()                                             // train the classifier
 
     // test sample ------------------------------------------------------------
     val z1 = VectorI (1, 0, 1, 1)                           // existing data vector to classify
@@ -354,9 +351,7 @@ object NaiveBayesTest2 extends App
     println ("---------------------------------------------------------------")
 
     val nb = NaiveBayes (xy, fn, 2, cn, null)             // create the classifier
-
-    // train the classifier ---------------------------------------------------
-    nb.train ()
+    nb.train ()                                           // train the classifier
 
     // test sample ------------------------------------------------------------
     val z = VectorI (1, 0)                                // new data vector to classify
@@ -407,18 +402,16 @@ object NaiveBayesTest3 extends App
                                    3,  2,  2,  1,  3,           // 23
                                    3,  2,  2,  2,  3)           // 24
 
-    xy -= 1
+    xy -= 1                                                     // shift values to start at 0
 
     val fn = Array ("Age", "Spectacle", "Astigmatic", "Tear")   // feature names
-    val cn = Array ("Hard", "Soft", "Neither")                       // class names
+    val cn = Array ("Hard", "Soft", "Neither")                  // class names
 
     println ("xy = " + xy)
     println ("---------------------------------------------------------------")
 
     val nb = NaiveBayes (xy, fn, 3, cn, null, 0)                // create the classifier
-
-    // train the classifier ---------------------------------------------------
-    nb.train ()
+    nb.train ()                                                 // train the classifier
 
     // test all rows ------------------------------------------------------------
     for (i <- xy.range1) {
@@ -430,11 +423,54 @@ object NaiveBayesTest3 extends App
                                   
 } // NaiveBayesTest3 object
 
+
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NaiveBayesTest4` object is used to test the 'NaiveBayes' class.
  *  > run-main scalation.analytics.classifier.NaiveBayesTest4
  */
 object NaiveBayesTest4 extends App
+{
+    // training-set -----------------------------------------------------------
+    // x0: Outlook:     Rain (0),   Overcast (1), Sunny (2)
+    // x1: Temperature: Cold (0),   Mild (1),     Hot (2)
+    // x2: Humidity:    Normal (0), High (1)
+    // x3: Wind:        Weak (0),   Strong (1)
+    // features:                   x0     x1     x2     x3     y
+    val xy = new MatrixI ((14, 5),  2,     2,     1,     0,    0,       // day  1 - data matrix
+                                    2,     2,     1,     1,    0,       // day  2
+                                    1,     2,     1,     0,    1,       // day  3
+                                    0,     1,     1,     0,    1,       // day  4
+                                    0,     0,     0,     0,    1,       // day  5
+                                    0,     0,     0,     1,    0,       // day  6
+                                    1,     0,     0,     1,    1,       // day  7
+                                    2,     1,     1,     0,    0,       // day  8
+                                    2,     0,     0,     0,    1,       // day  9
+                                    0,     1,     0,     0,    1,       // day 10
+                                    2,     1,     0,     1,    1,       // day 11
+                                    1,     1,     1,     1,    1,       // day 12
+                                    1,     2,     0,     0,    1,       // day 13
+                                    0,     1,     1,     1,    0)       // day 14
+
+    val fn = Array ("Outlook", "Temp", "Humidity", "Wind")              // feature names
+    val cn = Array ("No", "Yes")                                        // class names
+
+    println ("xy = " + xy)
+    println ("---------------------------------------------------------------")
+
+    val nb = NaiveBayes (xy, fn, 2, cn, null, 0)                        // create a classifier
+    nb.train ()                                                         // train the classifier
+
+    val z = VectorI (2, 2, 1, 1)                                        // new data vector to classify
+    println ("classify (" + z + ") = " + nb.classify (z))
+
+} // NaiveBayesTest4 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `NaiveBayesTest5` object is used to test the 'NaiveBayes' class.
+ *  > run-main scalation.analytics.classifier.NaiveBayesTest5
+ */
+object NaiveBayesTest5 extends App
 {
     val fname = BASE_DIR + "breast-cancer.arff"
     var data  = Relation (fname, -1, null)
@@ -446,5 +482,5 @@ object NaiveBayesTest4 extends App
     nb.buildModel ()
     println("cv accu = " + nb.crossValidateRand ())
 
-} // NaiveBayesTest4 object
+} // NaiveBayesTest5 object
 

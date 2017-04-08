@@ -13,6 +13,7 @@ import scala.math.{ceil, sqrt}
 import scalation.linalgebra.{MatrixD, VectorD, VectorI}
 import scalation.linalgebra.MatrixD.eye
 import scalation.math.double_exp
+import scalation.random.Normal
 import scalation.random.Quantile.studentTInv
 import scalation.util.SortingD.imedian
 
@@ -262,6 +263,31 @@ object StatVector
         cor
     } // corr
 
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the first-order auto-regressive correlation matrix for vector
+     *  (e.g., time series) 'y'.
+     *  @see halweb.uc3m.es/esp/Personal/personas/durban/esp/web/notes/gls.pdf
+     *  @param y  the vector whose auto-regressive correlation matrix is sought
+     */
+    def corrMat (y: VectorD): MatrixD =
+    {
+        val p  = y.acorr ()                        // first-order auto-correlation
+        val cv = eye (y.dim)                       // correlation on main diagonal (md) is 1
+        for (i <- cv.range1; j <- 0 until i) {
+            val c = p ~^ (i-j)                     // correlation drops with distance from md
+            cv(i, j) = c; cv(j, i) = c             // symmetric matrix
+        } // for
+        cv
+    } // corrMat
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the first-order auto-regressive covariance matrix for vector
+     *  (e.g., time series) 'y'.
+     *  @see halweb.uc3m.es/esp/Personal/personas/durban/esp/web/notes/gls.pdf
+     *  @param y  the vector whose auto-regressive covariance matrix is sought
+     */
+    def covMat (y: VectorD): MatrixD = corrMat (y) * y.variance
+
 } // StatVector object
 
 
@@ -419,4 +445,27 @@ object StatVectorTest4 extends App
     println ("-" * 60)
 
 } // StatVectorTest4 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `StatVectorTest5` is used to test the `StatVector` companion object.
+ *  > run-main scalation.stat.StatVectorTest5
+ */
+object StatVectorTest5 extends App
+{
+    import scalation.random.RNGStream.ranStream
+    import StatVector._
+
+    val noise = Normal (stream = ranStream)
+    val y     = new VectorD (10)
+    y(0)      = noise.gen
+    for (i <- 1 until y.dim) y(i) = 0.5 * y(i-1) + noise.gen   // auto-correlated vector
+
+    println ("y           = " + y)
+    println ("y.variance  = " + y.variance)
+    println ("y.acorr ()  = " + y.acorr ())
+    println ("corrMat (y) = " + corrMat (y))
+    println ("covMat (y)  = " + covMat (y))
+
+} // StatVectorTest5
 

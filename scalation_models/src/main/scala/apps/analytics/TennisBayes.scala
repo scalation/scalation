@@ -42,10 +42,11 @@ object TennisBayes extends App
                                     0,     1,     1,     1)       // day 14
     // day:           1  2  3  4  5  6  7  8  9 10 11 12 13 14
     val y  = VectorI (0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0)   // classification vector: 0(No), 1(Yes))
+    val cn = Array ("No", "Yes")                                  // class names
     val fn = Array ("Outlook", "Temp", "Humidity", "Wind")        // feature names
     val vc = VectorI (3, 3, 2, 2)                                 // value count: distinct values for each feature
 
-    val nb = new NaiveBayes (x, y, fn, 2, null, vc, 0)            // create a classifier
+    val nb = new NaiveBayes (x, y, fn, 2, cn, vc)                // create a classifier
   
     nb.train ()
     val z = VectorI (2, 2, 1, 1)                                  // new data vector to classify

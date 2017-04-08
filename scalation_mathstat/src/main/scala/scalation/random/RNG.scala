@@ -71,13 +71,14 @@ object RNGStream
      */
     def ranStream: Int = javaRNG.nextInt (RandomSeeds.seeds.length)
 
-} // RNGStream
+} // RNGStream object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RNGTest` object conducts three simple tests of the Random Number
  *  Generators: (1) Speed Test, (2) Means Test and (3) Chi-square Goodness of Fit Test.
  *  FIX: need to add (3) Variance Test and (4) K-S Goodness of Fit Test.
+ *  > run-main scalation.random.RNGTest
  */
 object RNGTest extends App with Error
 {
@@ -141,5 +142,5 @@ object RNGTest extends App with Error
        distrTest (g)
     } // for
 
-} // RNGTest
+} // RNGTest object
 

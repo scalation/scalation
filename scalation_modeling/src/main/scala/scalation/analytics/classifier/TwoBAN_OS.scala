@@ -575,7 +575,7 @@ class TwoBAN_OS (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
 
         for (itest <- itestA) {
             reset ()
-            trainQ (itest.asInstanceOf [Array [Int]])
+            trainQ (itest ().array)
             sum += test (itest)
         } // for
 

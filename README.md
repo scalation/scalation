@@ -227,48 +227,48 @@ Overall scaladoc generated <a href = "target/scala-2.12/api"> API </a> for Scala
 <td> MATH AND STAT
 <tr>
 <tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/util/package.html"> scalation.util </a>
+<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/util/index.html"> scalation.util </a>
 <td> A package of utilities needed by the other packages.
 <tr>
-<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/util/bld/package.html"> scalation.util.bld </a>
+<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/util/bld/index.html"> scalation.util.bld </a>
 <td> A subpackage of for building util implementations.
 <tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/scala2d/package.html"> scalation.scala2d </a>
+<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/scala2d/index.html"> scalation.scala2d </a>
 <td> A package supporting 2D graphics based on Java 2D.
 <tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/math/package.html"> scalation.math </a>
+<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/math/index.html"> scalation.math </a>
 <td> A package of mathematical objects and operations needed for analytics, simulation and optimization.
 <tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/package.html"> scalation.linalgebra </a>
+<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/index.html"> scalation.linalgebra </a>
 <td> A package of implementations for linear algebra (e.g., for vectors and matrices).
 Vectors and matrices of real (Double), rational and complex numbers are supported.
 <tr>
-<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/bld/package.html"> scalation.linalgebra.bld </a>
+<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/bld/index.html"> scalation.linalgebra.bld </a>
 <td> A subpackage for building implementations for linear algebra (e.g., for vectors and matrices).
 <tr>
-<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/gen/package.html"> scalation.linalgebra.gen </a>
+<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/gen/index.html"> scalation.linalgebra.gen </a>
 <td> A subpackage of generic implementations for linear algebra (e.g., for vectors and matrices).
 Vectors and matrices of types implementing Numeric can be instantiated.
 <tr>
-<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/mem_mapped/package.html"> scalation.linalgebra.mem_mapped </a>
+<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/mem_mapped/index.html"> scalation.linalgebra.mem_mapped </a>
 <td> A subpackage for memory mapped linear algebra (e.g., for vectors and matrices).
 <tr>
-<td> - - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/mem_mapped/bld/package.html"> scalation.linalgebra.mem_mapped.bld </a>
+<td> - - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/mem_mapped/bld/index.html"> scalation.linalgebra.mem_mapped.bld </a>
 <td> A sub-subpackage for building implementations for memory mapped linear algebra (e.g., for vectors and matrices).
 <tr>
-<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/par/package.html"> scalation.linalgebra.par </a>
+<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/par/index.html"> scalation.linalgebra.par </a>
 <td> A subpackage of parallel implementations for linear algebra.
 <tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/relalgebra/package.html"> scalation.relalgebra </a>
+<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/relalgebra/index.html"> scalation.relalgebra </a>
 <td> A package of implementations for columnar relational algebra.
 <tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/plot/package.html"> scalation.plot </a>
+<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/plot/index.html"> scalation.plot </a>
 <td> A package for displaying basic plots and histograms.
 <tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/random/package.html"> scalation.random </a>
+<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/random/index.html"> scalation.random </a>
 <td> A package for random numbers and random variates (Normal distribution, etc.)
 <tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/stat/package.html"> scalation.stat </a>
+<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/stat/index.html"> scalation.stat </a>
 <td> A package of statistical objects and operations needed for simulation,
 including implementations for summary statitistics and ANOVA.
 <tr>
@@ -276,111 +276,111 @@ including implementations for summary statitistics and ANOVA.
 <td> MODELING
 <tr>
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/model/package.html"> scalation.model </a>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/model/index.html"> scalation.model </a>
 <td> A package defining the general form of a model.
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/scala3d/package.html"> scalation.scala3d </a>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/scala3d/index.html"> scalation.scala3d </a>
 <td> A package supporting 3D graphics based on JavaFX 3D (Under development).
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/animation/package.html"> scalation.animation </a>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/animation/index.html"> scalation.animation </a>
 <td> A package supplying a general purpose animation engine.
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/calculus/package.html"> scalation.calculus </a>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/calculus/index.html"> scalation.calculus </a>
 <td> A package for computing derivatives, gradients and Jacobians.
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/minima/package.html"> scalation.minima </a>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/minima/index.html"> scalation.minima </a>
 <td> A package supporting simulation optimization (minimization).
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/maxima/package.html"> scalation.maxima </a>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/maxima/index.html"> scalation.maxima </a>
 <td> A package supporting simulation optimization (maximization).
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/analytics/package.html"> scalation.analytics </a>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/analytics/index.html"> scalation.analytics </a>
 <td> A package supporting analytics, including regression, time series analysis and clustering.
 <tr>
-<td> - <a href = "scalation_modeling/target/scala-2.12/api/scalation/analytics/par/package.html"> scalation.analytics.par </a>
+<td> - <a href = "scalation_modeling/target/scala-2.12/api/scalation/analytics/par/index.html"> scalation.analytics.par </a>
 <td> A subpackage supporting parallel analytics, including regression, time series analysis and clustering.
 <tr>
-<td> - <a href = "scalation_modeling/target/scala-2.12/api/scalation/analytics/classifier/package.html"> scalation.analytics.classifier </a>
+<td> - <a href = "scalation_modeling/target/scala-2.12/api/scalation/analytics/classifier/index.html"> scalation.analytics.classifier </a>
 <td> A subpackage supporting analytics, including several types of classifier.
 <tr>
-<td> -- <a href = "scalation_modeling/target/scala-2.12/api/scalation/analytics/classifier/par/package.html"> scalation.analytics.classifier.par </a>
+<td> -- <a href = "scalation_modeling/target/scala-2.12/api/scalation/analytics/classifier/par/index.html"> scalation.analytics.classifier.par </a>
 <td> A subpackage supporting parallel analytics, including several types of classifier.
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/graphalytics/package.html"> scalation.graphalytics </a>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/graphalytics/index.html"> scalation.graphalytics </a>
 <td> A package supporting graph analytics, including shortest path, subgraph isomorphism, etc.
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/graphalytics/mutable/package.html"> scalation.graphalytics.mutable </a>
+<td> - <a href = "scalation_modeling/target/scala-2.12/api/scalation/graphalytics/mutable/index.html"> scalation.graphalytics.mutable </a>
 <td> A package supporting graph analytics, including shortest path, subgraph isomorphism, etc. using mutable graphs.
 <!--
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/metamodel/package.html"> scalation.metamodel </a>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/metamodel/index.html"> scalation.metamodel </a>
 <td> A package supporting simulation metamodeling, espcially for optimization.
 -->
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/queueingnet/package.html"> scalation.queueingnet </a>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/queueingnet/index.html"> scalation.queueingnet </a>
 <td> A package supporting queueing network models.
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/tableau/package.html"> scalation.tableau </a>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/tableau/index.html"> scalation.tableau </a>
 <td> A simulation engine for tableau oriented (spreedsheet like) models.
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/event/package.html"> scalation.event </a>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/event/index.html"> scalation.event </a>
 <td> A simulation engine for event oriented models such as Event Scheduling or Event Graphs.
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/process/package.html"> scalation.process </a>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/process/index.html"> scalation.process </a>
 <td> A simulation engine for process oriented models such as Process-Interaction Models.
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/dynamics/package.html"> scalation.dynamics </a>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/dynamics/index.html"> scalation.dynamics </a>
 <td> A simulation engine for systems dynamics (continuous simulation), which includes
 general-purpose Ordinary Differential Equation (ODE) solvers.
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/dynamics_pde/package.html"> scalation.dynamics_pde </a>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/dynamics_pde/index.html"> scalation.dynamics_pde </a>
 <td> A simulation engine for systems dynamics (continuous simulation), which includes
 category-specific Partial Differential Equation (PDE) solvers.
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/physics/package.html"> scalation.physics </a>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/physics/index.html"> scalation.physics </a>
 <td> A physics engine for simulation based games (Under development).
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/activity/package.html"> scalation.activity </a>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/activity/index.html"> scalation.activity </a>
 <td> A simulation engine for activity oriented models such as Petri Nets.
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/state/package.html"> scalation.state </a>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/state/index.html"> scalation.state </a>
 <td> A simulation engine for state oriented models such as Markov Chains.
 <tr>
 <tr>
 <td> APPLICATIONS
 <tr>
 <tr>
-<td> <a href = "scalation_models/target/scala-2.12/api/apps/activity/package.html"> apps.activity </a>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/activity/index.html"> apps.activity </a>
 <td> Example models for activity oriented models such as Petri Nets.
 <tr>
-<td> <a href = "scalation_models/target/scala-2.12/api/apps/analytics/package.html"> apps.analytics </a>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/analytics/index.html"> apps.analytics </a>
 <td> Example analytics problems.
 <tr>
-<td> <a href = "scalation_models/target/scala-2.12/api/apps/dynamics/package.html"> apps.dynamics </a>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/dynamics/index.html"> apps.dynamics </a>
 <td> Example models for systems dynamics (continuous simulation).
 <tr>
-<td> <a href = "scalation_models/target/scala-2.12/api/apps/event/package.html"> apps.event </a>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/event/index.html"> apps.event </a>
 <td> Example models for event oriented models such as Event Graphs.
 <tr>
-<td> <a href = "scalation_models/target/scala-2.12/api/apps/game/package.html"> apps.game </a>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/game/index.html"> apps.game </a>
 <td> Example simulation-oriented games.
 <tr>
-<td> <a href = "scalation_models/target/scala-2.12/api/apps/montecarlo/package.html"> apps.montecarlo </a>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/montecarlo/index.html"> apps.montecarlo </a>
 <td> Example Monte Carlo simulation.
 <tr>
-<td> <a href = "scalation_models/target/scala-2.12/api/apps/optimization/package.html"> apps.optimization </a>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/optimization/index.html"> apps.optimization </a>
 <td> Example optimization problems.
 <tr>
-<td> <a href = "scalation_models/target/scala-2.12/api/apps/process/package.html"> apps.process </a>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/process/index.html"> apps.process </a>
 <td> Example models for process oriented models such as Process-Interaction Models.
 <tr>
-<td> <a href = "scalation_models/target/scala-2.12/api/apps/simopt/package.html"> apps.simopt </a>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/simopt/index.html"> apps.simopt </a>
 <td> Example simulation optimization problems.
 <tr>
-<td> <a href = "scalation_models/target/scala-2.12/api/apps/state/package.html"> apps.state </a>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/state/index.html"> apps.state </a>
 <td> Example models for state oriented models such as Markov Chains.
 <tr>
-<td> <a href = "scalation_models/target/scala-2.12/api/apps/tableau/package.html"> apps.tableau </a>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/tableau/index.html"> apps.tableau </a>
 <td> Example models for tableau oriented (spreadheet like) models.
 </table>
 </blockquote>
@@ -483,7 +483,7 @@ including implementations for summary statitistics and ANOVA.
 <td> <a href = "scalation_modeling/src/main/scala/scalation/graphalytics/"> scalation.graphalytics </a>
 <td> A package supporting graph analytics, including shotest path, subgraph isomorphism, etc.
 <tr>
-<td> <a href = "scalation_modeling/src/main/scala/scalation/graphalytics/mutable/"> scalation.graphalytics.mutable </a>
+<td> - <a href = "scalation_modeling/src/main/scala/scalation/graphalytics/mutable/"> scalation.graphalytics.mutable </a>
 <td> A package supporting graph analytics, including shotest path, subgraph isomorphism, etc. using mutable graphs.
 <!--
 <tr>

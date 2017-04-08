@@ -377,7 +377,7 @@ class OneBAN(x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String],
         val itestA = randOrder.split(nx)
         for (itest <- itestA) {
             reset ()
-            trainQ (itest ().asInstanceOf [Array [Int]])
+            trainQ (itest ().array)
             sum += test (itest)
         } // for
         sum / nx.toDouble
