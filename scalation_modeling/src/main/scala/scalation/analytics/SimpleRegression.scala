@@ -124,6 +124,7 @@ object SimpleRegressionTest extends App
     // 4 data points:
     val x = VectorD (1, 2, 3, 4)
     val y = VectorD (1, 3, 3, 4)
+//  val y = VectorD (1, 3, 2, 4)
 
     println ("x = " + x)
     println ("y = " + y)

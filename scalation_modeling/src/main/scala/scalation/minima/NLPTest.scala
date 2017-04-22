@@ -17,10 +17,10 @@ import scalation.linalgebra.VectorD
 /** The `NLPTest1` object used to test several Non-Linear Programming (NLP) algorithms
  *  on unconstrained problems.
  *  Algorithms:
- *      'sdcs' - Steepest Descent with Custom Line Search
- *      'sdgs' - Steepest Descent with Golden Section Line Search
+ *      'sdcs' - Gradient Descent with Custom Line Search
+ *      'sdgs' - Gradient Descent with Golden Section Line Search
  *      'prcg' - Polak-Ribiere Conjugate Gradient with Golden Section Line Search
- *      'sdws' - Steepest Descent with Wolfe Line Search
+ *      'sdws' - Gradient Descent with Wolfe Line Search
  *      'bfgs' - Broyden–Fletcher–Goldfarb–Shanno with Wolfe Line Search
  */
 object NLPTest1 extends App
@@ -37,7 +37,7 @@ object NLPTest1 extends App
         val x0   = new VectorD (n)          // zero vector
         var x    = x0
 
-        val sdgs = new SteepestDescent (f)
+        val sdgs = new GradientDescent (f)
         x = sdgs.solve (x0)
         println ("sdgs: optimal solution x = " + x + " with an objective value f(x) = " + f(x))
 
@@ -109,7 +109,7 @@ object NLPTest2 extends App
         val x0   = new VectorD (n)          // zero vector
         var x    = x0
 
-        val sdcs = new SteepestDescent (f)
+        val sdcs = new GradientDescent (f)
         x = sdcs.solve (x0)
         println ("sdgs: optimal solution x = " + x + " with an objective value f(x) = " + f(x))
 

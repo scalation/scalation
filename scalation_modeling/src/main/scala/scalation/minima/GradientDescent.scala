@@ -15,7 +15,7 @@ import scalation.linalgebra.VectorD
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `SteepestDescent` class solves unconstrained Non-Linear Programming (NLP)
+/** The `GradientDescent` class solves unconstrained Non-Linear Programming (NLP)
  *  problems using the Steepest Descent algorithm.  Given a function 'f' and a
  *  starting point 'x', the algorithm computes the gradient and takes steps in
  *  the opposite direction.  The algorithm iterates until it converges.  The class
@@ -30,7 +30,7 @@ import scalation.util.Error
  *  @param exactLS  whether to use exact (e.g., `GoldenLS`)
  *                            or inexact (e.g., `WolfeLS`) Line Search
  */
-class SteepestDescent (f: FunctionV2S, exactLS: Boolean = true)
+class GradientDescent (f: FunctionV2S, exactLS: Boolean = true)
       extends Minimizer with Error
 {
     private val DEBUG    = true                 // debug flag
@@ -96,20 +96,21 @@ class SteepestDescent (f: FunctionV2S, exactLS: Boolean = true)
         x                                              // return the current point
     } // solve
 
-} // SteepestDescent class
+} // GradientDescent class
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `SteepestDescentTest` object is used to test the `SteepestDescent` class.
+/** The `GradientDescentTest` object is used to test the `GradientDescent` class.
+ *  > run-main scalation.minima.GradientDescentTest
  */
-object SteepestDescentTest extends App
+object GradientDescentTest extends App
 {
     var x0 = VectorD (0.0, 0.0)                     // starting point
     var x: VectorD = null                           // optimal solution
 
     println ("\nProblem 1: (x_0 - 2)^2 + (x_1 - 3)^2 + 1") 
     def f (x: VectorD): Double = (x(0) - 2.0) * (x(0) - 2.0) + (x(1) - 3.0) * (x(1) - 3.0) + 1.0
-    val solver = new SteepestDescent (f)
+    val solver = new GradientDescent (f)
     x = solver.solve (x0)
     println ("optimal solution = " + x + ", objective value = " + f(x))
 
@@ -122,13 +123,13 @@ object SteepestDescentTest extends App
     println ("optimal solution = " + x + ", objective value = " + f(x))
 
     println ("\nProblem 3: x_0/4 + 5x_0^2 + x_0^4 - 9x_0^2 x_1 + 3x_1^2 + 2x_1^4")
-    // @see http://math.fullerton.edu/mathews/n2003/gradientsearch/GradientSearchMod/Links/GradientSearchMod_lnk_5.html
+    // @see math.fullerton.edu/mathews/n2003/gradientsearch/GradientSearchMod/Links/GradientSearchMod_lnk_5.html
     x0 = VectorD (0.0, 0.0)
     def f3 (x: VectorD): Double = x(0)/4.0 + 5.0*x(0)*x(0) + pow(x(0),4) -
                                   9.0*x(0)*x(0)*x(1) + 3.0*x(1)*x(1) + 2.0*pow(x(1),4)
-    val solver3 = new SteepestDescent (f3)
+    val solver3 = new GradientDescent (f3)
     x = solver3.solve (x0)
     println ("optimal solution = " + x + ", objective value = " + f3(x))
 
-} // SteepestDescentTest
+} // GradientDescentTest
 
