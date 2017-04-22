@@ -14,7 +14,7 @@ import math.{min, sqrt}
 
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.math._
-import scalation.minima.ConjGradient
+import scalation.minima.ConjugateGradient
 import scalation.stat.vectorD2StatVector
 import scalation.util.Error
 
@@ -71,7 +71,7 @@ class PortfolioOpt (r: MatrixD, label: Array [String])
         // require the vector to sum to 1 and each element to be non-negative
         def g (x: VectorD) = (1.0 - x.sum)~^2 + neg (x)~^2
 
-        val solver = new ConjGradient (f, g, true)        // quadratic optimizer
+        val solver = new ConjugateGradient (f, g, true)        // quadratic optimizer
         val x   = solver.solve (x0, .1)                   // optimal x vector
         val f_x = f(x)                                    // optimal objective function value
         (x, f_x)                                          // return optimal (x, f(x))

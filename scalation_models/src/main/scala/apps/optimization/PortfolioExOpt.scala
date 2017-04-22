@@ -14,7 +14,7 @@ import math.{abs, sqrt}
 
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.stat.StatVector
-import scalation.minima.ConjGradient
+import scalation.minima.ConjugateGradient
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PortfolioExOpt` object solves the following Quadratic Programming 'QP' problem:
@@ -75,7 +75,7 @@ object PortfolioExOpt extends App
     def f (x: VectorD) = -(mean dot x) / sqrt((cova * x) dot x) 
     def g (x: VectorD) = (x.sum - 1.0) + (1.0 - x.sum)
 
-    val solver = new ConjGradient (f, g, false)
+    val solver = new ConjugateGradient (f, g, false)
     var x = solver.solve (x0)
 
     println ("optimal solution x = " + x + " with an objective value f(x) = " + f(x))

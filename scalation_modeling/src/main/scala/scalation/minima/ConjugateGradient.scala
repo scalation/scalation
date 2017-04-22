@@ -17,7 +17,7 @@ import scalation.linalgebra.VectorD
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `ConjGradient` class implements the Polak-Ribiere Conjugate Gradient (PR-CG)
+/** The `ConjugateGradient` class implements the Polak-Ribiere Conjugate Gradient (PR-CG)
  *  Algorithm for solving Non-Linear  Programming (NLP) problems.  PR-CG determines
  *  a search direction as a weighted combination of the steepest descent direction
  *  (-gradient) and the previous direction.  The weighting is set by the beta function,
@@ -34,7 +34,7 @@ import scalation.util.Error
  *  @param exactLS  whether to use exact (e.g., `GoldenLS`)
  *                            or inexact (e.g., `WolfeLS`) Line Search
  */
-class ConjGradient (f: FunctionV2S, g: FunctionV2S = null,
+class ConjugateGradient (f: FunctionV2S, g: FunctionV2S = null,
                     ineq: Boolean = true, exactLS: Boolean = true)
       extends Minimizer with Error
 {
@@ -133,27 +133,28 @@ class ConjGradient (f: FunctionV2S, g: FunctionV2S = null,
         x                                              // return the current point
     } // solve
 
-} // ConjGradient class
+} // ConjugateGradient class
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `ConjGradientTest` object is used to test the `ConjGradient` class.
+/** The `ConjugateGradientTest` object is used to test the `ConjugateGradient` class.
+ *  > run-main scalation.minima.ConjugateGradientTest
  */
-object ConjGradientTest extends App
+object ConjugateGradientTest extends App
 {
     val x0 = new VectorD (2)
 
     println ("\nMinimize: (x_0 - 3)^2 + (x_1 - 4)^2 + 1")
     def f (x: VectorD): Double = (x(0) - 3.0) * (x(0) - 3.0) + (x(1) - 4.0) * (x(1) - 4.0) + 1.0
-    var solver = new ConjGradient (f)
+    var solver = new ConjugateGradient (f)
     var x = solver.solve (x0)
     println ("optimal solution x = " + x + " with an objective value f(x) = " + f(x))
 
     println ("\nMinimize: x_0^4 + (x_0 - 3)^2 + (x_1 - 4)^2 + 1")
     def g (x: VectorD): Double = pow (x(0), 4.0) + (x(0) - 3.0) * (x(0) - 3.0) + (x(1) - 4.0) * (x(1) - 4.0) + 1.0
-    solver = new ConjGradient (g)
+    solver = new ConjugateGradient (g)
     x = solver.solve (x0)
     println ("optimal solution x = " + x + " with an objective value g(x) = " + g(x))
 
-} // ConjGradientTest object
+} // ConjugateGradientTest object
 

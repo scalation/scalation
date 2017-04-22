@@ -72,10 +72,11 @@ class CoordinateDescent (f: FunctionV2S, exactLS: Boolean = true)
         var down = true                                       // moving down flag
 
         for (k <- 1 to MAX_ITER if down && dist > toler) {
-
-            for (j <- 0 until n) {                            // cycle thru coordinates - establish direction
+            
+            for (fb <- 1 to -1 by -2; j <- 0 until n) {        // cycle thru coordinates - establish direction
+                            
                 if (j > 0) dir(j-1) = 0.0
-                dir(j) = 1.0
+                dir(j) = fb                                   // set direction forward of backward by fb
                 y      = x + dir * lineSearch (x, dir, step)  // determine the next point
                 f_y    = f(y)                                 // objective function value for next point
 
@@ -101,19 +102,25 @@ object CoordinateDescentTest extends App
     var x0 = VectorD (0.0, 0.0)                     // starting point
     var x: VectorD = null                           // optimal solution
 
-    println ("\nProblem 1: (x_0 - 2)^2 + (x_1 - 3)^2 + 1") 
-    def f (x: VectorD): Double = (x(0) - 2.0) * (x(0) - 2.0) + (x(1) - 3.0) * (x(1) - 3.0) + 1.0
-    val solver = new CoordinateDescent (f)
+    println ("\nProblem 1: (x_0 - 3)^2 + (x_1 - 4)^2 + 1") 
+    def f (x: VectorD): Double = (x(0) - 3.0) * (x(0) - 3.0) + (x(1) - 4.0) * (x(1) - 4.0) + 1.0
+    var solver = new CoordinateDescent (f)
     x = solver.solve (x0)
     println ("optimal solution = " + x + ", objective value = " + f(x))
+
+    println ("\nMinimize: x_0^4 + (x_0 - 3)^2 + (x_1 - 4)^2 + 1")
+    def g (x: VectorD): Double = pow (x(0), 4.0) + (x(0) - 3.0) * (x(0) - 3.0) + (x(1) - 4.0) * (x(1) - 4.0) + 1.0
+    solver = new CoordinateDescent (g)
+    x = solver.solve (x0)
+    println ("optimal solution x = " + x + " with an objective value g(x) = " + g(x))
 
     println ("\nProblem 3: x_0/4 + 5x_0^2 + x_0^4 - 9x_0^2 x_1 + 3x_1^2 + 2x_1^4")
     // @see math.fullerton.edu/mathews/n2003/gradientsearch/GradientSearchMod/Links/GradientSearchMod_lnk_5.html
     x0 = VectorD (0.0, 0.0)
     def f3 (x: VectorD): Double = x(0)/4.0 + 5.0*x(0)*x(0) + pow(x(0),4) -
                                   9.0*x(0)*x(0)*x(1) + 3.0*x(1)*x(1) + 2.0*pow(x(1),4)
-    val solver3 = new CoordinateDescent (f3)
-    x = solver3.solve (x0)
+    solver = new CoordinateDescent (f3)
+    x = solver.solve (x0)
     println ("optimal solution = " + x + ", objective value = " + f3(x))
 
 } // CoordinateDescentTest

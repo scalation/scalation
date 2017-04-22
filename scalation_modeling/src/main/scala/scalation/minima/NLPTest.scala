@@ -41,7 +41,7 @@ object NLPTest1 extends App
         x = sdgs.solve (x0)
         println ("sdgs: optimal solution x = " + x + " with an objective value f(x) = " + f(x))
 
-        val prcg = new ConjGradient (f)
+        val prcg = new ConjugateGradient (f)
         x = prcg.solve (x0)
         println ("prcg: optimal solution x = " + x + " with an objective value f(x) = " + f(x))
 
@@ -113,7 +113,7 @@ object NLPTest2 extends App
         x = sdcs.solve (x0)
         println ("sdgs: optimal solution x = " + x + " with an objective value f(x) = " + f(x))
 
-        val prcg = new ConjGradient (f, g)
+        val prcg = new ConjugateGradient (f, g)
         x = prcg.solve (x0)
         println ("prcg: optimal solution x = " + x + " with an objective value f(x) = " + f(x))
 

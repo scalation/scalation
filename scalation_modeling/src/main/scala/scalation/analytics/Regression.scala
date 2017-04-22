@@ -97,6 +97,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
         b = if (x_pinv == null) fac.solve (x.t * y).asInstanceOf [VecT]   // FIX
             else x_pinv * y                                     // parameter vector [b_0, b_1, ... b_k]
         e = y - x * b                                           // residual/error vector
+        sseF ()                                                 // compute and save sum of squared errors
         diagnose (y, e)
     } // train
 
@@ -214,6 +215,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
             println ("%7s | %10.6f | %10.6f | %8.4f | %9.5f".format ("x" + sub(j), b(j), stdErr(j), t(j), p(j)))
         } // for
         println ()
+        println ("SSE:             %.4f".format (sse))
         println ("Residual stdErr: %.4f on %d degrees of freedom".format (sqrt (sse/(m-k-1.0)), k.toInt))
         println ("R-Squared:       %.4f, Adjusted rSquared:  %.4f".format (rSquared, rBarSq))
         println ("F-Statistic:     %.4f on %d and %d DF".format (fStat, k.toInt, (m-k-1).toInt))

@@ -710,7 +710,7 @@ class SparseVectorC (val dim_ : Int,
     def indexOf (x: Complex, e: Int = dim): Int =
     {        
         if (x =~ 0.0) { for (i <- range if this(i) =~ 0.0) return i; -1 }
-        for (x <- v if (x._1 < e && x._2 == x)) return x._1; -1 
+        for (y <- v if y._1 < e && y._2 == x) return y._1; -1 
     } // indexOf
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

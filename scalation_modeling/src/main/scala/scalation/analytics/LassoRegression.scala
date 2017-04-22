@@ -14,7 +14,7 @@ import scala.math.{abs, log, pow, sqrt}
 
 import scalation.linalgebra._
 import scalation.math.double_exp
-import scalation.minima.CoordinateDescent
+import scalation.minima._
 import scalation.plot.Plot
 import scalation.random.CDF.studentTCDF
 import scalation.util.{Error, time}
@@ -46,7 +46,7 @@ import RegTechnique._
  *  @param λ0         the initial vale for the regularization weight
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: Double = 0.1, technique: RegTechnique = QR)
+class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: Double = 0.01, technique: RegTechnique = QR)
       extends Predictor with Error
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
@@ -89,10 +89,15 @@ class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: D
      */
     def train ()
     {
-        val optimer = new CoordinateDescent (f)                 // coordinate descent optimer
+        val optimer = new CoordinateDescent (f)                 // Coordinate Descent optimizer
+//        val optimer = new GradientDescent (f)                 // Gradient Descent optimizer
+//        val optimer = new ConjGradient (f)                    // Conjugate Gradient optimizer
+//        val optimer = new QuasiNewton (f)                     // Quasi-Newton optimizer
+//        val optimer = new NelderMeadSimplex (f, x.dim2)       // Nelder-Mead optimizer
         val b0 = new VectorD (k+1)                              // initial guess for coefficient vector
-        b = optimer.solve (b0, 2.0)                             // find an optimal solution for coefficients
+        b = optimer.solve (b0, 0.5)                             // find an optimal solution for coefficients
         e = y - x * b                                           // residual/error vector
+        sseF ()                                                 // compute and save sum of squared errors
         diagnose (y, e)
     } // train
 
@@ -153,11 +158,13 @@ class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: D
             println ("%7s | %10.6f | %10.6f | %8.4f | %9.5f".format ("x" + sub(j), b(j), stdErr(j), t(j), p(j)))
         } // for
         println ()
-        println ("Residual stdErr: %.4f on %d degrees of freedom".format (sqrt (sse/(m-k-1.0)), k.toInt))
+        println ("SSE:             %.4f".format (sse))
+        println ("Residual stdErr: %.4f on %d degrees of freedom".format (sqrt (sse/(m-k-1.0)), k))
         println ("R-Squared:       %.4f, Adjusted rSquared:  %.4f".format (rSquared, rBarSq))
-        println ("F-Statistic:     %.4f on %d and %d DF".format (fStat, k.toInt, (m-k-1).toInt))
+        println ("F-Statistic:     %.4f on %d and %d DF".format (fStat, k, (m-k-1).toInt))
         println ("AIC:             %.4f".format (aic))
         println ("BIC:             %.4f".format (bic))
+        println ("λ:               %.4f".format (λ))
         println ("-" * 80)
     } // report
 
