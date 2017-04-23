@@ -8,8 +8,6 @@
  *  @see arxiv.org/pdf/1502.04759.pdf
  */
 
-//  U N D E R   D E V E L O P M E N T
-
 package scalation.minima
 
 import scala.math.{abs, max, pow}
@@ -21,7 +19,7 @@ import scalation.util.Error
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CoordinateDescent` class solves unconstrained Non-Linear Programming (NLP)
  *  problems using the Coordinate Descent algorithm.  Given a function 'f' and a
- *  starting point 'x', the algorithm picks coordinate directions (cyclically) and
+ *  starting point 'x0', the algorithm picks coordinate directions (cyclically) and
  *  takes steps in the those directions.  The algorithm iterates until it converges.
  *
  *  dir_k = kth coordinate direction

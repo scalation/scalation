@@ -51,12 +51,12 @@ class QuasiNewton (f: FunctionV2S, g: FunctionV2S = null,
     private var df: Array [FunctionV2S] = null   // array of partials
     private var b: MatrixD    = null         // approx. Hessian matrix (use b or binv)
     private var binv: MatrixD = null         // inverse of approx. Hessian matrix
-    private var bfgs          = true         // use BFGS (true) or Steepest-Descent (false)
+    private var bfgs          = true         // use BFGS (true) or Gradient Descent (false)
 
     type Pair = Tuple2 [VectorD, VectorD]    // pair of vectors
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Use the Steepest-Descent algorithm rather than the default BFGS algorithm.
+    /** Use the Gradient Descent algorithm rather than the default BFGS algorithm.
      */
     def setSteepest () { bfgs = false }
 
@@ -166,7 +166,7 @@ class QuasiNewton (f: FunctionV2S, g: FunctionV2S = null,
 //              dir = -(b.inverse * xx._2)            // next search direction using BFGS and 'b'
 //              updateB (s, xx._2 - x._2)             // update the deflection matrix 'b'
             } else {
-                dir = -xx._2                          // next search direction using Steepest-Descent
+                dir = -xx._2                          // next search direction using Gradient Descent
             } // if
             if (DEBUG) println ("solve: (k = " + k + ") move from " + x._1 + " to " + xx._1
                               + " where fg(xx._1) = " + fg(xx._1))

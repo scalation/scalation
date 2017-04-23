@@ -91,7 +91,7 @@ class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: D
     {
         val optimer = new CoordinateDescent (f)                 // Coordinate Descent optimizer
 //        val optimer = new GradientDescent (f)                 // Gradient Descent optimizer
-//        val optimer = new ConjGradient (f)                    // Conjugate Gradient optimizer
+//        val optimer = new ConjugateGradient (f)               // Conjugate Gradient optimizer
 //        val optimer = new QuasiNewton (f)                     // Quasi-Newton optimizer
 //        val optimer = new NelderMeadSimplex (f, x.dim2)       // Nelder-Mead optimizer
         val b0 = new VectorD (k+1)                              // initial guess for coefficient vector

@@ -16,8 +16,8 @@ import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GradientDescent` class solves unconstrained Non-Linear Programming (NLP)
- *  problems using the Steepest Descent algorithm.  Given a function 'f' and a
- *  starting point 'x', the algorithm computes the gradient and takes steps in
+ *  problems using the Gradient Descent algorithm.  Given a function 'f' and a
+ *  starting point 'x0', the algorithm computes the gradient and takes steps in
  *  the opposite direction.  The algorithm iterates until it converges.  The class
  *  assumes that partial derivative functions are not available unless explicitly
  *  given via the 'setDerivatives' method.
@@ -63,7 +63,7 @@ class GradientDescent (f: FunctionV2S, exactLS: Boolean = true)
     } // lineSearch
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve the Non-Linear Programming (NLP) problem using the Steepest Descent
+    /** Solve the Non-Linear Programming (NLP) problem using the Gradient Descent
      *  algorithm.
      *  @param x0     the starting point
      *  @param step   the initial step size
@@ -131,5 +131,5 @@ object GradientDescentTest extends App
     x = solver3.solve (x0)
     println ("optimal solution = " + x + ", objective value = " + f3(x))
 
-} // GradientDescentTest
+} // GradientDescentTest object
 

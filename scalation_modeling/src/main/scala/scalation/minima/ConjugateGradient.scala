@@ -121,7 +121,7 @@ class ConjugateGradient (f: FunctionV2S, g: FunctionV2S = null,
             y   = x + dir * lineSearch (x, dir, step)  // determine the next point
             f_y = fg(y)                                // objective function value for next point
             dir0 = dir                                 // save the current direction
-            dir = -gradient (fg, y)                    // next search direction using Steepest-Descent
+            dir = -gradient (fg, y)                    // next search direction using  Gradient Descent
             if (k > 1) dir += dir0 * beta (dir0, dir)  // modify search direction using PR-CG
 
             if (DEBUG) println ("solve: k = " + k + ", y = " + y + ", f_y = " + f_y + ", dir = " + dir)
