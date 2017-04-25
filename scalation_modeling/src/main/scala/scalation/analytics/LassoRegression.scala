@@ -86,6 +86,7 @@ class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: D
      *      y  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_1 , ... x_k] + e
      *  regularized by the sum of magnitudes of the coefficients.
      *  @see pdfs.semanticscholar.org/969f/077a3a56105a926a3b0c67077a57f3da3ddf.pdf
+     *  @see `scalation.minima.LassoAdmm`
      */
     def train ()
     {
