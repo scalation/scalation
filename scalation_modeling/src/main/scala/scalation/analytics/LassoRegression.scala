@@ -1,0 +1,217 @@
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.3
+ *  @date    Tue Apr 18 14:24:14 EDT 2017
+ *  @see     LICENSE (MIT style license file).
+ */
+
+//  U N D E R   D E V E L O P M E N T
+
+package scalation.analytics
+
+import scala.math.{abs, log, pow, sqrt}
+
+import scalation.linalgebra._
+import scalation.math.double_exp
+import scalation.minima._
+import scalation.plot.Plot
+import scalation.random.CDF.studentTCDF
+import scalation.util.{Error, time}
+import scalation.util.Unicode.sub
+
+import RegTechnique._
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `LassoRegression` class supports multiple linear regression.  In this case,
+ *  'x' is multi-dimensional [1, x_1, ... x_k].  Fit the parameter vector 'b' in
+ *  the regression equation
+ *  <p>
+ *      y  =  b dot x + e  =  b_0 + b_1 * x_1 + ... b_k * x_k + e
+ *  <p>
+ *  where 'e' represents the residuals (the part not explained by the model).
+ *  Use Least-Squares (minimizing the residuals) to fit the parameter vector
+ *  <p>
+ *      b  =  x_pinv * y   [ alternative: b  =  solve (y) ]
+ *  <p>
+ *  where 'x_pinv' is the pseudo-inverse.  Three techniques are provided:
+ *  <p>
+ *      'QR'         // QR Factorization: slower, more stable (default)
+ *      'Cholesky'   // Cholesky Factorization: faster, less stable (reasonable choice)
+ *      'Inverse'    // Inverse/Gaussian Elimination, classical textbook technique (outdated)
+ *  <p>
+ *  @see see.stanford.edu/materials/lsoeldsee263/05-ls.pdf
+ *  @param x          the input/design m-by-n matrix augmented with a first column of ones
+ *  @param y          the response vector
+ *  @param λ0         the initial vale for the regularization weight
+ *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
+ */
+class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: Double = 0.01, technique: RegTechnique = QR)
+      extends Predictor with Error
+{
+    if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
+    if (x.dim1 <= x.dim2) flaw ("constructor", "not enough data rows in matrix to use regression")
+
+    private val DEBUG    = false                                // debug flag
+    private val k        = x.dim2 - 1                           // number of variables (k = n-1)
+    private val m        = x.dim1.toDouble                      // number of data points (rows)
+    private val r_df     = (m-1.0) / (m-k-1.0)                  // ratio of degrees of freedom
+    private var rSquared = -1.0                                 // coefficient of determination (quality of fit)
+    private var rBarSq   = -1.0                                 // Adjusted R-squared
+    private var fStat    = -1.0                                 // F statistic (quality of fit)
+
+    private var aic      = -1.0                                 // Akaike Information Criterion (AIC)
+    private var bic      = -1.0                                 // Bayesian Information Criterion (BIC)
+
+    private var stdErr: VectoD = _                              // standard error of coefficients for each x_j
+    private var t: VectoD      = _                              // t statistics for each x_j
+    private var p: VectoD      = _                              // p values for each x_j
+
+    private var λ = λ0                                          // weight to put on regularization
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the sum of squares error + λ * sum of the magnitude  of coefficients.
+     *  This is the objective function to be minimized.
+     *  @param b  the vector of coefficients/parameters
+     */
+    def f (b: VectorD): Double =
+    {
+        e = y - x * b                                           // calculate the residuals/error
+        e dot e + λ * b.sumAbs 
+    } // f
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the predictor by fitting the parameter vector (b-vector) in the
+     *  multiple regression equation
+     *      y  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_1 , ... x_k] + e
+     *  regularized by the sum of magnitudes of the coefficients.
+     *  @see pdfs.semanticscholar.org/969f/077a3a56105a926a3b0c67077a57f3da3ddf.pdf
+     *  @see `scalation.minima.LassoAdmm`
+     */
+    def train ()
+    {
+        val optimer = new CoordinateDescent (f)                 // Coordinate Descent optimizer
+//        val optimer = new GradientDescent (f)                 // Gradient Descent optimizer
+//        val optimer = new ConjugateGradient (f)               // Conjugate Gradient optimizer
+//        val optimer = new QuasiNewton (f)                     // Quasi-Newton optimizer
+//        val optimer = new NelderMeadSimplex (f, x.dim2)       // Nelder-Mead optimizer
+        val b0 = new VectorD (k+1)                              // initial guess for coefficient vector
+        b = optimer.solve (b0, 0.5)                             // find an optimal solution for coefficients
+        e = y - x * b                                           // residual/error vector
+        sseF ()                                                 // compute and save sum of squared errors
+        diagnose (y, e)
+    } // train
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute diagostics for the regression model.
+     *  @param yy  the response vector
+     *  @param e   the residual/error vector
+     */
+    private def diagnose (yy: VectoD, e: VectoD)
+    {
+        val sst  = (yy dot yy) - yy.sum~^2.0 / m                // total sum of squares
+        val ssr  = sst - sse                                    // regression sum of squares
+        rSquared = ssr / sst                                    // coefficient of determination
+        rBarSq   = 1.0 - (1.0-rSquared) * r_df                  // R-bar-squared (adjusted R-squared)
+        fStat    = ssr * (m-k-1.0)  / (sse * k)                 // F statistic (msr / mse)
+        aic      = m * log (sse) - m * log (m) + 2.0 * (k+1)    // Akaike Information Criterion (AIC)
+        bic      = aic + (k+1) * (log (m) - 2.0)                // Bayesian Information Criterion (BIC)
+
+        val facCho = new Fac_Cholesky (x.t * x)                 // FIX - avoid re-calculating
+        val varEst = sse / (m-k-1.0)                            // variance estimate
+        val l      = facCho.factor1 ()                          // cholesky factorization
+        val varCov = l.inverse.t * l.inverse * varEst           // variance covariance matrix
+        val vars   = varCov.getDiag ()                          // individual variances
+
+        stdErr = vars.map ((x: Double) => sqrt (x))                                   // standard error of coefficients
+        t      = b / stdErr                                                           // Student's T statistic
+        p      = t.map ((x: Double) => 2.0 * studentTCDF (-abs (x), (m-k-1).toInt))   // p values
+    } // diagnose
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the quality of fit including 'rSquared'.
+     */
+    def fit: VectorD = VectorD (rSquared, rBarSq, fStat)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
+     *  e.g., (b_0, b_1, b_2) dot (1, z_1, z_2).
+     *  @param z  the new vector to predict
+     */
+    def predict (z: VectoD): Double = b dot z
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Predict the value of y = f(z) by evaluating the formula y = b dot z for
+     *  each row of matrix z.
+     *  @param z  the new matrix to predict
+     */
+    def predict (z: MatT): VectoD = z * b
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Print results and diagnostics for each predictor 'x_j' and the overall
+     *  quality of fit.
+     */
+    def report ()
+    {
+        println ("Coefficients:")
+        println ("        | Estimate   |   StdErr   |  t value | Pr(>|t|)")
+        for (j <- 0 until b.dim) {
+            println ("%7s | %10.6f | %10.6f | %8.4f | %9.5f".format ("x" + sub(j), b(j), stdErr(j), t(j), p(j)))
+        } // for
+        println ()
+        println ("SSE:             %.4f".format (sse))
+        println ("Residual stdErr: %.4f on %d degrees of freedom".format (sqrt (sse/(m-k-1.0)), k))
+        println ("R-Squared:       %.4f, Adjusted rSquared:  %.4f".format (rSquared, rBarSq))
+        println ("F-Statistic:     %.4f on %d and %d DF".format (fStat, k, (m-k-1).toInt))
+        println ("AIC:             %.4f".format (aic))
+        println ("BIC:             %.4f".format (bic))
+        println ("λ:               %.4f".format (λ))
+        println ("-" * 80)
+    } // report
+
+} // LassoRegression class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `LassoRegressionTest` object tests `LassoRegression` class using the following
+ *  regression equation.
+ *  <p>
+ *      y  =  b dot x  =  b_0 + b_1*x_1 + b_2*x_2.
+ *  <p>
+ *  Test regression and backward elimination.
+ *  @see http://statmaster.sdu.dk/courses/st111/module03/index.html
+ *  > run-main scalation.analytics.LassoRegressionTest
+ */
+object LassoRegressionTest extends App
+{
+    // 5 data points: constant term, x_1 coordinate, x_2 coordinate
+    val x = new MatrixD ((5, 3), 1.0, 36.0,  66.0,               // 5-by-3 matrix
+                                 1.0, 37.0,  68.0,
+                                 1.0, 47.0,  64.0,
+                                 1.0, 32.0,  53.0,
+                                 1.0,  1.0, 101.0)
+    val y = VectorD (745.0, 895.0, 442.0, 440.0, 1598.0)
+    val z = VectorD (1.0, 20.0, 80.0)
+
+//  println ("model: y = b_0 + b_1*x_1 + b_2*x_2")
+    println ("model: y = b₀ + b₁*x₁ + b₂*x₂")
+    println ("x = " + x)
+    println ("y = " + y)
+
+    val rg = new LassoRegression (x, y)
+    rg.train ()
+    println ("b = " + rg.coefficient)
+    rg.report ()
+
+    println ("fit = " + rg.fit)
+    val yp = rg.predict (z)                              // predict y for one point
+    println ("predict (" + z + ") = " + yp)
+
+    val yyp = rg.predict (x)                             // predict y for several points
+    println ("predict (" + x + ") = " + yyp)
+
+    new Plot (x.col(1), y, yyp)
+    new Plot (x.col(2), y, yyp)
+
+} // LassoRegressionTest object
+
