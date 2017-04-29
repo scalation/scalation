@@ -1,0 +1,46 @@
+
+package scalation.calculus
+
+import scalation.math.Combinatorics.fac
+
+case class Poly (c: Double*)
+{
+    private val DEBUG = true
+    private var nzeros, ii = 0
+    while (c(ii) == 0.0) { nzeroes += 1; ii += 1 }
+
+    val deg = c.size - 1 - nzeros
+    private val rng = 0 to deg
+
+    if (DEBUG) println (s"Poly ($c) has degree $deg")
+
+    def eval (x: Double): Double =
+    {
+        var sum = 0.0
+        for (ci <- c) sum = x * sum + ci 
+        sum
+    } // eval
+
+    def derv (): Poly =
+    {
+        Poly ((for (i <- rng) yield fac (i) * c(i)) :_*)
+    } // derv
+
+    override def toString: String =
+    {
+        val sb = new StringBuilder ()
+        for (i <- rng) sb.append (s"${c(i)} x^${deg_-i} + ")
+        sb.drop (3).toString
+    } // toString
+
+} // Poly class
+
+// run-main scalation.calculus.PolyTest
+
+object PolyTest extends App
+{
+    val pl = Poly (2.0, 3.0, 4.0)
+    println (s"pl = $pl")
+
+} // PolyTest object
+
