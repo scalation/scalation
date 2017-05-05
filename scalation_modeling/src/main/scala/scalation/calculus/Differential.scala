@@ -56,6 +56,7 @@ object Differential
      *  a 2-sided method (central difference).  Approximate the tangent line at
      *  '(x, f(x))' with the secant line through points '(x-h, f(x-h))' and '(x+h, f(x+h))'.
      *  Tends to be MORE ACCURATE than the 1-sided method.
+     *  Although a noun, 'derivative' was chosen over the verb 'differentiate'.
      *  @see www.math.montana.edu/frankw/ccp/modeling/continuous/heatflow2/firstder.htm
      *  @param f  the function whose derivative is sought
      *  @param x  the point (scalar) at which to estimate the derivative

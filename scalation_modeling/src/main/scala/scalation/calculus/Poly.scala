@@ -73,10 +73,44 @@ case class Poly (c: VectorD)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Take the derivative of 'this' polynomial, returning the result as a polynomial.
      */
-    def derv: Poly =
+    def derivative: Poly = Poly ((for (i <- 1 to deg) yield i * c(i)) :_*)
+
+    def Ⅾ : Poly = Poly ((for (i <- 1 to deg) yield i * c(i)) :_*)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Integrate 'this' polynomial, returning the result as a polynomial.
+     *  Note, the arbitrary constant 'c' for the indefinite integral is set to 1.
+     */
+    def integrate: Poly = Poly (1.0 +: (for (i <- 0 to deg) yield c(i) / (i+1.0)) :_*)
+
+    def ∫ : Poly = Poly (1.0 +: (for (i <- 0 to deg) yield c(i) / (i+1.0)) :_*)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Integrate 'this' polynomial on the interval 'on', returning its value as
+     *  a double.
+     *  @param on  the interval of integration
+     */
+    def integrate (on: Interval): Double =
     {
-        Poly ((for (i <- 1 to deg) yield i * c(i)) :_*)
-    } // derv
+        val pl = Poly (1.0 +: (for (i <- 0 to deg) yield c(i) / (i+1.0)) :_*)
+        pl (on._2) - pl (on._1)
+    } // integrate
+
+    def ∫ (on: Interval): Double =
+    {
+        val pl = Poly (1.0 +: (for (i <- 0 to deg) yield c(i) / (i+1.0)) :_*)
+        pl (on._2) - pl (on._1)
+    } // ∫
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Trim away trailing zero coefficients (i.e., those on highest order terms),
+     *  returning the resulting polynomial of possibly lower degree.
+     */
+    def trim: Poly = 
+    {
+        var i = deg; while (c(i) == 0.0) i -= 1          // skip trailing zeros
+        Poly (c.slice (0, i+1))                          // keep the rest
+    } // trim
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert the polynomial to a string.
@@ -116,18 +150,26 @@ object PolyTest extends App
     import scalation.plot.Plot
 
     val pl  = Poly (4.0, 3.0, 2.0)                  // example polynomial: 2 x^2 + 3 x + 4
-    val dpl = pl.derv                               // its derivative
+    val dpl = pl.derivative                         // its derivative
+    val ipl = pl.integrate                          // one of its indefinite integrals
+    val jpl = pl.integrate ((0.0, 2.0))             // one of its definite integrals
     val spl = pl + dpl                              // sum of polynomials and its dervivate
     val mpl = pl - dpl                              // difference of polynomial and its dervivate
     val tpl = pl * dpl                              // product of polynomial and its dervivate
+    val zpl = Poly (4.0, 0.0, 3.0, 0.0, 0.0)        // polynomial with trailing zero (e.g., 0 x^2)
 
     println (s"pl      = $pl")
     println (s"dpl     = $dpl")
+    println (s"ipl     = $ipl")
     println (s"spl     = $spl")
     println (s"mpl     = $mpl")
     println (s"tpl     = $tpl")
+    println (s"zpl     = $zpl")
+    println (s"t(zpl)  = ${zpl.trim}")
     println (s"pl (2)  = ${pl (2)}")
     println (s"dpl (2) = ${dpl (2)}")
+    println (s"ipl (2) = ${ipl (2)}")
+    println (s"jpl     = $jpl")
     println (s"spl (2) = ${spl (2)}")
     println (s"mpl (2) = ${mpl (2)}")
     println (s"tpl (2) = ${tpl (2)}")

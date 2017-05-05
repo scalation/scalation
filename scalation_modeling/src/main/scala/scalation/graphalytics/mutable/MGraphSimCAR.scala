@@ -16,7 +16,6 @@ import scala.collection.mutable.Map
 import scala.collection.mutable.{Set => SET}
 import scala.reflect.ClassTag
 
-import scalation.graphalytics.mutable.{ExampleMGraphS => EX_GRAPH}
 import scalation.util.{MultiSet, Wildcard}
 
 import LabelFunctions._
@@ -39,19 +38,11 @@ class MGraphSimCAR [TLabel: ClassTag] (g: MGraph [TLabel], q: MGraph [TLabel])
     for (u <- cLabel.indices) cLabel(u) = qChildLabels (q, u)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Apply the Graph Simulation pattern matching algorithm to find the mappings
-     *  from the query graph 'q' to the data graph 'g'.  These are represented by a
-     *  multi-valued function 'phi' that maps each query graph vertex 'u' to a
-     *  set of data graph vertices '{v}'.
-     */
-    def mappings (): Array [SET [Int]] = nisarMGraphSimCAR (feasibleMates ())
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given the mappings 'phi' produced by the 'feasibleMates' method,
-     *  eliminate mappings 'u -> v' when v's children fail to match u's.
+     *  prune mappings 'u -> v' where v's children fail to match u's.
      *  @param phi  array of mappings from a query vertex u to { graph vertices v }
      */
-    private def nisarMGraphSimCAR (phi: Array [SET [Int]]): Array [SET [Int]] =
+    def prune (phi: Array [SET [Int]]): Array [SET [Int]] =
     {
         var alter = true
         while (alter) {                                                    // check for matching children
@@ -81,10 +72,11 @@ class MGraphSimCAR [TLabel: ClassTag] (g: MGraph [TLabel], q: MGraph [TLabel])
             } // for           
         } // while
         phi
-    } // nisarMGraphSimCAR
+    } // prune
 
 } // MGraphSimCAR class
 
+import scalation.graphalytics.mutable.{ExampleMGraphS => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphSimCARTest` object is used to test the `MGraphSimCAR` class.

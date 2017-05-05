@@ -7,32 +7,66 @@
 
 <p>
 
+<ul>
+<li>
+<a href = "Graph.scala">Graph.scala</a>
+fixed label type <a href = "labelType.scala">LabelType</a>,
+node-labelled directed graphs where children are stored in immutable adjacency sets.
+<li>
+<a href = "mutable/Graph.scala">mutable.Graph.scala</a>
+generic label type [TLabel],
+node-labelled directed graphs where children are stored in mutable adjacency sets.
+<li>
+<a href = "mutable/MGraph.scala">mutable.MGraph.scala</a>
+generic label type [TLabel],
+node-labelled and edge labelled directed graphs where children are stored in mutable adjacency sets.
+</ul>
+
+<p>
+
 <table border = 3>
 <tr>
 <td> <b>Pattern Matcher</b>
-<td> <b>Graph</b> (parent ref)
+<td> <b>Graph</b> (parent refs)
 <td> <b>Graph</b>
-<td> <b>Digraph</b>
-<td> <b>MDigraph</b>
+<td> <b>mutable.Graph</b>
+<td> <b>mutable.Graph (CAR)</b>
+<td> <b>mutable.MGraph</b>
+<td> <b>mutable.MGraph (CAR)</b>
 <tr>
 <tr>
 <td> Graph Simulation
-<td> <a href = "GraphSim.scala">GraphSim.scala</a>
+<td> - No need for parent refs
 <td> <a href = "GraphSim2.scala">GraphSim2.scala</a>
-<td> <a href = "DigSim.scala">DigSim.scala</a>
-<td> <a href = "MDigSim.scala">MDigSim.scala</a>
+<td> <a href = "mutable/GraphSim.scala">mutable.GraphSim.scala</a>
+<td> <a href = "mutable/GraphSim.scala">mutable.GraphSim.scala</a>
+<td> <a href = "mutable/GraphSimCAR.scala">mutable.GraphSimCAR.scala</a>
+<td> <a href = "mutable/MGraphSim.scala">mutable.MGraphSim.scala</a>
+<td> <a href = "mutable/MGraphSimCAR.scala">mutable.MGraphSimCAR.scala</a>
 <tr>
 <td> Dual Simulation
 <td> <a href = "DualSim.scala">DualSim.scala</a> 
 <td> <a href = "DualSim2.scala">DualSim2.scala</a>
-<td> <a href = "DigDualSim.scala">DigDualSim.scala </a>
-<td> <a href = "MDigDualSim.scala">MDigDualSim.scala </a>
+<td> <a href = "mutable/DualSim.scala">mutable.DualSim.scala </a>
+<td> <a href = "mutable/DualSimCAR.scala">mutable.DualSimCAR.scala </a>
+<td> <a href = "mutable/MDualSim.scala">mutable.MDualSim.scala </a>
+<td> <a href = "mutable/MDualSimCAR.scala">mutable.MDualSimCAR.scala </a>
+<tr>
+<td> Strict Simulation
+<td> <a href = "StrictSim.scala">StrictSim.scala </a>
+<td> <a href = "StrictSim2.scala">StrictSim2.scala </a>
+<td> <a href = "mutable/StrictSim.scala">mutable.StrictSim.scala </a>
+<td> <a href = "mutable/StrictSimCAR.scala">mutable.StrictSimCAR.scala </a>
+<td> <a href = "mutable/MStrictSim.scala">mutable.MStrictSim.scala </a>
+<td> <a href = "mutable/MStrictSimCAR.scala">mutable.MStrictSimCAR.scala </a>
 <tr>
 <td> Tight Simulation
 <td> <a href = "TightSim.scala">TightSim.scala </a>
 <td> <a href = "TightSim2.scala">TightSim2.scala </a>
-<td> <a href = "DigTightSim.scala">DigTightSim.scala </a>
-<td> <a href = "MDigTightSim.scala">MDigTightSim.scala </a>
+<td> <a href = "mutable/TightSim.scala">mutable.TightSim.scala </a>
+<td> <a href = "mutable/TightSimCAR.scala">mutable.TightSimCAR.scala </a>
+<td> <a href = "mutable/MTightSim.scala">mutable.MTightSim.scala </a>
+<td> <a href = "mutable/MStrictSimCAR.scala">mutable.MStrictSimCAR.scala </a>
 <tr>
 <td>Subgraph Isomorphism
 <tr>
@@ -45,8 +79,8 @@
 <td> - using Dual Simulation
 <td> -
 <td> <a href = "DualIso.scala">DualIso.scala </a>
-<td> <a href = "DigDualIso.scala">DigDualIso.scala </a>
-<td> <a href = "MDigDualIso.scala">MDigDualIso.scala </a>
+<td> <a href = "mutable.DualIso.scala">mutable.DualIso.scala </a>
+<td> <a href = "mutable.MDualIso.scala">mutable.MDualIso.scala </a>
 </table>
 
 <p>

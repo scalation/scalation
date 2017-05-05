@@ -75,13 +75,13 @@ class Ball [TLabel] (srcGraph: Graph [TLabel], val center: Int, radius: Int)
      */
     override def toString: String = 
     {
-      var s = new StringBuilder ()
-      for (i <- chMap.keySet.toList.sorted) {
-           s.append (i + "->[");
-           for (j <- chMap.get (i).get.toList.sorted) s.append (j + ",")
-           s.append("],")
-       } // for
-       s.toString
+        var s = new StringBuilder ()
+        for (i <- chMap.keySet.toList.sorted) {
+            s.append (i + "->[");
+            for (j <- chMap.get (i).get.toList.sorted) s.append (j + ",")
+            s.append("],")
+        } // for
+        s.toString
     } // toString
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -116,6 +116,26 @@ class Ball [TLabel] (srcGraph: Graph [TLabel], val center: Int, radius: Int)
         } // for
         diameter    
     } // getBallDiameter
-  
+
 } // Ball class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Ball` companion object provides functions involving Balls.
+ */
+object Ball
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Merge mapping results, the union over all balls.
+     *  @param matches  the mapping results organized into balls
+     *  @param qSize    the number of vertices in query graph
+     */
+    def merge (matches: Map [Int, Array [SET [Int]]], qSize: Int): Array [SET [Int]] =
+    {
+        val phi_all = Array.fill [SET [Int]] (qSize) (SET [Int] ())
+        for ((c, phi_c) <- matches; i <- 0 until qSize) phi_all(i) ++= phi_c(i)
+        phi_all
+    } // merge
+  
+} // Ball object
 

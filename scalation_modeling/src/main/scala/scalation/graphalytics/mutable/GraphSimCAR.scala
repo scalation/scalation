@@ -38,19 +38,11 @@ class GraphSimCAR [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel])
     for (u <- cLabel.indices) cLabel(u) = qChildLabels (q, u)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Apply the Graph Simulation pattern matching algorithm to find the mappings
-     *  from the query graph 'q' to the data graph 'g'.  These are represented by a
-     *  multi-valued function 'phi' that maps each query graph vertex 'u' to a
-     *  set of data graph vertices '{v}'.
-     */
-    def mappings (): Array [SET [Int]] = nisarGraphSimCAR (feasibleMates ())
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given the mappings 'phi' produced by the 'feasibleMates' method,
-     *  eliminate mappings 'u -> v' when v's children fail to match u's.
+     *  prune mappings 'u -> v' where v's children fail to match u's.
      *  @param phi  array of mappings from a query vertex u to { graph vertices v }
      */
-    private def nisarGraphSimCAR (phi: Array [SET [Int]]): Array [SET [Int]] =
+    def prune (phi: Array [SET [Int]]): Array [SET [Int]] =
     {
         var alter = true
         while (alter) {                                     // check for matching children
@@ -69,7 +61,7 @@ class GraphSimCAR [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel])
             } // for           
         } // while
         phi
-    } // nisarGraphSimCAR
+    } // prune
 
 } // GraphSimCAR class
 

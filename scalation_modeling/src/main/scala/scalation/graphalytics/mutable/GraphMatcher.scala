@@ -8,12 +8,13 @@
  *  Graph Pattern Matching Using Mutable Sets
  */
 
-package scalation.graphalytics.mutable
+package scalation.graphalytics
+package mutable
 
 import scala.collection.mutable.{Set => SET}
 //import scala.collection.mutable.{HashSet => SET}
 
-import scalation.util.{time, Wildcard}
+import scalation.util.{banner, time, Wildcard}
 import scalation.util.Wildcard.hasWildcards
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -36,18 +37,7 @@ abstract class GraphMatcher [TLabel] (g: Graph [TLabel], q: Graph [TLabel])
      *  multi-valued function 'phi' that maps each query graph vertex 'u' to a
      *  set of data graph vertices '{v}'.
      */
-    def mappings (): Array [SET [Int]]
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Apply a graph pattern matching algorithm to find subgraphs of data graph
-     *  'g' that isomorphically match query graph 'q'.  These are represented
-     *  by a set of single-valued bijections {'psi'} where each 'psi' function
-     *  maps each query graph vertex 'u' to a data graph vertices 'v'.
-     */
-    def bijections (): SET [Array [Int]] =
-    {
-        throw new UnsupportedOperationException ()
-    } // bijections
+    def mappings (): Array [SET [Int]] = prune (feasibleMates ())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create an initial array of feasible mappings 'phi' from each query
@@ -84,8 +74,26 @@ abstract class GraphMatcher [TLabel] (g: Graph [TLabel], q: Graph [TLabel])
     } // feasibleMatesW
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Show the mappings between a query graph vertex u and a set of data
-     *  graph vertices {v}.
+    /** Given the mappings 'phi' produced by the 'feasibleMates' method,
+     *  prune mappings 'u -> v' where v's children fail to match u's.
+     *  @param phi  array of mappings from a query vertex u to { graph vertices v }
+     */
+    def prune (phi: Array [SET [Int]]): Array [SET [Int]]
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether two sets overlap, i.e., have a non-empty intersection.
+     *  @param set1  the first set
+     *  @param set2  the second set
+     */
+    def overlaps (set1: SET [Int], set2: SET [Int]): Boolean =
+    {
+        for (s <- set1 if set2 contains s) return true
+        false
+    } // overlaps
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Show all mappings between query graph vertices 'u_i' and their sets of
+     *  data graph vertices {v}.
      *  @param phi  the set-valued mapping function
      */
     def showMappings (phi: Array [SET [Int]])
@@ -95,17 +103,42 @@ abstract class GraphMatcher [TLabel] (g: Graph [TLabel], q: Graph [TLabel])
     } // showMappings
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Count the number of mappings between query graph vertices 'u_i' and their sets
+     *  of data graph vertices {v}, giving the number of distinct vertices and edges.
+     *  @param phi  the set-valued mapping function
+     */
+    def countMappings (phi: Array [SET [Int]]): Pair =
+    {
+        val distVertices = SET [Int] ()
+        val distEdges    = SET [Pair] ()
+        for (i <- phi.indices) distVertices ++= phi(i)
+        for (i <- phi.indices) {
+            for (v <- phi(i); v_c <- g.ch(v) if distVertices contains v_c) distEdges += ((v, v_c))
+        } // for
+        (distVertices.size, distEdges.size)
+    } // countMappings
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the Graph Pattern Matcher.
-     *  @param name  the name of graph pattern matcher
-     *  @param ans   the correct answer
+     *  @param mName  the name of graph pattern matcher
+     *  @param ans    the correct answer
      */
     def test (name: String, ans: Array [SET [Int]] = null)
     {
-        val phi = time { mappings () }                     // time the matcher
-        println (s"$name ---------------------------------------------------")
-        showMappings (phi)                                 // display results
+        val phi = time { mappings () }                                 // time the matcher
+        banner (s"query ${q.name} (${q.size}) via $name on data ${g.name} (${g.size})")
+        showMappings (phi)                                             // display results
+        println (s"(#distVertices, #distEdges) = ${countMappings (phi)}")
         if (ans != null) for (i <- phi.indices) assert (phi(i) == ans(i))
     } // test
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Apply a graph pattern matching algorithm to find subgraphs of data graph
+     *  'g' that isomorphically match query graph 'q'.  These are represented
+     *  by a set of single-valued bijections {'psi'} where each 'psi' function
+     *  maps each query graph vertex 'u' to a data graph vertices 'v'.
+     */
+    def bijections (): SET [Array [Int]] = throw new UnsupportedOperationException ()
 
 } // GraphMatcher abstract class
 

@@ -26,23 +26,15 @@ import scalation.util.time
 class MDualSim [TLabel] (g: MGraph [TLabel], q: MGraph [TLabel])
       extends GraphMatcher (g, q)
 {
-    private val DEBUG = true                                     // debug flag
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Apply the Dual Graph Simulation pattern matching algorithm to find the mappings
-     *  from the query graph 'q' to the data graph 'g'.  These are represented by a
-     *  multi-valued function 'phi' that maps each query graph vertex 'u' to a
-     *  set of data graph vertices '{v}'.
-     */
-    def mappings (): Array [SET [Int]] = saltzDualSim (feasibleMates ())
+    private val DEBUG = true                                      // debug flag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given the mappings 'phi' produced by the 'feasibleMates' method,
-     *  eliminate mappings 'u -> v' when (1) v's children fail to match u's
+     *  prune mappings 'u -> v' where (1) v's children fail to match u's
      *  or (2) v's parents fail to match u's.
      *  @param phi  array of mappings from a query vertex u to { graph vertices v }
      */
-    def saltzDualSim (phi: Array [SET [Int]]): Array [SET [Int]] =
+    def prune (phi: Array [SET [Int]]): Array [SET [Int]] =
     {
         var alter = true
         while (alter) {                                           // check for matching children/parents
@@ -76,7 +68,7 @@ class MDualSim [TLabel] (g: MGraph [TLabel], q: MGraph [TLabel])
 
         } // while
         phi
-    } // saltzDualSim
+    } // prune
 
 } // MDualSim class
 

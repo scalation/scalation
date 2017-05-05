@@ -29,19 +29,11 @@ class GraphSim [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel])
     private val DEBUG = true                                  // debug flag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Apply the Graph Simulation pattern matching algorithm to find the mappings
-     *  from the query graph 'q' to the data graph 'g'.  These are represented by a
-     *  multi-valued function 'phi' that maps each query graph vertex 'u' to a
-     *  set of data graph vertices '{v}'.
-     */
-    def mappings (): Array [SET [Int]] = saltzGraphSim (feasibleMates ())
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given the mappings 'phi' produced by the 'feasibleMates' method,
-     *  eliminate mappings 'u -> v' when v's children fail to match u's.
+     *  prune mappings 'u -> v' where v's children fail to match u's.
      *  @param phi  array of mappings from a query vertex u to { graph vertices v }
      */
-    def saltzGraphSim (phi: Array [SET [Int]]): Array [SET [Int]] =
+    def prune (phi: Array [SET [Int]]): Array [SET [Int]] =
     {
         var alter = true
         while (alter) {                                       // check for matching children
@@ -53,23 +45,21 @@ class GraphSim [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel])
                 val v_rem   = SET [Int] ()                    // vertices to be removed
 
                 for (v <- phi(u)) {                           // for each v in g image of u
-                    if ((g.ch(v) & phi_u_c).isEmpty) {        // v must have a child in phi(u_c)
-                        // phi(u) -= v                        // if not, remove vertex v from phi(u)
-                        // if (phi(u).isEmpty) return phi     // no match for vertex u => no overall match
-                        v_rem += v
+                    if (overlaps (g.ch(v), phi_u_c)) {        // v must have a child in phi(u_c)
+                        v_rem += v                            // add v to removal set
                         alter = true
-                    } // if
-                    if (! v_rem.isEmpty) {
-                        phi(u) --= v_rem                      // remove vertices in v_rem from phi(u)
-                        if (phi(u).isEmpty) return phi        // no match for vertex u => no overall match
                     } // if
                 } // for
 
+                if (! v_rem.isEmpty) {
+                    phi(u) --= v_rem                          // remove vertices in v_rem from phi(u)
+                    if (phi(u).isEmpty) return phi            // no match for vertex u => no overall match
+                } // if
             } // for
 
         } // while
         phi
-    } // saltzGraphSim
+    } // prune
 
 } // GraphSim class
 

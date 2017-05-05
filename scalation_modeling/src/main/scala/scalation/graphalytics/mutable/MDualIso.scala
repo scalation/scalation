@@ -46,7 +46,7 @@ class MDualIso [TLabel: ClassTag] (g: MGraph [TLabel], q: MGraph [TLabel])
     {
         matches = SET [Array [SET [Int]]] ()               // initialize matches to empty
         val phi = duals.feasibleMates ()                   // initial mappings from label match
-        saltzDualIso (duals.saltzDualSim (phi), 0)         // recursively find all bijections
+        refine (duals.prune (phi), 0)                      // recursively find all bijections
         val psi = simplify (matches)                       // pull bijections out matches
         noBijections = false                               // results now available
         psi                                                // return the set of bijections
@@ -58,11 +58,11 @@ class MDualIso [TLabel: ClassTag] (g: MGraph [TLabel], q: MGraph [TLabel])
      *  represented by a  multi-valued function 'phi' that maps each query graph
      *  vertex 'u' to a set of data graph vertices '{v}'.
      */
-    def mappings (): Array [SET [Int]] = 
+    override def mappings (): Array [SET [Int]] = 
     {
-        var psi: SET [Array [Int]] = null              // mappings from Dual Simulation
-        if (noBijections) psi = bijections ()          // if no results, create them
-        merge (psi)                                    // merge bijections to create mappings
+        var psi: SET [Array [Int]] = null                  // mappings from Dual Simulation
+        if (noBijections) psi = bijections ()              // if no results, create them
+        merge (psi)                                        // merge bijections to create mappings
     } // mappings
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -77,7 +77,7 @@ class MDualIso [TLabel: ClassTag] (g: MGraph [TLabel], q: MGraph [TLabel])
      *  @param phi    array of mappings from a query vertex u_q to { graph vertices v_g }
      *  @param depth  the depth of recursion
      */
-    private def saltzDualIso (phi: Array [SET [Int]], depth: Int)
+    private def refine (phi: Array [SET [Int]], depth: Int)
     {
         if (depth == q.size) {
             if (! phi.isEmpty) {
@@ -86,13 +86,13 @@ class MDualIso [TLabel: ClassTag] (g: MGraph [TLabel], q: MGraph [TLabel])
             } // if
         } else if (! phi.isEmpty) {
             for (i <- phi (depth) if (! contains (phi, depth, i))) {
-                val phiCopy = phi.map (x => x)                           // make a copy of phi
-                phiCopy (depth) = SET [Int] (i)                          // isolate vertex i
-                if (matches.size >= limit) return                        // quit if at LIMIT
-                saltzDualIso (duals.saltzDualSim (phiCopy), depth + 1)   // solve recursively for the next depth
+                val phiCopy = phi.map (x => x)                       // make a copy of phi
+                phiCopy (depth) = SET [Int] (i)                      // isolate vertex i
+                if (matches.size >= limit) return                    // quit if at LIMIT
+                refine (duals.prune (phiCopy), depth + 1)            // solve recursively for the next depth
             } // for
         } // if
-    } // saltzDualIso
+    } // refine
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether vertex 'j' is contained in any 'phi(i)' for the previous depths.
@@ -127,6 +127,13 @@ class MDualIso [TLabel: ClassTag] (g: MGraph [TLabel], q: MGraph [TLabel])
     {
         matches.map (m => m.map (set => set.iterator.next))
     } // simplify
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The 'prune' is not needed, pruning is delegated to incorporated graph
+     *  simulation algorithm.
+     *  @param phi  array of mappings from a query vertex u_q to { graph vertices v_g }
+     */
+    def prune (phi: Array [SET [Int]]): Array [SET [Int]] = throw new UnsupportedOperationException ()
 
 } // MDualIso class
 

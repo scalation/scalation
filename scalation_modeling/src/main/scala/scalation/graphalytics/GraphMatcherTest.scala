@@ -123,7 +123,6 @@ object GraphMatcherTest extends App
     } // test
 
     testMappings (new GraphSim2 (g, q), "GraphSim2", correctSimpleResult)
-    testMappings (new GraphSim (g, q),  "GraphSim",  correctSimpleResult)
     testMappings (new DualSim2 (g, q),  "DualSim2",  correctDualResult)
 
     // DualSim requires inverse adjacency ('pa') for access to parent vertices

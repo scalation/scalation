@@ -10,16 +10,10 @@
 
 package scalation.graphalytics.mutable
 
-import scala.collection.mutable.{ArrayStack, ListBuffer, Map, HashMap, MutableList}
+import scala.collection.mutable.{ArrayStack, HashMap, Map}
 import scala.collection.mutable.{Set => SET}
 import scala.reflect.ClassTag
 import scala.util.control.Breaks.{break, breakable}
-
-import scalation.graphalytics.mutable.{ExampleMGraphS => EX_GRAPH}
-import scalation.stat.Statistic
-import scalation.util.{MultiSet, Wildcard}
-
-import LabelFunctions._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The 'MStrictSimCAR' class provides an implementation for strict simulation
@@ -31,20 +25,13 @@ import LabelFunctions._
 class MStrictSimCAR [TLabel: ClassTag] (g: MGraph [TLabel], q: MGraph [TLabel]) 
       extends GraphMatcher (g, q)
 {
-    /** The DEBUG flag
-     */
-    private val DEBUG = false
+    private val DEBUG     = false                                       // debug  flag
+    private val qmet      = new GraphMetrics (q.clone, false)           // creating graph metrics object of query graph
+    private val dataSize  = g.size                                      // size of the data graph
+    private val querySize = q.size                                      // size of the query graph
 
-    private val listOfDistinctReducedSet = new ListBuffer [SET [String]] ()   // contains total number of matches 
-                                                                              // after post processing
-    private val mapOfBallWithSize = Map [Int, Long] ()                        // contains balls left after
-                                                                              // post processing with diameter.
-    private val listOfMatchedBallVertices = MutableList [Int] ()              // contains list of center vertices
-
-    private val qmet = new GraphMetrics (q.clone, false)                      // creating graph metrics object of query graph
-
-    private val dataSize  = g.size                                            // size of the data graph
-    private val querySize = q.size                                            // size of the query graph
+    private val phi0 = new MDualSimCAR (g, q).mappings ()               // initial mapping results from Dual Simulation
+    if (DEBUG) println (s"phi0 = ${phi0.deep}")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Apply the Strict Graph Simulation pattern matching algorithm to find the mappings
@@ -52,67 +39,50 @@ class MStrictSimCAR [TLabel: ClassTag] (g: MGraph [TLabel], q: MGraph [TLabel])
      *  multi-valued function 'phi' that maps each query graph vertex 'u' to a
      *  set of data graph vertices '{v}'.
      */
-    def mappings (): Array [SET [Int]] = merge (mappings2 ())
+    override def mappings (): Array [SET [Int]] = Ball.merge (mappings2 (), querySize)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Mapping results per ball.
+    /** Return mapping results per ball.
      */
-    def mappings2 (): HashMap [Int, Array [SET [Int]]] = strictSim (new MDualSimCAR (g, q).mappings ())
+    def mappings2 (): Map [Int, Array [SET [Int]]] = refine (phi0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Merged mapping results, the union over all balls. 
-     */
-    def merge (matches: Map [Int, Array [SET [Int]]]): Array [SET [Int]] =
-    { 
-         val phi_all = Array.ofDim [SET [Int]] (querySize)
-         for (i <- 0 until querySize) phi_all (i) = SET [Int] ()
-         for ((c, phi_c) <- matches) {
-             println (s"(c, phi_c) = ($c, ${phi_c.deep})")
-             for (i <- 0 until querySize) phi_all(i) ++= phi_c(i)
-         } // for
-         phi_all
-    } // merge
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Performs strict simulation to find mappings with balls.
+    /** Refine 'phi' using strict simulation to find mappings within balls.
      *  @param phi  the initial mapping after applying Dual to the whole graph
      */
-    def strictSim (phi: Array [SET [Int]]): HashMap [Int, Array [SET [Int]]] =
+    def refine (phi: Array [SET [Int]]): Map [Int, Array [SET [Int]]] =
     {
         if (phi.size == 0) { println ("No dual match."); return null }  // exit if no match after dual simulation
+        if (DEBUG) println (s"phi = ${phi.deep}")
 
-        val newGraph   = filterGraph (phi)                              // if doing strong sim more than once, must clone g
-        val prunedSize = phi.flatten.toSet.size                         // size of feasible matches after strict simulation
-        val qDiameter  = qmet.diam                                      // get the query diameter
-        val balls      = HashMap [Int, Ball [TLabel]] ()                         // map of balls: center -> ball               
-        val matches    = HashMap [Int, Array [SET [Int]]] ()            // map of matches in balls: center -> match
-        val gCenters   = (0 until q.size).flatMap(phi(_))               // set of mapped data graph centers
-        val bCenters   = SET [Int] ()                                   // set of centers for all balls
-        var ballSum    = 0
+        val newGraph  = filterGraph (phi)                               // if doing strict sim more than once, must clone g
+        val qDiameter = qmet.diam                                       // get the query diameter
+        val balls     = HashMap [Int, Ball [TLabel]] ()                 // map of balls: center -> ball               
+        val matches   = HashMap [Int, Array [SET [Int]]] ()             // map of matches in balls: center -> match
+        val gCenters  = (0 until q.size).flatMap (phi(_)).distinct      // set of mapped data graph centers
+        val bCenters  = SET [Int] ()                                    // set of centers for all balls
+        var ballSum   = 0
 
         for (center <- gCenters) {                                      // for each mapped data graph center
             val ball = new Ball (newGraph, center, qDiameter)           // create a new ball for that center vertex
             ballSum += ball.nodesInBall.size                            // calculate ball size
             val mat  = dualFilter (phi.clone, ball)                     // perform dual filter on the ball
             if (DEBUG) println (s"center = $center, mat = ${mat.deep}")
-            balls.put (center, ball)
+            balls += center -> ball
             if (mat.size != 0) { bCenters += center; matches += center -> mat }
             else if (DEBUG) println ("No match for ball centered at " + center + "\n")
         } // for
 
-        println ("SEQUENTIAL:    Data Graph Name:  " + g.name +
-                 "\n  Number of Data Graph Nodes:  " + dataSize +
-                 "\n            Query Graph Name:  " + q.name +
-                 "\n Number of Query Graph Nodes:  " + querySize +
-                 "\n     Number of Strict Matches:  " + bCenters.size +
-                 "\n    Graph Size after Pruning:  " + prunedSize + " nodes" +
-                 "\n              Query Diameter:  " + qDiameter +
-                 "\n           Average Ball Size:  " + (ballSum / prunedSize.toDouble) +
-                 "\n        Total Distinct Edges:  " + calculateTotalEdges (g, balls, bCenters) +
-                 "\n     Total Distinct Vertices:  " + calculateTotalVertices ())
-        println ("Ball Diameter Metrics(Min, Max, Mean, StdDev): " + calculateBallDiameterMetrics (balls) )
+        println (s"""SUMMARY:
+        bCenters                  = $bCenters
+        Query Graph Diameter      = $qDiameter
+        Number of Balls           = ${gCenters.size}
+        Average Ball Size         = ${ballSum / gCenters.size.toDouble}
+        Number of Matched Balls   = ${bCenters.size}
+        Average Matched Ball Size = ${ballSum / bCenters.size.toDouble}""")
+
         matches
-    } // strictSim
+    } // refine
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Prune the data graph by consider only those vertices and edges which
@@ -127,7 +97,7 @@ class MStrictSimCAR [TLabel: ClassTag] (g: MGraph [TLabel], q: MGraph [TLabel])
         val newCh = Array.ofDim [SET [Int]] (dataSize)
         for (i <- 0 until dataSize) newCh(i) = SET [Int] ()
 
-        for (u <- 0 until q.size; w <- phi(u)) {             // new ch and pa set for data graph based upon feasible vertices
+        for (u <- 0 until q.size; w <- phi(u)) {                  // new ch and pa set for data graph based upon feasible vertices
             for (v <- q.ch(u)) newCh(w) |= (g.ch(w) & phi(v))
         } // for
         new Graph (newCh, g.label, g.inverse, g.name + "2")       // create a new data graph
@@ -206,48 +176,11 @@ class MStrictSimCAR [TLabel: ClassTag] (g: MGraph [TLabel], q: MGraph [TLabel])
   
         for (v <- phi.indices if phi(v).isEmpty) return Array [SET [Int]] ()
         phi
-    } //dualFilter
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Count distinct vertices left after post processing.
-     */
-    def calculateTotalVertices (): Int = 
-    {
-        val totalSet = SET [String] ()
-        for (i <- 0 until listOfDistinctReducedSet.length) totalSet ++= listOfDistinctReducedSet(i)
-        totalSet.size
-    } // calculateTotalVertices
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Count distinct edges left after post processing.
-     *  @param g               the data graph  G(V, E, l)
-     *  @param balls           mappings from a center vertex to the Ball B(Graph, Center, Radius)
-     *  @param matchCenters    set of all vertices which are considered as center
-     */
-    def calculateTotalEdges (g: Graph [TLabel], balls: Map [Int, Ball [TLabel]], matchCenters: SET [Int]): Int = 
-    {
-        val distinctEdges = SET [String] ()
-        for (vert_id <- 0 until g.ch.length; if balls.keySet.contains (vert_id)) { 
-            balls.get (vert_id).get.chMap.foreach (i => i._2.foreach (j => distinctEdges += (i._1.toString + "_" + j.toString)))
-        } // for
-        distinctEdges.size
-    } // calculateTotalEdges
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Calculate statistics (e.g., min, max, avg diameter and standard deviation)
-     *  on the  balls left after postprocessing.
-     *  @param balls  mappings from a center vertex to the Ball B(Graph, Center, Radius)
-     */
-    def calculateBallDiameterMetrics (balls: Map [Int, Ball [TLabel]]): Statistic =
-    {
-        val ballStats = new Statistic ()
-        for (vert_id <- listOfMatchedBallVertices) ballStats.tally (balls.get (vert_id).get.getBallDiameter)
-        ballStats
-    } // calculateBallDiameterMetrics
+    } // dualFilter
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vertex from an array of central vertices, those which have 
-     *  highest ch set size and lowest frequency of label in the query graph, i.e.
+     *  highest 'ch' set size and lowest frequency of label in the query graph, i.e.,
      *  highest ratio.
      *  @param centr the array of vertices whose eccentricity is equal to the radius
      */
@@ -262,8 +195,16 @@ class MStrictSimCAR [TLabel: ClassTag] (g: MGraph [TLabel], q: MGraph [TLabel])
         index
     } // selectivityCriteria 
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The 'prune' is not needed, pruning is delegated to incorporated dual graph
+     *  simulation algorithm.
+     *  @param phi  array of mappings from a query vertex u_q to { graph vertices v_g }
+     */
+    def prune (phi: Array [SET [Int]]): Array [SET [Int]] = throw new UnsupportedOperationException ()
+
 } // MStrictSimCAR class
 
+import scalation.graphalytics.mutable.{ExampleMGraphD => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MStrictSimCARTest` object is used to test the `MStrictSimCAR` class.
@@ -275,9 +216,9 @@ object MStrictSimCARTest extends App
     val q = EX_GRAPH.q1
 
     println (s"g.checkEdges = ${g.checkEdges}")
-    q.printG ()
-    println (s"q.checkEdges = ${q.checkEdges}")
     g.printG ()
+    println (s"q.checkEdges = ${q.checkEdges}")
+    q.printG ()
 
     (new MStrictSimCAR (g, q)).test ("MStrictSimCAR")    // MStrict Simulation Pattern Matcher
 
@@ -294,9 +235,9 @@ object MStrictSimCARTest2 extends App
     val q = EX_GRAPH.q2
 
     println (s"g.checkEdges = ${g.checkEdges}")
-    q.printG ()
-    println (s"q.checkEdges = ${q.checkEdges}")
     g.printG ()
+    println (s"q.checkEdges = ${q.checkEdges}")
+    q.printG ()
 
     (new MStrictSimCAR (g, q)).test ("MStrictSimCAR")    // MStrict Simulation Pattern Matcher
 
@@ -304,21 +245,19 @@ object MStrictSimCARTest2 extends App
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `MStrictSimCARTest3` object is used to test the `MStrictSimCAR` class.
+/** The `MStrictSimCARTest3` object tests the `MStrictSimCAR` class by passing data graph
+ *  and query graph relative file paths.
  *  > run-main scalation.graphalytics.mutable.MStrictSimCARTest3
- *
+ */
 object MStrictSimCARTest3 extends App
 {
-    val g = EX_GRAPH.g3
-    val q = EX_GRAPH.q3
+    val g = MGraphIO [Double] ("gfile")
+    val q = MGraphIO [Double] ("qfile")
 
-    println (s"g.checkEdges = ${g.checkEdges}")
-    g.printG ()
     println (s"q.checkEdges = ${q.checkEdges}")
     q.printG ()
 
     (new MStrictSimCAR (g, q)).test ("MStrictSimCAR")    // MStrict Simulation Pattern Matcher
 
 } // MStrictSimCARTest3 object
- */
 

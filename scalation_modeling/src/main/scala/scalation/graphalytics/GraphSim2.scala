@@ -23,19 +23,11 @@ class GraphSim2 (g: Graph, q: Graph)
     private val DEBUG = true                    // debug flag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Apply the Graph Simulation pattern matching algorithm to find the mappings
-     *  from the query graph 'q' to the data graph 'g'.  These are represented by a
-     *  multi-valued function 'phi' that maps each query graph vertex 'u' to a
-     *  set of data graph vertices '{v}'.
-     */
-    def mappings (): Array [SET [Int]] = saltzGraphSim (feasibleMates ())
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given the mappings 'phi' produced by the 'feasibleMates' method,
-     *  eliminate mappings 'u -> v' when v's children fail to match u's.
+     *  prune mappings 'u -> v' where v's children fail to match u's.
      *  @param phi  array of mappings from a query vertex u to { graph vertices v }
      */
-    def saltzGraphSim (phi: Array [SET [Int]]): Array [SET [Int]] =
+    def prune (phi: Array [SET [Int]]): Array [SET [Int]] =
     {
         var alter = true
         while (alter) {                                          // check for matching children
@@ -45,7 +37,7 @@ class GraphSim2 (g: Graph, q: Graph)
             // loop over query vertices u, u's children u_c, and data vertices v in phi(u)
 
             for (u <- qRange; u_c <- q.ch(u); v <- phi(u)) {
-                if ((g.ch(v) & phi(u_c)).isEmpty) {              // v must have a child in phi(u_c)
+                if (overlaps (g.ch(v),  phi(u_c))) {             // v must have a child in phi(u_c)
                     phi(u) -= v                                  // remove vertex v from phi(u)
                     if (phi(u).isEmpty) return phi               // no match for vertex u => no overall match
                     alter = true

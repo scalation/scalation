@@ -30,19 +30,11 @@ class MGraphSim (g: MGraph [Double], q: MGraph [Double])
     private val DEBUG = true                                      // debug flag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Apply the Graph Simulation pattern matching algorithm to find the mappings
-     *  from the query graph 'q' to the data graph 'g'.  These are represented by a
-     *  multi-valued function 'phi' that maps each query graph vertex 'u' to a
-     *  set of data graph vertices '{v}'.
-     */
-    def mappings (): Array [SET [Int]] = saltzGraphSim (feasibleMates ())
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given the mappings 'phi' produced by the 'feasibleMates' method,
-     *  eliminate mappings 'u -> v' when v's children fail to match u's.
+     *  prune mappings 'u -> v' where v's children fail to match u's.
      *  @param phi  array of mappings from a query vertex u to { graph vertices v }
      */
-    def saltzGraphSim (phi: Array [SET [Int]]): Array [SET [Int]] =
+    def prune (phi: Array [SET [Int]]): Array [SET [Int]] =
     {
         var alter = true
         while (alter) {                                           // check for matching children
@@ -59,25 +51,23 @@ class MGraphSim (g: MGraph [Double], q: MGraph [Double])
                     val v_c = g.ch(v).filter (g.elabel (v, _) == elab_u2u_c)   // filter on edge labels
                     if (DEBUG) println (s"v = $v, v_c = $v_c, phi_u_c = $phi_u_c")
 
-                    if ((v_c & phi_u_c).isEmpty) {                // v must have a child in phi(u_c)
-//                      phi(u) -= v                               // if not, remove vertex v from phi(u)
-//                      if (phi(u).isEmpty) return phi            // no match for vertex u => no overall match
-                        v_rem += v
+                    if (overlaps (v_c, phi_u_c)) {                // v must have a child in phi(u_c)
+                        v_rem += v                                // add to removal set
                         alter = true
-                    } // if
-                    if (! v_rem.isEmpty) {
-                        if (DEBUG) println (s"v_rem = $v_rem from phi($u)")
-                        phi(u) --= v_rem                          // remove vertices in v_rem from phi(u)
-                        v_rem.clear ()
-                        if (phi(u).isEmpty) return phi            // no match for vertex u => no overall match
                     } // if
                 } // for
 
+                if (! v_rem.isEmpty) {
+                    if (DEBUG) println (s"v_rem = $v_rem from phi($u)")
+                    phi(u) --= v_rem                              // remove vertices in v_rem from phi(u)
+                    v_rem.clear ()
+                    if (phi(u).isEmpty) return phi                // no match for vertex u => no overall match
+                } // if
             } // for
 
         } // while
         phi
-    } // saltzGraphSim
+    } // prune
 
 } // MGraphSim class
 

@@ -21,7 +21,8 @@ import scalation.util.MultiSet
 import LabelFunctions._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The 'DualSimCAR' classs provides an implementation for Dual Graph Simulation.
+/** The 'DualSimCAR' classs provides an implementation for Dual Graph Simulation
+ *  with CArdinality Restrictions.
  *  @param g  the data graph  G(V, E, l)
  *  @param q  the query graph Q(U, D, k)
  */
@@ -43,20 +44,12 @@ class DualSimCAR [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel])
     for (u <- pLabel.indices) pLabel(u) = qParentLabels (q, u)
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Apply the Dual Graph Simulation pattern matching algorithm to find the mappings
-     *  from the query graph 'q' to the data graph 'g'.  These are represented by a
-     *  multi-valued function 'phi' that maps each query graph vertex 'u' to a
-     *  set of data graph vertices '{v}'.
-     */
-    def mappings (): Array [SET [Int]] = nisarDualSimCAR (feasibleMates ())
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given the mappings 'phi' produced by the 'feasibleMates' method,
-     *  eliminate mappings 'u -> v' when (1) v's children fail to match u's
+     *  prune mappings 'u -> v' where (1) v's children fail to match u's
      *  or (2) v's parents fail to match u's.
      *  @param phi  array of mappings from a query vertex u to { graph vertices v }
      */
-    def nisarDualSimCAR (phi: Array [SET [Int]]): Array [SET [Int]] =
+    def prune (phi: Array [SET [Int]]): Array [SET [Int]] =
     {
         var alter = true
         while (alter) {                                     // check for matching children and parents
@@ -88,10 +81,10 @@ class DualSimCAR [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel])
 
         } // while
         phi
-
-    } // nisarDualSimCAR
+    } // prune
 
 } // DualSimCAR class
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DualSimCARTest` object is used to test the `DualSimCAR` class.

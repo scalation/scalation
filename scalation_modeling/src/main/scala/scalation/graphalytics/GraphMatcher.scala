@@ -33,18 +33,7 @@ abstract class GraphMatcher (g: Graph, q: Graph)
      *  multi-valued function 'phi' that maps each query graph vertex 'u' to a
      *  set of data graph vertices '{v}'.
      */
-    def mappings (): Array [SET [Int]]
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Apply a graph pattern matching algorithm to find subgraphs of data graph
-     *  'g' that isomorphically match query graph 'q'.  These are represented
-     *  by a set of single-valued bijections {'psi'} where each 'psi' function
-     *  maps each query graph vertex 'u' to a data graph vertices 'v'.
-     */
-    def bijections (): SET [Array [Int]] =
-    {
-        throw new UnsupportedOperationException ()
-    } // bijections
+    def mappings (): Array [SET [Int]] = prune (feasibleMates ())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create an initial array of feasible mappings 'phi' from each query
@@ -55,6 +44,24 @@ abstract class GraphMatcher (g: Graph, q: Graph)
     {
         q.label.map (u_label => g.getVerticesWithLabel (u_label))
     } // feasibleMates
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given the mappings 'phi' produced by the 'feasibleMates' method,
+     *  prune mappings 'u -> v' where v's children fail to match u's.
+     *  @param phi  array of mappings from a query vertex u to { graph vertices v }
+     */
+    def prune (phi: Array [SET [Int]]): Array [SET [Int]]
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether two sets overlap, i.e., have a non-empty intersection.
+     *  @param set1  the first set
+     *  @param set2  the second set
+     */
+    def overlaps (set1: SET [Int], set2: SET [Int]): Boolean =
+    {
+        for (s <- set1 if set2 contains s) return true
+        false
+    } // overlaps
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show the mappings between a query graph vertex u and a set of data
@@ -69,8 +76,8 @@ abstract class GraphMatcher (g: Graph, q: Graph)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the graph pattern matcher.
-     *  @param  name  the name of graph pattern matcher
-     *  @param  ans   the correct answer
+     *  @param name  the name of graph pattern matcher
+     *  @param ans   the correct answer
      */
     def test (name: String, ans: Array [SET [Int]] = null)
     {
@@ -79,6 +86,14 @@ abstract class GraphMatcher (g: Graph, q: Graph)
         showMappings (phi)                                 // display results
         if (ans != null) for (i <- phi.indices) assert (phi(i) == ans(i))
     } // test
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Apply a graph pattern matching algorithm to find subgraphs of data graph
+     *  'g' that isomorphically match query graph 'q'.  These are represented
+     *  by a set of single-valued bijections {'psi'} where each 'psi' function
+     *  maps each query graph vertex 'u' to a data graph vertices 'v'.
+     */
+    def bijections (): SET [Array [Int]] = throw new UnsupportedOperationException ()
 
 } // GraphMatcher abstract class
 

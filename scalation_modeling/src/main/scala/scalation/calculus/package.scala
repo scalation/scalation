@@ -19,6 +19,10 @@ import scalation.math.FunctionS2S
  */
 package object calculus
 { 
+    /** Type definition for an interval [a, b]
+     */
+    type Interval = (Double, Double)
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Implicit conversion from 'FunctionS2S' to 'Hilbert', which supports 
      *  functional operators.

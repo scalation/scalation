@@ -10,7 +10,7 @@
 
 package scalation.graphalytics.mutable
 
-import scala.collection.mutable.{ArrayStack, ListBuffer, Map, HashMap, MutableList}
+import scala.collection.mutable.{ArrayStack, HashMap, ListBuffer, Map, MutableList}
 import scala.collection.mutable.{Set => SET}
 import scala.reflect.ClassTag
 import scala.util.control.Breaks.{break, breakable}
@@ -48,36 +48,22 @@ class TightSimCAR [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel])
      *  multi-valued function 'phi' that maps each query graph vertex 'u' to a
      *  set of data graph vertices '{v}'.
      */
-    def mappings (): Array [SET [Int]] = merge (mappings2 ())
+    override def mappings (): Array [SET [Int]] = Ball.merge (mappings2 (), querySize)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Mapping results per ball.
+    /** Return mapping results per ball.
      */
-    def mappings2 (): HashMap [Int, Array [SET [Int]]] = tightSim (new DualSimCAR (g, q).mappings ())
+    def mappings2 (): Map [Int, Array [SET [Int]]] = refine (new DualSimCAR (g, q).mappings ())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Merged mapping results, the union over all balls. 
-     */
-    def merge (matches: Map [Int, Array [SET [Int]]]): Array [SET [Int]] =
-    { 
-         val phi_all = Array.ofDim [SET [Int]] (querySize)
-         for (i <- 0 until querySize) phi_all (i) = SET [Int] ()
-         for ((c, phi_c) <- matches) {
-             println (s"(c, phi_c) = ($c, ${phi_c.deep})")
-             for (i <- 0 until querySize) phi_all(i) ++= phi_c(i)
-         } // for
-         phi_all
-    } // merge
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Performs tight simulation to find mappings with balls.
+    /** Refine 'phi' using tight simulation to find mappings with balls.
      *  @param phi  the initial mapping after applying Dual to the whole graph
      */
-    def tightSim (phi: Array [SET [Int]]): HashMap [Int, Array [SET [Int]]] =
+    def refine (phi: Array [SET [Int]]): Map [Int, Array [SET [Int]]] =
     {
         if (phi.size == 0) { println ("No dual match."); return null }  // exit if no match after dual simulation
 
-        val newGraph   = filterGraph (phi)                              // if doing strong sim more than once, must clone g
+        val newGraph   = filterGraph (phi)                              // if doing tight sim more than once, must clone g
         val prunedSize = phi.flatten.toSet.size                         // size of feasible matches after strict simulation
         val qDiameter  = qmet.rad                                       // get the query diameter
         val balls      = HashMap [Int, Ball [TLabel]] ()                         // map of balls: center -> ball               
@@ -112,7 +98,7 @@ class TightSimCAR [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel])
                  "\n     Total Distinct Vertices:  " + calculateTotalVertices ())
         println ("Ball Diameter Metrics(Min, Max, Mean, StdDev): " + calculateBallDiameterMetrics (balls) )
         matches
-    } // tightSim
+    } // refine
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Prune the data graph by consider only those vertices and edges which
@@ -261,6 +247,13 @@ class TightSimCAR [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel])
         } // for
         index
     } // selectivityCriteria 
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The 'prune' is not needed, pruning is delegated to incorporated dual graph
+     *  simulation algorithm.
+     *  @param phi  array of mappings from a query vertex u_q to { graph vertices v_g }
+     */
+    def prune (phi: Array [SET [Int]]): Array [SET [Int]] = throw new UnsupportedOperationException ()
 
 } // TightSimCAR class
 

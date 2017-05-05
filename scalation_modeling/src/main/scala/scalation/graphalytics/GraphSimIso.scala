@@ -30,13 +30,14 @@ class GraphSimIso (g: Graph, q: Graph)
      *  find the mappings from the query graph 'q' to the data graph 'g'.
      *  These are represented by a multi-valued function 'phi' that maps each
      *  query graph vertex 'u' to a set of data graph vertices '{v}'.
-     */
+     *
     def mappings (): Array [SET [Int]] = 
     {
         var psi: SET [Array [Int]] = null              // mappings from Dual Simulation
         if (noBijections) psi = bijections ()          // if no results, create them
         merge (psi)                                    // merge bijections to create mappings
     } // mappings
+     */
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Apply the Ullmann's Subgraph Isomorphism algorithm to find subgraphs of data
@@ -47,7 +48,7 @@ class GraphSimIso (g: Graph, q: Graph)
     override def bijections (): SET [Array [Int]] =
     {
         val phi = sims.feasibleMates ()                          // initial mappings from label match
-        GraphSimIso (sims.saltzGraphSim (phi), makeOrder (), 0)  // recursively find all bijections
+        refine (sims.prune (phi), makeOrder (), 0)               // recursively find all bijections
         val psi = simplify (matches)                             // pull bijections out matches
         noBijections = false                                     // results now available
         psi                                                      // return the set of bijections
@@ -58,7 +59,7 @@ class GraphSimIso (g: Graph, q: Graph)
      *  @param phi    array of mappings from a query vertex u_q to { graph vertices v_g }
      *  @param depth  the depth of recursion
      */
-    private def GraphSimIso (phi: Array [SET [Int]], ordering: Array [Int], depth: Int)
+    private def refine (phi: Array [SET [Int]], ordering: Array [Int], depth: Int)
     {
         if (depth == q.size) {
             if (! phi.isEmpty) {
@@ -66,16 +67,15 @@ class GraphSimIso (g: Graph, q: Graph)
                 if (matches.size % CHECK == 0) println ("GraphSimIso: matches so far = " + matches.size)
             } // if
         } else if (! phi.isEmpty) {
-            for (i <- phi (ordering (depth)) if (! contains (phi, i, ordering,
-              depth))) {
+            for (i <- phi (ordering (depth)) if (! contains (phi, i, ordering, depth))) {
                 val phiCopy = phi.map (x => x)                           // make a copy of phi
                 phiCopy (ordering (depth)) = SET [Int] (i)               // isolate vertex i
                 if (matches.size >= LIMIT) return                        // quit if at LIMIT
                 // solve recursively for the next depth 
-                GraphSimIso (sims.saltzGraphSim (phiCopy), ordering, depth + 1)
+                refine (sims.prune (phiCopy), ordering, depth + 1)
             } // for
         } // if
-    } // GraphSimIso
+    } // refine
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Establish a vertex order from largest to smallest adjacency set ('ch') size.
@@ -121,6 +121,13 @@ class GraphSimIso (g: Graph, q: Graph)
     /** Get the count of the number of matches.
      */
     def getMatches (): Int = matches.size
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The 'prune' is not needed, pruning is delegated to incorporated graph
+     *  simulation algorithm.
+     *  @param phi  array of mappings from a query vertex u_q to { graph vertices v_g }
+     */
+    def prune (phi: Array [SET [Int]]): Array [SET [Int]] = throw new UnsupportedOperationException ()
 
 } // GraphSimIso class
 

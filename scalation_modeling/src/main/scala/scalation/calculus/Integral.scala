@@ -49,7 +49,7 @@ object Integral
     private val c_bool = Array (14.0, 32.0, 12.0, 32.0)    // coefficients for boole
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Integrate ∫f(x)dx on interval [a, b] using the trapezoidal method.
+    /** Integrate '∫f(x)dx' on interval '[a, b]' using the trapezoidal method.
      *  @param a   the start of the integration interval
      *  @param b   the end of the integration interval
      *  @param f   the function to be integrated
@@ -65,7 +65,7 @@ object Integral
     } // trap
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Integrate ∫f(x)dx on interval [a, b] using the Simpson method.
+    /** Integrate '∫f(x)dx' on interval '[a, b]' using the Simpson method.
      *  @param a   the start of the integration interval
      *  @param b   the end of the integration interval
      *  @param f   the function to be integrated
@@ -81,7 +81,7 @@ object Integral
     } // simpson
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Integrate ∫f(x)dx on interval [a, b] using the 3/8 Simpson method.
+    /** Integrate '∫f(x)dx' on interval '[a, b]' using the 3/8 Simpson method.
      *  @param a   the start of the integration interval
      *  @param b   the end of the integration interval
      *  @param f   the function to be integrated
@@ -97,7 +97,7 @@ object Integral
     } // simpson38
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Integrate ∫f(x)dx on interval [a, b] using the Boole method.
+    /** Integrate '∫f(x)dx' on interval '[a, b]' using the Boole method.
      *  @param a   the start of the integration interval
      *  @param b   the end of the integration interval
      *  @param f   the function to be integrated
@@ -113,7 +113,7 @@ object Integral
     } // boole
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Integrate ∫f(x)dx on interval [a, b] using the Romberg method.
+    /** Integrate '∫f(x)dx' on interval '[a, b]' using the Romberg method.
      *  Translation of Java code from the site below to Scala.
      *  @see cs.roanoke.edu/Spring2012/CPSC402A/Integrate.java
      *  FIX: shouldn't need a 2D array/matrix.
@@ -137,15 +137,16 @@ object Integral
     } // romberg
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Integrate ∫f(x)dx on interval [a, b] using the default method.
-     *  @param a     the start of the integration interval
-     *  @param b     the end of the integration interval
-     *  @param f     the function to be integrated
+    /** Integrate '∫f(x)dx' on interval 'on' using the default method.
+     *  @param on  the interval of integration, e.g., (0.0, 2.0)
+     *  @param f   the function to be integrated
      */
-    def ∫ (on: (Double, Double), f: FunctionS2S): Double = romberg (on._1, on._2, f)
+    def integrate (on: Interval, f: FunctionS2S): Double = romberg (on._1, on._2, f)
+
+    def ∫ (on: Interval, f: FunctionS2S): Double = romberg (on._1, on._2, f)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Test each of the numerical integrators:  ∫f(x)dx on interval [a, b].
+    /** Test each of the numerical integrators:  '∫f(x)dx' on interval '[a, b]'.
      *  @param a    the start of the integration interval
      *  @param b    the end of the integration interval
      *  @param f    the function to be integrated
