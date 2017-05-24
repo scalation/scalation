@@ -411,11 +411,14 @@ object Complex
                  rr2 * math.sqrt (rad - a) * signum (b))
     } // sqrt
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Ordering for complex numbers.
+    /** Ordering for complex numbers
      */
     implicit val ord = new Ordering [Complex]
                { def compare (c: Complex, d: Complex) = c compare d }
+
+    /** Implicit numeric value for establishing type
+     */
+    implicit val num = _0
 
 } // Complex object
 

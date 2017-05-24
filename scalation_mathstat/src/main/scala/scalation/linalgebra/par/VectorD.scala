@@ -645,6 +645,18 @@ class VectorD (val dim: Int,
     } // argmax
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the argument maximum of 'this' vector (index of maximum element).
+     *  @param s  the starting index (inclusive) for the search
+     *  @param e  the ending index (exclusive) for the search
+     */
+    def argmax (s: Int, e: Int): Int =
+    {
+        var j = s
+        for (i <- s+1 until e if v(i) > v(j)) j = i
+        j
+    } // argmax
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the argument minimum of 'this' vector (index of minimum element).
      *  @param e  the ending index (exclusive) for the search
      */
@@ -654,6 +666,18 @@ class VectorD (val dim: Int,
         for (i <- 1 until e if v(i) < v(j)) j = i
         j
     } // argmin
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the argument mainmum of 'this' vector (index of minimum element).
+     *  @param s  the starting index (inclusive) for the search
+     *  @param e  the ending index (exclusive) for the search
+     */
+    def argmin (s: Int, e: Int): Int =
+    {
+        var j = s
+        for (i <- s+1 until e if v(i) < v(j)) j = i
+        j
+    } // arginm
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the argument minimum of 'this' vector (-1 if its not negative).

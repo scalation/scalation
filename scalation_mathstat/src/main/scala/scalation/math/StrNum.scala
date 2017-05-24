@@ -33,6 +33,10 @@ object StrO
     implicit val ord = new Ordering [StrNum]
                { def compare (s: StrNum, t: StrNum) = s compare t }
 
+    /** Implicit numeric value for establishing type
+     */
+    implicit val num = _0
+
     /** Default element separator (e.g., in a CSV file)
      */
     private val SP = ","

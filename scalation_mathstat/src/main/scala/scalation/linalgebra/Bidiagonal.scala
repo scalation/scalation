@@ -37,7 +37,7 @@ import scalation.util.Error
  *------------------------------------------------------------------------------
  *  @param a  the m-by-n matrix to bidiagonalize (requires m >= n)
  */
-class Bidiagonal (a: MatrixD)
+class Bidiagonal [MatT <: MatriD] (a: MatT) 
       extends Error
 {
     private val m = a.dim1                    // the number of rows in matrix a
@@ -69,7 +69,7 @@ class Bidiagonal (a: MatrixD)
      *  @param v2    the second vector
      *  @param from  the offset from which to compute the sliced dot product
      */
-    def sdot (v1: VectorD, v2: VectorD, from: Int = 0): Double =
+    def sdot (v1: VectoD, v2: VectoD, from: Int = 0): Double =
     {
         var sum = 0.0
         for (i <- from until v1.dim) sum += v1(i) * v2(i)
@@ -81,7 +81,7 @@ class Bidiagonal (a: MatrixD)
      *  to compute orthogonal matrices 'u' and 'v' such that 'u.t * a * v = b'
      *  where matrix 'b' is bidiagonal.
      */
-    def bidiagonalize (): (MatrixD, MatrixD, MatrixD) =
+    def bidiagonalize (): (MatriD, MatriD, MatriD) =
     {
         var f, g = 0.0                                  // typically [ f  g ]
         var h    = 0.0                                  //           [ 0  h ]

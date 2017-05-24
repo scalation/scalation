@@ -425,11 +425,14 @@ object Rational
      */
     def sqrt (x: Rational): Rational = x ~^ Rational (1l, 2l)
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Ordering for rational numbers.
+    /** Ordering for rational numbers
      */
     implicit val ord = new Ordering [Rational]
                { def compare (x: Rational, y: Rational) = x compare y }
+
+    /** Implicit numeric value for establishing type
+     */
+    implicit val num = _0
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a rational number from a `BigDecimal` number.

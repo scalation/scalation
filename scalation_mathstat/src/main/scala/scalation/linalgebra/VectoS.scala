@@ -377,11 +377,6 @@ trait VectoS
     def sum: StrNum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Sum the absolute value of the elements of 'this' vector.
-     */
-    def sumAbs: StrNum
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of 'this' vector skipping the 'i'-th element (Not Equal 'i').
      *  @param i  the index of the element to skip
      */

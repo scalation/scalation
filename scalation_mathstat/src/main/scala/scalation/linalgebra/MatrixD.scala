@@ -13,7 +13,7 @@ import java.io.PrintWriter
 
 import scala.io.Source.fromFile
 
-import scala.math.{abs => ABS}
+import scala.math.{abs => ABS, sqrt}
 
 import scalation.math.{double_exp, oneIf}
 import scalation.math.ExtremeD.TOL
@@ -1489,7 +1489,7 @@ class MatrixD (d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a normalized version of 'this' matrix.
-      */
+     */
     def normalizeU: MatrixD = MatrixD (for (j <- range2) yield col(j).normalizeU)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

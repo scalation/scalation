@@ -556,23 +556,23 @@ class VectorD (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of 'this' vector.
      */
-    def sum: Double = v.foldLeft (0.0)((s, x) => s + x)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Sum the absolute value of the elements of 'this' vector.
-     */
-    def sumAbs: Double = v.foldLeft (0.0)((s, x) => s + ABS (x))
+    def sum: Double = v.sum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of 'this' vector skipping the 'i'-th element (Not Equal 'i').
      *  @param i  the index of the element to skip
      */
-    def sumNE (i: Int): Double = sum - v(i)
+    def sumNE (i: Int): Double = v.sum - v(i)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the positive (> 0) elements of 'this' vector.
      */
-    def sumPos: Double = v.foldLeft (0.0)((s, x) => s + MAX (x, 0.0))
+    def sumPos: Double = 
+    {
+        var s = 0.0
+        for (x <- v) if (x > 0.0) s += x
+        s
+    } // sumPos
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Establish the rank order of the elements in 'self' vector, e.g.,
@@ -587,15 +587,15 @@ class VectorD (val dim: Int,
     def cumulate: VectorD =
     {
         val c = new VectorD (dim)
-        var sum = 0.0
-        for (i <- range) { sum += v(i); c.v(i) = sum }
+        var s = 0.0
+        for (i <- range) { s += v(i); c.v(i) = s }
         c
     } // cumulate
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize 'this' vector so that it sums to one (like a probability vector).
      */
-    def normalize: VectorD = this * (1.0 / sum)
+    def normalize: VectorD = this * (1.0 / v.sum)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize 'this' vector so its length is one (unit vector).
@@ -613,9 +613,9 @@ class VectorD (val dim: Int,
      */
     def dot (b: VectoD): Double =
     {
-        var sum = 0.0
-        for (i <- range) sum += v(i) * b(i)
-        sum
+        var s = 0.0
+        for (i <- range) s += v(i) * b(i)
+        s
     } // dot
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -624,19 +624,20 @@ class VectorD (val dim: Int,
      */
     def dot (b: VectorD): Double =
     {
-        var sum = 0.0
-        for (i <- range) sum += v(i) * b.v(i)
-        sum
+        var s = 0.0
+        for (i <- range) s += v(i) * b.v(i)
+        s
     } // dot
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Manhattan norm (1-norm) of 'this' vector.
+    /** Compute the Manhattan norm (1-norm) of 'this' vector, i.e., the sum of the
+     *  absolute values of the elements.
      */
     def norm1: Double =
     {
-        var sum = 0.0
-        for (i <- range) sum += ABS (v(i))
-        sum
+        var s = 0.0
+        for (x <- v) s += ABS (x)
+        s
     } // norm1
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1124,14 +1125,19 @@ object VectorDTest extends App
         println ("x * y    = " + (x * y))
         println ("x / y    = " + (x / y))
 
-        println ("x.min    = " + x.min ())
-        println ("x.max    = " + x.max ())
+        println ("x.abs    = " + x.abs)
+        println ("x.recip  = " + x.recip)
         println ("x.sum    = " + x.sum)
         println ("x.sumNE  = " + x.sumNE (0))
+        println ("x.sumPos = " + x.sumPos)
+        println ("x.rank   = " + x.rank)
         println ("x dot y  = " + (x dot y))
-        println ("x ∙ y    = " + (x ∙ y))
+        println ("x ∙ y    = " + x ∙ y)
         println ("x.normSq = " + x.normSq)
         println ("x.norm   = " + x.norm)
+        println ("x.norm1  = " + x.norm1)
+        println ("x.min    = " + x.min ())
+        println ("x.max    = " + x.max ())
         println ("x < y    = " + (x < y))
     } // for
 

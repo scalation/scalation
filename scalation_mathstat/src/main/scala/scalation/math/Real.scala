@@ -711,11 +711,15 @@ object Real
         if ((double_exp (10.0) ~^ xMag) * 10.0 <= xAbs) xMag + 1 else xMag   
     } // magnitude
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Ordering for real numbers.
+
+    /** Ordering for real numbers
      */
     implicit val ord = new Ordering [Real]
                { def compare (x: Real, y: Real) = x compare y }
+
+    /** Implicit numeric value for establishing type
+     */
+    implicit val num = _0
 
 } // Real object
 

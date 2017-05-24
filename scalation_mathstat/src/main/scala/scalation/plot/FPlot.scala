@@ -21,10 +21,10 @@ import scalation.scala2d.Shapes.{BasicStroke, Dimension, Graphics, Graphics2D}
 /** The `FPlot` class takes 'x' and 'y' vectors of data values and plots the '(x, y)'
  *  data points.  Optionally, a 'z' vector may be plotted with 'y'.  Note, axes are
  *  determined by the 'x' and 'y' vectors only.  For more vertical vectors use `PlotM`.
- *  @param x1       the x vector of data values (horizontal)
- *  @param y1       the y vector of data values (primary vertical)
- *  @param x2       the x vector of functional values (horizontal)
- *  @param y2       the z function of data values (secondary vertical) to compare with y
+ *  @param x1      the x vector of data values (horizontal)
+ *  @param y1      the y vector of data values (primary vertical)
+ *  @param x2      the x vector of functional values (horizontal)
+ *  @param y2      the z function of data values (secondary vertical) to compare with y
  *  @param _title  the title of the plot
  */
 class FPlot (x1: VectoD, y1: VectoD, x2: VectoD, y2: FunctionS2S, _title: String = "Plot y vs. x")
@@ -38,33 +38,33 @@ class FPlot (x1: VectoD, y1: VectoD, x2: VectoD, y2: FunctionS2S, _title: String
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `FCanvas` class provides a canvas on which to draw the plot.
- *  @param x1       the x vector of data values (horizontal)
- *  @param y1       the y vector of data values (primary vertical)
- *  @param x2       the x vector of functional values (horizontal)
- *  @param y2       the z function of data values (secondary vertical) to compare with y
+ *  @param x1      the x vector of data values (horizontal)
+ *  @param y1      the y vector of data values (primary vertical)
+ *  @param x2      the x vector of functional values (horizontal)
+ *  @param y2      the z function of data values (secondary vertical) to compare with y
  *  @param width   the width
  *  @param height  the height
  */
 class FCanvas (x1: VectoD, y1: VectoD, x2: VectoD, y2: FunctionS2S, width: Int, height: Int)
     extends Panel
 {
-    private val EPSILON   = 1E-9
-    private val frameW    = width
-    private val frameH    = height
-    private val offset    = 50
-    private val baseX     = offset
-    private val baseY     = frameH - offset
-    private val stepsX    = 10
-    private val stepsY    = 10
-    private val minX      = floor (x1.min ())
-    private val maxX      = ceil (x1.max () + EPSILON)
-    private val minY      = floor (y1.min ())
-    private val maxY      = ceil (y1.max () + EPSILON)
-    private val deltaX    = maxX - minX
-    private val deltaY    = maxY - minY
-    private val diameter  = 4
-    private val dot       = Ellipse ()
-    private val axis      = Line ()
+    private val EPSILON  = 1E-9
+    private val frameW   = width
+    private val frameH   = height
+    private val offset   = 50
+    private val baseX    = offset
+    private val baseY    = frameH - offset
+    private val stepsX   = 10
+    private val stepsY   = 10
+    private val minX     = floor (x1.min ())
+    private val maxX     = ceil (x1.max () + EPSILON)
+    private val minY     = floor (y1.min ())
+    private val maxY     = ceil (y1.max () + EPSILON)
+    private val deltaX   = maxX - minX
+    private val deltaY   = maxY - minY
+    private val diameter = 4
+    private val dot      = Ellipse ()
+    private val axis     = Line ()
 
     setBackground (white)
 
@@ -156,7 +156,7 @@ class FCanvas (x1: VectoD, y1: VectoD, x2: VectoD, y2: FunctionS2S, width: Int, 
     } // clip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert a Plot vectors to a string.
+    /** Convert 'this' object to a string.
      */
     override def toString = "Plot (y = " + y1 + " vs. x = " + x1 + ")"
 

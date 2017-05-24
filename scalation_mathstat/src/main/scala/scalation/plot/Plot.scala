@@ -83,23 +83,23 @@ class FramelessPlot (x: VectoD, y: VectoD, z: VectoD = null, var width: Int = 64
 class Canvas (x: VectoD, y: VectoD, z: VectoD, width: Int, height: Int)
       extends Panel
 {
-    private val EPSILON   = 1E-9
-    private val frameW    = width
-    private val frameH    = height
-    private val offset    = 50
-    private val baseX     = offset
-    private val baseY     = frameH - offset
-    private val stepsX    = 10
-    private val stepsY    = 10
-    private val minX      = floor (x.min ())
-    private val maxX      = ceil (x.max () + EPSILON)
-    private val minY      = floor (y.min ())
-    private val maxY      = ceil (y.max () + EPSILON)
-    private val deltaX    = maxX - minX
-    private val deltaY    = maxY - minY
-    private val diameter  = 4
-    private val dot       = Ellipse ()
-    private val axis      = Line ()
+    private val EPSILON  = 1E-9
+    private val frameW   = width
+    private val frameH   = height
+    private val offset   = 50
+    private val baseX    = offset
+    private val baseY    = frameH - offset
+    private val stepsX   = 10
+    private val stepsY   = 10
+    private val minX     = floor (x.min ())
+    private val maxX     = ceil (x.max () + EPSILON)
+    private val minY     = floor (y.min ())
+    private val maxY     = ceil (y.max () + EPSILON)
+    private val deltaX   = maxX - minX
+    private val deltaY   = maxY - minY
+    private val diameter = 4
+    private val dot      = Ellipse ()
+    private val axis     = Line ()
 
     setBackground (white)
 

@@ -377,11 +377,6 @@ trait VectoC
     def sum: Complex
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Sum the absolute value of the elements of 'this' vector.
-     */
-    def sumAbs: Complex
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of 'this' vector skipping the 'i'-th element (Not Equal 'i').
      *  @param i  the index of the element to skip
      */

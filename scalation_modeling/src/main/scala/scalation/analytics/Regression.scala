@@ -23,7 +23,7 @@ import scalation.util.Unicode.sub
 object RegTechnique extends Enumeration
 {
     type RegTechnique = Value
-    val QR, Cholesky, Inverse = Value
+    val QR, Cholesky, SVD, Inverse = Value
     
 } // RegTechnique
 
@@ -74,17 +74,23 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
 
     type Fac_QR = Fac_QR_H [MatT]                              // change as needed
 
-    private val fac = technique match {                        // select the factorization technique
+    private var dec: SVDecomp = _
+    private val fac: Factorization = technique match {         // select the factorization technique
         case QR       => new Fac_QR (x)                        // QR Factorization
         case Cholesky => new Fac_Cholesky (x.t * x)            // Cholesky Factorization
-        case _        => null                                  // don't factor, use inverse
+        case SVD      => dec = new SVD (x)                     // Singular Value Decomposition
+                         null.asInstanceOf [Factorization]
+        case _        => null.asInstanceOf [Factorization]     // don't factor, use inverse
     } // match
 
+/*
     private val x_pinv = technique match {                     // pseudo-inverse of x
         case QR       => val (q, r) = fac.factor12 (); r.inverse * q.t
         case Cholesky => fac.factor (); null                   // don't compute it directly
+        case SVD      =>
         case _        => (x.t * x).inverse * x.t               // classic textbook technique
     } // match
+*/
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
@@ -94,8 +100,20 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
      */
     def train ()
     {
+        b = technique match {
+            case QR       => fac.factor ()                             // X = QR
+                             fac.solve (x.t * y).asInstanceOf [VecT]
+            case Cholesky => fac.factor ()                             // XtX = 
+                             fac.solve (x.t * y).asInstanceOf [VecT]
+            case SVD      => dec.factor ()
+                             dec.solve (x.t * y).asInstanceOf [VecT]
+            case _        => val xtx_inv = (x.t * x).inverse           // (XtX)-1
+                             xtx_inv * (x.t * y)
+        } // match
+/*
         b = if (x_pinv == null) fac.solve (x.t * y).asInstanceOf [VecT]   // FIX
             else x_pinv * y                                     // parameter vector [b_0, b_1, ... b_k]
+*/
         e = y - x * b                                           // residual/error vector
         sseF ()                                                 // compute and save sum of squared errors
         diagnose (y, e)
@@ -110,8 +128,20 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
      */
     def train (yy: VectoD)
     {
+        b = technique match {
+            case QR       => fac.factor ()                             // X = QR
+                             fac.solve (x.t * y).asInstanceOf [VecT]
+            case Cholesky => fac.factor ()                             // XtX = 
+                             fac.solve (x.t * y).asInstanceOf [VecT]
+            case SVD      => fac.factor ()
+                             fac.solve (x.t * y).asInstanceOf [VecT]
+            case _        => val xtx_inv = (x.t * x).inverse           // (XtX)-1
+                             xtx_inv * (x.t * y)
+        } // match
+/*
         b = if (x_pinv == null) fac.solve (yy).asInstanceOf [VecT]   // FIX
             else x_pinv * yy                                    // parameter vector [b_0, b_1, ... b_k]
+*/
         e  = yy - x * b                                         // residual/error vector
         sseF ()                                                 // compute and save sum of squared errors
         diagnose (yy, e)

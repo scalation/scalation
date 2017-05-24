@@ -556,23 +556,23 @@ class VectorC (val dim: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of 'this' vector.
      */
-    def sum: Complex = v.foldLeft (_0)((s, x) => s + x)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Sum the absolute value of the elements of 'this' vector.
-     */
-    def sumAbs: Complex = v.foldLeft (_0)((s, x) => s + ABS (x))
+    def sum: Complex = v.sum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of 'this' vector skipping the 'i'-th element (Not Equal 'i').
      *  @param i  the index of the element to skip
      */
-    def sumNE (i: Int): Complex = sum - v(i)
+    def sumNE (i: Int): Complex = v.sum - v(i)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the positive (> 0) elements of 'this' vector.
      */
-    def sumPos: Complex = v.foldLeft (_0)((s, x) => s + MAX (x, _0))
+    def sumPos: Complex = 
+    {
+        var s = _0
+        for (x <- v) if (x > _0) s += x
+        s
+    } // sumPos
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Establish the rank order of the elements in 'self' vector, e.g.,
@@ -587,15 +587,15 @@ class VectorC (val dim: Int,
     def cumulate: VectorC =
     {
         val c = new VectorC (dim)
-        var sum = _0
-        for (i <- range) { sum += v(i); c.v(i) = sum }
+        var s = _0
+        for (i <- range) { s += v(i); c.v(i) = s }
         c
     } // cumulate
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize 'this' vector so that it sums to one (like a probability vector).
      */
-    def normalize: VectorC = this * (_1 / sum)
+    def normalize: VectorC = this * (_1 / v.sum)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Normalize 'this' vector so its length is one (unit vector).
@@ -613,9 +613,9 @@ class VectorC (val dim: Int,
      */
     def dot (b: VectoC): Complex =
     {
-        var sum = _0
-        for (i <- range) sum += v(i) * b(i)
-        sum
+        var s = _0
+        for (i <- range) s += v(i) * b(i)
+        s
     } // dot
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -624,19 +624,20 @@ class VectorC (val dim: Int,
      */
     def dot (b: VectorC): Complex =
     {
-        var sum = _0
-        for (i <- range) sum += v(i) * b.v(i)
-        sum
+        var s = _0
+        for (i <- range) s += v(i) * b.v(i)
+        s
     } // dot
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Manhattan norm (1-norm) of 'this' vector.
+    /** Compute the Manhattan norm (1-norm) of 'this' vector, i.e., the sum of the
+     *  absolute values of the elements.
      */
     def norm1: Complex =
     {
-        var sum = _0
-        for (i <- range) sum += ABS (v(i))
-        sum
+        var s = _0
+        for (x <- v) s += ABS (x)
+        s
     } // norm1
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1124,14 +1125,19 @@ object VectorCTest extends App
         println ("x * y    = " + (x * y))
         println ("x / y    = " + (x / y))
 
-        println ("x.min    = " + x.min ())
-        println ("x.max    = " + x.max ())
+        println ("x.abs    = " + x.abs)
+        println ("x.recip  = " + x.recip)
         println ("x.sum    = " + x.sum)
         println ("x.sumNE  = " + x.sumNE (0))
+        println ("x.sumPos = " + x.sumPos)
+        println ("x.rank   = " + x.rank)
         println ("x dot y  = " + (x dot y))
-        println ("x ∙ y    = " + (x ∙ y))
+        println ("x ∙ y    = " + x ∙ y)
         println ("x.normSq = " + x.normSq)
         println ("x.norm   = " + x.norm)
+        println ("x.norm1  = " + x.norm1)
+        println ("x.min    = " + x.min ())
+        println ("x.max    = " + x.max ())
         println ("x < y    = " + (x < y))
     } // for
 

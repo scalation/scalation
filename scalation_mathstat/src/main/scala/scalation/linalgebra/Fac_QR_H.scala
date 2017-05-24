@@ -108,6 +108,7 @@ class Fac_QR_H [MatT <: MatriD] (aa: MatT, needQ: Boolean = true)
      *  @param b  the constant vector
      */
     override def solve (b: VectoD): VectoD = r.bsolve (VectorD (transformB (b().toArray)))
+    def solve (b: VectorD): VectoD = r.bsolve (VectorD (transformB (b().array)))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Transform 'b' into 'q.t * b', i.e., perform the right side of the equation

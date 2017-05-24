@@ -936,7 +936,7 @@ class BidMatrixI (val d1: Int)
     /** Compute the 'abs' sum of 'this' bidiagonal matrix, i.e., the sum of the absolute
      *  value of its elements.  This is useful for comparing matrices '(a - b).sumAbs'.
      */
-    def sumAbs: Int = _dg.sumAbs + _sd.sumAbs
+    def sumAbs: Int = _dg.norm1 + _sd.norm1
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the sum of the lower triangular region of 'this' bidiagonal matrix.

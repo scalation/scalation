@@ -27,23 +27,23 @@ class PlotM (x: VectoD, y: MatriD, var label: Array [String] = null,
             _title: String = "PlotM y_i vs. x for each i")
       extends VizFrame (_title, null)
 {
-    private val EPSILON   = 1E-9
-    private val frameW    = getW
-    private val frameH    = getH
-    private val offset    = 70
-    private val baseX     = offset
-    private val baseY     = frameH - offset
-    private val stepsX    = 10
-    private val stepsY    = 10
-    private val minX      = floor (x.min ())
-    private val maxX      = ceil (x.max () + EPSILON)
-    private val minY      = floor (y.min ())
-    private val maxY      = ceil (y.max () + EPSILON)
-    private val deltaX    = maxX - minX
-    private val deltaY    = maxY - minY
-    private val diameter  = 4
-    private val dot       = Ellipse ()
-    private val axis      = Line ()
+    private val EPSILON  = 1E-9
+    private val frameW   = getW
+    private val frameH   = getH
+    private val offset   = 70
+    private val baseX    = offset
+    private val baseY    = frameH - offset
+    private val stepsX   = 10
+    private val stepsY   = 10
+    private val minX     = floor (x.min ())
+    private val maxX     = ceil (x.max () + EPSILON)
+    private val minY     = floor (y.min ())
+    private val maxY     = ceil (y.max () + EPSILON)
+    private val deltaX   = maxX - minX
+    private val deltaY   = maxY - minY
+    private val diameter = 4
+    private val dot      = Ellipse ()
+    private val axis     = Line ()
 
     if (label == null) label = defaultLabels
 
@@ -148,9 +148,9 @@ class PlotM (x: VectoD, y: MatriD, var label: Array [String] = null,
     } // clip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert a Plot vectors to a string.
+    /** Convert 'this' object to a string.
      */
-    override def toString = "Plot (y = " + y + " vs. x = " + x + ")"
+    override def toString = "PlotM (y = " + y + " vs. x = " + x + ")"
 
 } // PlotM class
 

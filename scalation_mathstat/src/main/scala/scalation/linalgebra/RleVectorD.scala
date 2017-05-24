@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author   Vishnu Gowda Harish, John Miller
- *  @version  1.0
+ *  @version  1.3
  *  @date     Mon March 28 5:10:20 EDT 2016
  *  @see      LICENSE (MIT style license file).
  */
@@ -1184,7 +1184,22 @@ class RleVectorD (val dim: Int, protected var v: ReArray [TripletD] = null)
         } // for
         j
     } // argmax
-       
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the argument maximum of 'this' vector (index of maximum element).
+     *  @param s  the starting index (inclusive) for the search
+     *  @param e  the ending index (exclusive) for the search
+     */
+    def argmax (s: Int, e: Int): Int =
+    {
+        var j = s
+        var temp = v(s).value
+        for (i <- s+1 until csize if v(i).startPos + v(i).count - 1 < e && v(i).value > temp) {
+            temp = v(i).value; j = v(i).startPos
+        } // for
+        j
+    } // argmax
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the argument minimum of 'this' vector (index of minimum element).
      *  @param e  the ending index (exclusive) for the search
@@ -1199,6 +1214,21 @@ class RleVectorD (val dim: Int, protected var v: ReArray [TripletD] = null)
         j
     } // argmin
      
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the argument minimum of 'this' vector (index of minimum element).
+     *  @param s  the starting index (inclusive) for the search
+     *  @param e  the ending index (exclusive) for the search
+     */
+    def argmin (s: Int, e: Int): Int =
+    {
+        var j = s
+        var temp = v(s).value
+        for (i <- s+1 until csize if v(i).startPos + v(i).count - 1 < e && v(i).value < temp) {
+            temp = v(i).value; j = v(i).startPos
+        } // for
+        j
+    } // argmin
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the argument minimum of 'this' vector (-1 if its not negative).
      *  @param e  the ending index (exclusive) for the search

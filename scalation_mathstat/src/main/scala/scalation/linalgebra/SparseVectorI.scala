@@ -708,7 +708,7 @@ class SparseVectorI (val dim_ : Int,
      *  @param e  the ending index (exclusive) for the search
      */
     def indexOf (x: Int, e: Int = dim): Int =
-    {
+    {        
         if (x =~ 0.0) { for (i <- range if this(i) =~ 0.0) return i; -1 }
         for (y <- v if y._1 < e && y._2 == x) return y._1; -1 
     } // indexOf

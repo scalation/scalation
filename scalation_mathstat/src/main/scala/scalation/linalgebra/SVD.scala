@@ -39,7 +39,7 @@ import scalation.util.Error
  *------------------------------------------------------------------------------
  *  @param a  the m-by-n matrix to factor/decompose (requires m >= n)
  */
-class SVD (a : MatrixD)
+class SVD [MatT <: MatriD] (a: MatT)
     extends SVDecomp with Error
 {
     private val DEBUG          = true                // debug flag
@@ -61,7 +61,7 @@ class SVD (a : MatrixD)
      *  a vector of singular values 'q' and a matrix of right singular vectors 'v'
      *  such that 'a = u ** q * v.t'.
      */
-    override def factor (): Tuple3 [MatrixD, VectorD, MatrixD] =
+    override def factor (): FactorType =
     {
         val bid       = new Bidiagonal (a)                // class for making bidiagonal matrices 
         val (u, b, v) = bid.bidiagonalize ()              // factor a into a bidiagonal matrix b 
@@ -207,7 +207,7 @@ class SVD (a : MatrixD)
           *  @param e  the super-diagonal
           *  @param q  the main diagonal
           */
-        def shiftFromBottom (k : Int, e: VectorD, q: VectorD)
+        def shiftFromBottom (k : Int, e: VectoD, q: VectoD)
         {
             bmx = q(l)
             y   = q(k-1)
@@ -215,10 +215,10 @@ class SVD (a : MatrixD)
             f   = ((y - z) * (y + z) + (g - h) * (g + h)) / (2.0 * h * y)
             g   = hypot (f, 1.0)
             f   = if (f < 0) ((bmx - z) * (bmx + z) + h * (y / (f - g) - h)) / bmx
-            else       ((bmx - z) * (bmx + z) + h * (y / (f + g) - h)) / bmx
+            else             ((bmx - z) * (bmx + z) + h * (y / (f + g) - h)) / bmx
 
-            println("f = "+f)
-            println("g = "+g)
+            println ("f = "+f)
+            println ("g = "+g)
         } // shiftFromBottom
 
         // final part for factor method
@@ -234,12 +234,12 @@ class SVD (a : MatrixD)
      *  @param e  the super-diagonal
      *  @param q  the main diagonal
      */
-    def testFSplitting (k : Int, e: VectorD, q: VectorD)
+    def testFSplitting (k : Int, e: VectoD, q: VectoD)
     {
         for (ll <- k to 0 by -1) {
             l = ll                               // make global index l track loop variable ll
             test_fconverge = false
-            if (abs (e(ll))   <= eps) {  println("e(ll) = "+e(ll));test_fconverge = true; return }
+            if (abs (e(ll))   <= eps) {  println ("e(ll) = "+e(ll));test_fconverge = true; return }
             if (abs (q(ll-1)) <= eps) return
         } // for
     } // testFSplitting
@@ -248,7 +248,7 @@ class SVD (a : MatrixD)
     /** Solve for 'x' in 'a^t*a*x = b' using `SVD`.
      *  @param b  the constant vector
      */
-    def solve (b: VectorD): VectorD =
+    override def solve (b: VectoD): VectoD =
     {
         val (u, d, vt) = factor ()                   // factor using SVD
         val alpha = u.t * b                          // principle component regression

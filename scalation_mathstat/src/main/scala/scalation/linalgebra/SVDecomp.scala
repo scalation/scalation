@@ -27,8 +27,8 @@ trait SVDecomp
     /** Factor type contains 'u, s, v' which are the left orthogonal matrix, the diagonal
      *  matrix/vector containing singular values and the right orthogonal matrix.
      */
-    type FactorType     = (MatrixD, VectorD, MatrixD)
-    type FactorTypeFull = (MatrixD, MatrixD, MatrixD)
+    type FactorType     = (MatriD, VectoD, MatriD)
+    type FactorTypeFull = (MatriD, MatriD, MatriD)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor/deflate the matrix by iteratively turning elements not in the main
@@ -62,7 +62,7 @@ trait SVDecomp
      *  @param u  the left orthongonal matrix
      *  @param s  the vector of singular values
      */
-    def flip (u: MatrixD, s: VectorD)
+    def flip (u: MatriD, s: VectoD)
     {
         for (i <- s.indices) {
             if (abs (s(i)) < TOL) s(i) = 0.0                   // zero out
@@ -75,13 +75,20 @@ trait SVDecomp
      *  @param u  the left orthongonal matrix
      *  @param v  the right orthongonal matrix
      */
-    def flip (u: MatrixD, v: MatrixD)
+    def flip (u: MatriD, v: MatriD)
     {
         for (j <- u.range2 if u(j, j) < 0.0) u.setCol(j, u.col(j) * -1.0)
         for (j <- v.range2 if v(j, j) < 0.0) v.setCol(j, v.col(j) * -1.0)
     } // flip
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve for 'x' in 'a^t*a*x = b' using `SVD`.
+     *  @param b  the constant vector
+     */
+    def solve (b: VectoD): VectoD = ???
+
 } // SVDecomp trait
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDecomp` object provides several test matrices as well as methods
@@ -144,7 +151,7 @@ object SVDecomp extends SVDecomp
      *  @param u_s_v  the given matrix a factored into three components
      *  @param name   the name of the test case
      */
-    def test (a: MatrixD, u_s_v: FactorType, name: String)
+    def test (a: MatriD, u_s_v: FactorType, name: String)
     {
         banner (name)
         println (s"factor matrix a = $a")
