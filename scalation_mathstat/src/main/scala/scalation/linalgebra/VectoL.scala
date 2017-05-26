@@ -493,10 +493,24 @@ trait VectoL
     def argmax (e: Int = dim): Int
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the argument maximum of 'this' vector (index of maximum element).
+     *  @param s  the starting index (inclusive) for the search
+     *  @param e  the ending index (exclusive) for the search
+     */
+    def argmax (s: Int, e: Int): Int
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the argument minimum of 'this' vector (index of minimum element).
      *  @param e  the ending index (exclusive) for the search
      */
     def argmin (e: Int = dim): Int
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the argument minimum of 'this' vector (index of minimum element).
+     *  @param s  the starting index (inclusive) for the search
+     *  @param e  the ending index (exclusive) for the search
+     */
+    def argmin (s: Int, e: Int): Int
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the argument minimum of 'this' vector (-1 if it's not negative).

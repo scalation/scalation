@@ -13,7 +13,7 @@ import java.io.PrintWriter
 
 import scala.io.Source.fromFile
 
-import scala.math.{abs => ABS, sqrt}
+import scala.math.{abs => ABS}
 
 import scalation.math.{double_exp, oneIf}
 import scalation.math.ExtremeD.TOL
@@ -1489,7 +1489,7 @@ class MatrixD (d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a normalized version of 'this' matrix.
-     */
+      */
     def normalizeU: MatrixD = MatrixD (for (j <- range2) yield col(j).normalizeU)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1921,7 +1921,7 @@ object MatrixDTest extends App with PackageInfo
     aa *= bb
     println ("aa *= bb  = " + aa)
 
-    val filename = getDataPath + "bb_matrix.csv"
+    val filename = scalation.DATA_DIR + "bb_matrix.csv"
     bb.write (filename)
     println ("bb_csv = " + MatrixD (filename))
 

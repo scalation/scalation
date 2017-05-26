@@ -61,15 +61,22 @@ object StrO
      */
     def min (s: StrNum, t: StrNum): StrNum = if (t < s) t else s
 
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the signum (sgn) of a StrNum.
+     *  @param s  the StrNum to obtain the signum of
+     */
+    def signum (s: StrNum): StrNum =
+    {
+        throw new UnsupportedOperationException ("StrNum does not support signum function")
+    } // signum
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the square root of that string number (currently not supported).
      *  @param s  that string number
      */
     def sqrt (s: StrNum): StrNum =
     {
-//      throw new NoSuchMethodException ("StrNum does not support sqrt function")
-        println ("StrNum.sqrt: sqrt function not supported")
-        _0
+        throw new UnsupportedOperationException ("StrNum does not support sqrt function")
     } // sqrt
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

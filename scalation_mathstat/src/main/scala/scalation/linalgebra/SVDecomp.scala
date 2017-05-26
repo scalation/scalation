@@ -23,6 +23,7 @@ import scalation.util.{banner, sline}
  *  The last three are still under development.
  */
 trait SVDecomp
+      extends Factorization
 {
     /** Factor type contains 'u, s, v' which are the left orthogonal matrix, the diagonal
      *  matrix/vector containing singular values and the right orthogonal matrix.
@@ -32,10 +33,24 @@ trait SVDecomp
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor/deflate the matrix by iteratively turning elements not in the main
+     *  diagonal to zero.
+     */
+    def factor () = factor123 ()
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the two factored matrices.
+     */
+    def factors: (MatriD, MatriD) =
+    {
+        throw new UnsupportedOperationException ("SVDecomp has three, not two factors")
+    } // factors
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Factor/deflate the matrix by iteratively turning elements not in the main
      *  diagonal to zero.  Then return the vector of singular values (i.e., the main
      *  diagonal), along with the left and right singular matrices.
      */
-    def factor (): FactorType = ???                          // return (u, s, v)
+    def factor123 (): FactorType = ???                          // return (u, s, v)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reorder the singular values to be in non-increasing order.  Must swap
@@ -151,17 +166,18 @@ object SVDecomp extends SVDecomp
      *  @param u_s_v  the given matrix a factored into three components
      *  @param name   the name of the test case
      */
-    def test (a: MatriD, u_s_v: FactorType, name: String)
+    def test (a: MatriD, svd: SVDecomp, name: String)
     {
         banner (name)
         println (s"factor matrix a = $a")
-        println (sline () + s"into (u, s, v) = $u_s_v")
-        val (u, s, v) = u_s_v
+        val (u, s, v) = svd.factor123 ()                         // factor matrix a
+        println (sline () + s"into (u, s, v) = ${(u, s, v)}")
         val prod = u ** s * v.t                                  // compute the product
         println (sline () + s"check: u ** s * v.t = $prod")      // should equal the original a matrix
-        println (s"prod - a = ${prod - a}")
+        println (s"prod - a = ${prod - a}")                      // difference should be close to 0
         println (sline ())
         assert (prod == a)
+        println (sline ())
     } // test
 
 } // SVDecomp object
@@ -174,13 +190,8 @@ import SVDecomp._
  */
 object SVDecompTest extends App
 {
-     val (u, s, v) = (new SVD (a1)).factor ()
-     test (a1, (u, s, v), "SVDTest")
-
-     val (u2, s2, v2) = (new SVD2 (a1)).factor ()
-     test (a1, (u2, s2, v2), "SVD2Test")
-
-     assert ((u, s, v) == (u2, s2, v2))
+     test (a1, new SVD (a1),  "SVDTest")
+     test (a1, new SVD2 (a1), "SVD2Test")
 
 } // SVDecompTest
 
@@ -191,13 +202,8 @@ object SVDecompTest extends App
  */
 object SVDecompTest2 extends App
 {
-     val (u, s, v) = (new SVD (a2)).factor ()
-     test (a2, (u, s, v), "SVDTest")
-
-     val (u2, s2, v2) = (new SVD2 (a2)).factor ()
-     test (a2, (u2, s2, v2), "SVD2Test")
-
-     assert ((u, s, v) == (u2, s2, v2))
+     test (a2, new SVD (a2),  "SVDTest")
+     test (a2, new SVD2 (a2), "SVD2Test")
 
 } // SVDecompTest2
 
@@ -208,13 +214,8 @@ object SVDecompTest2 extends App
  */
 object SVDecompTest3 extends App
 {
-     val (u, s, v) = (new SVD (a3)).factor ()
-     test (a3, (u, s, v), "SVDTest")
-
-     val (u2, s2, v2) = (new SVD2 (a3)).factor ()
-     test (a3, (u2, s2, v2), "SVD2Test")
-
-     assert ((u, s, v) == (u2, s2, v2))
+     test (a3, new SVD (a3),  "SVDTest")
+     test (a3, new SVD2 (a3), "SVD2Test")
 
 } // SVDecompTest3
 
@@ -225,13 +226,8 @@ object SVDecompTest3 extends App
  */
 object SVDecompTest4 extends App
 {
-     val (u, s, v) = (new SVD (a4)).factor ()
-     test (a4, (u, s, v), "SVDTest")
-
-     val (u2, s2, v2) = (new SVD2 (a4)).factor ()
-     test (a4, (u2, s2, v2), "SVD2Test")
-
-     assert ((u, s, v) == (u2, s2, v2))
+     test (a4, new SVD (a4),  "SVDTest")
+     test (a4, new SVD2 (a4), "SVD2Test")
 
 } // SVDecompTest4
 
@@ -242,13 +238,8 @@ object SVDecompTest4 extends App
  */
 object SVDecompTest5 extends App
 {
-     val (u, s, v) = (new SVD (a5)).factor ()
-     test (a5, (u, s, v), "SVDTest")
-
-     val (u2, s2, v2) = (new SVD2 (a5)).factor ()
-     test (a5, (u2, s2, v2), "SVD2Test")
-
-     assert ((u, s, v) == (u2, s2, v2))
+     test (a5, new SVD (a5),  "SVDTest")
+     test (a5, new SVD2 (a5), "SVD2Test")
 
 } // SVDecompTest5
 
@@ -259,13 +250,8 @@ object SVDecompTest5 extends App
  */
 object SVDecompTest6 extends App
 {
-     val (u, s, v) = (new SVD (a6)).factor ()
-     test (a6, (u, s, v), "SVDTest")
-
-     val (u2, s2, v2) = (new SVD2 (a6)).factor ()
-     test (a6, (u2, s2, v2), "SVD2Test")
-
-     assert ((u, s, v) == (u2, s2, v2))
+     test (a6, new SVD (a6),  "SVDTest")
+     test (a6, new SVD2 (a6), "SVD2Test")
 
 } // SVDecompTest6
 
@@ -276,13 +262,8 @@ object SVDecompTest6 extends App
  */
 object SVDecompTest7 extends App
 {
-     val (u, s, v) = (new SVD (a7)).factor ()
-     test (a7, (u, s, v), "SVDTest")
-
-     val (u2, s2, v2) = (new SVD2 (a7)).factor ()
-     test (a7, (u2, s2, v2), "SVDTest")
-
-     assert ((u, s, v) == (u2, s2, v2))
+     test (a7, new SVD (a7),  "SVDTest")
+     test (a7, new SVD2 (a7), "SVD2Test")
 
 } // SVDecompTest7
 
@@ -293,13 +274,8 @@ object SVDecompTest7 extends App
  */
 object SVDecompTest8 extends App
 {
-     val (u, s, v) = (new SVD (a8)).factor ()
-     test (a8, (u, s, v), "SVDTest")
-
-     val (u2, s2, v2) = (new SVD2 (a8)).factor ()
-     test (a8, (u2, s2, v2), "SVDTest")
-
-     assert ((u, s, v) == (u2, s2, v2))
+     test (a8, new SVD (a8),  "SVDTest")
+     test (a8, new SVD2 (a8), "SVD2Test")
 
 } // SVDecompTest68
 

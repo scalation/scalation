@@ -682,7 +682,7 @@ class SparseVectorD (val dim_ : Int,
         for (x <- v if (x._1 < e && x._2 < this(i))) i = x._1
         i
     } // argmin
-    
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the argument minimum of 'this' vector (index of minimum element).
      *  @param s  the starting index (inclusive) for the search
@@ -694,7 +694,7 @@ class SparseVectorD (val dim_ : Int,
         for (x <- v if (s < x._1 && x._1 < e && x._2 < this(i))) i = x._1
         i
     } // argmin
-
+    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the argument minimum of 'this' vector (-1 if its not negative).
      *  @param e  the ending index (exclusive) for the search

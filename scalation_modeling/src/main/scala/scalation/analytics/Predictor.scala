@@ -8,6 +8,8 @@
 
 package scalation.analytics
 
+import scala.math.sqrt
+
 import scalation.linalgebra.{VectoD, VectorI}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -51,6 +53,13 @@ trait Predictor
      */
     def sseF (): Double = { if (sse < 0.0) sse = e dot e; sse }
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the root mean squared error.  Note 'sse' is divided by the number
+     *  of instances 'm' rather than degrees of freedom 'df'.
+     *  @see https://en.wikipedia.org/wiki/Mean_squared_error
+     */
+    def rmseF (): Double = sqrt (sseF () / e.dim)
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit including 'rSquared'.
      */
@@ -59,7 +68,7 @@ trait Predictor
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the fit.  Override when necessary.
      */
-    def fitLabels: Seq [String] = Seq ("rSquared", "rBarSq", "fStat")
+    def fitLabels: Seq [String] = Seq ("rSquared", "rBarSq", "fStat", "rmse")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a new continuous data vector z, predict the y-value of f(z).

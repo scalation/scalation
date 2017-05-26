@@ -9,7 +9,7 @@
 package scalation.math
 
 import scala.language.implicitConversions
-import scala.math.{acos, cos, max, min, sin, signum}
+import scala.math.{acos, cos, max, min, sin}
 
 import Complex._
 
@@ -399,6 +399,19 @@ object Complex
     def min (c: Complex, d: Complex): Complex = if (d < c) d else c
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the complex signum (csgn) of a complex number.  The values may
+     *  be -1, 0, or 1.
+     *  @see en.wikipedia.org/wiki/Sign_function
+     *  @param c  the complex number to obtain the signum of
+     */
+    def signum (c: Complex): Complex =
+    {
+        if (c.re > 0.0)      _1
+        else if (c.re < 0.0) _1n
+        else                 math.signum (c.im).toComplex
+    } // signum
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the square root of that complex number.
      *  @see www.mathpropress.com/stan/bibliography/complexSquareRoot.pdf
      *  @param c  that complex number
@@ -408,7 +421,7 @@ object Complex
         val (a, b) = (c.re, c.im)
         val rad    = c.radius
         Complex (rr2 * math.sqrt (rad + a),
-                 rr2 * math.sqrt (rad - a) * signum (b))
+                 rr2 * math.sqrt (rad - a) * math.signum (b))
     } // sqrt
 
     /** Ordering for complex numbers

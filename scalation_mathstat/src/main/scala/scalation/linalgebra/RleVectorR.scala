@@ -317,7 +317,7 @@ class RleVectorR (val dim: Int, protected var v: ReArray [TripletR] = null)
         var mid   = 0
         while (start != end) {
             mid = (start + end) / 2
-            if (v(mid).startPos < i) start = mid + 1 else end = mid	        
+            if (v(mid).startPos < i) start = mid + 1 else end = mid
         } // while                           
         if (i == 0 || i == v(end).startPos || i > v(end).startPos) end else end - 1                    
     } // getTriplet
@@ -1184,6 +1184,21 @@ class RleVectorR (val dim: Int, protected var v: ReArray [TripletR] = null)
         } // for
         j
     } // argmax
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the argument maximum of 'this' vector (index of maximum element).
+     *  @param s  the starting index (inclusive) for the search
+     *  @param e  the ending index (exclusive) for the search
+     */
+    def argmax (s: Int, e: Int): Int =
+    {
+        var j = s
+        var temp = v(s).value
+        for (i <- s+1 until csize if v(i).startPos + v(i).count - 1 < e && v(i).value > temp) {
+            temp = v(i).value; j = v(i).startPos
+        } // for
+        j
+    } // argmax
        
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the argument minimum of 'this' vector (index of minimum element).
@@ -1198,7 +1213,22 @@ class RleVectorR (val dim: Int, protected var v: ReArray [TripletR] = null)
         } // for
         j
     } // argmin
-     
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the argument minimum of 'this' vector (index of minimum element).
+     *  @param s  the starting index (inclusive) for the search
+     *  @param e  the ending index (exclusive) for the search
+     */
+    def argmin (s: Int, e: Int): Int =
+    {
+        var j = s
+        var temp = v(s).value
+        for (i <- s+1 until csize if v(i).startPos + v(i).count - 1 < e && v(i).value < temp) {
+            temp = v(i).value; j = v(i).startPos
+        } // for
+        j
+    } // argmin
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the argument minimum of 'this' vector (-1 if its not negative).
      *  @param e  the ending index (exclusive) for the search

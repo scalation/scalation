@@ -61,7 +61,7 @@ class SVD [MatT <: MatriD] (a: MatT)
      *  a vector of singular values 'q' and a matrix of right singular vectors 'v'
      *  such that 'a = u ** q * v.t'.
      */
-    override def factor (): FactorType =
+    override def factor123 (): FactorType =
     {
         val bid       = new Bidiagonal (a)                // class for making bidiagonal matrices 
         val (u, b, v) = bid.bidiagonalize ()              // factor a into a bidiagonal matrix b 
@@ -250,7 +250,7 @@ class SVD [MatT <: MatriD] (a: MatT)
      */
     override def solve (b: VectoD): VectoD =
     {
-        val (u, d, vt) = factor ()                   // factor using SVD
+        val (u, d, vt) = factor123 ()                // factor using SVD
         val alpha = u.t * b                          // principle component regression
         vt ** d.recip * alpha                        // estimate coefficients
     } // solve
@@ -265,8 +265,7 @@ import SVDecomp._
  */
 object SVDTest extends App
 {
-    val (u2, s2, v2) = (new SVD (a1)).factor ()
-    test (a1, (u2, s2, v2), "SVDTest")
+    test (a1, new SVD (a1), "SVDTest")
 
 } // SVDTest object
 
@@ -278,8 +277,7 @@ object SVDTest extends App
  */
 object SVDTest2 extends App
 {
-    val (u2, s2, v2) = (new SVD (a2)).factor ()
-    test (a2, (u2, s2, v2), "SVDTest2")
+    test (a2, new SVD (a2), "SVDTest2")
 
 } // SVDTest2 object
 
@@ -290,8 +288,7 @@ object SVDTest2 extends App
  */
 object SVDTest3 extends App
 {
-    val (u2, s2, v2) = (new SVD (a3)).factor ()
-    test (a3, (u2, s2, v2), "SVDTest3")
+    test (a3, new SVD (a3), "SVDTest3")
 
 } // SVDTest3 object
 
@@ -302,8 +299,7 @@ object SVDTest3 extends App
  */
 object SVDTest4 extends App
 {
-    val (u2, s2, v2) = (new SVD (a4)).factor ()
-    test (a4, (u2, s2, v2), "SVDTest4")
+    test (a4, new SVD (a4), "SVDTest4")
 
 } // SVDTest4 object
 
@@ -314,8 +310,7 @@ object SVDTest4 extends App
  */
 object SVDTest5 extends App
 {
-    val (u2, s2, v2) = (new SVD (a5)).factor ()
-    test (a5, (u2, s2, v2), "SVDTest5")
+    test (a5, new SVD (a5), "SVDTest5")
 
 } // SVDTest5 object
 
@@ -326,8 +321,7 @@ object SVDTest5 extends App
  */
 object SVDTest6 extends App
 {
-    val (u2, s2, v2) = (new SVD (a6)).factor ()
-    test (a6, (u2, s2, v2), "SVDTest6")
+    test (a6, new SVD (a6), "SVDTest6")
 
 } // SVDTest6 object
 
@@ -340,8 +334,7 @@ object SVDTest6 extends App
 */
 object SVDTest7 extends App
 {
-    val (u2, s2, v2) = (new SVD (a7)).factor ()
-    test (a7, (u2, s2, v2), "SVDTest7")
+    test (a7, new SVD (a7), "SVDTest7")
 
 } // SVDTest7 object
 
@@ -352,8 +345,7 @@ object SVDTest7 extends App
  */
 object SVDTest8 extends App
 {
-    val (u2, s2, v2) = (new SVD (a8)).factor ()
-    test (a8, (u2, s2, v2), "SVDTest8")
+    test (a8, new SVD (a8), "SVDTest8")
 
 } // SVDTest8 object
 

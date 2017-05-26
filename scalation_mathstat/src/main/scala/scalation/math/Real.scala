@@ -685,6 +685,12 @@ object Real
     def min (x: Real, y: Real): Real = if (y < x) y else x
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the signum (sgn) of a real number.  The values may be -1, 0, or 1.
+     *  @param r  the real number to obtain the sigum of
+     */
+    def signum (r: Real): Real = r.signum
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the square root of real number 'x'.
      *  @param x  the real number whose square root is sought
      */

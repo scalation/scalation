@@ -1921,7 +1921,7 @@ object MatrixRTest extends App with PackageInfo
     aa *= bb
     println ("aa *= bb  = " + aa)
 
-    val filename = getDataPath + "bb_matrix.csv"
+    val filename = scalation.DATA_DIR + "bb_matrix.csv"
     bb.write (filename)
     println ("bb_csv = " + MatrixR (filename))
 

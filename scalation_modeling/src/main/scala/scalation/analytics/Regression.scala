@@ -14,7 +14,7 @@ import scalation.linalgebra._
 import scalation.math.double_exp
 import scalation.plot.Plot
 import scalation.random.CDF.studentTCDF
-import scalation.util.{Error, time}
+import scalation.util.{banner, Error, time}
 import scalation.util.Unicode.sub
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -24,6 +24,7 @@ object RegTechnique extends Enumeration
 {
     type RegTechnique = Value
     val QR, Cholesky, SVD, Inverse = Value
+    val techniques = Array (QR, Cholesky, SVD, Inverse)
     
 } // RegTechnique
 
@@ -60,8 +61,9 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
 
     private val DEBUG    = false                               // debug flag
     private val k        = x.dim2 - 1                          // number of variables (k = n-1)
-    private val m        = x.dim1.toDouble                     // number of data points (rows)
-    private val r_df     = (m-1.0) / (m-k-1.0)                 // ratio of degrees of freedom
+    private val m        = x.dim1.toDouble                     // number of data points (rows) as a double
+    private val df       = (m - k - 1).toInt                   // degrees of freedom
+    private val r_df     = (m - 1.0) / df                      // ratio of degrees of freedom
     private var rSquared = -1.0                                // coefficient of determination (quality of fit)
     private var rBarSq   = -1.0                                // Adjusted R-squared
     private var fStat    = -1.0                                // F statistic (quality of fit)
@@ -74,23 +76,13 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
 
     type Fac_QR = Fac_QR_H [MatT]                              // change as needed
 
-    private var dec: SVDecomp = _
     private val fac: Factorization = technique match {         // select the factorization technique
-        case QR       => new Fac_QR (x)                        // QR Factorization
+        case QR       => new Fac_QR (x, false)                 // QR Factorization
         case Cholesky => new Fac_Cholesky (x.t * x)            // Cholesky Factorization
-        case SVD      => dec = new SVD (x)                     // Singular Value Decomposition
-                         null.asInstanceOf [Factorization]
-        case _        => null.asInstanceOf [Factorization]     // don't factor, use inverse
+        case SVD      => new SVD (x)                           // Singular Value Decomposition
+        case _        => new Fac_Inv (x.t * x)                 // Inverse Factorization
     } // match
-
-/*
-    private val x_pinv = technique match {                     // pseudo-inverse of x
-        case QR       => val (q, r) = fac.factor12 (); r.inverse * q.t
-        case Cholesky => fac.factor (); null                   // don't compute it directly
-        case SVD      =>
-        case _        => (x.t * x).inverse * x.t               // classic textbook technique
-    } // match
-*/
+    fac.factor ()                                              // factor the matrix, either X or X.t * X
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
@@ -101,21 +93,14 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
     def train ()
     {
         b = technique match {
-            case QR       => fac.factor ()                             // X = QR
-                             fac.solve (x.t * y).asInstanceOf [VecT]
-            case Cholesky => fac.factor ()                             // XtX = 
-                             fac.solve (x.t * y).asInstanceOf [VecT]
-            case SVD      => dec.factor ()
-                             dec.solve (x.t * y).asInstanceOf [VecT]
-            case _        => val xtx_inv = (x.t * x).inverse           // (XtX)-1
-                             xtx_inv * (x.t * y)
+            case QR       => fac.solve (y)                     // R * b = Q.t * y
+            case Cholesky => fac.solve (x.t * y)               // L * L.t * b = X.t * y
+            case SVD      => fac.solve (y)                     // b = V * Σ^-1 * U.t * y
+            case _        => fac.solve (x.t * y)               // b = (X.t * X)^-1 * X.t * y
         } // match
-/*
-        b = if (x_pinv == null) fac.solve (x.t * y).asInstanceOf [VecT]   // FIX
-            else x_pinv * y                                     // parameter vector [b_0, b_1, ... b_k]
-*/
-        e = y - x * b                                           // residual/error vector
-        sseF ()                                                 // compute and save sum of squared errors
+
+        e = y - x * b                                          // residual/error vector
+        sseF ()                                                // compute and save sum of squared errors
         diagnose (y, e)
     } // train
 
@@ -129,21 +114,14 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
     def train (yy: VectoD)
     {
         b = technique match {
-            case QR       => fac.factor ()                             // X = QR
-                             fac.solve (x.t * y).asInstanceOf [VecT]
-            case Cholesky => fac.factor ()                             // XtX = 
-                             fac.solve (x.t * y).asInstanceOf [VecT]
-            case SVD      => fac.factor ()
-                             fac.solve (x.t * y).asInstanceOf [VecT]
-            case _        => val xtx_inv = (x.t * x).inverse           // (XtX)-1
-                             xtx_inv * (x.t * y)
+            case QR       => fac.solve (yy)                    // R * b = Q.t * yy
+            case Cholesky => fac.solve (x.t * yy)              // L * L.t * b = X.t * yy
+            case SVD      => fac.solve (yy)                    // b = V * Σ^-1 * U.t * yy
+            case _        => fac.solve (x.t * yy)              // b = (X.t * X)^-1 * X.t * yy
         } // match
-/*
-        b = if (x_pinv == null) fac.solve (yy).asInstanceOf [VecT]   // FIX
-            else x_pinv * yy                                    // parameter vector [b_0, b_1, ... b_k]
-*/
-        e  = yy - x * b                                         // residual/error vector
-        sseF ()                                                 // compute and save sum of squared errors
+
+        e  = yy - x * b                                        // residual/error vector
+        sseF ()                                                // compute and save sum of squared errors
         diagnose (yy, e)
     } // train
 
@@ -158,25 +136,25 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
         val ssr  = sst - sse                                     // regression sum of squares
         rSquared = ssr / sst                                     // coefficient of determination
         rBarSq   = 1.0 - (1.0-rSquared) * r_df                   // R-bar-squared (adjusted R-squared)
-        fStat    = ssr * (m-k-1.0)  / (sse * k)                  // F statistic (msr / mse)
+        fStat    = (ssr * df) / (sse * k)                        // F statistic (msr / mse)
         aic      = m * log (sse) - m * log (m) + 2.0 * (k+1)     // Akaike Information Criterion (AIC)
         bic      = aic + (k+1) * (log (m) - 2.0)                 // Bayesian Information Criterion (BIC)
 
-        val facCho = new Fac_Cholesky (x.t * x)                  // FIX - avoid re-calculating
-        val varEst = sse / (m-k-1.0)                             // variance estimate
-        val l      = facCho.factor1 ()                           // cholesky factorization
-        val varCov = l.inverse.t * l.inverse * varEst            // variance covariance matrix
-        val vars   = varCov.getDiag ()                           // individual variances
+        val facCho = if (technique == Cholesky) fac              // reuse Cholesky factorization
+                     else new Fac_Cholesky (x.t * x)             // create a Cholesky factorization
+        val l_inv  = facCho.factor1 ().inverse                   // take inverse of l from Cholesky factorization
+        val varEst = sse / df                                    // variance estimate
+        val varCov = l_inv.t * l_inv * varEst                    // variance-covariance matrix
 
-        stdErr = vars.map ((x: Double) => sqrt (x))                                   // standard error of coefficients
-        t      = b / stdErr                                                           // Student's T statistic
-        p      = t.map ((x: Double) => 2.0 * studentTCDF (-abs (x), (m-k-1).toInt))   // p values
+        stdErr = varCov.getDiag ().map (sqrt (_))                          // standard error of coefficients
+        t      = b / stdErr                                                // Student's T statistic
+        p      = t.map ((x: Double) => 2.0 * studentTCDF (-abs (x), df))   // p values
     } // diagnose
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit including 'rSquared'.
      */
-    def fit: VectorD = VectorD (rSquared, rBarSq, fStat)
+    def fit: VectorD = VectorD (rSquared, rBarSq, fStat, rmseF ())
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
@@ -197,7 +175,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector and the new quality of fit.
      */
-    def backElim (): Tuple3 [Int, VectoD, VectorD] =
+    def backElim (): (Int, VectoD, VectorD) =
     {
         var j_max = -1                                // index of variable to eliminate
         var b_max =  b                                // parameter values for best solution
@@ -207,7 +185,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
             val keep = m.toInt                        // i-value large enough to not exclude any rows in slice
             val rg_j = new Regression (x.sliceExclude (keep, j), y)       // regress with x_j removed
             rg_j.train ()
-            val bb  = rg_j.coefficient
+            val bb = rg_j.coefficient
             val ft = rg_j.fit
             if (ft(0) > ft_max(0)) { j_max = j; b_max = bb; ft_max = ft }
         } // for
@@ -246,9 +224,9 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
         } // for
         println ()
         println ("SSE:             %.4f".format (sse))
-        println ("Residual stdErr: %.4f on %d degrees of freedom".format (sqrt (sse/(m-k-1.0)), k.toInt))
+        println ("Residual stdErr: %.4f on %d degrees of freedom".format (sqrt (sse/df), k))
         println ("R-Squared:       %.4f, Adjusted rSquared:  %.4f".format (rSquared, rBarSq))
-        println ("F-Statistic:     %.4f on %d and %d DF".format (fStat, k.toInt, (m-k-1).toInt))
+        println ("F-Statistic:     %.4f on %d and %d DF".format (fStat, k, df))
         println ("AIC:             %.4f".format (aic))
         println ("BIC:             %.4f".format (bic))
         println ("-" * 80)
@@ -256,6 +234,41 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
 
 } // Regression class
 
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Regression` companion object provides a testing method.
+ */
+object Regression
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Test various regression techniques.
+     * @param x  the design matrix
+     * @param y  the response vector
+     * @param z  a vector to predict
+     */
+    def test (x: MatrixD, y: VectorD, z: VectorD)
+    {
+        for (tec <- techniques) {
+            banner (s"Fit the parameter vector b using $tec")
+            val rg = new Regression (x, y, tec)                       // use QR Factorization
+            rg.train ()
+            println ("b = " + rg.coefficient)
+            println ("fit = " + rg.fit)
+            rg.report ()
+
+            val yp = rg.predict (z)                          // predict y for on3 point
+            println ("predict (" + z + ") = " + yp)
+
+            val yyp = rg.predict (x)                         // predict y for several points
+            println ("predict (" + x + ") = " + yyp)
+
+            new Plot (y, yyp, null, tec.toString)
+        } // for
+    } // test
+
+} // Regression object
+
+import Regression._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RegressionTest` object tests `Regression` class using the following
@@ -283,22 +296,7 @@ object RegressionTest extends App
     println ("x = " + x)
     println ("y = " + y)
 
-    val rg = new Regression (x, y)
-    rg.train ()
-    println ("b = " + rg.coefficient)
-    rg.report ()
-
-    println ("fit = " + rg.fit)
-    val yp = rg.predict (z)                              // predict y for one point
-    println ("predict (" + z + ") = " + yp)
-
-    val yyp = rg.predict (x)                             // predict y for several points
-    println ("predict (" + x + ") = " + yyp)
-
-    new Plot (x.col(1), y, yyp)
-    new Plot (x.col(2), y, yyp)
-
-    println ("reduced model: fit = " + rg.backElim ())   // eliminate least predictive variable
+    test (x, y, z)
 
 } // RegressionTest object
 
@@ -322,42 +320,14 @@ object RegressionTest2 extends App
                                  1.0, 2.0, 2.0)
     val y = VectorD (6.0, 8.0, 7.0, 9.0)
     val z = VectorD (1.0, 2.0, 3.0)
-    var rg: Regression [MatrixD, VectorD] = _
+    //var rg: Regression [MatrixD, VectorD] = _
 
 //  println ("model: y = b_0 + b_1*x1 + b_2*x_2")
     println ("model: y = b₀ + b₁*x₁ + b₂*x₂")
     println ("x = " + x)
     println ("y = " + y)
 
-    println ("-------------------------------------------------")
-    println ("Fit the parameter vector b using QR Factorization")
-    rg = new Regression (x, y)                       // use QR Factorization
-    rg.train ()
-    println ("b = " + rg.coefficient)
-    rg.report ()
-
-    val yp = rg.predict (z)                          // predict y for on3 point
-    println ("predict (" + z + ") = " + yp)
-
-    val yyp = rg.predict (x)                         // predict y for several points
-    println ("predict (" + x + ") = " + yyp)
-
-    new Plot (x.col(1), y, yyp)
-    new Plot (x.col(2), y, yyp)
-
-    println ("-------------------------------------------------")
-    println ("Fit the parameter vector b using Cholesky Factorization")
-    rg = new Regression (x, y, Cholesky)             // use Cholesky Factorization
-    rg.train ()
-    println ("fit = " + rg.fit)
-    println ("predict (" + z + ") = " + rg.predict (z))
-
-    println ("-------------------------------------------------")
-    println ("Fit the parameter vector b using Matrix Inversion")
-    rg = new Regression (x, y, Inverse)              // use Matrix Inversion
-    rg.train ()
-    println ("fit = " + rg.fit)
-    println ("predict (" + z + ") = " + rg.predict (z))
+    test (x, y, z)
 
 } // RegressionTest2 object
 
@@ -405,12 +375,63 @@ object RegressionTest3 extends App
     println ("x = " + x)
     println ("y = " + y)
 
-    val rg = new Regression (x, y)
-    time { rg.train () }
-    println ("b = " + rg.coefficient)
-    rg.report ()
+    val z = VectorD(1.0,   46.0,   97.5,   7.0,    95.0)
 
-    println ("vif      = " + rg.vif)        // test multi-colinearity (VIF)
+    test (x, y, z)
 
 } // RegressionTest3 object
 
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RegressionTest4` object tests the multi-collinearity method in the
+ *  `Regression` class using the following regression equation.
+ *  <p>
+ *      y = b dot x = b_0 + b_1*x_1 + b_2*x_2 + b_3*x_3 + b_4 * x_4
+ *  <p>
+ *  @see online.stat.psu.edu/online/development/stat501/12multicollinearity/05multico_vif.html
+ *  @see online.stat.psu.edu/online/development/stat501/data/bloodpress.txt
+ *  > run-main scalation.analytics.RegressionTest4
+ */
+object RegressionTest4 extends App
+{
+    // 20 data points:      Constant      x_1     x_2    x_3      x_4
+    //                                    Age  Weight    Dur   Stress
+    val x = new MatrixD ((20, 5), 1.0,   47.0,   85.4,   5.1,    33.0,
+        1.0,   49.0,   94.2,   3.8,    14.0,
+        1.0,   49.0,   95.3,   8.2,    10.0,
+        1.0,   50.0,   94.7,   5.8,    99.0,
+        1.0,   51.0,   89.4,   7.0,    95.0,
+        1.0,   48.0,   99.5,   9.3,    10.0,
+        1.0,   49.0,   99.8,   2.5,    42.0,
+        1.0,   47.0,   90.9,   6.2,     8.0,
+        1.0,   49.0,   89.2,   7.1,    62.0,
+        1.0,   48.0,   92.7,   5.6,    35.0,
+        1.0,   47.0,   94.4,   5.3,    90.0,
+        1.0,   49.0,   94.1,   5.6,    21.0,
+        1.0,   50.0,   91.6,  10.2,    47.0,
+        1.0,   45.0,   87.1,   5.6,    80.0,
+        1.0,   52.0,  101.3,  10.0,    98.0,
+        1.0,   46.0,   94.5,   7.4,    95.0,
+        1.0,   46.0,   87.0,   3.6,    18.0,
+        1.0,   46.0,   94.5,   4.3,    12.0,
+        1.0,   48.0,   90.5,   9.0,    99.0,
+        1.0,   56.0,   95.7,   7.0,    99.0)
+    //  response BP
+    val y = VectorD (105.0, 115.0, 116.0, 117.0, 112.0, 121.0, 121.0, 110.0, 110.0, 114.0,
+        114.0, 115.0, 114.0, 106.0, 125.0, 114.0, 106.0, 113.0, 110.0, 122.0)
+
+    //  println ("model: y = b_0 + b_1*x1 + b_2*x_ + b3*x3 + b4*x42")
+    println ("model: y = b₀ + b₁∙x₁ + b₂∙x₂ + b₃∙x₃ + b₄∙x₄")
+    println ("x = " + x)
+    println ("y = " + y)
+
+    val z = VectorD(1.0,   46.0,   97.5,   7.0,    95.0)
+
+    val rg = new Regression (x, y)
+    rg.train ()
+    rg.report ()
+
+    println ("vif      = " + rg.vif)                     // test multi-colinearity (VIF)*/
+    println ("reduced model: fit = " + rg.backElim ())   // eliminate least predictive variable
+
+} // RegressionTest4 object

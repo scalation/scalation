@@ -45,7 +45,7 @@ class SVD_2by2 (f: Double, g: Double, h: Double)
     /** Factor matrix 'a' forming a diagonal matrix consisting of singular
      *  values and return the singular values in a vector.
      */
-    override def factor (): Tuple3 [MatrixD, VectorD, MatrixD] =
+    override def factor123 (): FactorType =
     {
         (null, null, null)                                  // FIX 
     } // factor

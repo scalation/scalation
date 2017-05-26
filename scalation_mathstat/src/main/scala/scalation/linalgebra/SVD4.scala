@@ -63,7 +63,7 @@ class SVD4 (aa: MatrixD)
      *  a vector of singular values 's' and a matrix of right singular vectors 'vv'
      *  such that 'a = uu ** s * vv.t'.
      */
-    override def factor (): Tuple3 [MatrixD, VectorD, MatrixD] =
+    override def factor123 (): FactorType =
     {
         if (! a.isBidiagonal) {
             val bid = new Bidiagonal2 (a)
@@ -222,9 +222,9 @@ class SVD4 (aa: MatrixD)
     /** Solve for `x` in `a^t*a*x = b` using `SVD`.
      *  @param  b the constant vector
      */
-    def solve (b: VectorD): VectorD =
+    def solve (b: VectorD): VectoD =
     {
-        val (u, d, vt) = factor ()                   // factor using SVD4
+        val (u, d, vt) = factor123 ()                // factor using SVD4
         val alpha = u.t * b                          // principle component regression
         vt ** d.recip * alpha                        // estimate coefficients
     } // solve
@@ -269,7 +269,7 @@ object SVD4
         println ("original matrix a = " + a)
 
         val svd       = new SVD4 (a)                             // Singular Value Decomposition object
-        val (u, s, v) = svd.factor ()                            // factor matrix a
+        val (u, s, v) = svd.factor123 ()                         // factor matrix a
         println (sline () + "svd.factor: (u, s, v) = " + (u, s, v))
         val prod = u ** s * v.t                                  // compute the product
         println (sline () + "check: u ** s * v.t = " + prod)     // should equal the original a matrix

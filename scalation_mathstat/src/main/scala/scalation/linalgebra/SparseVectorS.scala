@@ -661,6 +661,18 @@ class SparseVectorS (val dim_ : Int,
     } // argmax
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the argument maximum of 'this' vector (index of maximum element).
+     *  @param s  the starting index (inclusive) for the search
+     *  @param e  the ending index (exclusive) for the search
+     */
+    def argmax (s: Int, e: Int): Int =
+    {
+        var i = s
+        for (x <- v if (s < x._1 && x._1 < e && x._2 > this(i))) i = x._1
+        i
+    } // argmax
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the argument minimum of 'this' vector (index of minimum element).
      *  @param e  the ending index (exclusive) for the search
      */
@@ -668,6 +680,18 @@ class SparseVectorS (val dim_ : Int,
     {
         var i = 0
         for (x <- v if (x._1 < e && x._2 < this(i))) i = x._1
+        i
+    } // argmin
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the argument minimum of 'this' vector (index of minimum element).
+     *  @param s  the starting index (inclusive) for the search
+     *  @param e  the ending index (exclusive) for the search
+     */
+    def argmin (s: Int, e: Int): Int =
+    {
+        var i = s
+        for (x <- v if (s < x._1 && x._1 < e && x._2 < this(i))) i = x._1
         i
     } // argmin
     

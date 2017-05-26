@@ -37,7 +37,7 @@ object GapStatistic
             val mean  = x.mean
             val xzero = x - mean
             val svd   = new SVD (xzero)
-            val (u, s, vt) = svd.factor ()
+            val (u, s, vt) = svd.factor123 ()
             val xp    = xzero * vt.t
             val zp    = new MatrixD (x.dim1, x.dim2)
             for (i <- zp.range2) {

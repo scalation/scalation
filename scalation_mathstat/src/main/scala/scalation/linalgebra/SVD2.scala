@@ -37,7 +37,7 @@ class SVD2 (a: MatrixD)
      *  and return the singular values in vector 's' along with left and right
      *  singular matrices, 'u' and 'v'.
      */
-    override def factor (): FactorType =
+    override def factor123 (): FactorType =
     {
         if (notflat) deflate () else (eye(m), a.getDiag (), eye(n))    // (u, s, v)
     } // factor
@@ -87,8 +87,7 @@ import SVDecomp._
  */
 object SVD2Test extends App
 {
-    val (u2, s2, v2) = (new SVD2 (a1)).factor ()
-    test (a1, (u2, s2, v2), "SVD2Test")
+    test (a1, new SVD2 (a1), "SVD2Test")
 
 } // SVD2Test object
 
@@ -100,8 +99,7 @@ object SVD2Test extends App
  */
 object SVD2Test2 extends App
 {
-    val (u2, s2, v2) = (new SVD2 (a2)).factor ()
-    test (a2, (u2, s2, v2), "SVD2Test2")
+    test (a2, new SVD2 (a2), "SVD2Test2")
 
 } // SVD2Test2 object
 
@@ -112,8 +110,7 @@ object SVD2Test2 extends App
  */
 object SVD2Test3 extends App
 {
-    val (u2, s2, v2) = (new SVD2 (a3)).factor ()
-    test (a3, (u2, s2, v2), "SVD2Test3")
+    test (a3, new SVD2 (a3), "SVD2Test3")
 
 } // SVD2Test3 object
 
@@ -124,8 +121,7 @@ object SVD2Test3 extends App
  */
 object SVD2Test4 extends App
 {
-    val (u2, s2, v2) = (new SVD2 (a4)).factor ()
-    test (a4, (u2, s2, v2), "SVD2Test4")
+    test (a4, new SVD2 (a4), "SVD2Test4")
 
 } // SVD2Test4 object
 
@@ -136,8 +132,7 @@ object SVD2Test4 extends App
  */
 object SVD2Test5 extends App
 {
-    val (u2, s2, v2) = (new SVD2 (a5)).factor ()
-    test (a5, (u2, s2, v2), "SVD2Test5")
+    test (a5, new SVD2 (a5), "SVD2Test5")
 
 } // SVD2Test5 object
 
@@ -148,8 +143,7 @@ object SVD2Test5 extends App
  */
 object SVD2Test6 extends App
 {
-    val (u2, s2, v2) = (new SVD2 (a6)).factor ()
-    test (a6, (u2, s2, v2), "SVD2Test6")
+    test (a6, new SVD2 (a6), "SVD2Test6")
 
 } // SVD2Test6 object
 
@@ -160,8 +154,7 @@ object SVD2Test6 extends App
  */
 object SVD2Test7 extends App
 {
-    val (u2, s2, v2) = (new SVD2 (a7)).factor ()
-    test (a7, (u2, s2, v2), "SVD2Test7")
+    test (a7, new SVD2 (a7), "SVD2Test7")
 
 } // SVD2Test7 object
 
@@ -172,8 +165,7 @@ object SVD2Test7 extends App
  */
 object SVD2Test8 extends App
 {
-    val (u2, s2, v2) = (new SVD2 (a8)).factor ()
-    test (a8, (u2, s2, v2), "SVD2Test8")
+    test (a8, new SVD2 (a8), "SVD2Test8")
 
 } // SVD2Test8 object
 

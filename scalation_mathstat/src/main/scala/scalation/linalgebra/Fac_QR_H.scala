@@ -36,8 +36,8 @@ class Fac_QR_H [MatT <: MatriD] (aa: MatT, needQ: Boolean = true)
     protected val at = aa.t.asInstanceOf [MatrixD]             // transpose (for efficiency) of matrix aa
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform QR Factorization and result in a single matrix which contains Householder vectors
-     *  of each columns in lower triangular of 'aa' matrix. 
+    /** Perform QR Factorization and store the result in a single matrix which contains
+     *  Householder vectors of each column in the lower triangle of the 'aa' matrix. 
      *  This algorithm uses Householder orthogonalization.
      *  @see 5.1 and 5.2 in Matrix Computations
      *  @see QRDecomposition.java in Jama
@@ -112,7 +112,7 @@ class Fac_QR_H [MatT <: MatriD] (aa: MatT, needQ: Boolean = true)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Transform 'b' into 'q.t * b', i.e., perform the right side of the equation
-     *  'r*b = q.t * b' not using a full 'q' matrix.
+     *  'r*x = q.t * b' not using a full 'q' matrix.
      *  @param b  the constant vector
      */
     def transformB (b: Array [Double]): Array [Double] =  

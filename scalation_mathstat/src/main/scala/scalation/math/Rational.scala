@@ -420,6 +420,17 @@ object Rational
     def min (q: Rational, p: Rational): Rational = if (p < q) p else q
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the signum (sgn) of a rational number.  The values may be -1, 0, or 1.
+     *  @param r  the rational number to obtain the sigum of
+     */
+    def signum (r: Rational): Rational =
+    {
+        if (r.num == 0)     _0
+        else if (r.num > 0) math.signum (r.den).toRational
+        else               -math.signum (r.den).toRational
+    } // signum
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the square root of that rational number.
      *  @param x  that rational number
      */
