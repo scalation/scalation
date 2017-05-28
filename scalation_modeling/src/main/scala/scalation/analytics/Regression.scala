@@ -87,7 +87,9 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  multiple regression equation
+     *  <p>
      *      y  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_1 , ... x_k] + e
+     *  <p>
      *  using the ordinary least squares 'OLS' method.
      */
     def train ()
@@ -101,13 +103,15 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
 
         e = y - x * b                                          // residual/error vector
         sseF ()                                                // compute and save sum of squared errors
-        diagnose (y, e)
+        diagnose (y)
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Retrain the predictor by fitting the parameter vector (b-vector) in the
      *  multiple regression equation
+     *  <p>
      *      yy  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_1 , ... x_k] + e
+     *  <p>
      *  using the ordinary least squares 'OLS' method.
      *  @param yy  the new response vector
      */
@@ -122,15 +126,14 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
 
         e  = yy - x * b                                        // residual/error vector
         sseF ()                                                // compute and save sum of squared errors
-        diagnose (yy, e)
+        diagnose (yy)
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute diagostics for the regression model.
      *  @param yy  the response vector
-     *  @param e   the residual/error vector
      */
-    private def diagnose (yy: VectoD, e: VectoD)
+    def diagnose (yy: VectoD)
     {
         val sst  = (yy dot yy) - yy.sum~^2.0 / m                 // total sum of squares
         val ssr  = sst - sse                                     // regression sum of squares
