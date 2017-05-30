@@ -30,57 +30,66 @@ class SimpleRegression (x: MatrixD, y: VectorD)
     if (x.dim2 != 2)     flaw ("constructor", "design matrix must have 2 columns")
     if (x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
 
-    private val k        = 1                       // number of variables (k = n-1 where n = 2)
-    private val m        = x.dim1.toDouble         // number of data points (rows)
-    private val r_df     = (m-1.0) / (m-2.0)       // ratio of degrees of freedom
-    private var rSquared = -1.0                    // coefficient of determination (quality of fit)
-    private var rBarSq   = -1.0                    // adjusted R-squared
-    private var fStat    = -1.0                    // F statistic (quality of fit)
+    private val k        = 1                              // number of variables (k = n-1 where n = 2)
+    private val m        = x.dim1.toDouble                // number of data points (rows)
+    private val r_df     = (m-1.0) / (m-2.0)              // ratio of degrees of freedom
 
-    b = new VectorD (2)                            // parameter vector (b_0, b_1)
+    private var rBarSq   = -1.0                           // adjusted R-squared
+    private var fStat    = -1.0                           // F statistic (quality of fit)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  simple regression equation
+     *  <p>
      *      y = b dot x + e  = (b_0, b_1) dot (1, x_1) + e
+     *  <p>
      *  using the least squares method.
-     *  @see http://www.analyzemath.com/statistics/linear_regression.html
+     *  @see www.analyzemath.com/statistics/linear_regression.html
+     *  @param yy  the response vector
      */
-    def train ()
+    def train (yy: VectoD)
     {
-        val x1  = x.col(1)                         // get column 1 of x = [(1.0, x1)]
-        val sx  = x1.sum                           // sum of x values
-        val sy  = y.sum                            // sum of y values
-        val ssx = x1 dot x1                        // sum of squares x
-        val ssy = y dot y                          // sum of squares y
-        val sxy = x1 dot y                         // sum of cross products
+        val x1  = x.col(1)                                // get column 1 of x = [(1.0, x1)]
+        val sx  = x1.sum                                  // sum of x values
+        val sy  = y.sum                                   // sum of y values
+        val ssx = x1 dot x1                               // sum of squares x
+        val ssy = y dot y                                 // sum of squares y
+        val sxy = x1 dot y                                // sum of cross products
 
-        b(1) = (m * sxy - sx * sy) / (m * ssx - sx*sx)     // slope
-        b(0) = (sy - b(1) * sx) / m                        // intercept
+        b = new VectorD (2)                               // parameter vector (b_0, b_1)
+        b(1) = (m * sxy - sx * sy) / (m * ssx - sx*sx)    // slope
+        b(0) = (sy - b(1) * sx) / m                       // intercept
 
-        e = y - x * b                              // residual/error vector
-        sseF ()                                    // compute and save sum of squared errors
-        diagnose (y, e)
+        e = y - x * b                                     // residual/error vector
+        diagnose (y)                                      // compute diagnostics
     } // train
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the predictor by fitting the parameter vector (b-vector) in the
+     *  simple regression equation for the response passed into the class 'y'.
+     */
+    def train () { train (y) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute diagostics for the regression model.
      *  @param yy  the response vector
-     *  @param e   the residual/error vector
      */
-    private def diagnose (yy: VectoD, e: VectoD)
+    override def diagnose (yy: VectoD)
     {
-        val sst  = (yy dot yy) - yy.sum~^2.0 / m           // total sum of squares
-        val ssr  = sst - sse                               // regression sum of squares
-        rSquared = ssr / sst                               // coefficient of determination
-        rBarSq   = 1.0 - (1.0-rSquared) * r_df             // R-bar-squared (adjusted R-squared)
-        fStat    = ssr * (m-2.0) / sse                     // F statistic (msr / mse)
+        super.diagnose (yy)
+        rBarSq   = 1.0 - (1.0-rSq) * r_df                 // R-bar-squared (adjusted R-squared)
+        fStat    = (sst - sse) * (m-2.0) / sse            // F statistic (msr / mse)
     } // diagnose
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including 'rSquared'.
+    /** Return the quality of fit including.
      */
-    def fit: VectorD = VectorD (rSquared, rBarSq, fStat)
+    override def fit: VectorD = super.fit.asInstanceOf [VectorD] ++ VectorD (rBarSq, fStat)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the labels for the fit.
+     */
+    override def fitLabels: Seq [String] = super.fitLabels ++ Seq ("rBarSq", "fStat")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
@@ -133,7 +142,6 @@ object SimpleRegressionTest extends App
     rg.train ()
 
     println ("coefficient = " + rg.coefficient)
-    println ("sse         = " + rg.sseF ())
     println ("            = " + rg.fitLabels)
     println ("fit         = " + rg.fit)
 
@@ -165,7 +173,6 @@ object SimpleRegressionTest2 extends App
     rg.train ()
 
     println ("coefficient = " + rg.coefficient)
-    println ("sse         = " + rg.sseF ())
     println ("            = " + rg.fitLabels)
     println ("fit         = " + rg.fit)
 
@@ -206,7 +213,6 @@ object SimpleRegressionTest3 extends App
     rg.train ()
 
     println ("coefficient = " + rg.coefficient)
-    println ("sse         = " + rg.sseF ())
     println ("            = " + rg.fitLabels)
     println ("fit         = " + rg.fit)
 

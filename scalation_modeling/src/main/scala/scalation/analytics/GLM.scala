@@ -56,9 +56,9 @@ trait GLM
     def apply (x: MatrixD, y: VectorD): Regression [MatrixD, VectorD] =
     {
         if (add_1)
-            new Regression [MatrixD, VectorD] (one (x.dim1) +^: x, y, technique)
+            new Regression (one (x.dim1) +^: x, y, technique)
         else
-            new Regression [MatrixD, VectorD] (x, y, technique)
+            new Regression (x, y, technique)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -68,10 +68,9 @@ trait GLM
     def apply (xy: MatrixD): Regression [MatrixD, VectorD] =
     {
         if (add_1)
-            new Regression [MatrixD, VectorD] (one (xy.dim1) +^: xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1),
-                            technique)
+            new Regression (one (xy.dim1) +^: xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1), technique)
         else
-            new Regression [MatrixD, VectorD] (xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1), technique)
+            new Regression (xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1), technique)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -93,7 +92,7 @@ trait GLM
      *  @param y       the centered response vector
      *  @param lambda  the shrinkage parameter (0 => OLS) in the penalty term 'lambda * b dot b'
      */
-    def apply (x: MatrixD, y: VectorD, lambda: Double): RidgeRegression =
+    def apply (x: MatrixD, y: VectorD, lambda: Double): RidgeRegression [MatrixD, VectorD] =
     {
         new RidgeRegression (x, y, lambda, technique)
     } // apply
@@ -103,7 +102,7 @@ trait GLM
      *  @param xY      the combined centered input/design m-by-n matrix and response vector
      *  @param lambda  the shrinkage parameter (0 => OLS) in the penalty term 'lambda * b dot b'
      */
-    def apply (xy: MatrixD, lambda: Double): RidgeRegression =
+    def apply (xy: MatrixD, lambda: Double): RidgeRegression [MatrixD, VectorD] =
     {
         new RidgeRegression (xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1), lambda, technique)
     } // apply

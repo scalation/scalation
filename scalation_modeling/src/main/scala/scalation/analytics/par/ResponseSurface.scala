@@ -112,12 +112,12 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
      *  using the least squares method.
      *  @param yy  the new response vector
      */
-    def train (yy: VectorD) { rsm.train (yy) }
+    def train (yy: VectoD) { rsm.train (yy) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit including 'rSquared'.
      */
-    def fit: VectorD = rsm.fit
+    override def fit: VectoD = rsm.fit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a point z, use the quadratic 'rsm' regression equation to predict a
@@ -143,7 +143,7 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new quality of fit.
      */
-    def backElim (): Tuple3 [Int, VectoD, VectorD] = rsm.backElim ()
+    def backElim (): (Int, VectoD, VectoD) = rsm.backElim ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor 'VIF' for each variable to test

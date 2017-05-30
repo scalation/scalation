@@ -68,31 +68,36 @@ class ANCOVA (x_ : MatrixD, t: VectorI, y: VectorD, levels: Int, technique: RegT
     } // assignDummyVars
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  regression equation
-     *      y  =  b dot x + e  =  [b_0, ... b_k+l] dot [1, x_1, ..., d_1, ...] + e
-     *  using the least squares method.
-     */
-    def train () { rg.train () }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Retrain the predictor by fitting the parameter vector (b-vector) in the
      *  multiple regression equation
+     *  <p>
      *      yy  =  b dot x + e  =  [b_0, ... b_k+l] dot [1, x_1, ..., d_1, ...] + e
+     *  <p>
      *  using the least squares method.
-     *  @param yy  the new response vector
+     *  @param yy  the response vector
      */
-    def train (yy: VectorD) { rg.train (yy) }
+    def train (yy: VectoD) { rg.train (yy) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit 'rSquared'.
+    /** Train the predictor by fitting the parameter vector (b-vector) in the
+     *  regression equation using the least squares method on 'y'.
      */
-    def fit: VectorD = rg.fit
+    def train () { rg.train () }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector of residuals/errors.
      */
     override def residual: VectoD = rg.residual
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the quality of fit 'rSquared'.
+     */
+    override def fit: VectorD = rg.fit
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the labels for the fit.
+     */
+    override def fitLabels: Seq [String] = rg.fitLabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,

@@ -10,7 +10,7 @@
 
 package scalation.analytics
 
-import scala.math.pow
+import scala.math.log
 
 import scalation.linalgebra._
 import scalation.plot.Plot
@@ -30,13 +30,14 @@ import RegTechnique._
  *  where 'e' represents the residuals (the part not explained by the model).
  *  Use Least-Squares (minimizing the residuals) to fit the parameter vector
  *  <p>
- *      b  =  x_pinv * y   [ alternative: b  =  solve (y) ]
+ *      b  =  fac.solve (.)  with regularization  x.t * x + λ * I
  *  <p>
- *  where 'x_pinv' is the pseudo-inverse.  Three techniques are provided:
+ *  Four factorization techniques are provided:
  *  <p>
  *      'QR'         // QR Factorization: slower, more stable (default)
  *      'Cholesky'   // Cholesky Factorization: faster, less stable (reasonable choice)
- *      'Inverse'    // Inverse/Gaussian Elimination, classical textbook technique (outdated)
+ *      'SVD'        // Singular Value Decomposition: slowest, most robust
+ *      'Inverse'    // Inverse/Gaussian Elimination, classical textbook technique 
  *  <p>
  *  @see statweb.stanford.edu/~tibs/ElemStatLearn/
  *  @param x          the centered input/design m-by-n matrix NOT augmented with a first column of ones
@@ -44,82 +45,84 @@ import RegTechnique._
  *  @param lambda     the shrinkage parameter (0 => OLS) in the penalty term 'lambda * b dot b'
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: RegTechnique = Inverse)
+class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda: Double = 0.1,
+                       technique: RegTechnique = Cholesky)
       extends Predictor with Error
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
     if (x.dim1 <= x.dim2) flaw ("constructor", "not enough data rows in matrix to use regression")
 
-    private val DEBUG      = true                               // debug flag
-    private val k          = x.dim2 - 1                         // number of variables (k = n-1)
-    private val m          = x.dim1.toDouble                    // number of data points (rows)
-    private val r_df       = (m-1.0) / (m-k-1.0)                // ratio of degrees of freedom
-    private var rSquared   = -1.0                               // coefficient of determination (quality of fit)
-    private var rBarSq     = -1.0                               // Adjusted R-squared
-    private var fStat      = -1.0                               // F statistic (quality of fit)
+    private val DEBUG  = true                                  // debug flag
+    private val k      = x.dim2 - 1                            // number of variables (k = n-1)
+    private val m      = x.dim1.toDouble                       // number of data points (rows)
+    private val df     = (m - k - 1).toInt                     // degrees of freedom
+    private val r_df   = (m-1.0) / df                          // ratio of degrees of freedom
 
-    type Fac_QR = Fac_QR_H [MatrixD]                            // change as needed
+    private var rBarSq = -1.0                                  // adjusted R-squared
+    private var fStat  = -1.0                                  // F statistic (quality of fit)
+    private var aic    = -1.0                                  // Akaike Information Criterion (AIC)
+    private var bic    = -1.0                                  // Bayesian Information Criterion (BIC)
 
-    private val fac = technique match {                         // select the factorization technique
-        case QR       => new Fac_QR (x)                         // QR Factorization
-        case Cholesky => new Fac_Cholesky (x.t * x)             // Cholesky Factorization
-        case _        => null                                   // don't factor, use inverse
+    //* Compute x.t * x and add lambda to the diagonal
+    val xtx_ = x.t * x; for (i <- xtx_.range1) xtx_(i, i) += lambda
+
+    type Fac_QR = Fac_QR_H [MatT]                              // change as needed
+
+    // QR and SVD not yet implemented
+    private val fac: Factorization = technique match {         // select the factorization technique
+        case Cholesky => new Fac_Cholesky (xtx_)               // Cholesky Factorization
+        case _        => new Fac_Inv (xtx_)                    // Inverse Factorization
     } // match
-
-    private val x_pinv = technique match {                      // pseudo-inverse of x
-        case QR       => val (q, r) = fac.factor12 (); r.inverse * q.t
-        case Cholesky => fac.factor (); null                    // don't compute it directly
-        case _        => (xtx).inverse * x.t                    // classic textbook technique
-    } // match
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute x.t * x and add lambda to the diagonal
-     */
-    def xtx: MatrixD = { val a = x.t * x; for (i <- 0 until a.dim1) a(i, i) += lambda; a }
+    fac.factor ()                                              // factor the matrix, either X or X.t * X
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  multiple regression equation
-     *      y  =  b dot x + e  =  [b_1, ... b_k] dot [x_1, ... x_k] + e
-     *  using the least squares method.
-     */
-    def train ()
-    {
-        b        = if (x_pinv == null) fac.solve (y).asInstanceOf [VectorD]   // FIX
-                   else x_pinv * y                              // x parameter vector [b_1, ... b_k]
-        val e    = y - x * b                                    // residual/error vector
-        val sse  = e dot e                                      // residual/error sum of squares
-        val sst  = (y dot y) - pow (y.sum, 2) / m               // total sum of squares
-        val ssr  = sst - sse                                    // regression sum of squares
-        rSquared = ssr / sst                                    // coefficient of determination (R-squared)
-        rBarSq   = 1.0 - (1.0-rSquared) * r_df                  // R-bar-squared (adjusted R-squared)
-        fStat    = ssr * (m-k-1.0)  / (sse * k)                 // F statistic (msr / mse)
-    } // train
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Retrain the predictor by fitting the parameter vector (b-vector) in the
-     *  multiple regression equation
+     *  <p>
      *      yy  =  b dot x + e  =  [b_1, ... b_k] dot [x_1, ... x_k] + e
+     *  <p>
      *  using the least squares method.
      *  @param yy  the new response vector
      */
-    def train (yy: VectorD)
+    def train (yy: VectoD)
     {
-        b        = if (x_pinv == null) fac.solve (yy).asInstanceOf [VectorD]   // FIX
-                   else x_pinv * yy                             // x parameter vector [b_1, ... b_k]
-        val e    = yy - x * b                                   // residual/error vector
-        val sse  = e dot e                                      // residual/error sum of squares
-        val sst  = (yy dot yy) - pow (yy.sum, 2) / m            // total sum of squares
-        val ssr  = sst - sse                                    // regression sum of squares
-        rSquared = ssr / sst                                    // coefficient of determination
-        rBarSq   = 1.0 - (1.0-rSquared) * r_df                  // R-bar-squared (adjusted R-squared)
-        fStat    = ssr * (m-k-1.0)  / (sse * k)                 // F statistic (msr / mse)
+        b = technique match {                                  // solve for coefficient vector b
+            case Cholesky => fac.solve (x.t * yy)              // L * L.t * b = X.t * yy
+            case _        => fac.solve (x.t * yy)              // b = (X.t * X)^-1 * X.t * yy
+        } // match
+
+        e = yy - x * b                                         // compute residual/error vector
+        diagnose (yy)                                          // compute diagonostics
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of the fit including 'rSquared'.
+    /** Train the predictor by fitting the parameter vector (b-vector) in the
+     *  multiple regression equation using the least squares method on 'y'.
      */
-    def fit: VectorD = VectorD (rSquared, rBarSq, fStat)
+    def train () { train (y) }
+
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute diagostics for the regression model.
+     *  @param yy  the response vector
+     */
+    override def diagnose (yy: VectoD)
+    {
+        super.diagnose (yy)
+        rBarSq = 1.0 - (1.0-rSq) * r_df                        // R-bar-squared (adjusted R-squared)
+        fStat  = ((sst - sse) * df) / (sse * k)                // F statistic (msr / mse)
+        aic    = m * log (sse) - m * log (m) + 2.0 * (k+1)     // Akaike Information Criterion (AIC)
+        bic    = aic + (k+1) * (log (m) - 2.0)                 // Bayesian Information Criterion (BIC)
+    } // diagnose
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the quality of fit.
+     */
+    override def fit: VectorD = super.fit.asInstanceOf [VectorD] ++ VectorD (rBarSq, fStat, aic, bic)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the labels for the fit.
+     */
+    override def fitLabels: Seq [String] = super.fitLabels ++ Seq ("rBarSq", "fStat", "aic", "bic")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula below.
@@ -132,19 +135,20 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new quality of fit.
      */
-    def backElim (): Tuple3 [Int, VectoD, VectorD] =
+    def backElim (): (Int, VectoD, VectorD) =
     {
-        var j_max   = -1                              // index of variable to eliminate
-        var b_max: VectoD = null                      // parameter values for best solution
-        var ft_max = VectorD (3); ft_max.set (-1.0)   // optimize on quality of fit (ft(0) is rSquared)
+        val ir    =  2                                          // ft(ir) is rSq
+        var j_max = -1                                          // index of variable to eliminate
+        var b_max: VectoD = null                                // parameter values for best solution
+        var ft_max = VectorD.fill (fitLabels.size)(-1.0)        // optimize on quality of fit
 
         for (j <- 1 to k) {
-            val keep = m.toInt                        // i-value large enough to not exclude any rows in slice
-            val rg_j = new RidgeRegression (x.sliceExclude (keep, j), y)       // regress with x_j removed
+            val keep = m.toInt                                  // i-value large enough to not exclude any rows in slice
+            val rg_j = new RidgeRegression (x.sliceExclude (keep, j), y)    // regress with x_j removed
             rg_j.train ()
             val b  = rg_j.coefficient
             val ft = rg_j.fit
-            if (ft(0) > ft_max(0)) { j_max = j; b_max = b; ft_max = ft }
+            if (ft(ir) > ft_max(ir)) { j_max = j; b_max = b; ft_max = ft }
         } // for
         (j_max, b_max, ft_max)
     } // backElim
@@ -157,13 +161,14 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
      */
     def vif: VectorD =
     {
-        val vifV = new VectorD (k)           // VIF vector
+        val ir   =  2                                           // ft(ir) is rSq
+        val vifV = new VectorD (k)                              // VIF vector
         for (j <- 1 to k) {
-            val keep = m.toInt               // i-value large enough to not exclude any rows in slice
-            val x_j  = x.col(j)                                           // x_j is jth column in x
-            val rg_j = new RidgeRegression (x.sliceExclude (keep, j), x_j)     // regress with x_j removed
+            val keep = m.toInt                                  // i-value large enough to not exclude any rows in slice
+            val x_j  = x.col(j)                                               // x_j is jth column in x
+            val rg_j = new RidgeRegression (x.sliceExclude (keep, j), x_j)    // regress with x_j removed
             rg_j.train ()
-            vifV(j-1) =  1.0 / (1.0 - rg_j.fit(0))                        // store vif for x_1 in vifV(0)
+            vifV(j-1) =  1.0 / (1.0 - rg_j.fit(ir))             // store vif for x_1 in vifV(0)
         } // for
         vifV
     } // vif
@@ -233,14 +238,13 @@ object RidgeRegressionTest2 extends App
                                  2.0, 2.0)
     val y = VectorD (6.0, 8.0, 7.0, 9.0)
     val z = VectorD (2.0, 3.0)
-    var rrg: RidgeRegression = null
 
     println ("x = " + x)
     println ("y = " + y)
 
     println ("-------------------------------------------------")
-    println ("Fit the parameter vector b using QR Factorization")
-    rrg = new RidgeRegression (x, y)
+    println ("Fit the parameter vector b")
+    val rrg = new RidgeRegression (x, y)
     rrg.train ()
     println ("fit = " + rrg.fit)
     val yp = rrg.predict (z)                         // predict y for on3 point

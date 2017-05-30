@@ -46,35 +46,40 @@ class TranRegression (x: MatrixD, y: VectorD, transform: FunctionS2S = log, tech
 {
     if (x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
 
-    val yy = y.map (transform)                        // transform the response vector
-    val rg = new Regression (x, yy, technique)        // regular multiple linear regression
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  regression equation
-     *      y  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_1, x_2 ... x_k] + e
-     *  using the least squares method.
-     */
-    def train () { rg.train () }
+    val yt = y.map (transform)                        // transform the response vector
+    val rg = new Regression (x, yt, technique)        // regular multiple linear regression
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Retrain the predictor by fitting the parameter vector (b-vector) in the
      *  multiple regression equation
+     *  <p>
      *      yy  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_1, x_2 ... x_k] + e
+     *  <p>
      *  using the least squares method.
-     *  @param yy  the new response vector
+     *  @param yy  the response vector
      */
-    def train (yy: VectorD) { rg.train (yy) }
+    def train (yy: VectoD) { rg.train (yy.map (transform)) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including 'rSquared'.
+    /** Train the predictor by fitting the parameter vector (b-vector) in the
+     *  regression equation on 'yt'.
      */
-    def fit: VectorD = rg.fit
+    def train () { rg.train (yt) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector of residuals/errors.
      */
     override def residual: VectoD = rg.residual
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the quality of fit.
+     */
+    override def fit: VectorD = rg.fit
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the labels for the fit.
+     */
+    override def fitLabels: Seq [String] = rg.fitLabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,

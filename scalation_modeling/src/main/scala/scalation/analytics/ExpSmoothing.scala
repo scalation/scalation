@@ -75,11 +75,12 @@ class ExpSmoothing (y: VectoD, t: VectoD)
     def f_obj (αα: Double): Double = { e = y - smooth (αα); e.normSq }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train an `ExpSmoothing` model to times series data, by finding the value for
+    /** Train the `ExpSmoothing` model to times series data, by finding the value for
      *  the smoothing parameter 'α' that minimizes the sum of squared errors (sse).
      *  FIX - use either a penalty or cross-validation, else α -> 1
+     *  @param yy  the response vector
      */
-    def train ()
+    def train (yy: VectoD)
     {
         val α1    = α                                          // initial value for α
         val sse_1 = f_obj (α1)                                 // initial sum of squared errors
@@ -92,22 +93,31 @@ class ExpSmoothing (y: VectoD, t: VectoD)
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the `ExpSmoothing` model to times series data, by finding the value for
+     *  the smoothing parameter 'α' that minimizes the sum of squared errors (sse).
+     *  Use the response passed into the class 'y'.
+     */
+    def train () { train (y) }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute diagostics for the Exponential Smoothing model.
      *  @param yy  the response vector
      */
-    def diagnose (yy: VectoD)
+    override def diagnose (yy: VectoD)
     {
-        val sst  = (yy dot yy) - yy.sum~^2.0 / n               // total sum of squares
-        println (s"sst = $sst")
-        val ssr  = sst - sse                                   // regression sum of squares
-        rSquared = ssr / sst                                   // coefficient of determination
-        fStat    = (ssr * df) / sse                            // F statistic (msr / mse)
+        super.diagnose (yy)
+        fStat = ((sst - sse) * df) / sse                       // F statistic (msr / mse)
     } // diagnose
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit including 'rSquared'. Not providing 'rBarSq'.
      */
-    def fit: VectoD = VectorD (rSquared, fStat, -1.0, rmseF ())
+    override def fit: VectorD = super.fit.asInstanceOf [VectorD] ++ VectorD (fStat)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the labels for the fit. 
+     */
+    override def fitLabels: Seq [String] = super.fitLabels ++ Seq ("fStat")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the next (unknown) value in the time-series.

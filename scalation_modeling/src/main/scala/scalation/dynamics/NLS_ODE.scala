@@ -74,8 +74,8 @@ class NLS_ODE (z: VectorD, ts: VectorD, b_init: VectorD, private var w: VectorD 
         val hmin = 0.01
         val hmax = 1.0
         val y = VectorD (for (i <- ts.indices) yield integrate2 (dy_dt, y0, ts(i), hmin, hmax))
-        e = z - y                           // residuals/errors
-        (w * e.sq).sum                      // sum of weighted squared error
+        e = z - y                                              // residuals/errors
+        (w * e.sq).sum                                         // sum of weighted squared error
     } // wsseF
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -90,8 +90,26 @@ class NLS_ODE (z: VectorD, ts: VectorD, b_init: VectorD, private var w: VectorD 
         println (s"final objectiveF ($b) = ${objectiveF (b)}")
     } // train
 
-    def fit: VectorD = VectorD (objectiveF (b))                // FIX - add more indicators of quality
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the predictor by fitting the parameter vector (b-vector) using a
+     *  non-linear least squares method.
+     */
+    def train (yy: VectoD) { throw new UnsupportedOperationException ("train (yy) not implemented yet") }
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the quality of fit.
+     */
+    override def fit: VectorD = VectorD (objectiveF (b))       // FIX - add more indicators of quality
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the labels for the fit.
+     */
+    override def fitLabels: Seq [String] = Seq ("objectiveF")
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Predict the value of 'y = f(zz)'.
+     *  @param zz  the new vector to predict
+     */
     def predict (zz: VectoD): Double = 0.0                     // FIX - meaning?
 
 } // NLS_ODE class

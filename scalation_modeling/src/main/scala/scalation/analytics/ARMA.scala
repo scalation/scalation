@@ -245,18 +245,15 @@ class ARMA (y: VectoD, t: VectoD)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train/fit an `ARMA` model to times series data.
      */
-    def train ()
+    def train (yy: VectoD)
     {
         // FIX: to be implemented
     } // train
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including 'rSquared'.
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train/fit an `ARMA` model to times series data on 'y'.
      */
-    def fit: VectoD =
-    {
-        VectorD (0.0)        // FIX: not yet implemented
-    } // fit
+    def train () { train (y) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** For all the time points in vector t, predict the value of y = f(t) by ...

@@ -12,7 +12,7 @@
 
 package scalation.analytics
 
-import scala.math.{exp, pow}
+import scala.math.{exp, log, pow}
 
 import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.minima.QuasiNewton
@@ -39,13 +39,16 @@ class ExpRegression (x: MatrixD, nonneg: Boolean, y: VectorD)
     if (x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
     if (nonneg && ! y.isNonnegative) flaw ("constructor", "response vector y must be nonnegative")
 
-    private val k          = x.dim2 - 1          // number of variables (k = n-1)
-    private val m          = x.dim1.toDouble     // number of data points (rows)
-    private val r_df       = (m-1.0) / (m-k-1.0) // ratio of degrees of freedom
+    private val DEBUG  = false                                 // debug flag
+    private val k      = x.dim2 - 1                            // number of variables (k = n-1)
+    private val m      = x.dim1.toDouble                       // number of data points (rows)
+    private val df     = (m - k - 1).toInt                     // degrees of freedom
+    private val r_df   = (m-1.0) / df                          // ratio of degrees of freedom
 
-    private var rSquared   = -1.0                // coefficient of determination (quality of fit)
-    private var rBarSq     = -1.0                // Adjusted R-squared
-    private var fStat      = -1.0                // F statistic (quality of fit)
+    private var rBarSq = -1.0                                  // adjusted R-squared
+    private var fStat  = -1.0                                  // F statistic (quality of fit)
+    private var aic    = -1.0                                  // Akaike Information Criterion (AIC)
+    private var bic    = -1.0                                  // Bayesian Information Criterion (BIC)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** For a given parameter vector b, compute '-2 * Log-Likelihood' (-2LL).
@@ -73,7 +76,7 @@ class ExpRegression (x: MatrixD, nonneg: Boolean, y: VectorD)
     {
         var sum = 0.0
         for (i <- 0 until y.dim) {
-            val bx = b(0)                                  // only use intercept
+            val bx = b(0)                                      // only use intercept
             sum += -bx - y(i) / exp { bx }
         } // for
         -2.0 * sum
@@ -82,25 +85,46 @@ class ExpRegression (x: MatrixD, nonneg: Boolean, y: VectorD)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  exponential regression equation.
+     *  @param yy  the response vector
+     */
+    def train (yy: VectoD) { throw new UnsupportedOperationException ("train (yy) not implemented yet") }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the predictor by fitting the parameter vector (b-vector) in the
+     *  exponential regression equation.
      */
     def train ()
     {
-        val b0   = new VectorD (x.dim2)             // use b_0 = 0 for starting guess for parameters
-        val bfgs = new QuasiNewton (ll)             // minimizer for -2LL
-        b        = bfgs.solve (b0)                  // find optimal solution for parameters
-        val e    = y / (x * b)                      // residual/error vector
-        val sse  = e dot e                          // residual/error sum of squares
-        val sst  = (y dot y) - pow (y.sum, 2) / m   // total sum of squares
-        val ssr  = sst - sse                        // regression sum of squares
-        rSquared = ssr / sst                        // coefficient of determination (R-squared)
-        rBarSq   = 1.0 - (1.0-rSquared) * r_df      // R-bar-squared (adjusted R-squared)
-        fStat    = ssr * (m-k-1.0)  / (sse * k)     // F statistic (msr / mse)
+        val b0   = new VectorD (x.dim2)                        // use b_0 = 0 for starting guess for parameters
+        val bfgs = new QuasiNewton (ll)                        // minimizer for -2LL
+        b        = bfgs.solve (b0)                             // find optimal solution for parameters
+
+        val e    = y / (x * b)                                 // residual/error vector e
+        diagnose (y)                                           // compute diagonostics
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including 'rSquared'.
+    /** Compute diagostics for the regression model.
+     *  @param yy  the response vector
      */
-    def fit: VectorD = VectorD (rSquared, rBarSq, fStat)
+    override def diagnose (yy: VectoD)
+    {
+        super.diagnose (yy)
+        rBarSq = 1.0 - (1.0-rSq) * r_df                        // R-bar-squared (adjusted R-squared)
+        fStat  = ((sst - sse) * df) / (sse * k)                // F statistic (msr / mse)
+        aic    = m * log (sse) - m * log (m) + 2.0 * (k+1)     // Akaike Information Criterion (AIC)
+        bic    = aic + (k+1) * (log (m) - 2.0)                 // Bayesian Information Criterion (BIC)
+    } // diagnose
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the quality of fit.
+     */
+    override def fit: VectorD = super.fit.asInstanceOf [VectorD] ++ VectorD (rBarSq, fStat, aic, bic)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the labels for the fit.
+     */
+    override def fitLabels: Seq [String] = super.fitLabels ++ Seq ("rBarSq", "fStat", "aic", "bic")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,

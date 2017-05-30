@@ -79,11 +79,18 @@ class PoissonRegression (x: MatrixD, y: VectorI, fn: Array [String] = null)
     } // ll_null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** For the full model, train the classifier by fitting the parameter vector
-     *  (b-vector) in the logistic regression equation using maximum likelihood.
+    /** For the full model, train the predictor by fitting the parameter vector
+     *  (b-vector) in the Poisson regression equation using maximum likelihood.
+     *  @param yy  the response vector
+     */
+    def train (yy: VectoD) { throw new UnsupportedOperationException ("train (yy) not implemeted yet") }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** For the full model, train the predictor by fitting the parameter vector
+     *  (b-vector) in the Poisson regression equation using maximum likelihood.
      *  Do this by minimizing '-2LL'.
      */
-    override def train ()
+    def train ()
     {
          val b0   = new VectorD (x.dim2)         // use b_0 = 0 for starting guess for parameters
          val bfgs = new QuasiNewton (ll)         // minimizer for -2LL
@@ -95,7 +102,7 @@ class PoissonRegression (x: MatrixD, y: VectorI, fn: Array [String] = null)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** For the null model, train the classifier by fitting the parameter vector
-     *  (b-vector) in the logistic regression equation using maximum likelihood.
+     *  (b-vector) in the Poisson regression equation using maximum likelihood.
      *  Do this by minimizing '-2LL'.
      */
     def train_null ()
@@ -111,11 +118,16 @@ class PoissonRegression (x: MatrixD, y: VectorI, fn: Array [String] = null)
     /** Return the quality of fit including 'rSquared'.  Assumes both train_null and
      *  train have already been called.
      */
-    def fit: VectorD = 
+    override def fit: VectorD = 
     {
         pseudo_rSq = 1.0 - r_dev / n_dev
         VectorD (n_dev, r_dev, aic, pseudo_rSq)
     } // fit
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the labels for the fit.
+     */
+    override def fitLabels: Seq [String] = Seq ("n_dev", "r_dev", "aic", "pseudo_rSq")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Classify the value of 'y = f(z)' by evaluating the formula 'y = exp (b dot z)'.

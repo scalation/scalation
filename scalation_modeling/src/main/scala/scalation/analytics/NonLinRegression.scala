@@ -8,6 +8,8 @@
 
 package scalation.analytics
 
+import scala.math.log
+
 import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.math.double_exp
 import scalation.minima.QuasiNewton
@@ -30,38 +32,41 @@ import scalation.util.Error
  *  @param f       the non-linear function f(x, b) to fit
  *  @param b_init  the initial guess for the parameter vector b
  */
-class NonLinRegression (x: MatrixD, y: VectorD,
-                        f: (VectoD, VectoD) => Double,
+class NonLinRegression (x: MatrixD, y: VectorD, f: (VectoD, VectoD) => Double,
                         b_init: VectorD)
       extends Predictor with Error
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
 
-    private val DEBUG      = false                      // debug flag
-    private val k          = x.dim2 - 1                 // number of variables (k = n-1
-    private val m          = x.dim1                     // number of data points (rows in matrix x)
-    private val r_df       = (m-1.0) / (m-k-1.0)        // ratio of degrees of freedom
-    private var rSquared   = -1.0                       // coefficient of determination (quality of fit)
-    private var rBarSq     = -1.0                       // adjusted R-squared
-    private var fStat      = -1.0                       // F statistic (quality of fit)
+    private val DEBUG  = false                                 // debug flag
+    private val k      = x.dim2 - 1                            // number of variables (k = n-1
+    private val m      = x.dim1                                // number of data points (rows in matrix x)
+    private val df     = (m - k - 1).toInt                     // degrees of freedom
+    private val r_df   = (m-1.0) / (m-k-1.0)                   // ratio of degrees of freedom
+
+    private var rBarSq = -1.0                                  // adjusted R-squared
+    private var fStat  = -1.0                                  // F statistic (quality of fit)
+    private var aic    = -1.0                                  // Akaike Information Criterion (AIC)
+    private var bic    = -1.0                                  // Bayesian Information Criterion (BIC)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Function to compute the Sum of Squares Error 'SSE' for given values for
      *  the parameter vector 'b'.
-     *  @param b  the parameter vector - FIX - to `VectoD`
+     *  @param b  the parameter vector
      */
-    def sseF (b: VectorD): Double =
+    def sseF (b: VectoD): Double =
     {
-        val z = new VectorD (m)                         // create vector z to hold predicted outputs
-        for (i <- 0 until m) z(i) = f (x(i), b)         // compute values for z
-        val e = y - z                                   // residual/error vector
-        e dot e                                         // residual/error sum of squares
+        val yp = VectorD (for (i <- x.range1) yield f(x(i), b))   // create vector yp of predicted responses
+        e = y - yp                                                // residual/error vector
+        e dot e                                                   // residual/error sum of squares
     } // sseF
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  non-linear regression equation
+     *  <p>
      *      y = f(x, b)
+     *  <p>
      *  using the least squares method.
      *  Caveat:  Optimizer may converge to an unsatisfactory local optima.
      *           If the regression can be linearized, use linear regression for
@@ -69,31 +74,43 @@ class NonLinRegression (x: MatrixD, y: VectorD,
      */
     def train ()
     {
-        val bfgs = new QuasiNewton (sseF)                // minimize sse using NLP
-        b        = bfgs.solve (b_init)                   // estimate for b from optimizer
-        diagnose (y, null)
+        val bfgs = new QuasiNewton (sseF)                      // minimize sse using NLP
+        b        = bfgs.solve (b_init)                         // estimate for b from optimizer
+
+        diagnose (y)                                           // compute diagonostics
     } // train
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the predictor by fitting the parameter vector (b-vector) in the
+     *  non-linear regression equation for the response passed into the class 'y'.
+     */
+    def train (yy: VectoD) { throw new UnsupportedOperationException ("train (yy) not implemented yet") }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute diagostics for the regression model.
      *  @param yy  the response vector
-     *  @param e   the residual/error vector (not used directly)
      */
-    private def diagnose (yy: VectorD, e: VectorD)
+    override def diagnose (yy: VectoD)
     {
-        val sse    = sseF (b.asInstanceOf [VectorD])            // residual/error sum of squares - FIX
-        val sst    = (yy dot yy) - yy.sum~^2.0 / m.toDouble     // total sum of squares
-        val ssr    = sst - sse                                  // regression sum of squares
-        rSquared   = ssr / sst                                  // coefficient of determination
-        rBarSq     = 1.0 - (1.0-rSquared) * r_df                // R-bar-squared (adjusted R-squared)
-        fStat      = ssr * (m-k-1.0)  / (sse * k)               // F statistic (msr / mse)
-        if (DEBUG) println ("sse = " + sse)
+        sse    = sseF (b.asInstanceOf [VectorD])               // residual/error sum of squares
+        sst    = (yy dot yy) - yy.sum~^2.0 / m.toDouble        // total sum of squares
+        rSq    = (sst - sse) / sst                             // coefficient of determination R^2
+
+        rBarSq = 1.0 - (1.0-rSq) * r_df                        // R-bar-squared (adjusted R-squared)
+        fStat  = (sst - sse) * df  / (sse * k)                 // F statistic (msr / mse)
+        aic    = m * log (sse) - m * log (m) + 2.0 * (k+1)     // Akaike Information Criterion (AIC)
+        bic    = aic + (k+1) * (log (m) - 2.0)                 // Bayesian Information Criterion (BIC)
     } // diagnose
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including 'rSquared'.
+    /** Return the quality of fit.
      */
-    def fit: VectorD = VectorD (rSquared, rBarSq, fStat)
+    override def fit: VectorD = super.fit.asInstanceOf [VectorD] ++ VectorD (rBarSq, fStat, aic, bic)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the labels for the fit.
+     */
+    override def fitLabels: Seq [String] = super.fitLabels ++ Seq ("rBarSq", "fStat", "aic", "bic")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = f(z, b),

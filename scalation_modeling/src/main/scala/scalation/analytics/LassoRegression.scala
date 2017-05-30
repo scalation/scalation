@@ -55,83 +55,95 @@ class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: D
     private val DEBUG    = false                                // debug flag
     private val k        = x.dim2 - 1                           // number of variables (k = n-1)
     private val m        = x.dim1.toDouble                      // number of data points (rows)
-    private val r_df     = (m-1.0) / (m-k-1.0)                  // ratio of degrees of freedom
-    private var rSquared = -1.0                                 // coefficient of determination (quality of fit)
-    private var rBarSq   = -1.0                                 // Adjusted R-squared
-    private var fStat    = -1.0                                 // F statistic (quality of fit)
+    private val df       = (m - k - 1).toInt                    // degrees of freedom
+    private val r_df     = (m-1.0) / df                         // ratio of degrees of freedom
 
+    private var rBarSq   = -1.0                                 // adjusted R-squared
+    private var fStat    = -1.0                                 // F statistic (quality of fit)
     private var aic      = -1.0                                 // Akaike Information Criterion (AIC)
     private var bic      = -1.0                                 // Bayesian Information Criterion (BIC)
 
-    private var stdErr: VectoD = _                              // standard error of coefficients for each x_j
-    private var t: VectoD      = _                              // t statistics for each x_j
-    private var p: VectoD      = _                              // p values for each x_j
+    private var stdErr: VectoD = null                           // standard error of coefficients for each x_j
+    private var t: VectoD      = null                           // t statistics for each x_j
+    private var p: VectoD      = null                           // p values for each x_j
 
     private var λ = λ0                                          // weight to put on regularization
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the sum of squares error + λ * sum of the magnitude  of coefficients.
      *  This is the objective function to be minimized.
-     *  @param b  the vector of coefficients/parameters
+     *  @param yy  the response vector
+     *  @param b   the vector of coefficients/parameters
      */
-    def f (b: VectorD): Double =
+    def f (yy: VectoD)(b: VectorD): Double =
     {
-        e = y - x * b                                           // calculate the residuals/error
+        e = yy - x * b                                          // calculate the residuals/error
         e dot e + λ * b.norm1 
     } // f
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  multiple regression equation
+     *  <p>
      *      y  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_1 , ... x_k] + e
+     *  <p>
      *  regularized by the sum of magnitudes of the coefficients.
      *  @see pdfs.semanticscholar.org/969f/077a3a56105a926a3b0c67077a57f3da3ddf.pdf
      *  @see `scalation.minima.LassoAdmm`
+     *  @param yy  the response vector
      */
-    def train ()
+    def train (yy: VectoD)
     {
-        val optimer = new CoordinateDescent (f)                 // Coordinate Descent optimizer
-//        val optimer = new GradientDescent (f)                 // Gradient Descent optimizer
-//        val optimer = new ConjugateGradient (f)               // Conjugate Gradient optimizer
-//        val optimer = new QuasiNewton (f)                     // Quasi-Newton optimizer
-//        val optimer = new NelderMeadSimplex (f, x.dim2)       // Nelder-Mead optimizer
+        val g       = f(yy) _
+        val optimer = new CoordinateDescent (g)                 // Coordinate Descent optimizer
+//        val optimer = new GradientDescent (g)                 // Gradient Descent optimizer
+//        val optimer = new ConjugateGradient (g)               // Conjugate Gradient optimizer
+//        val optimer = new QuasiNewton (g)                     // Quasi-Newton optimizer
+//        val optimer = new NelderMeadSimplex (g, x.dim2)       // Nelder-Mead optimizer
         val b0 = new VectorD (k+1)                              // initial guess for coefficient vector
         b = optimer.solve (b0, 0.5)                             // find an optimal solution for coefficients
-        e = y - x * b                                           // residual/error vector
-        sseF ()                                                 // compute and save sum of squared errors
-        diagnose (y, e)
+
+        e = yy - x * b                                          // residual/error vector
+        diagnose (yy)                                           // compute diagostics
     } // train
+
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the predictor by fitting the parameter vector (b-vector) in the
+     *  multiple regression equation for the response passed into the class 'y'.
+     */
+    def train () { train (y) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute diagostics for the regression model.
      *  @param yy  the response vector
-     *  @param e   the residual/error vector
      */
-    private def diagnose (yy: VectoD, e: VectoD)
+    override def diagnose (yy: VectoD)
     {
-        val sst  = (yy dot yy) - yy.sum~^2.0 / m                // total sum of squares
-        val ssr  = sst - sse                                    // regression sum of squares
-        rSquared = ssr / sst                                    // coefficient of determination
-        rBarSq   = 1.0 - (1.0-rSquared) * r_df                  // R-bar-squared (adjusted R-squared)
-        fStat    = ssr * (m-k-1.0)  / (sse * k)                 // F statistic (msr / mse)
-        aic      = m * log (sse) - m * log (m) + 2.0 * (k+1)    // Akaike Information Criterion (AIC)
-        bic      = aic + (k+1) * (log (m) - 2.0)                // Bayesian Information Criterion (BIC)
+        super.diagnose (yy)
+        rBarSq   = 1.0 - (1.0-rSq) * r_df                        // R-bar-squared (adjusted R-squared)
+        fStat    = ((sst - sse) * df) / (sse * k)                // F statistic (msr / mse)
+        aic      = m * log (sse) - m * log (m) + 2.0 * (k+1)     // Akaike Information Criterion (AIC)
+        bic      = aic + (k+1) * (log (m) - 2.0)                 // Bayesian Information Criterion (BIC)
 
-        val facCho = new Fac_Cholesky (x.t * x)                 // FIX - avoid re-calculating
-        val varEst = sse / (m-k-1.0)                            // variance estimate
-        val l      = facCho.factor1 ()                          // cholesky factorization
-        val varCov = l.inverse.t * l.inverse * varEst           // variance covariance matrix
-        val vars   = varCov.getDiag ()                          // individual variances
+        val facCho = new Fac_Cholesky (x.t * x)                  // create a Cholesky factorization
+        val l_inv  = facCho.factor1 ().inverse                   // take inverse of l from Cholesky factorization
+        val varEst = sse / df                                    // variance estimate
+        val varCov = l_inv.t * l_inv * varEst                    // variance-covariance matrix
 
-        stdErr = vars.map ((x: Double) => sqrt (x))                                   // standard error of coefficients
-        t      = b / stdErr                                                           // Student's T statistic
-        p      = t.map ((x: Double) => 2.0 * studentTCDF (-abs (x), (m-k-1).toInt))   // p values
+        stdErr = varCov.getDiag ().map (sqrt (_))                          // standard error of coefficients
+        t      = b / stdErr                                                // Student's T statistic
+        p      = t.map ((x: Double) => 2.0 * studentTCDF (-abs (x), df))   // p values
     } // diagnose
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including 'rSquared'.
+    /** Return the quality of fit.
      */
-    def fit: VectorD = VectorD (rSquared, rBarSq, fStat)
+    override def fit: VectorD = super.fit.asInstanceOf [VectorD] ++ VectorD (rBarSq, fStat, aic, bic)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the labels for the fit.
+     */
+    override def fitLabels: Seq [String] = super.fitLabels ++ Seq ("rBarSq", "fStat", "aic", "bic")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
@@ -160,9 +172,9 @@ class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: D
         } // for
         println ()
         println ("SSE:             %.4f".format (sse))
-        println ("Residual stdErr: %.4f on %d degrees of freedom".format (sqrt (sse/(m-k-1.0)), k))
-        println ("R-Squared:       %.4f, Adjusted rSquared:  %.4f".format (rSquared, rBarSq))
-        println ("F-Statistic:     %.4f on %d and %d DF".format (fStat, k, (m-k-1).toInt))
+        println ("Residual stdErr: %.4f on %d degrees of freedom".format (sqrt (sse/df), k))
+        println ("R-Squared:       %.4f, Adjusted rSquared:  %.4f".format (rSq, rBarSq))
+        println ("F-Statistic:     %.4f on %d and %d DF".format (fStat, k, df))
         println ("AIC:             %.4f".format (aic))
         println ("BIC:             %.4f".format (bic))
         println ("λ:               %.4f".format (λ))

@@ -10,33 +10,56 @@ package scalation.analytics
 
 import scala.math.sqrt
 
-import scalation.linalgebra.{VectoD, VectorI}
+import scalation.linalgebra.{VectoD, VectorD, VectoI}
+import scalation.math.double_exp
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Predictor` trait provides a common framework for several predictors.
- *  A predictor is for unbounded responses (real or integer).  When the number
- *  of distinct responses is bounded by some integer 'k', a classifier should
- *  be used.  
+ *  A predictor is for potentially unbounded responses (real or integer).
+ *  When the number of distinct responses is bounded by some relatively small
+ *  integer 'k', a classifier is likdely more appropriate.
+ *  Note, the 'train' method must be called first.
  */
 trait Predictor
 {
-    /** Coefficient/parameter vector [b_0, b_1, ... b_k]
-     */
-    protected var b: VectoD = _
-
-    /** Residual/error vector [e_0, e_1, ... e_m-1]
-     */
-    protected var e: VectoD = null
-
-    /** Sum of squared errors
-     */
-    protected var sse: Double = -1.0
+    protected var b: VectoD = null                  // coefficient/parameter vector [b_0, b_1, ... b_k]
+    protected var e: VectoD = null                  // residual/error vector [e_0, e_1, ... e_m-1]
+    protected var sse       = -1.0                  // sum of squared errors
+    protected var sst       = -1.0                  // total of squared errors
+    protected var rmse      = -1.0                  // root mean squared error
+    protected var rSq       = -1.0                  // coefficient of determination (quality of fit)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a set of data vectors 'x's and their corresponding responses 'yy's,
+     *  train the prediction function 'yy = f(x)' by fitting its parameters.
+     *  The 'x' values must be provided by the implementing class.  Also, 'train'
+     *  must call 'diagnose'.
+     *  @param yy  the response vector
+     */
+    def train (yy: VectoD)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a set of data vectors 'x's and their corresponding responses 'y's,
-     *  train the prediction function 'y = f(x)' by fitting its parameters.
+     *  passed into the implementing class, train the prediction function 'y = f(x)'
+     *  by fitting its parameters.
      */
     def train ()
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute diagostics for the predictor.  Override to add more diagostics.
+     *  Note, for 'rmse', 'sse' is divided by the number of instances 'm' rather
+     *  than degrees of freedom.
+     *  @see en.wikipedia.org/wiki/Mean_squared_error
+     *  @param yy  the response vector
+     */
+    def diagnose (yy: VectoD)
+    {
+        val m = e.dim                               // number of instances
+        sse   = e dot e                             // sum of squared errors
+        sst   = (yy dot yy) - yy.sum~^2.0 / m       // total sum of squares
+        rmse  = sqrt (sse / e.dim)                  // root mean square error
+        rSq   = (sst - sse) / sst                   // coefficient of determination R^2
+    } // diagnose
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector of coefficient/parameter values.
@@ -49,26 +72,15 @@ trait Predictor
     def residual: VectoD = e
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the sum of squared errors.  Compute 'sse' if not done already.
+    /** Return the quality of fit including 'sse', rmse' and 'rSq'.  Override to
+     *  add more.
      */
-    def sseF (): Double = { if (sse < 0.0) sse = e dot e; sse }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the root mean squared error.  Note 'sse' is divided by the number
-     *  of instances 'm' rather than degrees of freedom 'df'.
-     *  @see https://en.wikipedia.org/wiki/Mean_squared_error
-     */
-    def rmseF (): Double = sqrt (sseF () / e.dim)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including 'rSquared'.
-     */
-    def fit: VectoD
+    def fit: VectoD = VectorD (sse, rmse, rSq)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the fit.  Override when necessary.
      */
-    def fitLabels: Seq [String] = Seq ("rSquared", "rBarSq", "fStat", "rmse")
+    def fitLabels: Seq [String] = Seq ("sse", "rmse", "rSq")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a new continuous data vector z, predict the y-value of f(z).
@@ -80,7 +92,7 @@ trait Predictor
     /** Given a new discrete data vector z, predict the y-value of f(z).
      *  @param z  the vector to use for prediction
      */
-    def predict (z: VectorI): Double = predict (z.toDouble)
+    def predict (z: VectoI): Double = predict (z.toDouble)
 
 } // Predictor trait
 

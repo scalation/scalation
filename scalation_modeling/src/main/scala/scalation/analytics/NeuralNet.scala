@@ -79,6 +79,12 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int, eta: Double = 1.0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given training data 'x' and 'y', fit the weight matrices 'w' and 'v'.
+     *  @param yy  the response vector
+     */
+    def train (yy: VectoD) { throw new UnsupportedOperationException ("train (yy) not implemented yet") }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given training data 'x' and 'y', fit the weight matrices 'w' and 'v'.
      */
     def train () { if (w == null) setWeights (); backProp () }
 
@@ -133,8 +139,17 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int, eta: Double = 1.0)
     /** Return the fit (weight matrix 'w' and weight matrix 'v').
      *  FIX - make compatible with `Predictor`
      */
-    def fit2: Tuple2 [MatrixD, MatrixD] = (w, v)
-    def fit: VectorD = VectorD (-1.0, -1.0)
+    def fit2: (MatrixD, MatrixD) = (w, v)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the quality of fit.
+     */
+    override def fit: VectorD = new VectorD (0)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the labels for the fit.
+     */
+    override def fitLabels: Seq [String] = Seq ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given an input vector 'zi', predict the output/response vector 'zo'.

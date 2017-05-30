@@ -8,6 +8,8 @@
 
 // U N D E R   D E V E L O P M E N T 
 
+// needs to be FIXed
+
 package scalation.analytics
 
 import scala.math.{abs, pow, sqrt}
@@ -68,7 +70,7 @@ class Regression_WLS (x: MatrixD, y: VectorD, private var w: VectoD = null, tech
         w      = rp.recip                                      // set weight vector for WLS to reciprocal of rp
 
         if (DEBUG) {
-            println ("b_OLS      = " + ols_y.fit)             // Ordinary Least Squares (OLS)
+            println ("b_OLS      = " + ols_y.fit)              // Ordinary Least Squares (OLS)
             println ("residual e = " + e)
             println ("rad r      = " + r)
             println ("rad rp     = " + rp)
@@ -105,7 +107,7 @@ class Regression_WLS (x: MatrixD, y: VectorD, private var w: VectoD = null, tech
      *  using the weighted least squares 'WLS' method.
      *  @param yy  the new response vector
      */
-    def train (yy: VectorD)
+    def train (yy: VectoD)
     {
         val xw = new MatrixD (x)                                // x multiplied by weights
         for (i <- 0 until x.dim1) xw(i) *= w(i)
@@ -124,7 +126,7 @@ class Regression_WLS (x: MatrixD, y: VectorD, private var w: VectoD = null, tech
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit including 'rSquared'.
      */
-    def fit: VectorD = VectorD (rSquared, rBarSq, fStat)
+    override def fit: VectorD = VectorD (rSquared, rBarSq, fStat)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,

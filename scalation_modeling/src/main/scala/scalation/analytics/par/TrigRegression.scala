@@ -81,12 +81,12 @@ class TrigRegression (t: VectorD, y: VectorD, k: Int, w: Double = Pi, technique:
      *  using the least squares method.
      *  @param yy  the new response vector
      */
-    def train (yy: VectorD) { rg.train (yy) }
+    def train (yy: VectoD) { rg.train (yy) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit including 'rSquared'.
      */
-    def fit: VectorD = rg.fit
+    override def fit: VectoD = rg.fit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot expand (z),
@@ -107,7 +107,7 @@ class TrigRegression (t: VectorD, y: VectorD, k: Int, w: Double = Pi, technique:
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new quality of fit
      */
-    def backElim (): Tuple3 [Int, VectoD, VectorD] = rg.backElim ()
+    def backElim (): (Int, VectoD, VectoD) = rg.backElim ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor 'VIF' for each variable to test

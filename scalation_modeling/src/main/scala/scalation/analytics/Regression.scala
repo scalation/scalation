@@ -11,7 +11,7 @@ package scalation.analytics
 import scala.math.{abs, log, pow, sqrt}
 
 import scalation.linalgebra._
-import scalation.math.double_exp
+//import scalation.math.double_exp
 import scalation.plot.Plot
 import scalation.random.CDF.studentTCDF
 import scalation.util.{banner, Error, time}
@@ -40,13 +40,14 @@ import RegTechnique._
  *  where 'e' represents the residuals (the part not explained by the model).
  *  Use Least-Squares (minimizing the residuals) to fit the parameter vector
  *  <p>
- *      b  =  x_pinv * y   [ alternative: b  =  solve (y) ]
+ *      b  =  fac.solve (.)
  *  <p>
- *  where 'x_pinv' is the pseudo-inverse.  Three techniques are provided:
+ *  Four factorization techniques are provided:
  *  <p>
  *      'QR'         // QR Factorization: slower, more stable (default)
  *      'Cholesky'   // Cholesky Factorization: faster, less stable (reasonable choice)
- *      'Inverse'    // Inverse/Gaussian Elimination, classical textbook technique (outdated)
+ *      'SVD'        // Singular Value Decomposition: slowest, most robust
+ *      'Inverse'    // Inverse/Gaussian Elimination, classical textbook technique
  *  <p>
  *  @see see.stanford.edu/materials/lsoeldsee263/05-ls.pdf
  *  @param x          the input/design m-by-n matrix augmented with a first column of ones
@@ -59,20 +60,20 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
     if (x.dim1 <= x.dim2) flaw ("constructor", "not enough data rows in matrix to use regression")
 
-    private val DEBUG    = false                               // debug flag
-    private val k        = x.dim2 - 1                          // number of variables (k = n-1)
-    private val m        = x.dim1.toDouble                     // number of data points (rows) as a double
-    private val df       = (m - k - 1).toInt                   // degrees of freedom
-    private val r_df     = (m - 1.0) / df                      // ratio of degrees of freedom
-    private var rSquared = -1.0                                // coefficient of determination (quality of fit)
-    private var rBarSq   = -1.0                                // Adjusted R-squared
-    private var fStat    = -1.0                                // F statistic (quality of fit)
-    private var aic      = -1.0                                // Akaike Information Criterion (AIC)
-    private var bic      = -1.0                                // Bayesian Information Criterion (BIC)
+    private val DEBUG  = false                                 // debug flag
+    private val k      = x.dim2 - 1                            // number of variables (k = n-1)
+    private val m      = x.dim1.toDouble                       // number of data points (rows) as a double
+    private val df     = (m - k - 1).toInt                     // degrees of freedom
+    private val r_df   = (m - 1.0) / df                        // ratio of degrees of freedom
 
-    private var stdErr: VectoD = _                             // standard error of coefficients for each x_j
-    private var t: VectoD      = _                             // t statistics for each x_j
-    private var p: VectoD      = _                             // p values for each x_j
+    private var rBarSq = -1.0                                  // adjusted R-squared
+    private var fStat  = -1.0                                  // F statistic (quality of fit)
+    private var aic    = -1.0                                  // Akaike Information Criterion (AIC)
+    private var bic    = -1.0                                  // Bayesian Information Criterion (BIC)
+
+    private var stdErr: VectoD = null                          // standard error of coefficients for each x_j
+    private var t: VectoD      = null                          // t statistics for each x_j
+    private var p: VectoD      = null                          // p values for each x_j
 
     type Fac_QR = Fac_QR_H [MatT]                              // change as needed
 
@@ -88,66 +89,47 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  multiple regression equation
      *  <p>
-     *      y  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_1 , ... x_k] + e
-     *  <p>
-     *  using the ordinary least squares 'OLS' method.
-     */
-    def train ()
-    {
-        b = technique match {
-            case QR       => fac.solve (y)                     // R * b = Q.t * y
-            case Cholesky => fac.solve (x.t * y)               // L * L.t * b = X.t * y
-            case SVD      => fac.solve (y)                     // b = V * Σ^-1 * U.t * y
-            case _        => fac.solve (x.t * y)               // b = (X.t * X)^-1 * X.t * y
-        } // match
-
-        e = y - x * b                                          // residual/error vector
-        sseF ()                                                // compute and save sum of squared errors
-        diagnose (y)
-    } // train
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Retrain the predictor by fitting the parameter vector (b-vector) in the
-     *  multiple regression equation
-     *  <p>
      *      yy  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_1 , ... x_k] + e
      *  <p>
      *  using the ordinary least squares 'OLS' method.
-     *  @param yy  the new response vector
+     *  @param yy  the response vector
      */
     def train (yy: VectoD)
     {
-        b = technique match {
+        b = technique match {                                  // solve for coefficient vector b
             case QR       => fac.solve (yy)                    // R * b = Q.t * yy
             case Cholesky => fac.solve (x.t * yy)              // L * L.t * b = X.t * yy
             case SVD      => fac.solve (yy)                    // b = V * Σ^-1 * U.t * yy
             case _        => fac.solve (x.t * yy)              // b = (X.t * X)^-1 * X.t * yy
         } // match
 
-        e  = yy - x * b                                        // residual/error vector
-        sseF ()                                                // compute and save sum of squared errors
-        diagnose (yy)
+        e = yy - x * b                                         // compute residual/error vector e
+        diagnose (yy)                                          // compute diagonostics
     } // train
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the predictor by fitting the parameter vector (b-vector) in the
+     *  multiple regression equation for the response passed into the class 'y'.
+     */
+    def train () { train (y) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute diagostics for the regression model.
      *  @param yy  the response vector
      */
-    def diagnose (yy: VectoD)
+    override def diagnose (yy: VectoD)
     {
-        val sst  = (yy dot yy) - yy.sum~^2.0 / m                 // total sum of squares
-        val ssr  = sst - sse                                     // regression sum of squares
-        rSquared = ssr / sst                                     // coefficient of determination
-        rBarSq   = 1.0 - (1.0-rSquared) * r_df                   // R-bar-squared (adjusted R-squared)
-        fStat    = (ssr * df) / (sse * k)                        // F statistic (msr / mse)
-        aic      = m * log (sse) - m * log (m) + 2.0 * (k+1)     // Akaike Information Criterion (AIC)
-        bic      = aic + (k+1) * (log (m) - 2.0)                 // Bayesian Information Criterion (BIC)
+        super.diagnose (yy)
+        rBarSq = 1.0 - (1.0-rSq) * r_df                        // R-bar-squared (adjusted R-squared)
+        fStat  = ((sst - sse) * df) / (sse * k)                // F statistic (msr / mse)
+        aic    = m * log (sse) - m * log (m) + 2.0 * (k+1)     // Akaike Information Criterion (AIC)
+        bic    = aic + (k+1) * (log (m) - 2.0)                 // Bayesian Information Criterion (BIC)
 
-        val facCho = if (technique == Cholesky) fac              // reuse Cholesky factorization
-                     else new Fac_Cholesky (x.t * x)             // create a Cholesky factorization
-        val l_inv  = facCho.factor1 ().inverse                   // take inverse of l from Cholesky factorization
-        val varEst = sse / df                                    // variance estimate
-        val varCov = l_inv.t * l_inv * varEst                    // variance-covariance matrix
+        val facCho = if (technique == Cholesky) fac            // reuse Cholesky factorization
+                     else new Fac_Cholesky (x.t * x)           // create a Cholesky factorization
+        val l_inv  = facCho.factor1 ().inverse                 // take inverse of l from Cholesky factorization
+        val varEst = sse / df                                  // variance estimate
+        val varCov = l_inv.t * l_inv * varEst                  // variance-covariance matrix
 
         stdErr = varCov.getDiag ().map (sqrt (_))                          // standard error of coefficients
         t      = b / stdErr                                                // Student's T statistic
@@ -155,20 +137,25 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
     } // diagnose
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including 'rSquared'.
+    /** Return the quality of fit.
      */
-    def fit: VectorD = VectorD (rSquared, rBarSq, fStat, rmseF ())
+    override def fit: VectorD = super.fit.asInstanceOf [VectorD] ++ VectorD (rBarSq, fStat, aic, bic)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
-     *  e.g., (b_0, b_1, b_2) dot (1, z_1, z_2).
+    /** Return the labels for the fit. 
+     */
+    override def fitLabels: Seq [String] = super.fitLabels ++ Seq ("rBarSq", "fStat", "aic", "bic")
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Predict the value of 'y = f(z)' by evaluating the formula 'y = b dot z',
+     *  e.g., '(b_0, b_1, b_2) dot (1, z_1, z_2)'.
      *  @param z  the new vector to predict
      */
     def predict (z: VectoD): Double = b dot z
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula y = b dot z for
-     *  each row of matrix z.
+    /** Predict the value of 'y = f(z)' by evaluating the formula 'y = b dot z',
+     *  for each row of matrix 'z'.
      *  @param z  the new matrix to predict
      */
     def predict (z: MatT): VectoD = z * b
@@ -180,17 +167,18 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
      */
     def backElim (): (Int, VectoD, VectorD) =
     {
-        var j_max = -1                                // index of variable to eliminate
-        var b_max =  b                                // parameter values for best solution
-        var ft_max = VectorD (3); ft_max.set (-1.0)   // optimize on quality of fit (ft(0) is rSquared)
+        val ir    =  2                                               // ft(2) is rSq
+        var j_max = -1                                               // index of variable to eliminate
+        var b_max =  b                                               // parameter values for best solution
+        var ft_max = VectorD.fill (fitLabels.size)(-1.0)             // optimize on quality of fit
 
         for (j <- 1 to k) {
-            val keep = m.toInt                        // i-value large enough to not exclude any rows in slice
-            val rg_j = new Regression (x.sliceExclude (keep, j), y)       // regress with x_j removed
+            val keep = m.toInt                                       // i-value large enough to not exclude any rows in slice
+            val rg_j = new Regression (x.sliceExclude (keep, j), y)  // regress with x_j removed
             rg_j.train ()
             val bb = rg_j.coefficient
             val ft = rg_j.fit
-            if (ft(0) > ft_max(0)) { j_max = j; b_max = bb; ft_max = ft }
+            if (ft(ir) > ft_max(ir)) { j_max = j; b_max = bb; ft_max = ft }
         } // for
         (j_max, b_max, ft_max)
     } // backElim
@@ -203,13 +191,14 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
      */
     def vif: VectorD =
     {
-        val vifV = new VectorD (k)           // VIF vector
+        val ir   =  2                                           // ft(ir) is rSq
+        val vifV = new VectorD (k)                              // VIF vector
         for (j <- 1 to k) {
-            val keep = m.toInt               // i-value large enough to not exclude any rows in slice
-            val x_j  = x.col(j)                                           // x_j is jth column in x
-            val rg_j = new Regression (x.sliceExclude (keep, j), x_j)     // regress with x_j removed
+            val keep = m.toInt                                  // i-value large enough to not exclude any rows in slice
+            val x_j  = x.col(j)                                          // x_j is jth column in x
+            val rg_j = new Regression (x.sliceExclude (keep, j), x_j)    // regress with x_j removed
             rg_j.train ()
-            vifV(j-1) =  1.0 / (1.0 - rg_j.fit(0))                        // store vif for x_1 in vifV(0)
+            vifV(j-1) =  1.0 / (1.0 - rg_j.fit(ir))             // store vif for x_1 in vifV(0)
         } // for
         vifV
     } // vif
@@ -228,7 +217,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
         println ()
         println ("SSE:             %.4f".format (sse))
         println ("Residual stdErr: %.4f on %d degrees of freedom".format (sqrt (sse/df), k))
-        println ("R-Squared:       %.4f, Adjusted rSquared:  %.4f".format (rSquared, rBarSq))
+        println ("R-Squared:       %.4f, Adjusted rSquared:  %.4f".format (rSq, rBarSq))
         println ("F-Statistic:     %.4f on %d and %d DF".format (fStat, k, df))
         println ("AIC:             %.4f".format (aic))
         println ("BIC:             %.4f".format (bic))

@@ -96,7 +96,7 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = QR)
      *  using the least squares method.
      *  @param yy  the new response vector
      */
-    def train (yy: VectorD)
+    def train (yy: VectoD)
     {
         b        = if (x_pinv == null) fac.solve (yy)
                    else x_pinv * yy                             // parameter vector [b_0, b_1, ... b_k]
@@ -112,7 +112,7 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = QR)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of the fit, including 'rSquared'.
      */
-    def fit: VectorD = VectorD (rSquared, rBarSq, fStat)
+    override def fit: VectoD = VectorD (rSquared, rBarSq, fStat)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
@@ -126,11 +126,11 @@ class Regression (x: MatrixD, y: VectorD, technique: RegTechnique = QR)
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new R-squared value and the new F statistic.
      */
-    def backElim (): Tuple3 [Int, VectoD, VectorD] =
+    def backElim (): (Int, VectoD, VectoD) =
     {
         var j_max  = -1                               // index of variable to eliminate
         var b_max: VectoD = null                      // parameter values for best solution
-        var ft_max = VectorD (3); ft_max.set (-1.0)   // optimize on quality of fit (ft(0) is rSquared)
+        var ft_max: VectoD = VectorD (3); ft_max.set (-1.0)   // optimize on quality of fit (ft(0) is rSquared)
 
         for (j <- 1 to k) {
             val keep = m.toInt                        // i-value large enough to not exclude any rows in slice

@@ -57,30 +57,35 @@ class PolyRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  regression equation
-     *      y  =  b dot x + e  =  [b_0, ... b_k] dot [1, t, t^2 ... t^k] + e
+     *  multiple regression equation
+     *  <p>
+     *      yy  =  b dot x + e  =  [b_0, ... b_k] dot [1, t, t^2 ... t^k] + e
+     *  <p>
      *  using the least squares method.
+     *  @param yy  the response vector
+     */
+    def train (yy: VectoD) { rg.train (yy) }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the predictor by fitting the parameter vector (b-vector) in the
+     *  regression equation using the least squares method on 'y'
      */
     def train () { rg.train () }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Retrain the predictor by fitting the parameter vector (b-vector) in the
-     *  multiple regression equation
-     *      yy  =  b dot x + e  =  [b_0, ... b_k] dot [1, t, t^2 ... t^k] + e
-     *  using the least squares method.
-     *  @param yy  the new response vector
-     */
-    def train (yy: VectorD) { rg.train (yy) }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including 'rSquared'.
-     */
-    def fit: VectorD = rg.fit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector of residuals/errors.
      */
     override def residual: VectoD = rg.residual
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the quality of fit including 'rSquared'.
+     */
+    override def fit: VectorD = rg.fit
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the labels for the fit.
+     */
+    override def fitLabels: Seq [String] = rg.fitLabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot expand (z),
@@ -101,7 +106,7 @@ class PolyRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = 
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new R-squared value and the new F statistic.
      */
-    def backElim (): Tuple3 [Int, VectoD, VectorD] = rg.backElim ()
+    def backElim (): (Int, VectoD, VectorD) = rg.backElim ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor (VIF) for each variable to test

@@ -66,6 +66,11 @@ class Perceptron (x: MatrixD, y: VectorD, eta: Double = 1.0)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given training data x and y, fit the weight vector w.
      */
+    def train (yy: VectoD) { throw new UnsupportedOperationException ("train (yy) not implemented yet") }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given training data x and y, fit the weight vector w.
+     */
     def train () { if (w == null) setWeights (); minimizeError () }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -89,7 +94,12 @@ class Perceptron (x: MatrixD, y: VectorD, eta: Double = 1.0)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the fit, the weight vector 'w'.
      */
-    def fit: VectorD = w
+    override def fit: VectorD = w
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the labels for the fit.
+     */
+    override def fitLabels: Seq [String] = Seq ("w")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a new input vector 'zi', predict the output/response value 'zo'.

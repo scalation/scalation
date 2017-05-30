@@ -66,30 +66,35 @@ class TrigRegression (t: VectorD, y: VectorD, k: Int, w: Double = Pi, technique:
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  regression equation
-     *      y  =  b dot x + e  =  [b_0, ... b_k] dot [expanded t] + e
+     *  multiple regression equation
+     *  <p>
+     *      yy  =  b dot x + e  =  [b_0, ... b_k] dot [expanded t] + e
+     *  <p>
      *  using the least squares method.
+     *  @param yy  the response vector
+     */
+    def train (yy: VectoD) { rg.train (yy) }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the predictor by fitting the parameter vector (b-vector) in the
+     *  regression equation using 'y'.
      */
     def train () { rg.train () }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Retrain the predictor by fitting the parameter vector (b-vector) in the
-     *  multiple regression equation
-     *      yy  =  b dot x + e  =  [b_0, ... b_k] dot [expanded t] + e
-     *  using the least squares method.
-     *  @param yy  the new response vector
-     */
-    def train (yy: VectorD) { rg.train (yy) }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including 'rSquared'.
-     */
-    def fit: VectorD = rg.fit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector of residuals/errors.
      */
     override def residual: VectoD = rg.residual
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the quality of fit.
+     */
+    override def fit: VectorD = rg.fit
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the labels for the fit.
+     */
+    override def fitLabels: Seq [String] = rg.fitLabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot expand (z),

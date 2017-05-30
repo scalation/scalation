@@ -98,29 +98,34 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector ('b'-vector) in the
      *  quadratic 'rsm' regression equation, e.g., for 2D
-     *      y  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_0, x_0^2, x_1, x_1*x_0, x_1^2] + e
-     *  using the least squares method.
-     */
-    def train () { rsm.train () }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Retrain the predictor by fitting the parameter vector ('b'-vector) in the
-     *  quadratic 'rsm' regression equation, e.g., for 2D
+     *  <p>
      *      yy  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_0, x_0^2, x_1, x_1*x_0, x_1^2] + e
+     *  <p>
      *  using the least squares method.
      *  @param yy  the new response vector
      */
-    def train (yy: VectorD) { rsm.train (yy) }
+    def train (yy: VectoD) { rsm.train (yy) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including 'rSquared'.
+    /** Train the predictor by fitting the parameter vector ('b'-vector) in the
+     *  quadratic 'rsm' regression equation, e.g., for 2D using the least squares method on 'y'.
      */
-    def fit: VectorD = rsm.fit
+    def train () { rsm.train () }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector of residuals/errors.
      */
     override def residual: VectoD = rsm.residual
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the quality of fit.
+     */
+    override def fit: VectorD = rsm.fit
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the labels for the fit.
+     */
+    override def fitLabels: Seq [String] = rsm.fitLabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a point 'z', use the quadratic 'rsm' regression equation to predict a
