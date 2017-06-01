@@ -710,6 +710,64 @@ trait MatriC
     def norm1: Complex = (for (j <- range2) yield col(j).norm1).max
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute an estimate of the L1 norm of 'this' matrix, i.e., maximum absolute
+     *  column sum.  It uses an adapted version of Hager's algorithm.
+     *  @author Michael Cotterell
+     *  @see Algorithm 4.1 in HIGHAM1998
+     *  @see Higham, N.J. "Fortran Codes for Estimating the One-Norm of a 
+     *       Real or Complex Matrix, with Applications to Condition Estimation."
+     *       ACM Trans. Math. Soft., 14, 1988, pp. 381-396. 
+     *  @see www.maths.manchester.ac.uk/~higham/narep/narep135.pdf
+     *  @param inv  whether or not to compute for inverse (default true)
+     */
+    def norm1est (inv: Boolean = true): Complex =
+    {
+        val a  = this
+        val at = a.t
+        val e  = a(0); e.set (_1 / a.dim2)
+        var v  = if (inv) a.solve (e) else a * e
+        if (a.dim2 == 1) return v.norm        
+
+        var γ    = v.norm1
+        var ξ    = v.map (signum (_))
+        var x    = if (inv) at.solve (ξ) else at * ξ
+        var k    = 2
+        var done = false
+        val ITER = 5
+
+        while (! done) {
+            val j = x.abs.argmax ()
+            for (k <- e.range) e(k) = if (k == j) _1 else _0    // one in jth position
+            v     = if (inv) a.solve (e) else a.col (j) 
+            val g = γ
+            γ     = v.norm1
+            if (v.map (signum (_)) == ξ || γ <= g) {
+                for (i <- x.range) x(i) = (if (i % 2 == 0) -_1 else _1) * (_1 + ((i - _1) / (x.dim - 1)))
+                x = if (inv) a.solve (x) else a * x
+                if ((_1 * 2 * x.norm1) / (_1 * 3 * x.dim) > γ) { v = x; γ = (_1 * 2 * x.norm1) / (_1 * 3 * x.dim) }
+            } // if
+            ξ     = v.map (signum (_))
+            x     = if (inv) at.solve (ξ) else at * ξ
+            k    += 1
+            if (x.norm1 == x(j) || k > ITER) done = true
+        } // while
+        γ
+    } // norm1est
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the condition number of 'this' (a) matrix, which equals
+     *  <p>
+     *      ||a|| ||b||  where b = a.inverse
+     *  <p>
+     */
+    def conditionNum: Complex =
+    {
+        val nrm1 = norm1                         // norm of a (this)
+        val nrm2 = norm1est ()                   // estimate of norm of a^-1
+        nrm1 * nrm2
+    } // conditionNum
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the determinant of 'this' matrix.
      */
     def det: Complex
