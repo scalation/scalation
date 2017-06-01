@@ -133,26 +133,40 @@ class ARMA (y: VectoD, t: VectoD)
      *  <p>
      *      x_t = θ_0 * e_t-1 + ... + θ_q-1 * e_t-q + e_t
      *  <p>
-     *  @param q  the order of the AR model
+     *  @param q  the order of the MA model
      */
     def est_ma (q: Int = 1): VectoD =
     {
         if (q != 1) flaw ("ma", "only works for q = 1, use ARMA instead")
-        val θ = methodOfInnovations                     // MA(q) coefficients: θ_0
+        val θ = methodOfInnovations (q)                  // MA(q) coefficients: θ_0
         println ("coefficients for MA(" + q + "): θ = " + θ)
         θ           
     } // est_ma
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Apply the Method of Innovation to estimate coefficients for MA(q) model.
-     *  Caveat:  only works for q = 1
-     *  @see http://www.stat.berkeley.edu/~bartlett/courses/153-fall2010/lectures/10.pdf
+     *  @see www.stat.berkeley.edu/~bartlett/courses/153-fall2010/lectures/10.pdf
+     *  @see www.math.kth.se/matstat/gru/sf2943/tsform.pdf
+     *  @param q  the order of the MA model
      */
-    def methodOfInnovations: VectoD =
+    def methodOfInnovations (q: Int): VectoD =
     {
-        val θ = new VectorD (1)                         // MA(q) coefficients: θ_0
-        // FIX - to be implemented
-        θ           
+        val v = new VectorD (q)
+        v(0)  = ac(0)                                 // auto-covariance (gamma) for lag 0
+        val theta = new MatrixD (q, q)
+
+        for (l <- 1 until q) {
+            for (k <- 0 until l) {
+                var sum1 = 0.0
+                for (j <- 0 until k) sum1 += theta(l, l-j) * theta(k, k-j) * v(j)
+                theta(l, l-k) = 1.0 / v(k) * (ac (l-k) - sum1)
+            } // for
+            var sum2 = 0.0
+            for (j <- 0 until l) sum2 += theta(l, l-j) * theta(l, l-j) * v(j)
+            v(l) = v(0) - sum2
+        } // for
+
+        theta (q-1)
     } // methodOfInnovations
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -209,10 +223,10 @@ class ARMA (y: VectoD, t: VectoD)
     def hannanRissanen (p: Int, q: Int): VectoD =
     {
         // use a high Auto-Regression model for initial estimates of residuals
-        val k = p + q + 7
-        val φφ = durbinLevinson (k).slice (1, p+1)       // AR(k) coefficients: φ_0, ..., φ_k-1
+        val k = p + q + 3
+        val φφ = durbinLevinson (k).slice (1, k+1)       // AR(k) coefficients: φ_0, ..., φ_k-1
         println ("coefficients for AR(" + k + "): φφ = " + φφ)
-        val e = new VectorD (n)                          // FIX - get noise values from AR(k)
+        e = new VectorD (n)                              // FIX - get noise values from AR(k)
 
         // estimate residuals a(t) 
         val a = new VectorD (n - k)

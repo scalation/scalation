@@ -4,15 +4,19 @@
  *  @version 1.3
  *  @date    Sat Jan 31 20:59:02 EST 2015
  *  @see     LICENSE (MIT style license file).
+ *
+ *  Ridge Regression using QR
+ *  @see math.stackexchange.com/questions/299481/qr-factorization-for-ridge-regression
+ *  Ridge Regression using SVD
+ *  @see Hastie, T., Tibshirani, R., & Friedman, J. (2009). The Elements of Statistical Learning
  */
-
-// FIX - currently only works for Inverse
 
 package scalation.analytics
 
-import scala.math.log
+import scala.math.{log, sqrt}
 
 import scalation.linalgebra._
+import scalation.minima.GoldenSectionLS
 import scalation.plot.Plot
 import scalation.util.{Error, time}
 
@@ -42,10 +46,10 @@ import RegTechnique._
  *  @see statweb.stanford.edu/~tibs/ElemStatLearn/
  *  @param x          the centered input/design m-by-n matrix NOT augmented with a first column of ones
  *  @param y          the centered response vector
- *  @param lambda     the shrinkage parameter (0 => OLS) in the penalty term 'lambda * b dot b'
+ *  @param lambda_    the shrinkage parameter (0 => OLS) in the penalty term 'lambda * b dot b'
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda: Double = 0.1,
+class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda_ : Double = 0.1,
                        technique: RegTechnique = Cholesky)
       extends Predictor with Error
 {
@@ -64,16 +68,27 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
     private var bic    = -1.0                                  // Bayesian Information Criterion (BIC)
 
     //* Compute x.t * x and add lambda to the diagonal
-    val xtx_ = x.t * x; for (i <- xtx_.range1) xtx_(i, i) += lambda
+    private val xtx    = x.t * x
+    private val lambda = if (lambda_ <= 0.0) gcv (y) else lambda_
+    private var xtx_ : MatT = null.asInstanceOf [MatT]; xtx_λI (lambda)
+    private val ey     = MatrixD.eye (x.dim1, x.dim2)          // identity matrix
 
     type Fac_QR = Fac_QR_H [MatT]                              // change as needed
 
-    // QR and SVD not yet implemented
+    // SVD not yet implemented
     private val fac: Factorization = technique match {         // select the factorization technique
+        case QR       => { val x_ = (x ++ (ey * sqrt (lambda))).asInstanceOf [MatT];
+                           new Fac_QR (x_) }                   // QR Factorization
         case Cholesky => new Fac_Cholesky (xtx_)               // Cholesky Factorization
         case _        => new Fac_Inv (xtx_)                    // Inverse Factorization
     } // match
     fac.factor ()                                              // factor the matrix, either X or X.t * X
+
+    def xtx_λI (λ: Double)
+    {
+        xtx_ = xtx.copy ().asInstanceOf [MatT]
+        for (i <- xtx_.range1) xtx_(i, i) += λ
+    } // xtx_λI
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
@@ -82,13 +97,14 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
      *      yy  =  b dot x + e  =  [b_1, ... b_k] dot [x_1, ... x_k] + e
      *  <p>
      *  using the least squares method.
-     *  @param yy  the new response vector
+     *  @param yy  the response vector
      */
     def train (yy: VectoD)
     {
         b = technique match {                                  // solve for coefficient vector b
-            case Cholesky => fac.solve (x.t * yy)              // L * L.t * b = X.t * yy
-            case _        => fac.solve (x.t * yy)              // b = (X.t * X)^-1 * X.t * yy
+            case QR       => fac.solve (yy ++ new VectorD (y.dim))  // FIX - give formula
+            case Cholesky => fac.solve (x.t * yy)                   // L * L.t * b = X.t * yy
+            case _        => fac.solve (x.t * yy)                   // b = (X.t * X)^-1 * X.t * yy
         } // match
 
         e = yy - x * b                                         // compute residual/error vector
@@ -100,6 +116,25 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
      *  multiple regression equation using the least squares method on 'y'.
      */
     def train () { train (y) }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find an optimal value for the shrinkage parameter 'λ' using Generalized
+     *  Cross Validation (GCV).
+     *  @param yy the response vector
+     */
+    def gcv (yy: VectoD): Double =
+    {
+        def f_sse (λ: Double): Double = 
+        {
+            xtx_λI (λ)
+            train (yy)
+            if (sse.isNaN) throw new ArithmeticException ("sse is NaN")
+            sse
+        } // f_sse
+
+        val gs = new GoldenSectionLS (f_sse _)
+        gs.search ()
+    } // gcv
 
    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute diagostics for the regression model.

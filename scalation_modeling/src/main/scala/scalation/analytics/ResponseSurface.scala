@@ -113,6 +113,11 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
     def train () { rsm.train () }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the vector of coefficients.
+     */
+    override def coefficient: VectoD = rsm.coefficient
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector of residuals/errors.
      */
     override def residual: VectoD = rsm.residual
@@ -166,13 +171,40 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ResponseSurfaceTest` object is used to test the `ResponseSurface` class.
+ *  > run-main scalation.analytics.ResponseSurfaceTest
  */
 object ResponseSurfaceTest extends App
 {
-    val x: MatrixD = null
-    val y: VectorD = null
+    val x = new MatrixD ((20, 2), 47.0,   85.4,
+                                  49.0,   94.2,
+                                  49.0,   95.3,
+                                  50.0,   94.7,
+                                  51.0,   89.4,
+                                  48.0,   99.5,
+                                  49.0,   99.8,
+                                  47.0,   90.9,
+                                  49.0,   89.2,
+                                  48.0,   92.7,
+                                  47.0,   94.4,
+                                  49.0,   94.1,
+                                  50.0,   91.6,
+                                  45.0,   87.1,
+                                  52.0,  101.3,
+                                  46.0,   94.5,
+                                  46.0,   87.0,
+                                  46.0,   94.5,
+                                  48.0,   90.5,
+                                  56.0,   95.7)
+    //  response BP
+    val y = VectorD (105.0, 115.0, 116.0, 117.0, 112.0, 121.0, 121.0, 110.0, 110.0, 114.0,
+        114.0, 115.0, 114.0, 106.0, 125.0, 114.0, 106.0, 113.0, 110.0, 122.0)
 
     val rsm = new ResponseSurface (x, y)
+    rsm.train ()
+
+    println (rsm.fitLabels)
+    println ("fit         = " + rsm.fit)
+    println ("coefficient = " + rsm.coefficient)
 
 } // ResponseSurfaceTest object
 

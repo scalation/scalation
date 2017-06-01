@@ -1,6 +1,6 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  John Miller
+/** @author  John Miller, Vamsi Nadella
  *  @version 1.3
  *  @date    Sun Sep 23 21:14:14 EDT 2012
  *  @see     LICENSE (MIT style license file).
@@ -95,4 +95,35 @@ trait Predictor
     def predict (z: VectoI): Double = predict (z.toDouble)
 
 } // Predictor trait
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `PredictorTest` object tests all the classes in the `scalation.analytics`
+ *  package that extend the `Predictor` trait.
+ *  > run-main scalation.analytics.PredictorTest
+ */
+object PredictorTest extends App
+{
+    import scalation.util.banner
+
+    banner ("ANCOVATest");            ANCOVATest.main (null)
+    banner ("ANOVATest");             ANOVATest.main (null)
+    banner ("ARMATest");              ARMATest.main (null)
+    banner ("ExpRegressionTest");     ExpRegressionTest.main (null)
+    banner ("ExpSmoothingTest");      ExpSmoothingTest.main (null)
+    banner ("LassoRegressionTest");   LassoRegressionTest.main (null)
+    banner ("NeuralNetTest");         NeuralNetTest.main (null)
+    banner ("NonLinRegressionTest");  NonLinRegressionTest.main (null)
+    banner ("PerceptronTest");        PerceptronTest.main (null)
+    banner ("PoissonRegressionTest"); PoissonRegressionTest.main (null)
+    banner ("PolyRegressionTest");    PolyRegressionTest.main (null)
+    banner ("RegressionTest");        RegressionTest.main (null)
+    banner ("Regression_WLSTest");    Regression_WLSTest.main (null)
+    banner ("ResponseSurfaceTest");   ResponseSurfaceTest.main (null)
+    banner ("RidgeRegressionTest");   RidgeRegressionTest.main (null)
+    banner ("SimpleRegressionTest");  SimpleRegressionTest.main (null)
+    banner ("TranRegressionTest");    TranRegressionTest.main (null)
+    banner ("TrigRegressionTest");    TrigRegressionTest.main (null)
+
+} // PredictorTest object
 

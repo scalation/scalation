@@ -161,22 +161,22 @@ trait GLM
      *  @param t  the input vector: 't_i' expands to 'x_i'
      *  @param y  the response vector
      *  @param k  the maximum multiplier in the trig function 'kwt'
-     *  @param w  the base displacement angle in radians
+     *  @param p   extra parameter to make apply methods unique (pass in 0)
      */
-    def apply (t: VectorD, y: VectorD, k: Int, w: Double): TrigRegression =
+    def apply (t: VectorD, y: VectorD, k: Int, p: Int): TrigRegression =
     {
-        new TrigRegression (t, y, k, w, technique)
+        new TrigRegression (t, y, k, technique)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Trigonometric Regression model.
      *  @param ty  the combined input vector and response vector
      *  @param k   the maximum multiplier in the trig function 'kwt'
-     *  @param w   the base displacement angle in radians
+     *  @param p   extra parameter to make apply methods unique (pass in 0)
      */
-    def apply (ty: MatrixD, k: Int, w: Double): TrigRegression =
+    def apply (ty: MatrixD, k: Int, p: Int): TrigRegression =
     {
-        new TrigRegression (ty.col (0), ty.col (1), k, w, technique)
+        new TrigRegression (ty.col (0), ty.col (1), k, technique)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

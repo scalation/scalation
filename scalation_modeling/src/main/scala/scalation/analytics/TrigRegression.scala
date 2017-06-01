@@ -34,18 +34,18 @@ import RegTechnique._
  *  @param t          the input vector: t_i expands to x_i
  *  @param y          the response vector
  *  @param k          the maximum multiplier in the trig function (kwt)
- *  @param w          the base displacement angle in radians
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class TrigRegression (t: VectorD, y: VectorD, k: Int, w: Double = Pi, technique: RegTechnique = QR)
+class TrigRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = QR)
       extends Predictor with Error
 {
     if (t.dim != y.dim) flaw ("constructor", "dimensions of t and y are incompatible")
     if (t.dim <= k)     flaw ("constructor", "not enough data points for the given order")
 
-    val x = new MatrixD (t.dim, 1 + 2 * k)             // design matrix built from t
+    private val w = (2.0 * Pi) / (t.max() - t.min())           // base displacement angle in radians
+    private val x = new MatrixD (t.dim, 1 + 2 * k)             // design matrix built from t
     for (i <- 0 until t.dim) x(i) = expand (t(i))
-    val rg = new Regression (x, y, technique)          // regular multiple linear regression
+    private val rg = new Regression (x, y, technique)          // regular multiple linear regression
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Expand the scalar 't' into a vector of powers of 't': 
@@ -80,6 +80,11 @@ class TrigRegression (t: VectorD, y: VectorD, k: Int, w: Double = Pi, technique:
      *  regression equation using 'y'.
      */
     def train () { rg.train () }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the vector of coefficients.
+     */
+    override def coefficient: VectoD = rg.coefficient
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector of residuals/errors.
@@ -134,6 +139,7 @@ class TrigRegression (t: VectorD, y: VectorD, k: Int, w: Double = Pi, technique:
  *  <p>
  *      y  =  b dot x  =  b_0 + b_1*t + b_2*t^2.
  *  <p>
+ *  > run-main scalation.analytics.TrigRegressionTest
  */
 object TrigRegressionTest extends App
 {
@@ -148,12 +154,15 @@ object TrigRegressionTest extends App
     println ("y = " + y)
 
     val order = 8
-    val prg   = new TrigRegression (t, y, order)
-    prg.train ()
-    println ("fit = " + prg.fit)
+    val trg   = new TrigRegression (t, y, order)
+    trg.train ()
+
+    println (trg.fitLabels)
+    println ("fit         = " + trg.fit)
+    println ("coefficient = " + trg.coefficient)
 
     val z = 10.5                                  // predict y for one point
-    val yp = prg.predict (z)
+    val yp = trg.predict (z)
     println ("predict (" + z + ") = " + yp)
 
 } // TrigRegressionTest object

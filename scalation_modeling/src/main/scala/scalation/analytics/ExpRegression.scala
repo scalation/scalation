@@ -99,7 +99,7 @@ class ExpRegression (x: MatrixD, nonneg: Boolean, y: VectorD)
         val bfgs = new QuasiNewton (ll)                        // minimizer for -2LL
         b        = bfgs.solve (b0)                             // find optimal solution for parameters
 
-        val e    = y / (x * b)                                 // residual/error vector e
+        e = y / (x * b)                                        // residual/error vector e
         diagnose (y)                                           // compute diagonostics
     } // train
 

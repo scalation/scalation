@@ -34,7 +34,7 @@ import RegTechnique._
  *  @param k          the order of the polynomial
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class PolyRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = QR)
+class PolyRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = Cholesky)
       extends Predictor with Error
 {
     if (t.dim != y.dim) flaw ("constructor", "dimensions of t and y are incompatible")
@@ -71,6 +71,11 @@ class PolyRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = 
      *  regression equation using the least squares method on 'y'
      */
     def train () { rg.train () }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the vector of coefficients.
+     */
+    override def coefficient: VectoD = rg.coefficient
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector of residuals/errors.
@@ -125,27 +130,36 @@ class PolyRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = 
  *  <p>
  *      y  =  b dot x  =  b_0 + b_1*t + b_2*t^2.
  *  <p>
+ *  Note, the 'order' at which R-Squared drops is QR(7), Cholesky(14), SVD(6), Inverse(13).
+ *  > run-main scalation.analytics.PolyRegressionTest
  */
 object PolyRegressionTest extends App
 {
     import scalation.random.Normal
 
-    val noise = Normal (0.0, 500.0)
+    val noise = Normal (0.0, 100.0)
     val t     = VectorD.range (0, 100)
     val y     = new VectorD (t.dim)
-    for (i <- 0 until 100) y(i) = 10.0 - 10.0 * i + i~^2 + noise.gen
+    for (i <- 0 until 100) y(i) = 10.0 - 10.0 * i + i~^2 + i * noise.gen
 
     println ("t = " + t)
     println ("y = " + y)
 
-    val order = 8
-    val prg   = new PolyRegression (t, y, order)
+    val order     = 6
+    val technique = Cholesky                        // others: QR, SVD or Inverse
+    val prg       = new PolyRegression (t, y, order)
     prg.train ()
-    println ("fit = " + prg.fit)
 
-    val z = 10.5                                  // predict y for one point
-    val yp = prg.predict (z)
-    println ("predict (" + z + ") = " + yp)
+    println (prg.fitLabels)
+    println ("fit         = " + prg.fit)
+    println ("coefficient = " + prg.coefficient)
+
+    val yp = t.map (prg.predict (_))
+    new Plot (t, y, yp, "PolyRegression")
+
+    val z = 10.5                                    // predict y for one point
+    val yp2 = prg.predict (z)
+    println ("predict (" + z + ") = " + yp2)
 
 } // PolyRegressionTest object
 
