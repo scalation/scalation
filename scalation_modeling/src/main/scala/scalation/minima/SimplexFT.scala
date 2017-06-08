@@ -18,7 +18,7 @@ package scalation.minima
 import scala.collection.mutable.{ArrayBuffer, ArrayStack}
 import scala.util.control.Breaks.{breakable, break}
 
-import scalation.linalgebra.{MatriD, VectoD, VectorD, VectorI}
+import scalation.linalgebra.{Fac_LU, MatriD, VectoD, VectorD, VectorI}
 import scalation.random.Randi
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -189,14 +189,17 @@ class SimplexFT (a: MatriD, b: VectoD, c: VectoD, var x_B: Array [Int] = null)
     if (c.dim != N) flaw ("constructor", "c.dim = " + c.dim + " != " + N)
 
     if (x_B == null) x_B = setBasis ()
-    private val ba: MatriD       = a.selectCols (x_B)          // basis-matrix (selected columns from matrix-a)
-    private val lu       = ba.lud                      // perform an LU Decomposition on the basis-matrix
+    private val ba: MatriD = a.selectCols (x_B)        // basis-matrix (selected columns from matrix-a)
+    private val lud      = new Fac_LU (ba)             // perform an LU Decomposition on the basis-matrix
+    lud.factor ()
+    private val lu       = lud.factors
+
 //  private var l_inv    = lu._1.inverse               // L-inverted
 //  private var u_inv    = lu._2.inverse               // U-inverted  (b_inv = u_inv * l_inv)
 
     private val c_B      = c.select (x_B)              // cost for basic variables
 //  private val c_       = c_B * (u_inv * l_inv)       // adjusted cost via inverse
-    private val c_ : VectoD      = c_B                         // adjusted cost via back-substitution - FIX
+    private val c_ : VectoD = c_B                      // adjusted cost via back-substitution - FIX
 //  private val b_       = (u_inv * l_inv) * b         // adjusted constants via inverse
     private val b_       = ba.solve (lu, b)            // adjusted constants via back-substitution
 

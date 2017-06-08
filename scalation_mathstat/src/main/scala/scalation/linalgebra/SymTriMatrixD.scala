@@ -794,7 +794,7 @@ class SymTriMatrixD (val d1: Int)
      *  FIX: would be more efficient to use tridiagonal matrices than dense matrices.
      *  @see www.webpages.uidaho.edu/~barannyk/Teaching/LU_factorization_tridiagonal.pdf
      */
-    def lud: Tuple2 [MatriD, MatriD] =
+    def lud_npp: (MatriD, MatriD) =
     {
         val l  = eye (d1)                  // lower triangular matrix
         val u  = new MatrixD (d1, d1)      // upper triangular matrix
@@ -811,10 +811,10 @@ class SymTriMatrixD (val d1: Int)
         u setDiag (_sd, 1)                 // set super-diagonal for u
         u setDiag (ud)                     // set diagonal for u
         (l, u)
-    } // lud
+    } // lud_npp
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'a*x = l*u*x = b' (see 'lud' above).
+    /** Solve for 'x' in the equation 'a*x = l*u*x = b' (see 'lud_npp' above).
      *  @param l  the lower triangular matrix
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
@@ -830,7 +830,7 @@ class SymTriMatrixD (val d1: Int)
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
+    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud_npp' above).
      *  @param lu  the lower and upper triangular matrices
      *  @param b   the constant vector
      */
@@ -840,7 +840,7 @@ class SymTriMatrixD (val d1: Int)
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' tridiagonal matrix,
      *  using the Thomas Algorithm.
      *  Caveat:  Stability vs. diagonal dominance.
-     *  This method is more efficient, since a 'lud' creates dense matrices.
+     *  This method is more efficient, since a 'lud_npp' creates dense matrices.
      *  @see en.wikibooks.org/wiki/Algorithm_Implementation/Linear_Algebra/Tridiagonal_matrix_algorithm
      *  @param b  the constant vector
      */
@@ -1125,7 +1125,7 @@ class SymTriMatrixD (val d1: Int)
         throw new NoSuchMethodException ("lowerT not implemented since result may not be SymTriMatrix")
     } // upperT
 
-    def lud_ip (): Tuple2 [MatriD, MatriD] = 
+    def lud_ip (): (MatriD, MatriD) = 
     {
         throw new NoSuchMethodException ("lud_ip not implemented since result may not be SymTriMatrix")
     } // lud_ip
@@ -1252,7 +1252,7 @@ object SymTriMatrixDTest extends App
 
     println ("a.det = " + a.det)	
 
-    val (l, u) = a.lud
+    val (l, u) = a.lud_npp
     println ("l  = " + l)
     println ("u  = " + u)
     println ("lu = " + (l * u))

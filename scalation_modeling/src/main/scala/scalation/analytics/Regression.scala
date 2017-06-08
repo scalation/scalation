@@ -23,8 +23,8 @@ import scalation.util.Unicode.sub
 object RegTechnique extends Enumeration
 {
     type RegTechnique = Value
-    val QR, Cholesky, SVD, Inverse = Value
-    val techniques = Array (QR, Cholesky, SVD, Inverse)
+    val QR, Cholesky, SVD, LU, Inverse = Value
+    val techniques = Array (QR, Cholesky, SVD, LU, Inverse)
     
 } // RegTechnique
 
@@ -47,6 +47,7 @@ import RegTechnique._
  *      'QR'         // QR Factorization: slower, more stable (default)
  *      'Cholesky'   // Cholesky Factorization: faster, less stable (reasonable choice)
  *      'SVD'        // Singular Value Decomposition: slowest, most robust
+ *      'LU'         // LU Factorization: better than Inverse
  *      'Inverse'    // Inverse/Gaussian Elimination, classical textbook technique
  *  <p>
  *  @see see.stanford.edu/materials/lsoeldsee263/05-ls.pdf
@@ -81,6 +82,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
         case QR       => new Fac_QR (x, false)                 // QR Factorization
         case Cholesky => new Fac_Cholesky (x.t * x)            // Cholesky Factorization
         case SVD      => new SVD (x)                           // Singular Value Decomposition
+        case LU       => new Fac_LU (x.t * x)                  // LU Factorization
         case _        => new Fac_Inv (x.t * x)                 // Inverse Factorization
     } // match
     fac.factor ()                                              // factor the matrix, either X or X.t * X
@@ -100,6 +102,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
             case QR       => fac.solve (yy)                    // R * b = Q.t * yy
             case Cholesky => fac.solve (x.t * yy)              // L * L.t * b = X.t * yy
             case SVD      => fac.solve (yy)                    // b = V * Σ^-1 * U.t * yy
+            case LU       => fac.solve (x.t * yy)              // b = (X.t * X) \ X.t * yy
             case _        => fac.solve (x.t * yy)              // b = (X.t * X)^-1 * X.t * yy
         } // match
 

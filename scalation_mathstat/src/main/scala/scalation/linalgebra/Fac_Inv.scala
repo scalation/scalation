@@ -10,7 +10,7 @@ package scalation.linalgebra
 
 import scala.math.sqrt
 
-import scalation.util.Error
+import scalation.util.{banner, Error}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Fac_Inv` class provides methods to factor an 'n-by-n' identity matrix 'I'
@@ -60,15 +60,23 @@ object Fac_InvTest extends App
                                  0.4,  1.04, -0.12, 0.28,
                                  0.8, -0.12,  9.2,  1.4,
                                 -0.2,  0.28,  1.4,  4.35)
+
     val b = VectorD (-0.2, -0.32, 13.52, 14.17)
 
-    val inv = new Fac_Inv (a)
     println ("a = " + a)
-    println ("factor = " + inv.factor ())
-    println ("solve  = " + inv.solve (b))
+    println ("b = " + b)
 
-    val lu = a.lud
-    println ("lu solve = " + a.solve (lu, b))
+    banner ("Matrix Inversion")
+    val inv = new Fac_Inv (a)
+    inv.factor ()
+    println ("factors = " + inv.factors)
+    println ("solve   = " + inv.solve (b))
+
+    banner ("LU Factorization")
+    val lu = new Fac_LU (a)
+    lu.factor ()
+    println ("factors = " + lu.factors)
+    println ("solve   = " + lu.solve (b))
 
 } // Fac_InvTest object
 

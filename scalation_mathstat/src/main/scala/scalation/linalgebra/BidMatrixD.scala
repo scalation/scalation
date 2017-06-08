@@ -1011,12 +1011,12 @@ class BidMatrixD (val d1: Int)
     // The following methods are currently not implemented for Bidiagonal matrices:
     //--------------------------------------------------------------------------
 
-    def lud: Tuple2 [MatriD, MatriD] =
+    def lud_npp: (MatriD, MatriD) =
     {
-        throw new NoSuchMethodException ("lud not implemented since it's already an upper matrix")
-    } // lud
+        throw new NoSuchMethodException ("lud_npp not implemented since it's already an upper matrix")
+    } // lud_npp
 
-    def lud_ip (): Tuple2 [MatriD, MatriD] = 
+    def lud_ip (): (MatriD, MatriD) = 
     {
         throw new NoSuchMethodException ("lud_ip not implemented since it's already an upper matrix")
     } // lud_ip

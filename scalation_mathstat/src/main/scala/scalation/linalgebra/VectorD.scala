@@ -826,6 +826,16 @@ class VectorD (val dim: Int,
         count
     } // countPos
 
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Count the number of zero elements in the 'this' vector.
+     */
+    def countZero: Int =
+    {
+        var count = 0
+        for (i <- 0 until dim if v(i) == 0.0) count += 1
+        count
+    } // countZero
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Clean values in 'this' vector at or below the threshold 'thres' by setting
      *  them to zero.  Iterative algorithms give approximate values and if very close

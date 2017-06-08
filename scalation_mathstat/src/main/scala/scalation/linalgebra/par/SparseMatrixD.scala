@@ -20,8 +20,6 @@ import scalation.util.{Error, SortedLinkedHashMap}
  *  than storing the matrix as a 2 dimensional array, it is stored as an array
  *  of sorted-linked-maps, which record all the non-zero values for each particular
  *  row, along with their j-index as (j, v) pairs.
- *  Note: _npp versions of methods are not appropriate for sparse matrices
- *       (i.e., always use partial pivoting).
  *  @param d1  the first/row dimension
  *  @param d2  the second/column dimension
  */
@@ -1063,21 +1061,16 @@ class SparseMatrixD (val d1: Int,
     } // getMinVal
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Decompose this sparse matrix into the product of lower and upper triangular
-     *  matrices (l, u) using the LU Decomposition algorithm.  This version uses
-     *  partial pivoting.
+    /** Factor this sparse matrix into the product of lower and upper triangular
+     *  matrices (l, u) using an LU Decomposition algorithm.
      */
-    def lud: Tuple2 [SparseMatrixD, SparseMatrixD] =
+    def lud_npp: (SparseMatrixD, SparseMatrixD) =
     {
         val l = new SparseMatrixD (dim1, dim2)   // lower triangular matrix
         val u = new SparseMatrixD (this)         // upper triangular matrix (a copy of this)
         for (i <- u.range1) {
-            var pivot = u(i, i)
-            if (pivot =~ 0.0) {
-                val k = partialPivoting (u, i)   // find the maxiumum element below pivot
-                swap (u, i, k, i)                // swap rows i and k from column k
-                pivot = u(i, i)                  // reset the pivot
-            } // if
+            val pivot = u(i, i)
+            if (pivot =~ 0.0) flaw ("lud_nnp", s"use Fac_LU since there is a zero pivot at row $i")
             l(i, i) = 1.0
             for (j <- i + 1 until u.dim2) l(i, j) = 0.0
             for (k <- i + 1 until u.dim1) {
@@ -1086,25 +1079,20 @@ class SparseMatrixD (val d1: Int,
                 for (j <- u.range2) u(k, j) -= mul * u(i, j)
             } // for
         } // for
-        Tuple2 (l, u)
-    } // lud
+        (l, u)
+    } // lud_npp
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Decompose in-place this sparse matrix into the product of lower and upper triangular
-     *  matrices (l, u) using the LU Decomposition algorithm.  This version uses
-     *  partial pivoting.
+    /** Factor in-place this sparse matrix into the product of lower and upper triangular
+     *  matrices (l, u) using an LU Decomposition algorithm.
      */
-    def lud_ip: Tuple2 [SparseMatrixD, SparseMatrixD] =
+    def lud_ip: (SparseMatrixD, SparseMatrixD) =
     {
         val l = new SparseMatrixD (dim1, dim2)   // lower triangular matrix
         val u = this                             // upper triangular matrix (this)
         for (i <- u.range1) {
-            var pivot = u(i, i)
-            if (pivot =~ 0.0) {
-                val k = partialPivoting (u, i)   // find the maxiumum element below pivot
-                swap (u, i, k, i)                // swap rows i and k from column k
-                pivot = u(i, i)                  // reset the pivot
-            } // if
+            val pivot = u(i, i)
+            if (pivot =~ 0.0) flaw ("lud_ip", s"use Fac_LU since there is a zero pivot at row $i")
             l(i, i) = 1.0
             for (j <- i + 1 until u.dim2) l(i, j) = 0.0
             for (k <- i + 1 until u.dim1) {
@@ -1113,7 +1101,7 @@ class SparseMatrixD (val d1: Int,
                 for (j <- u.range2) u(k, j) -= mul * u(i, j)
             } // for
         } // for
-        Tuple2 (l, u)
+        (l, u)
     } // lud_ip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1150,7 +1138,7 @@ class SparseMatrixD (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' using back substitution in the equation 'u*x = y' where
-     *  'this' matrix ('u') is upper triangular (see 'lud' above).
+     *  'this' matrix ('u') is upper triangular (see 'lud_npp' above).
      *  @param y  the constant vector
      */
     def bsolve (y: VectoD): VectorD =
@@ -1165,7 +1153,7 @@ class SparseMatrixD (val d1: Int,
     } // bsolve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for x in the equation l*u*x = b (see lud above).
+    /** Solve for x in the equation l*u*x = b (see 'lud_npp' above).
      *  @param l  the lower triangular matrix
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
@@ -1182,7 +1170,7 @@ class SparseMatrixD (val d1: Int,
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' (see lud above).
+    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud_npp' above).
      *  @param lu  the lower and upper triangular matrices
      *  @param b   the constant vector
      */
@@ -1192,7 +1180,7 @@ class SparseMatrixD (val d1: Int,
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' matrix.
      *  @param b  the constant vector.
      */
-    def solve (b: VectoD): VectorD = solve (lud, b)
+    def solve (b: VectoD): VectorD = solve (lud_npp, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Combine this sparse matrix with matrix b, placing them along the diagonal and
@@ -1594,11 +1582,11 @@ object SparseMatrixDTest extends App
     val z  = new SparseMatrixD (2, 2)
     z.set (Array (Array (1.0, 2.0), Array (3.0, 2.0)))
     val b  = VectorD (8.0, 7.0)
-    val lu = z.lud
+    val lu = z.lud_npp
 
     println ("z         = " + z)
     println ("z.t       = " + z.t)
-    println ("z.lud     = " + lu)
+    println ("z.lud_npp = " + lu)
     println ("z.solve   = " + z.solve (lu._1, lu._2, b))
     println ("z.inverse = " + z.inverse)
     println ("z.inv * b = " + z.inverse * b)

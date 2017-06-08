@@ -10,7 +10,7 @@ package scalation.linalgebra
 
 import scala.math.sqrt
 
-import scalation.util.Error
+import scalation.util.{banner, Error}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Fac_Cholesky` class provides methods to factor an 'n-by-n' symmetric,
@@ -84,15 +84,23 @@ object Fac_CholeskyTest extends App
                                  0.4,  1.04, -0.12, 0.28,
                                  0.8, -0.12,  9.2,  1.4,
                                 -0.2,  0.28,  1.4,  4.35)
+
     val b = VectorD (-0.2, -0.32, 13.52, 14.17)
 
-    val chol = new Fac_Cholesky (a)
     println ("a = " + a)
-    println ("factor   = " + chol.factor ())
-    println ("solve    = " + chol.solve (b))
+    println ("b = " + a)
 
-    val lu = a.lud
-    println ("lu solve = " + a.solve (lu, b))
+    banner ("Cholesky Factorization")
+    val chol = new Fac_Cholesky (a)
+    chol.factor ()
+    println ("factors = " + chol.factors)
+    println ("solve   = " + chol.solve (b))
+
+    banner ("LU Factorization")
+    val lu = new Fac_LU (a)
+    lu.factor ()
+    println ("factors = " + lu.factors)
+    println ("solve   = " + lu.solve (b))
 
 } // Fac_CholeskyTest object
 

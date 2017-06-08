@@ -17,7 +17,7 @@ import scala.math.{abs => ABS}
 
 import scalation.math.{double_exp, oneIf}
 import scalation.math.ExtremeD.TOL
-import scalation.util.{Error, PackageInfo}
+import scalation.util.{Error, banner}
 
 import MatrixD.eye
 
@@ -36,6 +36,10 @@ class MatrixD (d1: Int,
                private [linalgebra] var v: Array [Array [Double]] = null)
       extends MatriD with Error with Serializable
 {
+    /** Debug flag
+     */
+    private val DEBUG = true
+
     /** Dimension 1
      */
     lazy val dim1 = d1
@@ -89,16 +93,16 @@ class MatrixD (d1: Int,
     /** Construct a matrix and assign values from matrix 'b'.
      *  @param b  the matrix of values to assign
      */
-    def this (b: MatrixD)
+    def this (b: MatriD)
     {
         this (b.dim1, b.dim2)
-        for (i <- range1; j <- range2) v(i)(j) = b.v(i)(j)
+        for (i <- range1; j <- range2) v(i)(j) = b(i, j)
     } // constructor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create an exact copy of 'this' m-by-n matrix.
      */
-    def copy (): MatrixD = new MatrixD (dim1, dim2, (for (i <- range1) yield v(i).clone ()).toArray)
+    def copy: MatrixD = new MatrixD (dim1, dim2, (for (i <- range1) yield v(i).clone ()).toArray)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create an m-by-n matrix with all elements initialized to zero.
@@ -1008,24 +1012,27 @@ class MatrixD (d1: Int,
      */ 
     def upperT: MatrixD =
     {
-        val up = new MatrixD (dim1, dim2)
-        for (i <- range1; j <- i until dim2) up.v(i)(j) = v(i)(j)
+        val up = new MatrixD (dim2)
+        for (i <- range2; j <- i until dim2) up.v(i)(j) = v(i)(j)
         up
     } // upperT
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Factor 'this' matrix into the product of upper and lower triangular
-     *  matrices '(l, u)' using the 'LU' Factorization algorithm.  This version uses
-     *  no partial pivoting.
+    /** Factor 'this' matrix into the product of upper and lower triangular matrices
+     *  '(l, u)' using an 'LU' Factorization algorithm.
+     *  Caveat:  This version requires square matrices and performs no partial pivoting.
+     *  @see `Fac_LU` for a more complete implementation
      */
     def lud_npp: (MatrixD, MatrixD) =
     {
-        val l = new MatrixD (dim1, dim2)    // lower triangular matrix
+        if (! isSquare) throw new IllegalArgumentException ("lud_npp: requires a square matrix")
+
+        val l = new MatrixD (dim1)          // lower triangular matrix
         val u = new MatrixD (this)          // upper triangular matrix (a copy of this)
 
         for (i <- u.range1) {
             val pivot = u.v(i)(i)
-            if (pivot =~ 0.0) flaw ("lud_npp", "use lud since you have a zero pivot")
+            if (pivot =~ 0.0) flaw ("lud_npp", s"use Fac_LU since there is a zero pivot at row $i")
             l.v(i)(i) = 1.0
             for (j <- i + 1 until u.dim2) l.v(i)(j) = 0.0
             for (k <- i + 1 until u.dim1) {
@@ -1033,55 +1040,27 @@ class MatrixD (d1: Int,
                 l.v(k)(i) = mul
                 for (j <- u.range2) u.v(k)(j) = u.v(k)(j) - mul * u.v(i)(j)
             } // for
+            if (DEBUG) println (s"for iteration $i: u = $u")
         } // for
         (l, u)
     } // lud_npp
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Factor 'this' matrix into the product of lower and upper triangular
-     *  matrices '(l, u)' using the 'LU' Factorization algorithm.  This version uses
-     *  partial pivoting.
-     */
-    def lud: (MatrixD, MatrixD) =
-    {
-        val l = new MatrixD (dim1, dim2)         // lower triangular matrix
-        val u = new MatrixD (this)               // upper triangular matrix (a copy of this)
-
-        for (i <- u.range1) {
-            var pivot = u.v(i)(i)
-            if (pivot =~ 0.0) {
-                val k = partialPivoting (u, i)   // find the maxiumum element below pivot
-                u.swap (i, k, i)                 // swap rows i and k from column k
-                pivot = u.v(i)(i)                // reset the pivot
-            } // if
-            l.v(i)(i) = 1.0
-            for (j <- i + 1 until u.dim2) l.v(i)(j) = 0.0
-            for (k <- i + 1 until u.dim1) {
-                val mul = u.v(k)(i) / pivot
-                l.v(k)(i) = mul
-                for (j <- u.range2) u.v(k)(j) = u.v(k)(j) - mul * u.v(i)(j)
-            } // for
-        } // for
-        (l, u)
-    } // lud
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor in-place 'this' matrix into the product of lower and upper triangular
-     *  matrices '(l, u)' using the 'LU' Factorization algorithm.  This version uses
-     *  partial pivoting.
+     *  matrices '(l, u)' using the 'LU' Factorization algorithm.
+     *  Caveat:  This version requires square matrices and performs no partial pivoting.
+     *  @see `Fac_LU` for a more complete implementation
      */
     def lud_ip (): (MatrixD, MatrixD) =
     {
-        val l = new MatrixD (dim1, dim2)         // lower triangular matrix
+        if (! isSquare) throw new IllegalArgumentException ("lud_ip: requires a square matrix")
+
+        val l = new MatrixD (dim1)               // lower triangular matrix
         val u = this                             // upper triangular matrix (this)
 
         for (i <- u.range1) {
-            var pivot = u.v(i)(i)
-            if (pivot =~ 0.0) {
-                val k = partialPivoting (u, i)   // find the maxiumum element below pivot
-                u.swap (i, k, i)                 // swap rows i and k from column k
-                pivot = u.v(i)(i)                // reset the pivot
-            } // if
+            val pivot = u.v(i)(i)
+            if (pivot =~ 0.0) flaw ("lud_ip", s"use Fac_LU since there is a zero pivot at row $i")
             l.v(i)(i) = 1.0
             for (j <- i + 1 until u.dim2) l.v(i)(j) = 0.0
             for (k <- i + 1 until u.dim1) {
@@ -1089,6 +1068,7 @@ class MatrixD (d1: Int,
                 l.v(k)(i) = mul
                 for (j <- u.range2) u.v(k)(j) = u.v(k)(j) - mul * u.v(i)(j)
             } // for
+            if (DEBUG) println (s"for iteration $i: u = $u")
         } // for
         (l, u)
     } // lud_ip
@@ -1109,15 +1089,14 @@ class MatrixD (d1: Int,
             kMax = k
         } // for
 
-        if (kMax == i) {
-            flaw ("partialPivoting", "unable to find a non-zero pivot for row " + i)
-        } // if
+        if (kMax == i) flaw ("partialPivoting", s"unable to find a non-zero pivot for row $i")
+        if (DEBUG) println (s"partialPivoting: replace pivot ($i, $i) with pivot ($kMax, $i)")
         kMax
     } // partialPivoting
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' using back substitution in the equation 'u*x = y' where
-     *  'this' matrix ('u') is upper triangular (see 'lud' above).
+     *  'this' matrix ('u') is upper triangular (see 'lud_npp' above).
      *  @param y  the constant vector
      */
     def bsolve (y: VectoD): VectorD =
@@ -1133,7 +1112,7 @@ class MatrixD (d1: Int,
     } // bsolve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
+    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud_npp' above).
      *  @param l  the lower triangular matrix
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
@@ -1151,7 +1130,7 @@ class MatrixD (d1: Int,
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
+    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud_npp' above).
      *  @param lu  the lower and upper triangular matrices
      *  @param b   the constant vector
      */
@@ -1169,7 +1148,7 @@ class MatrixD (d1: Int,
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' matrix.
      *  @param b  the constant vector.
      */
-    def solve (b: VectoD): VectorD = solve (lud, b)
+    def solve (b: VectoD): VectorD = solve (lud_npp, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Combine 'this' matrix with matrix 'b', placing them along the diagonal and
@@ -1837,7 +1816,7 @@ object MatrixD extends Error
 /** The `MatrixDTest` object tests the operations provided by `MatrixD` class.
  *  > run-main scalation.linalgebra.MatrixDTest
  */
-object MatrixDTest extends App with PackageInfo
+object MatrixDTest extends App
 {
     for (l <- 1 to 4) {
         println ("\n\tTest MatrixD on real matrices of dim " + l)
@@ -1861,18 +1840,16 @@ object MatrixDTest extends App with PackageInfo
     val zz  = new MatrixD ((3, 3), 3, 1, 0,
                                    1, 4, 2,
                                    0, 2, 5)
-    val bz  = VectorD (5, 3, 6)
-    val b   = VectorD (8, 7)
-    val lu  = z.lud
-    val lu2 = z.lud_npp
+    val bz = VectorD (5, 3, 6)
+    val b  = VectorD (8, 7)
+    val lu = z.lud_npp
 
     println ("z            = " + z)
     println ("z.t          = " + z.t)
     println ("z.tip        = " + z.tip); z.tip   // restore back
-    println ("z.lud        = " + lu)
-    println ("z.lud_npp    = " + lu2)
+    println ("z.lud_npp    = " + lu)
     println ("z.solve      = " + z.solve (lu._1, lu._2, b))
-    println ("zz.solve     = " + zz.solve (zz.lud, bz))
+    println ("zz.solve     = " + zz.solve (zz.lud_npp, bz))
     println ("z.inverse    = " + z.inverse)
     println ("z.inverse_ip = " + z.inverse_ip ())
     println ("t.inverse    = " + t.inverse)

@@ -16,7 +16,7 @@ package scalation.minima
 
 import scala.util.control.Breaks.{breakable, break}
 
-import scalation.linalgebra.{MatrixD, VectoD, VectorD}
+import scalation.linalgebra.{Fac_LU, MatrixD, VectoD, VectorD}
 import scalation.random.Randi
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -53,7 +53,9 @@ class SimplexBG (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] = null
 
     if (x_B == null) x_B = setBasis ()
     private val ba       = a.selectCols (x_B)          // basis-matrix (selected columns from matrix-a)
-    private val lu       = ba.lud                      // perform an LU Decomposition on the basis-matrix
+    private val lud      = new Fac_LU (ba)             // perform an LU Decomposition on the basis-matrix
+    lud.factor ()
+    private val lu       = lud.factors
 //  private var l_inv    = lu._1.inverse               // L-inverted
 //  private var u_inv    = lu._2.inverse               // U-inverted  (b_inv = u_inv * l_inv)
 

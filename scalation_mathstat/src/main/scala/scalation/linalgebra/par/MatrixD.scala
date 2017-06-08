@@ -966,17 +966,16 @@ class MatrixD (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Decompose this matrix into the product of upper and lower triangular
-     *  matrices (l, u) using the LU Decomposition algorithm.  This version uses
-     *  no partial pivoting.
+     *  matrices (l, u) using an LU Decomposition algorithm.
      */
-    def lud_npp: Tuple2 [MatrixD, MatrixD] =
+    def lud_npp: (MatrixD, MatrixD) =
     {
         val l = new MatrixD (dim1, dim2)    // lower triangular matrix
         val u = new MatrixD (this)          // upper triangular matrix (a copy of this)
 
         for (i <- u.range1) {
             val pivot = u(i, i)
-            if (pivot =~ 0.0) flaw ("lud_npp", "use lud since you have a zero pivot")
+            if (pivot =~ 0.0) flaw ("lud_npp", "use Fac_LU since you have a zero pivot")
             l(i, i) = 1.0
             for (j <- i + 1 until u.dim2) l(i, j) = 0.0
             for (k <- i + 1 until u.dim1) {
@@ -985,57 +984,21 @@ class MatrixD (val d1: Int,
                 for (j <- u.range2) u(k, j) = u(k, j) - mul * u(i, j)
             } // for
         } // for
-        Tuple2 (l, u)
+        (l, u)
     } // lud_npp
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Decompose this matrix into the product of lower and upper triangular
-     *  matrices (l, u) using the LU Decomposition algorithm.  This version uses
-     *  partial pivoting.
-     */
-    def lud: Tuple2 [MatrixD, MatrixD] =
-    {
-        val l = new MatrixD (dim1, dim2)         // lower triangular matrix
-        val u = new MatrixD (this)               // upper triangular matrix (a copy of this)
-
-        for (i <- u.range1) {
-            var pivot = u(i, i)
-            if (pivot =~ 0.0) {
-                val k = partialPivoting (u, i)   // find the maxiumum element below pivot
-                swap (u, i, k, i)                // swap rows i and k from column k
-                pivot = u(i, i)                  // reset the pivot
-            } // if
-            l(i, i) = 1.0
-            for (j <- i + 1 until u.dim2) l(i, j) = 0.0
-            for (k <- ((i + 1) until dim1 by granularity).par){
-                var end = k + granularity; if (k + granularity >= dim1) end = dim1 
-                for (kk <- k until end) {
-                    val mul = u(kk, i) / pivot
-                    l(kk, i) = mul
-                    for (j <- u.range2) u(kk, j) = u(kk, j) - mul * u(i, j)
-                } // for
-            } // for
-        } // for
-        Tuple2 (l, u)
-    } // lud
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Decompose in-place this matrix into the product of lower and upper triangular
-     *  matrices (l, u) using the LU Decomposition algorithm.  This version uses
-     *  partial pivoting.
+     *  matrices (l, u) using an LU Decomposition algorithm.
      */
-    def lud_ip: Tuple2 [MatrixD, MatrixD] =
+    def lud_ip: (MatrixD, MatrixD) =
     {
         val l = new MatrixD (dim1, dim2)         // lower triangular matrix
         val u = this                             // upper triangular matrix (this)
 
         for (i <- u.range1) {
             var pivot = u(i, i)
-            if (pivot =~ 0.0) {
-                val k = partialPivoting (u, i)   // find the maxiumum element below pivot
-                swap (u, i, k, i)                // swap rows i and k from column k
-                pivot = u(i, i)                  // reset the pivot
-            } // if
+            if (pivot =~ 0.0) flaw ("lud_npp", "use Fac_LU since you have a zero pivot")
             l(i, i) = 1.0
             for (j <- i + 1 until u.dim2) l(i, j) = 0.0
             for (k <- i + 1 until u.dim1) {
@@ -1044,7 +1007,7 @@ class MatrixD (val d1: Int,
                 for (j <- u.range2) u(k, j) = u(k, j) - mul * u(i, j)
             } // for
         } // for
-        Tuple2 (l, u)
+        (l, u)
     } // lud_ip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1082,7 +1045,7 @@ class MatrixD (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' using back substitution in the equation 'u*x = y' where
-     *  'this' matrix ('u') is upper triangular (see 'lud' above).
+     *  'this' matrix ('u') is upper triangular (see 'lud_npp' above).
      *  @param y  the constant vector
      */
     def bsolve (y: VectoD): VectorD =
@@ -1098,7 +1061,7 @@ class MatrixD (val d1: Int,
     } // bsolve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for x in the equation l*u*x = b (see lud above).
+    /** Solve for x in the equation l*u*x = b (see lud_npp above).
      *  @param l  the lower triangular matrix
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
@@ -1116,7 +1079,7 @@ class MatrixD (val d1: Int,
     } // solve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' (see lud above).
+    /** Solve for 'x' in the equation 'l*u*x = b' (see lud_npp above).
      *  @param lu  the lower and upper triangular matrices
      *  @param b   the constant vector
      */
@@ -1126,7 +1089,7 @@ class MatrixD (val d1: Int,
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' matrix.
      *  @param b  the constant vector.
      */
-    def solve (b: VectoD): VectorD = solve (lud, b)
+    def solve (b: VectoD): VectorD = solve (lud_npp, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Combine this matrix with matrix b, placing them along the diagonal and
@@ -1710,13 +1673,11 @@ object MatrixDTest extends App
     val z   = new MatrixD ((2, 2), 1.0, 2.0,
                                       3.0, 2.0)
     val b   = VectorD (8.0, 7.0)
-    val lu  = z.lud
-    val lu2 = z.lud_npp
+    val lu  = z.lud_npp
 
     println ("z         = " + z)
     println ("z.t       = " + z.t)
-    println ("z.lud     = " + lu)
-    println ("z.lud_npp = " + lu2)
+    println ("z.lud_npp = " + lu)
     println ("z.solve   = " + z.solve (lu._1, lu._2, b))
     println ("z.inverse = " + z.inverse)
     println ("z.inv * b = " + z.inverse * b)

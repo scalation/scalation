@@ -34,7 +34,7 @@ class Fac_QR_RR [MatT <: MatriD] (aa: MatT, needQ: Boolean = true)
       extends Fac_QR_H (aa, needQ) with Pivoting
 {
     private var _rank = 0                                          // the rank of matrix aa
-    private val _piv   = VectorI.range (0, n)                      // the vector storing the column pivots
+    private val _piv  = VectorI.range (0, n)                       // the vector storing the column pivots
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the pivot vector.
@@ -108,7 +108,7 @@ object Fac_QR_RRTest extends App
         println ("-" * 60)
         val (q, r) = qr.factor12 ()                      // (q orthogonal, r upper triangular)
         val prod   = q * r                               // product of q * r
-        val r_est  = r.rank (true)                       // estimated rank
+        val r_est  = qr.rank                             // estimated rank
         val ns     = qr.nullspace (r_est)                // ns is a basis for the nullscpace
         val ar     = qr.reorderCols (a, qr.piv)          // a matrix with columns reordered
 

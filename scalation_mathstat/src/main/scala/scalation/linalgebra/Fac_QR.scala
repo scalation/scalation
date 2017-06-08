@@ -116,17 +116,12 @@ object Fac_QRTest extends App
         println ("-" * 60)
         val (q, r) = qr.factor12 ()                      // (q orthogonal, r upper triangular)
         val prod   = q * r                               // product of q * r
-        val r_est  = r.rank (true)                       // estimated rank
-        val ns     = qr.nullspace (r_est)                // ns is a basis for the nullscpace
 
         println (nm + "    = " + a)                      // original matrix
         println ("q     = " + q)                         // orthogonal matrix
         println ("r     = " + r)                         // right upper triangular matrix
-        println ("r_est = " + r_est)                     // rank
         println ("q*r   = " + prod)                      // product q * r
         println ("eq    = " + (a == prod))               // check that q * r  = a
-        println ("ns    = " + ns)                        // nullspace
-        println ("a*ns  = " + (a * ns))                  // check that a * ns = 0
     } // test
 
     println ("*" * 60)
