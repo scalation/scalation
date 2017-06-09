@@ -314,7 +314,7 @@ class SymTriMatrixQ (val d1: Int)
      */
     def slice (r_from: Int, r_end: Int, c_from: Int, c_end: Int): SymTriMatrixQ =
     {
-        throw new NoSuchMethodException ("SymTriMatrixQ must be symmetric")
+        throw new UnsupportedOperationException ("SymTriMatrixQ must be symmetric")
     } // slice
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -324,7 +324,7 @@ class SymTriMatrixQ (val d1: Int)
      */
     def sliceExclude (row: Int, col: Int): SymTriMatrixQ =
     {
-        throw new NoSuchMethodException ("SymTriMatrixQ does not support sliceExclude")
+        throw new UnsupportedOperationException ("SymTriMatrixQ does not support sliceExclude")
     } // sliceExclude
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -333,7 +333,7 @@ class SymTriMatrixQ (val d1: Int)
      */
     def selectRows (rowIndex: Array [Int]): SymTriMatrixQ =
     {
-        throw new NoSuchMethodException ("SymTriMatrixQ does not support selectRows")
+        throw new UnsupportedOperationException ("SymTriMatrixQ does not support selectRows")
     } // selectRows
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -366,7 +366,7 @@ class SymTriMatrixQ (val d1: Int)
      */
     def selectCols (colIndex: Array [Int]): SymTriMatrixQ =
     {
-        throw new NoSuchMethodException ("SymTriMatrixQ does not support selectCols")
+        throw new UnsupportedOperationException ("SymTriMatrixQ does not support selectCols")
     } // selectCols
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -381,7 +381,7 @@ class SymTriMatrixQ (val d1: Int)
      */
     def +: (u: VectoQ): SymTriMatrixQ =
     {
-        throw new NoSuchMethodException ("SymTriMatrixQ does not support +:")
+        throw new UnsupportedOperationException ("SymTriMatrixQ does not support +:")
     } // +:
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -390,7 +390,7 @@ class SymTriMatrixQ (val d1: Int)
      */
     def +^: (u: VectoQ): SymTriMatrixQ =
     {
-        throw new NoSuchMethodException ("SymTriMatrixQ does not support +^:")
+        throw new UnsupportedOperationException ("SymTriMatrixQ does not support +^:")
     } // +^:
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -399,7 +399,7 @@ class SymTriMatrixQ (val d1: Int)
      */
     def :+ (u: VectoQ): SymTriMatrixQ =
     {
-        throw new NoSuchMethodException ("SymTriMatrixQ does not support :+")
+        throw new UnsupportedOperationException ("SymTriMatrixQ does not support :+")
     } // :+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -408,7 +408,7 @@ class SymTriMatrixQ (val d1: Int)
      */
     def :^+ (u: VectoQ): SymTriMatrixQ =
     {
-        throw new NoSuchMethodException ("SymTriMatrixQ does not support :^+")
+        throw new UnsupportedOperationException ("SymTriMatrixQ does not support :^+")
     } // :^+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -417,7 +417,7 @@ class SymTriMatrixQ (val d1: Int)
      */
     def ++ (b: MatriQ): SymTriMatrixQ =
     {
-        throw new NoSuchMethodException ("SymTriMatrixQ does not support ++")
+        throw new UnsupportedOperationException ("SymTriMatrixQ does not support ++")
     } // ++
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -426,7 +426,7 @@ class SymTriMatrixQ (val d1: Int)
      */
     def ++^ (b: MatriQ): SymTriMatrixQ =
     {
-        throw new NoSuchMethodException ("SymTriMatrixQ does not support ++^")
+        throw new UnsupportedOperationException ("SymTriMatrixQ does not support ++^")
     } // ++^
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -450,7 +450,7 @@ class SymTriMatrixQ (val d1: Int)
      */
     def + (u: VectoQ): MatrixQ =
     {
-        throw new NoSuchMethodException ("SymTriMatrixQ does not support + for VectoQ")
+        throw new UnsupportedOperationException ("SymTriMatrixQ does not support + for VectoQ")
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -484,7 +484,7 @@ class SymTriMatrixQ (val d1: Int)
      */
     def += (u: VectoQ): MatrixQ =
     {
-        throw new NoSuchMethodException ("SymTriMatrixQ does not support += for VectoQ")
+        throw new UnsupportedOperationException ("SymTriMatrixQ does not support += for VectoQ")
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -517,7 +517,7 @@ class SymTriMatrixQ (val d1: Int)
      */
     def - (u: VectoQ): MatrixQ =
     {
-        throw new NoSuchMethodException ("SymTriMatrixQ does not support - for VectoQ")
+        throw new UnsupportedOperationException ("SymTriMatrixQ does not support - for VectoQ")
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -551,7 +551,7 @@ class SymTriMatrixQ (val d1: Int)
      */
     def -= (u: VectoQ): MatrixQ =
     {
-        throw new NoSuchMethodException ("SymTriMatrixQ does not support -= for VectoQ")
+        throw new UnsupportedOperationException ("SymTriMatrixQ does not support -= for VectoQ")
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -569,7 +569,7 @@ class SymTriMatrixQ (val d1: Int)
      */
     def * (b: MatriQ): SymTriMatrixQ = 
     {
-        throw new NoSuchMethodException ("SymTriMatrixQ does not support * with general matrices")
+        throw new UnsupportedOperationException ("SymTriMatrixQ does not support * with general matrices")
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -620,7 +620,7 @@ class SymTriMatrixQ (val d1: Int)
      */
     def *= (b: MatriQ): SymTriMatrixQ =
     {
-        throw new NoSuchMethodException ("inplace matrix multiplication not implemented")
+        throw new UnsupportedOperationException ("inplace matrix multiplication not implemented")
     } // *=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -735,7 +735,7 @@ class SymTriMatrixQ (val d1: Int)
      */
     def ** (u: VectoQ): SymTriMatrixQ = 
     {
-        throw new NoSuchMethodException ("matrix * vector -> matrix not implemented")
+        throw new UnsupportedOperationException ("matrix * vector -> matrix not implemented")
     } // **
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -745,7 +745,7 @@ class SymTriMatrixQ (val d1: Int)
      */
     def **= (u: VectoQ): SymTriMatrixQ =
     {
-        throw new NoSuchMethodException ("inplace matrix * vector -> matrix not implemented")
+        throw new UnsupportedOperationException ("inplace matrix * vector -> matrix not implemented")
     } // **=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -772,7 +772,7 @@ class SymTriMatrixQ (val d1: Int)
      */
     def ~^ (p: Int): SymTriMatrixQ =
     {
-        throw new NoSuchMethodException ("matrix power function (~^) not implemented")
+        throw new UnsupportedOperationException ("matrix power function (~^) not implemented")
     } // ~^
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -794,7 +794,7 @@ class SymTriMatrixQ (val d1: Int)
      *  FIX: would be more efficient to use tridiagonal matrices than dense matrices.
      *  @see www.webpages.uidaho.edu/~barannyk/Teaching/LU_factorization_tridiagonal.pdf
      */
-    def lud: Tuple2 [MatriQ, MatriQ] =
+    def lud_npp: (MatriQ, MatriQ) =
     {
         val l  = eye (d1)                  // lower triangular matrix
         val u  = new MatrixQ (d1, d1)      // upper triangular matrix
@@ -811,40 +811,31 @@ class SymTriMatrixQ (val d1: Int)
         u setDiag (_sd, 1)                 // set super-diagonal for u
         u setDiag (ud)                     // set diagonal for u
         (l, u)
-    } // lud
+    } // lud_npp
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'a*x = l*u*x = b' (see 'lud' above).
+    /** Solve for 'x' in the equation 'a*x = l*u*x = b' (see 'lud_npp' above).
      *  @param l  the lower triangular matrix
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
      */
-    def solve (l: MatriQ, u: MatriQ, b: VectoQ): VectorQ = 
+    def solve (l: MatriQ, u: MatriQ, b: VectoQ): VectoQ = 
     {
         if (! l.isInstanceOf [MatrixQ] || ! u.isInstanceOf [MatrixQ]) {
-            throw new NoSuchMethodException ("'l.solve (u)' is only implemented for dense matrices")
+            throw new IllegalArgumentException ("'l.solve (u)' is only implemented for dense matrices")
         } // if
-        val ll = l.asInstanceOf [MatrixQ]
-        val uu = u.asInstanceOf [MatrixQ]
-        ll.solve (uu, b)
+        l.solve (l, u, b)
     } // solve
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
-     *  @param lu  the lower and upper triangular matrices
-     *  @param b   the constant vector
-     */
-    def solve (lu: Tuple2 [MatriQ, MatriQ], b: VectoQ): VectorQ = solve (lu._1, lu._2, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' tridiagonal matrix,
      *  using the Thomas Algorithm.
      *  Caveat:  Stability vs. diagonal dominance.
-     *  This method is more efficient, since a 'lud' creates dense matrices.
+     *  This method is more efficient, since a 'lud_npp' creates dense matrices.
      *  @see en.wikibooks.org/wiki/Algorithm_Implementation/Linear_Algebra/Tridiagonal_matrix_algorithm
      *  @param b  the constant vector
      */
-    def solve (b: VectoQ): VectorQ =
+    def solve (b: VectoQ): VectoQ =
     {
         val j = d1 - 2
         val x = new VectorQ (b)               // solution vector, start with copy of b
@@ -1117,37 +1108,37 @@ class SymTriMatrixQ (val d1: Int)
 
     def lowerT: SymTriMatrixQ =
     {
-        throw new NoSuchMethodException ("lowerT not implemented since result may not be SymTriMatrix")
+        throw new UnsupportedOperationException ("lowerT not implemented since result may not be SymTriMatrix")
     } // lowerT
 
     def upperT: SymTriMatrixQ =
     {
-        throw new NoSuchMethodException ("lowerT not implemented since result may not be SymTriMatrix")
+        throw new UnsupportedOperationException ("lowerT not implemented since result may not be SymTriMatrix")
     } // upperT
 
-    def lud_ip (): Tuple2 [MatriQ, MatriQ] = 
+    def lud_ip (): (MatriQ, MatriQ) = 
     {
-        throw new NoSuchMethodException ("lud_ip not implemented since result may not be SymTriMatrix")
+        throw new UnsupportedOperationException ("lud_ip not implemented since result may not be SymTriMatrix")
     } // lud_ip
 
     def bsolve (y: VectoQ): VectorQ =
     {
-        throw new NoSuchMethodException ("bsolve not implemented since upper triangular is symmetric")
+        throw new UnsupportedOperationException ("bsolve not implemented since upper triangular is symmetric")
     } // bsolve
 
     def inverse_ip (): SymTriMatrixQ = 
     {
-        throw new NoSuchMethodException ("inverse_ip not implemented since result may not be SymTriMatrix")
+        throw new UnsupportedOperationException ("inverse_ip not implemented since result may not be SymTriMatrix")
     } // inverse_ip
 
     def reduce: SymTriMatrixQ = 
     {
-        throw new NoSuchMethodException ("reduce not yet implemented")
+        throw new UnsupportedOperationException ("reduce not yet implemented")
     } // reduce
 
     def reduce_ip ()
     {
-        throw new NoSuchMethodException ("reduce_ip not implemented since results may not be SymTriMatrix")
+        throw new UnsupportedOperationException ("reduce_ip not implemented since results may not be SymTriMatrix")
     } // reduce_ip
 
 } // SymTriMatrixQ class
@@ -1252,7 +1243,7 @@ object SymTriMatrixQTest extends App
 
     println ("a.det = " + a.det)	
 
-    val (l, u) = a.lud
+    val (l, u) = a.lud_npp
     println ("l  = " + l)
     println ("u  = " + u)
     println ("lu = " + (l * u))

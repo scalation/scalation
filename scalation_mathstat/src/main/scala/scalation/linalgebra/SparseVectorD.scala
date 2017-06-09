@@ -47,7 +47,7 @@ class SparseVectorD (val dim_ : Int,
      *  @param iv  the tuple containing (index, value)
      *  @param dm  the dimension for the new vector
      */
-    def this (iv: Tuple2 [Int, Double], dm: Int) { this (dm); this(iv._1) = iv._2 }
+    def this (iv: (Int, Double), dm: Int) { this (dm); this(iv._1) = iv._2 }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create an exact copy of 'this' vector.
@@ -289,7 +289,7 @@ class SparseVectorD (val dim_ : Int,
     /** Add 'this' vector and scalar 's._2' only at position 's._1'.
      *  @param s  the (scalar, position) to add
      */
-    def + (s: Tuple2 [Int, Double]): SparseVectorD =
+    def + (s: (Int, Double)): SparseVectorD =
     {
         if (s._1 =~ 0.0) this
         else {
@@ -341,7 +341,7 @@ class SparseVectorD (val dim_ : Int,
     /** From 'this' vector subtract scalar 's._2' only at position 's._1'.
      *  @param s  the (scalar, position) to subtract
      */
-    def - (s: Tuple2 [Int, Double]): SparseVectorD =
+    def - (s: (Int, Double)): SparseVectorD =
     {
         if (s._1 =~ 0.0) this
         else {
@@ -1093,7 +1093,7 @@ object SparseVectorDTest2 extends App
 
     for (x <- 0 until 10) {    
         var cnt = 0   
-        while(cnt < 1000000) {
+        while (cnt < 1000000) {
             val x  = r.nextInt (50).toDouble + 1
             val x1 = r.nextInt (90)
             if(x1 == 1) v1(cnt) = x

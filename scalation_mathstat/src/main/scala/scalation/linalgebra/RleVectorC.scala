@@ -592,7 +592,7 @@ class RleVectorC (val dim: Int, protected var v: ReArray [TripletC] = null)
      *  the uncompressed vector
      *  @param s  the (scalar, position) to subtract
      */
-    def + (s: Tuple2 [Int, Complex]): VectoC = 
+    def + (s: (Int, Complex)): VectoC = 
     {
         val c = new VectorC (dim)
         var k = 0
@@ -747,7 +747,7 @@ class RleVectorC (val dim: Int, protected var v: ReArray [TripletC] = null)
      *  the uncompressed vector
      *  @param s  the (scalar, position) to subtract
      */
-    def - (s: Tuple2 [Int, Complex]): VectoC = 
+    def - (s: (Int, Complex)): VectoC = 
     {
       val c = new VectorC (dim)
       var k = 0
@@ -1063,13 +1063,12 @@ class RleVectorC (val dim: Int, protected var v: ReArray [TripletC] = null)
      */
     def dot (b: VectoC): Complex =
     {
-     
-      b match {
-      case _: RleVectorC => this dot b.asInstanceOf [RleVectorC]
-      case _             => var sum = _0
-                            for (i <- range) sum += this(i) * b(i)
-                            sum 
-      } // match     
+        b match {
+        case _: RleVectorC => this dot b.asInstanceOf [RleVectorC]
+        case _             => var sum = _0
+                              for (i <- range) sum += this(i) * b(i)
+                              sum 
+        } // match     
     } // dot
        
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1383,7 +1382,7 @@ class RleVectorC (val dim: Int, protected var v: ReArray [TripletC] = null)
      */
     def sort () 
      { 
-         throw new NoSuchMethodException ("sort is not implemented yet")
+         throw new UnsupportedOperationException ("sort is not implemented yet")
      } // sort
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1391,7 +1390,7 @@ class RleVectorC (val dim: Int, protected var v: ReArray [TripletC] = null)
      */
     def sort2 () 
     {
-        throw new NoSuchMethodException ("sort2 is not implemented yet") 
+        throw new UnsupportedOperationException ("sort2 is not implemented yet") 
     } // sort2 
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1433,7 +1432,7 @@ class RleVectorC (val dim: Int, protected var v: ReArray [TripletC] = null)
     def tryCompareTo [B >: RleVectorC] (b: B)
         (implicit view_1: (B) => PartiallyOrdered [B]): Option [Int] =
     {
-        throw new NoSuchMethodException ("tryCompareTo is not implemented yet") 
+        throw new UnsupportedOperationException ("tryCompareTo is not implemented yet") 
     } // tryCompareTo
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

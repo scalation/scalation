@@ -314,7 +314,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def slice (r_from: Int, r_end: Int, c_from: Int, c_end: Int): SymTriMatrixD =
     {
-        throw new NoSuchMethodException ("SymTriMatrixD must be symmetric")
+        throw new UnsupportedOperationException ("SymTriMatrixD must be symmetric")
     } // slice
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -324,7 +324,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def sliceExclude (row: Int, col: Int): SymTriMatrixD =
     {
-        throw new NoSuchMethodException ("SymTriMatrixD does not support sliceExclude")
+        throw new UnsupportedOperationException ("SymTriMatrixD does not support sliceExclude")
     } // sliceExclude
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -333,7 +333,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def selectRows (rowIndex: Array [Int]): SymTriMatrixD =
     {
-        throw new NoSuchMethodException ("SymTriMatrixD does not support selectRows")
+        throw new UnsupportedOperationException ("SymTriMatrixD does not support selectRows")
     } // selectRows
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -366,7 +366,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def selectCols (colIndex: Array [Int]): SymTriMatrixD =
     {
-        throw new NoSuchMethodException ("SymTriMatrixD does not support selectCols")
+        throw new UnsupportedOperationException ("SymTriMatrixD does not support selectCols")
     } // selectCols
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -381,7 +381,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def +: (u: VectoD): SymTriMatrixD =
     {
-        throw new NoSuchMethodException ("SymTriMatrixD does not support +:")
+        throw new UnsupportedOperationException ("SymTriMatrixD does not support +:")
     } // +:
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -390,7 +390,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def +^: (u: VectoD): SymTriMatrixD =
     {
-        throw new NoSuchMethodException ("SymTriMatrixD does not support +^:")
+        throw new UnsupportedOperationException ("SymTriMatrixD does not support +^:")
     } // +^:
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -399,7 +399,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def :+ (u: VectoD): SymTriMatrixD =
     {
-        throw new NoSuchMethodException ("SymTriMatrixD does not support :+")
+        throw new UnsupportedOperationException ("SymTriMatrixD does not support :+")
     } // :+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -408,7 +408,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def :^+ (u: VectoD): SymTriMatrixD =
     {
-        throw new NoSuchMethodException ("SymTriMatrixD does not support :^+")
+        throw new UnsupportedOperationException ("SymTriMatrixD does not support :^+")
     } // :^+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -417,7 +417,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def ++ (b: MatriD): SymTriMatrixD =
     {
-        throw new NoSuchMethodException ("SymTriMatrixD does not support ++")
+        throw new UnsupportedOperationException ("SymTriMatrixD does not support ++")
     } // ++
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -426,7 +426,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def ++^ (b: MatriD): SymTriMatrixD =
     {
-        throw new NoSuchMethodException ("SymTriMatrixD does not support ++^")
+        throw new UnsupportedOperationException ("SymTriMatrixD does not support ++^")
     } // ++^
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -450,7 +450,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def + (u: VectoD): MatrixD =
     {
-        throw new NoSuchMethodException ("SymTriMatrixD does not support + for VectoD")
+        throw new UnsupportedOperationException ("SymTriMatrixD does not support + for VectoD")
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -484,7 +484,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def += (u: VectoD): MatrixD =
     {
-        throw new NoSuchMethodException ("SymTriMatrixD does not support += for VectoD")
+        throw new UnsupportedOperationException ("SymTriMatrixD does not support += for VectoD")
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -517,7 +517,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def - (u: VectoD): MatrixD =
     {
-        throw new NoSuchMethodException ("SymTriMatrixD does not support - for VectoD")
+        throw new UnsupportedOperationException ("SymTriMatrixD does not support - for VectoD")
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -551,7 +551,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def -= (u: VectoD): MatrixD =
     {
-        throw new NoSuchMethodException ("SymTriMatrixD does not support -= for VectoD")
+        throw new UnsupportedOperationException ("SymTriMatrixD does not support -= for VectoD")
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -569,7 +569,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def * (b: MatriD): SymTriMatrixD = 
     {
-        throw new NoSuchMethodException ("SymTriMatrixD does not support * with general matrices")
+        throw new UnsupportedOperationException ("SymTriMatrixD does not support * with general matrices")
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -620,7 +620,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def *= (b: MatriD): SymTriMatrixD =
     {
-        throw new NoSuchMethodException ("inplace matrix multiplication not implemented")
+        throw new UnsupportedOperationException ("inplace matrix multiplication not implemented")
     } // *=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -735,7 +735,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def ** (u: VectoD): SymTriMatrixD = 
     {
-        throw new NoSuchMethodException ("matrix * vector -> matrix not implemented")
+        throw new UnsupportedOperationException ("matrix * vector -> matrix not implemented")
     } // **
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -745,7 +745,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def **= (u: VectoD): SymTriMatrixD =
     {
-        throw new NoSuchMethodException ("inplace matrix * vector -> matrix not implemented")
+        throw new UnsupportedOperationException ("inplace matrix * vector -> matrix not implemented")
     } // **=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -772,7 +772,7 @@ class SymTriMatrixD (val d1: Int)
      */
     def ~^ (p: Int): SymTriMatrixD =
     {
-        throw new NoSuchMethodException ("matrix power function (~^) not implemented")
+        throw new UnsupportedOperationException ("matrix power function (~^) not implemented")
     } // ~^
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -819,22 +819,13 @@ class SymTriMatrixD (val d1: Int)
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
      */
-    def solve (l: MatriD, u: MatriD, b: VectoD): VectorD = 
+    def solve (l: MatriD, u: MatriD, b: VectoD): VectoD = 
     {
         if (! l.isInstanceOf [MatrixD] || ! u.isInstanceOf [MatrixD]) {
-            throw new NoSuchMethodException ("'l.solve (u)' is only implemented for dense matrices")
+            throw new IllegalArgumentException ("'l.solve (u)' is only implemented for dense matrices")
         } // if
-        val ll = l.asInstanceOf [MatrixD]
-        val uu = u.asInstanceOf [MatrixD]
-        ll.solve (uu, b)
+        l.solve (l, u, b)
     } // solve
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud_npp' above).
-     *  @param lu  the lower and upper triangular matrices
-     *  @param b   the constant vector
-     */
-    def solve (lu: Tuple2 [MatriD, MatriD], b: VectoD): VectorD = solve (lu._1, lu._2, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' tridiagonal matrix,
@@ -844,7 +835,7 @@ class SymTriMatrixD (val d1: Int)
      *  @see en.wikibooks.org/wiki/Algorithm_Implementation/Linear_Algebra/Tridiagonal_matrix_algorithm
      *  @param b  the constant vector
      */
-    def solve (b: VectoD): VectorD =
+    def solve (b: VectoD): VectoD =
     {
         val j = d1 - 2
         val x = new VectorD (b)               // solution vector, start with copy of b
@@ -1117,37 +1108,37 @@ class SymTriMatrixD (val d1: Int)
 
     def lowerT: SymTriMatrixD =
     {
-        throw new NoSuchMethodException ("lowerT not implemented since result may not be SymTriMatrix")
+        throw new UnsupportedOperationException ("lowerT not implemented since result may not be SymTriMatrix")
     } // lowerT
 
     def upperT: SymTriMatrixD =
     {
-        throw new NoSuchMethodException ("lowerT not implemented since result may not be SymTriMatrix")
+        throw new UnsupportedOperationException ("lowerT not implemented since result may not be SymTriMatrix")
     } // upperT
 
     def lud_ip (): (MatriD, MatriD) = 
     {
-        throw new NoSuchMethodException ("lud_ip not implemented since result may not be SymTriMatrix")
+        throw new UnsupportedOperationException ("lud_ip not implemented since result may not be SymTriMatrix")
     } // lud_ip
 
     def bsolve (y: VectoD): VectorD =
     {
-        throw new NoSuchMethodException ("bsolve not implemented since upper triangular is symmetric")
+        throw new UnsupportedOperationException ("bsolve not implemented since upper triangular is symmetric")
     } // bsolve
 
     def inverse_ip (): SymTriMatrixD = 
     {
-        throw new NoSuchMethodException ("inverse_ip not implemented since result may not be SymTriMatrix")
+        throw new UnsupportedOperationException ("inverse_ip not implemented since result may not be SymTriMatrix")
     } // inverse_ip
 
     def reduce: SymTriMatrixD = 
     {
-        throw new NoSuchMethodException ("reduce not yet implemented")
+        throw new UnsupportedOperationException ("reduce not yet implemented")
     } // reduce
 
     def reduce_ip ()
     {
-        throw new NoSuchMethodException ("reduce_ip not implemented since results may not be SymTriMatrix")
+        throw new UnsupportedOperationException ("reduce_ip not implemented since results may not be SymTriMatrix")
     } // reduce_ip
 
 } // SymTriMatrixD class

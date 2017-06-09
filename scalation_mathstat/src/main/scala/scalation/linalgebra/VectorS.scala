@@ -48,12 +48,12 @@ class VectorS (val dim: Int,
      *  @param iv  the tuple containing (index, value)
      *  @param dm  the dimension for the new vector
      */
-    def this (iv: Tuple2 [Int, StrNum], dm: Int) { this (dm); v(iv._1) = iv._2 }
+    def this (iv: (Int, StrNum), dm: Int) { this (dm); v(iv._1) = iv._2 }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create an exact copy of 'this' vector.
      */
-    def copy: VectorS = new VectorS (this)
+    def copy (): VectorS = new VectorS (this)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a zero vector (all elements are zero) of length 'size'.
@@ -316,7 +316,7 @@ class VectorS (val dim: Int,
     /** Add 'this' vector and scalar 's._2' only at position 's._1'.
      *  @param s  the (position, scalar) to add
      */
-    def + (s: Tuple2 [Int, StrNum]): VectorS =
+    def + (s: (Int, StrNum)): VectorS =
     {
         val c = new VectorS (dim)
         for (i <- range) c.v(i) = if (i == s._1) v(i) + s._2 else v(i)
@@ -388,7 +388,7 @@ class VectorS (val dim: Int,
     /** From 'this' vector subtract scalar 's._2' only at position 's._1'.
      *  @param s  the (position, scalar) to subtract
      */
-    def - (s: Tuple2 [Int, StrNum]): VectorS =
+    def - (s: (Int, StrNum)): VectorS =
     {
         val c = new VectorS (dim)
         for (i <- range) c.v(i) = if (i == s._1) v(i) - s._2 else v(i)
@@ -825,6 +825,16 @@ class VectorS (val dim: Int,
         for (i <- 0 until dim if v(i) > _0) count += 1
         count
     } // countPos
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Count the number of zero elements in the 'this' vector.
+     */
+    def countZero: Int =
+    {
+        var count = 0
+        for (i <- 0 until dim if v(i) == _0) count += 1
+        count
+    } // countZero
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Clean values in 'this' vector at or below the threshold 'thres' by setting

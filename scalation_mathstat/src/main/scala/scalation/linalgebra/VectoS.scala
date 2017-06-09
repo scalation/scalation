@@ -228,7 +228,7 @@ trait VectoS
     /** Add 'this' vector and scalar 's._2' only at position 's._1'.
      *  @param s  the (position, scalar) to add
      */
-    def + (s: Tuple2 [Int, StrNum]): VectoS
+    def + (s: (Int, StrNum)): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' vector and vector 'b'.
@@ -263,7 +263,7 @@ trait VectoS
     /** From 'this' vector subtract scalar 's._2' only at position 's._1'.
      *  @param s  the (position, scalar) to subtract
      */
-    def - (s: Tuple2 [Int, StrNum]): VectoS
+    def - (s: (Int, StrNum)): VectoS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place vector 'b'.

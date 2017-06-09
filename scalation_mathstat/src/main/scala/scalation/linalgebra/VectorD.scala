@@ -48,12 +48,12 @@ class VectorD (val dim: Int,
      *  @param iv  the tuple containing (index, value)
      *  @param dm  the dimension for the new vector
      */
-    def this (iv: Tuple2 [Int, Double], dm: Int) { this (dm); v(iv._1) = iv._2 }
+    def this (iv: (Int, Double), dm: Int) { this (dm); v(iv._1) = iv._2 }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create an exact copy of 'this' vector.
      */
-    def copy: VectorD = new VectorD (this)
+    def copy (): VectorD = new VectorD (this)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a zero vector (all elements are zero) of length 'size'.
@@ -316,7 +316,7 @@ class VectorD (val dim: Int,
     /** Add 'this' vector and scalar 's._2' only at position 's._1'.
      *  @param s  the (position, scalar) to add
      */
-    def + (s: Tuple2 [Int, Double]): VectorD =
+    def + (s: (Int, Double)): VectorD =
     {
         val c = new VectorD (dim)
         for (i <- range) c.v(i) = if (i == s._1) v(i) + s._2 else v(i)
@@ -388,7 +388,7 @@ class VectorD (val dim: Int,
     /** From 'this' vector subtract scalar 's._2' only at position 's._1'.
      *  @param s  the (position, scalar) to subtract
      */
-    def - (s: Tuple2 [Int, Double]): VectorD =
+    def - (s: (Int, Double)): VectorD =
     {
         val c = new VectorD (dim)
         for (i <- range) c.v(i) = if (i == s._1) v(i) - s._2 else v(i)

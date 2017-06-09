@@ -230,7 +230,7 @@ class BidMatrixI (val d1: Int)
      */
     def set (u: Array [Array [Int]])
     {
-        throw new NoSuchMethodException ("values for BidMatrixI should be diagonal")
+        throw new UnsupportedOperationException ("values for BidMatrixI should be diagonal")
     } // set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -304,7 +304,7 @@ class BidMatrixI (val d1: Int)
      */
     def slice (r_from: Int, r_end: Int, c_from: Int, c_end: Int): BidMatrixI =
     {
-        throw new NoSuchMethodException ("BidMatrixI must be square")
+        throw new UnsupportedOperationException ("BidMatrixI must be square")
     } // slice
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -314,7 +314,7 @@ class BidMatrixI (val d1: Int)
      */
     def sliceExclude (row: Int, col: Int): BidMatrixI =
     {
-        throw new NoSuchMethodException ("BidMatrixI does not support sliceExclude")
+        throw new UnsupportedOperationException ("BidMatrixI does not support sliceExclude")
     } // sliceExclude
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -323,7 +323,7 @@ class BidMatrixI (val d1: Int)
      */
     def selectRows (rowIndex: Array [Int]): BidMatrixI =
     {
-        throw new NoSuchMethodException ("BidMatrixI does not support selectRows")
+        throw new UnsupportedOperationException ("BidMatrixI does not support selectRows")
     } // selectRows
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -356,7 +356,7 @@ class BidMatrixI (val d1: Int)
      */
     def selectCols (colIndex: Array [Int]): BidMatrixI =
     {
-        throw new NoSuchMethodException ("BidMatrixI does not support selectCols")
+        throw new UnsupportedOperationException ("BidMatrixI does not support selectCols")
     } // selectCols
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -364,7 +364,7 @@ class BidMatrixI (val d1: Int)
      */
     def t: BidMatrixI =
     {
-        throw new NoSuchMethodException ("BidMatrixI does not support transpose")
+        throw new UnsupportedOperationException ("BidMatrixI does not support transpose")
     } // t
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -373,7 +373,7 @@ class BidMatrixI (val d1: Int)
      */
     def +: (u: VectoI): BidMatrixI =
     {
-        throw new NoSuchMethodException ("BidMatrixI does not support +:")
+        throw new UnsupportedOperationException ("BidMatrixI does not support +:")
     } // +:
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -382,7 +382,7 @@ class BidMatrixI (val d1: Int)
      */
     def +^: (u: VectoI): BidMatrixI =
     {
-        throw new NoSuchMethodException ("BidMatrixI does not support +^:")
+        throw new UnsupportedOperationException ("BidMatrixI does not support +^:")
     } // +^:
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -391,7 +391,7 @@ class BidMatrixI (val d1: Int)
      */
     def :+ (u: VectoI): BidMatrixI =
     {
-        throw new NoSuchMethodException ("BidMatrixI does not support :+")
+        throw new UnsupportedOperationException ("BidMatrixI does not support :+")
     } // :+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -400,7 +400,7 @@ class BidMatrixI (val d1: Int)
      */
     def :^+ (u: VectoI): BidMatrixI =
     {
-        throw new NoSuchMethodException ("BidMatrixI does not support :^+")
+        throw new UnsupportedOperationException ("BidMatrixI does not support :^+")
     } // :^+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -409,7 +409,7 @@ class BidMatrixI (val d1: Int)
      */
     def ++ (b: MatriI): BidMatrixI =
     {
-        throw new NoSuchMethodException ("BidMatrixI does not support ++")
+        throw new UnsupportedOperationException ("BidMatrixI does not support ++")
     } // ++
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -418,7 +418,7 @@ class BidMatrixI (val d1: Int)
      */
     def ++^ (b: MatriI): BidMatrixI =
     {
-        throw new NoSuchMethodException ("BidMatrixI does not support ++^")
+        throw new UnsupportedOperationException ("BidMatrixI does not support ++^")
     } // ++^
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -442,7 +442,7 @@ class BidMatrixI (val d1: Int)
      */
     def + (u: VectoI): BidMatrixI =
     {
-        throw new NoSuchMethodException ("BidMatrixI does not support + with VectoI")
+        throw new UnsupportedOperationException ("BidMatrixI does not support + with VectoI")
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -476,7 +476,7 @@ class BidMatrixI (val d1: Int)
      */
     def += (u: VectoI): MatrixI =
     {
-        throw new NoSuchMethodException ("BidMatrixI does not support += with VectoI")
+        throw new UnsupportedOperationException ("BidMatrixI does not support += with VectoI")
     } // +=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -509,7 +509,7 @@ class BidMatrixI (val d1: Int)
      */
     def - (u: VectoI): BidMatrixI =
     {
-        throw new NoSuchMethodException ("BidMatrixI does not support - with VectoI")
+        throw new UnsupportedOperationException ("BidMatrixI does not support - with VectoI")
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -543,7 +543,7 @@ class BidMatrixI (val d1: Int)
      */
     def -= (u: VectoI): BidMatrixI =
     {
-        throw new NoSuchMethodException ("BidMatrixI does not support -= with VectoI")
+        throw new UnsupportedOperationException ("BidMatrixI does not support -= with VectoI")
     } // -=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -561,7 +561,7 @@ class BidMatrixI (val d1: Int)
      */
     def * (b: MatriI): BidMatrixI = 
     {
-        throw new NoSuchMethodException ("BidMatrixI does not support * with general matrices")
+        throw new UnsupportedOperationException ("BidMatrixI does not support * with general matrices")
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -609,7 +609,7 @@ class BidMatrixI (val d1: Int)
      */
     def *= (b: MatriI): BidMatrixI =
     {
-        throw new NoSuchMethodException ("inplace matrix multiplication not implemented")
+        throw new UnsupportedOperationException ("inplace matrix multiplication not implemented")
     } // *=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -693,7 +693,7 @@ class BidMatrixI (val d1: Int)
      */
     def ** (u: VectoI): BidMatrixI = 
     {
-        throw new NoSuchMethodException ("matrix * vector -> matrix not implemented")
+        throw new UnsupportedOperationException ("matrix * vector -> matrix not implemented")
     } // **
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -703,7 +703,7 @@ class BidMatrixI (val d1: Int)
      */
     def **= (u: VectoI): BidMatrixI =
     {
-        throw new NoSuchMethodException ("inplace matrix * vector -> matrix not implemented")
+        throw new UnsupportedOperationException ("inplace matrix * vector -> matrix not implemented")
     } // **=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -730,7 +730,7 @@ class BidMatrixI (val d1: Int)
      */
     def ~^ (p: Int): BidMatrixI =
     {
-        throw new NoSuchMethodException ("matrix power function (~^) not implemented")
+        throw new UnsupportedOperationException ("matrix power function (~^) not implemented")
     } // ~^
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -766,13 +766,6 @@ class BidMatrixI (val d1: Int)
         for (i <- n-1 to 0 by -1) x(i) = (b(i) - e(i) * x(i+1)) / d(i)
         x
     } // solve
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
-     *  @param lu  the lower and upper triangular matrices
-     *  @param b   the constant vector
-     */
-    def solve (lu: Tuple2 [MatriI, MatriI], b: VectoI): VectorI = solve (lu._1, lu._2, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Combine 'this' bidiagonal matrix with matrix 'b', placing them along the
@@ -1011,34 +1004,34 @@ class BidMatrixI (val d1: Int)
     // The following methods are currently not implemented for Bidiagonal matrices:
     //--------------------------------------------------------------------------
 
-    def lud: Tuple2 [MatriI, MatriI] =
+    def lud_npp: (MatriI, MatriI) =
     {
-        throw new NoSuchMethodException ("lud not implemented since it's already an upper matrix")
-    } // lud
+        throw new UnsupportedOperationException ("lud_npp not implemented since it's already an upper matrix")
+    } // lud_npp
 
-    def lud_ip (): Tuple2 [MatriI, MatriI] = 
+    def lud_ip (): (MatriI, MatriI) = 
     {
-        throw new NoSuchMethodException ("lud_ip not implemented since it's already an upper matrix")
+        throw new UnsupportedOperationException ("lud_ip not implemented since it's already an upper matrix")
     } // lud_ip
 
     def solve (l: MatriI, u: MatriI, b: VectoI): VectorI = 
     {
-        throw new NoSuchMethodException ("solve lu not implemented, since lud not needed")
+        throw new UnsupportedOperationException ("solve lu not implemented, since lud not needed")
     } // solve
 
     def inverse_ip (): BidMatrixI = 
     {
-        throw new NoSuchMethodException ("inverse_ip not implemented since result may not be BidMatrix")
+        throw new UnsupportedOperationException ("inverse_ip not implemented since result may not be BidMatrix")
     } // inverse_ip
 
     def reduce: BidMatrixI = 
     {
-        throw new NoSuchMethodException ("reduce not yet implemented")
+        throw new UnsupportedOperationException ("reduce not yet implemented")
     } // reduce
 
     def reduce_ip ()
     {
-        throw new NoSuchMethodException ("reduce_ip not implemented since result may not be BidMatrix")
+        throw new UnsupportedOperationException ("reduce_ip not implemented since result may not be BidMatrix")
     } // reduce_ip
 
 } // BidMatrixI class

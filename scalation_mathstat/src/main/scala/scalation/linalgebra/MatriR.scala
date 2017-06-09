@@ -517,18 +517,16 @@ trait MatriR
     def upperT: MatriR 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Decompose 'this' matrix into the product of lower and upper triangular
-     *  matrices '(l, u)' using the 'LU' Decomposition algorithm.  This version uses
-     *  partial pivoting.
+    /** Factor 'this' matrix into the product of lower and upper triangular
+     *  matrices '(l, u)' using the 'LU' Decomposition algorithm.
      */
-    def lud: Tuple2 [MatriR, MatriR]
+    def lud_npp: (MatriR, MatriR)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Decompose in-place 'this' matrix into the product of lower and upper triangular
-     *  matrices '(l, u)' using the 'LU' Decomposition algorithm.  This version uses
-     *  partial pivoting.
+    /** Factor in-place 'this' matrix into the product of lower and upper triangular
+     *  matrices '(l, u)' using the 'LU' Decomposition algorithm.
      */
-    def lud_ip (): Tuple2 [MatriR, MatriR]
+    def lud_ip (): (MatriR, MatriR)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' using back substitution in the equation 'u*x = y' where
@@ -550,30 +548,13 @@ trait MatriR
      *  @param lu  the lower and upper triangular matrices
      *  @param b   the constant vector
      */
-    def solve (lu: Tuple2 [MatriR, MatriR], b: VectoR): VectoR
+    def solve (lu: (MatriR, MatriR), b: VectoR): VectoR = solve (lu._1, lu._2, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' matrix.
      *  @param b  the constant vector.
      */
     def solve (b: VectoR): VectoR
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine the rank of 'this' m-by-n matrix by taking the upper triangular
-     *  matrix 'u' from the 'LU' Decomposition and counting the number of non-zero
-     *  diagonal elements.  Implementing classes may override this method with
-     *  a better one (e.g., using 'SVD' or Rank Revealing 'QR').
-     *  @see http://en.wikipedia.org/wiki/Rank_%28linear_algebra%29
-     *  @param upper  flag indicating whether this matrix is already upper triangular
-     */
-    def rank (upper: Boolean = false): Int =
-    {
-        val max   = if (dim1 < dim2) dim1 else dim2      // rank <= min (m, n)
-        val u     = if (upper) this else lud._2          // upper triangular matrix
-        var count = 0
-        for (i <- 0 until max if u(i, i) !=~ _0) count += 1
-        count
-    } // rank
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Combine 'this' matrix with matrix 'b', placing them along the diagonal and
@@ -708,64 +689,6 @@ trait MatriR
      *  column vectors.  This is useful for comparing matrices '(a - b).norm1'.
      */
     def norm1: Real = (for (j <- range2) yield col(j).norm1).max
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute an estimate of the L1 norm of 'this' matrix, i.e., maximum absolute
-     *  column sum.  It uses an adapted version of Hager's algorithm.
-     *  @author Michael Cotterell
-     *  @see Algorithm 4.1 in HIGHAM1998
-     *  @see Higham, N.J. "Fortran Codes for Estimating the One-Norm of a 
-     *       Real or Complex Matrix, with Applications to Condition Estimation."
-     *       ACM Trans. Math. Soft., 14, 1988, pp. 381-396. 
-     *  @see www.maths.manchester.ac.uk/~higham/narep/narep135.pdf
-     *  @param inv  whether or not to compute for inverse (default true)
-     */
-    def norm1est (inv: Boolean = true): Real =
-    {
-        val a  = this
-        val at = a.t
-        val e  = a(0); e.set (_1 / a.dim2)
-        var v  = if (inv) a.solve (e) else a * e
-        if (a.dim2 == 1) return v.norm        
-
-        var γ    = v.norm1
-        var ξ    = v.map (signum (_))
-        var x    = if (inv) at.solve (ξ) else at * ξ
-        var k    = 2
-        var done = false
-        val ITER = 5
-
-        while (! done) {
-            val j = x.abs.argmax ()
-            for (k <- e.range) e(k) = if (k == j) _1 else _0    // one in jth position
-            v     = if (inv) a.solve (e) else a.col (j) 
-            val g = γ
-            γ     = v.norm1
-            if (v.map (signum (_)) == ξ || γ <= g) {
-                for (i <- x.range) x(i) = (if (i % 2 == 0) -_1 else _1) * (_1 + ((i - _1) / (x.dim - 1)))
-                x = if (inv) a.solve (x) else a * x
-                if ((_1 * 2 * x.norm1) / (_1 * 3 * x.dim) > γ) { v = x; γ = (_1 * 2 * x.norm1) / (_1 * 3 * x.dim) }
-            } // if
-            ξ     = v.map (signum (_))
-            x     = if (inv) at.solve (ξ) else at * ξ
-            k    += 1
-            if (x.norm1 == x(j) || k > ITER) done = true
-        } // while
-        γ
-    } // norm1est
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the condition number of 'this' (a) matrix, which equals
-     *  <p>
-     *      ||a|| ||b||  where b = a.inverse
-     *  <p>
-     */
-    def conditionNum: Real =
-    {
-        val nrm1 = norm1                         // norm of a (this)
-        val nrm2 = norm1est ()                   // estimate of norm of a^-1
-        nrm1 * nrm2
-    } // conditionNum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the determinant of 'this' matrix.

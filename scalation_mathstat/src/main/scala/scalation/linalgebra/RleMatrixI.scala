@@ -15,7 +15,7 @@ import scala.math.{abs => ABS, max => MAX, min => MIN}
 
 import scalation.math.{int_exp, oneIf}
 import scalation.math.ExtremeD.TOL
-import scalation.util.{Error, PackageInfo, ReArray}
+import scalation.util.{Error, ReArray}
 
 import RleMatrixI._
 
@@ -49,6 +49,12 @@ import RleMatrixI._
             v(i) = new RleVectorI (d1, v1)
         } // for   
     } // if
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Construct a 'dim1' by 'dim1' square matrix.
+     *  @param dim1  the row and column dimension
+     */
+    def this (dim1: Int) { this (dim1, dim1) }
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create an exact copy of 'this' m-by-n matrix.
@@ -560,7 +566,7 @@ import RleMatrixI._
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' using back substitution in the equation 'u*x = y' where
-     *  'this' matrix ('u') is upper triangular (see 'lud' above).
+     *  'this' matrix ('u') is upper triangular (see 'lud_npp' above).
      *  @param y  the constant vector
      */
     def bsolve (y: VectoI): RleVectorI = 
@@ -734,8 +740,8 @@ import RleMatrixI._
         var b: MatrixI = null
         for (j <- range2) {
             b = (this.toDense).sliceExclude (0, j)   // the submatrix that excludes row 0 and column j
-            sum += (if (j % 2 == 0) this(0, j) * (if (b.dim1 == 1) b(0,0) else b.det)
-                    else           -this(0, j) * (if (b.dim1 == 1) b(0,0) else b.det))
+            sum += (if (j % 2 == 0) this(0, j) * (if (b.dim1 == 1) b(0, 0) else b.det)
+                    else           -this(0, j) * (if (b.dim1 == 1) b(0, 0) else b.det))
         } // for 
         sum
     } // det
@@ -893,35 +899,42 @@ import RleMatrixI._
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor 'this' matrix into the product of lower and upper triangular
-     *  matrices '(l, u)' using the 'LU' Factorization algorithm.
+     *  matrices '(l, u)' using an 'LU' Factorization algorithm.
+     *  FIX - check for 0 pivots (divide by zero).
      */
-    def lud: Tuple2 [RleMatrixI, RleMatrixI] = 
+    def lud_npp: (RleMatrixI, RleMatrixI) = 
     {
-        val l = new RleMatrixI (dim1, dim2)
-        val u = new RleMatrixI (dim1, dim2)
+        if (! isSquare) throw new IllegalArgumentException ("lud_npp: requires a square matrix")
+
+        val l = new RleMatrixI (dim1)
+        val u = new RleMatrixI (dim1)
+
         for (i <- range1) l(i,i) = 1
         for (j <- range2) u(0, j) = this(0, j)
-        for (i <- 1 until dim1) l(i,0) = this(i, 0) / u(0, 0)
+        for (i <- 1 until dim1) l(i, 0) = this(i, 0) / u(0, 0)
         for (i <- 1 until dim1; j <- 1 until dim2) {
             var sum = 0
-            if (i > j) {    // find l(i, j)
+            if (i > j) {                                   // find l(i, j)
                 for (k <- 0 until j) sum += l(i, k) * u(k, j)
                 l(i, j) = (this(i, j) - sum) / u(j, j)
             } // if
-            if (i <= j) {   // find u(i, j)
-                 for (k <- 0 until j) sum += l(i, k) * u(k, j)
-                 u(i, j) = this(i, j) - sum
+            if (i <= j) {                                  // find u(i, j)
+                for (k <- 0 until j) sum += l(i, k) * u(k, j)
+                u(i, j) = this(i, j) - sum
             } // if
         } // for
-        Tuple2 (l, u)
-    } // lud
+        (l, u)
+    } // lud_npp
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor in-place 'this' matrix into the product of lower and upper triangular
-     *  matrices '(l, u)' using the 'LU' Factorization algorithm.
+     *  matrices '(l, u)' using an 'LU' Factorization algorithm.
+     *  FIX - check for 0 pivots (divide by zero).
      */
     def lud_ip: (RleMatrixI, RleMatrixI) = 
     {
+        if (! isSquare) throw new IllegalArgumentException ("lud_ip: requires a square matrix")
+
         var w = new VectorI (dim1)
         for (k <- range1) {
             for (j <- k+1 until dim2) w(j) = this(k, j)
@@ -931,7 +944,7 @@ import RleMatrixI._
                 for (j <- k+1 until dim2) this(i, j) = this(i, j) - (a * w(j))
             } // for
         } // for
-        var l = new RleMatrixI (dim1, dim2)
+        var l = new RleMatrixI (dim1)
         for (i <- range1; j <- 0 to i) {         
             if (i == j) l(i, j) = 1
             else if (i > j) {
@@ -1018,8 +1031,8 @@ import RleMatrixI._
         val b = new RleMatrixI (dim1, dim2)
         for (i <- range1; j <- range2) b(i, j) = this(i, j)
         for (i <- range1) {
-            var x = b(i,i)
-            if (x == 0) flaw ("reduce", "unable to find a non-zero pivot in row "+i)
+            var x = b(i, i)
+            if (x =~ 0) flaw ("reduce", "unable to find a non-zero pivot in row " + i)
             for (j <- range2) b(i, j) = b(i, j) / x
             for (k <- range1) {
                 if (k != i && b(k, i) != 0) {
@@ -1043,7 +1056,7 @@ import RleMatrixI._
         
         val b = this
         for (i <- range1) {
-            var pivot = b(i,i)
+            var pivot = b(i, i)
             if (pivot =~ 0) {
                 val k = partialPivoting (b, i)  // find the maxiumum element below pivot
                 b.swap (i, k, i)                // in b, swap rows i and k from column i
@@ -1101,7 +1114,7 @@ import RleMatrixI._
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
      */
-    def solve (l: MatriI,u: MatriI, b: VectoI): RleVectorI = 
+    def solve (l: MatriI, u: MatriI, b: VectoI): VectoI = 
     {
         var y = new RleVectorI (l.dim2)
         for (i <- 0 until y.dim) {
@@ -1109,29 +1122,14 @@ import RleMatrixI._
             for (j <- 0 until i) sum += l(i, j) * y(j)
             y(i) = b(i) - sum
         } // for
-        u.bsolve (y).asInstanceOf [RleVectorI]
+        u.bsolve (y)
     } // solve
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b'
-     *  @param lu  the lower and upper triangular matrices
-     *  @param b   the constant vector
-     */
-    def solve (lu: Tuple2 [MatriI, MatriI], b: VectoI): RleVectorI = solve (lu._1, lu._2, b)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' where 'l = this'.  Requires
-     *  'l' to be lower triangular.
-     *  @param u  the upper triangular matrix
-     *  @param b  the constant vector
-     */
-    def solve (u: MatriI, b: VectoI): RleVectorI = solve (this, u, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' matrix.
      *  @param b  the constant vector.
      */ 
-    def solve (b: VectoI): RleVectorI = solve (lud, b)
+    def solve (b: VectoI): VectoI = solve (lud_npp, b)
   
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the sum of 'this' matrix, i.e., the sum of its elements.
@@ -1289,7 +1287,7 @@ object RleMatrixI
 /** The `RleMatrixITest` object tests the operations provided by `MatrixI` class.
  *  > run-main scalation.linalgebra.RleMatrixITest
  */
-object RleMatrixITest extends App with PackageInfo
+object RleMatrixITest extends App
 {
     for (l <- 1 to 4) {
         println ("\n\tTest RleMatrixI on real matrices of dim " + l)
@@ -1315,13 +1313,13 @@ object RleMatrixITest extends App with PackageInfo
                                                0, 2, 5))
     val bz  = VectorI (5, 3, 6)
     val b   = VectorI (8, 7)
-    val lu  = z.lud
+    val lu  = z.lud_npp
 
     println ("z            = " + z)
     println ("z.t          = " + z.t)
-    println ("z.lud        = " + lu)
+    println ("z.lud_npp    = " + lu)
     println ("z.solve      = " + z.solve (lu._1, lu._2, b))
-    println ("zz.solve     = " + zz.solve (zz.lud, bz))
+    println ("zz.solve     = " + zz.solve (zz.lud_npp, bz))
     println ("z.inverse    = " + z.inverse)
     println ("z.inverse_ip = " + z.inverse_ip ())
     println ("t.inverse    = " + t.inverse)

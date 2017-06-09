@@ -96,8 +96,6 @@ import SparseMatrixC.eye
  *  than storing the matrix as a 2 dimensional array, it is stored as an array
  *  of sorted-linked-maps, which record all the non-zero values for each particular
  *  row, along with their j-index as (j, v) pairs.
- *  Note: '_npp' versions of methods are not appropriate for sparse matrices
- *       (i.e., always use partial pivoting).
  *  @param d1  the first/row dimension
  *  @param d2  the second/column dimension
  */
@@ -157,7 +155,7 @@ class SparseMatrixC (val d1: Int,
      *  @param dim  the (row, column) dimensions
      *  @param u    the repeated values
      */
-    def this (dim: Tuple2 [Int, Int], u: Complex*)
+    def this (dim: (Int, Int), u: Complex*)
     {
         this (dim._1, dim._2)
         for (i <- range1; j <- range2) v(i)(j) = u(i * dim2 + j)
@@ -293,7 +291,7 @@ class SparseMatrixC (val d1: Int,
      */
     def set (x: Complex)
     {
-        throw new NoSuchMethodException ("use a dense matrix instead")
+        throw new UnsupportedOperationException ("use a dense matrix instead")
     } // set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -872,7 +870,7 @@ class SparseMatrixC (val d1: Int,
      */
     def dot (b: MatriC): VectorC =
     {
-        throw new NoSuchMethodException ("matrix dot matrix - dot not implemented")
+        throw new UnsupportedOperationException ("matrix dot matrix - dot not implemented")
     } // dot
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1072,21 +1070,18 @@ class SparseMatrixC (val d1: Int,
     } // upperT
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Decompose 'this' sparse matrix into the product of lower and upper triangular
-     *  matrices '(l, u)' using the 'LU' Decomposition algorithm.  This version uses
-     *  partial pivoting.
+    /** Factor 'this' sparse matrix into the product of lower and upper triangular
+     *  matrices '(l, u)' using the 'LU' Decomposition algorithm.
      */
-    def lud: Tuple2 [SparseMatrixC, SparseMatrixC] =
+    def lud_npp: (SparseMatrixC, SparseMatrixC) =
     {
-        val l = new SparseMatrixC (dim1, dim2)   // lower triangular matrix
+        if (! isSquare) throw new IllegalArgumentException ("lud_npp: requires a square matrix")
+
+        val l = new SparseMatrixC (dim1)         // lower triangular matrix
         val u = new SparseMatrixC (this)         // upper triangular matrix (a copy of this)
         for (i <- u.range1) {
-            var pivot = u(i, i)
-            if (pivot =~ _0) {
-                val k = partialPivoting (u, i)   // find the maximum element below pivot
-                swap (u, i, k, i)                // swap rows i and k from column k
-                pivot = u(i, i)                  // reset the pivot
-            } // if
+            val pivot = u(i, i)
+            if (pivot =~ _0) flaw ("lud_npp", s"use Fac_LU since there is a zero pivot at row 5")
             l(i, i) = _1
             for (j <- i + 1 until u.dim2) l(i, j) = _0
             for (k <- i + 1 until u.dim1) {
@@ -1095,25 +1090,22 @@ class SparseMatrixC (val d1: Int,
                 for (j <- u.range2) u(k, j) -= mul * u(i, j)
             } // for
         } // for
-        Tuple2 (l, u)
-    } // lud
+        (l, u)
+    } // lud_npp
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Decompose in-place 'this' sparse matrix into the product of lower and upper
+    /** Factor in-place 'this' sparse matrix into the product of lower and upper
      *  triangular matrices '(l, u)' using the 'LU' Decomposition algorithm.
-     *  This version uses partial pivoting.
      */
-    def lud_ip (): Tuple2 [SparseMatrixC, SparseMatrixC] =
+    def lud_ip (): (SparseMatrixC, SparseMatrixC) =
     {
-        val l = new SparseMatrixC (dim1, dim2)   // lower triangular matrix
+        if (! isSquare) throw new IllegalArgumentException ("lud_ip: requires a square matrix")
+
+        val l = new SparseMatrixC (dim1)         // lower triangular matrix
         val u = this                             // upper triangular matrix (this)
         for (i <- u.range1) {
-            var pivot = u(i, i)
-            if (pivot =~ _0) {
-                val k = partialPivoting (u, i)   // find the maximum element below pivot
-                swap (u, i, k, i)                // swap rows i and k from column k
-                pivot = u(i, i)                  // reset the pivot
-            } // if
+            val pivot = u(i, i)
+            if (pivot =~ _0) flaw ("lud_ip", s"use Fac_LU since there is a zero pivot at row 5")
             l(i, i) = _1
             for (j <- i + 1 until u.dim2) l(i, j) = _0
             for (k <- i + 1 until u.dim1) {
@@ -1122,7 +1114,7 @@ class SparseMatrixC (val d1: Int,
                 for (j <- u.range2) u(k, j) -= mul * u(i, j)
             } // for
         } // for
-        Tuple2 (l, u)
+        (l, u)
     } // lud_ip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1159,7 +1151,7 @@ class SparseMatrixC (val d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' using back substitution in the equation 'u*x = y' where
-     *  'this' matrix ('u') is upper triangular (see 'lud' above).
+     *  'this' matrix ('u') is upper triangular (see 'lud_npp' above).
      *  @param y  the constant vector
      */
     def bsolve (y: VectoC): VectorC =
@@ -1174,12 +1166,12 @@ class SparseMatrixC (val d1: Int,
     } // bsolve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
+    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud_npp' above).
      *  @param l  the lower triangular matrix
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
      */
-    def solve (l: MatriC, u: MatriC, b: VectoC): VectorC =
+    def solve (l: MatriC, u: MatriC, b: VectoC): VectoC =
     {
         val y = new VectorC (l.dim2)       
         for (k <- 0 until y.dim) {                   // solve for y in l*y = b
@@ -1187,21 +1179,14 @@ class SparseMatrixC (val d1: Int,
             for (j <- 0 until k) sum += l(k, j) * y(j)
             y(k) = b(k) - sum
         } // for
-        u.bsolve (y).asInstanceOf [VectorC]
+        u.bsolve (y)
     } // solve
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud' above).
-     *  @param lu  the lower and upper triangular matrices
-     *  @param b   the constant vector
-     */
-    def solve (lu: Tuple2 [MatriC, MatriC], b: VectoC): VectorC = solve (lu._1, lu._2, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' matrix.
      *  @param b  the constant vector.
      */
-    def solve (b: VectoC): VectorC = solve (lud, b)
+    def solve (b: VectoC): VectoC = solve (lud_npp, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Combine 'this' sparse matrix with matrix 'b', placing them along the diagonal and
@@ -1274,7 +1259,7 @@ class SparseMatrixC (val d1: Int,
      */
     def inverse_npp: SparseMatrixC =
     {
-        throw new NoSuchMethodException ("inverse_npp: not appropriate for sparse matrices")
+        throw new UnsupportedOperationException ("inverse_npp: not appropriate for sparse matrices")
 /*
         val b = new SparseMatrixC (this)           // copy this matrix into b
         val c = eye (dim1)                         // let c represent the augmentation
@@ -1613,11 +1598,11 @@ object SparseMatrixCTest extends App
     val z  = new SparseMatrixC ((2, 2), 1, 2,
                                         3, 2)
     val b  = VectorC (8, 7)
-    val lu = z.lud
+    val lu = z.lud_npp
 
     println ("z         = " + z)
     println ("z.t       = " + z.t)
-    println ("z.lud     = " + lu)
+    println ("z.lud_npp = " + lu)
     println ("z.solve   = " + z.solve (lu._1, lu._2, b))
     println ("z.inverse = " + z.inverse)
     println ("z.inv * b = " + z.inverse * b)

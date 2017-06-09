@@ -150,7 +150,7 @@ class SimplexBG (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] = null
      *  Iteratively pivot until there an optimal solution is found or it is
      *  determined that the solution is unbounded.  Return the optimal vector x.
      */
-    def solve (): VectorD =
+    def solve (): VectoD =
     {
         if (DEBUG) showTableau (0)                   // for iter = 0
         var k    = -1                                // the leaving variable (row)
@@ -183,12 +183,12 @@ class SimplexBG (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] = null
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the primal (basis only) solution vector (x).
      */
-    def primal: VectorD = ba.solve (lu._1, lu._2, b)            // (u_inv * l_inv)  * b
+    def primal: VectoD = ba.solve (lu._1, lu._2, b)            // (u_inv * l_inv)  * b
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the full primal solution vector (xx).
      */
-    def primalFull (x: VectorD): VectorD = 
+    def primalFull (x: VectoD): VectorD = 
     {
         val xx = new VectorD (N)
         for (i <- 0 until x_B.length) xx(x_B(i)) = x(i)

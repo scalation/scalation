@@ -155,7 +155,7 @@ class SparseMatrixD (val d1: Int,
      *  @param dim  the (row, column) dimensions
      *  @param u    the repeated values
      */
-    def this (dim: Tuple2 [Int, Int], u: Double*)
+    def this (dim: (Int, Int), u: Double*)
     {
         this (dim._1, dim._2)
         for (i <- range1; j <- range2) v(i)(j) = u(i * dim2 + j)
@@ -291,7 +291,7 @@ class SparseMatrixD (val d1: Int,
      */
     def set (x: Double)
     {
-        throw new NoSuchMethodException ("use a dense matrix instead")
+        throw new UnsupportedOperationException ("use a dense matrix instead")
     } // set
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -870,7 +870,7 @@ class SparseMatrixD (val d1: Int,
      */
     def dot (b: MatriD): VectorD =
     {
-        throw new NoSuchMethodException ("matrix dot matrix - dot not implemented")
+        throw new UnsupportedOperationException ("matrix dot matrix - dot not implemented")
     } // dot
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1080,8 +1080,8 @@ class SparseMatrixD (val d1: Int,
         val l = new SparseMatrixD (dim1)         // lower triangular matrix
         val u = new SparseMatrixD (this)         // upper triangular matrix (a copy of this)
         for (i <- u.range1) {
-            var pivot = u(i, i)
-            if (pivot =~ 0.0) flaw ("lud_npp", s"use Fac_LU since there is a zero pivot at row $i")
+            val pivot = u(i, i)
+            if (pivot =~ 0.0) flaw ("lud_npp", s"use Fac_LU since there is a zero pivot at row 2")
             l(i, i) = 1.0
             for (j <- i + 1 until u.dim2) l(i, j) = 0.0
             for (k <- i + 1 until u.dim1) {
@@ -1104,8 +1104,8 @@ class SparseMatrixD (val d1: Int,
         val l = new SparseMatrixD (dim1)         // lower triangular matrix
         val u = this                             // upper triangular matrix (this)
         for (i <- u.range1) {
-            var pivot = u(i, i)
-            if (pivot =~ 0.0) flaw ("lud_ip", s"use Fac_LU since there is a zero pivot at row $i")
+            val pivot = u(i, i)
+            if (pivot =~ 0.0) flaw ("lud_ip", s"use Fac_LU since there is a zero pivot at row 2")
             l(i, i) = 1.0
             for (j <- i + 1 until u.dim2) l(i, j) = 0.0
             for (k <- i + 1 until u.dim1) {
@@ -1171,7 +1171,7 @@ class SparseMatrixD (val d1: Int,
      *  @param u  the upper triangular matrix
      *  @param b  the constant vector
      */
-    def solve (l: MatriD, u: MatriD, b: VectoD): VectorD =
+    def solve (l: MatriD, u: MatriD, b: VectoD): VectoD =
     {
         val y = new VectorD (l.dim2)       
         for (k <- 0 until y.dim) {                   // solve for y in l*y = b
@@ -1179,21 +1179,14 @@ class SparseMatrixD (val d1: Int,
             for (j <- 0 until k) sum += l(k, j) * y(j)
             y(k) = b(k) - sum
         } // for
-        u.bsolve (y).asInstanceOf [VectorD]
+        u.bsolve (y)
     } // solve
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' in the equation 'l*u*x = b' (see 'lud_npp' above).
-     *  @param lu  the lower and upper triangular matrices
-     *  @param b   the constant vector
-     */
-    def solve (lu: Tuple2 [MatriD, MatriD], b: VectoD): VectorD = solve (lu._1, lu._2, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' matrix.
      *  @param b  the constant vector.
      */
-    def solve (b: VectoD): VectorD = solve (lud_npp, b)
+    def solve (b: VectoD): VectoD = solve (lud_npp, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Combine 'this' sparse matrix with matrix 'b', placing them along the diagonal and
@@ -1266,7 +1259,7 @@ class SparseMatrixD (val d1: Int,
      */
     def inverse_npp: SparseMatrixD =
     {
-        throw new NoSuchMethodException ("inverse_npp: not appropriate for sparse matrices")
+        throw new UnsupportedOperationException ("inverse_npp: not appropriate for sparse matrices")
 /*
         val b = new SparseMatrixD (this)           // copy this matrix into b
         val c = eye (dim1)                         // let c represent the augmentation

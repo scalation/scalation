@@ -548,7 +548,7 @@ trait MatriD
      *  @param lu  the lower and upper triangular matrices
      *  @param b   the constant vector
      */
-    def solve (lu: Tuple2 [MatriD, MatriD], b: VectoD): VectoD
+    def solve (lu: (MatriD, MatriD), b: VectoD): VectoD = solve (lu._1, lu._2, b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'a*x = b' where 'a' is 'this' matrix.

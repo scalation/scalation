@@ -329,7 +329,7 @@ class Eigenvector (a: MatrixD, _e: VectorD = null)
  */
 object EigenTest extends App
 {
-    import scalation.util.Banner.banner
+    import scalation.util.banner
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** For matrix a, find Hessenburg matrix, eigenvalues and eigenvectors.

@@ -210,6 +210,51 @@ class Fac_LU [MatT <: MatriD] (a: MatT)
 object Fac_LU
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve for 'x' in the equation 'a*x = b' in an over determined system of
+     *  linear equation using least squares.  Return the solution vector 'x'.
+     *  @see people.csail.mit.edu/bkph/articles/Pseudo_Inverse.pdf
+     *  @param a   the matrix A holding the coefficients of the equations
+     *  @param b  the constant vector
+     */
+    def solveOver (a: MatriD, b: VectoD): VectoD =
+    {
+        val at = a.t
+        val lu = new Fac_LU (at * a)
+        lu.factor ()
+        lu.solve (at * b)
+    } // solveOver
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve for 'x' in the equation 'a*x = b' in an under determined system of
+     *  linear equation by finding the smallest solution.  Return the solution
+     *  vector 'x'.
+     *  @see people.csail.mit.edu/bkph/articles/Pseudo_Inverse.pdf
+     *  @param a   the matrix A holding the coefficients of the equations
+     *  @param b  the constant vector
+     */
+    def solveUnder (a: MatriD, b: VectoD): VectoD =
+    {
+        val at = a.t
+        val lu = new Fac_LU (a * at)
+        lu.factor ()
+        at * lu.solve (b)
+    } // solveUnder
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve a system of linear equations 'a*x = b'.
+     *  @param a   the matrix A holding the coefficients of the equations
+     *  @param lu  LU Factorization of matrix A
+     *  @param b   the constant vector
+     */
+    def solve (a: MatriD, lu: Fac_LU [MatriD], b: VectoD): VectoD =
+    {
+        val (m, n) = (a.dim1, a.dim2)
+        if (m == n)     lu.solve (b)         // square
+        else if (m > n) solveOver (a, b)     // more equations than variables
+        else            solveUnder (a, b)    // fewer equations then variables
+    } // solve
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute an estimate of the L1 norm of 'this' matrix, i.e., maximum absolute
      *  column sum.  It uses an adapted version of Hager's algorithm.
      *  @author Michael Cotterell
@@ -229,12 +274,12 @@ object Fac_LU
         val at_lu = new Fac_LU (a); at_lu.factor ()                  // factor the transpose matrix a
 
         val e  = a(0); e.set (1.0 / a.dim2)
-        var v  = if (inv) a_lu.solve (e) else a * e
+        var v  = if (inv) solve (a, a_lu, e) else a * e
         if (a.dim2 == 1) return v.norm
 
         var γ    = v.norm1
         var ξ    = v.map (signum (_))
-        var x    = if (inv) at_lu.solve (ξ) else at * ξ
+        var x    = if (inv) solve (at, at_lu, ξ) else at * ξ
         var k    = 2
         var done = false
         val ITER = 5
@@ -242,18 +287,18 @@ object Fac_LU
         while (! done) {
             val j = x.abs.argmax ()
             for (k <- e.range) e(k) = if (k == j) 1.0 else 0.0    // one in jth position
-            v     = if (inv) a_lu.solve (e) else a.col (j)
+            v     = if (inv) solve (a, a_lu, e) else a.col (j)
             val g = γ
             γ     = v.norm1
 
             if (v.map (signum (_)) == ξ || γ <= g) {
                 for (i <- x.range) x(i) = (if (i % 2 == 0) -1.0 else 1.0) * (1.0 + ((i - 1.0) / (x.dim - 1)))
-                x = if (inv) a_lu.solve (x) else a * x
+                x = if (inv) solve (a, a_lu, x) else a * x
                 if ((2.0 * x.norm1) / (3.0 * x.dim) > γ) { v = x; γ = (2.0 * x.norm1) / (3.0 * x.dim) }
             } // if
 
             ξ  = v.map (signum (_))
-            x  = if (inv) at_lu.solve (ξ) else at * ξ
+            x  = if (inv) solve (at, at_lu, ξ) else at * ξ
             k += 1
             if (x.norm1 == x(j) || k > ITER) done = true
         } // while
