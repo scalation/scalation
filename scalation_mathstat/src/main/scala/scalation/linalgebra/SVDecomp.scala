@@ -102,6 +102,13 @@ trait SVDecomp
      */
     def solve (b: VectoD): VectoD = ???
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the condition number of 'this' matrix, i.e., the ratio of the
+     *  largest singular value to the smallest.  Note, if not of full rank, it
+     *  will be infinity.
+     */
+    def conditionNum: Double = { val s = factor123 ()._2; s(0) / s(s.dim -1) }
+
 } // SVDecomp trait
 
 

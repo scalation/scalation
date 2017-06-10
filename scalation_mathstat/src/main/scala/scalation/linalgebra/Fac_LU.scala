@@ -179,6 +179,18 @@ class Fac_LU [MatT <: MatriD] (a: MatT)
     } // bsolve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the inverse of matrix 'a' from the LU Factorization.
+     */
+    def inverse: MatriD =
+    {
+        if (m != n) throw new IllegalArgumentException ("inverse: matrix must be square");
+
+        val inv = MatrixD.eye (n)                    // inverse matrix - starts as identity
+        for (j <- a.range2) inv.setCol (j, solve (inv.col (j)))
+        inv
+    } // inverse
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the determinant of matrix 'a'.  The value of the determinant
      *  indicates, among other things, whether there is a unique solution to a
      *  system of linear equations (a nonzero determinant).
@@ -207,13 +219,13 @@ class Fac_LU [MatT <: MatriD] (a: MatT)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Fac_LU` companion object provides functions related to LU Factorization.
  */
-object Fac_LU
+object Fac_LU extends Error
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' in the equation 'a*x = b' in an over determined system of
      *  linear equation using least squares.  Return the solution vector 'x'.
      *  @see people.csail.mit.edu/bkph/articles/Pseudo_Inverse.pdf
-     *  @param a   the matrix A holding the coefficients of the equations
+     *  @param a  the matrix A holding the coefficients of the equations
      *  @param b  the constant vector
      */
     def solveOver (a: MatriD, b: VectoD): VectoD =
@@ -229,7 +241,7 @@ object Fac_LU
      *  linear equation by finding the smallest solution.  Return the solution
      *  vector 'x'.
      *  @see people.csail.mit.edu/bkph/articles/Pseudo_Inverse.pdf
-     *  @param a   the matrix A holding the coefficients of the equations
+     *  @param a  the matrix A holding the coefficients of the equations
      *  @param b  the constant vector
      */
     def solveUnder (a: MatriD, b: VectoD): VectoD =
@@ -269,17 +281,19 @@ object Fac_LU
      */
     def norm1est (a: MatriD, a_lu: Fac_LU [MatriD], inv: Boolean = true): Double =
     {
+        if (! a.isSquare) flaw ("norm1est", "the matrix must be square")
+
         if (! a_lu.factored) a_lu.factor ()                       // factor matrix a
         val at    = a.t
         val at_lu = new Fac_LU (a); at_lu.factor ()                  // factor the transpose matrix a
 
         val e  = a(0); e.set (1.0 / a.dim2)
-        var v  = if (inv) solve (a, a_lu, e) else a * e
+        var v  = if (inv) a_lu.solve (e) else a * e
         if (a.dim2 == 1) return v.norm
 
         var γ    = v.norm1
         var ξ    = v.map (signum (_))
-        var x    = if (inv) solve (at, at_lu, ξ) else at * ξ
+        var x    = if (inv) at_lu.solve (ξ) else at * ξ
         var k    = 2
         var done = false
         val ITER = 5
@@ -287,18 +301,18 @@ object Fac_LU
         while (! done) {
             val j = x.abs.argmax ()
             for (k <- e.range) e(k) = if (k == j) 1.0 else 0.0    // one in jth position
-            v     = if (inv) solve (a, a_lu, e) else a.col (j)
+            v     = if (inv) a_lu.solve (e) else a.col (j)
             val g = γ
             γ     = v.norm1
 
             if (v.map (signum (_)) == ξ || γ <= g) {
                 for (i <- x.range) x(i) = (if (i % 2 == 0) -1.0 else 1.0) * (1.0 + ((i - 1.0) / (x.dim - 1)))
-                x = if (inv) solve (a, a_lu, x) else a * x
+                x = if (inv) a_lu.solve (x) else a * x
                 if ((2.0 * x.norm1) / (3.0 * x.dim) > γ) { v = x; γ = (2.0 * x.norm1) / (3.0 * x.dim) }
             } // if
 
             ξ  = v.map (signum (_))
-            x  = if (inv) solve (at, at_lu, ξ) else at * ξ
+            x  = if (inv) at_lu.solve (ξ) else at * ξ
             k += 1
             if (x.norm1 == x(j) || k > ITER) done = true
         } // while
@@ -321,21 +335,34 @@ object Fac_LU
      *  <p>
      *      ||a|| ||b||  where b = a.inverse
      *  <p>
+     *  Requires 'a' to be a square matrix.
+     *  For rectangular matrices, @see `SVDecomp`.
      *  @param a     the matrix whose condition number is sought
      *  @param a_lu  LU Factorization of matrix A
      */
     def conditionNum (a: MatriD, a_lu: Fac_LU [MatriD]): Double =
     {
         val nrm1 = a.norm1                            // norm of matrix a
-        val nrm2 = norm1est (a, a_lu)                 // estimate of norm of a^-1
+        val nrm2 = a_lu.inverse.norm1                 // norm of a^-1
         nrm1 * nrm2
     } // conditionNum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the condition number of matrix 'a'.
-     *  @param a  the matrix whose condition number is sought
+    /** Compute the condition number of matrix 'a', which equals
+     *  <p>
+     *      ||a|| ||b||  where b = a.inverse
+     *  <p>
+     *  Requires 'a' to be a square matrix.
+     *  For rectangular matrices, @see `SVDecomp`.
+     *  @param a     the matrix whose condition number is sought
+     *  @param a_lu  LU Factorization of matrix A
      */
-    def conditionNum (a: MatriD): Double = conditionNum (a, new Fac_LU (a))
+    def conditionNum2 (a: MatriD, a_lu: Fac_LU [MatriD]): Double =
+    {
+        val nrm1 = a.norm1                            // norm of matrix a
+        val nrm2 = norm1est (a, a_lu)                 // estimate of norm of a^-1
+        nrm1 * nrm2
+    } // conditionNum2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the LU Factorization of matrix 'a' into 'l' and 'u' and its usage
@@ -347,35 +374,47 @@ object Fac_LU
     {
         println (s"a = $a")
         println (s"b = $b")
+        val n = a.dim2
 
         banner ("Factor A into L and U using LU Factorization")
 
         val lu = new Fac_LU (a)
-        lu.factor ()                                  // factor matrix A into L and U
+        lu.factor ()                                       // factor matrix A into L and U
         val (l, u) = lu.factors
         println (s"(l, u) = ($l, $u)")
-        println (s"rank = ${lu.rank}")                // rank of matrix A
-        println (s"cond = ${conditionNum (a, lu)}")   // condition number of matrix A
+        println (s"rank = ${lu.rank}")                     // rank of matrix A
 
         if (a.isSquare) {
+            println (s"cond = ${conditionNum (a, lu)}")    // condition number of matrix A
+            println (s"con2 = ${conditionNum2 (a, lu)}")   // condition number of matrix A
+
             banner ("Solve for x in Ax = b using LUx = Pb")
 
-            val x = lu.solve (b)                      // solve for x
-            val ax = a * x                            // compute Ax
+            val x = lu.solve (b)                           // solve for x
+            val ax = a * x                                 // compute Ax
             println (s"x   = $x")
             println (s"a*x = $ax")
             println (s"b   = $b")
             println (s"a*x - b = ${ax - b}")
-            assert (ax == b)                          // ensure Ax = Pb
+            assert (ax == b)                               // ensure Ax = Pb
+
+            banner ("Verify that A * A^-1 = I")
+
+            val ai  = lu.inverse                           // inverse of A
+            val aai = a * ai                               // multiply A and A^-1
+            println (s"ai = $ai")
+            println (s"ai - a.inverse = ${ai - a.inverse}")
+            println (s"aai = $aai")
+            assert (aai == MatrixD.eye (n))                // ensure A * A^-1 = I
         } // if
 
         banner ("Verfify that A = QLU")
 
-        val qlu = l * u                               // multiply L and U
-        lu.permute (qlu)                              // permute l * u -> QLU
+        val qlu = l * u                                    // multiply L and U
+        lu.permute (qlu)                                   // permute l * u -> QLU
         println (s"q*l*u = $qlu")
         println (s"a - q*l*u = ${a - qlu}")
-        assert (a == qlu)                             // ensure A = QLU
+        assert (a == qlu)                                  // ensure A = QLU
     } // test
 
 } // Fac_LU object
