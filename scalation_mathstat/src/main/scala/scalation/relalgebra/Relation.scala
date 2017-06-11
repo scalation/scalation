@@ -1414,20 +1414,20 @@ object RelationTest4 extends App
 object RelationTest5 extends App 
 {
     val sales_item1 =  Relation ("Sales_Item1", Seq ("Date", "FL", "GA", "NC", "SC"),
-                                  Seq (Vector[Any] ("20130101", 10, 5, 5, 4),
-                                       Vector[Any] ("20130102", 20, 30, 40, 25),
-                                       Vector[Any] ("20130103", 8, 6, 9, 9),
-                                       Vector[Any] ("20130104", 6, 7, 9, 10),
-                                       Vector[Any] ("20130105", 4, 7, 9, 10)),
+                                  Seq (Vector [Any] ("20130101", 10, 5, 5, 4),
+                                       Vector [Any] ("20130102", 20, 30, 40, 25),
+                                       Vector [Any] ("20130103", 8, 6, 9, 9),
+                                       Vector [Any] ("20130104", 6, 7, 9, 10),
+                                       Vector [Any] ("20130105", 4, 7, 9, 10)),
                                   0,"SIIII")
                               
                       
     val price_item1 =  Relation ("Price_Item1", Seq ("Date", "FL", "GA", "NC", "SC"),
-                                  Seq (Vector[Any] ("20130101", 1.6, 1.6, 1.5, 1.3),
-                                       Vector[Any] ("20130102", 1.6, 1.6, 1.5, 1.2),
-                                       Vector[Any] ("20130103", 1.5, 1.6, 1.5, 1.4),
-                                       Vector[Any] ("20130104", 1.4, 1.7, 1.5, 1.4),
-                                       Vector[Any] ("20130105", 1.4, 1.7, 1.4, 1.4)),
+                                  Seq (Vector [Any] ("20130101", 1.6, 1.6, 1.5, 1.3),
+                                       Vector [Any] ("20130102", 1.6, 1.6, 1.5, 1.2),
+                                       Vector [Any] ("20130103", 1.5, 1.6, 1.5, 1.4),
+                                       Vector [Any] ("20130104", 1.4, 1.7, 1.5, 1.4),
+                                       Vector [Any] ("20130105", 1.4, 1.7, 1.4, 1.4)),
                                  0,"SDDDD")
     val revenue     =  Relation ("Revenue", -1, null, "Item", "FL", "GA", "NC", "SC")
     

@@ -59,7 +59,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
       extends Predictor with Error
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
-    if (x.dim1 <= x.dim2) flaw ("constructor", "not enough data rows in matrix to use regression")
+    if (x.dim1 < x.dim2) flaw ("constructor", "not enough data rows in matrix to use regression")
 
     private val DEBUG  = false                                 // debug flag
     private val k      = x.dim2 - 1                            // number of variables (k = n-1)
@@ -237,24 +237,24 @@ object Regression
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test various regression techniques.
-     * @param x  the design matrix
-     * @param y  the response vector
-     * @param z  a vector to predict
+     *  @param x  the design matrix
+     *  @param y  the response vector
+     *  @param z  a vector to predict
      */
     def test (x: MatrixD, y: VectorD, z: VectorD)
     {
-        for (tec <- techniques) {
+        for (tec <- techniques) {                              // use 'tec' Factorization
             banner (s"Fit the parameter vector b using $tec")
-            val rg = new Regression (x, y, tec)                       // use QR Factorization
+            val rg = new Regression (x, y, tec)
             rg.train ()
-            println ("b = " + rg.coefficient)
+            println ("b   = " + rg.coefficient)
             println ("fit = " + rg.fit)
             rg.report ()
 
-            val yp = rg.predict (z)                          // predict y for on3 point
+            val yp = rg.predict (z)                            // predict y for one point
             println ("predict (" + z + ") = " + yp)
 
-            val yyp = rg.predict (x)                         // predict y for several points
+            val yyp = rg.predict (x)                           // predict y for several points
             println ("predict (" + x + ") = " + yyp)
 
             new Plot (y, yyp, null, tec.toString)

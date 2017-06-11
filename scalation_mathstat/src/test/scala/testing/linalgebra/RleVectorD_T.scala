@@ -149,8 +149,6 @@ object RleVectorD_T extends Tester //with App
                             x().size)
     test ("sum",            x.sum,
                             x().sum)
-    test ("sumAbs",         x.sumAbs,
-                            (for (i <- x.indices) yield abs (x(i))).sum)
     test ("sumPos",         x.sumPos,
                             (for (i <- x.indices) yield max (x(i), 0.0)).sum)
     test ("swap",           { x.swap (j, k); x },
