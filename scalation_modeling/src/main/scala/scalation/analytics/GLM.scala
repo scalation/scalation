@@ -78,7 +78,7 @@ trait GLM
      *  @param x  the input/design m-by-n matrix
      *  @param y  the response m-vector
      */
-    def apply (x: MatrixD, y: VectorD, w: VectorD): Regression_WLS =
+    def apply (x: MatrixD, y: VectorD, w: VectorD): Regression_WLS [MatrixD, VectorD] =
     {
         if (add_1)
             new Regression_WLS (one (x.dim1) +^: x, y, w, technique)

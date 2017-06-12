@@ -103,6 +103,7 @@ class Perceptron (x: MatrixD, y: VectorD, private var eta: Double = 1.0)
      *  predicted value 'yp'.  Minimize 1/2 of the dot product of error with itself
      *  using gradient-descent.  The gradient is '-x.t * (e * yp * (_1 - yp))', so
      *  move in the opposite direction of the gradient.
+     *  @param yy  the output vector
      */
     def minimizeError (yy: VectoD)
     {
