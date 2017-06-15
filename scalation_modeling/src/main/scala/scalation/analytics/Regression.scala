@@ -11,7 +11,6 @@ package scalation.analytics
 import scala.math.{abs, log, pow, sqrt}
 
 import scalation.linalgebra._
-//import scalation.math.double_exp
 import scalation.plot.Plot
 import scalation.random.CDF.studentTCDF
 import scalation.util.{banner, Error, time}
@@ -51,34 +50,38 @@ import RegTechnique._
  *      'Inverse'    // Inverse/Gaussian Elimination, classical textbook technique
  *  <p>
  *  @see see.stanford.edu/materials/lsoeldsee263/05-ls.pdf
- *  @param x          the input/design m-by-n matrix augmented with a first column of ones
- *  @param y          the response vector
+ *  Note, not intended for use when the number of degrees of freedom 'df' is negative.
+ *  @see en.wikipedia.org/wiki/Degrees_of_freedom_(statistics)
+ *  @param x          the input/data m-by-n matrix
+ *                        (augment with a first column of ones to include intercept in model)
+ *  @param y          the response n vector
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: RegTechnique = QR)
+class Regression [MatT <: MatriD, VecT <: VectoD] (protected val x: MatT, protected val y: VecT,
+                  technique: RegTechnique = QR)
       extends Predictor with Error
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
-    if (x.dim1 < x.dim2) flaw ("constructor", "not enough data rows in matrix to use regression")
+    if (x.dim1 < x.dim2) flaw ("constructor", "NEGATIVE df - not enough data rows in matrix to use regression")
 
-    private val DEBUG  = false                                 // debug flag
-    private val k      = x.dim2 - 1                            // number of variables (k = n-1)
-    private val m      = x.dim1.toDouble                       // number of data points (rows) as a double
-    private val df     = (m - k - 1).toInt                     // degrees of freedom
-    private val r_df   = (m - 1.0) / df                        // ratio of degrees of freedom
+    private val   DEBUG  = false                               // debug flag
+    protected val k      = x.dim2 - 1                          // number of variables (k = n-1) FIX - assumes intercept
+    protected val m      = x.dim1.toDouble                     // number of data points (rows) as a double
+    protected val df     = (m - k - 1).toInt                   // degrees of freedom
+    protected val r_df   = (m - 1.0) / df                      // ratio of degrees of freedom
 
-    private var rBarSq = -1.0                                  // adjusted R-squared
-    private var fStat  = -1.0                                  // F statistic (quality of fit)
-    private var aic    = -1.0                                  // Akaike Information Criterion (AIC)
-    private var bic    = -1.0                                  // Bayesian Information Criterion (BIC)
+    protected var rBarSq = -1.0                                // adjusted R-squared
+    protected var fStat  = -1.0                                // F statistic (quality of fit)
+    protected var aic    = -1.0                                // Akaike Information Criterion (AIC)
+    protected var bic    = -1.0                                // Bayesian Information Criterion (BIC)
 
-    private var stdErr: VectoD = null                          // standard error of coefficients for each x_j
-    private var t: VectoD      = null                          // t statistics for each x_j
-    private var p: VectoD      = null                          // p values for each x_j
+    protected var stdErr: VectoD = null                        // standard error of coefficients for each x_j
+    protected var t: VectoD      = null                        // t statistics for each x_j
+    protected var p: VectoD      = null                        // p values for each x_j
 
     type Fac_QR = Fac_QR_H [MatT]                              // change as needed
 
-    private val fac: Factorization = technique match {         // select the factorization technique
+    protected val fac: Factorization = technique match {       // select the factorization technique
         case QR       => new Fac_QR (x, false)                 // QR Factorization
         case Cholesky => new Fac_Cholesky (x.t * x)            // Cholesky Factorization
         case SVD      => new SVD (x)                           // Singular Value Decomposition
@@ -134,9 +137,11 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: 
         val varEst = sse / df                                  // variance estimate
         val varCov = l_inv.t * l_inv * varEst                  // variance-covariance matrix
 
-        stdErr = varCov.getDiag ().map (sqrt (_))                          // standard error of coefficients
-        t      = b / stdErr                                                // Student's T statistic
-        p      = t.map ((x: Double) => 2.0 * studentTCDF (-abs (x), df))   // p values
+        stdErr = varCov.getDiag ().map (sqrt (_))              // standard error of coefficients
+        t      = b / stdErr                                    // Student's T statistic
+
+        p = if (df > 0) t.map ((x: Double) => 2.0 * studentTCDF (-abs (x), df))   // p values
+            else -VectorD.one (k+1)
     } // diagnose
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -237,7 +242,7 @@ object Regression
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test various regression techniques.
-     *  @param x  the design matrix
+     *  @param x  the data matrix
      *  @param y  the response vector
      *  @param z  a vector to predict
      */

@@ -81,9 +81,9 @@ trait GLM
     def apply (x: MatrixD, y: VectorD, w: VectorD): Regression_WLS [MatrixD, VectorD] =
     {
         if (add_1)
-            new Regression_WLS (one (x.dim1) +^: x, y, w, technique)
+            new Regression_WLS (one (x.dim1) +^: x, y, technique, w)
         else
-            new Regression_WLS (x, y, w, technique)
+            new Regression_WLS (x, y, technique, w)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

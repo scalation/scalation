@@ -115,7 +115,7 @@ object Relation
         val newCol = Vector.fill [Vec] (colName.length)(null)
         val r3     = Relation (name, colName, newCol, key, domain)
         for (ln <- lines) {
-            if (cnt <= 0) r3.add (r3.row (ln.split (eSep), domain)) else cnt -= 1
+            if (cnt <= 0) r3.add (r3.row (ln.split (eSep).map (_.trim), domain)) else cnt -= 1
         } // for
         r3
     } // apply
@@ -140,12 +140,12 @@ object Relation
 
         for (ln <- lines) {
             if (first) {
-                colName   = ln.split (eSep)
+                colName   = ln.split (eSep).map (_.trim)
                 colBuffer = Array.ofDim (colName.length)
                 for (i <- colBuffer.indices) colBuffer(i) = new ArrayBuffer ()
                 first = false
             } else {
-                val values = ln.split (eSep)
+                val values = ln.split (eSep).map (_.trim)
                 values.indices.foreach (i => { colBuffer(i) += values(i) })
             } // if
         } // for
@@ -172,12 +172,12 @@ object Relation
 
         for (ln <- lines) {
             if (first) {
-                colName   = ln.split (eSep)
+                colName   = ln.split (eSep).map (_.trim)
                 colBuffer = Array.ofDim (colName.length)
                 for (i <- colBuffer.indices) colBuffer(i) = new ArrayBuffer ()
                 first = false
             } else {
-                val values = ln.split (eSep)
+                val values = ln.split (eSep).map (_.trim)
                 values.indices.foreach (i => { colBuffer(i) += values(i) })
             } // if
         } // for
@@ -207,7 +207,7 @@ object Relation
         val lines  = getFromURL_File (fileName)
         val newCol = Vector.fill [Vec] (colName.length)(null)
         val r3     = Relation (name, colName, newCol, key, domain)
-        for (ln <- lines) r3.add (r3.row (ln.split (eSep), domain))
+        for (ln <- lines) r3.add (r3.row (ln.split (eSep).map (_.trim), domain))
         r3
     } // apply
 

@@ -21,6 +21,8 @@ object Differential
 {
     type FunctionV2S  = VectorD => Double      // function of a vector - VectorD
     type FunctionV_2S = VectoD  => Double      // function of a vector - VectoD  - base trait
+    type FunctionV2V  = VectorD => VectorD     // vector-valued function of a vector - VectorD
+    type FunctionV_2V = VectoD  => VectoD      // vector-valued function of a vector - VectoD  - base trait
     type FunctionsV   = Array [FunctionV2S]    // array of vector functions
 
     private var h   = 1E-6                     // default step size used for estimating derivatives

@@ -19,7 +19,7 @@ import scalation.linalgebra.MatrixD.outer
 import scalation.random.Random
 import scalation.util.Error
 
-import LogisticFunction.sigmoid
+import ActivationFunc._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NeuralNet` class supports basic 3-layer (input, hidden and output) Neural
@@ -99,7 +99,7 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int, eta: Double = 1.0)
     {
         breakable { for (k <- 0 until MAX_ITER) {               // kth learning phase
            var sse = 0.0                                        // sum error over layers
-           for (i <- 0 until m) hh(i) = _11 ++ sigmoid (w * x(i))      // values for hidden layer
+           for (i <- 0 until m) hh(i) = _11 ++ sigmoidV (w * x(i))      // values for hidden layer
            sse += minimizeError (hh, y, v)                      // adjust v weights (hidden -> output)
            sse += minimizeError (x, hh, w)                      // adjust w weights (input  -> hidden)
            println ("weights for " + k + "th phase: w = " + w + "\nv = " + v)
@@ -124,7 +124,7 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int, eta: Double = 1.0)
         for (i <- 0 until m) {                         // for each example in training set
             val xi = xx(i)                             // ith input value (vector)
             val yi = yy(i)                             // ith target output value (vector)
-            val zo = sigmoid (ww * xi)                 // ith predicted output value (vector)
+            val zo = sigmoidV (ww * xi)                // ith predicted output value (vector)
             val eo = yi - zo                           // error = target - predicted
             val gr = outer (xi, eo * zo * (_1 - zo))   // -gradients of 1/2 dot product of error
             println (gr.dim1 + ", " + gr.dim2)
@@ -158,8 +158,8 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int, eta: Double = 1.0)
      */
     def predictAll (zi: VectoD): VectoD = 
     {
-        val zh = _11 ++ sigmoid (w * zi)    // augmented hidden values
-        sigmoid (v * zh)                    // predicted output values
+        val zh = _11 ++ sigmoidV (w * zi)    // augmented hidden values
+        sigmoidV (v * zh)                    // predicted output values
     } // predictAll
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

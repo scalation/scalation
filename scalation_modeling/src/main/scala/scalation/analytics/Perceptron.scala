@@ -14,10 +14,12 @@ import scala.math.exp
 import scala.util.control.Breaks.{break, breakable}
 
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
+import scalation.math.FunctionS2S
+import scalation.calculus.Differential.FunctionV_2V
 import scalation.random.RandomVecD
 import scalation.util.{banner, Error}
 
-import LogisticFunction.sigmoid
+import ActivationFunc._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Perceptron` class supports single-output, 2-layer (input and output)
@@ -30,11 +32,14 @@ import LogisticFunction.sigmoid
  *  <p>
  *  The parameter vector 'b' (w) gives the weights between input and output layers.
  *  Note, b0 is treated as the bias, so x0 must be 1.0.
- *  @param x    the input matrix (training data consisting of m input vectors)
- *  @param y    the output vector (training data consisting of m output values)
- *  @param eta  the learning/convergence rate (typically less than 1.0)
+ *  @param x       the input matrix (training data consisting of m input vectors)
+ *  @param y       the output vector (training data consisting of m output values)
+ *  @param eta     the learning/convergence rate (typically less than 1.0)
+ *  @param afunc   the activation function (mapping scalar => scalar)
+ *  @param afuncV  the activation function (mapping vector => vector)
  */
-class Perceptron (x: MatrixD, y: VectorD, private var eta: Double = 1.0)
+class Perceptron (x: MatrixD, y: VectorD, private var eta: Double = 1.0,
+                  afunc: FunctionS2S = sigmoid _, afuncV: FunctionV_2V = sigmoidV _)
       extends Predictor with Error
 {
     private val DEBUG    = false                       // debug flag
@@ -93,7 +98,7 @@ class Perceptron (x: MatrixD, y: VectorD, private var eta: Double = 1.0)
      */
     def check (yy: VectoD)
     { 
-        e = yy - sigmoid (x * b)                              // compute residual/error vector 
+        e = yy - afuncV (x * b)                               // compute residual/error vector 
         diagnose (yy)                                         // compute diagonostics
     } // check
 
@@ -108,7 +113,7 @@ class Perceptron (x: MatrixD, y: VectorD, private var eta: Double = 1.0)
     def minimizeError (yy: VectoD)
     {
         breakable { for (k <- 0 until MAX_ITER) {             // kth learning phase
-            val yp = sigmoid (x * b)                          // vector of predicted outputs
+            val yp = afuncV (x * b)                           // vector of predicted outputs
             val e  = yy - yp                                  // residual/error vector
             b     += x.t * (e * yp * (_1 - yp)) * eta         // adjust the weights
 
@@ -122,13 +127,13 @@ class Perceptron (x: MatrixD, y: VectorD, private var eta: Double = 1.0)
     /** Given a new input vector 'z', predict the output/response value 'f(z)'.
      *  @param z  the new input vector
      */
-    def predict (z: VectoD): Double = sigmoid (b dot z)
+    def predict (z: VectoD): Double = afunc (b dot z)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a new input vector 'z', predict the output/response value 'f(z)'.
      *  @param z  the new input vector
      */
-    def predict (z: MatriD): VectoD = VectorD (for (i <-z.range1) yield sigmoid (b dot z(i)))
+    def predict (z: MatriD): VectoD = VectorD (for (i <-z.range1) yield afunc (b dot z(i)))
 
 } // Perceptron class
 

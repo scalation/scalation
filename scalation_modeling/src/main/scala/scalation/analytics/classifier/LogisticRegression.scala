@@ -1,5 +1,4 @@
 
-
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @version 1.3
@@ -9,16 +8,16 @@
 
 // FIX: needs improved optimization
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
 import scala.math.{exp, log}
 
-import scalation.analytics.LogisticFunction
 import scalation.linalgebra.{MatrixD, VectorD, VectoD, VectorI}
 import scalation.minima.QuasiNewton
 import scalation.plot.Plot
 
-import LogisticFunction.sigmoid
+import ActivationFunc.sigmoid
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `LogisticRegression` class supports (binomial) logistic regression.  In this

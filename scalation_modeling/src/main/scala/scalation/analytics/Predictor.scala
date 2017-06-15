@@ -24,8 +24,9 @@ trait Predictor
 {
     protected var b: VectoD = null                  // coefficient/parameter vector [b_0, b_1, ... b_k]
     protected var e: VectoD = null                  // residual/error vector [e_0, e_1, ... e_m-1]
-    protected var sse       = -1.0                  // sum of squared errors
-    protected var sst       = -1.0                  // total of squared errors
+    protected var sse       = -1.0                  // sum of squares error
+    protected var ssr       = -1.0                  // sum of squares regression/model
+    protected var sst       = -1.0                  // sum of squares total (ssr + sse)
     protected var rmse      = -1.0                  // root mean squared error
     protected var rSq       = -1.0                  // coefficient of determination (quality of fit)
 
@@ -55,10 +56,11 @@ trait Predictor
     def diagnose (yy: VectoD)
     {
         val m = e.dim                               // number of instances
-        sse   = e dot e                             // sum of squared errors
-        sst   = (yy dot yy) - yy.sum~^2.0 / m       // total sum of squares
+        sse   = e dot e                             // sum of squares error
+        sst   = (yy dot yy) - yy.sum~^2.0 / m       // sum of squares total
+        ssr   = sst - sse                           // sum of squares regression
         rmse  = sqrt (sse / e.dim)                  // root mean square error
-        rSq   = (sst - sse) / sst                   // coefficient of determination R^2
+        rSq   = ssr / sst                           // coefficient of determination R^2
     } // diagnose
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

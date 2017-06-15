@@ -42,7 +42,7 @@ import scalation.util.Error
 class SVD [MatT <: MatriD] (a: MatT)
     extends SVDecomp with Error
 {
-    private val DEBUG          = true                // debug flag
+    private val DEBUG          = false               // debug flag
     private val MAX_ITER       = 100                 // maximum number of iterations
     private val m              = a.dim1              // number of rows
     private val n              = a.dim2              // number of columns
