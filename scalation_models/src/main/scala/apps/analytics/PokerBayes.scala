@@ -8,7 +8,7 @@
 
 package apps.analytics
 
-import scalation.analytics.BASE_DIR
+import scalation.analytics.classifier.BASE_DIR
 import scalation.analytics.classifier.{AugNaiveBayes, NaiveBayes}
 import scalation.linalgebra.{MatrixI, VectorI}
 import scalation.util.{getFromURL_File, time}

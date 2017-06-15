@@ -766,7 +766,17 @@ class SparseVectorC (val dim_ : Int,
         for (x <- v if x._2 > _0) count += 1
         count
     } // countPos
-    
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Count the number of zero elements in 'this' vector.
+     */
+    def countZero: Int =
+    {
+        var count = 0
+        for (x <- v if x._2 == _0) count += 1
+        count
+    } // countZero
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return a new vector consisting of the distinct elements from 'this' vector.
      */

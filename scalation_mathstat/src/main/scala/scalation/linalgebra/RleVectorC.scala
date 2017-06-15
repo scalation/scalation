@@ -1324,7 +1324,17 @@ class RleVectorC (val dim: Int, protected var v: ReArray [TripletC] = null)
         for (i <- crange if v(i).value > _0) count += v(i).count
         count
     } // countPos
-        
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Count the number of zero elements in the 'this' vector.
+     */
+    def countZero: Int =
+    {
+        var count = 0
+        for (i <- crange if v(i).value == _0) count += v(i).count
+        count
+    } // countZero
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the number of distinct elements in 'this' vector.
      */

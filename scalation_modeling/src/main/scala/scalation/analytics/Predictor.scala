@@ -101,8 +101,8 @@ trait Predictor
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PredictorTest` object tests all the classes in the `scalation.analytics`
- *  package that extend the `Predictor` trait.
- *  > run-main scalation.analytics.PredictorTest
+ *  package that directly or indirectly extend the `Predictor` trait.
+ *  > run-main scalation.analytics.PredictorTet
  */
 object PredictorTest extends App
 {
@@ -110,7 +110,7 @@ object PredictorTest extends App
 
     banner ("ANCOVATest");            ANCOVATest.main (null)
     banner ("ANOVATest");             ANOVATest.main (null)
-    banner ("ARMATest");              ARMATest.main (null)
+    banner ("ARIMATest");             ARIMATest.main (null)
     banner ("ExpRegressionTest");     ExpRegressionTest.main (null)
     banner ("ExpSmoothingTest");      ExpSmoothingTest.main (null)
     banner ("LassoRegressionTest");   LassoRegressionTest.main (null)

@@ -562,6 +562,11 @@ trait VectoR
     def countPos: Int
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Count the number of zero elements in the 'this' vector.
+     */
+    def countZero: Int
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a vector consisting of the distinct elements in 'this' vector.
      */
     def distinct: VectoR

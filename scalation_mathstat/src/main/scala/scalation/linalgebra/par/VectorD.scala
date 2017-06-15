@@ -754,6 +754,17 @@ class VectorD (val dim: Int,
     } // countPos
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Count the number of zero elements in 'this' vector.
+     */
+    def countZero: Int =
+    {
+        var count = 0
+        for (i <- 0 until dim if v(i) == 0.0) count += 1
+        count
+    } // countZero
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return a new vector consisteing of the distinct elements from 'this' vector.
      */
     def distinct: VectorD = VectorD (v.distinct)
