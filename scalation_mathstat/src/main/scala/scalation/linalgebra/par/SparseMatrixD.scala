@@ -967,6 +967,20 @@ class SparseMatrixD (val d1: Int,
     } // **=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply vector 'u' by 'this' matrix to produce another matrix 'u_i * a_ij'.
+     *  E.g., multiply a diagonal matrix represented as a vector by a matrix.
+     *  This operator is right associative.
+     *  @param u  the vector to multiply by
+     */
+    def **: (u: VectoD): SparseMatrixD =
+    {
+        val dm = math.min (dim2, u.dim)
+        val c  = new SparseMatrixD (dim1, dm)
+        for (i <- range1.par; e <- v(i)) c(i, e._1) = u(i) * e._2
+        c
+    } // **:
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide this sparse matrix by scalar x.
      *  @param x  the scalar to divide by
      */

@@ -947,8 +947,9 @@ class SparseMatrixL (val d1: Int,
      */
     def ** (u: VectoL): SparseMatrixL =
     {
-        val c = new SparseMatrixL (dim1, dim2)
-        for (i <- c.range1; e <- v(i)) c(i, e._1) = e._2 * u(e._1)
+        val dm = math.min (dim2, u.dim)
+        val c  = new SparseMatrixL (dim1, dm)
+        for (i <- c.range1; e <- v(i)) { val j = e._1; if (j < dm) c(i, j) = e._2 * u(j) }
         c
     } // **
 
@@ -959,9 +960,24 @@ class SparseMatrixL (val d1: Int,
      */
     def **= (u: VectoL): SparseMatrixL =
     {
-        for (i <- range1; e <- v(i)) this(i, e._1) = e._2 * u(e._1)
+        if (dim2 > u.dim) flaw ("**=", "vector u not large enough")
+        for (i <- range1; e <- v(i)) { val j = e._1; this(i, j) = e._2 * u(j) }
         this
     } // **=
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply vector 'u' by 'this' matrix to produce another matrix 'u_i * a_ij'.
+     *  E.g., multiply a diagonal matrix represented as a vector by a matrix.
+     *  This operator is right associative.
+     *  @param u  the vector to multiply by
+     */
+    def **: (u: VectoL): SparseMatrixL =
+    {
+        val dm = math.min (dim2, u.dim)
+        val c  = new SparseMatrixL (dim1, dm)
+        for (i <- range1; e <- v(i)) { val j = e._1; if (j < dm) c(i, j) = u(i) * e._2 }
+        c
+    } // **:
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide 'this' sparse matrix by scalar 'x'.

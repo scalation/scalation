@@ -426,6 +426,14 @@ trait MatriQ
     def **= (u: VectoQ): MatriQ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply vector 'u' by 'this' matrix to produce another matrix 'u_i * a_ij'.
+     *  E.g., multiply a diagonal matrix represented as a vector by a matrix.
+     *  This operator is right associative.
+     *  @param u  the vector to multiply by
+     */
+    def **: (u: VectoQ): MatriQ
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide 'this' matrix by scalar 'x'.
      *  @param x  the scalar to divide by
      */

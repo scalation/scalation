@@ -687,24 +687,30 @@ class BidMatrixR (val d1: Int)
     } // mdot
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply 'this' bidiagonal matrix by vector 'u' to produce another matrix
-     *  'a_ij * u_j'.
+    /** Multiply 'this' bidiagonal matrix by vector 'u' to produce another matrix 'a_ij * u_j'.
+     *  E.g., multiply a diagonal matrix represented as a vector by a matrix.
      *  @param u  the vector to multiply by
      */
-    def ** (u: VectoR): BidMatrixR = 
-    {
-        throw new UnsupportedOperationException ("matrix * vector -> matrix not implemented")
-    } // **
+    def ** (u: VectoR): MatrixR = this * BidMatrixR (u)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' bidiagonal matrix by vector 'u' to produce another
      *  matrix 'a_ij * u_j'.
+     *  E.g., multiply a diagonal matrix represented as a vector by a matrix.
      *  @param u  the vector to multiply by
      */
-    def **= (u: VectoR): BidMatrixR =
+    def **= (u: VectoR): MatrixR =
     {
         throw new UnsupportedOperationException ("inplace matrix * vector -> matrix not implemented")
     } // **=
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply vector 'u' by 'this' bidiagonal matrix to produce another matrix 'u_i * a_ij'.
+     *  E.g., multiply a diagonal matrix represented as a vector by a matrix.
+     *  This operator is right associative.
+     *  @param u  the vector to multiply by
+     */
+    def **: (u: VectoR): MatrixR = BidMatrixR (u) * this
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide 'this' bidiagonal matrix by scalar 'x'.
@@ -1043,7 +1049,7 @@ class BidMatrixR (val d1: Int)
 object BidMatrixR extends Error
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a matrix and assign values from the array of vectors 'u'.
+    /** Create a bidiagonal matrix and assign values from the array of vectors 'u'.
      *  @param u           the array of vectors to assign
      *  @param columnwise  whether the vectors are treated as column or row vectors
      */
@@ -1063,8 +1069,8 @@ object BidMatrixR extends Error
     } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a matrix and assign values from the Scala `Vector` of vectors 'u'.
-     *  Assumes vectors are column-wise.
+    /** Create a bidiagonal matrix and assign values from the Scala `Vector` of
+     *  vectors 'u'.  Assumes vectors are column-wise.
      *  @param u  the Vector of vectors to assign
      */
     def apply (u: Vector [VectoR]): BidMatrixR =
@@ -1072,6 +1078,17 @@ object BidMatrixR extends Error
         val u_dim = u(0).dim
         val x = new BidMatrixR (u_dim)
         for (j <- 0 until u.length) x.setCol (j, u(j))        // assign column vectors
+        x
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a bidiagonal matrix and assign values from vector 'u'.
+     *  @param u  the vector to assign
+     */
+    def apply (u: VectoR): BidMatrixR =
+    {
+        val x = new BidMatrixR (u.dim)
+        for (i <- 0 until u.dim) x(i, i) = u(i)
         x
     } // apply
 

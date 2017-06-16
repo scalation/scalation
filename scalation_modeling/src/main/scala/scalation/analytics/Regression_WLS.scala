@@ -147,10 +147,8 @@ object Regression_WLS
      */
     def reweightX (x: MatriD, rW: VectoD): MatriD =
     {
-        val rtW    = if (rW == null) rootW else rW
-        val rootWW = new MatrixD (rtW.dim)                     // rw as a diagonal matrix
-        rootWW.setDiag (rtW)                                   // FIX - use **:
-        rootWW * x
+        val rtW = if (rW == null) rootW else rW                // root weight vector
+        rtW **: x                                              // vector (as if diagonal matrix) * matrix (right associative)
     } // reweightX
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -160,10 +158,8 @@ object Regression_WLS
      */
     def reweightY (y: VectoD, rW: VectoD): VectoD =
     {
-        val rtW    = if (rW == null) rootW else rW
-        val rootWW = new MatrixD (rtW.dim)                     // rw_ as a diagonal matrix
-        rootWW.setDiag (rtW)                                   // FIX - use **: ?
-        rootWW * y
+        val rtW = if (rW == null) rootW else rW                // root weight vector
+        rtW * y                                                // vector * vector (element by element)
     } // reweightY
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

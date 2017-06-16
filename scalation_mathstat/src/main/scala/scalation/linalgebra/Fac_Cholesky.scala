@@ -43,6 +43,7 @@ class Fac_Cholesky [MatT <: MatriD] (a: MatT)
             val diff = a(i, j) - (l(i) dot l(j))
             l(i, j)  = if (i == j) sqrt (diff) else  diff / l(j, j)
         } // for
+        factored = true
     } // factor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

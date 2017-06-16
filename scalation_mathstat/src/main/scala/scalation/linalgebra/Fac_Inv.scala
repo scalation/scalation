@@ -33,7 +33,7 @@ class Fac_Inv [MatT <: MatriD] (a: MatT)
     /** Factor matrix 'I' into the product of 'a' and 'a^-1' by computing the
      *  inverse of 'a'.
      */
-    def factor () = { ai = a.inverse }
+    def factor () = { ai = a.inverse; factored = true }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return both the matrices 'a' and its inverse 'a^-1'.

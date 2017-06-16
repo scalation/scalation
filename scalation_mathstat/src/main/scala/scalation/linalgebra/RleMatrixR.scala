@@ -418,27 +418,6 @@ import RleMatrixR._
     def csize: VectorI = VectorI (for (j <- range2) yield v(j).csize) 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide 'this' matrix by scalar 'x'.
-     *  @param x the scalar to divide by
-     */
-    def / (x: Real): MatriR = 
-    {
-        val c = new RleMatrixR (dim1, dim2)
-        for (i <- range2) c.v(i) = v(i) / x
-        c
-    } // /
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Divide in-place 'this' matrix by scalar 'x'.
-     *  @param x  the scalar to divide by
-     */
-    def /= (x: Real): MatriR = 
-    {
-        for (i <- range2) v(i) /= x
-        this
-    } // /=
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' matrix subtract scalar 'x'.
      *  @param x the scalar to subtract
      */
@@ -533,80 +512,6 @@ import RleMatrixR._
     } // ~^
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the lower triangular of 'this' matrix (rest are zero).
-     */ 
-    def lowerT: RleMatrixR = 
-    {
-        var x = new RleMatrixR (dim1, dim2)
-        for (i <- range1; j <- 0 to i) x(i, j) = this(i, j)
-        x
-    } // lowerT
-    
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Use partial pivoting to find a maximal non-zero pivot and return its row
-     *  index, i.e., find the maximum element '(k, i)' below the pivot '(i, i)'.
-     *  @param a  the matrix to perform partial pivoting on
-     *  @param i  the row and column index for the current pivot
-     */
-    private def partialPivoting (a: RleMatrixR, i: Int): Int =
-    {
-        var max  = a.v(i)(i)         // initially set to the pivot
-        var kMax = i                 // initially the pivot row
-
-        for (k <- i + 1 until a.dim1 if ABS (a.v(k)(i)) > max) {
-            max  = ABS (a.v(k)(i))
-            kMax = k
-        } // for
-
-        if (kMax == i) {
-            flaw ("partialPivoting", "unable to find a non-zero pivot for row " + i)
-        } // if
-        kMax
-    } // partialPivoting
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Solve for 'x' using back substitution in the equation 'u*x = y' where
-     *  'this' matrix ('u') is upper triangular (see 'lud_npp' above).
-     *  @param y  the constant vector
-     */
-    def bsolve (y: VectoR): RleVectorR = 
-    {
-        var x = new RleVectorR (dim2)
-        for (i <- dim1 - 1 to 0 by -1) {
-            var sum = _0
-            for (j <- i + 1 until dim2) sum += this(i, j) * x(j)
-            x(i) = (y(i) - sum) / this(i, i)
-        } // for
-        x
-    } // bsolve
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the upper triangular of 'this' matrix (rest are zero).
-     */ 
-    def upperT: RleMatrixR = 
-    {
-        var x = RleMatrixR (new MatrixR (dim1, dim2))
-        for (i <- range1; j <- i until dim2) x(i, j) = this(i, j)
-        x
-    } // upperT
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create an 'm-by-n' identity matrix I (ones on main diagonal, zeros elsewhere).
-     *  If 'n' is <= 0, set it to 'm' for a square identity matrix.
-     *  FIX: store as a diagonal matrix.
-     *  @param m  the row dimension of the matrix
-     *  @param n  the column dimension of the matrix (defaults to 0 => square matrix)
-     */
-    def eye (m: Int, n: Int = 0): RleMatrixR =
-    {
-        val nn = if (n <= 0) m else n             // square matrix, if n <= 0
-        val mn = if (m <= nn) m else nn           // length of main diagonal
-        val c = new RleMatrixR (m, nn)
-        for (i <- 0 until mn) c(i, i) = 1
-        c
-    } // eye
-    
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply 'this' matrix by (column) vector 'u'
      *  @param u  the vector to multiply by
      */
@@ -698,8 +603,9 @@ import RleMatrixR._
      */
     def ** (u: VectoR): MatriR = 
     {
-        var c = new RleMatrixR (dim1,dim2)
-        for (i <- range1; j <- range2) c(i, j) = this(i, j) * u(j)
+        val dm = math.min (dim2, u.dim)
+        var c  = new RleMatrixR (dim1, dm)
+        for (i <- range1; j <- c.range2) c(i, j) = this(i, j) * u(j)
         c
     } // **
 
@@ -709,9 +615,45 @@ import RleMatrixR._
      */
     def **= (u: VectoR): MatriR = 
     {
+        if (dim2 > u.dim) flaw ("**=", "vector u not large enough")
         for (i <- range1; j <- range2) this(i, j) = this(i, j) * u(j)
         this
     } // **=
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply vector 'u' by 'this' matrix to produce another matrix 'u_i * a_ij'.
+     *  E.g., multiply a diagonal matrix represented as a vector by a matrix.
+     *  This operator is right associative.
+     *  @param u  the vector to multiply by
+     */
+    def **: (u: VectoR): MatriR =
+    {
+        val dm = math.min (dim2, u.dim)
+        val c  = new RleMatrixR (dim1, dm)
+        for (i <- range1; j <- c.range2) c(i, j) = u(i) * this(i, j)
+        c
+    } // **:
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide 'this' matrix by scalar 'x'.
+     *  @param x the scalar to divide by
+     */
+    def / (x: Real): MatriR = 
+    {
+        val c = new RleMatrixR (dim1, dim2)
+        for (i <- range2) c.v(i) = v(i) / x
+        c
+    } // /
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide in-place 'this' matrix by scalar 'x'.
+     *  @param x  the scalar to divide by
+     */
+    def /= (x: Real): MatriR = 
+    {
+        for (i <- range2) v(i) /= x
+        this
+    } // /=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Clean values in 'this' matrix at or below the threshold 'thres' by setting
@@ -839,7 +781,6 @@ import RleMatrixR._
         for (j <- b.range2) vv(j) = RleVectorR (for (i <- range2) yield  v(i) dot b.v(j))
         new RleMatrixR (dim2, b.dim2, vv)
     } // mdot
-  
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get the 'k'th diagonal of 'this' matrix.
@@ -896,6 +837,64 @@ import RleMatrixR._
         for (j <- 0 until dim2) if (v(j).size != dim1) return false
         true
     } // isRectangular
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the lower triangular of 'this' matrix (rest are zero).
+     */ 
+    def lowerT: RleMatrixR = 
+    {
+        var x = new RleMatrixR (dim1, dim2)
+        for (i <- range1; j <- 0 to i) x(i, j) = this(i, j)
+        x
+    } // lowerT
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the upper triangular of 'this' matrix (rest are zero).
+     */ 
+    def upperT: RleMatrixR = 
+    {
+        var x = RleMatrixR (new MatrixR (dim1, dim2))
+        for (i <- range1; j <- i until dim2) x(i, j) = this(i, j)
+        x
+    } // upperT
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Use partial pivoting to find a maximal non-zero pivot and return its row
+     *  index, i.e., find the maximum element '(k, i)' below the pivot '(i, i)'.
+     *  @param a  the matrix to perform partial pivoting on
+     *  @param i  the row and column index for the current pivot
+     */
+    private def partialPivoting (a: RleMatrixR, i: Int): Int =
+    {
+        var max  = a.v(i)(i)         // initially set to the pivot
+        var kMax = i                 // initially the pivot row
+
+        for (k <- i + 1 until a.dim1 if ABS (a.v(k)(i)) > max) {
+            max  = ABS (a.v(k)(i))
+            kMax = k
+        } // for
+
+        if (kMax == i) {
+            flaw ("partialPivoting", "unable to find a non-zero pivot for row " + i)
+        } // if
+        kMax
+    } // partialPivoting
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve for 'x' using back substitution in the equation 'u*x = y' where
+     *  'this' matrix ('u') is upper triangular (see 'lud_npp' above).
+     *  @param y  the constant vector
+     */
+    def bsolve (y: VectoR): RleVectorR = 
+    {
+        var x = new RleVectorR (dim2)
+        for (i <- dim1 - 1 to 0 by -1) {
+            var sum = _0
+            for (j <- i + 1 until dim2) sum += this(i, j) * x(j)
+            x(i) = (y(i) - sum) / this(i, i)
+        } // for
+        x
+    } // bsolve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor 'this' matrix into the product of lower and upper triangular
@@ -1222,6 +1221,7 @@ import RleMatrixR._
 
 } // RleMatrixR class
 
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RleMatrixR` companion object provides operations for `RleMatrixR` that don't require
  *  'this' (like static methods in Java).  It provides factory methods for building
@@ -1261,8 +1261,24 @@ object RleMatrixR
      */
     def apply (x: MatrixR): RleMatrixR = 
     {
-        RleMatrixR (for ( j <- 0 until x.dim2) yield RleVectorR (x.col(j)))
+        RleMatrixR (for (j <- 0 until x.dim2) yield RleVectorR (x.col(j)))
     } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an 'm-by-n' identity matrix I (ones on main diagonal, zeros elsewhere).
+     *  If 'n' is <= 0, set it to 'm' for a square identity matrix.
+     *  FIX: store as a diagonal matrix.
+     *  @param m  the row dimension of the matrix
+     *  @param n  the column dimension of the matrix (defaults to 0 => square matrix)
+     */
+    def eye (m: Int, n: Int = 0): RleMatrixR =
+    {
+        val nn = if (n <= 0) m else n             // square matrix, if n <= 0
+        val mn = if (m <= nn) m else nn           // length of main diagonal
+        val c = new RleMatrixR (m, nn)
+        for (i <- 0 until mn) c(i, i) = _1
+        c
+    } // eye
   
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /**

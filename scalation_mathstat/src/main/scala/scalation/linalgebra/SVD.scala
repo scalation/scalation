@@ -82,14 +82,13 @@ class SVD [MatT <: MatriD] (a: MatT)
         {
             for (iter <- 0 until MAX_ITER) {
                 testFSplitting (k, e, q)
-                println("l ="+l)
-                println("test_fconverge ="+test_fconverge)
+                if (DEBUG) println (s"iterate: l = $l \t test_fconverge = $test_fconverge")
 
                 if (! test_fconverge) cancellation (l, k)
 
                 if (testFConvergence (l, k)) {
-                    println (s"for k = $k, converged after ${iter+1} iterations")
-                    if (DEBUG) println (s"e = $e \nq = $q")
+                    println (s"iterate: for k = $k, converged after ${iter+1} iterations")
+                    if (DEBUG) println (s"iterate: e = $e \nq = $q")
                     return
                 } // if
 
@@ -217,8 +216,7 @@ class SVD [MatT <: MatriD] (a: MatT)
             f   = if (f < 0) ((bmx - z) * (bmx + z) + h * (y / (f - g) - h)) / bmx
             else             ((bmx - z) * (bmx + z) + h * (y / (f + g) - h)) / bmx
 
-            println ("f = "+f)
-            println ("g = "+g)
+            if (DEBUG) println (s"shiftFromBottom: f = $f \t g = $g")
         } // shiftFromBottom
 
         // final part for factor method
@@ -239,7 +237,7 @@ class SVD [MatT <: MatriD] (a: MatT)
         for (ll <- k to 0 by -1) {
             l = ll                               // make global index l track loop variable ll
             test_fconverge = false
-            if (abs (e(ll))   <= eps) {  println ("e(ll) = "+e(ll));test_fconverge = true; return }
+            if (abs (e(ll))   <= eps) { println (s"e(ll) = ${e(ll)}"); test_fconverge = true; return }
             if (abs (q(ll-1)) <= eps) return
         } // for
     } // testFSplitting

@@ -39,6 +39,7 @@ class Fac_LQ (aa: MatriD)
         val (qt, lt) = new Fac_QR_H (art).factor12 ()     // change `Fac-QR_H` class as needed
         l = lt.t
         q = qt.t
+        factored = true 
     } // factor
 
     def factors: (MatriD, MatriD) = (l, q)

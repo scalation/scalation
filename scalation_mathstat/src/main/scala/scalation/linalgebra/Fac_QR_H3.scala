@@ -75,7 +75,6 @@ class Fac_QR_H3 (aa: MatrixD, needQ: Boolean = true)
         for (j <- 0 until p; i <- 0 until j) r(i, j) = a(i, j)  // fill in rest of r matrix
         r.clean (TOL)                                           // comment out to avoid cleaning r matrix
 
-
         factored = true
     } // factor
 

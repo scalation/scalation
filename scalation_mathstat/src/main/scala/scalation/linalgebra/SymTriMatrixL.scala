@@ -729,24 +729,30 @@ class SymTriMatrixL (val d1: Int)
     } // mdot
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Multiply 'this' tridiagonal matrix by vector 'u' to produce another matrix
-     *  'a_ij * u_j'.
+    /** Multiply 'this' tridiagonal matrix by vector 'u' to produce another matrix 'a_ij * u_j'.
+     *  E.g., multiply a diagonal matrix represented as a vector by a matrix.
      *  @param u  the vector to multiply by
      */
-    def ** (u: VectoL): SymTriMatrixL = 
-    {
-        throw new UnsupportedOperationException ("matrix * vector -> matrix not implemented")
-    } // **
+    def ** (u: VectoL): MatrixL = this * SymTriMatrixL (u)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' tridiagonal matrix by vector 'u' to produce another
      *  matrix 'a_ij * u_j'.
+     *  E.g., multiply a diagonal matrix represented as a vector by a matrix.
      *  @param u  the vector to multiply by
      */
-    def **= (u: VectoL): SymTriMatrixL =
+    def **= (u: VectoL): MatrixL =
     {
         throw new UnsupportedOperationException ("inplace matrix * vector -> matrix not implemented")
     } // **=
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply vector 'u' by 'this' tridiagonal matrix to produce another matrix 'u_i * a_ij'.
+     *  E.g., multiply a diagonal matrix represented as a vector by a matrix.
+     *  This operator is right associative.
+     *  @param u  the vector to multiply by
+     */
+    def **: (u: VectoL): MatrixL = SymTriMatrixL (u) * this
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide 'this' tridiagonal matrix by scalar 'x'.
@@ -1179,6 +1185,17 @@ object SymTriMatrixL extends Error
         val u_dim = u(0).dim
         val x = new SymTriMatrixL (u_dim)
         for (j <- 0 until u.length) x.setCol (j, u(j))        // assign column vectors
+        x
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a diagonal symtri matrix and assign values from vector 'u'.
+     *  @param u  the vector to assign
+     */ 
+    def apply (u: VectoL): SymTriMatrixL =
+    {   
+        val x = new SymTriMatrixL (u.dim)
+        for (i <- 0 until u.dim) x(i, i) = u(i)
         x
     } // apply
 

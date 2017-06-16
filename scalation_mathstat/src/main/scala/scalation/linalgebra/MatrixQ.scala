@@ -937,6 +937,20 @@ class MatrixQ (d1: Int,
     } // **=
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply vector 'u' by 'this' matrix to produce another matrix 'u_i * a_ij'.
+     *  E.g., multiply a diagonal matrix represented as a vector by a matrix.
+     *  This operator is right associative.
+     *  @param u  the vector to multiply by
+     */
+    def **: (u: VectoQ): MatrixQ =
+    {
+        val dm = math.min (dim2, u.dim)
+        val c  = new MatrixQ (dim1, dm)
+        for (i <- range1; j <- c.range2) c.v(i)(j) = u(i) * v(i)(j)
+        c
+    } // **:
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide 'this' matrix by scalar 'x'.
      *  @param x  the scalar to divide by
      */
