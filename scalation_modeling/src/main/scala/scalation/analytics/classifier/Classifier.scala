@@ -8,10 +8,9 @@
 
 package scalation.analytics.classifier
 
-import java.util.Random
-
 import scalation.linalgebra.{VectoD, VectoI, VectorI}
-import scalation.random.RandomVecI
+import scalation.random.PermutedVecI
+import scalation.random.RNGStream.ranStream
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Classifier` trait provides a common framework for several classifiers.
@@ -29,9 +28,9 @@ trait Classifier
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a set of data vectors and their classifications, build a classifier.
-     *  @param itrain  the indices of the instances considered train data
+     *  @param itest  the indices of the instances considered as testing data
      */
-    def train (itrain: Array [Int]) {}
+    def train (itest: IndexedSeq [Int]) {}
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier, i.e., calculate statistics and create conditional
@@ -80,7 +79,7 @@ trait Classifier
      *  the rest of the data is "training data'.
      *  @param nx  the number of crosses and cross-validations (defaults to 5x).
      */
-    def crossValidate (nx: Int = 5): Double =
+    def crossValidate (nx: Int = 10): Double =
     {
         val testSize = size / nx
         var sum      = 0.0
@@ -88,7 +87,6 @@ trait Classifier
         for (i <- 0 until nx) {
             val testStart = i * testSize
             val testEnd   = testStart + testSize
-            reset ()
             train (testStart, testEnd)
             sum += test (testStart, testEnd)
         } // for
@@ -101,28 +99,23 @@ trait Classifier
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the accuracy of the classified results by cross-validation, returning
-     *  the accuracy.  The "test data" starts at 'testStart' and ends at 'testEnd',
-     *  the rest of the data is "training data'.
-     *  @param nx  the number of crosses and cross-validations (defaults to 5x).
+     *  the accuracy. This version of cross-validation relies on "subtracting"
+     *  frequencies from the previously stored global data to achieve efficiency.
+     *  @param nx  number of crosses and cross-validations (defaults to 10x).
      */
-    def crossValidateRand (nx: Int = 5): Double =
+    def crossValidateRand (nx: Int = 10): Double =
     {
-        val testSize = size / nx
-        var sum      = 0.0
-        val rng = new Random ()
-        val rvg = RandomVecI (testSize, size-1, stream = rng.nextInt (1000) )
-        for (i <- 0 until nx) {
-            val itest = rvg.igen
-            reset ()
-            val itrain = Array.range (0, size) diff itest()
-            train (itrain)
+        var sum         = 0.0
+        val permutedVec = PermutedVecI (VectorI.range(0, size), ranStream)
+        val randOrder   = permutedVec.igen
+        val itestA      = randOrder.split (nx)
+
+        for (itest <- itestA) {
+            train (itest())
             sum += test (itest)
         } // for
 
-        val avg = sum / nx.toDouble
-//      println ("Average accuracy = " + avg)
-//      println ("------------------------------------------------------------")
-        avg
+        sum / nx.toDouble
     } // crossValidateRand
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -38,7 +38,7 @@ object Pathway extends App
     // d[H2]/dt                         = - kf1 [H2] [O] + kb1 [H] [OH] - kf3 [H2] [OH] + kb3 [H2O] [H]
     def dh2_dt (t: Double, c: VectorD)  = -kf._1*c(0)*c(2) + kb._1*c(3)*c(4) - kf._3*c(0)*c(4) + kb._3*c(5)*c(3) 
 
-    // d[O2]/dt                         = - kf2 [H] [O2] + kb2 [O] [OH] (2)
+    // d[O2]/dt                         = - kf2 [H] [O2] + kb2 [O] [OH]
     def do2_dt (t: Double, c: VectorD)  = -kf._2*c(3)*c(1) + kb._2*c(2)*c(4)
 
     // d[O]/dt                          = - kf1 [H2] [O] + kb1 [H] [OH] + kf2 [H] [O2] - kb2 [O] [OH]

@@ -14,14 +14,16 @@ import scala.math.abs
 import scalation.linalgebra.VectorD
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Poly` class provides simple operations on polynomials.
+/** The `Poly` class provides operations on univariate polynomials.
  *  <p>
  *      Poly (2, 3) => 3 x + 2
  *  <p>
  *  Note, reverse order of coefficients, i.e., coefficients for smallest terms first.
+ *  @see `MPoly' for multivariate polynomials.
  *  @param c  the coefficients of the polynomial
+ *  @param x  the variable/indeterminate of the polynomial
  */
-case class Poly (c: VectorD)
+case class Poly (c: VectorD, x: String = "x")
 {
     private val DEBUG = true                         // debug flag
     val deg           = c.size - 1                   // degree of the polynomial
@@ -113,16 +115,50 @@ case class Poly (c: VectorD)
     } // trim
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert the polynomial to a string.
+    /** Parse a readable/LaTeX-compatible string to create a polynomial, using
+     *  a PEG parser.
+     *  @see https://github.com/sirthias/parboiled2
+     *  @param str  the string to parse, e.g., "2.0 x^3 + 3.0 x^2 + 4.0 x + 5.0"
+     */
+    def parse (str: String): Poly =
+    {
+        null
+    } // parse
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Parse a compilable Scala expression string to create a polynomial, using
+     *  a PEG parser.
+     *  @see https://github.com/sirthias/parboiled2
+     *  @param str  the string to parse, e.g., "2.0*x~^3 + 3.0*x~^2 + 4.0*x + 5.0"
+     */
+    def parse2 (str: String): Poly =
+    {
+        null
+    } // parse2
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert the polynomial to a readable/LaTeX-compatible string.
      */
     override def toString: String =
     {
         val sb = new StringBuilder ()
-        for (i <- deg to 0 by -1) sb.append (if (i >= 2)      s"${c(i)} x^$i + "
-                                             else if (i == 1) s"${c(i)} x + "
+        for (i <- deg to 0 by -1) sb.append (if (i >= 2)      s"${c(i)} $x^$i + "
+                                             else if (i == 1) s"${c(i)} $x + "
                                              else             s"${c(i)}")
         sb.toString
     } // toString
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert the polynomial to an compilable Scala expression string.
+     */
+    def toString2: String =
+    {
+        val sb = new StringBuilder ()
+        for (i <- deg to 0 by -1) sb.append (if (i >= 2)      s"${c(i)}*$x~^$i + "
+                                             else if (i == 1) s"${c(i)}*$x + "
+                                             else             s"${c(i)}")
+        sb.toString
+    } // toString2
 
 } // Poly class
 
@@ -138,6 +174,13 @@ object Poly
      */
     def apply (c: Double*): Poly = Poly (VectorD (c))
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a polynomial from repeated doubles.
+     *  @param x  the variable/indeterminate of the polynomial
+     *  @param c  the coefficients as a repeated double
+     */
+    def apply (x: String, c: Double*): Poly = Poly (VectorD (c), x)
+
 } // Poly object
 
 
@@ -149,7 +192,7 @@ object PolyTest extends App
 {
     import scalation.plot.Plot
 
-    val pl  = Poly (4.0, 3.0, 2.0)                  // example polynomial: 2 x^2 + 3 x + 4
+    val pl  = Poly (5.0, 4.0, 3.0, 2.0)             // example polynomial: 2 x^3 + 3 x^2 + 4 x + 5
     val dpl = pl.derivative                         // its derivative
     val ipl = pl.integrate                          // one of its indefinite integrals
     val jpl = pl.integrate ((0.0, 2.0))             // one of its definite integrals
@@ -159,6 +202,7 @@ object PolyTest extends App
     val zpl = Poly (4.0, 0.0, 3.0, 0.0, 0.0)        // polynomial with trailing zero (e.g., 0 x^2)
 
     println (s"pl      = $pl")
+    println (s"pl.2    = ${pl.toString2}")
     println (s"dpl     = $dpl")
     println (s"ipl     = $ipl")
     println (s"spl     = $spl")

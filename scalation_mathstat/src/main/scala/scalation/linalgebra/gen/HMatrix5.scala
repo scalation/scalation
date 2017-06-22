@@ -10,7 +10,7 @@ package scalation.linalgebra.gen
 
 import scala.reflect.ClassTag
 
-import scalation.linalgebra.{VectoI, VectorI}
+import scalation.linalgebra.VectoI
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -51,6 +51,21 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
      */
     val nu = implicitly [Numeric [T]]
     import nu._
+
+    /** Stores the 3rd - 5th dimensions of this HMatrix5. In this case, the 3rd
+     *  dimension is fixed while the 4th and 5th dimensions vary with the 2nd
+     *  and 3rd dimensions, respectively.
+     */
+    private var dim3 = 0
+    private var dims4: Array[Int] = null
+    private var dims5: Array[Int] = null
+
+    /** Stores the 3rd - 5th dimensions of this HMatrix5. In this case, they all
+     *  vary with the 2nd dimension.
+     */
+    private var vc3: VectoI = null
+    private var vc4: VectoI = null
+    private var vc5: VectoI = null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the format to the 'newFormat'.
@@ -121,16 +136,19 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
      *  well, and the 4th varies with 2nd and 5th dimensions varies the 3rd dimension.
      *  @param dim1   size of the 1st dimension of the hypermatrix
      *  @param dim2   size of the 2nd dimension of the hypermatrix
-     *  @param dim3   size of the 3rd dimension of the hypermatrix
-     *  @param dims4  array of sizes of the 4th dimension of the hypermatrix
-     *  @param dims5  array of sizes of the 5th dimension of the hypermatrix
+     *  @param dim3_  size of the 3rd dimension of the hypermatrix
+     *  @param dims4_ array of sizes of the 4th dimension of the hypermatrix
+     *  @param dims5_ array of sizes of the 5th dimension of the hypermatrix
      */
-    def this (dim1: Int, dim2: Int, dim3: Int, dims4: Array [Int], dims5: Array [Int]) =
+    def this (dim1: Int, dim2: Int, dim3_ : Int, dims4_ : Array [Int], dims5_ : Array [Int]) =
     {
-        this (dim1, dim2, dim3)
-        if (dims4.length != dim2) flaw ("constructor", "wrong number of elements for 4th dimension")
-        if (dims5.length != dim3) flaw ("constructor", "wrong number of elements for 5th dimension")
-        for (i <- range1; j <- range2; k <- 0 until dim3) hmat(i)(j)(k) = Array.ofDim [T] (dims4(j), dims5(k))
+        this (dim1, dim2, dim3_)
+        if (dims4_.length != dim2) flaw ("constructor", "wrong number of elements for 4th dimension")
+        if (dims5_.length != dim3_) flaw ("constructor", "wrong number of elements for 5th dimension")
+        for (i <- range1; j <- range2; k <- 0 until dim3_) hmat(i)(j)(k) = Array.ofDim [T] (dims4_(j), dims5_(k))
+        dim3 = dim3_
+        dims4 = dims4_
+        dims5 = dims5_
     } // aux constructor
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -156,7 +174,7 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
      *  @param i  1st dimension index of the hypermatrix
      *  @param j  2nd dimension index of the hypermatrix
      */
-    def dim_3 (i: Int, j: Int): Int = hmat(i)(j).length
+    def dim_3 (i: Int = 0, j: Int = 0): Int = hmat(i)(j).length
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the size of the 4th dimension for the given 'i', 'j', and 'k'.
@@ -164,7 +182,7 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
      *  @param j  2nd dimension index of the hypermatrix
      *  @param k  3rd dimension index of the hypermatrix
      */
-    def dim_4 (i: Int, j: Int, k: Int): Int = hmat(i)(j)(k).length
+    def dim_4 (i: Int, j: Int, k: Int = 0): Int = hmat(i)(j)(k).length
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the size of the 5th dimension for the given 'i', 'j', 'k', and 'l'.
@@ -173,7 +191,7 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
      *  @param k  3rd dimension index of the hypermatrix
      *  @param l  4rd dimension index of the hypermatrix
      */
-    def dim_5 (i: Int, j: Int, k: Int, l: Int): Int = hmat(i)(j)(k)(l).length
+    def dim_5 (i: Int, j: Int, k: Int = 0, l: Int = 0): Int = hmat(i)(j)(k)(l).length
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Allocate a 3D array for the 3rd, 4th and 5th dimensions of the hypermatrix
@@ -190,43 +208,36 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     } // alloc
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Allocate all elements of the 3rd and 4th dimensions of the hypermatrix,
-     *  where the 3rd and 4th dimensions only vary with the 2nd dimension.
+    /** Allocate all elements of the 3rd, 4th and 5th dimensions of the hypermatrix,
+     *  where the 3rd and 4th dimensions vary with the 2nd dimension.
      *  @param dims3  array of sizes of the 3rd dimension of the hypermatrix
-     *  @param dims4  array of sizes of the 4th dimension of the hypermatrix
-     */
-    def alloc (dims3: Array [Int], dims4: Array [Int])
-    {
-        if (dims3.length != dim2) flaw ("alloc", "wrong number of elements for 3rd dimension")
-        if (dims4.length != dim2) flaw ("alloc", "wrong number of elements for 4th dimension")
-        for (i <- range1; j <- range2) hmat(i)(j) = Array.ofDim [Array[T]] (dims3(j), dims4(j))
-    } // alloc
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Allocate all elements of the 4th and 5th dimensions of the hypermatrix,
-     *  where the 4th and 5th(?) dimensions only vary with the 2nd dimension.
-     *  FIX:  clean up and regualrize all the 'alloc' methods.
      *  @param dims4  array of sizes of the 4th dimension of the hypermatrix
      *  @param dims5  array of sizes of the 5th dimension of the hypermatrix
      */
-    def alloc2 (dims4: Array [Int], dims5: Array [Int])
+    def alloc (dims3: Array [Int], dims4: Array [Int], dims5: Array [Int])
     {
+        if (dims3.length != dim2) flaw ("alloc", "wrong number of elements for 3rd dimension")
         if (dims4.length != dim2) flaw ("alloc", "wrong number of elements for 4th dimension")
-//      if (dims5.length != dim2) flaw ("alloc", "wrong number of elements for 5th dimension")
-        for (i <- range1; j <- range2; k <- 0 until hmat(i)(j).length) hmat(i)(j)(k) = Array.ofDim [T] (dims4(j), dims5(j))
-    } // alloc2
+        if (dims5.length != dim2) flaw ("alloc", "wrong number of elements for 5th dimension")
+        for (i <- range1; j <- range2) hmat(i)(j) = Array.ofDim [T] (dims3(j), dims4(j), dims5(j))
+    } // alloc
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Allocate the 3rd to 5th dimensions of the hypermatrix based on the given
      *  value counts for the dimensions.
-     *  @param vc3   value count array giving sizes for 3rd dimension based on j
-     *  @param vc4   value count array giving sizes for 4th dimension based on j
-     *  @param vc5   value count array giving sizes for 5th dimension based on j
+     *  @param vc3_   value count giving sizes for 3rd dimension based on j
+     *  @param vc4_   value count giving sizes for 4th dimension based on j
+     *  @param vc5_   value count giving sizes for 5th dimension based on j
      */
-    def alloc (vc3: VectoI, vc4: VectoI, vc5: VectoI)
+    def alloc (vc3_ : VectoI, vc4_ : VectoI, vc5_ : VectoI)
     {
-        if (vc3.size != dim2) flaw ("alloc", "Dimensions mismatch")
-        for (i <- range1; j <- range2) hmat(i)(j) = Array.ofDim [T] (vc3(j), vc4(j), vc5(j))
+        if (vc3_.size != dim2) flaw ("alloc", "wrong number of elements for 3rd dimension")
+        if (vc4_.size != dim2) flaw ("alloc", "wrong number of elements for 4th dimension")
+        if (vc5_.size != dim2) flaw ("alloc", "wrong number of elements for 5th dimension")
+        for (i <- range1; j <- range2) hmat(i)(j) = Array.ofDim [T] (vc3_(j), vc4_(j), vc5_(j))
+        vc3 = vc3_
+        vc4 = vc4_
+        vc5 = vc5_
     } // alloc
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -251,26 +262,34 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     def update (i: Int, j: Int, k: Int, l: Int, m: Int, v: T) = hmat(i)(j)(k)(l)(m) = v
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add 'this' hypermatrix and hypermatrix 'b'.
+    /** Add 'this' hypermatrix and hypermatrix 'b'. Only supports addition in
+     *  two cases: 1) 3rd dimension fixed, 4th and 5th dimensions vary with 2nd
+     *  and 3rd dimensions, respectively; 2)3rd, 4th and 5th dimensions all vary
+     *  with the 2nd dimension.
      *  @param b  the hypermatrix to add (requires 'leDimensions')
      */
     def + (b: HMatrix5 [T]): HMatrix5 [T] =
     {
-        val c = new HMatrix5 [T] (dim1, dim2)
-        for (i <- range1; j <- range2) {
-            val kk = dim_3(i, j)
-            val ll = dim_4(i, j, kk)
-            val mm = dim_5(i, j, kk, ll)
-            c.alloc (i, j, kk, ll, mm)
-            for (k <- 0 until kk; l <- 0 until ll; m <- 0 until mm) {
+        var c: HMatrix5[T] = null
+        if (dims4 != null ) {
+            c = new HMatrix5 [T] (dim1, dim2, dim3, dims4, dims5)
+            for (i <- range1; j <- range2; k <- 0 until dim3; l <- 0 until dims4(j); m <- 0 until dims5(k)) {
                 c.hmat(i)(j)(k)(l)(m) = hmat(i)(j)(k)(l)(m) + b.hmat(i)(j)(k)(l)(m)
             } // for
-        } // for
+        } else {
+            c = new HMatrix5 [T] (dim1, dim2)
+            c.alloc(vc3, vc4, vc5)
+            for (i <- range1; j <- range2; k <- 0 until vc3(j); l <- 0 until vc4(j); m <- 0 until vc5(j)) {
+                c.hmat(i)(j)(k)(l)(m) = hmat(i)(j)(k)(l)(m) + b.hmat(i)(j)(k)(l)(m)
+            } // for
+        } // if
         c
     } // +
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' hypermatrix subtract hypermatrix 'b'.
+    /** From 'this' hypermatrix subtract hypermatrix 'b'. Only supports
+     *  subtraction if each successive dimension varies with all of the previous
+     *  dimensions.
      *  @param b  the hypermatrix to add (requires 'leDimensions')
      */
     def - (b: HMatrix5 [T]): HMatrix5 [T] =
@@ -305,12 +324,14 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
     } // leDimensions
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set all the hypermatrix element values to 'x'.
+    /** Set all the hypermatrix element values to 'x'. This operation assumes
+     *  that the 4th and 5th dimensions vary with the 2nd and 3rd dimensions,
+     *  respectively.
      *  @param x  the value to set all elements to
      */
     def set (x: T) = { for (i <- range1; j <- range2; k <- 0 until dim_3 (i, j);
-                            l <-0 until dim_4(i, j, dim_3(i, j));
-                            m <-0 until dim_5 (i, j, dim_3(i, j),dim_4 (i, j, dim_3(i, j)) )) hmat(i)(j)(k)(l)(m) = x }
+                            l <-0 until dim_4 (i, j);
+                            m <-0 until dim_5 (i, j, k)) hmat(i)(j)(k)(l)(m) = x }
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Clear (make null) all contents in the 3rd, 4th and 5th dimensions of the hypermatrix.

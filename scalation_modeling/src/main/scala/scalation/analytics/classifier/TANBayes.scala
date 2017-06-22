@@ -8,23 +8,18 @@
 
 package scalation.analytics.classifier
 
-import java.util.Random
-
 import scala.collection.mutable.{Set => SET, Map}
 
 import scalation.graphalytics.Pair
 import scalation.graphalytics.mutable.{MinSpanningTree, MGraph}
-
-import scalation.linalgebra.{MatrixD, MatriI, MatrixI, VectorD, VectoI, VectorI}
+import scalation.linalgebra.{MatriI, MatrixI, VectorD, VectoI, VectorI}
 import scalation.linalgebra.gen.{HMatrix2, HMatrix3, HMatrix4, HMatrix5}
-import scalation.random.PermutedVecI
-import scalation.random.RNGStream._
 import scalation.relalgebra.Relation
 
 import BayesClassifier.me_default
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `TANBayes` class implements an Integer-Based Tree Augmented Naive Bayes
+/** The `TANBayes0` class implements an Integer-Based Tree Augmented Naive Bayes
  *  Classifier,  which is a commonly used such classifier for discrete input data.
  *  The classifier is trained using a data matrix 'x' and a classification vector 'y'.
  *  Each data vector in the matrix is classified into one of 'k' classes numbered
@@ -32,45 +27,39 @@ import BayesClassifier.me_default
  *  each class in the training-set.  Relative posterior probabilities are computed
  *  by multiplying these by values computed using conditional probabilities.  The
  *  classifier supports limited dependency between features/variables.
+ *
+ *  This classifier uses the standard cross-validation technique.
  *  -----------------------------------------------------------------------------
- *  @param x    the integer-valued data vectors stored as rows of a matrix
- *  @param y   the class vector, where y(l) = class for row l of the matrix, x(l)
- *  @param fn  the names for all features/variables
- *  @param k   the number of classes
- *  @param cn  the names for all classes
- *  @param me  use m-estimates (me == 0 => regular MLE estimates)
- *  @param vc  the value count (number of distinct values) for each feature
+ *
+ *  @param x      the integer-valued data vectors stored as rows of a matrix
+ *  @param y      the class vector, where y(l) = class for row l of the matrix, x(l)
+ *  @param fn     the names for all features/variables
+ *  @param k      the number of classes
+ *  @param cn     the names for all classes
+ *  @param vc     the value count (number of distinct values) for each feature
+ *  @param me     use m-estimates (me == 0 => regular MLE estimates)
  */
-class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
+class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
                 me: Double = me_default, private var vc: VectoI = null)
       extends BayesClassifier (x, y, fn, k, cn)
 {
-    private val DEBUG  = false // debug flag
+    private val DEBUG  = false                            // debug flag
 
-    private var parent = new VectorI (n)                 // vector holding the parent for each feature/variable
-    private val vcp    = new VectorI (n)                 // value count for the parent
+    protected var parent = new VectorI (n)                // vector holding the parent for each feature/variable
+    protected val vcp    = new VectorI (n)                // value count for the parent
 
-    private val f_C  = new VectorI (k)                   // frequency counts for classes 0, ..., k-1
-    private var p_C  = new VectorD (k)                   // probabilities for classes 0, ..., k-1
-    private val f_CXP  = new HMatrix4 [Int] (k, n)       // conditional frequency counts for variable/feature j: xj
-    private val p_X_CP = new HMatrix4 [Double] (k, n)    // conditional probabilities for variable/feature j: xj
-
-    private val N0 = 5.0                                 // parameter needed for smoothing
-    val tiny = 1E-9
+    protected val f_CXP  = new HMatrix4 [Int] (k, n)      // conditional frequency counts for variable/feature j: xj
+    protected val p_X_CP = new HMatrix4 [Double] (k, n)   // conditional probabilities for variable/feature j: xj
 
     if (vc == null) {
-        shiftToZero; vc = vc_fromData                    // set to default for binary data (2)
+        shiftToZero; vc = vc_fromData                     // set value counts from data
     } // if
 
-    private val vca = vc.toArray
+    protected val vca = vc.toArray
 
-    private val g_f_CXZ = new HMatrix5 [Int] (k, n, n, vca, vca)   // joint frequency of C, X, and Z, where X, Z are features/columns
-    private val f_CXZ   = new HMatrix5 [Int] (k, n, n, vca, vca)
-    private val g_f_CX  = new HMatrix3 [Int] (k, n, vca)           // joint frequency of C and X
-    private val f_CX    = new HMatrix3 [Int] (k, n, vca)
-    private val g_f_C   = new VectorI (k)
-    private val g_f_X   = new HMatrix2[Int] (n, vca)
-    private val f_X     = new HMatrix2[Int] (n, vca)
+    f_CXZ = new HMatrix5 [Int] (k, n, n, vca, vca)      // local joint frequency (using partial dataset, i.e. when using cross validation) of C, X, and Z, where X, Z are features/columns
+    f_CX  = new HMatrix3 [Int] (k, n, vca)              // local joint frequency of C and X
+    f_X   = new HMatrix2 [Int] (n, vca)                 // local frequency of X
 
     if (DEBUG) {
         println ("value count vc      = " + vc)
@@ -79,53 +68,30 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
     } // if
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build the model by computing global frequencies.
-     *  @param testStart  beginning of test region (inclusive)
-     *  @param testEnd    end of test region (exclusive)
-     */
-    def buildModel (testStart: Int = 0, testEnd: Int = 0): (Array [Boolean], DAG) =
-    {
-        // compute frequency values based on the entire dataset
-        frequenciesAll ()
-
-        val pp: Traversable [Array [Int]] = for (p <- parent) yield Array (p)
-        (Array.fill(n)(true), new DAG (pp.toArray))
-    } // buildModel
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier by computing the probabilities for C, and the
      *  conditional probabilities for X_j.
      *  @param testStart  starting index of test region (inclusive) used in cross-validation.
      *  @param testEnd    ending index of test region. (exclusive) used in cross-validation.
      */
-    def train (testStart: Int = 0, testEnd: Int = 0)
-    {
-        computeParentQ ((testStart until testEnd).toArray)
-        computeVcp ()
-        f_CXP.alloc (vc, vcp)
-        p_X_CP.alloc (vc, vcp)
-        copyFreqCXP()
-        train2()
-        if (smooth) smoothParam(testEnd - testStart)
-    } // train
+    def train (testStart: Int, testEnd: Int) = train (testStart until testEnd)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier by computing the probabilities for C, and the
-     *  conditional probabilities for X_j. This is the quick version that uses
-     *  the "subtraction" method to achieve efficiency.
-     *  @param itest  indices of the instances considered testing data
+     *  conditional probabilities for X_j.
+     *  @param itest  indices of the instances considered as testing data
      */
-    def trainQ (itest: Array [Int])
+    override def train (itest: IndexedSeq [Int])
     {
-        computeParentQ (itest)                             // frequency computations are also done here
-        computeVcp()
+        val idx = if (additive) 0 until m diff itest
+                  else          itest
+        computeParent (idx)                             // frequency computations are also done here
+        computeVcp ()
         f_CXP.alloc (vc, vcp)
         p_X_CP.alloc (vc, vcp)
-        // only the joint frequencies of Class, X-feature, and its Parent needs to be copied, other frequencies were done in computeParentQ
         copyFreqCXP ()
         train2 ()
         if (smooth) smoothParam (itest.size)
-    } // trainQ
+    } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier by computing the probabilities for C, and the
@@ -134,7 +100,7 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
     private def train2 ()
     {
         p_C = f_C.toDouble / md                               // prior probability for class yi
-        for (i <- 0 until k; j <- 0 until n) {                // for each class yi & feature xj
+        for (i <- 0 until k; j <- 0 until n if fset(j)) {                // for each class yi & feature xj
             val me_vc = me / vc(j).toDouble
             for (xj <- 0 until vc(j); xp <- 0 until vcp(j)) {
                 val d = if (parent(j) > -1) f_CX(i, parent(j), xp)
@@ -146,127 +112,60 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
 
         if (DEBUG) {
             println ("p_C = " + p_C)                 // P(C = i)
-            println ("p_X_CP = " + p_X_CP)                 // P(X_j = x | C = i)
+            println ("p_X_CP = " + p_X_CP)           // P(X_j = x | C = i)
         } // if
     } // train2
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute frequency counts using the entire data matrix
-     */
-    def frequenciesAll ()
-    {
-        for (i <- 0 until m) {
-            val yi = y(i)
-            g_f_C(yi) += 1
-            for (j <- 0 until n) {
-                g_f_X(j, x(i, j)) += 1
-                g_f_CX(yi, j, x(i, j)) += 1
-                for (j2 <- j+1 until n) g_f_CXZ(yi, j, j2, x(i, j), x(i, j2)) += 1
-            } // for
-        } // for
-
-        for (c <- 0 until k; j <- 0 until n; j2 <- j+1 until n; xj <- 0 until vc(j); xj2 <- 0 until vc(j2)) {
-            g_f_CXZ(c, j2, j, xj2, xj) = g_f_CXZ(c, j, j2, xj, xj2)
-        } // for
-    } // frequenciesAll
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform smoothing operations on the learned parameters by using Dirichlet priors
-     *  to compute the posterior probabilities of the parameters given the training dataset.
-     *  @see citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.178.8884&rep=rep1&type=pdf
-     *  @param testSize  size of the test size
-     */
-    private def smoothParam (testSize: Int = 0)
-    {
-        for (i <- 0 until k) {
-            p_C(i) *= m / (m + N0)
-            p_C(i) += N0 * k / (m + N0)
-            for (j <- 0 until n) {
-                val pj = parent(j)
-                for (xj <- 0 until vc(j); xp <- 0 until vcp(j)) {
-
-                    val f_px = if (pj > -1) f_CX(i, pj, xp) else f_C(i)
-
-                    // NOTE: two alternative priors, may work better for some datasets
-//                  val theta0 = f_CXP(i, j, xj, xp) / (md - testSize)
-//                  val theta0 = f_CX(i, j, xj) / (md - testSize)
-                    val theta0 = f_X(j, xj) / (md - testSize)
-
-                    p_X_CP(i, j, xj, xp) *= (f_px / (f_px + N0))
-                    p_X_CP(i, j, xj, xp) += (N0 / (f_px + N0) * theta0)
-                } // for
-            } // for
-        } // for
-    } // smoothParam
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Clone/copy the values used in CMI calculations (most of them can also be
-     *  used in the training process) from global freq variables
-     *  (based on the entire dataset) into local ones (based on portions of the
-     *  dataset).
-     */
-    private def copyFreqCMI ()
-    {
-        for (i <- 0 until k) {
-            f_C(i) = g_f_C(i)
-            for (j <- x.range2; xj <- 0 until vc(j)) {
-                if (i == 0) f_X(j, xj) = g_f_X(j, xj)
-                f_CX(i, j, xj) = g_f_CX(i, j, xj)
-                for (j2 <- j+1 until n; xj2 <- 0 until vc(j2)) {
-                    f_CXZ(i, j, j2, xj, xj2) = g_f_CXZ(i, j, j2, xj, xj2)
-                    f_CXZ(i, j2, j, xj2, xj) = f_CXZ(i, j, j2, xj, xj2)
-                } // for
-            } // for
-        } // for
-    } // copyFreq
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Clone/copy the values from global freq variables into local ones.
-     */
-    private def copyFreqCXP ()
-    {
-        for (i <- 0 until k; j <- x.range2; xj <- 0 until vc(j); xp <- 0 until vcp(j)) {
-            f_CXP(i, j, xj, xp) = if (parent(j) > -1) f_CXZ(i, j, parent(j), xj, xp)
-                                  else                f_CX(i, j, xj)
-        } // for
-    } // copyFreq
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Decrement frequency counters used in CMI calculations based on the 'i'th
-     *  row of the data matrix.
-     *  @param i  the index for current data row
-     */
-    private def decrementCMI (i: Int)
-    {
-        val yi   = y(i)                                       // get the class for ith row
-        f_C(yi) -= 1                                          // decrement frequency for class yi
-        for (j <- x.range2) {
-            f_X(j, x(i, j)) -= 1
-            f_CX (yi, j, x(i, j)) -= 1
-            for (j2 <- j+1 until n) {
-                f_CXZ (yi, j, j2, x(i, j), x(i, j2)) -= 1
-                f_CXZ (yi, j2, j, x(i, j2), x(i, j)) -= 1
-            } // for
-        } // for
-    } // decrementCMI
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the parent of each feature based on the correlation matrix.
-     *  Feature x_i is only a possible candidate for parent of feature x_j if i < j.
+     *  Feature x_i is only a possible candidate for parent of feature x_j if
+     *  i < j
+     *  @param idx   indicies of either training or testing region
      */
-    def computeParentQ (itest: Array [Int])
+    def computeParent (idx: IndexedSeq [Int])
     {
-        val cmiMx = calcCMIQ (itest)
-        for (j1 <- 0 until n; j2 <- 0 until j1) cmiMx(j1, j2) = cmiMx(j2, j1)
+        val cmiMx = calcCMI (idx, vca)
+        for (j1 <- 0 until n if fset(j1); j2 <- 0 until j1 if fset(j2)) cmiMx(j1, j2) = cmiMx(j2, j1)
 
-        val ch       = Array.ofDim[SET[Int]] (n)
+        val ch       = Array.fill [SET[Int]] (n)(SET())
         val elabel   = Map [Pair, Double] ()
 
-        for (i <- 0 until n) ch(i) = SET((i + 1 until n): _*)
-        for (i <- 0 until n; j <- i + 1 until n) elabel += new Pair(i, j) -> cmiMx(i, j)
+        for (i <- 0 until n if fset(i); j <- i + 1 until n if fset(j)) { ch(i) += j; elabel += new Pair(i, j) -> cmiMx(i, j) }
 
         parent = VectorI (maxSpanningTree (ch, elabel).makeITree ())
     } // computeParent
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Clone/copy the values from global freq variables into local ones.
+     *  Only the joint frequencies of Class, X-feature, and its Parent needs
+     *  to be copied for parameter learning purposes.
+     */
+    private def copyFreqCXP ()
+    {
+        for (i <- 0 until k; j <- x.range2 if fset(j); xj <- 0 until vc(j); xp <- 0 until vcp(j)) {
+            f_CXP(i, j, xj, xp) = if (parent(j) > -1) f_CXZ(i, j, parent(j), xj, xp)
+                                  else                f_CX(i, j, xj)
+        } // for
+    } // copyFreqCXP
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Increment frequency counters used in CMI calculations based on the 'i'th
+     *  row of the data matrix.
+     *  @param i  the index for current data row
+     */
+    protected override def updateFreq (i: Int)
+    {
+        val yi   = y(i)                                       // get the class for ith row
+        f_C(yi) += 1                                          // decrement frequency for class yi
+        for (j <- x.range2 if fset(j)) {
+            f_X(j, x(i, j)) += 1
+            f_CX (yi, j, x(i, j)) += 1
+            for (j2 <- j+1 until n if fset(j2)) {
+                f_CXZ (yi, j, j2, x(i, j), x(i, j2)) += 1
+                f_CXZ (yi, j2, j, x(i, j2), x(i, j)) += 1
+            } // for
+        } // for
+    } // updateFreq
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create MaxSpanningTree from conditional mutual information
@@ -282,45 +181,38 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
      */
     def computeVcp ()
     {
-        vcp.set(1)                              // set default value count to 1
-        for (j <- 0 until n if (parent(j) > -1)) vcp(j) = vc(parent(j))
+        vcp.set (1)                              // set default value count to 1
+        for (j <- 0 until n if (fset(j) && parent(j) > -1)) vcp(j) = vc(parent(j))
     } // computeVcp
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the conditional mutual information matrix
+    /** Perform smoothing operations on the learned parameters by using Dirichlet priors
+     *  to compute the posterior probabilities of the parameters given the training dataset.
+     *  @see citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.178.8884&rep=rep1&type=pdf
+     *  @param testSize  size of the test size
      */
-    def calcCMIQ (itest: Array [Int]): MatrixD =
+    private def smoothParam (testSize: Int = 0)
     {
-        val p_CXZ = new HMatrix5 [Double] (k, n, n, vca, vca)    // joint probability of C, X, and Z, where X, Z are features/columns
-        val p_CX  = new HMatrix3 [Double] (k, n, vca)            // joint probability of C and X
-        var p_C: VectorD = null
+        for (i <- 0 until k) {
+            p_C(i) *= m / (m + N0)
+            p_C(i) += N0 * k / (m + N0)
+            for (j <- 0 until n if fset(j)) {
+                val pj = parent(j)
+                for (xj <- 0 until vc(j); xp <- 0 until vcp(j)) {
 
-        copyFreqCMI ()
-        for (i <- itest) decrementCMI(i)
+                    val f_px = if (pj > -1) f_CX(i, pj, xp) else f_C(i)
 
-        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Compute marginal and joint probabilities
-         */
-        def probabilities ()
-        {
-            for (j <- 0 until n) {
-                for (xj <- 0 until vc(j)) {
-                    //p_X(j, xj) = (f_X(j, xj)) / md
-                    for (c <- 0 until k) {
-                        p_CX(c, j, xj) = (f_CX(c, j, xj) + tiny) / md
-                        for (j2 <- j + 1 until n; xj2 <- 0 until vc(j2)) {
-                            p_CXZ(c, j, j2, xj, xj2) = (f_CXZ(c, j, j2, xj, xj2) + tiny) / md
-                        } // for
-                    } // for
+                    //NOTE: two alternative priors, may work better for some datasets
+                    //val theta0 = f_CXP(i, j, xj, xp) / (md - testSize)
+//                    val theta0 = f_CX(i, j, xj) / (md - testSize)
+                    val theta0 = f_X(j, xj) / (md - testSize)
+
+                    p_X_CP(i, j, xj, xp) *= (f_px / (f_px + N0))
+                    p_X_CP(i, j, xj, xp) += (N0 / (f_px + N0) * theta0)
                 } // for
             } // for
-        } // probabilities
-
-        p_C = f_C.toDouble / m
-        probabilities ()
-
-        cmiJoint (p_C, p_CX, p_CXZ)
-    } // calcCMIQ
+        } // for
+    } // smoothParam
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'z', classify it returning the class number
@@ -331,9 +223,9 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
     def classify (z: VectoI): (Int, String, Double) =
     {
         val prob = new VectorD (p_C)
-        for (i <- 0 until k; j <- 0 until n) {
-                prob(i) *=  (if (parent(j) > -1) p_X_CP(i, j, z(j), z(parent(j)))   // P(X_j = z_j | C = i), parent
-                             else                p_X_CP(i, j, z(j), 0))             // P(X_j = z_j | C = i), no parent (other than the class)
+        for (i <- 0 until k; j <- 0 until n if fset(j)) {
+                prob(i) *=  (if (parent(j) > -1) p_X_CP(i, j, z(j), z(parent(j)))    // P(X_j = z_j | C = i), parent
+                             else                p_X_CP(i, j, z(j), 0))              // P(X_j = z_j | C = i), no parent (other than the class)
         } // for
         if (DEBUG) println ("prob = " + prob)
         val best = prob.argmax ()             // class with the highest relative posterior probability
@@ -341,7 +233,7 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
     } // classify
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Reset or re-initialize the frequency tables and the probability tables.
+    /** Reset or re-initialize the frequency tables.
      */
     def reset ()
     {
@@ -356,30 +248,123 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
      */
     override def getParent: VectorI = parent
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Test the accuracy of the classified results by cross-validation, returning
-     *  the accuracy. This version of cross-validation relies on "subtracting"
-     *  frequencies from the previously stored global data to achieve efficiency.
-     *  @param nx  number of crosses and cross-validations (defaults to 10x).
-     */
-    override def crossValidateRand (nx: Int = 10): Double =
-    {
-        //println("Calling efficient CV")
-        val testSize = size / nx
-        var sum      = 0.0
-        val rng = new Random ()
-        val permutedVec = PermutedVecI (VectorI.range(0, size), ranStream)
-        val randOrder = permutedVec.igen
-        val itestA = randOrder.split(nx)
+} // TANBayes0 class
 
-        for (itest <- itestA) {
-            reset ()
-            trainQ (itest ().array)
-            sum += test (itest)
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `TANBayes0` object is the companion object for the `TANBayes0` class.
+ */
+object TANBayes0
+{
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a `TANBayes0` object, passing 'x' and 'y' together in one matrix.
+     *
+     *  @param xy     the data vectors along with their classifications stored as rows of a matrix
+     *  @param fn     the names of the features
+     *  @param k      the number of classes
+     *  @param vc     the value count (number of distinct values) for each feature
+     *  @param me     use m-estimates (me == 0 => regular MLE estimates)
+     */
+    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
+               me: Double = me_default, vc: VectoI = null, smooth: Boolean = true) =
+    {
+        new TANBayes0 (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn,
+                      me, vc)
+    } // apply
+
+} // TANBayes0 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The same classifier but uses an optimized cross-validation technique.
+ *  -----------------------------------------------------------------------------
+ *  @param x   the integer-valued data vectors stored as rows of a matrix
+ *  @param y   the class vector, where y(l) = class for row l of the matrix, x(l)
+ *  @param fn  the names for all features/variables
+ *  @param k   the number of classes
+ *  @param cn  the names for all classes
+ *  @param me  use m-estimates (me == 0 => regular MLE estimates)
+ *  @param vc  the value count (number of distinct values) for each feature
+ */
+class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
+                me: Double = me_default, private var vc: VectoI = null)
+        extends TANBayes0 (x, y, fn, k, cn, me, vc)
+{
+    private val DEBUG  = false                                     // debug flag
+
+    if (vc == null) vc = new VectorI (vca.length, vca)
+
+    private val g_f_CXZ = new HMatrix5 [Int] (k, n, n, vca, vca)   // global joint frequency (using entire dataset) of C, X, and Z, where X, Z are features/columns
+    private val g_f_CX  = new HMatrix3 [Int] (k, n, vca)           // global joint frequency of C and X
+    private val g_f_C   = new VectorI (k)                          // global frequency of C
+    private val g_f_X   = new HMatrix2[Int] (n, vca)               // global frequency of X
+
+    additive = false
+
+    if (DEBUG) {
+        println ("value count vc      = " + vc)
+        println ("value count vcp     = " + vcp)
+        println ("parent features par = " + parent)
+    } // if
+
+    frequenciesAll ()
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute frequency counts using the entire data matrix
+     */
+    def frequenciesAll ()
+    {
+        for (i <- 0 until m) {
+            val yi = y(i)
+            g_f_C(yi) += 1
+            for (j <- 0 until n if fset(j)) {
+                g_f_X(j, x(i, j)) += 1
+                g_f_CX(yi, j, x(i, j)) += 1
+                for (j2 <- j+1 until n if fset(j2)) g_f_CXZ(yi, j, j2, x(i, j), x(i, j2)) += 1
+            } // for
         } // for
 
-        sum / nx.toDouble
-    } // crossValidateRand
+        for (c <- 0 until k; j <- 0 until n if fset(j); j2 <- j+1 until n if fset(j2); xj <- 0 until vc(j); xj2 <- 0 until vc(j2)) {
+            g_f_CXZ(c, j2, j, xj2, xj) = g_f_CXZ(c, j, j2, xj, xj2)
+        } // for
+    } // frequenciesAll
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Decrement frequency counters used in CMI calculations based on the 'i'th
+     *  row of the data matrix.
+     *  @param i  the index for current data row
+     */
+    protected override def updateFreq (i: Int)
+    {
+        val yi   = y(i)                                       // get the class for ith row
+        f_C(yi) -= 1                                          // decrement frequency for class yi
+        for (j <- x.range2 if fset(j)) {
+            f_X(j, x(i, j)) -= 1
+            f_CX (yi, j, x(i, j)) -= 1
+            for (j2 <- j+1 until n if fset(j2)) {
+                f_CXZ (yi, j, j2, x(i, j), x(i, j2)) -= 1
+                f_CXZ (yi, j2, j, x(i, j2), x(i, j)) -= 1
+            } // for
+        } // for
+    } // updateFreq
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reset or re-initialize the frequency tables from the global frequencies.
+     */
+    override def reset ()
+    {
+        for (i <- 0 until k) {
+            f_C(i) = g_f_C(i)
+            for (j <- x.range2 if fset(j); xj <- 0 until vc(j)) {
+                if (i == 0) f_X(j, xj) = g_f_X(j, xj)
+                f_CX(i, j, xj) = g_f_CX(i, j, xj)
+                for (j2 <- j+1 until n if fset(j2); xj2 <- 0 until vc(j2)) {
+                    f_CXZ(i, j, j2, xj, xj2) = g_f_CXZ(i, j, j2, xj, xj2)
+                    f_CXZ(i, j2, j, xj2, xj) = f_CXZ(i, j, j2, xj, xj2)
+                } // for
+            } // for
+        } // for
+    } // reset
 
 } // TANBayes class
 
@@ -407,8 +392,9 @@ object TANBayes
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `TANBayesTest` object is used to test the `TANBayes` class.
+/** The `TANBayesTest` object is used to test the `TANBayes0` class.
  *  Classify whether a car is more likely to be stolen (1) or not (1).
+ *
  *  @see www.inf.u-szeged.hu/~ormandi/ai2/06-AugNaiveBayes-example.pdf
  *  > run-main scalation.analytics.classifier.TANBayesTest
  */
@@ -418,7 +404,7 @@ object TANBayesTest extends App
     // x1: Type:    SUV (1), Sports (0)
     // x2: Origin:  Domestic (1), Imported (0)
     // features:                x0 x1 x2
-    val x = new MatrixI((10, 3), 1, 0, 1,             // data matrix
+    val x = new MatrixI((10, 3), 1, 0, 1,               // data matrix
                                  1, 0, 1,
                                  1, 0, 1,
                                  0, 0, 1,
@@ -429,31 +415,36 @@ object TANBayesTest extends App
                                  1, 1, 0,
                                  1, 0, 0)
 
-    val y = VectorI (1, 0, 1, 0, 1, 0, 1, 0, 0, 1)     // classification vector: 0(No), 1(Yes))
-    val fn = Array("Color", "Type", "Origin")          // feature/variable names
-    val cn = Array("No", "Yes")                        // class names
+    val y = VectorI (1, 0, 1, 0, 1, 0, 1, 0, 0, 1)      // classification vector: 0(No), 1(Yes))
+    val fn = Array ("Color", "Type", "Origin")          // feature/variable names
+    val cn = Array ("No", "Yes")                        // class names
 
     println("xy = " + (x :^+ y))
     println("---------------------------------------------------------------")
 
-    val tan = new TANBayes(x, y, fn, 2, cn)            // create the classifier
+    val tan0 = new TANBayes0 (x, y, fn, 2, cn)          // create the classifier
+    val tan  = new TANBayes  (x, y, fn, 2, cn)           // create the classifier
 
     // train the classifier ---------------------------------------------------
-    tan.train()
+    tan0.train ()
+    tan.train ()
 
     // test sample ------------------------------------------------------------
-    val z1 = VectorI (1, 0, 1)                         // existing data vector to classify
-    val z2 = VectorI (1, 1, 1)                         // new data vector to classify
-    println ("classify (" + z1 + ") = " + tan.classify (z1) + "\n")
-    println ("classify (" + z2 + ") = " + tan.classify (z2) + "\n")
+    val z1 = VectorI (1, 0, 1)                          // existing data vector to classify
+    val z2 = VectorI (1, 1, 1)                          // new data vector to classify
+    println ("Use tan0 to classify (" + z1 + ") = " + tan0.classify (z1))
+    println ("Use tan  to classify (" + z1 + ") = " + tan.classify (z1))
+    println ("Use tan0 to classify (" + z2 + ") = " + tan0.classify (z2))
+    println ("Use tan  to classify (" + z2 + ") = " + tan.classify (z2))
 
-    tan.crossValidate ()                               // cross validate the classifier
+    println ("tan0 cv accu = " + tan0.crossValidateRand())  // cross validate the classifier
+    println ("tan  cv accu = " + tan.crossValidateRand())   // cross validate the classifier
 
 } // TANBayesTest object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `TANBayesTest2` object is used to test the `TANBayes` class.
+/** The `TANBayesTest2` object is used to test the `TANBayes0` class.
  *  Given whether a person is Fast and/or Strong, classify them as making C = 1
  *  or not making C = 0 the football team.
  *  > run-main scalation.analytics.classifier.TANBayesTest2
@@ -476,29 +467,32 @@ object TANBayesTest2 extends App
                                   0, 0, 0,
                                   0, 0, 0)
 
-    val fn = Array ("Fast", "Strong")                  // feature names
-    val cn = Array ("No", "Yes")                       // class names
+    val fn = Array ("Fast", "Strong")                   // feature names
+    val cn = Array ("No", "Yes")                        // class names
 
     println("xy = " + xy)
     println("---------------------------------------------------------------")
 
-    val tan = TANBayes(xy, fn, 2, cn, 1, null)    // create the classifier
-    //tan.computeParent ()
+    val tan0 = TANBayes0 (xy, fn, 2, cn, 1, null)       // create the classifier
+    val tan  = TANBayes  (xy, fn, 2, cn, 1, null)        // create the classifier
 
     // train the classifier ---------------------------------------------------
+    tan0.train ()
     tan.train ()
 
     // test sample ------------------------------------------------------------
     val z = VectorI (1, 0) // new data vector to classify
-    println("classify (" + z + ") = " + tan.classify (z) + "\n")
+    println ("Use tan0 to classify (" + z + ") = " + tan0.classify (z))
+    println ("Use tan  to classify (" + z + ") = " + tan.classify (z))
 
-    tan.crossValidate()                                 // cross validate the classifier
+    println ("tan0 cv accu = " + tan0.crossValidateRand())    // cross validate the classifier
+    println ("tan  cv accu = " + tan.crossValidateRand())     // cross validate the classifier
 
 } // TANBayesTest2 object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `TANBayesTest3` object is used to test the `TANBayes` class.
+/** The `TANBayesTest3` object is used to test the `TANBayes0` class.
  *  > run-main scalation.analytics.classifier.TANBayesTest3
  */
 object TANBayesTest3 extends App
@@ -507,13 +501,20 @@ object TANBayesTest3 extends App
     var data = Relation (filename, -1, null)
     val xy = data.toMatriI2 (null)
     val fn = data.colName.slice(0, xy.dim2 - 1).toArray
-    val cn = Array ("p", "e")                           // class names
+    val cn = Array ("p", "e")                                   // class names
     val k  = 2
 
     println("---------------------------------------------------------------")
-    val tan = TANBayes (xy, fn, k, cn)    // create the classifier
-    tan.buildModel ()
-    println("cv accu = " + tan.crossValidateRand())
+    val tan0 = TANBayes0 (xy, fn, k, cn)                        // create the classifier
+    val tan  = TANBayes  (xy, fn, k, cn)                         // create the classifier
+    println("tan0 cv accu = " + tan0.crossValidateRand())       // cross validate the classifier
+    println("tan  cv accu = " + tan.crossValidateRand())        // cross validate the classifier
+
+    tan0.featureSelection ()
+    tan.featureSelection ()
+
+    println ("After feature selection")
+    println("tan0 cv accu = " + tan0.crossValidateRand())       // cross validate the classifier
+    println("tan  cv accu = " + tan.crossValidateRand())        // cross validate the classifier
 
 } // TANBayesTest3 object
-

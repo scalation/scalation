@@ -9,7 +9,7 @@
 package apps.analytics
 
 import scalation.analytics.classifier.BASE_DIR
-import scalation.analytics.classifier.{AugNaiveBayes, NaiveBayes}
+import scalation.analytics.classifier.{NaiveBayes, TANBayes}
 import scalation.linalgebra.{MatrixI, VectorI}
 import scalation.util.{getFromURL_File, time}
 
@@ -64,14 +64,14 @@ object PokerBayes extends App
     val vc = VectorI (4, 13, 4, 13, 4, 13, 4, 13, 4, 13)          // value count: distinct values for each feature
 
     val nb  = NaiveBayes (xy, fn, k, cn, vc)                      // create a Naive Bayes classifier
-    val anb = NaiveBayes (xy, fn, k, cn, vc)                      // create an Augmented Naive Bayes classifier
+    val tnb = TANBayes (xy, fn, k, cn, 1.0, vc)                   // create a Tree Augmented Naive Bayes classifier
   
     time { nb.train () }                                          // train the classifier
-    time { anb.train () }                                         // train the classifier
+    time { tnb.train () }                                         // train the classifier
 
     val z = VectorI (3, 3, 2, 3, 0, 8, 3, 5, 2, 5)                // new data vector/hand to classify
     println (s"nb.classify ($z)  = ${nb.classify (z)}")           // answer = 2 (Two Pair)
-    println (s"anb.classify ($z) = ${anb.classify (z)}")          // answer = 2 (Two Pair)
+    println (s"tnb.classify ($z) = ${tnb.classify (z)}")          // answer = 2 (Two Pair)
 
 } // PokerBayes object
 

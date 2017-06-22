@@ -58,7 +58,7 @@ class BayesClfML (bayesBuilder: Int => BayesClassifier, nLabels: Int, nFeatures:
     def train (testStart: Int, testEnd: Int)
     {
         for (l <- 0 until nLabels) {
-            bayes(l).buildModel ()
+//          bayes(l).buildModel ()
             bayes(l).train (testStart, testEnd)
             if (l < nLabels - 1) bayes(l+1) = bayesBuilder (l+1)
         } // for
@@ -69,7 +69,7 @@ class BayesClfML (bayesBuilder: Int => BayesClassifier, nLabels: Int, nFeatures:
      *  conditional probabilities for X_j.
      *  @param itrain indices of the instances considered train data
      */
-    override def train (itrain: Array [Int])
+    override def train (itrain: IndexedSeq [Int])
     {
         for (l <- 0 until nLabels) {
             bayes(l) = bayesBuilder (l)

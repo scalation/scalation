@@ -27,6 +27,7 @@ trait Predictor
     protected var sse       = -1.0                  // sum of squares error
     protected var ssr       = -1.0                  // sum of squares regression/model
     protected var sst       = -1.0                  // sum of squares total (ssr + sse)
+    protected var mae       = -1.0                  // mean absolute error
     protected var rmse      = -1.0                  // root mean squared error
     protected var rSq       = -1.0                  // coefficient of determination (quality of fit)
 
@@ -59,6 +60,7 @@ trait Predictor
         sse   = e dot e                             // sum of squares error
         sst   = (yy dot yy) - yy.sum~^2.0 / m       // sum of squares total
         ssr   = sst - sse                           // sum of squares regression
+        mae   = e.norm1 / e.dim                     // mean absolute error
         rmse  = sqrt (sse / e.dim)                  // root mean square error
         rSq   = ssr / sst                           // coefficient of determination R^2
     } // diagnose
@@ -74,15 +76,15 @@ trait Predictor
     def residual: VectoD = e
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including 'sse', rmse' and 'rSq'.  Override to
-     *  add more.
+    /** Return the quality of fit including 'sse', 'mae', rmse' and 'rSq'.
+     *  Override to add more quality of fit measures.
      */
-    def fit: VectoD = VectorD (sse, rmse, rSq)
+    def fit: VectoD = VectorD (sse, mae, rmse, rSq)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the fit.  Override when necessary.
      */
-    def fitLabels: Seq [String] = Seq ("sse", "rmse", "rSq")
+    def fitLabels: Seq [String] = Seq ("sse", "mae", "rmse", "rSq")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a new continuous data vector z, predict the y-value of f(z).

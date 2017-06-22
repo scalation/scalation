@@ -52,7 +52,7 @@ class PGMHD3fl (x: MatriI, z: MatriI, y: MatriI, fn: Array [String], cn: Array [
 //  private val pa_X2C = new HMatrix2 [Int] (nx)           // hypermatrix holding the parents for each X-feature
 //  private val pa_Z2X = new HMatrix2 [Int] (nz)           // hypermatrix holding the parents for each Z-feature
 
-    private val f_CX  = new MatrixI (ny, nx)               // co-occurrence frequency counts for C-class j & X-feature k
+    private val f_CX_  = new MatrixI (ny, nx)              // co-occurrence frequency counts for C-class j & X-feature k
     private val f_XZ  = new MatrixI (nx, nz)               // co-occurrence frequency counts for X-feature k & Z-feature l
 
     private val x_in  = new VectorI (nx)                   // f_CX summed over all C - flow into X from above
@@ -95,7 +95,7 @@ class PGMHD3fl (x: MatriI, z: MatriI, y: MatriI, fn: Array [String], cn: Array [
         val x_i = x(i)                                               // level 1 - mid feature level
         val z_i = z(i)                                               // level 2 - low feature level
         for (j <- y_i.range if y_i(j) == 1) {
-            for (k <- x_i.range if x_i(k) == 1) f_CX(j, k) += 1      // both y_i(j) & x_i(k) occur
+            for (k <- x_i.range if x_i(k) == 1) f_CX_(j, k) += 1     // both y_i(j) & x_i(k) occur
         } // for
         for (k <- x_i.range if x_i(k) == 1) {
             for (l <- z_i.range if z_i(l) == 1) f_XZ(k, l) += 1      // both x_i(k) & z_i(l) occur
@@ -114,14 +114,14 @@ class PGMHD3fl (x: MatriI, z: MatriI, y: MatriI, fn: Array [String], cn: Array [
         if (DEBUG) banner ("frequencies (testStart, testEnd)")
         for (i <- 0 until y.dim1 if i < testStart || i >= testEnd) increment (i)
 
-        for (j <- 0 until ny; k <- 0 until nx) x_in(k) += f_CX(j, k)
+        for (j <- 0 until ny; k <- 0 until nx) x_in(k) += f_CX_(j, k)
         for (k <- 0 until nx; l <- 0 until nz) z_in(l) += f_XZ(k, l)
 
-        for (j <- 0 until ny; k <- 0 until nx) y_cl(j, k) += f_CX(j, k) / x_in(k).toDouble
+        for (j <- 0 until ny; k <- 0 until nx) y_cl(j, k) += f_CX_(j, k) / x_in(k).toDouble
         for (k <- 0 until nx; l <- 0 until nz) x_cl(k, l) += f_XZ(k, l) / z_in(l).toDouble
 
         if (DEBUG) {
-            println ("f_CX  = " + f_CX)                        // #(C_j = c & X_k = x)
+            println ("f_CX  = " + f_CX_)                       // #(C_j = c & X_k = x)
             println ("f_XZ  = " + f_XZ)                        // #(X_k = x & Z_l = z)
             println ("x_in  = " + x_in)                        // sum f_CX over C
             println ("z_in  = " + z_in)                        // sum f_XZ over X
@@ -148,19 +148,19 @@ class PGMHD3fl (x: MatriI, z: MatriI, y: MatriI, fn: Array [String], cn: Array [
      *  training data.
      *  @param itrain indices of the instances considered train data
      */
-    private def frequencies (itrain: Array [Int])
+    private def frequencies (itrain: IndexedSeq [Int])
     {
         if (DEBUG) banner ("frequencies (itrain)")
         for (i <- itrain) increment (i)
 
-        for (j <- 0 until ny; k <- 0 until nx) x_in(k) += f_CX(j, k)
+        for (j <- 0 until ny; k <- 0 until nx) x_in(k) += f_CX_(j, k)
         for (k <- 0 until nx; l <- 0 until nz) z_in(l) += f_XZ(k, l)
 
-        for (j <- 0 until ny; k <- 0 until nx) y_cl(j, k) += f_CX(j, k) / x_in(k).toDouble
+        for (j <- 0 until ny; k <- 0 until nx) y_cl(j, k) += f_CX_(j, k) / x_in(k).toDouble
         for (k <- 0 until nx; l <- 0 until nz) x_cl(k, l) += f_XZ(k, l) / z_in(l).toDouble
 
         if (DEBUG) {
-            println ("f_CX  = " + f_CX)                        // #(C_j = c & X_k = x)
+            println ("f_CX  = " + f_CX_)                       // #(C_j = c & X_k = x)
             println ("f_XZ  = " + f_XZ)                        // #(X_k = x & Z_l = z)
             println ("x_in  = " + x_in)                        // sum f_CX over C
             println ("z_in  = " + z_in)                        // sum f_XZ over X
@@ -173,7 +173,7 @@ class PGMHD3fl (x: MatriI, z: MatriI, y: MatriI, fn: Array [String], cn: Array [
     /** Train the classifier by computing frequencies, inflows and scores.
      *  @param itrain indices of the instances considered train data
      */
-    override def train (itrain: Array [Int])
+    override def train (itrain: IndexedSeq [Int])
     {
         frequencies (itrain)                                   // compute frequencies skipping test region
 
@@ -212,7 +212,7 @@ class PGMHD3fl (x: MatriI, z: MatriI, y: MatriI, fn: Array [String], cn: Array [
      */
     def reset ()
     {
-        f_CX.set (0)
+        f_CX_.set (0)
         f_XZ.set (0)
         x_in.set (0)
         z_in.set (0)

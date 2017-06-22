@@ -52,9 +52,10 @@ class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: A
 
 
 //  private val f_X   = new HMatrix2 [Int] (nx)            // frequency counts for X-feature jx
-    private val f_CX  = new HMatrix3 [Int] (k, nx)         // frequency counts for C-class i & X-feature jx
+                f_CX  = new HMatrix3 [Int] (k, nx)         // frequency counts for C-class i & X-feature jx
 //  private val f_XZ  = new HMatrix4 [Int] (nx, nz)        // frequency counts for X-feature jx & Z-feature jz
-    private val f_CXZ = new HMatrix4 [Int] (k, nz)         // frequency counts for C-class i & X-feature jx & Z-feature jz
+//  private val f_CXZ = new HMatrix4 [Int] (k, nz)         // frequency counts for C-class i & X-feature jx & Z-feature jz
+    private val f_CXZ_ = new HMatrix4 [Int] (k, nz)        // frequency counts for C-class i & X-feature jx & Z-feature jz
 
     if (vc == null) {
         shiftToZero; vc = vc_fromData                      // set value counts from the data
@@ -68,7 +69,7 @@ class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: A
 //  f_X.alloc (vc_x)
     f_CX.alloc (vc_x)
 //  f_XZ.alloc (vc_x, vc_z)
-    f_CXZ.alloc (vc_z, vc_p)
+    f_CXZ_.alloc (vc_z, vc_p)
 
     if (DEBUG) {
         println ("distinct value count vc_x = " + vc_x.deep)
@@ -130,7 +131,7 @@ class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: A
                     val jp = parent (jj)                       // X_jp is parent of Z_j
                     val x_jp = x(l, jp)                        // get value for jp-th X-feature
 //                  f_XZ(jp, jj, x_jp, z_j) += 1               // f_XZ
-                    f_CXZ(i, jj, z_j, x_jp) += 1               // f_CXZ
+                    f_CXZ_(i, jj, z_j, x_jp) += 1              // f_CXZ
                 } // if
             } // for
 
@@ -163,7 +164,7 @@ class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: A
      *  training data.
      *  @param itrain indices of the instances considered train data
      */
-    private def frequencies (itrain: Array [Int])
+    private def frequencies (itrain: IndexedSeq [Int])
     {
         if (DEBUG) banner ("frequencies (itrain)")
 
@@ -181,7 +182,7 @@ class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: A
                     val jp = parent (jj)                       // X_jp is parent of Z_j
                     val x_jp = x(l, jp)                        // get value for jp-th X-feature
 //                  f_XZ(jp, jj, x_jp, z_j) += 1               // f_XZ
-                    f_CXZ(i, jj, z_j, x_jp) += 1               // f_CXZ
+                    f_CXZ_(i, jj, z_j, x_jp) += 1              // f_CXZ
                 } // if
             } // for
 
@@ -200,7 +201,7 @@ class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: A
      *  conditional probabilities for X_j.
      *  @param itrain indices of the instances considered train data
      */
-    override def train (itrain: Array [Int])
+    override def train (itrain: IndexedSeq [Int])
     {
         frequencies (itrain)                                   // compute frequencies skipping test region
 
@@ -222,7 +223,7 @@ class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: A
             prob(i) = 1.0                       // proportional to probabilty
             for (j <- 0 until n) {
                 if (j < nx) prob(i) *= f_CX(i, j, u(j))
-                else        prob(i) *= f_CXZ(i, j-nx, u(j), u(parent(j-nx)))
+                else        prob(i) *= f_CXZ_(i, j-nx, u(j), u(parent(j-nx)))
             } // for
         } // for
         if (DEBUG) println ("prob = " + prob)

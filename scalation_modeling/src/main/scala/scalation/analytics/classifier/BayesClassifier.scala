@@ -1,6 +1,6 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  John Miller, Zhe Jin
+/** @author  John Miller, Hao Peng, Zhe Jin
  *  @version 1.3
  *  @date    Sat Aug  8 20:26:34 EDT 2015
  *  @see     LICENSE (MIT style license file).
@@ -9,9 +9,8 @@
 package scalation.analytics.classifier
 
 import scala.collection.mutable.ListBuffer
-
-import scalation.linalgebra.{MatrixD, MatriI, MatrixI, VectorD, VectoI, VectorI}
-import scalation.linalgebra.gen.{HMatrix3, HMatrix5}
+import scalation.linalgebra.{MatriI, MatrixD, MatrixI, VectoI, VectorD, VectorI}
+import scalation.linalgebra.gen.{HMatrix2, HMatrix3, HMatrix5}
 import scalation.math.log2
 import scalation.relalgebra.Relation
 
@@ -33,7 +32,6 @@ class DAG (val parent: Array [Array [Int]])
 
 } // DAG class
 
-
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BayesClassifier` object provides factory methods for building Bayesian
  *  classifiers.  The following types of classifiers are currently supported:
@@ -54,7 +52,17 @@ class DAG (val parent: Array [Array [Int]])
 abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String])
          extends ClassifierInt (x, y, fn, k, cn) with BayesMetrics
 {
-    protected var smooth     = true                    // FIX - what ??
+    protected var smooth   = true                    // flag for using parameter smoothing
+    protected val N0       = 5.0                     // parameter needed for smoothing
+    protected val tiny     = 1E-9                    // value needed for CMI calculations
+    protected var additive = true                    // flag to use additive approach for training/cross-validation
+
+    protected val f_C = new VectorI (k)              // frequency counts for classes 0, ..., k-1
+    protected var p_C = new VectorD (k)              // probabilities for classes 0, ..., k-1
+
+    protected var f_X:   HMatrix2 [Int] = null       // Frequency of X
+    protected var f_CX:  HMatrix3 [Int] = null       // Joint frequency of C and X
+    protected var f_CXZ: HMatrix5 [Int] = null       // Joint frequency of C, X, and Z, where X, Z are features/columns
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Toggle the value of the 'smooth' property.
@@ -62,32 +70,42 @@ abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int
     def toggleSmooth () { smooth = ! smooth}
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build the model with feature order and selection.
-     *  @param testStart  the start of test region (inclusive)
-     *  @param testEnd    the end of test region (exclusive)
+    /** Compute the conditional mutual information matrix
+     *  @param idx   indicies of either training or testing region
+     *  @param vca   array of value counts
      */
-    def buildModel (testStart: Int = 0, testEnd: Int = 0): (Array [Boolean], DAG)
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute conditional mutual information for XY given Z from frequency counts
-     *  @see http://www.cs.technion.ac.il/~dang/journal_papers/friedman1997Bayesian.pdf, p.12
-     *  @param pz    the probability of Z
-     *  @param ptz   the probability of X given Z, or Y given Z
-     *  @param pxyz  the probability of Y and Y given Z
-     *
-    def condMutualInformation (pz: VectorD, ptz: HMatrix3 [Double], pxyz: HMatrix5 [Double]): MatrixD =
+    def calcCMI (idx: IndexedSeq [Int], vca: Array [Int]): MatrixD =
     {
-        val sum = new MatrixD(ptz.dim2, ptz.dim2)
-        for (i <- 0 until ptz.dim2; j <- 0 until ptz.dim2) {
-            for (q <- 0 until ptz.dim_3(i); t <- 0 until ptz.dim_3(j)) {
-                for (r <- 0 until pz.dim) {
-                    sum(i, j) += pxyz(r, i, j, q, t) * log2 ((pz(r) * pxyz(r, i, j, q, t)) / (ptz(r, i, q) * ptz(r, j, t)))
+        val p_CXZ = new HMatrix5 [Double] (k, n, n, vca, vca)          // Joint probability of C, X, and Z, where X, Z are features/columns
+        val p_CX  = new HMatrix3 [Double] (k, n, vca)                  // Joint probability of C and X
+        var p_C: VectorD = null
+
+        reset ()
+        for (i <- idx) updateFreq (i)
+
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        /** Compute marginal and joint probabilities
+         */
+        def probabilities ()
+        {
+            for (j <- 0 until n if fset(j)) {
+                //val me_vc = me / vc(j).toDouble
+                for (xj <- 0 until vca(j)) {
+                    for (c <- 0 until k) {
+                        p_CX(c, j, xj) = (f_CX(c, j, xj) + tiny) / md
+                        for (j2 <- j + 1 until n if fset(j2); xj2 <- 0 until vca(j2)) {
+                            p_CXZ(c, j, j2, xj, xj2) = (f_CXZ(c, j, j2, xj, xj2) + tiny) / md
+                        } // for
+                    } // for
                 } // for
             } // for
-        } // for
-        sum
-    } // conMutualInformation
-     */
+        } // probabilities
+
+        p_C = f_C.toDouble / m
+        probabilities ()
+
+        cmiJoint (p_C, p_CX, p_CXZ)
+    } // calcCMI
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute conditional mutual information matrix given the marginal probability
@@ -103,11 +121,11 @@ abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int
         val cmiMx = new MatrixD (p_CX.dim2, p_CX.dim2)
         for (c <- 0 until k) {                               // check each class, where k = p_C.size
             val pc = p_C(c)
-            for (j <- 0 until p_CX.dim2; xj <- 0 until p_CX.dim_3(j)) {
+            for (j <- 0 until p_CX.dim2 if fset(j); xj <- 0 until p_CX.dim_3(j)) {
                 // n = p_CX.dim2, vc(j) = p_CX.dim_3(j)
                 val pcx = p_CX(c, j, xj)
-                for (j2 <- j + 1 until p_CX.dim2; xj2 <- 0 until p_CX.dim_3(j2)) {
-                    val pcz = p_CX(c, j2, xj2)
+                for (j2 <- j + 1 until p_CX.dim2 if fset(j2); xj2 <- 0 until p_CX.dim_3(j2)) {
+                    val pcz  = p_CX(c, j2, xj2)
                     val pcxz = p_CXZ(c, j, j2, xj, xj2)
                     cmiMx(j, j2) += pcxz * log2((pc * pcxz) / (pcx * pcz))
                 } // for
@@ -120,6 +138,13 @@ abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int
     /** Return the parent (override as needed).
      */
     def getParent: Any = null
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Increment/Decrement frequency counters based on the 'i'th row of the
+     *  data matrix.
+     *  @param i  the index for current data row
+     */
+    protected def updateFreq (i: Int) {}
 
 } // BayesClassifier class
 
@@ -177,40 +202,6 @@ object BayesClassifier
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build a Selective Naive Bayes classification model.
-     *  @param x     the integer-valued data vectors stored as rows of a matrix
-     *  @param y     the class vector, where y(l) = class for row l of the matrix x, x(l)
-     *  @param fn    the names for all features/variables
-     *  @param k     the number of classes
-     *  @param cn    the names for all classes
-     *  @param fset  the list of selected features
-     *  @param vc    the value count (number of distinct values) for each feature
-     *  @param me    use m-estimates (me == 0 => regular MLE estimates)
-     */
-    def apply (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-               fset: ListBuffer [Int], vc: VectoI, me: Float): SelNaiveBayes =
-    {
-        new SelNaiveBayes (x, y, fn, k, cn, fset, vc, me)
-    } // apply
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build a Selective Naive Bayes classification model, passing 'x' and 'y'
-     *  together in one matrix.
-     *  @param xy    the data vectors along with their classifications stored as rows of a matrix
-     *  @param fn    the names for all features/variables
-     *  @param k     the number of classes
-     *  @param cn    the names for all classes
-     *  @param fset  the list of selected features
-     *  @param vc    the value count (number of distinct values) for each feature
-     *  @param me    use m-estimates (me == 0 => regular MLE estimates)
-     */
-    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
-               fset: ListBuffer [Int], vc: VectoI, me: Float): SelNaiveBayes =
-    {
-        SelNaiveBayes (xy, fn, k, cn, fset, vc, me)
-    } // apply
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Augmented Naive Bayes (1-BAN) classification model.
      *  @param x      the integer-valued data vectors stored as rows of a matrix
      *  @param y      the class vector, where y(l) = class for row l of the matrix, x(l)
@@ -245,42 +236,6 @@ object BayesClassifier
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build a Augmented Selective Naive Bayes (Selective 1-BAN) classification model.
-     *  @param x       the integer-valued data vectors stored as rows of a matrix
-     *  @param y       the class vector, where y(l) = class for row l the matrix x, x(l)
-     *  @param fn      the names for all features/variables
-     *  @param k       the number of classes
-     *  @param cn      the names for all classes
-     *  @param fset    the list of selected features
-     *  @param vc      the value count (number of distinct values) for each feature
-     *  @param me      use m-estimates (me == 0 => regular MLE estimates)
-     *  @param thres   the correlation threshold between 2 features for possible parent-child relationship
-     */
-    def apply (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-               fset: ListBuffer [Int], vc: VectoI, me: Float, thres: Double, smooth: Boolean): SelOneBAN =
-    {
-        new SelOneBAN (x, y, fn, k, cn, list2Array (fset, fn.length), vc, me, thres)
-    } // apply
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build a Augmented Selective Naive Bayes (Selective 1-BAN) classification model,
-     *  passing 'x' and 'y' together in one matrix.
-     *  @param xy      the data vectors along with their classifications stored as rows of a matrix
-     *  @param fn      the names for all features/variables
-     *  @param k       the number of classes
-     *  @param cn      the names for all classes
-     *  @param fset    the list of selected features
-     *  @param vc      the value count (number of distinct values) for each feature
-     *  @param me      use m-estimates (me == 0 => regular MLE estimates)
-     *  @param thres   the correlation threshold between 2 features for possible parent-child relationship
-     */
-    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
-              fset: ListBuffer [Int], vc: VectoI, me: Float, thres: Double): SelOneBAN =
-    {
-        SelOneBAN (xy, fn, k, cn, list2Array (fset, fn.length), vc, me, thres)
-    } // apply
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Tree Augmented Naive Bayes (TAN) classification model.
      *  @param x       the integer-valued data vectors stored as rows of a matrix
      *  @param y       the class vector, where y(l) = class for row l of the matrix, x(l)
@@ -310,40 +265,6 @@ object BayesClassifier
     def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String], me: Float, vc: VectoI): TANBayes =
     {
         TANBayes (xy, fn, k, cn, me, vc)
-    } // apply
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build a Selective Tree Augmented Naive Bayes (Selective TAN) classification model.
-     *  @param x     the integer-valued data vectors stored as rows of a matrix
-     *  @param y     the class vector, where y(l) = class for row l the matrix x, x(l)
-     *  @param fn    the names for all features/variables
-     *  @param k     the number of classes
-     *  @param cn    the names for all classes
-     *  @param fset  the `Boolean` array indicating the selected features
-     *  @param me    use m-estimates (me == 0 => regular MLE estimates)
-     *  @param vc    the value count (number of distinct values) for each feature
-     */
-    def apply (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-               fset: Array [Boolean], me: Float, vc: VectoI): SelTANBayes =
-    {
-        new SelTANBayes (x, y, fn, k, cn, fset, me, vc)
-    } // apply
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build a Selective Tree Augmented Naive Bayes (Selective TAN) classification model,
-     *  passing 'x' and 'y' together in one matrix.
-     *  @param xy    the data vectors along with their classifications stored as rows of a matrix
-     *  @param fn    the names of the features/variables
-     *  @param k     the number of classes
-     *  @param cn    the names for all classes
-     *  @param fset  the `Boolean` array indicating the selected features
-     *  @param me    use m-estimates (me == 0 => regular MLE estimates)
-     *  @param vc    the value count (number of distinct values) for each feature
-     */
-    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
-               fset: Array [Boolean], me: Float, vc: VectoI): SelTANBayes =
-    {
-        SelTANBayes (xy, fn, k, cn, fset, me, vc)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -402,7 +323,6 @@ object BayesClassifier
     {
         println ("-" * 60)
         println ("T E S T  " + name)
-        bc.buildModel ()
         val avg_accu = if (RANDOMIZED) bc.crossValidateRand (XFOLD)
                        else            bc.crossValidate (XFOLD)
         println ("Average accuracy = " + avg_accu)
@@ -410,7 +330,7 @@ object BayesClassifier
         avg_accu
     } // test
 
-} // BayesClassifier
+} // BayesClassifier object
 
 import BayesClassifier.{me_default, test}
 
@@ -443,19 +363,35 @@ object BayesClassifierTest extends App
     val cn = Array ("No", "Yes")                               // class names
     val vc = null.asInstanceOf [VectoI]                        // use default value count
     val me = me_default                                        // me-estimates
-    val th = 0.3                                               // threshold
+    val th = 0.0                                               // threshold
 
     println ("---------------------------------------------------------------")
     println ("D A T A   M A T R I X")
     println ("xy = " + xy)
 
-    test (BayesClassifier (xy, fn, k, cn, vc, me),           "Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me),     "Selective Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, me, th),     "1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me, th), "Selective 1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, me, vc),           "TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, me, vc),     "Selective TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, th, me),       "2-BAN-OS")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me)
+    test (nb,         "Naive Bayes")
+
+    val oneban = BayesClassifier (xy, fn, k, cn, vc, me, th)
+    test (oneban,     "1-BAN")
+
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc)
+    test (tan,        "TAN Bayes")
+
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me)
+    test (twoban,     "2-BAN-OS")
+
+    nb.featureSelection ()
+    test (nb,         "Selective Naive Bayes")
+
+    oneban.featureSelection ()
+    test (oneban,     "Selective 1-BAN")
+
+    tan.featureSelection ()
+    test (tan,        "Selective TAN Bayes")
+
+    twoban.featureSelection ()
+    test (twoban,     "Selective 2-BAN-OS")
 
 } // BayesClassifierTest object
 
@@ -469,9 +405,9 @@ object BayesClassifierTest2 extends App
     val fname = BASE_DIR + "bayes_data.csv"                    // file's relative path name
     val (m, n) = (683, 10)                                     // number of (rows/lines, columns) in file
 
-    val xy = ClassifierInt(fname, m, n) // load 'xy' data matrix from file
+    val xy = ClassifierInt(fname, m, n)                        // load 'xy' data matrix from file
 
-    xy.setCol (n - 1, xy.col(n - 1).map((z: Int) => z / 2 - 1))       // transform the last column
+    xy.setCol (n - 1, xy.col(n - 1).map((z: Int) => z / 2 - 1))// transform the last column
 
     val fn = Array ("Clump Thickness", "Uniformity of Cell Size", "Uniformity of Cell Shape", "Marginal Adhesion",
                     "Single Epithelial Cell Size", "Bare Nuclei", "Bland Chromatin", "Normal Nucleoli", "Mitoses")
@@ -479,15 +415,31 @@ object BayesClassifierTest2 extends App
     val cn = Array ("benign", "malignant")
     val vc = VectorI (11, 11, 11, 11, 11, 11, 11, 11, 11)      // value count
     val me = me_default                                        // me-estimates
-    val th = 0.3                                               // threshold
+    val th = 0.0                                               // threshold
 
-    test (BayesClassifier (xy, fn, k, cn, vc, me),           "Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me),     "Selective Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, me, th),       "1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me, th), "Selective 1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, me, vc),           "TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, me, vc),     "Selective TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, th, me),       "2-BAN-OS")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me)
+    test (nb,         "Naive Bayes")
+
+    val oneban = BayesClassifier (xy, fn, k, cn, vc, me, th)
+    test (oneban,     "1-BAN")
+
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc)
+    test (tan,        "TAN Bayes")
+
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me)
+    test (twoban,     "2-BAN-OS")
+
+    nb.featureSelection ()
+    test (nb,         "Selective Naive Bayes")
+
+    oneban.featureSelection ()
+    test (oneban,     "Selective 1-BAN")
+
+    tan.featureSelection ()
+    test (tan,        "Selective TAN Bayes")
+
+    twoban.featureSelection ()
+    test (twoban,     "Selective 2-BAN-OS")
 
 } // BayesClassifierTest2 object
 
@@ -499,23 +451,39 @@ object BayesClassifierTest2 extends App
 object BayesClassifierTest3 extends App
 {
     val filename = BASE_DIR + "breast-cancer.arff"
-    var data = Relation (filename, -1, null)
+    val data = Relation (filename, -1, null)
     val xy = data.toMatriI2 (null)
 
-    val fn = data.colName.toArray
+    val fn = data.colName.toArray.slice (0, xy.dim2 - 1)
     val k  = 2
     val cn = Array ("0", "1")                                  // class names
     val vc = null.asInstanceOf [VectoI]                        // use default value count
     val me = me_default                                        // me-estimates
-    val th = 0.3                                               // threshold
+    val th = 0.0                                               // threshold
 
-    test (BayesClassifier (xy, fn, k, cn, vc, me),           "Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me),     "Selective Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, me, th),       "1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me, th), "Selective 1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, me, vc),           "TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, me, vc),     "Selective TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, th, me),       "2-BAN-OS")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me)
+    test (nb,         "Naive Bayes")
+
+    val oneban = BayesClassifier (xy, fn, k, cn, vc, me, th)
+    test (oneban,     "1-BAN")
+
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc)
+    test (tan,        "TAN Bayes")
+
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me)
+    test (twoban,     "2-BAN-OS")
+
+    nb.featureSelection ()
+    test (nb,         "Selective Naive Bayes")
+
+    oneban.featureSelection ()
+    test (oneban,     "Selective 1-BAN")
+
+    tan.featureSelection ()
+    test (tan,        "Selective TAN Bayes")
+
+    twoban.featureSelection ()
+    test (twoban,     "Selective 2-BAN-OS")
 
 } // BayesClassifierTest3 object
 
@@ -527,7 +495,7 @@ object BayesClassifierTest3 extends App
 object BayesClassifierTest4 extends App
 {
     val filename = BASE_DIR + "adult.txt"
-    var data = Relation (filename, -1, null)
+    val data = Relation (filename, -1, null)
     val xy = data.toMatriI2 (Seq (0, 1, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14))
 
     val fn = Array ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
@@ -535,15 +503,31 @@ object BayesClassifierTest4 extends App
     val cn = Array ("0", "1")                                  // class names
     val vc = null.asInstanceOf [VectoI]                        // use default value count
     val me = me_default                                        // me-estimates
-    val th = 0.3                                               // threshold
+    val th = 0.0                                               // threshold
 
-    test (BayesClassifier (xy, fn, k, cn, vc, me),           "Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me),     "Selective Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, me, th),       "1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me, th), "Selective 1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, me, vc),           "TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, me, vc),     "Selective TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, th, me),       "2-BAN-OS")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me)
+    test (nb,         "Naive Bayes")
+
+    val oneban = BayesClassifier (xy, fn, k, cn, vc, me, th)
+    test (oneban,     "1-BAN")
+
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc)
+    test (tan,        "TAN Bayes")
+
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me)
+    test (twoban,     "2-BAN-OS")
+
+    nb.featureSelection ()
+    test (nb,         "Selective Naive Bayes")
+
+    oneban.featureSelection ()
+    test (oneban,     "Selective 1-BAN")
+
+    tan.featureSelection ()
+    test (tan,        "Selective TAN Bayes")
+
+    twoban.featureSelection ()
+    test (twoban,     "Selective 2-BAN-OS")
 
 } // BayesClassifierTest4 object
 
@@ -555,24 +539,40 @@ object BayesClassifierTest4 extends App
 object BayesClassifierTest5 extends App
 {
     val filename = BASE_DIR + "letter-recognition.data"
-    var data = Relation (filename, -1, null)
+    val data = Relation (filename, -1, null)
     val xy = data.toMatriI2 (null); xy.swapCol (0, xy.dim2 - 1)
 
-    val fn = data.colName.toArray
+    val fn = data.colName.toArray.slice (0, xy.dim2 - 1)
     val k  = 26
     val cn = Array ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
                     "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z")      // class names
     val vc = null.asInstanceOf [VectoI]                        // use default value count
     val me = me_default                                        // me-estimates
-    val th = 0.3                                               // threshold
+    val th = 0.0                                               // threshold
 
-    test (BayesClassifier (xy, fn, k, cn, vc, me),           "Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me),     "Selective Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, me, th),       "1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me, th), "Selective 1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, me, vc),           "TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, me, vc),     "Selective TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, th, me),       "2-BAN-OS")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me)
+    test (nb,         "Naive Bayes")
+
+    val oneban = BayesClassifier (xy, fn, k, cn, vc, me, th)
+    test (oneban,     "1-BAN")
+
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc)
+    test (tan,        "TAN Bayes")
+
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me)
+    test (twoban,     "2-BAN-OS")
+
+    nb.featureSelection ()
+    test (nb,         "Selective Naive Bayes")
+
+    oneban.featureSelection ()
+    test (oneban,     "Selective 1-BAN")
+
+    tan.featureSelection ()
+    test (tan,        "Selective TAN Bayes")
+
+    twoban.featureSelection ()
+    test (twoban,     "Selective 2-BAN-OS")
 
 } // BayesClassifierTest5 object
 
@@ -584,23 +584,39 @@ object BayesClassifierTest5 extends App
 object BayesClassifierTest6 extends App
 {
     val filename = BASE_DIR + "german.data"
-    var data = Relation (filename, -1, null)
+    val data = Relation (filename, -1, null)
     val xy = data.toMatriI2 (null); xy.setCol (24, xy.col(24).map((z: Int) => z - 1))
 
-    val fn = data.colName.toArray
+    val fn = data.colName.toArray.slice (0, xy.dim2 - 1)
     val k  = 2
     val cn = Array ("0", "1")                                  // class names
     val vc = null.asInstanceOf [VectoI]                        // use default value count
     val me = me_default                                        // me-estimates
-    val th = 0.3                                               // threshold
+    val th = 0.0                                               // threshold
 
-    test (BayesClassifier (xy, fn, k, cn, vc, me),           "Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me),     "Selective Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, me, th),       "1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me, th), "Selective 1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, me, vc),           "TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, me, vc),     "Selective TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, th, me),       "2-BAN-OS")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me)
+    test (nb,         "Naive Bayes")
+
+    val oneban = BayesClassifier (xy, fn, k, cn, vc, me, th)
+    test (oneban,     "1-BAN")
+
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc)
+    test (tan,        "TAN Bayes")
+
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me)
+    test (twoban,     "2-BAN-OS")
+
+    nb.featureSelection ()
+    test (nb,         "Selective Naive Bayes")
+
+    oneban.featureSelection ()
+    test (oneban,     "Selective 1-BAN")
+
+    tan.featureSelection ()
+    test (tan,        "Selective TAN Bayes")
+
+    twoban.featureSelection ()
+    test (twoban,     "Selective 2-BAN-OS")
 
 } // BayesClassifierTest6 object
 
@@ -612,23 +628,39 @@ object BayesClassifierTest6 extends App
 object BayesClassifierTest7 extends App
 {
     val filename = BASE_DIR + "flare.data"
-    var data = Relation (filename, -1, null)
+    val data = Relation (filename, -1, null)
     val xy = data.toMatriI2 (null)
 
-    val fn = data.colName.toArray
+    val fn = data.colName.toArray.slice (0, xy.dim2 - 1)
     val k  = 2
     val cn = Array ("0", "1")                                  // class names
     val vc = null.asInstanceOf [VectoI]                        // use default value count
     val me = me_default                                        // me-estimates
-    val th = 0.3                                               // threshold
+    val th = 0.0                                               // threshold
 
-    test (BayesClassifier (xy, fn, k, cn, vc, me),           "Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me),     "Selective Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, me, th),       "1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me, th), "Selective 1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, me, vc),           "TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, me, vc),     "Selective TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, th, me),       "2-BAN-OS")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me)
+    test (nb,         "Naive Bayes")
+
+    val oneban = BayesClassifier (xy, fn, k, cn, vc, me, th)
+    test (oneban,     "1-BAN")
+
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc)
+    test (tan,        "TAN Bayes")
+
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me)
+    test (twoban,     "2-BAN-OS")
+
+    nb.featureSelection ()
+    test (nb,         "Selective Naive Bayes")
+
+    oneban.featureSelection ()
+    test (oneban,     "Selective 1-BAN")
+
+    tan.featureSelection ()
+    test (tan,        "Selective TAN Bayes")
+
+    twoban.featureSelection ()
+    test (twoban,     "Selective 2-BAN-OS")
 
 } // BayesClassifierTest7 object
 
@@ -640,23 +672,39 @@ object BayesClassifierTest7 extends App
 object BayesClassifierTest8 extends App
 {
     val filename = BASE_DIR + "connect-4.dat"
-    var data = Relation (filename, -1, null)
+    val data = Relation (filename, -1, null)
     val xy = data.toMatriI2 (null)
 
-    val fn = data.colName.toArray
+    val fn = data.colName.toArray.slice (0, xy.dim2 - 1)
     val k  = 3
     val cn = Array ("0", "1", "2")                             // class names
     val vc = null.asInstanceOf [VectoI]                        // use default value count
     val me = me_default                                        // me-estimates
-    val th = 0.3                                               // threshold
+    val th = 0.0                                               // threshold
 
-    test (BayesClassifier (xy, fn, k, cn, vc, me),           "Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me),     "Selective Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, me, th),       "1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me, th), "Selective 1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, me, vc),           "TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, me, vc),     "Selective TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, th, me),       "2-BAN-OS")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me)
+    test (nb,         "Naive Bayes")
+
+    val oneban = BayesClassifier (xy, fn, k, cn, vc, me, th)
+    test (oneban,     "1-BAN")
+
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc)
+    test (tan,        "TAN Bayes")
+
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me)
+    test (twoban,     "2-BAN-OS")
+
+    nb.featureSelection ()
+    test (nb,         "Selective Naive Bayes")
+
+    oneban.featureSelection ()
+    test (oneban,     "Selective 1-BAN")
+
+    tan.featureSelection ()
+    test (tan,        "Selective TAN Bayes")
+
+    twoban.featureSelection ()
+    test (twoban,     "Selective 2-BAN-OS")
 
 } // BayesClassifierTest8 object
 
@@ -668,23 +716,39 @@ object BayesClassifierTest8 extends App
 object BayesClassifierTest9 extends App
 {
     val filename = BASE_DIR + "connect-4.dat"
-    var data = Relation (filename, -1, null)
+    val data = Relation (filename, -1, null)
     val xy = data.toMatriI2 (null)
 
-    val fn = data.colName.toArray
+    val fn = data.colName.toArray.slice (0, xy.dim2 - 1)
     val k  = 3
     val cn = Array ("0", "1", "2")                             // class names
     val vc = null.asInstanceOf [VectoI]                        // use default value count
     val me = me_default                                        // me-estimates
-    val th = 0.3                                               // threshold
+    val th = 0.0                                               // threshold
 
-    test (BayesClassifier (xy, fn, k, cn, vc, me),           "Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me),     "Selective Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, me, th),       "1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me, th), "Selective 1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, me, vc),           "TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, me, vc),     "Selective TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, th, me),       "2-BAN-OS")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me)
+    test (nb,         "Naive Bayes")
+
+    val oneban = BayesClassifier (xy, fn, k, cn, vc, me, th)
+    test (oneban,     "1-BAN")
+
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc)
+    test (tan,        "TAN Bayes")
+
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me)
+    test (twoban,     "2-BAN-OS")
+
+    nb.featureSelection ()
+    test (nb,         "Selective Naive Bayes")
+
+    oneban.featureSelection ()
+    test (oneban,     "Selective 1-BAN")
+
+    tan.featureSelection ()
+    test (tan,        "Selective TAN Bayes")
+
+    twoban.featureSelection ()
+    test (twoban,     "Selective 2-BAN-OS")
 
 } // BayesClassifierTest9 object
 
@@ -696,23 +760,39 @@ object BayesClassifierTest9 extends App
 object BayesClassifierTest10 extends App
 {
     val filename = BASE_DIR + "nursery.dat"
-    var data = Relation (filename, -1, null)
+    val data = Relation (filename, -1, null)
     val xy = data.toMatriI2 (null)
 
-    val fn = data.colName.toArray
+    val fn = data.colName.toArray.slice (0, xy.dim2 - 1)
     val k  = 5
     val cn = Array ("0", "1", "2", "3", "4")                   // class names
     val vc = null.asInstanceOf [VectoI]                        // use default value count
     val me = me_default                                        // me-estimates
-    val th = 0.3                                               // threshold
+    val th = 0.0                                               // threshold
 
-    test (BayesClassifier (xy, fn, k, cn, vc, me),           "Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me),     "Selective Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, me, th),       "1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me, th), "Selective 1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, me, vc),           "TANaive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, me, vc),     "Selective TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, th, me),       "2-BAN-OS")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me)
+    test (nb,         "Naive Bayes")
+
+    val oneban = BayesClassifier (xy, fn, k, cn, vc, me, th)
+    test (oneban,     "1-BAN")
+
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc)
+    test (tan,        "TAN Bayes")
+
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me)
+    test (twoban,     "2-BAN-OS")
+
+    nb.featureSelection ()
+    test (nb,         "Selective Naive Bayes")
+
+    oneban.featureSelection ()
+    test (oneban,     "Selective 1-BAN")
+
+    tan.featureSelection ()
+    test (tan,        "Selective TAN Bayes")
+
+    twoban.featureSelection ()
+    test (twoban,     "Selective 2-BAN-OS")
 
 } // BayesClassifierTest10 object
 
@@ -724,24 +804,40 @@ object BayesClassifierTest10 extends App
 object BayesClassifierTest11 extends App
 {
     val filename = BASE_DIR + "kr-vs-k.dat"
-    var data = Relation (filename, -1, null)
+    val data = Relation (filename, -1, null)
     val xy = data.toMatriI2 (null)
 
-    val fn = data.colName.toArray
+    val fn = data.colName.toArray.slice (0, xy.dim2 - 1)
     val k  = 18
     val cn = Array ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
                     "10", "11", "12", "13", "14", "15", "16", "17")     // class names
     val vc = null.asInstanceOf [VectoI]                        // use default value count
     val me = me_default                                        // me-estimates
-    val th = 0.3                                               // threshold
+    val th = 0.0                                               // threshold
 
-    test (BayesClassifier (xy, fn, k, cn, vc, me),           "Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me),     "Selective Naive Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, me, th),       "1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, null, vc, me, th), "Selective 1-BAN")
-    test (BayesClassifier (xy, fn, k, cn, me, vc),           "TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, null, me, vc),     "Selective TAN Bayes")
-    test (BayesClassifier (xy, fn, k, cn, vc, th, me),       "2-BAN-OS")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me)
+    test (nb,         "Naive Bayes")
+
+    val oneban = BayesClassifier (xy, fn, k, cn, vc, me, th)
+    test (oneban,     "1-BAN")
+
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc)
+    test (tan,        "TAN Bayes")
+
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me)
+    test (twoban,     "2-BAN-OS")
+
+    nb.featureSelection ()
+    test (nb,         "Selective Naive Bayes")
+
+    oneban.featureSelection ()
+    test (oneban,     "Selective 1-BAN")
+
+    tan.featureSelection ()
+    test (tan,        "Selective TAN Bayes")
+
+    twoban.featureSelection ()
+    test (twoban,     "Selective 2-BAN-OS")
 
 } // BayesClassifierTest11 object
 

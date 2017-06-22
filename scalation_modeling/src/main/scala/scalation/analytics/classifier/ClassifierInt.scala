@@ -9,8 +9,8 @@
 package scalation.analytics.classifier
 
 import scala.math.round
-
-import scalation.linalgebra.{MatriD, MatrixD, MatriI, MatrixI, VectoD, VectoI, VectorI}
+import scala.util.control.Breaks.{break, breakable}
+import scalation.linalgebra.{MatriD, MatriI, MatrixD, MatrixI, VectoD, VectoI, VectorI}
 import scalation.stat.vectorD2StatVector
 import scalation.util.{Error, getFromURL_File}
 
@@ -41,6 +41,11 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int, 
     /** the feature-set size as a Double
      */
     protected val nd = n.toDouble
+
+    /** the set of features to turn on or off. All features are on by default.
+     *  Used for feature selection.
+     */
+    protected val fset = Array.fill [Boolean](n)(true)
 
     if (y.dim != m)     flaw ("constructor", "y.dim must equal training-set size (m)")
     if (fn.length != n) flaw ("constructor", "fn.length must equal feature-set size (n)")
@@ -163,6 +168,60 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int, 
         } // for
         cor
     } // calcCorrelation
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform feature selection on the classifier. Use backward elimination
+     *  technique, that is, remove the least significant feature, in terms of cross-
+     *  validation accuracy, in each round.
+     *  @param TOL  tolerance indicating negligible accuracy loss when removing features
+     */
+    def featureSelection (TOL: Double = 0.01)
+    {
+        val DEBUG = false
+
+        var accuracy = crossValidateRand ()
+        if (DEBUG) println ("Initial accuracy with no feature removed: " + accuracy)
+
+        //keep removing one feature at a time until no more feature should be removed
+        breakable{ while (true) {
+            var minDiff      = 1.0
+            var toRemove     = -1
+            if (DEBUG) println ("Try to remove each feature and achieve best accuracy...")
+
+            for (j <- 0 until n if fset(j)) {
+                if (DEBUG) println ("Test by temporarily removing feature " + j)
+                fset(j) = false
+                val currentAccu = crossValidateRand ()
+                val accuracyDiff = accuracy - currentAccu
+                if (accuracyDiff < minDiff) {               // search for the feature with minimal impact on cv accuracy
+                    minDiff  = accuracyDiff
+                    accuracy = currentAccu
+                    toRemove = j
+                } // if
+                fset(j) = true
+            } // for
+
+            //only remove the feature if the minimum accuracy drop is less than a small TOL value (acceptable accuracy reduction)
+            if (minDiff < TOL && toRemove > -1) {
+                fset(toRemove) = false
+                if (DEBUG) {
+                    println ("Feature " + toRemove + " has been removed.")
+                    println ("The new accuracy is " + accuracy + " after removing feature " + toRemove)
+                }
+            } else {
+                if (DEBUG) println ("No more features can/should be removed.")
+                break
+            } // if
+        }} // breakable while
+
+        val remained = new StringBuilder ()
+        val removed  = new StringBuilder ()
+        for (j <- 0 until n) if (fset(j)) remained append s"$j " else removed append s"$j "
+        println ("The following features have remained: " + remained)
+        println ("The following features were removed: " + removed)
+        if (DEBUG) println ("NOTE: The classifier must be re-trained before classifying any instances.")
+
+    } // featureSelection
 
 } // ClassifierInt abstract class
 

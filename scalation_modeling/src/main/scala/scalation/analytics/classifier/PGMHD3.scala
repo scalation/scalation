@@ -179,7 +179,7 @@ class PGMHD3 (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: Arr
      *  training data.
      *  @param itrain indices of the instances considered train data
      */
-    private def frequencies (itrain: Array [Int])
+    private def frequencies (itrain: IndexedSeq [Int])
     {
         if (DEBUG) banner ("frequencies (itrain)")
         for (l <- itrain) {                                    // l = lth row of data matrix x
@@ -204,7 +204,7 @@ class PGMHD3 (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: Arr
      *  conditional probabilities for X_j.
      *  @param itrain indices of the instances considered train data
      */
-    override def train (itrain: Array [Int])
+    override def train (itrain: IndexedSeq [Int])
     {
         frequencies (itrain)                                   // compute frequencies skipping test region
 
