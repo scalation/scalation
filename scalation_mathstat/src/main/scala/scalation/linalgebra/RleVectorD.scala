@@ -79,9 +79,7 @@ object RleVectorD
             if (x(i) != x(i - 1)) {
                 c1(idx) = new TripletD (x(i - 1), count,(i) - count); idx += 1
                 count = 1; z += 1
-            } else {
-                count += 1
-            } // if
+            } else count += 1
         } // for
         c1(idx) = new TripletD (x(x.dim - 1), count, x.dim - count)
         new RleVectorD (x.dim, c1)
@@ -102,7 +100,7 @@ object RleVectorD
             if (xs(i) != xs(i - 1)) {
                 c1(idx) = new TripletD (xs(i - 1), count, (i) - count); idx += 1
                 count = 1; z += 1
-            } else { count += 1 } // if
+            } else count += 1
         } // for
        c1(idx) = new TripletD (xs(xs.size - 1), count, xs.size - count)
        new RleVectorD (xs.size, c1)
@@ -115,19 +113,23 @@ object RleVectorD
      */
     def apply (x: Double, xs: Double*): RleVectorD =
     {
-        var c1 = new ReArray [TripletD] ()
-        var idx = 0
+        var c1    = new ReArray [TripletD] ()
+        var idx   = 0
         var count = 1
-        var z = 0
-        if (xs(1) != x) {
+        var z     = 0
+        if (xs.size == 0) {
+            c1(idx) = new TripletD (x, 1, 0)
+            return new RleVectorD (xs.size + 1, c1)
+        } // if
+        if (xs(0) != x) {
             c1(idx) = new TripletD (x, 1, 0); idx += 1
             count = 1; z += 1
-        } else { count += 1 } // if
-        for (i <- 2 until xs.size) {      
+        } else count += 1
+        for (i <- 1 until xs.size) {      
             if (xs(i) != xs(i - 1)) {
                 c1(idx) = new TripletD (xs(i - 1), count, i - count); idx += 1
                 count = 1; z += 1
-            } else { count += 1 } // if
+            } else count += 1
         } // for
         c1(idx) = new TripletD (xs(xs.size - 1), count, xs.size - count)
         new RleVectorD (xs.size + 1, c1)   
@@ -496,7 +498,7 @@ class RleVectorD (val dim: Int, protected var v: ReArray [TripletD] = null)
         for (i <- c.range) c(i) = v(basis(i)).value
         c
     } // select
-    
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate 'this' vector and vector' b' and return the uncompressed vector
      *  @param b  the vector to be concatenated
@@ -515,7 +517,8 @@ class RleVectorD (val dim: Int, protected var v: ReArray [TripletD] = null)
     def ++ (s: Double): RleVectorD =
     {    
         val c = new RleVectorD (dim + 1, new ReArray [TripletD] (csize))  
-        for (i<- crange) c.v(i) = v(i)
+//      for (i <- crange) c.v(i) = v(i)
+        for (i <- crange) c.v(i) = new TripletD (v(i).value, v(i).count, v(i).startPos)
         if (v(csize - 1).value == s) c.v(csize - 1).count += 1     
         else c.v(csize) = new TripletD (s, 1, v(csize - 1).startPos + v(csize - 1).count)      
         c
@@ -1002,11 +1005,6 @@ class RleVectorD (val dim: Int, protected var v: ReArray [TripletD] = null)
     def sum: Double = v.foldLeft (0.0) ((s, a) => s + (a.value * a.count)) 
           
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Sum the absolute value of the elements of 'this' vector.
-     */
-    def sumAbs: Double = v.foldLeft (0.0) ((s, a) => s + (ABS (a.value) * a.count)) 
-        
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of 'this' vector skipping the 'i'-th element (Not Equal 'i').
      *  @param i  the index of the element to skip
      */
@@ -1386,21 +1384,92 @@ class RleVectorD (val dim: Int, protected var v: ReArray [TripletD] = null)
     /** Determine whether 'this' vector is in sorted (ascending) order.
      */
     def isSorted: Boolean = (new SortingD (this().toArray)).isSorted 
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Partition function of quicksort.
+     *  @param l    the low index
+     *  @param h    the high index
+     *  @param asc  whether to sort in ascending order
+     */
+    def qspartition (l: Int, h: Int, asc: Boolean = true): Int =
+    {
+        var pivot = v(h).value
+        var i = l - 1
+        for (j <- l until h) {
+            if (asc) if (v(j).value <= pivot) { i += 1; swap (i, j) }
+            else     if (v(j).value > pivot)  { i += 1; swap (i, j) }
+        } // for
+        swap (i+1, h)
+        i + 1
+    } // qspartition
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Quicksort implementation for rle vectors.
+     *  @param l    the low index
+     *  @param h    the high index
+     *  @param asc  whether to sort in ascending order
+     */
+    def rle_quicksort (l: Int, h: Int, asc: Boolean = true)
+    {
+        if (l < h) {
+            val p = qspartition (l, h, asc)
+            rle_quicksort (l, p - 1, asc)
+            rle_quicksort (p + 1, h, asc)
+        } // if
+    } // rle_quicksort
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sort 'this' vector in-place in ascending (non-decreasing) order.
      */
     def sort () 
-     { 
-         throw new UnsupportedOperationException ("sort is not implemented yet")
-     } // sort
+    { 
+        rle_quicksort (0, csize - 1)
+        var co = 0
+        var sp = 0
+        var j  = 0
+        var i  = 0
+        while (i < csize) {
+            co = v(i).count
+            while (i + 1 < csize && v(i).value == v(i + 1).value) {
+                i  += 1
+                co += v(i).count
+            } // while
+            v(j).value    = v(i).value
+            v(j).count    = co
+            v(j).startPos = sp
+            sp += co
+            co  = 0
+            j  += 1
+            i  += 1
+        } // while
+        v.reduceToSize (j)
+    } // sort
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sort 'this' vector in-place in descending (non-increasing) order.
      */
     def sort2 () 
     {
-        throw new UnsupportedOperationException ("sort2 is not implemented yet") 
+        rle_quicksort (0, csize - 1, false)
+        var co = 0
+        var sp = 0
+        var j  = 0
+        var i  = 0
+        while (i < csize) {
+            co = v(i).count
+            while (i + 1 < csize && v(i).value == v(i + 1).value) {
+                i  += 1
+                co += v(i).count
+            } // while
+            v(j).value = v(i).value
+            v(j).count = co
+            v(j).startPos = sp
+            sp += co
+            co  = 0
+            j  += 1
+            i  += 1
+        } // while
+        v.reduceToSize (j)
     } // sort2 
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1410,7 +1479,7 @@ class RleVectorD (val dim: Int, protected var v: ReArray [TripletD] = null)
      */
     def swap (i: Int, j: Int)
     {
-        val t = this(j); this(j) = this(i); this(i) = t
+        val t = v(j); v(j) = v(i); v(i) = t
     } // swap
        
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -1147,7 +1147,7 @@ import RleMatrixD._
     def sumAbs: Double = 
     {
         var sum = 0.0
-        for (i <- range2) sum += v(i).sumAbs
+        for (i <- range2) sum += v(i).norm1
         sum
     } // sumAbs
 

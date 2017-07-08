@@ -1147,7 +1147,7 @@ import RleMatrixL._
     def sumAbs: Long = 
     {
         var sum = 0l
-        for (i <- range2) sum += v(i).sumAbs
+        for (i <- range2) sum += v(i).norm1
         sum
     } // sumAbs
 

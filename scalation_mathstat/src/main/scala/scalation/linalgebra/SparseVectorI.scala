@@ -485,16 +485,6 @@ class SparseVectorI (val dim_ : Int,
     } // sum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Sum the absolute value of the elements of 'this' vector.
-     */
-    def sumAbs: Int = 
-    {
-        var sum = 0
-        for (x <- v) sum += ABS (x._2)
-        sum
-    } // sumAbs
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sum the elements of 'this' vector skipping the 'i'-th element (Not Equal 'i').
      *  @param i  the index of the element to skip
      */
@@ -593,7 +583,7 @@ class SparseVectorI (val dim_ : Int,
     def norm1: Int =
     {  
         var sum = 0
-        for ( x <- v ) sum += ABS (x._2)
+        for (x <- v) sum += ABS (x._2)
         sum
     } // norm1
 
