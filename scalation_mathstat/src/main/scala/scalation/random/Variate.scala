@@ -987,7 +987,7 @@ case class Sharp (x: Double = 1, stream: Int = 0)
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This class generates `StudentT` random variates.
+/** This class generates `StudentT` (Student's t) random variates.
  *  This continuous RV models cases where data are normally distributed, but
  *  variability increases since the variance is unknown.
  *  @see http://www.math.uah.edu/stat/special/Student.html

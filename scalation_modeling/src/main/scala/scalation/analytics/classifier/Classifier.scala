@@ -33,9 +33,7 @@ trait Classifier
     def train (itest: IndexedSeq [Int]) {}
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the classifier, i.e., calculate statistics and create conditional
-     *  density 'cd' functions.  Assumes that conditional densities follow the
-     *  Normal (Gaussian) distribution.
+    /** Given a set of data vectors and their classifications, build a classifier.
      */
     def train () { train (0, 0) }
 

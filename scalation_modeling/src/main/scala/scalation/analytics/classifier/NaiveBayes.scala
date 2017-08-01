@@ -131,7 +131,6 @@ class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [
     /** Given a discrete data vector 'z', classify it returning the class number
      *  (0, ..., k-1) with the highest relative posterior probability.
      *  Return the best class, its name and its relative probability.
-     *
      *  @param z  the data vector to classify
      */
     def classify (z: VectoI): (Int, String, Double) =

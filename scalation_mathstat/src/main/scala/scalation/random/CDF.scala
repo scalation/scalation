@@ -434,26 +434,26 @@ object CDF
      *  @see [JKB 1995] Johnson, Kotz & Balakrishnan "Continuous Univariate 
      *       Distributions" (Volume 2) (2nd Edition) (Chapter 28) (1995) 
      *  @param x   the x coordinate, argument to F(x)
-     *  @param df  the degrees of freedom (must be > 0)
+     *  @param df  the degrees of freedom (must be > 0.0)
      */    
-    def studentTCDF (x: Double, df: Int): Double =
+    def studentTCDF (x: Double, df: Double): Double =
     {
-        if (df <= 0) {
+        if (df <= 0.0) {
             flaw ("studentTCDF", "parameter df must be strictly positive")
             return NaN
         } // if
 
-        if (df == 1) {                           // Cauchy CDF
+        if (df =~ 1.0) {                                   // Cauchy CDF
             0.5 + (1.0/Pi) * atan (x)
-        } else if (df == 2) {                    // Explicit Formula
+        } else if (df =~ 2.0) {                            // Explicit Formula
             0.5 + (x/2.0) * pow (2.0 + x*x, -0.5)
-        } else if (df < 2*x*x) {                 // [JKB 1995]
+        } else if (df < 2.0*x*x) {                         // [JKB 1995]
             val z = 0.5 * rBetaF (df / (df + x*x), 0.5*df, 0.5)
             if (x > 0) 1.0 - z else z
-        } else if (df < 30) {                    // [JKB 1995]
+        } else if (df < 30.0) {                            // [JKB 1995]
             val z = 0.5 * rBetaC (x*x / (df + x*x), 0.5, 0.5*df)
             if (x > 0) 1.0 - z else z
-        } else {                                 // Ordinary Normal Approximation (ONA)
+        } else {                                           // Ordinary Normal Approximation (ONA)
             normalCDF (x)                  
         } // if
     } // studentTCDF
@@ -469,6 +469,24 @@ object CDF
         val df = if (pr == null) 9 else pr(0).toInt
         studentTCDF (x, df)
     } // studentTCDF
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the Cumulative Distribution Function (CDF) for "Noncentral t"
+     *  distribution.
+     *  @see https://en.wikipedia.org/wiki/Noncentral_t-distribution
+     *  @param x   the x coordinate, argument to F(x)
+     *  @param mu  the noncentrality parameter (or mean)
+     *  @param df  the degrees of freedom (must be > 0.0)
+     */    
+    def noncentralTCDF (x: Double, mu: Double, df: Double): Double =
+    {
+        if (df <= 0.0) {
+            flaw ("noncentralTCDF", "parameter df must be strictly positive")
+            return NaN
+        } // if
+
+        throw new UnsupportedOperationException ("noncentralTCDF in CDF not implemented yet")  // FIX
+    } // noncentralTCDF
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Cumulative Distribution Function (CDF) for the ChiSquare
