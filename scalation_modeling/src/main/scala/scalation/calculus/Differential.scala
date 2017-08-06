@@ -10,6 +10,8 @@
 
 package scalation.calculus
 
+import scala.math.sqrt
+
 import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.math.FunctionS2S
 
@@ -29,6 +31,7 @@ object Differential
     private var h2  = h + h                    // twice the step size
     private var hh  = h * h                    // step size squared
     private var hh4 = 4.0 * hh                 // step size squared
+    private var hl  = sqrt (h)                 // relative large step for finite difference
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset the step size from its default step size to one more suitable for
@@ -39,6 +42,28 @@ object Differential
      *  @param step  the new step size to reset h to
      */
     def resetH (step: Double) { h = step; h2 = h + h; hh = h * h; hh4 = 4.0 * hh }
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reset the large step size from its default step size to one more suitable
+     *  for your function.
+     *  @param largeStep  the new large step size to reset hl to
+     */
+    def resetHR (largeStep: Double) { hl = largeStep }
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    // Finite Difference
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Estimate the finite difference of the scalar-to-scalar function 'f' at 'x'
+     *  using a 1-sided method (forward difference).  May work better than the
+     *  derivative for noisy functions.
+     *  @param f  the function whose derivative is sought
+     *  @param x  the point (scalar) at which to estimate the finite difference
+     */
+    def fdiffernce (f: FunctionS2S, x: Double): Double = (f(x + hl) - f(x)) / hl
+
+    def Δ (f: FunctionS2S)(x: Double): Double = (f(x + hl) - f(x)) / hl
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     // First Order
@@ -65,7 +90,7 @@ object Differential
      */
     def derivative (f: FunctionS2S, x: Double): Double = (f(x + h) - f(x - h)) / h2
 
-    def Ⅾ (f: FunctionS2S, x: Double): Double = (f(x + h) - f(x - h)) / h2
+    def Ⅾ (f: FunctionS2S)(x: Double): Double = (f(x + h) - f(x - h)) / h2
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Estimate the 'i'th partial derivative of the vector-to-scalar function 'f' at
@@ -243,7 +268,7 @@ object DifferentialTest extends App
     val x = VectorD (2.0, 2.0)
 
     banner ("Derivatives")
-    println (s"Ⅾ g($y)  = ${Ⅾ (g, y)}")                       // derivative
+    println (s"Ⅾ g($y)  = ${Ⅾ (g)(y)}")                       // derivative
     println (s"ⅮⅮ g($y) = ${ⅮⅮ (g, y)}")                      // second derivative
 
     banner ("Partial Derivatives")

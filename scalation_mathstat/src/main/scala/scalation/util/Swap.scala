@@ -18,8 +18,8 @@ object Swap
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Swap two elements in a regular array.
-     *  @param  i  first element to swap
-     *  @param  j  second element to swap
+     *  @param i  first element to swap
+     *  @param j  second element to swap
      */
     def swap [T] (a: Array [T], i: Int, j: Int)
     {
@@ -28,8 +28,8 @@ object Swap
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Swap two elements in a resizable array.
-     *  @param  i  first element to swap
-     *  @param  j  second element to swap
+     *  @param i  first element to swap
+     *  @param j  second element to swap
      */
     def swap [T] (a: ArrayBuffer [T], i: Int, j: Int)
     {
@@ -38,13 +38,14 @@ object Swap
 
 } // Swap object
 
+import Swap.swap
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** This object is used to test the Swap object.
+/** This `SwapTest` is used to test the `Swap` object.
+    > run-main scalation.util.SwapTest
  */
 object SwapTest extends App
 {
-    import Swap.swap
     val a = Array (0, 1, 2, 3, 4, 5, 6, 7)
     swap (a, 1, 6)
     println (a.deep)

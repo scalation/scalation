@@ -41,16 +41,16 @@ import scalation.util.banner
  */
 class TTest (x: VectorD, y: VectorD, pooled: Boolean = true)
 {
-    private val DEBUG  = true                             // debug flag
-    private val n1     = x.dim                            // sample size for x
-    private val n2     = y.dim                            // sample size for y
-    private val n1_    = n1 - 1                           // sample size for x less one (df1)
-    private val n2_    = n2 - 1                           // sample size for y less one (df2)
-    private val dfp    = n1_ + n2_                        // pooled degrees of freedom
+    private val DEBUG = true                              // debug flag
+    private val n1    = x.dim                             // sample size for x
+    private val n2    = y.dim                             // sample size for y
+    private val n1_   = n1 - 1                            // sample size for x less one (df1)
+    private val n2_   = n2 - 1                            // sample size for y less one (df2)
+    private val dfp   = n1_ + n2_                         // pooled degrees of freedom
 
-    private val μ1     = x.mean                           // sample mean of x
-    private val μ2     = y.mean                           // sample mean of y
-    private val diff   = abs (μ1 - μ2)                    // absolute difference in sample means
+    private val μ1    = x.mean                            // sample mean of x
+    private val μ2    = y.mean                            // sample mean of y
+    private val diff  = abs (μ1 - μ2)                     // absolute difference in sample means
 
     private val sv1   = x.variance                        // sample variance of x
     private val sv2   = y.variance                        // sample variance of y
@@ -136,6 +136,9 @@ class TTest (x: VectorD, y: VectorD, pooled: Boolean = true)
 } //  TTest class
 
 
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `TTest` companion object provides a convenient method for performing t-test.
+ */
 object TTest
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

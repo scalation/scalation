@@ -87,8 +87,10 @@ class SVD [MatT <: MatriD] (a: MatT)
                 if (! test_fconverge) cancellation (l, k)
 
                 if (testFConvergence (l, k)) {
-                    println (s"iterate: for k = $k, converged after ${iter+1} iterations")
-                    if (DEBUG) println (s"iterate: e = $e \nq = $q")
+                    if (DEBUG) {
+                        println (s"iterate: for k = $k, converged after ${iter+1} iterations")
+                        println (s"iterate: e = $e \nq = $q")
+                    } // if
                     return
                 } // if
 
@@ -237,7 +239,7 @@ class SVD [MatT <: MatriD] (a: MatT)
         for (ll <- k to 0 by -1) {
             l = ll                               // make global index l track loop variable ll
             test_fconverge = false
-            if (abs (e(ll))   <= eps) { println (s"e(ll) = ${e(ll)}"); test_fconverge = true; return }
+            if (abs (e(ll))   <= eps) { if (DEBUG) println (s"e(ll) = ${e(ll)}"); test_fconverge = true; return }
             if (abs (q(ll-1)) <= eps) return
         } // for
     } // testFSplitting

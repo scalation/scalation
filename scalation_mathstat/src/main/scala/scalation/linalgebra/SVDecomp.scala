@@ -35,7 +35,7 @@ trait SVDecomp
     /** Factor/deflate the matrix by iteratively turning elements not in the main
      *  diagonal to zero.
      */
-    def factor () = factor123 ()
+    def factor () { factor123 () }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the two factored matrices.
@@ -114,44 +114,70 @@ trait SVDecomp
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDecomp` object provides several test matrices as well as methods
- *  for determining rank and test the SVD factorizations.
+ *  for making full representations, reducing dimensionality, determining rank
+ *  and testing SVD factorizations.
  */
 object SVDecomp extends SVDecomp
 {
-    val a1 = new MatrixD ((2, 2), 1.00,  2.00,                             // original matrix
-                                  0.00,  2.00)                             // 2 by 2, bidiagonal
+    val a1 = new MatrixD ((2, 2), 1.00,  2.00,                           // original matrix
+                                  0.00,  2.00)                           // 2 by 2, bidiagonal
 
-    val a2 = new MatrixD ((3, 2), 3.0, -1.0,                               // original matrix
-                                  1.0,  3.0,                               // 3 by 2
+    val a2 = new MatrixD ((3, 2), 3.0, -1.0,                             // original matrix
+                                  1.0,  3.0,                             // 3 by 2
                                   1.0,  1.0)
 
-    val a3 = new MatrixD ((3, 3), 1.0, 1.0, 0.0,                           // original matrix
-                                  0.0, 2.0, 2.0,                           // 3 by 3, bidiagonal
+    val a3 = new MatrixD ((3, 3), 1.0, 1.0, 0.0,                         // original matrix
+                                  0.0, 2.0, 2.0,                         // 3 by 3, bidiagonal
                                   0.0, 0.0, 3.0)
 
-    val a4 = new MatrixD ((3, 3), 0.0,     1.0, 1.0,                       // original matrix
-                                  sqrt(2), 2.0, 0.0,                       // 3 by 3
+    val a4 = new MatrixD ((3, 3), 0.0,     1.0, 1.0,                     // original matrix
+                                  sqrt(2), 2.0, 0.0,                     // 3 by 3
                                   0.0,     1.0, 1.0)
 
-    val a5 = new MatrixD ((4, 4), 0.9501, 0.8913, 0.8214, 0.9218,          // original matrix
-                                  0.2311, 0.7621, 0.4447, 0.7382,          // 4 by 4
+    val a5 = new MatrixD ((4, 4), 0.9501, 0.8913, 0.8214, 0.9218,        // original matrix
+                                  0.2311, 0.7621, 0.4447, 0.7382,        // 4 by 4
                                   0.6068, 0.4565, 0.6154, 0.1763,
                                   0.4860, 0.0185, 0.7919, 0.4057)
 
-    val a6 = new MatrixD ((3, 2), 4, 5,                                   // original matrix
-                                  6, 7,                                   // 3 by 2
+    val a6 = new MatrixD ((3, 2), 4, 5,                                  // original matrix
+                                  6, 7,                                  // 3 by 2
                                   9, 8)
 
-    val a7 = new MatrixD ((5, 3), 0.44444444,  0.3333333, -1.3333333,     // original matrix
-                                  0.41111111, -0.3166667, -0.3333333,     // 5 by 3
+    val a7 = new MatrixD ((5, 3), 0.44444444,  0.3333333, -1.3333333,    // original matrix
+                                  0.41111111, -0.3166667, -0.3333333,    // 5 by 3
                                  -0.18888889,  0.4833333, -0.3333333,
                                  -0.03333333, -0.6500000,  1.0000000,
                                  -0.63333333,  0.1500000,  1.0000000)
 
-     val a8 = new MatrixD ((4, 4), 1.0, 2.0, 3.0, 4.0,                    // original matrix
-                                   4.0, 3.0, 2.0, 1.0,                    // 4 by 4
+     val a8 = new MatrixD ((4, 4), 1.0, 2.0, 3.0, 4.0,                   // original matrix
+                                   4.0, 3.0, 2.0, 1.0,                   // 4 by 4
                                    5.0, 6.0, 7.0, 8.0,
                                    8.0, 7.0, 6.0, 5.0)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert an SVD factoring to its full representation, returning the result as
+     *  three matrices.
+     *  @param u_s_v  the 3-way factorization
+     */
+    def factorFull (u_s_v: FactorType): FactorTypeFull =
+    {
+        val s  = u_s_v._2.dim
+        val ss = new MatrixD (s); ss.setDiag (s)                 // turn vector into diagonal matrix
+        (u_s_v._1, ss, u_s_v._3)
+    } // factorFull
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reduce the dimensionality of the 'u', 's' and 'v' matrices from 'n' to 'k'.
+     *  If 'k = rank', there is no loss of information; when 'k < rank', multiplying
+     *  the three matrices results in an approximation (little is lost so long as
+     *  the singular values set to zero (i.e., clipped) are small).
+     *  @param u_s_v  the 3-way factorization
+     *  @param k      the desired dimensionality
+     */
+    def reduce (u_s_v: FactorType, k: Int): FactorType =
+    {
+        (u_s_v._1.sliceCol (0, k), u_s_v._2.slice (0, k), u_s_v._3.sliceCol (0, k))
+    } // reduce
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine the rank of a matrix by counting the number of non-zero singular
@@ -284,5 +310,5 @@ object SVDecompTest8 extends App
      test (a8, new SVD (a8),  "SVDTest")
      test (a8, new SVD2 (a8), "SVD2Test")
 
-} // SVDecompTest68
+} // SVDecompTest8
 
