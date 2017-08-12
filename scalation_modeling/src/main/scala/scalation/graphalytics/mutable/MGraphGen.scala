@@ -10,25 +10,56 @@ package scalation.graphalytics.mutable
 
 import scala.collection.mutable.{Map, Queue}
 import scala.collection.mutable.{Set => SET}
-import scala.math.pow
+import scala.math.{abs, pow}
 import scala.reflect.ClassTag
-import scala.util.Random
 
-import scalation.linalgebra.VectorI
-import scalation.random.RandomVecI
+import scalation.random._
+import scalation.util.{banner, Error}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphGen` object is used to build random graph with various characteristics.
+ *  Needs to generate vertex labels of various types including `Int`, `Double`,
+ *  `String`, `VectorD` based on the `TLabel` type.
+ *  @param typeSelector  the variable for type matches (work around for generic erasure)
+ *  @param stream        the random number stream to use (0 to 999)
  */
-class MGraphGen [TLabel: ClassTag]
+class MGraphGen [TLabel: ClassTag] (typeSelector: TLabel, stream: Int = 0)
+       extends Error
 {
-    /** Random number generator
+   /** Debug flag
      */
-    private val rand = new Random
+    private val DEBUG = true
 
-    /** Map of edge labels: (u, v) -> label
+    /** Random number generator with interval (0, 1)
      */
-    private val elabel:  Map [Tuple2 [Int, Int], TLabel] = Map ()
+    private val ran = Random (stream)
+
+    /** Random number/integer generator: 0, 1, ...
+     */
+    private val rng = Randi0 (stream = stream)
+
+    /** Random set generator
+     */
+    private val rsg = RandomSet (stream = stream)
+
+    /** Random label generator for the `TLabel` type parameter
+     */
+    private var rlg: Variate = _
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the Random Variate Generator, using the one based on the `TLabel` type.
+     *  @param nLabs  the number of labels to generate
+     */
+    def setVariate (nLabs: Int)
+    {
+        typeSelector match {
+        case _: Int     => rlg = Randi (1, nLabs, stream)
+        case _: Double  => rlg = Randi (1, nLabs, stream)
+        case _: String  => rlg = RandomWord (nLabs, stream = stream)
+//      case _: VectorD => rlg = RandomVecD (nLabs, stream)
+        case _          => flaw ("setVariate", "label type not supported")
+        } // match
+    } // setVariate
 
     //------------------------------------------------------------------------
     // Methods generating random graphs where the number of outgoing edges (the degree)
@@ -45,18 +76,32 @@ class MGraphGen [TLabel: ClassTag]
      *  @param avDegree  the average degree
      *  @param inverse   whether to create inverse adjacency (parents)
      *  @param name      the name of the graph
+     *  @param locality  whether to select children from anywhere in graph or locally
      */
     def genRandomGraph (size: Int, nLabels: Int, eLabels: Int, avDegree: Int, inverse: Boolean = false,
-                        name: String = "g"): MGraph [TLabel] =
+                        name: String = "g", locality: Boolean = true): MGraph [TLabel] =
     {
-        val ch = Array.ofDim [SET [Int]] (size)
-        for (i <- ch.indices) {                                    // for each vertex i
-            val degree = rand.nextInt (avDegree * 2 + 1)           // out degree for vertex i
-            val rvec   = RandomVecI (degree, size-1, i)            // random vector of integers
-            ch(i)      = SET ((rvec.igen)(): _*)                   // children of vertex i
+        val hwidth = avDegree + 4                                   // half width for generation window
+        val width  = 2 * hwidth                                     // full width
+        val ch     = Array.fill [SET [Int]] (size)(SET [Int] ())    // holder for children
+
+        for (i <- ch.indices) {
+            val degree = rng.iigen (avDegree * 2 + 1)               // desired out-degree for vertex i
+            if (locality) {
+                val delta  = rsg.igen (degree, width, i)            // offsets for children
+                for (j <- delta) {
+                    var ch_i = abs (i + j - hwidth)
+                    if (ch_i >= size) ch_i -= ch_i - size + 1
+                    if (ch_i == i) ch_i = abs (i - 1)
+                    ch(i) += ch_i                                   // generate children randomly with locality
+                } // for
+            } else {
+                ch(i) = rsg.igen (degree, size-1, i)                // generate children uniformly across graph
+            } // if
         } // for
-        val label  = randDistLabels (size, nLabels)                // randomly assigned vertex labels
-        val elabel = randDisteLabels (ch, eLabels)                 // randomly assigned edge labels
+
+        val label  = randDistLabels (size, nLabels)                 // randomly assign vertex labels
+        val elabel = randDisteLabels (ch, eLabels)                  // randomly assign edge labels
         new MGraph (ch, label, elabel, inverse, name)
     } // genRandomGraph
 
@@ -70,11 +115,15 @@ class MGraphGen [TLabel: ClassTag]
      *  @param inverse   whether to create inverse adjacency (parents)
      *  @param name      the name of the graph
      */
-    def genRandomConnectedGraph (size: Int, nLabels: Int, eLabels: Int, avDegree: Int, inverse: Boolean = false,
-                                 name: String = "g"): MGraph [TLabel] =
+    def genRandomConnectedGraph (size: Int, nLabels: Int, eLabels: Int, avDegree: Int,
+                                 inverse: Boolean = false, name: String = "g"): MGraph [TLabel] =
     {
         var g: MGraph [TLabel] = null
-        do g = genRandomGraph (size, nLabels, eLabels, avDegree, inverse, name) while (! g.isConnected)
+        var it = 0
+        do {
+            g = genRandomGraph (size, nLabels, eLabels, avDegree, inverse, name)
+        } while (! g.isConnected)
+        println (s"genRandomConnectedGraph: $it iterations")
         g
     } // genRandomConnectedGraph
   
@@ -83,21 +132,23 @@ class MGraphGen [TLabel: ClassTag]
      *  distribution (currently with the magic number 2.1 for the power law exponent).
      *  @param size      the number of vertices to generate
      *  @param nLabels   the number of labels (distributed according to power law)
-     *  @param avDegree  the average degree
+     *  @param eLabels   the number of edge labels (distributed uniformly)
+     *  @param avDegree  the average out-degree
+     *  @param distPow   the power/exponent (2.1 is used in WWW graph pg 72 of m&m graph data)
      *  @param inverse   whether to create inverse adjacency (parents)
      *  @param name      the name of the graph
      */
-    def genRandomGraph_PowLabels (size: Int, nLabels: Int, avDegree: Int, inverse: Boolean = false,
-                                  name: String = "g"): MGraph [TLabel] =
+    def genRandomGraph_PowLabels (size: Int, nLabels: Int, eLabels: Int, avDegree: Int, distPow: Double = 2.1,
+                                  inverse: Boolean = false, name: String = "g"): MGraph [TLabel] =
     {
         val ch = Array.ofDim [SET [Int]] (size)
-        for (i <- ch.indices) {                                          // each vertex i
-            val degree = rand.nextInt (avDegree * 2 + 1)                  // out degree
-            for (j <- 0 until degree if ! (ch contains j)) ch(i) += j   // add the edge i -> j
+        for (i <- ch.indices) {
+            val degree = rng.iigen (avDegree * 2 + 1)                   // out-degree for vertex i
+            ch(i)      = rsg.igen (degree, size - 1, i)                 // children of vertex i
         } // for
 
-        // 2.1 is used in WWW graph pg 72 of m&m graph data
-        val label = powDistLabels (size, nLabels, 2.1)
+        val label  = powDistLabels (size, nLabels, distPow)             // power law for vertex lables
+        val elabel = randDisteLabels (ch, eLabels)                      // randomly assign edge labels
         new MGraph (ch, label, elabel, inverse, name)
     } // genRandomGraph_PowLabels
 
@@ -111,21 +162,24 @@ class MGraphGen [TLabel: ClassTag]
      *  and uniformly distributed labels.
      *  @param size       the number of vertices 
      *  @param nLabels    the number of labels (distributed uniformly)
+     *  @param eLabels   the number of edge labels (distributed uniformly)
      *  @param maxDegree  the maximum allowed degree for any vertex
-     *  @param distPow    the power/exponent
+     *  @param distPow    the power/exponent (2.1 is used in WWW graph pg 72 of m&m graph data)
      *  @param inverse    whether to create inverse adjacency (parents)
      *  @param name       the name of the graph
      */
-    def genPowerLawGraph (size: Int, nLabels: Int, maxDegree: Int, distPow: Double,
+    def genPowerLawGraph (size: Int, nLabels: Int, eLabels: Int, maxDegree: Int, distPow: Double = 2.1,
                           inverse: Boolean = false, name: String = "g"): MGraph [TLabel] =
     {
+        val powLaw = PowerLaw (0, maxDegree, distPow)
         val ch = Array.ofDim [SET [Int]] (size)
-        for (i <- ch.indices) {                                          // each vertex i
-            val degree = powInt (0, maxDegree, distPow)                   // out degree
-            for (j <- 0 until degree if ! (ch contains j)) ch(i) += j   // add the edge i -> j
+        for (i <- ch.indices) {
+            val degree = powLaw.igen                                    // out-degree
+            ch(i)      = rsg.igen (degree, size - 1, i)                 // children of vertex i
         } // for
 
-        val label = randDistLabels (size, nLabels)
+        val label  = randDistLabels (size, nLabels)                     // randomly assign vertex labels
+        val elabel = randDisteLabels (ch, eLabels)                      // randomly assign edge labels
         new MGraph (ch, label, elabel, inverse, name)
     } // genPowerLawGraph
 
@@ -134,21 +188,24 @@ class MGraphGen [TLabel: ClassTag]
      *  and power law distributed labels.
      *  @param size       the number of vertices 
      *  @param nLabels    the number of labels (distributed according to power law)
+     *  @param eLabels   the number of edge labels (distributed uniformly)
      *  @param maxDegree  the maximum allowed degree for any vertex
-     *  @param distPow    the power/exponent
+     *  @param distPow    the power/exponent (2.1 is used in WWW graph pg 72 of m&m graph data)
      *  @param inverse    whether to create inverse adjacency (parents)
      *  @param name       the name of the graph
      */
-    def genPowerLawGraph_PowLabels (size: Int, nLabels: Int, maxDegree: Int, distPow: Double,
+    def genPowerLawGraph_PowLabels (size: Int, nLabels: Int, eLabels: Int, maxDegree: Int, distPow: Double = 2.1,
                                     inverse: Boolean = false, name: String = "g"): MGraph [TLabel] =
     {
+        val powLaw = PowerLaw (0, maxDegree, distPow)
         val ch = Array.ofDim [SET [Int]] (size)
-        for (i <- ch.indices) {                                          // each vertex i
-            val degree = powInt (0, maxDegree, distPow)                   // out degree
-            for (j <- 0 until degree if ! (ch contains j)) ch(i) += j   // add the edge i -> j
+        for (i <- ch.indices) {
+            val degree = powLaw.igen                                    // out-degree
+            ch(i)      = rsg.igen (degree, size - 1, i)                 // children of vertex i
         } // for
 
-        val label = powDistLabels (size, nLabels, distPow)
+        val label  = powDistLabels (size, nLabels, distPow)             // power law for vertex lables
+        val elabel = randDisteLabels (ch, eLabels)                      // randomly assign edge labels
         new MGraph (ch, label, elabel, inverse, name)
     } // genPowerLawGraph_PowLabels
 
@@ -163,7 +220,7 @@ class MGraphGen [TLabel: ClassTag]
      *  it chooses a random number of children to traverse, with that random
      *  number averaging to 'avDegree'.
      *  @param size      the number of vertices to extract
-     *  @param avDegree  the average out degree
+     *  @param avDegree  the average out-degree
      *  @param g         the data graph to extract from
      *  @param inverse   whether to create inverse adjacency (parents)
      *  @param name      the name of the graph
@@ -171,62 +228,84 @@ class MGraphGen [TLabel: ClassTag]
     def genBFSQuery (size: Int, avDegree: Int, g: MGraph [TLabel], inverse: Boolean = false,
                      name: String = "g"): MGraph [TLabel] =
     {
-        val maxRestarts = 5000
-        var nRestarts   = 0
-        var cycle       = false
-        var nodes       = SET [Int] ()
-        var chMap: Map [Int, SET [Int]] = null
+        val maxRestarts = 5000                                            // limit on retries
+        val nedges      = avDegree * size                                 // desired number of edges
 
-        while (nodes.size < size && nRestarts < maxRestarts) {
-            if (nRestarts % 100 == 0) println ("restarting " + nRestarts)
-            chMap     = Map [Int, SET [Int]] ()
-            nodes      = SET [Int] ()
-            val q      = Queue [Int] ()
-            val start  = rand.nextInt (g.size)     // randomly pick a start node in ch 
-            q.enqueue (start)
-            nodes += start
+        var nRestarts   = 0                                               // restarts so far
+        var nodes       = SET [Int] ()                                    // current set of extracted vertices
+        var edges       = 0                                               // number of edges so far
+        var maxEdges    = 0                                               // number of edges in best try
+        var maxNodes: SET [Int] = null                                    // nodes in best try
+        var chMap:    Map [Int, SET [Int]] = null                         // child map
+        var maxChMap: Map [Int, SET [Int]] = null                         // child map in best try
 
-            while (! q.isEmpty && nodes.size < size) {
-                val chs = SET [Int] ()
-                val newNode = q.dequeue
-                val newNodeChildren = g.ch (newNode)
-                if (! newNodeChildren.isEmpty) {
-                    val nncArr = newNodeChildren.toArray
-                    for (i <- 0 until rand.nextInt (avDegree * 2 + 1) if nodes.size < size) {
-                        val newChild = nncArr (rand.nextInt (newNodeChildren.size)) 
-                        if (!nodes.contains(newChild)) { nodes += newChild; q.enqueue (newChild) }
-                        else cycle = true
-                        if (newChild != newNode) chs += newChild 
-                    } // for
-                    chMap += (newNode -> (chMap.getOrElse (newNode, SET [Int] ()) ++ chs))
-                } // if
+        while ((nodes.size < size || edges < nedges) && nRestarts < maxRestarts) {
+            nodes   = SET [Int] ()
+            chMap   = Map [Int, SET [Int]] ()
+            val q   = Queue [Int] ()                                      // queue for BFS visitation
+            var v_s = -1                                                  // starting vertex
+
+            var degree = 1 + rng.iigen (avDegree * 2)                     // desired out-degree
+            do {
+                v_s = rng.iigen (g.size - 1)                              // randomly pick a start vertex
+            } while (g.ch(v_s).size < degree + 1)
+
+            nodes += v_s                                                  // add starting vertex to nodes
+            q.enqueue (v_s)                                               // place it in the BFS queue
+            edges = 0                                                     // no edges yet
+
+            while (! q.isEmpty && nodes.size < size) {                    // need size number of vertices
+
+                val v = q.dequeue                                         // candidate vertex v
+                val v_chs = g.ch(v)                                       // all its children
+                degree = 1 + rng.iigen (avDegree * 2)                     // desired out-degree
+                val chs   = pickChildren (v, v_chs.toArray, degree)       // pick random subset of v's children
+                val chs2  = SET [Int] ()                                  // those making the cut
+
+                for (v_ch <- chs) {                                       // chs2: appropriate vertices from chs
+                    degree = 1 + rng.iigen (avDegree * 2)
+                    if (g.ch(v_ch).size >= degree + 1) {
+                        if (nodes.size < size) {                          // still need vertices => take edges
+                            if (! (nodes contains v_ch)) {
+                                nodes += v_ch                             // add child vertex to nodes
+                                q.enqueue (v_ch)                          // put it on the BFS queue
+                            } // if
+                            chs2 += v_ch
+                            edges += 1
+                        } else if (nodes contains v_ch) {                 // can only take edge if child in nodes
+                            chs2 += v_ch
+                            edges += 1
+                        } else {
+                           println ("genBFSquery: can't find enough child vertices for $v")
+                        } // if
+                    } // if
+                } // for
+
+                println (s"nodes = $nodes")
+                chMap += (v -> (chMap.getOrElse (v, SET [Int] ()) ++ chs2))
             } // while
 
-            if (nodes.size < size) nRestarts += 1
+            println (s"chMap = $chMap")
+
+            if (edges > maxEdges) {                                       // if most edges so far, save as best
+                maxEdges = edges
+                maxNodes = nodes.clone ()
+                maxChMap = chMap.clone ()
+            } // if
+
+            if (nodes.size < size || edges < nedges) {                    // not enough vertices/edges, try again
+                nRestarts += 1
+                println ("=" * 80)
+                println (s"RESTART: #restarts = $nRestarts, #nodes = ${nodes.size}, #edges = $edges")
+                println ("=" * 80)
+            } // if
         } // while
-    
-        if (nRestarts == maxRestarts) { println ("genBFSQuery: could not find a good query"); return null }
-    
-        // create a vertex map from old to new ids, e.g., 7 -> 0, 11 -> 1, 15 -> 2
-        val vertexMap = Map [Int, Int] ()
-        var c = 0
-        for (v <- nodes) { vertexMap += (v -> c); c += 1 }
 
-        // for each new id, record the old id
-        val new2OldIds = Array.ofDim [Int] (size)
-        vertexMap.foreach { case (oldId, newId) => new2OldIds(newId) = oldId }
+        println (s"maxEdges = $maxEdges")
 
-        // for each mapped vertex, assign its mapped children
-        val ch = Array.ofDim [SET [Int]] (size).map (x => SET [Int] ())
-        for ((v, v_ch) <- chMap) ch(vertexMap (v)) = v_ch.map (vertexMap (_))
+        if (nRestarts == maxRestarts) println ("genBFSQuery: could not find a query graph with enough edges")
 
-        // map the vertex, edge labels
-        val qlabel  = new2OldIds.map (g.label(_)).toArray
-        val qelabel = Map [Tuple2 [Int, Int], TLabel] ()
-        for (i <- ch.indices; j <- ch(i)) qelabel += (i, j) -> g.elabel((new2OldIds(i), new2OldIds(j)))
-
-        if (cycle) println ("genBFSQuery: query has a cycle")
-        new MGraph (ch, qlabel, qelabel, inverse, name)
+        buildQGraph (maxNodes, maxChMap, g.label, inverse, name)
     } // genBFSQuery
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -249,7 +328,7 @@ class MGraphGen [TLabel: ClassTag]
             chMap    = Map [Int, SET [Int]] ()
             nodes     = SET [Int] ()
             val q     = Queue [Int] ()
-            val start = rand.nextInt (g.size)         // randomly pick a start node in ch
+            val start =  rng.iigen (g.size - 1)                           // randomly pick a start node in ch
             println ("extractSubgraph: start node: " + start)
             q.enqueue (start)
             nodes += start
@@ -282,8 +361,9 @@ class MGraphGen [TLabel: ClassTag]
         newLabelMap.foreach { case (oldL, newL) => newToOldLabels (newL) = oldL }
         val ch = Array.ofDim [SET [Int]] (size).map (x => SET [Int] ())
         for ((node, children) <- chMap) ch (newLabelMap(node)) = children.map (x => newLabelMap (x)) 
-        val label = newToOldLabels.map (x => g.label(x)).toArray
-        new MGraph (ch, label, elabel, inverse, name)
+        val label   = newToOldLabels.map (x => g.label(x)).toArray
+        val qelabel = Map [(Int, Int), TLabel] ()                   // FIX - fill in map
+        new MGraph (ch, label, qelabel, inverse, name)
     } // extractSubgraph
 
     //------------------------------------------------------------------------
@@ -291,30 +371,73 @@ class MGraphGen [TLabel: ClassTag]
     //------------------------------------------------------------------------
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Renumber the selected nodes (give them new consecutive ids).
-     *  @param node
-     *  @param chMap
+    /** Randomly Pick 'degree' children of vertex 'v'.  Requires 'v' to have at
+     *  least 'degree children.
+     *  @param v       the given vertex
+     *  @param v_ch    vertex v's children as an array
+     *  @param degree  the number of children to pick (out-degree)
      */
-//  private def renumber (node: SET [Int], chMap: Map [Int, SET [Int]]): Array [SET [Int]] =
-//  {
-//      val oldId2newId = Map [Int, Int] ()
-//      var i = 0
-//      for (v <- node) { oldId2newId += (v -> i); i += 1 }
-//      val newToOldLabels = Array.ofDim [Int] (size)
-//      for (
-//      newLabelMap.foreach { case (oldL, newL) => newToOldLabels (newL) = oldL }
-//      Array.ofDim [SET [Int]] (size).map (x => SET [Int] ())
-//  } // renumber
+    private def pickChildren (v: Int, v_ch: Array [Int], degree: Int): SET [Int] =
+    {
+        println (s"pickChildren: v = $v, v_ch = ${v_ch.deep}, degree = $degree")
+        val chs = SET [Int] ()                                       // set of children to be formed
+        var it  = 0                                                  // iteration counter
+        do {
+            val v_c = v_ch(rng.iigen (v_ch.size - 1))
+            if (v_c != v) chs += v_c
+            it += 1
+            if (it > 100 * degree) { println ("pickChildren: can't find enough children"); return SET [Int] () }
+        } while (chs.size < degree)
+        println (s"pickChildren: chs = $chs")
+        chs
+    } // pickChildren
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return an array with labels distributed between 0 and 'nLabels - 1'.
+    /** Build a query graph from the subgraph extracted from the data graph.
+     *  @param nodes    the nodes extracted from the data graph
+     *  @param chMap    the child map: vertex -> children
+     *  @param gLabel   the labels from the data graph
+     *  @param inverse  whether to create inverse adjacency (parents)
+     *  @param name     the name for the new query graph
+     */
+    private def buildQGraph (nodes: SET [Int], chMap: Map [Int, SET [Int]], gLabel: Array [TLabel],
+                             inverse: Boolean, name: String): MGraph [TLabel] =
+    {
+        // create a vertex map from old to new ids, e.g., 7 -> 0, 11 -> 1, 15 -> 2
+        var vertexMap = Map [Int, Int] ()
+        var c = 0
+        for (v <- nodes) { vertexMap += (v -> c); c += 1 }
+
+        // for each new id, record the old id
+        val new2OldIds = Array.ofDim [Int] (nodes.size)
+        vertexMap.foreach { case (oldId, newId) => new2OldIds(newId) = oldId }
+
+        // for each mapped vertex, assign its mapped children
+        val ch = Array.ofDim [SET [Int]] (nodes.size).map (x => SET [Int] ())
+        for ((v, v_ch) <- chMap) ch(vertexMap (v)) = v_ch.map (vertexMap (_))
+
+        // map the vertex and edge labels
+        val label   = new2OldIds.map (gLabel(_)).toArray
+        val qelabel = Map [(Int, Int), TLabel] ()                   // FIX - fill in map
+        new MGraph (ch, label, qelabel, inverse, name)
+    } // buildQGraph
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return an array with labels distributed between 1 and 'nLabels'.
      *  based on a uniform distribution.
      *  @param size     the number of vertices
      *  @param nLabels  the number of labels
      */
     private def randDistLabels (size: Int, nLabels: Int): Array [TLabel] =
     {
-        Array.ofDim [TLabel] (size).map ( x => rand.nextInt (nLabels).asInstanceOf [TLabel])
+        setVariate (nLabels)                                                                // set rlg
+        typeSelector match {
+        case _: Int     => Array.ofDim (size).map (_ => rlg.igen.asInstanceOf [TLabel])     // for `Int`
+        case _: Double  => Array.ofDim (size).map (_ => rlg.gen.asInstanceOf [TLabel])      // for `Double`
+        case _: String  => Array.ofDim (size).map (_ => rlg.sgen.asInstanceOf [TLabel])     // for `String`
+//      case _: VectorD => // implement                                                     // for `VectorD`
+        case _          => { flaw ("randDistLabels", "label type not supported"); null.asInstanceOf [Array [TLabel]] }
+        } // match
     } // randDistLabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -323,10 +446,10 @@ class MGraphGen [TLabel: ClassTag]
      *  @param ch       the adjacency (child array)
      *  @param nLabels  the number of edge labels
      */
-    private def randDisteLabels (ch: Array [SET [Int]], eLabels: Int): Map [Tuple2 [Int, Int], TLabel] =
+    private def randDisteLabels (ch: Array [SET [Int]], eLabels: Int): Map [(Int, Int), TLabel] =
     {
-        val elab = Map [Tuple2 [Int, Int], TLabel] ()
-        for (i <- ch.indices; c <- ch(i)) elab += (i, c) -> rand.nextInt (eLabels).asInstanceOf [TLabel]
+        val elab = Map [(Int, Int), TLabel] ()
+        for (i <- ch.indices; c <- ch(i)) elab += (i, c) -> rng.iigen (eLabels).asInstanceOf [TLabel]  // FIX - other types
         elab
     } // randDisteLabels
 
@@ -339,44 +462,63 @@ class MGraphGen [TLabel: ClassTag]
      */
     private def powDistLabels (size: Int, nLabels: Int, pow: Double): Array [TLabel] =
     {
-        Array.ofDim [TLabel] (size).map ( x => powInt (0, nLabels, pow).asInstanceOf [TLabel])
+        val powLaw = PowerLaw (1.0, nLabels + 1.0, pow, stream)
+        typeSelector match {
+        case _: Int     => Array.ofDim (size).map (_ => powLaw.igen.asInstanceOf [TLabel])
+        case _: Double  => Array.ofDim (size).map (_ => powLaw.gen.asInstanceOf [TLabel])
+        case _: String  => Array.ofDim (size).map (_ => powLaw.sgen.asInstanceOf [TLabel])
+//      case _: VectorD => // implement
+        case _          => { flaw ("powDistLabels", "label type not supported"); null.asInstanceOf [Array [TLabel]] }
+        } // match
     } // powDistLabels
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return an array with labels distributed between 0 and 'nLabels - 1'.
-     *  based on a Gaussian/Normal distribution.
-     *  @param size     the number of vertices
-     *  @param nLabels  the number of labels
-     */
-    private def gaussianDistLabels (size: Int, nLabels: Int): Array [TLabel] =
-    {
-        Array.ofDim [TLabel] (size).map ( x => gaussInt (nLabels / 2.0).asInstanceOf [TLabel])
-    } // gaussianDistLabels
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return a random integer between min and max with a frequency determined
-     *  by a power law distribution.
-     *  @param min      the minimum value
-     *  @param max      the maximum value
-     *  @param distPow  the power distribution
-     */
-    private def powInt (min: Int, max: Int, distPow: Double): Int =
-    {
-        val exp = distPow + 1.0
-        max - 1 - pow (( (pow (max, exp) - pow (min, exp)) * rand.nextDouble + pow (min, exp) ),
-                       (1.0 / exp)).toInt
-    } // powInt
-
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return an integer with a probability based on a gaussian distribution
-     *  centered at d
-     *  FIX: may need to truncate with
-     *      'math.min(math.max((rand.nextGaussian()*d+d).toInt, 0), d*2).toInt'
-     *  @param d  the distance indicator
-     */
-    private def gaussInt (d: Double) = (rand.nextGaussian () * 2.0 * d).toInt
-
 } // MGraphGen class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphGen` companion object provides simple methods for creating data
+ *  and query graphs.
+ */
+object MGraphGen
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Generate both the data graph 'g' and the query graph 'q'.
+     *  @param gSize      the size of the data graph
+     *  @param nLabels    the number of distinct labels
+     *  @param gAvDegree  the average vertex out-degree for data graph
+     *  @param addPa      whether to add direct references to parents
+     *  @param typeSel    the type selector
+     */
+    def genGraph [TLabel: ClassTag] (typeSel: TLabel, stream: Int = 0, gSize: Int = 100,
+                  nLabels: Int = 100, eLabels: Int = 5, gAvDegree: Int = 8, addPa: Boolean = false):
+        Graph [TLabel] =
+    {
+        val gGen = new MGraphGen [TLabel] (typeSel, stream)
+        gGen.genRandomConnectedGraph (gSize, nLabels, eLabels, gAvDegree, addPa, "g")   // data graph
+    } // genGraph
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Generate both the data graph 'g' and the query graph 'q'.
+     *  @param gSize      the size of the data graph
+     *  @param qSize      the size of the query graph
+     *  @param nLabels    the number of distinct labels
+     *  @param gAvDegree  the average vertex out-degree for data graph
+     *  @param qAvDegree  the average vertex out-degree for query graph
+     *  @param addPa      whether to add direct references to parents
+     *  @param typeSel    the type selector
+     */
+    def genGraphs [TLabel: ClassTag] (typeSel: TLabel, stream: Int = 0,
+                   gSize: Int = 100, qSize: Int = 10, nLabels: Int = 100, eLabels: Int = 5,
+                   gAvDegree: Int = 8, qAvDegree: Int = 2, addPa: Boolean = false):
+        (Graph [TLabel], Graph [TLabel]) =
+    {
+        val gGen = new MGraphGen [TLabel] (typeSel, stream)
+        val g = gGen.genRandomConnectedGraph (gSize, nLabels, eLabels, gAvDegree, addPa, "g")   // data graph
+        val q = gGen.genBFSQuery (qSize, qAvDegree, g, addPa, "q")                              // query graph
+        (g, q)
+    } // genGraphs
+
+} // MGraphGen object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -386,7 +528,7 @@ class MGraphGen [TLabel: ClassTag]
  */
 object MGraphGenTest extends App
 {
-    val mgGen = new MGraphGen [Int]
+    val mgGen = new MGraphGen (0)
 
     println ("MGraphGenTest: test genRandomGraph")
     (1 to 5).foreach { _ =>
@@ -399,7 +541,7 @@ object MGraphGenTest extends App
     (1 to 5).foreach { _ => mgGen.genRandomConnectedGraph (4, 100, 5, 1).printG () }
 
     println ("MGraphGenTest: test genRandomGraph_PowLabels")
-    val g1 = mgGen.genRandomGraph_PowLabels (200, 50, 2)
+    val g1 = mgGen.genRandomGraph_PowLabels (200, 50, 3, 2)
     g1.printG ()
     println (s"g1.labelMap = ${g1.labelMap}")
  
@@ -413,15 +555,15 @@ object MGraphGenTest extends App
  */
 object MGraphGenTest2 extends App
 {
-    val mgGen = new MGraphGen [Int]
+    val mgGen = new MGraphGen (0)
 
     println ("MGraphGenTest2: test genPowerLawGraph")
-    val g2 = mgGen.genPowerLawGraph (50, 10, 10, 2.1)
+    val g2 = mgGen.genPowerLawGraph (50, 10, 10, 2)
     g2.printG ()
     g2.ch.sortBy (_.size).foreach { println(_) }
 
     println ("MGraphGenTest2: test genPowerLawGraph_PowLabels")
-    val g3 = mgGen.genPowerLawGraph_PowLabels (50, 10, 10, 2.1)
+    val g3 = mgGen.genPowerLawGraph_PowLabels (50, 10, 10, 2)
     g3.printG ()
     g3.ch.sortBy (_.size).foreach { println (_) }
     println (s"g3.labelMap = ${g3.labelMap}")
@@ -436,7 +578,7 @@ object MGraphGenTest2 extends App
  */
 object MGraphGenTest3 extends App
 {
-    val mgGen = new MGraphGen [Int]
+    val mgGen = new MGraphGen (0)
 
     val nVertices = 10000
     val nLabels   =    10

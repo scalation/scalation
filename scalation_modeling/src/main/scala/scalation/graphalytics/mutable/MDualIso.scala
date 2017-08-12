@@ -188,7 +188,7 @@ object MDualIsoTest2 extends App
  */
 object MDualIsoTest3 extends App
 {
-    val mgGen = new MGraphGen [Double]
+    val mgGen = new MGraphGen (0.0)
 
     val gSize     = 1000         // size of the data graph
     val qSize     =   10         // size of the query graph

@@ -259,14 +259,28 @@ class MatrixC (d1: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select rows from 'this' matrix according to the given index/basis.
+     *  The new matrix is formed by copying rows from the current matrix.
      *  @param rowIndex  the row index positions (e.g., (0, 2, 5))
      */
     def selectRows (rowIndex: Array [Int]): MatrixC =
     {
         val c = new MatrixC (rowIndex.length, dim2)
-        for (i <- c.range1) c.v(i) = v(rowIndex(i))
+        for (i <- c.range1; j <- c.range2) c.v(i)(j) = v(rowIndex(i))(j)
         c
     } // selectRows
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Select rows from 'this' matrix according to the given index/basis.
+     *  The new matrix is formed by referencing rows in the current matrix,
+     *  thereby saving space.
+     *  @param rowIndex  the row index positions (e.g., (0, 2, 5))
+     */
+    def selectRows2 (rowIndex: Array [Int]): MatrixC =
+    {
+        val a = Array.ofDim [Array [Complex]] (rowIndex.length)
+        for (i <- a.indices) a(i) = v(rowIndex(i))
+        new MatrixC (a.length, dim2, a)
+    } // selectRows2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get column 'col' from the matrix, returning it as a vector.
@@ -1854,8 +1868,13 @@ object MatrixCTest extends App
     println ("z.inv * b    = " + z.inverse * b)
     println ("z.det        = " + z.det)
     println ("z            = " + z)
-    z *= z                             // in-place matrix multiplication
-    println ("z squared = " + z)
+    z *= z                                       // in-place matrix multiplication
+    println ("z squared    = " + z)
+    val zz1 = zz.selectRows (Array (0, 2))
+    val zz2 = zz.selectRows2 (Array (0, 2))
+    zz(0, 0) = -3
+    println ("zz.selectRows  = " + zz1)
+    println ("zz.selectRows2 = " + zz2)
 
     val w = new MatrixC ((2, 3), 2,  3, 5, 
                                 -4,  2, 3)

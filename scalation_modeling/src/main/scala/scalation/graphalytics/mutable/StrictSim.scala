@@ -249,7 +249,7 @@ object StrictSimTest2 extends App
  *  and query graph relative file paths.
  *  > run-main scalation.graphalytics.mutable.StrictSimTest3
  */
-object StrictSimTest3 extends App 
+object StrictSimTest4 extends App 
 {
     val g = GraphIO [Double] ("gfile")
     val q = GraphIO [Double] ("qfile")
@@ -259,5 +259,5 @@ object StrictSimTest3 extends App
 
     (new StrictSim (g, q)).test ("StrictSim")   // Strict Graph Simulation Pattern Matcher
 
-} // StrictSimTest3 object
+} // StrictSimTest4 object
 

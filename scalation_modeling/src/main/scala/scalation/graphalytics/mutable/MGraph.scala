@@ -188,7 +188,7 @@ object MGraphTest2 extends App
  */
 object MGraphTest3 extends App
 {
-    val mgGen = new MGraphGen [Double]
+    val mgGen = new MGraphGen (0.0)
 
     private val nVertices = 20         // number of vertices
     private val nLabels   = 5          // number of distinct vertex labels

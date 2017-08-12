@@ -227,7 +227,7 @@ object MGraphIO
  */
 object MGraphIOTest extends App
 {
-    val mgGen = new MGraphGen [Int]
+    val mgGen = new MGraphGen (0)
 
     val name     = "ran_graph"    // the name of the graph
     val size     = 50             // size of the graph

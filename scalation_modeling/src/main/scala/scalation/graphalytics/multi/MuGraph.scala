@@ -255,7 +255,7 @@ object MuGraphTest2 extends App
  */
 object MuGraphTest3 extends App
 {
-    val mgGen = new MGraphGen [Double]
+    val mgGen = null                   // FIX - new MuGraphGen [Double]
 
     private val nVertices = 20         // number of vertices
     private val nLabels   = 5          // number of distinct vertex labels
@@ -264,8 +264,8 @@ object MuGraphTest3 extends App
     private val inverse   = false      // whether inverse adjacency is used (parents)
     private val name      = "gr"       // name of the graph
 
-    val mGraph = mgGen.genRandomGraph (nVertices, nLabels, eLabels, outDegree, inverse, name)
-    MuGraph (mGraph, "mu" + name).printG ()
+//  val mGraph = mgGen.genRandomGraph (nVertices, nLabels, eLabels, outDegree, inverse, name)
+//  MuGraph (mGraph, "mu" + name).printG ()
 
 } // MuGraphTest3
 

@@ -103,12 +103,32 @@ class GraphMetrics [TLabel: ClassTag] (val g: Graph [TLabel], isUndirected: Bool
         } // for
     } // visit
 
+} // GraphMetrics class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphMetrics` companion object provides basic statistics about graphs.
+ */
+object GraphMetrics
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return basic statistics about graph 'g', currently the number of vertices and edges.
+     *  @param g  the given graph
+     */
+    def stats [TLabel] (g: Graph [TLabel]): Seq [Int] =
+    {
+        var sum = 0
+        for (i <- g.ch.indices) sum += g.ch(i).size
+        Seq (g.ch.length, sum)
+    } // stats
+
 } // GraphMetrics
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphMetricsTest` object is used to test the `GraphMetrics` class.
  *  @see http://math.stackexchange.com/questions/240556/radius-diameter-and-center-of-graph
+ *  > run-main scalation.garphalytics.mutable.GraphMetricsTest
  */
 object GraphMetricsTest extends App
 {
