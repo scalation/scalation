@@ -38,7 +38,7 @@ sbt clean doc; cd ..
 # build the scalation_models subproject
 
 echo ================================== scalation_models ============================================
-echo // "cd scalation_models; sbt compile sbt run-main scalation.GenIndexHtml"
+echo // "cd scalation_models; sbt compile; sbt run-main scalation.GenIndexHtml"
 echo // "sbt clean doc; cd .."
 
 cd scalation_models; sbt compile; sbt "run-main scalation.GenIndexHtml"

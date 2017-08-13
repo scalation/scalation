@@ -144,7 +144,7 @@ class GraphGen [TLabel: ClassTag] (typeSelector: TLabel, stream: Int = 0)
             ch(i)      = rsg.igen (degree, size - 1, i)            // children of vertex i
         } // for
 
-        val label = powDistLabels (size, nLabels, 2.1)             // power law for vertex lables
+        val label = powDistLabels (size, nLabels, distPow)        // power law for vertex lables
         new Graph (ch, label, inverse, name)
     } // genRandomGraph_PowLabels
 
@@ -187,7 +187,7 @@ class GraphGen [TLabel: ClassTag] (typeSelector: TLabel, stream: Int = 0)
      *  @param inverse    whether to create inverse adjacency (parents)
      *  @param name       the name of the graph
      */
-    def genPowerLawGraph_PowLabels (size: Int, nLabels: Int, maxDegree: Int, distPow: Double,
+    def genPowerLawGraph_PowLabels (size: Int, nLabels: Int, maxDegree: Int, distPow: Double = 2.1,
                                     inverse: Boolean = false, name: String = "g"): Graph [TLabel] =
     {
         val powLaw = PowerLaw (0, maxDegree, distPow)
@@ -301,6 +301,64 @@ class GraphGen [TLabel: ClassTag] (typeSelector: TLabel, stream: Int = 0)
         buildQGraph (maxNodes, maxChMap, g.label, inverse, name)
     } // genBFSQuery
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Extracts a subgraph of 'size' vertices from graph 'g' by performing a
+     *  breadth-first search from a random vertex.
+     *  FIX - needs testing
+     *  @param size     the number of vertices to extract
+     *  @param g        the data graph to extract from
+     *  @param inverse  whether to create inverse adjacency (parents)
+     *  @param name     the name of the graph
+     */
+    def extractSubgraph (size: Int, g: Graph [TLabel], inverse: Boolean = false, name: String = "g"): Graph [TLabel] =
+    {
+        val maxRestarts = 5000
+        var nRestarts   = 0
+        var chMap: Map [Int, SET [Int]] = null
+        var nodes:  SET [Int] = null
+
+        while (nodes.size < size && nRestarts < maxRestarts) {
+            if (nRestarts % 100 == 0) println ("restarting " + nRestarts)
+            chMap    = Map [Int, SET [Int]] ()
+            nodes     = SET [Int] ()
+            val q     = Queue [Int] ()
+            val start =  rng.iigen (g.size - 1)                           // randomly pick a start node in ch
+            println ("extractSubgraph: start node: " + start)
+            q.enqueue (start)
+            nodes += start
+
+            while (! q.isEmpty && nodes.size < size) {
+                val chs = SET [Int] ()
+                val newNode = q.dequeue
+                val newNodeChildren = g.ch (newNode)
+                if (! newNodeChildren.isEmpty) {
+                    for (newChild <- newNodeChildren if nodes.size < size) {
+                        if (! nodes.contains (newChild)) { nodes += newChild; q.enqueue (newChild) }
+                    } // for
+                } // if
+            } // while
+
+            for (n <- nodes) { val chs = g.ch(n) intersect nodes; chMap += (n -> chs ) }
+            if (nodes.size < size) {
+                nRestarts += 1
+                println ("nodes.size only " + nodes.size)
+            } // if
+        } // while
+
+        if (nRestarts == maxRestarts) { println ("extractSubgraph: could not find a good query"); return null }
+
+        // gives the nodes new ids (FIX: refactor to renumber - use buildQGraph)
+        val newLabelMap = Map [Int, Int] ()
+        var c = 0
+        for (x <- nodes) { newLabelMap += (x -> c); c += 1 }
+        val newToOldLabels = Array.ofDim [Int] (size)
+        newLabelMap.foreach { case (oldL, newL) => newToOldLabels (newL) = oldL }
+        val ch = Array.ofDim [SET [Int]] (size).map (x => SET [Int] ())
+        for ((node, children) <- chMap) ch (newLabelMap(node)) = children.map (x => newLabelMap (x))
+        val label = newToOldLabels.map (x => g.label(x)).toArray
+        new Graph (ch, label, inverse, name)
+    } // extractSubgraph
+
     //------------------------------------------------------------------------
     // Private helper methods.
     //------------------------------------------------------------------------
@@ -329,6 +387,7 @@ class GraphGen [TLabel: ClassTag] (typeSelector: TLabel, stream: Int = 0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a query graph from the subgraph extracted from the data graph.
+     *  Includes the renumbering of vertex ids.
      *  @param nodes    the nodes extracted from the data graph
      *  @param chMap    the child map: vertex -> children
      *  @param gLabel   the labels from the data graph
@@ -538,12 +597,12 @@ object GraphGenTest4 extends App
     val gGen = new GraphGen (0)
 
     println ("GraphGenTest4: test genPowerLawGraph")
-    val g2 = gGen.genPowerLawGraph (50, 10, 10, 2.1)
+    val g2 = gGen.genPowerLawGraph (50, 10, 10)
     g2.printG ()
     g2.ch.sortBy (_.size).foreach { println(_) }
 
     println ("GraphGenTest4: test genPowerLawGraph_PowLabels")
-    val g3 = gGen.genPowerLawGraph_PowLabels (50, 10, 10, 2.1)
+    val g3 = gGen.genPowerLawGraph_PowLabels (50, 10, 10)
     g3.printG ()
     g3.ch.sortBy (_.size).foreach { println(_) }
     println (s"g3.labelMap = ${g3.labelMap}")
@@ -553,30 +612,26 @@ object GraphGenTest4 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphGenTest5` object is used to test the `GraphGen` class for extracting
- *  query graphs from data graphs.
+ *  query graphs from data graphs (note: data graph should be connected).
  *  > run-main scalation.graphalytics.mutable.GraphGenTest5
  */
 object GraphGenTest5 extends App
 {
-    val gGen = new GraphGen (0)
+    val gGen = new GraphGen (0.0)
 
-    println ("GraphGenTest5: test genRandomGraph")
+    banner ("GraphGenTest5: test genRandomConnectedGraph")
     val nVertices = 10000
     val nLabels   =    10
     val avDegree  =    16     
-    var g = gGen.genRandomGraph (nVertices, nLabels, avDegree)
+    var g = gGen.genRandomConnectedGraph (nVertices, nLabels, avDegree)
     println ("done generating data graph")
-    println ("g.size    = " + g.size)
-    println ("g.nEdges  = " + g.nEdges)
-    println ("av degree = " + g.nEdges / g.size.toDouble)
+    println (GraphMetrics.stats (g))
 
-    println ("GraphGenTest5: test genBFSQuery")
+    banner ("GraphGenTest5: test genBFSQuery")
     (1 to 5).foreach { _ =>
         var q = gGen.genBFSQuery (20, 3, g)
         q.printG ()
-        println ("q.size    = " + q.size)
-        println ("q.nEdges  = " + q.nEdges)
-        println ("av degree = " + q.nEdges / q.size.toDouble)
+        println (GraphMetrics.stats (q))
     } // foreach
     println ("done")
 
@@ -590,32 +645,32 @@ object GraphGenTest5 extends App
  */
 object GraphGenTest6 extends App
 {
-     for (i <- 0 until 3) {
-         val (g, q) = GraphGen.genGraphs (0.0, i)
-         banner ("data graph")
-         g.printG ()
-         println (GraphMetrics.stats (g))
-         banner ("query graph")
-         q.printG ()
-         println (GraphMetrics.stats (q))
-     } // for
+    for (stream <- 0 until 3) {
+        val (g, q) = GraphGen.genGraphs (0.0, stream)
+        banner ("data graph")
+        g.printG ()
+        println (GraphMetrics.stats (g))
+        banner ("query graph")
+        q.printG ()
+        println (GraphMetrics.stats (q))
+    } // for
 
 } // GraphGenTest6
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphGenTest7` object is used to test the `GraphGen` companion object
- *  for generating data query graphs.
+ *  for generating data graphs.
  *  > run-main scalation.graphalytics.mutable.GraphGenTest7
  */
 object GraphGenTest7 extends App
 {
-     for (i <- 0 until 3) {
-         val g = GraphGen.genGraph (0.0, i)
-         banner ("data graph")
-         g.printG ()
-         println (GraphMetrics.stats (g))
-     } // for
+    for (stream <- 0 until 3) {
+        val g = GraphGen.genGraph (0.0, stream)
+        banner ("data graph")
+        g.printG ()
+        println (GraphMetrics.stats (g))
+    } // for
 
 } // GraphGenTest7
 

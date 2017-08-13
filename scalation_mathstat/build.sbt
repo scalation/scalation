@@ -7,7 +7,7 @@ lazy val commonSettings = Seq (
 name         := "scalation",
 organization := "scalation",
 version      := "1.3",
-scalaVersion := "2.12.2",
+scalaVersion := "2.12.3",
 fork         := true,
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -16,7 +16,9 @@ fork         := true,
 scalacOptions += "-deprecation",
 scalacOptions += "-feature",
 scalacOptions += "-Xfatal-warnings",
-scalacOptions += "-opt:l:classpath",            // optimize
+scalacOptions += "-opt:l:method",               // enable all intra-method optimizations
+scalacOptions += "-opt:l:inline",               // enable cross-method optimizations 
+scalacOptions += "-opt-inline-from:**",         // allow inlining for all classes
 scalacOptions += "-opt-warnings",
 scalacOptions += "-Xlint:-adapted-args",        // run lint - disable "adapted-args" (auto tupling used)
 // scalacOptions += "-feature",

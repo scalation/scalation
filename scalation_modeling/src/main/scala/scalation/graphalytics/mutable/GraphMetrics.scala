@@ -112,14 +112,14 @@ class GraphMetrics [TLabel: ClassTag] (val g: Graph [TLabel], isUndirected: Bool
 object GraphMetrics
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return basic statistics about graph 'g', currently the number of vertices and edges.
+    /** Return basic statistics about graph 'g', currently (1) number of vertices,
+     * (2) number of edges, and (3) average out-degree.
      *  @param g  the given graph
      */
-    def stats [TLabel] (g: Graph [TLabel]): Seq [Int] =
+    def stats [TLabel] (g: Graph [TLabel]): Seq [AnyVal] =
     {
-        var sum = 0
-        for (i <- g.ch.indices) sum += g.ch(i).size
-        Seq (g.ch.length, sum)
+        val (n, e) = (g.size, g.nEdges)
+        Seq (n, e, e / n.toDouble)
     } // stats
 
 } // GraphMetrics

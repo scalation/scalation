@@ -311,6 +311,7 @@ class MGraphGen [TLabel: ClassTag] (typeSelector: TLabel, stream: Int = 0)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Extracts a subgraph of 'size' vertices from graph 'g' by performing a
      *  breadth-first search from a random vertex.
+     *  FIX - needs testing
      *  @param size     the number of vertices to extract
      *  @param g        the data graph to extract from
      *  @param inverse  whether to create inverse adjacency (parents)
@@ -353,7 +354,7 @@ class MGraphGen [TLabel: ClassTag] (typeSelector: TLabel, stream: Int = 0)
 
         if (nRestarts == maxRestarts) { println ("extractSubgraph: could not find a good query"); return null }
 
-        // gives the nodes new ids (FIX: refactor to renumber)
+        // gives the nodes new ids (FIX: refactor to renumber - use buildQGraph)
         val newLabelMap = Map [Int, Int] () 
         var c = 0 
         for (x <- nodes) { newLabelMap += (x -> c); c += 1 }
@@ -394,6 +395,7 @@ class MGraphGen [TLabel: ClassTag] (typeSelector: TLabel, stream: Int = 0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a query graph from the subgraph extracted from the data graph.
+     *  Includes the renumbering of vertex ids.
      *  @param nodes    the nodes extracted from the data graph
      *  @param chMap    the child map: vertex -> children
      *  @param gLabel   the labels from the data graph
@@ -476,13 +478,13 @@ class MGraphGen [TLabel: ClassTag] (typeSelector: TLabel, stream: Int = 0)
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `GraphGen` companion object provides simple methods for creating data
+/** The `MGraphGen` companion object provides simple methods for creating data
  *  and query graphs.
  */
 object MGraphGen
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Generate both the data graph 'g' and the query graph 'q'.
+    /** Randomly generate a data graph 'g'.
      *  @param gSize      the size of the data graph
      *  @param nLabels    the number of distinct labels
      *  @param gAvDegree  the average vertex out-degree for data graph
@@ -491,14 +493,14 @@ object MGraphGen
      */
     def genGraph [TLabel: ClassTag] (typeSel: TLabel, stream: Int = 0, gSize: Int = 100,
                   nLabels: Int = 100, eLabels: Int = 5, gAvDegree: Int = 8, addPa: Boolean = false):
-        Graph [TLabel] =
+        MGraph [TLabel] =
     {
         val gGen = new MGraphGen [TLabel] (typeSel, stream)
         gGen.genRandomConnectedGraph (gSize, nLabels, eLabels, gAvDegree, addPa, "g")   // data graph
     } // genGraph
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Generate both the data graph 'g' and the query graph 'q'.
+    /** Randomly generate both a data graph 'g' and a query graph 'q'.
      *  @param gSize      the size of the data graph
      *  @param qSize      the size of the query graph
      *  @param nLabels    the number of distinct labels
@@ -510,7 +512,7 @@ object MGraphGen
     def genGraphs [TLabel: ClassTag] (typeSel: TLabel, stream: Int = 0,
                    gSize: Int = 100, qSize: Int = 10, nLabels: Int = 100, eLabels: Int = 5,
                    gAvDegree: Int = 8, qAvDegree: Int = 2, addPa: Boolean = false):
-        (Graph [TLabel], Graph [TLabel]) =
+        (MGraph [TLabel], MGraph [TLabel]) =
     {
         val gGen = new MGraphGen [TLabel] (typeSel, stream)
         val g = gGen.genRandomConnectedGraph (gSize, nLabels, eLabels, gAvDegree, addPa, "g")   // data graph
@@ -524,24 +526,25 @@ object MGraphGen
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The 'MGraphGenTest' object is used to test the 'MGraphGen' class for building
  *  random graphs where a vertex's degree is uniformly distributed.
+ *  This work build graphs with `Int` vertex/edge labels.
  *  > run-main scalation.graphalytics.mutable.MGraphGenTest
  */
 object MGraphGenTest extends App
 {
-    val mgGen = new MGraphGen (0)
+    val gGen = new MGraphGen (0)
 
     println ("MGraphGenTest: test genRandomGraph")
     (1 to 5).foreach { _ =>
-        val g = mgGen.genRandomGraph (4, 100, 5, 1)
+        val g = gGen.genRandomGraph (4, 100, 5, 1)
         g.printG ()
         println ("CONNECTED?  " + g.isConnected)
     } // foreach
 
     println ("MGraphGenTest: test genRandomConnectedGraph")
-    (1 to 5).foreach { _ => mgGen.genRandomConnectedGraph (4, 100, 5, 1).printG () }
+    (1 to 5).foreach { _ => gGen.genRandomConnectedGraph (4, 100, 5, 1).printG () }
 
     println ("MGraphGenTest: test genRandomGraph_PowLabels")
-    val g1 = mgGen.genRandomGraph_PowLabels (200, 50, 3, 2)
+    val g1 = gGen.genRandomGraph_PowLabels (200, 50, 3, 2)
     g1.printG ()
     println (s"g1.labelMap = ${g1.labelMap}")
  
@@ -549,56 +552,146 @@ object MGraphGenTest extends App
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The 'MGraphGenTest2' object is used to test the 'MGraphGen' class for building
- *  power law graphs.
+/** The `MGraphGenTest2` object is used to test the `MGraphGen` class for building
+ *  random graphs where a vertex's degree is uniformly distributed.
+ *  This work build graphs with `Double` vertex/edge labels.
  *  > run-main scalation.graphalytics.mutable.MGraphGenTest2
  */
 object MGraphGenTest2 extends App
 {
-    val mgGen = new MGraphGen (0)
+    val gGen = new GraphGen (0.0)
 
-    println ("MGraphGenTest2: test genPowerLawGraph")
-    val g2 = mgGen.genPowerLawGraph (50, 10, 10, 2)
-    g2.printG ()
-    g2.ch.sortBy (_.size).foreach { println(_) }
+    println ("MGraphGenTest: test genRandomGraph")
+    (1 to 5).foreach { _ =>
+        val g = gGen.genRandomGraph (4, 100, 1)
+        g.printG ()
+        println ("CONNECTED?  " + g.isConnected)
+    } // foreach
 
-    println ("MGraphGenTest2: test genPowerLawGraph_PowLabels")
-    val g3 = mgGen.genPowerLawGraph_PowLabels (50, 10, 10, 2)
-    g3.printG ()
-    g3.ch.sortBy (_.size).foreach { println (_) }
-    println (s"g3.labelMap = ${g3.labelMap}")
+    println ("MGraphGenTest2: test genRandomConnectedGraph")
+    (1 to 5).foreach { _ => gGen.genRandomConnectedGraph (4, 100, 1).printG () }
 
-} // MGraphGenTest2 object
+    println ("MGraphGenTest2: test genRandomGraph_PowLabels")
+    val g1 = gGen.genRandomGraph_PowLabels (200, 50, 2)
+    g1.printG ()
+    println (s"g1.labelMap = ${g1.labelMap}")
+
+} // MGraphGenTest2
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `MGraphGenTest3` object is used to test the `MGraphGen` class for extracting
- *  query graphs from data graphs.
+/** The `MGraphGenTest3` object is used to test the `MGraphGen` class for building
+ *  random graphs where a vertex's degree is uniformly distributed.
+ *  This work build graphs with `String` vertex/edge labels.
  *  > run-main scalation.graphalytics.mutable.MGraphGenTest3
  */
 object MGraphGenTest3 extends App
 {
-    val mgGen = new MGraphGen (0)
+    val gGen = new GraphGen ("0")
 
+    println ("MGraphGenTest: test genRandomGraph")
+    (1 to 5).foreach { _ =>
+        val g = gGen.genRandomGraph (4, 100, 1)
+        g.printG ()
+        println ("CONNECTED?  " + g.isConnected)
+    } // foreach
+
+    println ("MGraphGenTest3: test genRandomConnectedGraph")
+    (1 to 5).foreach { _ => gGen.genRandomConnectedGraph (4, 100, 1).printG () }
+
+    println ("MGraphGenTest3: test genRandomGraph_PowLabels")
+    val g1 = gGen.genRandomGraph_PowLabels (200, 50, 2)
+    g1.printG ()
+    println (s"g1.labelMap = ${g1.labelMap}")
+
+} // MGraphGenTest3
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The 'MGraphGenTest4' object is used to test the 'MGraphGen' class for building
+ *  power law graphs.
+ *  > run-main scalation.graphalytics.mutable.MGraphGenTest4
+ */
+object MGraphGenTest4 extends App
+{
+    val gGen = new MGraphGen (0)
+
+    println ("MGraphGenTest2: test genPowerLawGraph")
+    val g2 = gGen.genPowerLawGraph (50, 10, 10, 2)
+    g2.printG ()
+    g2.ch.sortBy (_.size).foreach { println(_) }
+
+    println ("MGraphGenTest2: test genPowerLawGraph_PowLabels")
+    val g3 = gGen.genPowerLawGraph_PowLabels (50, 10, 10, 2)
+    g3.printG ()
+    g3.ch.sortBy (_.size).foreach { println (_) }
+    println (s"g3.labelMap = ${g3.labelMap}")
+
+} // MGraphGenTest4 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `MGraphGenTest5` object is used to test the `MGraphGen` class for extracting
+ *  query graphs from data graphs (note: data graph should be connected).
+ *  > run-main scalation.graphalytics.mutable.MGraphGenTest5
+ */
+object MGraphGenTest5 extends App
+{
+    val gGen = new MGraphGen (0.0)
+
+    println ("MGraphGenTest5: test genRandomConnectedGraph")
     val nVertices = 10000
     val nLabels   =    10
     val eLabels   =     5
     val avDegree  =    16
-    val g = mgGen.genRandomGraph (nVertices, nLabels, eLabels, avDegree)
+    val g = gGen.genRandomConnectedGraph (nVertices, nLabels, eLabels, avDegree)
     println ("done generating data graph")
-    println ("g.size    = " + g.size)
-    println ("g.nEdges  = " + g.nEdges)
-    println ("av degree = " + g.nEdges / g.size.toDouble)
+    println (GraphMetrics.stats (g))
 
-    println ("MGraphGenTest3: test genBFSQuery")
+    println ("MGraphGenTest5: test genBFSQuery")
     (1 to 5).foreach { _ =>
-        val q = mgGen.genBFSQuery (25, 3, g)
+        val q = gGen.genBFSQuery (25, 3, g)
         q.printG ()
-        println ("q.size    = " + q.size)
-        println ("q.nEdges  = " + q.nEdges)
-        println ("av degree = " + q.nEdges / q.size.toDouble)
+        println (GraphMetrics.stats (g))
     } // foreach
     println ("done")
 
-} // MGraphGenTest3 object
+} // MGraphGenTest5 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `MGraphGenTest6` object is used to test the `MGraphGen` companion object
+ *  for generating both data and query graphs.
+ *  > run-main scalation.graphalytics.mutable.MGraphGenTest6
+ */
+object MGraphGenTest6 extends App
+{
+     for (stream <- 0 until 3) {
+         val (g, q) = MGraphGen.genGraphs (0.0, stream)
+         banner ("data graph")
+         g.printG ()
+         println (GraphMetrics.stats (g))
+         banner ("query graph")
+         q.printG ()
+         println (GraphMetrics.stats (q))
+     } // for
+
+} // MGraphGenTest6
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `MGraphGenTest7` object is used to test the `MGraphGen` companion object
+ *  for generating data graphs.
+ *  > run-main scalation.graphalytics.mutable.MGraphGenTest7
+ */
+object MGraphGenTest7 extends App
+{
+     for (stream <- 0 until 3) {
+         val g = MGraphGen.genGraph (0.0, stream)
+         banner ("data graph")
+         g.printG ()
+         println (GraphMetrics.stats (g))
+     } // for
+
+} // MGraphGenTest7
 

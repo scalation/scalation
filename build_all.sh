@@ -34,7 +34,7 @@ cp scalation_modeling/target/scala-2.12/scalation_modeling_2.12-1.3.jar scalatio
 # build the scalation_models subproject
 
 echo ================================== scalation_models ============================================
-echo // "cd scalation_models compile; cd .."
+echo // "cd scalation_models; sbt compile; cd .."
 
-cd scalation_models compile; cd ..
+cd scalation_models; sbt compile; cd ..
 
