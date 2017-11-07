@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Hao Peng
- *  @version 1.3
+ *  @version 1.4
  *  @date    Mon Jul 27 01:27:00 EDT 2015
  *  @see     LICENSE (MIT style license file).
  */

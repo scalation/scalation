@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.3
+ *  @version 1.4
  *  @date    Sun Aug  7 20:40:29 EDT 2016
  *  @see     LICENSE (MIT style license file).
  */
@@ -25,9 +25,11 @@ case class RandomStr (lRange: Range = 4 to 6, cRange: Range = 97 to 122, stream:
 
     val mean = NaN
 
-    def pf (s: Double): Double = throw new NoSuchMethodException ("'pf' not implemented")
+    def pf (s: Double): Double = throw new UnsupportedOperationException ("'pf' not implemented")
 
-    def gen: Double = throw new NoSuchMethodException ("'gen' not implemented, use 'sgen' instead")
+    def gen: Double = throw new UnsupportedOperationException ("'gen' not implemented, use 'sgen' instead")
+
+    def gen1 (z: Double): Double = throw new UnsupportedOperationException ("'gen1' not implemented, use 'sgen1' instead")
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Generate a random string.
@@ -38,6 +40,20 @@ case class RandomStr (lRange: Range = 4 to 6, cRange: Range = 97 to 122, stream:
         for (i <- 0 until lrng.igen) sb.append (crng.igen.toChar)
         sb.toString
     } // igen
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine the next random string for the particular distribution.
+     *  It is only valid for discrete random variates.
+     *  This version allows one parameter.
+     *  @param z  the limit parameter as a range
+     */
+    def sgen1 (z: Range): String =
+    {
+        val lrng = Randi (z.start, z.end, stream)       // random integer generator
+        val sb = new StringBuilder ()
+        for (i <- 0 until lrng.igen) sb.append (crng.igen.toChar)
+        sb.toString
+    } // sgen1
 
 } // RandomStr class
 
@@ -60,9 +76,11 @@ case class RandomWord (nWords: Int = 10, lRange: Range = 4 to 6, cRange: Range =
 
     val mean = NaN
 
-    def pf (s: Double): Double = throw new NoSuchMethodException ("'pf' not implemented")
+    def pf (s: Double): Double = throw new UnsupportedOperationException ("'pf' not implemented")
 
-    def gen: Double = throw new NoSuchMethodException ("'gen' not implemented, use 'sgen' instead")
+    def gen: Double = throw new UnsupportedOperationException ("'gen' not implemented, use 'sgen' instead")
+
+    def gen1 (z: Double): Double = throw new UnsupportedOperationException ("'gen1' not implemented, use 'sgen1' instead")
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Generate a random string.

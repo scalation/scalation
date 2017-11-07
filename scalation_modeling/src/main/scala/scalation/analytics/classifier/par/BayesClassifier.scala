@@ -12,11 +12,12 @@ import java.util.concurrent.ForkJoinPool
 
 import scala.collection.mutable.ListBuffer
 import scala.collection.parallel.ForkJoinTaskSupport
+
+import scalation.columnar_db.Relation
 import scalation.analytics.classifier.{BayesMetrics, ClassifierInt}
 import scalation.linalgebra.gen.{HMatrix2, HMatrix3, HMatrix5}
 import scalation.linalgebra.{MatriI, MatrixD, MatrixI, VectoI, VectorD, VectorI}
 import scalation.math.log2
-import scalation.relalgebra.Relation
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BayesClassifier` object provides factory methods for building Bayesian

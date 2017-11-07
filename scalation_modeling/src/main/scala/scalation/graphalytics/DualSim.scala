@@ -37,7 +37,7 @@ class DualSim (g: Graph, q: Graph)
             // loop over query vertices u, data vertices v in phi(u), and u's children u_c
 
             for (u <- qRange; v <- phi(u); u_c <- q.ch(u)) {
-                if (overlaps (g.ch(v), phi(u_c)))  {        // v must have a child in phi(u_c)
+                if (disjoint (g.ch(v), phi(u_c)))  {        // v must have a child in phi(u_c)
                     phi(u) -= v                             // remove v due to lack of child match 
                     alter  = true
                 } // if
@@ -46,7 +46,7 @@ class DualSim (g: Graph, q: Graph)
             // loop over query vertices u, data vertices v in phi(u), and u's parents u_p
 
             for (u <- qRange; v <- phi(u); u_p <- q.pa(u)) {
-                if (overlaps (g.pa(v), phi(u_p))) {         // v must have a parent in phi(u_p)
+                if (disjoint (g.pa(v), phi(u_p))) {         // v must have a parent in phi(u_p)
                     phi(u) -= v                             // remove v due to lack of parent match
                     alter   = true
                 } // if

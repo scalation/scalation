@@ -17,7 +17,7 @@ import scala.math.min
 
 import scalation.linalgebra.{MatriI, VectoI, VectorD, VectorI}
 import scalation.linalgebra.gen.HMatrix3
-import scalation.relalgebra.Relation
+import scalation.columnar_db.Relation
 import scalation.util.banner
 
 import BayesClassifier.me_default

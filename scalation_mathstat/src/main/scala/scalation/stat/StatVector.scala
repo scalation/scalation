@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.3
+ *  @version 1.4
  *  @date    Wed Aug 26 18:41:26 EDT 2009
  *  @see     LICENSE (MIT style license file).
  */
@@ -245,7 +245,7 @@ object StatVector
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the correlation matrix for the columns of matrix 'x'.
      *  Note:  sample vs. population results in essentailly the same values.
-     *  @param x  the matrix whose column columns correlations are sought
+     *  @param x  the matrix whose column-column correlations are sought
      */
     def corr (x: MatrixD): MatrixD =
     {
@@ -262,6 +262,28 @@ object StatVector
         } // for
         cor
     } // corr
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the cosine similarity matrix for the columns of matrix 'x'.
+     *  @see stats.stackexchange.com/questions/97051/building-the-connection-between-cosine-similarity-and-correlation-in-r
+     *  @param x  the matrix whose column-column cosines are sought
+     */
+    def cos (x: MatrixD): MatrixD =
+    {
+        val cs = eye (x.dim2)                       // cosine matrix
+
+        for (i <- cs.range1) {
+            val y  = x.col (i)                      // ith column vector
+            val ny = y.norm
+            for (j <- 0 until i) {
+                val z  = x.col (j)                  // jth column vector
+                val nz = z.norm
+                cs(i, j) = (y dot z) / (ny * nz)
+                cs(j, i) = cs (i, j)
+            } // for
+        } // for
+        cs
+    } // cos
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the first-order auto-regressive correlation matrix for vector
@@ -438,6 +460,9 @@ object StatVectorTest4 extends App
     println (s"pcov (x)    = ${pcov (x)}")           // population covariance matrix
     println ("-" * 60)
     println (s"corr (x)    = ${corr (x)}")           // correlation matrix
+    println ("-" * 60)
+    println (s"cos (x)     = ${cos (x)}")            // cosine matrix
+    assert (cos (x - x.mean) == corr (x))
     println ("-" * 60)
     println (s"center (x)  = $cx")                   // mean centered
     println ("-" * 60)

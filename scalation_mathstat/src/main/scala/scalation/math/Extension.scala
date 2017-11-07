@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.3
+ *  @version 1.4
  *  @date    Mon Nov 14 2:34:38 EST 2011
  *  @see     LICENSE (MIT style license file).
  *  @see     http://www.scala-lang.org/node/724

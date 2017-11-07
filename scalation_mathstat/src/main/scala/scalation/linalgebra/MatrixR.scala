@@ -2,7 +2,7 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @builder scalation.linalgebra.bld.BldMatrix
- *  @version 1.3
+ *  @version 1.4
  *  @date    Sun Sep 16 14:09:25 EDT 2012
  *  @see     LICENSE (MIT style license file).
  */
@@ -1569,6 +1569,13 @@ class MatrixR (d1: Int,
 object MatrixR extends Error
 {
     private val PROGRESS = 200000                            // give feedback at progress count
+    private var sp       = ','                               // character separating the values
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reset the separating character from its CSV default.
+     *  @param sp_  the new separating character
+     */
+    def setSp (sp_ : Char) { sp = sp_ }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a matrix and assign values from a sequence/array of vectors 'u'.
@@ -1625,7 +1632,6 @@ object MatrixR extends Error
      */
     def apply (fileName: String): MatrixR =
     {
-        val sp     = ','                                          // character separating the values
         val lines  = fromFile (fileName).getLines.toArray         // get the lines from file
         val (m, n) = (lines.length, lines(0).split (sp).length)
         val x      = new MatrixR (m, n)
@@ -1643,7 +1649,6 @@ object MatrixR extends Error
      */
     def apply (fileName: String, skip: Int): MatrixR =
     {
-        val sp     = ','                                          // character separating the values
         val lines  = fromFile (fileName).getLines.toArray         // get the lines from file
         val (m, n) = (lines.length-skip, lines(0).split (sp).length)
         val x      = new MatrixR (m, n)

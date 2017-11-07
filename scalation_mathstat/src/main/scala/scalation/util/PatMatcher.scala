@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Aravind Kalimurthy
- *  @version 1.3
+ *  @version 1.4
  *  @date    Mon Aug 29 12:31:10 EDT 2016
  *  @see     LICENSE (MIT style license file).
  *
@@ -20,10 +20,15 @@ import java.util.regex.MatchResult
  *  `Pattern` and `Matcher`.  A faster alternative is `PatMatcherB`, see below.
  *  @param regex  the regular expression pattern to be matched
  */
-class PatMatcher (regex: String)
-      extends MatchResult with Error
+class PatMatcher (var regex: String)
+      extends MatchResult with Matchable with Error
 {
     import java.util.regex.{Matcher, Pattern}
+
+    /** The variable to drop "\.r" from 'regex' String/
+     */
+    private val REGEX_EXT = "\\.r"
+    regex = regex.replace(REGEX_EXT, "")
 
     /** The compiled regular expression, i.e., the pattern/machine to recognize the 'regex'.
      */
@@ -32,6 +37,13 @@ class PatMatcher (regex: String)
     /** The pattern matcher for a given 'input' string (must call matcher).
      */
     private var jMatcher: Matcher = null
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The equal-match operator determines whether the 'input' string matches the
+     *  given 'regex' string.
+     *  @param input  the string to be matched
+     */
+    def =~ (input: String): Boolean = { matcher (input) find () }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a matcher that will match the given 'input' against the regex pattern.
@@ -119,13 +131,18 @@ class PatMatcher (regex: String)
  *  FIX:  Brics results often do not agree with Java regex results, so still searching
  *  for a good alternative to 'java.util.regex'.  The following benchmark shows that
  *  Brics is fast, but only agrees with 'java.util.regex' in 2 of 5 test cases.
- *   @see www.javaadvent.com/2015/12/java-regular-expression-library-benchmarks-2015.html
+ *  @see www.javaadvent.com/2015/12/java-regular-expression-library-benchmarks-2015.html
  *  @param regex  the regular expression pattern to be matched
  *
-class PatMatcherB (regex: String)
-      extends MatchResult with Error
+class PatMatcherB (var regex: String)
+      extends MatchResult with Matchable with Error
 {    
     import dk.brics.automaton._
+
+    /** The variable to drop "\.r" from 'regex' String/
+     */
+    private val REGEX_EXT = "\\.r"          
+    regex = regex.replace(REGEX_EXT, "")
 
     /** The compiled regular expression, i.e., the pattern/machine to recognize the 'regex'.
      */
@@ -138,6 +155,13 @@ class PatMatcherB (regex: String)
     /** The current pattern matcher for a given 'input' string (must call matcher).
      */
     private var bMatcher: AutomatonMatcher = null
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The equal-match operator determines whether the 'input' string matches the
+     *  given 'regex' string.   
+     *  @param input  the string to be matched
+     */
+    def =~ (_input: String): Boolean = { println("In PatMatcherB "); matcher (_input) find () }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a matcher that will match the given 'input' against the regex pattern.
@@ -287,3 +311,24 @@ object PatMatcherTest extends App
 // jam@cs.uga.edu
 // 08/28/2016
 // http://www.cs.uga.edu/~jam/scalation.html
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `PatMatcherTest` object is used to test the `PatMatcher` vs. `PatMatcherB` classes.
+ *  It compares the match results and performance of Java and Brics regex pattern matchers.
+ *  @see http://lh3lh3.users.sourceforge.net/reb.shtml
+ *  > run-main scalation.util.PatMatcherTest2
+ *
+object PatMatcherTest2 extends App
+{
+    val q  = new PatMatcher ("[a-z][A-Z]\\.r")
+    val q1 = new PatMatcherB ("[a-z][A-Z]\\.r")
+    
+    val res  = q =~ "WrittenBy"
+    val res1 = q =~ "knows"
+
+    println(res)
+    println(res1)
+
+} // RegexTest2
+ */
+

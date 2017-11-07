@@ -13,22 +13,36 @@
 
 echo ================================= scalation_mathstat ===========================================
 echo // "cd scalation_mathstat; sbt compile package; cd .."
-echo // "cp scalation_mathstat/target/scala-2.12/scalation_mathstat_2.12-1.3.jar scalation_modeling/lib"
-echo // "cp scalation_mathstat/target/scala-2.12/scalation_mathstat_2.12-1.3.jar scalation_models/lib"
+echo // "cp scalation_mathstat/target/scala-2.12/scalation_mathstat_2.12-1.4.jar scalation_database/lib"
+echo // "cp scalation_mathstat/target/scala-2.12/scalation_mathstat_2.12-1.4.jar scalation_modeling/lib"
+echo // "cp scalation_mathstat/target/scala-2.12/scalation_mathstat_2.12-1.4.jar scalation_models/lib"
 
 cd scalation_mathstat; sbt compile package; cd ..
-cp scalation_mathstat/target/scala-2.12/scalation_mathstat_2.12-1.3.jar scalation_modeling/lib
-cp scalation_mathstat/target/scala-2.12/scalation_mathstat_2.12-1.3.jar scalation_models/lib
+cp scalation_mathstat/target/scala-2.12/scalation_mathstat_2.12-1.4.jar scalation_database/lib
+cp scalation_mathstat/target/scala-2.12/scalation_mathstat_2.12-1.4.jar scalation_modeling/lib
+cp scalation_mathstat/target/scala-2.12/scalation_mathstat_2.12-1.4.jar scalation_models/lib
+
+#####################################################################################################
+# build the scalation_database subproject and copy its jar file to the dependent subproject
+
+echo ================================= scalation_database ===========================================
+echo // "cd scalation_database; sbt compile package; cd .."
+echo // "cp scalation_database/target/scala-2.12/scalation_database_2.12-1.4.jar scalation_modeling/lib"
+echo // "cp scalation_database/target/scala-2.12/scalation_database_2.12-1.4.jar scalation_models/lib"
+
+cd scalation_database; sbt compile package; cd ..
+cp scalation_database/target/scala-2.12/scalation_database_2.12-1.4.jar scalation_modeling/lib
+cp scalation_database/target/scala-2.12/scalation_database_2.12-1.4.jar scalation_models/lib
 
 #####################################################################################################
 # build the scalation_modeling subproject and copy its jar file to the dependent subproject
 
 echo ================================= scalation_modeling ===========================================
 echo // "cd scalation_modeling; sbt compile package; cd .."
-echo // "cp scalation_modeling/target/scala-2.12/scalation_modeling_2.12-1.3.jar scalation_models/lib"
+echo // "cp scalation_modeling/target/scala-2.12/scalation_modeling_2.12-1.4.jar scalation_models/lib"
 
 cd scalation_modeling; sbt compile package; cd ..
-cp scalation_modeling/target/scala-2.12/scalation_modeling_2.12-1.3.jar scalation_models/lib
+cp scalation_modeling/target/scala-2.12/scalation_modeling_2.12-1.4.jar scalation_models/lib
 
 #####################################################################################################
 # build the scalation_models subproject

@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.3
+ *  @version 1.4
  *  @date    Wed Aug 26 18:41:26 EDT 2009
  *  @see     LICENSE (MIT style license file).
  */
@@ -9,7 +9,7 @@
 package scalation.stat
 
 import scala.collection.mutable.ListBuffer
-import scala.math.sqrt
+import scala.math.{abs, sqrt}
 
 import scalation.math.ExtremeD
 import scalation.random.{Quantile, Uniform}
@@ -32,6 +32,10 @@ class Statistic (val name: String = "stat", unbiased: Boolean = false)
      */
     protected var sum = 0.0
 
+    /** Sum of the sample absolute values
+     */
+    protected var sumAb = 0.0
+
     /** Sum of the sample values squared
      */
     protected var sumSq = 0.0
@@ -48,6 +52,7 @@ class Statistic (val name: String = "stat", unbiased: Boolean = false)
     {
         n     = 0
         sum   = 0.0
+        sumAb = 0.0
         sumSq = 0.0
         minX  = ExtremeD.MAX_VALUE
         maxX  = ExtremeD.MOST_NEGATIVE
@@ -61,6 +66,7 @@ class Statistic (val name: String = "stat", unbiased: Boolean = false)
     {
         n     += 1
         sum   += x
+        sumAb += abs (x)
         sumSq += x * x
         if (x < minX) minX = x
         if (x > maxX) maxX = x
@@ -108,12 +114,17 @@ class Statistic (val name: String = "stat", unbiased: Boolean = false)
     def stddev: Double = sqrt (variance)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute/estimate the mean square (ms).
+    /** Compute/estimate the mean square (ms), e.g., Mean Square Error (MSE).
      */
     def ms: Double = sumSq / n.toDouble
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute/estimate the root mean square (rms).
+    /** Compute/estimate the mean absolue value (ma), e.g., Mean Absolute Error (MAE).
+     */
+    def ma: Double = sumAb / n.toDouble
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute/estimate the root mean square (rms), e.g., Root Mean Square Error (RMSE).
      */
     def rms: Double = sqrt (ms)
 
@@ -133,7 +144,7 @@ class Statistic (val name: String = "stat", unbiased: Boolean = false)
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show the values of this collector's accumulators.
      */
-    def show: String = "Statistic: " + n + ", " + sum + ", " + sumSq + ", " + minX + ", " + maxX
+    def show: String = s"Statistic: $n, $sum, $sumAb, $sumSq, $minX, $maxX"
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the summary statistics as a row/Array.
@@ -175,18 +186,20 @@ object Statistic
     /** Create a statistical object and set its accumulators and extreme values.
      *  @param n         the number of samples
      *  @param sum       sum of the sample values
+     *  @param sumAb     sum of the sample absolute values
      *  @param sumSq     sum of the sample values squared
      *  @param minX      the minimum sample value
      *  @param maxX      the maximum sample value
      *  @param name      the name for this statistic (e.g., 'waitingTime')
      *  @param unbiased  whether the estimators are restricted to be unbiased
      */
-    def apply (n: Int, sum: Double, sumSq: Double, minX: Double, maxX: Double,
+    def apply (n: Int, sum: Double, sumAb: Double, sumSq: Double, minX: Double, maxX: Double,
                name: String = "stat", unbiased: Boolean = false): Statistic =
     {
         val stat   = new Statistic (name, unbiased)
         stat.n     = n
         stat.sum   = sum
+        stat.sumAb = sumAb
         stat.sumSq = sumSq
         stat.minX  = minX
         stat.maxX  = maxX
@@ -207,17 +220,19 @@ object Statistic
         if (m < 1) { flaw ("average", "there are no subparts to average"); return null }
         var n     = 0
         var sum   = 0.0
+        var sumAb = 0.0
         var sumSq = 0.0
         var minX  = Double.MaxValue
         var maxX  = 0.0
         for (s <- subStats) {
             n     += s.n
             sum   += s.sum
+            sumAb += s.sumAb
             sumSq += s.sumSq
             if (s.minX < minX) minX = s.minX
             if (s.maxX > maxX) maxX = s.maxX
         } // for
-        Statistic (n, sum, sumSq, minX, maxX, name, unbiased)
+        Statistic (n, sum, sumAb, sumSq, minX, maxX, name, unbiased)
     } // aggregate
 
 } // Statistic object
@@ -268,6 +283,7 @@ class TimeStatistic (override val name: String = "p-stat",
 
         n     += 1
         sum   += x * duration
+        sumAb += abs (x) * duration
         sumSq += x * x * duration
         if (x < minX) minX = x
         if (x > maxX) maxX = x
@@ -309,6 +325,7 @@ object TimeStatistic
     /** Create a statistical object and set its accumulators and extreme values.
      *  @param n           the number of samples
      *  @param sum         sum of the sample values
+     *  @param sumAb       sum of the sample absolute values
      *  @param sumSq       sum of the sample values squared
      *  @param minX        the minimum sample value
      *  @param maxX        the maximum sample value
@@ -316,12 +333,13 @@ object TimeStatistic
      *  @param _lastTime   the time of latest observation
      *  @param _startTime  the time observation began
      */
-    def apply (n: Int, sum: Double, sumSq: Double, minX: Double, maxX: Double, name: String = "p-stat",
-               _lastTime: Double = 0.0, _startTime: Double = 0.0): TimeStatistic =
+    def apply (n: Int, sum: Double, sumAb: Double, sumSq: Double, minX: Double, maxX: Double,
+               name: String = "p-stat", _lastTime: Double = 0.0, _startTime: Double = 0.0): TimeStatistic =
     {
         val stat   = new TimeStatistic (name, _lastTime, _startTime)
         stat.n     = n
         stat.sum   = sum
+        stat.sumAb = sumAb
         stat.sumSq = sumSq
         stat.minX  = minX
         stat.maxX  = maxX
@@ -340,6 +358,7 @@ object TimeStatistic
         if (m < 1) { flaw ("average", "there are no subparts to average"); return null }
         var n     = 0
         var sum   = 0.0
+        var sumAb = 0.0
         var sumSq = 0.0
         var minX  = Double.MaxValue
         var maxX  = 0.0
@@ -348,13 +367,14 @@ object TimeStatistic
         for (s <- subStats) {
             n     += s.n
             sum   += s.sum
+            sumAb += s.sumAb
             sumSq += s.sumSq
-            if (s.minX < minX)      minX = s.minX
-            if (s.maxX > maxX)      maxX = s.maxX
+            if (s.minX < minX) minX = s.minX
+            if (s.maxX > maxX) maxX = s.maxX
             if (s.startTime < starT) starT = s.startTime
             if (s.lastTime  > lastT) lastT = s.lastTime
         } // for
-        TimeStatistic (n, sum, sumSq, minX, maxX, name, lastT, starT)
+        TimeStatistic (n, sum, sumAb, sumSq, minX, maxX, name, lastT, starT)
     } // aggregate
 
 } // TimeStatistic object
@@ -363,6 +383,7 @@ object TimeStatistic
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StatisticTest` object is used to test the `Statistic` and `TimeStatistic`
  *  classes.
+ *  > run-main scalation.stat.StatisticTest
  */
 object StatisticTest extends App
 {
@@ -375,6 +396,8 @@ object StatisticTest extends App
     for (i <- 1 to 1000) stat1.tally (rv.gen)
     println (Statistic.labels)
     println (stat1)
+    println (stat1.show)
+    println (s"ma = ${stat1.ma}, rms = ${stat1.rms}")
 
     //:: Test time persistent statistics
 
@@ -383,6 +406,8 @@ object StatisticTest extends App
     for (i <- 1 to 1000) stat2.accum (rv.gen, 2.0 * i)
     println (Statistic.labels)
     println (stat2)
+    println (stat2.show)
+    println (s"ma = ${stat2.ma}, rms = ${stat2.rms}")
 
 } // StatisticTest object
 

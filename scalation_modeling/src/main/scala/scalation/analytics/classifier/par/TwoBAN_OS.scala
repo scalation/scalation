@@ -15,11 +15,12 @@ import scala.math.min
 import scala.util.control.Breaks.{break, breakable}
 
 import scalation.analytics.classifier.TabuFeatures
+import scalation.columnar_db.Relation
 import scalation.linalgebra._
 import scalation.linalgebra.gen.{HMatrix2, HMatrix3, HMatrix5}
 import scalation.random.PermutedVecI
 import scalation.random.RNGStream.ranStream
-import scalation.relalgebra.Relation
+
 import BayesClassifier.me_default
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

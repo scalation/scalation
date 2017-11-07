@@ -9,10 +9,10 @@
 package scalation.analytics.classifier
 
 import scala.collection.mutable.ListBuffer
+import scalation.columnar_db.Relation
 import scalation.linalgebra.{MatriI, MatrixD, MatrixI, VectoI, VectorD, VectorI}
 import scalation.linalgebra.gen.{HMatrix2, HMatrix3, HMatrix5}
 import scalation.math.log2
-import scalation.relalgebra.Relation
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The 'DAG' class provides a data structure for storing directed acyclic graphs.

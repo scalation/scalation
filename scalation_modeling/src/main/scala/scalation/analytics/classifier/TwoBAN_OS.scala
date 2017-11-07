@@ -10,11 +10,11 @@ package scalation.analytics.classifier
 
 import scala.util.control.Breaks.{break, breakable}
 
+import scalation.columnar_db.Relation
 import scalation.linalgebra.{MatrixD, MatriI, MatrixI, VectoD, VectorD, VectoI, VectorI}
 import scalation.linalgebra.gen.{HMatrix2, HMatrix3, HMatrix5}
 import scalation.random.PermutedVecI
 import scalation.random.RNGStream.ranStream
-import scalation.relalgebra.Relation
 
 import BayesClassifier.me_default
 

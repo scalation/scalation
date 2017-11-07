@@ -37,7 +37,7 @@ class GraphSim2 (g: Graph, q: Graph)
             // loop over query vertices u, u's children u_c, and data vertices v in phi(u)
 
             for (u <- qRange; u_c <- q.ch(u); v <- phi(u)) {
-                if (overlaps (g.ch(v),  phi(u_c))) {             // v must have a child in phi(u_c)
+                if (disjoint (g.ch(v),  phi(u_c))) {             // v must have a child in phi(u_c)
                     phi(u) -= v                                  // remove vertex v from phi(u)
                     if (phi(u).isEmpty) return phi               // no match for vertex u => no overall match
                     alter = true
@@ -46,7 +46,7 @@ class GraphSim2 (g: Graph, q: Graph)
 
         } // while
         phi
-    } // saltzGraphSim
+    } // prune
 
 } // GraphSim2 class
 

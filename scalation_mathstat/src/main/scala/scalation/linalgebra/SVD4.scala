@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Michael Cotterell
- *  @version 1.3
+ *  @version 1.4
  *  @date    Mon Mar  2 16:18:29 EST 2015
  *  @see     LICENSE (MIT style license file).
  *

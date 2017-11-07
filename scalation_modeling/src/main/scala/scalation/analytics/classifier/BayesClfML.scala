@@ -8,8 +8,8 @@
 
 package scalation.analytics.classifier
 
+import scalation.columnar_db.Relation
 import scalation.linalgebra.{MatriI, MatrixI, VectoD, VectorD, VectoI, VectorI}
-import scalation.relalgebra.Relation
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BayesClfML` class implements an Integer-Based Naive Bayes Multi-Label Classifier,

@@ -10,9 +10,9 @@ package scalation.analytics.classifier
 
 import scala.math.abs
 
+import scalation.columnar_db.Relation
 import scalation.linalgebra.{MatriI, VectoI, VectorD, VectorI}
 import scalation.linalgebra.gen._
-import scalation.relalgebra.Relation
 import scalation.util.{banner, time}
 
 import BayesClassifier.me_default

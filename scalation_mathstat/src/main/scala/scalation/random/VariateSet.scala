@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.3
+ *  @version 1.4
  *  @date    Wed Sep 16 16:12:08 EDT 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -15,7 +15,7 @@ import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VariateSet` abstract class serves as a base class for all the random
- *  variate set (RVS) generators. They use one of the Random Number Generators
+ *  variate set (RVS) generators.  They use one of the Random Number Generators
  *  (RNG's) from Random.scala to generate numbers following their particular
  *  multivariate distribution.
  *-----------------------------------------------------------------------------
@@ -80,9 +80,9 @@ case class RandomSet (count: Int = 10, max: Int = 20, skip: Int = -1, stream: In
 
     def mean: Double =  max / 2.0 
 
-    def pf (s: Set [Int]): Double = throw new NoSuchMethodException ("'pf' not implemented")
+    def pf (s: Set [Int]): Double = throw new UnsupportedOperationException ("'pf' not implemented")
 
-    def gen: Set [Double] = throw new NoSuchMethodException ("'gen' not implemented, use 'igen' instead")
+    def gen: Set [Double] = throw new UnsupportedOperationException ("'gen' not implemented, use 'igen' instead")
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Generate a random set of unique integers 'r' in the range '0 to max'.
@@ -110,7 +110,7 @@ case class RandomSet (count: Int = 10, max: Int = 20, skip: Int = -1, stream: In
         val r = Set [Int] ()
         var e = 0
         for (i <- 0 until n) {
-            do e = rng.iigen (mx) while (e == skp || i > 0 && (r contains e))
+            do e = rng.igen1 (mx) while (e == skp || i > 0 && (r contains e))
             r += e
         } // for
         r
@@ -128,7 +128,7 @@ case class RandomSet (count: Int = 10, max: Int = 20, skip: Int = -1, stream: In
         val r  = Set [Int] ()
         var e  = 0
         for (i <- 0 until n) {
-            do e = sa(rng.iigen (mx)) while (i > 0 && (r contains e))
+            do e = sa(rng.igen1 (mx)) while (i > 0 && (r contains e))
             r += e
         } // for
         r
@@ -138,14 +138,86 @@ case class RandomSet (count: Int = 10, max: Int = 20, skip: Int = -1, stream: In
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RandomSetS` class generates a random set/subset of strings.
+ *  @param count   the size of the set (number of strings)
+ *  @param stream  the random number stream
+ */
+case class RandomSetS (count: Int = 10, stream: Int = 0)
+     extends VariateSet (stream) 
+{
+    _discrete = true
+
+    private val rng = RandomStr (stream = stream)       // random string generator
+
+    def mean: Double = throw new UnsupportedOperationException ("'mean' not implemented")
+
+    def pf (s: Set [Int]): Double = throw new UnsupportedOperationException ("'pf' not implemented")
+
+    def gen: Set [Double] = sgen.map (_.toDouble)
+
+    def igen: Set [Int] = sgen.map (_.toInt)
+
+    def sgen: Set [String] =
+    {
+        val y   = Set [String] ()
+        var str = ""
+        for (i <- 0 until count) {
+            do str = rng.sgen while (i > 0 && (y contains str))
+            y += str
+        } // for
+        y
+    } // sgen
+
+} // RandomSetS class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RandomSetW` class generates a random set/subset of words.
+ *  @param count   the size of the set (number of words)
+ *  @param nWords  the numbers of words to predetermine.
+ *  @param lRange  the range of string lengths to generate
+ *  @param cRange  the range of characters to generate
+ *  @param stream  the random number stream
+ */
+case class RandomSetW (count: Int = 10, nWords: Int = 20, lRange: Range = 4 to 6,
+                       cRange: Range = 97 to 122,stream: Int = 0)
+     extends VariateSet (stream)
+{
+    _discrete = true
+
+    private val rng = RandomWord (nWords, lRange, cRange, stream)       // random word generator
+
+    def mean: Double = throw new UnsupportedOperationException ("'mean' not implemented")
+
+    def pf (s: Set [Int]): Double = throw new UnsupportedOperationException ("'pf' not implemented")
+
+    def gen: Set [Double] = sgen.map (_.toDouble)
+
+    def igen: Set [Int] = sgen.map (_.toInt)
+
+    def sgen: Set [String] =
+    {
+        val y   = Set [String] ()
+        var str = ""
+        for (i <- 0 until count) {
+            do str = rng.sgen while (i > 0 && (y contains str))
+            y += str
+        } // for
+        y
+    } // sgen
+
+} // RandomSetW class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VariateSetTest` object is used to test the Random Variate Set (RVS)
  *  generators from the classes derived from `VariateSet`.
  *  > run-main scalation.random.VariateSetTest
  */
 object VariateSetTest extends App
 {
-     val rsg = RandomSet (10)                          // variate set generator
-     var rs:  Set [Int]  = null                        // variate set
+     val rsg = RandomSet (10)                           // variate set generator
+     var rs:  Set [Int]  = null                         // variate set
 
      println ("Test: RandomSet random set generation ------------------------")
      println ("mean = " + rsg.mean)                     // random set generator
@@ -156,4 +228,36 @@ object VariateSetTest extends App
      for (k <- 0 until 30) println (rsg.igen (rs, 5))
 
 } // VariateSetTest object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `VariateSetTest2` object is used to test the Random Variate Set (RVS)
+ *  generators from the classes derived from `VariateSet`.
+ *  > run-main scalation.random.VariateSetTest2
+ */
+object VariateSetTest2 extends App
+{
+     val rsg = RandomSetS (10)                          // variate set generator
+     var rs:  Set [String]  = null                      // variate set
+
+     println ("Test: RandomSetS random set generation ------------------------")
+     for (k <- 0 until 30) { rs = rsg.sgen;  println (rs) }
+
+} // VariateSetTest2 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `VariateSetTest3` object is used to test the Random Variate Set (RVS)
+ *  generators from the classes derived from `VariateSet`.
+ *  > run-main scalation.random.VariateSetTest3
+ */
+object VariateSetTest3 extends App
+{
+     val rsg = RandomSetW (10)                          // variate set generator
+     var rs:  Set [String]  = null                      // variate set
+
+     println ("Test: RandomSetW random set generation ------------------------")
+     for (k <- 0 until 30) { rs = rsg.sgen;  println (rs) }
+
+} // VariateSetTest3 object
 

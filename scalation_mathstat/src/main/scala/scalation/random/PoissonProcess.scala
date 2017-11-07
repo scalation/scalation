@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Casey Bowman
- *  @version 1.3
+ *  @version 1.4
  *  @date    Sat Mar 15 15:28:44 EDT 2014
  *  @see     LICENSE (MIT style license file).
  *
@@ -152,6 +152,18 @@ case class PoissonProcess (lambda: Double, stream: Int = 0)
      */
     def gen: Double = { t += e_rv.gen; t }
 
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine the next random number for the particular distribution.
+     *  This version allows one paramater.
+     *  @param z  the limit paramater
+     */
+    def gen1 (z: Double): Double = 
+    { 
+        val e_rv = Exponential (1.0 / z, stream)    // exponential rv generator
+        t += e_rv.gen
+        t
+    } // gen1
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset the global time value to zero.
      */
@@ -262,6 +274,16 @@ case class NHPoissonProcess (lambda: VectorD, dt: Double = 1.0, stream: Int = 0)
      *  variable.
      */
     def gen: Double = genTime - tlast
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine the next random number for the particular distribution.
+     *  This version allows one paramater.
+     *  @param z  the limit paramater
+     */ 
+    def gen1 (z: Double): Double =
+    {
+        throw new UnsupportedOperationException ("gen1 not implemented for NHPoissonProcess")
+    } // gen1
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset the NHPP by resetting 'e' to zero.

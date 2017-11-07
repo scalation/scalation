@@ -2,7 +2,7 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Yung Long Li 
  *  @builder scalation.linalgebra.bld.BldSparseMatrix
- *  @version 1.3
+ *  @version 1.4
  *  @date    Sat Nov 10 19:05:18 EST 2012
  *  @see     LICENSE (MIT style license file).
  */

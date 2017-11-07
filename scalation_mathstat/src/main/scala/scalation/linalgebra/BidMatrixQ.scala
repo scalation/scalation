@@ -2,7 +2,7 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @builder scalation.linalgebra.bld.BldBidMatrix
- *  @version 1.3
+ *  @version 1.4
  *  @date    Mon May 19 15:52:24 EDT 2014
  *  @see     LICENSE (MIT style license file).
  */

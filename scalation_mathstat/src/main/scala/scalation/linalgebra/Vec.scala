@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.3
+ *  @version 1.4
  *  @date    Sun Aug 23 15:42:06 EDT 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -31,7 +31,7 @@ trait Vec
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Vec` object provides a minimal set of functions that apply across all
  *  types of vectors. 
- *  @see `scalation.relalgebra.Relation`
+ *  @see `scalation.columnar_db.Relation`
  */
 object Vec
 {

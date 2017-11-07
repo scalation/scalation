@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.3
+ *  @version 1.4
  *  @date    Wed Sep  9 13:07:48 EDT 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -19,7 +19,7 @@ package scalation.util
  *  @see en.wikipedia.org/wiki/List_of_Unicode_characters
  *  @see arxiv.org/abs/1112.1751
  *------------------------------------------------------------------------------
- *  Unicode is used in the following:
+ *  Classes using Unicode include the following:
  *  @see `scalation.analytics.Regression`
  *  @see `scalation.linalgebra.bld.BldVector`
  *  @see `scalation.math` (package object)
@@ -27,7 +27,7 @@ package scalation.util
  *  @see `scalation.math.Rational`
  *  @see `scalation.math.Real`
  *  @see `scalation.math.StrNum`
- *  @see `scalation.relalgebra.Relation`
+ *  @see `scalation.columnar_db.Relation`
  */
 object Unicode
 {

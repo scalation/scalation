@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Yung Long Li 
- *  @version 1.3
+ *  @version 1.4
  *  @date    Sat Jan 12 15:15:41 EST 2013
  *  @see     LICENSE (MIT style license file).
  */

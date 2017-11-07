@@ -52,6 +52,18 @@ abstract class GraphMatcher (g: Graph, q: Graph)
      */
     def prune (phi: Array [SET [Int]]): Array [SET [Int]]
 
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether two sets are disjoint, i.e., have an empty intersection.
+     *  @param set1  the first set
+     *  @param set2  the second set
+     */
+    def disjoint (set1: SET [Int], set2: SET [Int]): Boolean =
+    {
+        for (s <- set1 if set2 contains s) return false
+        true
+    } // disjoint
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether two sets overlap, i.e., have a non-empty intersection.
      *  @param set1  the first set

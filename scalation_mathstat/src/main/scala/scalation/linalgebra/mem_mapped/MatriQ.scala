@@ -2,7 +2,7 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @builder scalation.linalgebra.mem_mapped.bld.BldMatri
- *  @version 1.3
+ *  @version 1.4
  *  @date    Mon Sep 28 11:18:16 EDT 2015
  *  @see     LICENSE (MIT style license file).
  */

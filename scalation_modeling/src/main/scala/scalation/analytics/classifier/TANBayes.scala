@@ -10,11 +10,10 @@ package scalation.analytics.classifier
 
 import scala.collection.mutable.{Set => SET, Map}
 
-import scalation.graphalytics.Pair
-import scalation.graphalytics.mutable.{MinSpanningTree, MGraph}
+import scalation.columnar_db.Relation
+import scalation.graph_db.{MGraph, MinSpanningTree, Pair}
 import scalation.linalgebra.{MatriI, MatrixI, VectorD, VectoI, VectorI}
 import scalation.linalgebra.gen.{HMatrix2, HMatrix3, HMatrix4, HMatrix5}
-import scalation.relalgebra.Relation
 
 import BayesClassifier.me_default
 

@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Aravind Kalimurthy
- *  @version 1.3
+ *  @version 1.4
  *  @date    Wed Aug 24 20:55:35 EDT 2016
  *  @see     LICENSE (MIT style license file).
  *
@@ -46,7 +46,7 @@ import Wildcard._
  *  @param pattern  the underlying object to be accessed via the 'pattern' accessor
  */
 class Wildcard (val self: String)
-      extends AnyVal
+      extends Matchable
 {    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The equal-match operator determines whether the 'pattern' string matches the
@@ -54,7 +54,7 @@ class Wildcard (val self: String)
      *  wildcard characters.
      *  @param self  the self against which the string to be matched
      */
-    def =~ (pattern: Any): Boolean =
+    def =~ (pattern: String): Boolean =
     {
         pattern match {
         case _: String => isMatch (pattern.asInstanceOf [String])

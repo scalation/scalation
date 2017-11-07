@@ -2,7 +2,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Casey Bowman (code generated)
- *  @version 1.3
+ *  @version 1.4
  *  @date    Thu Mar 27 14:21:03 EDT 2014
  *  @see     LICENSE (MIT style license file).
  */

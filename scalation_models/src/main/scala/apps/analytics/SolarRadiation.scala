@@ -8,8 +8,8 @@
 package apps.analytics
 
 import scalation.analytics.BASE_DIR
+import scalation.columnar_db.Relation
 import scalation.linalgebra.{MatrixD, MatrixKind, RleMatrixD, RleVectorD, VectorD}
-import scalation.relalgebra.Relation
 import scalation.util.{timed}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
