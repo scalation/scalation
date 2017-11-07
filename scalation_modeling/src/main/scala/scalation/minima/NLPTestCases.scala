@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.3
+ *  @version 1.4
  *  @date    Sun Oct  2 22:43:44 EDT 2011
  *  @see     LICENSE (MIT style license file).
  *  @see     http://www.ai7.uni-bayreuth.de/test_problem_coll.pdf

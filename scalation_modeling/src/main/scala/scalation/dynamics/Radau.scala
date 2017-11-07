@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.3
+ *  @version 1.4
  *  @date    Fri Dec 30 18:23:13 EST 2011
  *  @see     LICENSE (MIT style license file).
  *  @see     http://users.bart.nl/users/termaten/Publications/Coached/JdS_Radau_1997.pdf

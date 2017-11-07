@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.3
+ *  @version 1.4
  *  @date    Mon Jan 21 14:43:50 EST 2013
  *  @see     LICENSE (MIT style license file).
  *  @see     http://page.mi.fu-berlin.de/rojas/neural/chapter/K7.pdf

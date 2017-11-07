@@ -1,0 +1,7 @@
+
+https://github.com/sbt/sbt/issues/2156
+
+Well, the problems seems to be gone after I disabled all concurrency in SBT:
+
+concurrentRestrictions := Seq(Tags.limitAll(1))
+

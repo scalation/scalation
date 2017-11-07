@@ -48,7 +48,13 @@ libraryDependencies += "org.scala-lang" % "scala-compiler" % scalaVersion.value,
 // Unit Testing
 
 libraryDependencies += "junit" % "junit" % "4.11" % "test",
-libraryDependencies += "com.novocode" % "junit-interface" % "0.8" % "test->default"
+libraryDependencies += "com.novocode" % "junit-interface" % "0.8" % "test->default",
+
+////////////////////////////////////////////////////////////////////////////////
+// Neo4j Driver
+// @see https://mvnrepository.com/artifact/org.neo4j.driver/neo4j-java-driver
+
+libraryDependencies += "org.neo4j.driver" % "neo4j-java-driver" % "1.4.4"
 
 ) // root
 

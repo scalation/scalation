@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Naman Fatehpuria
- *  @version 1.3
+ *  @version 1.4
  *  @date    Mon Mar  3 14:39:17 EST 2014
  *  @see     LICENSE (MIT style license file).
  *

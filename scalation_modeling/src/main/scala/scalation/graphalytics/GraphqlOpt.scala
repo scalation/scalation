@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Ayushi Jain, John Miller
- *  @version 1.3
+ *  @version 1.4
  *  @date    Thu Feb 4 2013
  *  @see     LICENSE (MIT style license file).
  */

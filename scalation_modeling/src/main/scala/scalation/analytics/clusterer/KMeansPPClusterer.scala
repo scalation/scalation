@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Michael Cotterell, John Miller, Hao Peng
- *  @version 1.3
+ *  @version 1.4
  *  @date    Tue Mar  7 22:10:21 2017
  *  @see     LICENSE (MIT style license file).
  *

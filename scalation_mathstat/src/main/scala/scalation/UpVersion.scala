@@ -17,11 +17,12 @@ import scala.io._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The 'UpVersion' object is used to update the version number in the source code.
+ *  After running, must rest 'pat1', since it will get updated.
  */
 object UpVersion
 {
     private val DEBUG      = true                      // debug flag
-    private val pat1       = "@version 1.4"            // pattern to find (change as needed)
+    private val pat1       = "@version 1.3"            // pattern to find (change as needed)
     private val pat2       = "@version 1.4"            // replacement pattern (change as needed)
     private val SKIP       = "old"                     // do not process files in this directory
     private val sep        = File.separator            // file separator ('/' for UNIX, '\' for Windows)
@@ -54,11 +55,12 @@ object UpVersion
     } // update
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Update the version number for all source (.scala) files.
+    /** Update the version number for all source (.scala) files in current module.
      */
     def updateAll ()
     {
-        println ("Update version number in source code files starting from currentDir = " + currentDir)
+        println (s"Update version number in source code files starting from currentDir = $currentDir")
+        println (s"from $pat1 to $pat2")
         updater (new File (currentDir))
     } // updateAll
 

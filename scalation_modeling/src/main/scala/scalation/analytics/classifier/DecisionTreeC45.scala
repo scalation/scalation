@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Jerry Shi, John Miller
- *  @version 1.3
+ *  @version 1.4
  *  @date    Wed Jan  9 15:07:13 EST 2013
  *  @see     LICENSE (MIT style license file).
  *  @see     http://en.wikipedia.org/wiki/C4.5_algorithm

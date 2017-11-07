@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Usman Nisar, John Miller
- *  @version 1.3
+ *  @version 1.4
  *  @date    Mon May  6 10:50:37 EDT 2013
  *  @see     LICENSE (MIT style license file).
  *
