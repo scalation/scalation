@@ -13,7 +13,7 @@ package scalation
 //import scalation.linalgebra.VectorD
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `graphalytics` package contains classes, traits and objects for graph
+/** The `graph_db` package contains classes, traits and objects for graph
  *  analytics on Trees, 'DAG's and Directed Graphs.  It provides an implicit
  *  conversion when needed for converting doubles to vectors.
  */
@@ -25,7 +25,7 @@ package object graph_db
 
     /** The relative path for base directory
      */
-    val BASE_DIR = DATA_DIR + "graphalytics" + ⁄
+    val BASE_DIR = DATA_DIR + "graph_db" + ⁄
 
     /** The standard file extension for graphs
      */

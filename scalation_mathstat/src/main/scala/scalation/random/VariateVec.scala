@@ -363,8 +363,8 @@ case class RandomVecI (dim: Int = 10, max: Int = 20, min: Int = 10, skip: Int = 
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `RandomVecS` class generates a random vector of integers.
- *  Ex: (3, 2, 0, 4, 1) has 'dim' = 5 and 'max' = 4.
+/** The `RandomVecS` class generates a random vector of strings.
+ *  Ex: ("3", "2", "0", "4", "1") has 'dim' = 5 and 'max' = 4.
  *  @param dim     the dimension/size of the vector (number of elements)
  *  @param unique  whether the strings must be unique
  *  @param stream  the random number stream
@@ -374,8 +374,9 @@ case class RandomVecS (dim: Int = 10, unique: Boolean = true, stream: Int = 0)
 {
     _discrete = true
 
-    private val mu  = NaN                               // mean
-    private val rng = RandomStr (stream = stream)       // random string generator
+    private val LIMIT  = 1000000                           // limit on retries
+    private val mu     = NaN                               // mean
+    private val rng    = RandomStr (stream = stream)       // random string generator
 
     def mean: VectorD = VectorD.fill (dim)(mu)
 
@@ -390,7 +391,12 @@ case class RandomVecS (dim: Int = 10, unique: Boolean = true, stream: Int = 0)
         val y   = new VectorS (dim)
         var str = ""
         for (i <- 0 until dim) {
-            do str = rng.sgen while (unique && i > 0 && (y.slice (0, i) contains str))
+            var cnt = 0
+            do {
+                str = rng.sgen
+                if (cnt == LIMIT) throw new Exception ("RandomVecS: may be in infinite loop")
+                cnt += 1
+            } while (unique && i > 0 && (y.slice (0, i) contains str))
             y(i) = str
         } // for
         y

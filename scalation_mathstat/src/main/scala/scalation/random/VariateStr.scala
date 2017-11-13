@@ -17,7 +17,7 @@ import scalation.util.Error
  *  @param cRange  the range of characters to generate
  *  @param stream  the random number stream
  */
-case class RandomStr (lRange: Range = 4 to 6, cRange: Range = 97 to 122, stream: Int = 0)
+case class RandomStr (lRange: Range = 4 to 7, cRange: Range = 97 to 122, stream: Int = 0)
      extends Variate (stream)
 {
     private val lrng = Randi (lRange.start, lRange.end, stream)       // random integer generator

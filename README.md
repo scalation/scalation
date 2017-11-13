@@ -1,3 +1,4 @@
+
 <html>
 <head>
 <LINK href="style.css" rel="stylesheet" type="text/css">
@@ -20,7 +21,6 @@ This system, coded in Scala, supports multi-paradigm simulation modeling includi
 
 <p>
 <a href = "http://www.scala-lang.org">Scala</a> is a modern object-oriented, functional programming language
-<!-- (see <a href = "feature_matrix.html"> feature matrix </a>) -->
 that is well-suited for developing simulation engines.
 It is in the Java family of languages and can call Java code.
 The inclusion of advanced and functional programming capabilities,
@@ -29,14 +29,12 @@ ScalaTion also supports optimization and analytics as they nowadays go hand-in-h
 Some of the algorithms come in both sequential and parallel versions.
 
 <p>
-The <b>ScalaTion 1.3</b> version defines multiple .par subpackages that contain parallel versions of sequential algorithms.
+The <b>ScalaTion 1.4</b> version defines multiple .par subpackages that contain parallel versions of sequential algorithms.
 Future directions include completing the 'scala3d' and 'physics' packages.
 
 <p>
-As of version 1.3, ScalaTion consists of three subprojects:
-scalation_mathstat,
-scalation_modeling and
-sclation_models.
+As of version 1.4, ScalaTion consists of 4 subprojects:
+scalation_mathstat, scalation_database, scalation_modeling and scalation_models
 
 <p>
 Please read the <a href = LICENSE.html> LICENSE </a> file (an MIT style license).
@@ -50,38 +48,25 @@ Requires:
 <br>
 Recommended:
 <a href = "http://www.scala-sbt.org/">sbt</a> &nbsp;
-(see <a href = "http://www.scala-sbt.org/0.13/tutorial/Setup.html">Setup.html</a>)
+(see <a href = "http://www.scala-sbt.org/0.13/docs/Setup.html">Setup.html</a>)
 
 <h4>1. Download one of the following two files</h4>
 
-<a href = "../scalation_1.3.tar.gz"> scalation_1.3.tar.gz </a> <br> <b>OR</b> <br>
-<a href = "../scalation_1.3.zip"> scalation_1.3.zip </a>
+<a href = "../scalation_1.4.tar.gz"> scalation_1.4.tar.gz </a> <br> <b>OR</b> <br>
+<a href = "../scalation_1.4.zip"> scalation_1.4.zip </a>
 
 <p>
 <h4>2. Untar or unzip the file</h4>
 
 <pre><code>
-$ tar xvfz scalation_1.3.tar.gz <br> <b>OR</b> <br>
-$ unzip scalation_1.3.zip
+$ tar xvfz scalation_1.4.tar.gz <br> <b>OR</b> <br>
+$ unzip scalation_1.4.zip
 </code></pre>
-
-<!--
-<p>
-<h4>3. Export the SCALATION_CLASSES environment variable to point at class files</h4>
-
-<pre><code>
-export SCALATION_CLASSES=$HOME/scalation_1.3/target/scala-2.12.1/classes
-</code></pre>
-
-<p>
-Adjust the prefix to correspond to where you installed scalation.
-Ideally, put the export in one of your dot files (e.g., .profile or .bashrc).
--->
 
 <h4>3. To compile code or run apps, enter sbt and type compile, run-main or exit </h4>
 
 <pre><code>
-$ cd scalation_1.3 <br>
+$ cd scalation_1.4 <br>
 $ cd scalation_models <br>
 $ sbt <br>
 > compile <br>
@@ -91,10 +76,10 @@ $ sbt <br>
 </code></pre>
 
 <p>
-ScalaTion 1.3 is set up to use the Simple Build Tool <a href = "http://www.scala-sbt.org">sbt</a>.
+ScalaTion 1.4 is set up to use the Simple Build Tool <a href = "http://www.scala-sbt.org">sbt</a>.
 
 <p>
-ScalaTion 1.3 uses the following build specification files
+ScalaTion 1.4 uses the following build specification files
 <a href = "scalation_mathstat/build.sbt">build.sbt</a>,
 <a href = "scalation_modeling/build.sbt">build.sbt</a> and
 <a href = "scalation_mmodels/build.sbt">build.sbt</a>.
@@ -103,28 +88,6 @@ class files are in the <b>target/scala-2.12/classes</b> directory, and
 documentation files are in the <b>target/scala-2.12/api</b> directory.
 Data file input, output or analytics are stored in subdirectories of <b>data</b>,
 while database files are stored in <b>store</b>.
-
-<!--
-<h4>4. Run apps (e.g., for process oriented simulation in Bank.scala)</h4>
-
-<pre><code>
-$ scar apps.process.Bank <br> <b>OR</b> <br>
-$ scala -cp $SCALATION_CLASSES apps.process.Bank
-</code></pre>
-
-<p>
-
-The '<a href = "scar">scar</a>' shell script works for Linux, Unix and Mac.
-Use '<a href = "scar.bat">scar.bat</a>' for Windows.
-</code></pre>
-
-<h4>5. Run src test code (e.g., for Regression in scalation.analytics)</h4>
-
-<pre><code>
-$ scar scalation.analytics.RegressionTest <br> <b>OR</b> <br>
-$ scala -cp $SCALATION_CLASSES scalation.analytics.RegressionTest
-</code></pre>
--->
 
 <p><hr><p>
 
@@ -141,7 +104,7 @@ Create and run HelloWorld.scala, see <a href = "https://www.assembla.com/spaces/
 </ol>
 
 <p>
-For more information about the source code, see 
+For more information about the source code, see
 <a href = "src/README_src.hmtl">src/README_src.hmtl</a>.
 
 <A name = "papers">
@@ -190,7 +153,7 @@ John A. Miller, Michael E. Cotterell and Stephen J. Buckley,
 <a href = "http://informs-sim.org/wsc13papers/includes/files/104.pdf">
 "Supporting a Modeling Continuum in ScalaTion: From Predictive Analytics to Simulation Modeling,"</a>
 Proceedings of the 2013 ACM/IEEE Winter Simulation Conference (WSC'13),
-Washington, DC (December 2013) pp. 1191-1202. 
+Washington, DC (December 2013) pp. 1191-1202.
 
 <p>
 <li>
@@ -204,14 +167,11 @@ Anchorage, Alaska (June-July 2014) pp. 498-505.
 Online <a href = "../home/theses/jain_thesis/bigdata_2014/BigDataCong2014_DualIso_Supplement.pdf">supplement</a>
 
 </ol>
+
 <A name = "scaladoc">
 
 <p><hr><p>
 <h3> Source Packages (doc) </h3>
-<p>
-
-<p>
-Overall scaladoc generated <a href = "target/scala-2.12/api"> API </a> for ScalaTion
 <p>
 
 <blockquote>
@@ -221,167 +181,179 @@ Overall scaladoc generated <a href = "target/scala-2.12/api"> API </a> for Scala
 <td> <b>Description</b>
 <tr>
 <tr>
-~/scalation_1.3/target/scala-2.12/api
+<td> <a href = "scalation_mathstat/target/scala-2.12/api/index.html">MATH AND STAT</a>
 <tr>
-<tr>
-<td> MATH AND STAT
-<tr>
-<tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/util/index.html"> scalation.util </a>
-<td> A package of utilities needed by the other packages.
-<tr>
-<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/util/bld/index.html"> scalation.util.bld </a>
-<td> A subpackage of for building util implementations.
-<tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/scala2d/index.html"> scalation.scala2d </a>
-<td> A package supporting 2D graphics based on Java 2D.
-<tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/math/index.html"> scalation.math </a>
-<td> A package of mathematical objects and operations needed for analytics, simulation and optimization.
-<tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/index.html"> scalation.linalgebra </a>
-<td> A package of implementations for linear algebra (e.g., for vectors and matrices).
-Vectors and matrices of real (Double), rational and complex numbers are supported.
-<tr>
-<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/bld/index.html"> scalation.linalgebra.bld </a>
-<td> A subpackage for building implementations for linear algebra (e.g., for vectors and matrices).
-<tr>
-<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/gen/index.html"> scalation.linalgebra.gen </a>
-<td> A subpackage of generic implementations for linear algebra (e.g., for vectors and matrices).
-Vectors and matrices of types implementing Numeric can be instantiated.
-<tr>
-<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/mem_mapped/index.html"> scalation.linalgebra.mem_mapped </a>
-<td> A subpackage for memory mapped linear algebra (e.g., for vectors and matrices).
-<tr>
-<td> - - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/mem_mapped/bld/index.html"> scalation.linalgebra.mem_mapped.bld </a>
-<td> A sub-subpackage for building implementations for memory mapped linear algebra (e.g., for vectors and matrices).
-<tr>
-<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/par/index.html"> scalation.linalgebra.par </a>
-<td> A subpackage of parallel implementations for linear algebra.
-<tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/relalgebra/index.html"> scalation.relalgebra </a>
-<td> A package of implementations for columnar relational algebra.
 <tr>
 <td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/plot/index.html"> scalation.plot </a>
-<td> A package for displaying basic plots and histograms.
+<td> The `plot` package contains classes, traits and objects for simple plotting of x-y data. 
+<tr>
+<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/scala2d/index.html"> scalation.scala2d </a>
+<td> The `scala2d` package contains classes, traits and objects for for simple 2D graphics in scala, based upon `java.swing`, `java.awt` and `java_awt_geom`. 
+<tr>
+<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/index.html"> scalation.linalgebra </a>
+<td> The `linalgebra` package contains classes, traits and objects for linear algebra, including vectors and matrices for real and complex numbers. 
+<tr>
+<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/mem_mapped/index.html"> scalation.linalgebra.mem_mapped </a>
+<td> The `mem_mapped` package contains classes, traits and objects for out-of-core linear algebra, including vectors and matrices for real and complex numbers. 
+<tr>
+<td> - - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/mem_mapped/bld/index.html"> scalation.linalgebra.mem_mapped.bld </a>
+<td> The `bld` package contains traits and objects for generating source code for out-of-core vector classes, matrix traits and matrix classes. 
+<tr>
+<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/bld/index.html"> scalation.linalgebra.bld </a>
+<td> The `bld` package contains traits and objects for generating source code for vector classes, matrix traits and matrix classes. 
+<tr>
+<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/gen/index.html"> scalation.linalgebra.gen </a>
+<td> The `gen` package contains generic classes, traits and objects for linear algebra, including vectors and matrices for types implementing `Numeric`. Tend to run more slowly than the specialized versions in `linalgebra`. 
+<tr>
+<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/par/index.html"> scalation.linalgebra.par </a>
+<td> The `par` package contains classes, traits and objects for parallel linear algebra, including vectors and matrices for real and complex numbers. 
 <tr>
 <td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/random/index.html"> scalation.random </a>
-<td> A package for random numbers and random variates (Normal distribution, etc.)
+<td> The `random` package contains classes, traits and objects for the generation of random numbers. 
 <tr>
 <td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/stat/index.html"> scalation.stat </a>
-<td> A package of statistical objects and operations needed for simulation,
-including implementations for summary statitistics and ANOVA.
+<td> The `stat` package contains classes, traits and objects for  basic statistical functions and analyses.  The package object itself defines an implicit conversion from `scalation.linalgebra.VectorD` to `StatVector`. 
+<tr>
+<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/par/index.html"> scalation.par </a>
+<td> The `par` package contains classes, traits and objects for parallel processing techniques such as Map-Reduce. 
+<tr>
+<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/util/index.html"> scalation.util </a>
+<td> The `util` package contains classes, traits and objects for basic utility functions. 
+<tr>
+<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/util/bld/index.html"> scalation.util.bld </a>
+<td> The `bld` package contains traits and objects for generating source code for memory mapped arrays. 
+<tr>
+<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/math/index.html"> scalation.math </a>
+<td> The `math` package contains classes, traits and objects for common mathematical operations.  Its package object defines exponentiation, logarithmic, trigonometric, etc. operators and functions. 
+<tr>
+<td> <a href = "scalation_database/target/scala-2.12/api/index.html">DATABASE</a>
 <tr>
 <tr>
-<td> MODELING
+<td> <a href = "scalation_database/target/scala-2.12/api/scalation/columnar_db/index.html"> scalation.columnar_db </a>
+<td> The `columar_db` package contains classes, traits and objects for columnar relational algebra, where columns are vectors from the `linalgebra` package. 
 <tr>
+<td> <a href = "scalation_database/target/scala-2.12/api/scalation/graph_db/index.html"> scalation.graph_db </a>
+<td> The `graph_db` package contains classes, traits and objects for graph analytics on Trees, 'DAG's and Directed Graphs.  It provides an implicit conversion when needed for converting doubles to vectors. 
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/model/index.html"> scalation.model </a>
-<td> A package defining the general form of a model.
+<td> - <a href = "scalation_database/target/scala-2.12/api/scalation/graph_db/graph_algebra/index.html"> scalation.graph_db.graph_algebra </a>
+<td> The `graph_algebra` package provide graph algebra operators. 
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/scala3d/index.html"> scalation.scala3d </a>
-<td> A package supporting 3D graphics based on JavaFX 3D (Under development).
+<td> - <a href = "scalation_database/target/scala-2.12/api/scalation/graph_db/pattern_matching/index.html"> scalation.graph_db.pattern_matching </a>
+<td> The `pattern_matching` package contains classes, traits and objects for graph pattern matching such as graph simulation and subgraph isomorphism. 
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/animation/index.html"> scalation.animation </a>
-<td> A package supplying a general purpose animation engine.
+<td> - - <a href = "scalation_database/target/scala-2.12/api/scalation/graph_db/pattern_matching/test/index.html"> scalation.graph_db.pattern_matching.test </a>
+<td> The `test` package contains classes for testing graph pattern matching algorithms. 
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/calculus/index.html"> scalation.calculus </a>
-<td> A package for computing derivatives, gradients and Jacobians.
+<td> <a href = "scalation_modeling/target/scala-2.12/api/index.html">MODELING</a>
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/minima/index.html"> scalation.minima </a>
-<td> A package supporting simulation optimization (minimization).
-<tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/maxima/index.html"> scalation.maxima </a>
-<td> A package supporting simulation optimization (maximization).
-<tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/analytics/index.html"> scalation.analytics </a>
-<td> A package supporting analytics, including regression, time series analysis and clustering.
-<tr>
-<td> - <a href = "scalation_modeling/target/scala-2.12/api/scalation/analytics/par/index.html"> scalation.analytics.par </a>
-<td> A subpackage supporting parallel analytics, including regression, time series analysis and clustering.
-<tr>
-<td> - <a href = "scalation_modeling/target/scala-2.12/api/scalation/analytics/classifier/index.html"> scalation.analytics.classifier </a>
-<td> A subpackage supporting analytics, including several types of classifier.
-<tr>
-<td> -- <a href = "scalation_modeling/target/scala-2.12/api/scalation/analytics/classifier/par/index.html"> scalation.analytics.classifier.par </a>
-<td> A subpackage supporting parallel analytics, including several types of classifier.
-<tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/graphalytics/index.html"> scalation.graphalytics </a>
-<td> A package supporting graph analytics, including shortest path, subgraph isomorphism, etc.
-<tr>
-<td> - <a href = "scalation_modeling/target/scala-2.12/api/scalation/graphalytics/mutable/index.html"> scalation.graphalytics.mutable </a>
-<td> A package supporting graph analytics, including shortest path, subgraph isomorphism, etc. using mutable graphs.
-<!--
-<tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/metamodel/index.html"> scalation.metamodel </a>
-<td> A package supporting simulation metamodeling, espcially for optimization.
--->
-<tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/queueingnet/index.html"> scalation.queueingnet </a>
-<td> A package supporting queueing network models.
-<tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/tableau/index.html"> scalation.tableau </a>
-<td> A simulation engine for tableau oriented (spreedsheet like) models.
-<tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/event/index.html"> scalation.event </a>
-<td> A simulation engine for event oriented models such as Event Scheduling or Event Graphs.
-<tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/process/index.html"> scalation.process </a>
-<td> A simulation engine for process oriented models such as Process-Interaction Models.
-<tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/dynamics/index.html"> scalation.dynamics </a>
-<td> A simulation engine for systems dynamics (continuous simulation), which includes
-general-purpose Ordinary Differential Equation (ODE) solvers.
-<tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/dynamics_pde/index.html"> scalation.dynamics_pde </a>
-<td> A simulation engine for systems dynamics (continuous simulation), which includes
-category-specific Partial Differential Equation (PDE) solvers.
 <tr>
 <td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/physics/index.html"> scalation.physics </a>
-<td> A physics engine for simulation based games (Under development).
+<td> The `physics` package contains classes, traits and objects for for simulation oriented games.  It utilizes ODE and PDE solvers from the scalation package to move objects in either 2D or 3D canvases/scene graphs. @see buildnewgames.com/gamephysics/ 
+<tr>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/model/index.html"> scalation.model </a>
+<td> The `model` package contains a trait giving a template for models to follow. 
+<tr>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/graphalytics/index.html"> scalation.graphalytics </a>
+<td> The `graphalytics` package contains classes, traits and objects for graph analytics on Trees, 'DAG's and Directed Graphs.  It provides an implicit conversion when needed for converting doubles to vectors. 
+<tr>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/calculus/index.html"> scalation.calculus </a>
+<td> The `calculus` package contains classes with methods for computing derivatives, gradient vectors, Jacobian matrices, integrals and basic operators in Functional Analysis. 
+<tr>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/dynamics/index.html"> scalation.dynamics </a>
+<td> The `dynamics` package contains classes, traits and objects for system dynamics simulations using Ordinary Differential Equations (ODEs). 
+<tr>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/event/index.html"> scalation.event </a>
+<td> The `event` package contains classes, traits and objects for event oriented simulation models (for example, event scheduling or event graphs). 
+<tr>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/dynamics_pde/index.html"> scalation.dynamics_pde </a>
+<td> The `dynamics_pde` package contains classes, traits and objects for system dynamics simulations using Partial Differential Equations 'PDE's. 
+<tr>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/minima/index.html"> scalation.minima </a>
+<td> The `minima` package contains classes, traits and objects for optimization to find minima. 
 <tr>
 <td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/activity/index.html"> scalation.activity </a>
-<td> A simulation engine for activity oriented models such as Petri Nets.
+<td> The `activity` package contains classes, traits and objects for activity-oriented simulation models (for example, Petri Nets). 
 <tr>
 <td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/state/index.html"> scalation.state </a>
-<td> A simulation engine for state oriented models such as Markov Chains.
+<td> The `state` package contains classes, traits and objects for state-oriented simulation models (for example, Markov Chains). 
 <tr>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/animation/index.html"> scalation.animation </a>
+<td> The `animation` package contains classes, traits and objects for 2D animation of simulation objects. 
 <tr>
-<td> APPLICATIONS
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/analytics/index.html"> scalation.analytics </a>
+<td> The `analytics` package contains classes, traits and objects for analytics including clustering and prediction. 
 <tr>
+<td> - <a href = "scalation_modeling/target/scala-2.12/api/scalation/analytics/classifier/index.html"> scalation.analytics.classifier </a>
+<td> The analytics package contains classes, traits and objects for analytics focused on classification. 
 <tr>
-<td> <a href = "scalation_models/target/scala-2.12/api/apps/activity/index.html"> apps.activity </a>
-<td> Example models for activity oriented models such as Petri Nets.
+<td> - - <a href = "scalation_modeling/target/scala-2.12/api/scalation/analytics/classifier/par/index.html"> scalation.analytics.classifier.par </a>
+<td> The par package contains classes, traits and objects for analytics including classification, clustering and prediction with parallel implementations. 
 <tr>
-<td> <a href = "scalation_models/target/scala-2.12/api/apps/analytics/index.html"> apps.analytics </a>
-<td> Example analytics problems.
+<td> - <a href = "scalation_modeling/target/scala-2.12/api/scalation/analytics/clusterer/index.html"> scalation.analytics.clusterer </a>
+<td> The `clusterer` package contains classes, traits and objects for clustering algorithms. 
 <tr>
-<td> <a href = "scalation_models/target/scala-2.12/api/apps/dynamics/index.html"> apps.dynamics </a>
-<td> Example models for systems dynamics (continuous simulation).
+<td> - <a href = "scalation_modeling/target/scala-2.12/api/scalation/analytics/recommender/index.html"> scalation.analytics.recommender </a>
+<td> The `recommender` package contains classes, traits and objects of recommendation systems. 
 <tr>
-<td> <a href = "scalation_models/target/scala-2.12/api/apps/event/index.html"> apps.event </a>
-<td> Example models for event oriented models such as Event Graphs.
+<td> - <a href = "scalation_modeling/target/scala-2.12/api/scalation/analytics/par/index.html"> scalation.analytics.par </a>
+<td> The `par` package contains classes, traits and objects for parallel analytics including clustering and prediction. 
 <tr>
-<td> <a href = "scalation_models/target/scala-2.12/api/apps/game/index.html"> apps.game </a>
-<td> Example simulation-oriented games.
+<td> - <a href = "scalation_modeling/target/scala-2.12/api/scalation/analytics/fda/index.html"> scalation.analytics.fda </a>
+<td> The `fda` package contains classes, traits and objects for Functional Data Analysis (FDA). 
 <tr>
-<td> <a href = "scalation_models/target/scala-2.12/api/apps/montecarlo/index.html"> apps.montecarlo </a>
-<td> Example Monte Carlo simulation.
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/tableau/index.html"> scalation.tableau </a>
+<td> The `tableau` package contains classes for tableau oriented simulation models (similar to spreadsheet simulations). 
 <tr>
-<td> <a href = "scalation_models/target/scala-2.12/api/apps/optimization/index.html"> apps.optimization </a>
-<td> Example optimization problems.
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/queueingnet/index.html"> scalation.queueingnet </a>
+<td> The `queueingnet` package contains classes, traits and objects for solving simple queueing network problems. 
 <tr>
-<td> <a href = "scalation_models/target/scala-2.12/api/apps/process/index.html"> apps.process </a>
-<td> Example models for process oriented models such as Process-Interaction Models.
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/process/index.html"> scalation.process </a>
+<td> The `process` package contains classes, traits and objects for process-oriented simulation models (for example, process-interaction). 
+<tr>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/maxima/index.html"> scalation.maxima </a>
+<td> The `maxima` package contains classes, traits and objects for optimization to find maxima. 
+<tr>
+<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/scala3d/index.html"> scalation.scala3d </a>
+<td> The `scala3d` package contains classes, traits and objects for for simple 3D graphics in scala, based upon javafx.  Its package object contains type aliases for 'javafx.geometry.Point3D' and all subclasses of 'javafx.scene.shape.Shape3D'. 
+<tr>
+<td> <a href = "scalation_models/target/scala-2.12/api/index.html">APPLICATIONS</a>
+<tr>
 <tr>
 <td> <a href = "scalation_models/target/scala-2.12/api/apps/simopt/index.html"> apps.simopt </a>
-<td> Example simulation optimization problems.
+<td> The `simopt` package contains example applications for simulation optimization. 
+<tr>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/montecarlo/index.html"> apps.montecarlo </a>
+<td> The `montecarlo` package contains example applications for Monte Carlo Simulation. 
+<tr>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/dynamics/index.html"> apps.dynamics </a>
+<td> The `dynamics` package contains example applications for continuous simulation models based on Ordinary Differential Equations 'ODE's or Partial Differential Equations 'PDE's. 
+<tr>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/event/index.html"> apps.event </a>
+<td> The `event` package contains example applications for event oriented simulation models. 
+<tr>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/game/index.html"> apps.game </a>
+<td> The `game` package contains example applications for simulation oriented games. 
+<tr>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/database/index.html"> apps.database </a>
+<td> The `database` package contains applications of databases. 
+<tr>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/optimization/index.html"> apps.optimization </a>
+<td> The `optimization` package contains example applications for finding solutions (minima or maxima) to optimization problems. 
+<tr>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/activity/index.html"> apps.activity </a>
+<td> The `activity` package contains example applications for activity oriented simulation models. 
 <tr>
 <td> <a href = "scalation_models/target/scala-2.12/api/apps/state/index.html"> apps.state </a>
-<td> Example models for state oriented models such as Markov Chains.
+<td> The `state` package contains example applications for state oriented simulation models. 
+<tr>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/analytics/index.html"> apps.analytics </a>
+<td> The `analytics` package contains example applications for analytics: prediction, classification or clustering. 
 <tr>
 <td> <a href = "scalation_models/target/scala-2.12/api/apps/tableau/index.html"> apps.tableau </a>
-<td> Example models for tableau oriented (spreadheet like) models.
+<td> The `tableau` package contains example applications for tableau oriented simulation models. 
+<tr>
+<td> <a href = "scalation_models/target/scala-2.12/api/apps/process/index.html"> apps.process </a>
+<td> The `process` package contains example applications for process oriented simulation models. 
 </table>
 </blockquote>
 
@@ -398,245 +370,198 @@ category-specific Partial Differential Equation (PDE) solvers.
 <td> <b>Description</b>
 <tr>
 <tr>
-<td> <a href = "scalation_mathstat/src/main/scala/scalation">MATH AND STAT MODULE</a>
+<td> <a href = "scalation_mathstat/src/main/scala/scalation">MATH AND STAT</a>
 <tr>
-<tr>
-<td> <a href = "scalation_mathstat/src/main/scala/scalation/util/"> scalation.util </a>
-<td> A package of utilities needed by other packages.
-<tr>
-<td> - <a href = "scalation_mathstat/src/main/scala/scalation/util/bld/"> scalation.util.bld </a>
-<td> A subpackage of for building util implementations.
-<tr>
-<td> <a href = "scalation_mathstat/src/main/scala/scalation/scala2d/"> scalation.scala2d </a>
-<td> A package supporting 2D graphics based on Java 2D.
-<tr>
-<td> <a href = "scalation_mathstat/src/main/scala/scalation/math/"> scalation.math </a>
-<td> A package of mathematical objects and operations needed for analytics, simulation and optimization.
-<tr>
-<td> <a href = "scalation_mathstat/src/main/scala/scalation/linalgebra/"> scalation.linalgebra </a>
-<td> A package of implementations for linear algebra (e.g., for vectors and matrices).
-Vectors and matrices of real (Double) and complex numbers are supported.
-<tr>
-<td> - <a href = "scalation_mathstat/src/main/scala/scalation/linalgebra/bld/"> scalation.linalgebra.bld </a>
-<td> A subpackage for building implementations for linear algebra (e.g., for vectors and matrices).
-<tr>
-<td> - <a href = "scalation_mathstat/src/main/scala/scalation/linalgebra/gen/"> scalation.linalgebra.gen </a>
-<td> A subpackage of generic implementations for linear algebra (e.g., for vectors and matrices).
-Vectors and matrices of types implementing Numeric can be instantiated.
-<tr>
-<td> - <a href = "scalation_mathstat/src/main/scala/scalation/linalgebra/mem_mapped/"> scalation.linalgebra.mem_mapped </a>
-<td> A subpackage for memory mapped linear algebra (e.g., for vectors and matrices).
-<tr>
-<td> - - <a href = "scalation_mathstat/src/main/scala/scalation/linalgebra/mem_mapped/bld/"> scalation.linalgebra.mem_mapped.bld </a>
-<td> A sub-subpackage for building implementations for memory mapped linear algebra (e.g., for vectors and matrices).
-<tr>
-<td> - <a href = "scalation_mathstat/src/main/scala/scalation/linalgebra/par/"> scalation.linalgebra.par </a>
-<td> A subpackage of parallel implementations for linear algebra.
-<tr>
-<td> <a href = "scalation_mathstat/src/main/scala/scalation/relalgebra/"> scalation.relalgebra </a>
-<td> A package of implementations for columnar relational algebra.
 <tr>
 <td> <a href = "scalation_mathstat/src/main/scala/scalation/plot/"> scalation.plot </a>
-<td> A package for displaying basic plots and histograms.
+<td> The `plot` package contains classes, traits and objects for simple plotting of x-y data. 
+<tr>
+<td> <a href = "scalation_mathstat/src/main/scala/scalation/scala2d/"> scalation.scala2d </a>
+<td> The `scala2d` package contains classes, traits and objects for for simple 2D graphics in scala, based upon `java.swing`, `java.awt` and `java_awt_geom`. 
+<tr>
+<td> <a href = "scalation_mathstat/src/main/scala/scalation/linalgebra/"> scalation.linalgebra </a>
+<td> The `linalgebra` package contains classes, traits and objects for linear algebra, including vectors and matrices for real and complex numbers. 
+<tr>
+<td> - <a href = "scalation_mathstat/src/main/scala/scalation/linalgebra/mem_mapped/"> scalation.linalgebra.mem_mapped </a>
+<td> The `mem_mapped` package contains classes, traits and objects for out-of-core linear algebra, including vectors and matrices for real and complex numbers. 
+<tr>
+<td> - - <a href = "scalation_mathstat/src/main/scala/scalation/linalgebra/mem_mapped/bld/"> scalation.linalgebra.mem_mapped.bld </a>
+<td> The `bld` package contains traits and objects for generating source code for out-of-core vector classes, matrix traits and matrix classes. 
+<tr>
+<td> - <a href = "scalation_mathstat/src/main/scala/scalation/linalgebra/bld/"> scalation.linalgebra.bld </a>
+<td> The `bld` package contains traits and objects for generating source code for vector classes, matrix traits and matrix classes. 
+<tr>
+<td> - <a href = "scalation_mathstat/src/main/scala/scalation/linalgebra/gen/"> scalation.linalgebra.gen </a>
+<td> The `gen` package contains generic classes, traits and objects for linear algebra, including vectors and matrices for types implementing `Numeric`. Tend to run more slowly than the specialized versions in `linalgebra`. 
+<tr>
+<td> - <a href = "scalation_mathstat/src/main/scala/scalation/linalgebra/par/"> scalation.linalgebra.par </a>
+<td> The `par` package contains classes, traits and objects for parallel linear algebra, including vectors and matrices for real and complex numbers. 
 <tr>
 <td> <a href = "scalation_mathstat/src/main/scala/scalation/random/"> scalation.random </a>
-<td> A package for random numbers and random variates (Normal distribution, etc.)
+<td> The `random` package contains classes, traits and objects for the generation of random numbers. 
 <tr>
 <td> <a href = "scalation_mathstat/src/main/scala/scalation/stat/"> scalation.stat </a>
-<td> A package of statistical objects and operations needed for simulation,
-including implementations for summary statitistics and ANOVA.
+<td> The `stat` package contains classes, traits and objects for  basic statistical functions and analyses.  The package object itself defines an implicit conversion from `scalation.linalgebra.VectorD` to `StatVector`. 
+<tr>
+<td> <a href = "scalation_mathstat/src/main/scala/scalation/par/"> scalation.par </a>
+<td> The `par` package contains classes, traits and objects for parallel processing techniques such as Map-Reduce. 
+<tr>
+<td> <a href = "scalation_mathstat/src/main/scala/scalation/util/"> scalation.util </a>
+<td> The `util` package contains classes, traits and objects for basic utility functions. 
+<tr>
+<td> - <a href = "scalation_mathstat/src/main/scala/scalation/util/bld/"> scalation.util.bld </a>
+<td> The `bld` package contains traits and objects for generating source code for memory mapped arrays. 
+<tr>
+<td> <a href = "scalation_mathstat/src/main/scala/scalation/math/"> scalation.math </a>
+<td> The `math` package contains classes, traits and objects for common mathematical operations.  Its package object defines exponentiation, logarithmic, trigonometric, etc. operators and functions. 
+<tr>
+<td> <a href = "scalation_database/src/main/scala/scalation">DATABASE</a>
 <tr>
 <tr>
-<td> <a href = "scalation_modeling/src/main/scala/scalation">MODELING MODULE</a>
+<td> <a href = "scalation_database/src/main/scala/scalation/columnar_db/"> scalation.columnar_db </a>
+<td> The `columar_db` package contains classes, traits and objects for columnar relational algebra, where columns are vectors from the `linalgebra` package. 
 <tr>
+<td> <a href = "scalation_database/src/main/scala/scalation/graph_db/"> scalation.graph_db </a>
+<td> The `graph_db` package contains classes, traits and objects for graph analytics on Trees, 'DAG's and Directed Graphs.  It provides an implicit conversion when needed for converting doubles to vectors. 
 <tr>
-<td> <a href = "scalation_modeling/src/main/scala/scalation/model/"> scalation.model </a>
-<td> A package defining the general form of a model.
+<td> - <a href = "scalation_database/src/main/scala/scalation/graph_db/graph_algebra/"> scalation.graph_db.graph_algebra </a>
+<td> The `graph_algebra` package provide graph algebra operators. 
 <tr>
-<td> <a href = "scalation_modeling/src/main/scala/scalation/scala3d/"> scalation.scala3d </a>
-<td> A package supporting 3D graphics based on JavaFX 3D (Under development).
+<td> - <a href = "scalation_database/src/main/scala/scalation/graph_db/pattern_matching/"> scalation.graph_db.pattern_matching </a>
+<td> The `pattern_matching` package contains classes, traits and objects for graph pattern matching such as graph simulation and subgraph isomorphism. 
 <tr>
-<td> <a href = "scalation_modeling/src/main/scala/scalation/animation/"> scalation.animation </a>
-<td> A package supplying a general purpose animation engine.
+<td> - - <a href = "scalation_database/src/main/scala/scalation/graph_db/pattern_matching/test/"> scalation.graph_db.pattern_matching.test </a>
+<td> The `test` package contains classes for testing graph pattern matching algorithms. 
 <tr>
-<td> <a href = "scalation_modeling/src/main/scala/scalation/calculus/"> scalation.calculus </a>
-<td> A package for computing derivatives, gradients and Jacobians.
+<td> <a href = "scalation_modeling/src/main/scala/scalation">MODELING</a>
 <tr>
-<td> <a href = "scalation_modeling/src/main/scala/scalation/minima/"> scalation.minima </a>
-<td> A package supporting simulation optimization (minimization).
-<tr>
-<td> <a href = "scalation_modeling/src/main/scala/scalation/maxima/"> scalation.maxima </a>
-<td> A package supporting simulation optimization (maximization).
-<tr>
-<td> <a href = "scalation_modeling/src/main/scala/scalation/analytics/"> scalation.analytics </a>
-<td> A package supporting analytics, including regression, time series analysis and clustering.
-<tr>
-<td> - <a href = "scalation_modeling/src/main/scala/scalation/analytics/par/"> scalation.analytics.par </a>
-<td> A subpackage supporting parallel analytics, including regression, time series analysis and clustering.
-<tr>
-<td> - <a href = "scalation_modeling/src/main/scala/scalation/analytics/classifier/"> scalation.analytics.classifier </a>
-<td> A subpackage supporting analytics, including several types of classifiers.
-<tr>
-<td> -- <a href = "scalation_modeling/src/main/scala/scalation/analytics/classifier/par/"> scalation.analytics.classifier.par </a>
-<td> A subpackage supporting parallel analytics, including several types of classifiers.
-<tr>
-<td> <a href = "scalation_modeling/src/main/scala/scalation/graphalytics/"> scalation.graphalytics </a>
-<td> A package supporting graph analytics, including shotest path, subgraph isomorphism, etc.
-<tr>
-<td> - <a href = "scalation_modeling/src/main/scala/scalation/graphalytics/mutable/"> scalation.graphalytics.mutable </a>
-<td> A package supporting graph analytics, including shotest path, subgraph isomorphism, etc. using mutable graphs.
-<!--
-<tr>
-<td> <a href = "scalation_modeling/src/main/scala/scalation/metamodel/"> scalation.metamodel </a>
-<td> A package supporting simulation metamodeling, especially for optimization.
--->
-<tr>
-<td> <a href = "scalation_modeling/src/main/scala/scalation/queueingnet/"> scalation.queueingnet </a>
-<td> A package supporting queueing network models.
-<tr>
-<td> <a href = "scalation_modeling/src/main/scala/scalation/tableau/"> scalation.tableau </a>
-<td> A simulation engine for tableau oriented (spreedsheet like) models.
-<tr>
-<td> <a href = "scalation_modeling/src/main/scala/scalation/event/"> scalation.event </a>
-<td> A simulation engine for event oriented models such as Event Scheduling or Event Graphs.
-<tr>
-<td> <a href = "scalation_modeling/src/main/scala/scalation/process/"> scalation.process </a>
-<td> A simulation engine for process oriented models such as Process-Interaction Models.
-<tr>
-<td> <a href = "scalation_modeling/src/main/scala/scalation/dynamics/"> scalation.dynamics </a>
-<td> A simulation engine for systems dynamics (continuous simulation), which includes
-general-purpose Ordinary Differential Equation (ODE) solvers.
-<tr>
-<td> <a href = "scalation_modeling/src/main/scala/scalation/dynamics_pde/"> scalation.dynamics_pde </a>
-<td> A simulation engine for systems dynamics (continuous simulation), which includes
-category-specific Partial Differential Equation (PDE) solvers.
 <tr>
 <td> <a href = "scalation_modeling/src/main/scala/scalation/physics/"> scalation.physics </a>
-<td> A physics engine for simulation based games (Under development).
+<td> The `physics` package contains classes, traits and objects for for simulation oriented games.  It utilizes ODE and PDE solvers from the scalation package to move objects in either 2D or 3D canvases/scene graphs. @see buildnewgames.com/gamephysics/ 
+<tr>
+<td> <a href = "scalation_modeling/src/main/scala/scalation/model/"> scalation.model </a>
+<td> The `model` package contains a trait giving a template for models to follow. 
+<tr>
+<td> <a href = "scalation_modeling/src/main/scala/scalation/graphalytics/"> scalation.graphalytics </a>
+<td> The `graphalytics` package contains classes, traits and objects for graph analytics on Trees, 'DAG's and Directed Graphs.  It provides an implicit conversion when needed for converting doubles to vectors. 
+<tr>
+<td> <a href = "scalation_modeling/src/main/scala/scalation/calculus/"> scalation.calculus </a>
+<td> The `calculus` package contains classes with methods for computing derivatives, gradient vectors, Jacobian matrices, integrals and basic operators in Functional Analysis. 
+<tr>
+<td> <a href = "scalation_modeling/src/main/scala/scalation/dynamics/"> scalation.dynamics </a>
+<td> The `dynamics` package contains classes, traits and objects for system dynamics simulations using Ordinary Differential Equations (ODEs). 
+<tr>
+<td> <a href = "scalation_modeling/src/main/scala/scalation/event/"> scalation.event </a>
+<td> The `event` package contains classes, traits and objects for event oriented simulation models (for example, event scheduling or event graphs). 
+<tr>
+<td> <a href = "scalation_modeling/src/main/scala/scalation/dynamics_pde/"> scalation.dynamics_pde </a>
+<td> The `dynamics_pde` package contains classes, traits and objects for system dynamics simulations using Partial Differential Equations 'PDE's. 
+<tr>
+<td> <a href = "scalation_modeling/src/main/scala/scalation/minima/"> scalation.minima </a>
+<td> The `minima` package contains classes, traits and objects for optimization to find minima. 
 <tr>
 <td> <a href = "scalation_modeling/src/main/scala/scalation/activity/"> scalation.activity </a>
-<td> A simulation engine for activity oriented models such as Petri Nets.
+<td> The `activity` package contains classes, traits and objects for activity-oriented simulation models (for example, Petri Nets). 
 <tr>
 <td> <a href = "scalation_modeling/src/main/scala/scalation/state/"> scalation.state </a>
-<td> A simulation engine for state oriented models such as Markov Chains.
+<td> The `state` package contains classes, traits and objects for state-oriented simulation models (for example, Markov Chains). 
 <tr>
+<td> <a href = "scalation_modeling/src/main/scala/scalation/animation/"> scalation.animation </a>
+<td> The `animation` package contains classes, traits and objects for 2D animation of simulation objects. 
+<tr>
+<td> <a href = "scalation_modeling/src/main/scala/scalation/analytics/"> scalation.analytics </a>
+<td> The `analytics` package contains classes, traits and objects for analytics including clustering and prediction. 
+<tr>
+<td> - <a href = "scalation_modeling/src/main/scala/scalation/analytics/classifier/"> scalation.analytics.classifier </a>
+<td> The analytics package contains classes, traits and objects for analytics focused on classification. 
+<tr>
+<td> - - <a href = "scalation_modeling/src/main/scala/scalation/analytics/classifier/par/"> scalation.analytics.classifier.par </a>
+<td> The par package contains classes, traits and objects for analytics including classification, clustering and prediction with parallel implementations. 
+<tr>
+<td> - <a href = "scalation_modeling/src/main/scala/scalation/analytics/clusterer/"> scalation.analytics.clusterer </a>
+<td> The `clusterer` package contains classes, traits and objects for clustering algorithms. 
+<tr>
+<td> - <a href = "scalation_modeling/src/main/scala/scalation/analytics/recommender/"> scalation.analytics.recommender </a>
+<td> The `recommender` package contains classes, traits and objects of recommendation systems. 
+<tr>
+<td> - <a href = "scalation_modeling/src/main/scala/scalation/analytics/par/"> scalation.analytics.par </a>
+<td> The `par` package contains classes, traits and objects for parallel analytics including clustering and prediction. 
+<tr>
+<td> - <a href = "scalation_modeling/src/main/scala/scalation/analytics/fda/"> scalation.analytics.fda </a>
+<td> The `fda` package contains classes, traits and objects for Functional Data Analysis (FDA). 
+<tr>
+<td> <a href = "scalation_modeling/src/main/scala/scalation/tableau/"> scalation.tableau </a>
+<td> The `tableau` package contains classes for tableau oriented simulation models (similar to spreadsheet simulations). 
+<tr>
+<td> <a href = "scalation_modeling/src/main/scala/scalation/queueingnet/"> scalation.queueingnet </a>
+<td> The `queueingnet` package contains classes, traits and objects for solving simple queueing network problems. 
+<tr>
+<td> <a href = "scalation_modeling/src/main/scala/scalation/process/"> scalation.process </a>
+<td> The `process` package contains classes, traits and objects for process-oriented simulation models (for example, process-interaction). 
+<tr>
+<td> <a href = "scalation_modeling/src/main/scala/scalation/maxima/"> scalation.maxima </a>
+<td> The `maxima` package contains classes, traits and objects for optimization to find maxima. 
+<tr>
+<td> <a href = "scalation_modeling/src/main/scala/scalation/scala3d/"> scalation.scala3d </a>
+<td> The `scala3d` package contains classes, traits and objects for for simple 3D graphics in scala, based upon javafx.  Its package object contains type aliases for 'javafx.geometry.Point3D' and all subclasses of 'javafx.scene.shape.Shape3D'. 
 <tr>
 <td> <a href = "scalation_models/src/main/scala/apps">APPLICATIONS</a>
 <tr>
 <tr>
-<td> <a href = "scalation_models/src/main/scala/apps/activity/"> apps.activity </a>
-<td> Example models for activity oriented models such as Petri Nets.
-<tr>
-<td> <a href = "scalation_models/src/main/scala/apps/analytics/"> apps.analytics </a>
-<td> Example analytics problems.
-<tr>
-<td> <a href = "scalation_models/src/main/scala/apps/dynamics/"> apps.dynamics </a>
-<td> Example models for systems dynamics (continuous simulation).
-<tr>
-<td> <a href = "scalation_models/src/main/scala/apps/event/"> apps.event </a>
-<td> Example models for event oriented models such as Event Graphs.
-<tr>
-<td> <a href = "scalation_models/src/main/scala/apps/game/"> apps.game </a>
-<td> Example simulation-oriented games.
+<td> <a href = "scalation_models/src/main/scala/apps/simopt/"> apps.simopt </a>
+<td> The `simopt` package contains example applications for simulation optimization. 
 <tr>
 <td> <a href = "scalation_models/src/main/scala/apps/montecarlo/"> apps.montecarlo </a>
-<td> Example Monte Carlo simulation.
+<td> The `montecarlo` package contains example applications for Monte Carlo Simulation. 
+<tr>
+<td> <a href = "scalation_models/src/main/scala/apps/dynamics/"> apps.dynamics </a>
+<td> The `dynamics` package contains example applications for continuous simulation models based on Ordinary Differential Equations 'ODE's or Partial Differential Equations 'PDE's. 
+<tr>
+<td> <a href = "scalation_models/src/main/scala/apps/event/"> apps.event </a>
+<td> The `event` package contains example applications for event oriented simulation models. 
+<tr>
+<td> <a href = "scalation_models/src/main/scala/apps/game/"> apps.game </a>
+<td> The `game` package contains example applications for simulation oriented games. 
+<tr>
+<td> <a href = "scalation_models/src/main/scala/apps/database/"> apps.database </a>
+<td> The `database` package contains applications of databases. 
 <tr>
 <td> <a href = "scalation_models/src/main/scala/apps/optimization/"> apps.optimization </a>
-<td> Example optimization problems.
+<td> The `optimization` package contains example applications for finding solutions (minima or maxima) to optimization problems. 
 <tr>
-<td> <a href = "scalation_models/src/main/scala/apps/process/"> apps.process </a>
-<td> Example models for process oriented models such as Process-Interaction Models.
-<tr>
-<td> <a href = "scalation_models/src/main/scala/apps/simopt/"> apps.simopt </a>
-<td> Example simulation optimization problems.
+<td> <a href = "scalation_models/src/main/scala/apps/activity/"> apps.activity </a>
+<td> The `activity` package contains example applications for activity oriented simulation models. 
 <tr>
 <td> <a href = "scalation_models/src/main/scala/apps/state/"> apps.state </a>
-<td> Example models for state oriented models such as Markov Chains.
+<td> The `state` package contains example applications for state oriented simulation models. 
+<tr>
+<td> <a href = "scalation_models/src/main/scala/apps/analytics/"> apps.analytics </a>
+<td> The `analytics` package contains example applications for analytics: prediction, classification or clustering. 
 <tr>
 <td> <a href = "scalation_models/src/main/scala/apps/tableau/"> apps.tableau </a>
-<td> Example models for tableau oriented (spreadheet like) models.
+<td> The `tableau` package contains example applications for tableau oriented simulation models. 
 <tr>
+<td> <a href = "scalation_models/src/main/scala/apps/process/"> apps.process </a>
+<td> The `process` package contains example applications for process oriented simulation models. 
 <tr>
-<td> <a href = "scalation_mathstat/src/test/scala/testing">UNIT TESTS</a>
+<td> <a href = "scalation_mathstat/src/test/scala/testing">MATH AND STAT UNIT TESTS</a>
 <tr>
-<tr>
-<td> <a href = "scalation_mathstat/src/test/scala/testing/util/"> testing.util </a>
-<td> Tests for package of utilities needed by other packages.
-<tr>
-<td> <a href = "scalation_mathstat/src/test/scala/testing/scala2d/"> testing.scala2d </a>
-<td> Tests for package supporting 2D graphics based on Java 2D.
-<tr>
-<td> <a href = "scalation_mathstat/src/test/scala/testing/math/"> testing.math </a>
-<td> Tests for package of mathematical objects and operations needed for analytics, simulation and optimization.
 <tr>
 <td> <a href = "scalation_mathstat/src/test/scala/testing/linalgebra/"> testing.linalgebra </a>
-<td> Tests for package of implementations for linear algebra (e.g., for vectors and matrices).
-Vectors and matrices of real (Double) and complex numbers are supported.
-<tr>
-<td> <a href = "scalation_mathstat/src/test/scala/testing/relalgebra/"> testing.relalgebra </a>
-<td> Tests for package of implementations for columnar relational algebra.
-<tr>
-<td> <a href = "scalation_mathstat/src/test/scala/testing/plot/"> testing.plot </a>
-<td> Tests for package for displaying basic plots and histograms.
-<tr>
-<td> <a href = "scalation_mathstat/src/test/scala/testing/random/"> testing.random </a>
-<td> Tests for package for random numbers and random variates (Normal distribution, etc.)
+<td> Unit tests for the `linalgebra` package. 
 <tr>
 <td> <a href = "scalation_mathstat/src/test/scala/testing/stat/"> testing.stat </a>
-<td> Tests for package of statistical objects and operations needed for simulation,
-including implementations for summary statitistics and ANOVA.
+<td> Unit tests for the `stat` package. 
 </table>
 </blockquote>
 
-<!--
-
-<p>
-<h3> Source Packages for JalaTion (Under Development) </h3>
-<p>
-
-<blockquote>
-<table border = 3>
-<tr>
-<td> <b>Package</b>
-<td> <b>Description</b>
-<tr>
-<tr>
-<td> <a href = "src/main/java/jalation/util/"> jalation.util </a>
-<td> A package of utilities needed by other packages.
-<tr>
-<td> <a href = "src/main/java/jalation/analytics/"> jalation.analytics </a>
-<td> A package supporting analytics, including regression, time series analysis and clustering.
-<tr>
-<td> <a href = "src/main/java/jalation/graphalytics/"> jalation.graphalytics </a>
-<td> A package supporting graph analytics, including shotest path, subgraph isomorphism, etc.
-</table>
-</blockquote>
-
-<p>
-<h3> Code Generators (Under Development) </h3>
-<p>
-
-<blockquote>
-<table border = 3>
-<tr>
-<td> <b>Package</b>
-<td> <b>Description</b>
-<tr>
-<tr>
-<td> <a href = "rc/gen_scalation/dynamics/"> gen_scalation.dynamics </a>
-<td> A package containing DeMO to scalation.dynamics generators.
-</table>
-</blockquote>
-
--->
 
 <p>
 <h3> Code Release Process </h3>
 <p>
 
 <pre><code>
-$ cd scalation_1.3 <br>
+$ cd scalation_1.4 <br>
 $ cd scalation_mathstat <br>
 $ sbt <br>
 > compile <br>

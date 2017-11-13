@@ -74,7 +74,10 @@ abstract class VariateSet (stream: Int = 0)
 case class RandomSet (count: Int = 10, max: Int = 20, skip: Int = -1, stream: Int = 0)
      extends VariateSet (stream)
 {
-    if (max < count) flaw ("constructor", "requires max >= count")
+    if (count > max) {
+        flaw ("constructor", "requires count <= max")
+        throw new IllegalArgumentException ("RandomSet: count shouldn't be larger than max")
+    } // if
 
     private val rng = Randi0 (max, stream)              // random integer generator
 

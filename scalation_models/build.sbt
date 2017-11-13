@@ -10,6 +10,8 @@ version      := "1.4",
 scalaVersion := "2.12.4",
 fork         := true,
 
+concurrentRestrictions := Seq(Tags.limitAll(1)),
+
 ////////////////////////////////////////////////////////////////////////////////
 // Scala options
 
