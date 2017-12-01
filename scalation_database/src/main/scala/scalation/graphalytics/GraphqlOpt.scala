@@ -276,12 +276,12 @@ object GraphqlOptTest2 extends App
                               SET (1, 4),
                               SET (0, 1, 2),
                               SET (0)),
-                       Array (0, 2, 2, 1, 2),
+                       Array ("0", "2", "2", "1", "2"),
                        true, "g")
     
     val q = new Graph (Array (SET (1),
                               SET [Int] ()),
-                       Array (2, 0),
+                       Array ("2", "0"),
                        true, "q")
     g.printG ()                                               // print data graph
     q.printG ()                                               // print query graph

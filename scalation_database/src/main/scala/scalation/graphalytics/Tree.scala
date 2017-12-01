@@ -13,8 +13,8 @@ package scalation.graphalytics
 import scala.collection.mutable.{ArrayBuffer, Map}
 import scala.math.pow
 
-import scalation.animation.{AnimateCommand, DgAnimator}
-import scalation.animation.CommandType._
+//import scalation.animation.{AnimateCommand, DgAnimator}
+//import scalation.animation.CommandType._
 import scalation.random.{Randi, Variate}
 import scalation.scala2d.Colors._
 import scalation.scala2d.{Ellipse, QCurve, R2}
@@ -124,7 +124,7 @@ object Tree
         def genPre (depth: Double, p: TreeNode, lev: Int, ord: Int, sibs: Int)
         {
             val n = tree.add (p)                                             // add node n to tree
-            if (ANIMATE) tree.aniStep (n, p, ord, sibs)
+//          if (ANIMATE) tree.aniStep (n, p, ord, sibs)
             if (lev < depth) {
                 val imax = rng.igen
                 for (i <- 0 until imax) genPre (depth, n, lev+1, i, imax)    // add n's children
@@ -186,16 +186,16 @@ class Tree (val root: TreeNode, depth: Double, val name: String = "tree")
 
     /** Tree animator
      */
-    private val ani = if (ANIMATE) new DgAnimator ("Tree") else null
+//  private val ani = if (ANIMATE) new DgAnimator ("Tree") else null
 
     /** Tree command queue
      */
-    private val cq = if (ANIMATE) ani.getCommandQueue else null
+//  private val cq = if (ANIMATE) ani.getCommandQueue else null
 
     root.loc.x = MID
     root.loc.y = TOP
-    if (ANIMATE) cq.add (AnimateCommand (CreateNode, 0, Ellipse (), " n-0", true, root.colr,
-                                  Array (root.loc.x, root.loc.y, DIA, DIA), 0.0))
+//  if (ANIMATE) cq.add (AnimateCommand (CreateNode, 0, Ellipse (), " n-0", true, root.colr,
+//                                Array (root.loc.x, root.loc.y, DIA, DIA), 0.0))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the 'i'th node.
@@ -278,7 +278,7 @@ class Tree (val root: TreeNode, depth: Double, val name: String = "tree")
      *  @param p     the parent node
      *  @param ord   the birth order of the node
      *  @param sibs  the number of siblings
-     */
+     *
     def aniStep (n: TreeNode, p: TreeNode, ord: Int, sibs: Int)
     {
         if (ANIMATE) {
@@ -292,10 +292,11 @@ class Tree (val root: TreeNode, depth: Double, val name: String = "tree")
             cq.add (AnimateCommand (CreateEdge, -k, QCurve (), "", true, black, null, t+100.0, p.nid, k))
         } // if
     } // aniStep
+     */
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build up the animation step by traversing the tree.
-     */
+     *
     def aniTree ()
     {
         if (ANIMATE) {
@@ -303,6 +304,7 @@ class Tree (val root: TreeNode, depth: Double, val name: String = "tree")
             showAnimation ()
         } // if
     } // aniTree
+     */
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Recursive helper method for animating the tree using a preorder traversal.
@@ -310,17 +312,19 @@ class Tree (val root: TreeNode, depth: Double, val name: String = "tree")
      *  @param p     the parent node
      *  @param ord   the birth order of the node
      *  @param sibs  the number of siblings
-     */
+     *
     private def aniPre (n: TreeNode, p: TreeNode, ord: Int, sibs: Int) 
     {
         aniStep (n, p, ord, sibs)                        // animation step for node n
         for (j <- n.child.indices) aniPre (n.child(j), n, j, n.child.length)
     } // aniPre
+     */
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Animate the generation of the tree.
-     */
+     *
     def showAnimation () { if (ANIMATE) ani.animate (0, 100000) }
+     */
 
 } // Tree class
 
@@ -336,7 +340,7 @@ object TreeTest extends App
 
     val ct = Tree (3, 2, 3)
     ct.printTree ()
-    ct.showAnimation ()
+//  ct.showAnimation ()
 
     println ("--------------------------------------------------------------")
 
@@ -357,14 +361,14 @@ object TreeTest2 extends App
     val ct = new Tree (root, 2.0)                           // root, depth = 2
     for (i <- 0 until FANOUT) {
         val n = ct.add (ct.root)
-        ct.aniStep (n, root, i, FANOUT) 
+//      ct.aniStep (n, root, i, FANOUT) 
         for (j <- 0 until FANOUT) {
             val m = ct.add (n)
-            ct.aniStep (m, n, j, FANOUT) 
+//          ct.aniStep (m, n, j, FANOUT) 
         } // for
     } // for
     ct.printTree ()
-    ct.showAnimation ()
+//  ct.showAnimation ()
 
     println ("--------------------------------------------------------------")
 
@@ -390,7 +394,7 @@ object TreeTest3 extends App
         } // for
     } // for
     tree.printTree ()
-    tree.aniTree ()
+//  tree.aniTree ()
 
     println ("--------------------------------------------------------------")
 
@@ -407,7 +411,7 @@ object TreeTest4 extends App
     println ("--------------------------------------------------------------")
 
     val pred = Array (-1, 0, 0, 1, 1, 2, 2)
-    val labl = Array (10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0)
+    val labl = Array ("10", "11", "12", "13", "14", "15", "16")
     val tree = Tree (pred, labl, 3.0, "t")
     tree.printTree ()
 

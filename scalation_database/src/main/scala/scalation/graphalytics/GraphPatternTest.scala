@@ -8,7 +8,7 @@
 
 package scalation.graphalytics
 
-import scalation.graphalytics.{ExampleGraphD => EX_GRAPH}
+import scalation.graphalytics.{ExampleGraphS => EX_GRAPH}
 import scala.collection.{Set => SET}
 
 import scalation.util.sline

@@ -8,7 +8,8 @@
  *  Graph Data Structure Using Mutable Sets
  */
 
-package scalation.graph_db
+package scalation
+package graph_db
 
 import scala.collection.mutable.{ArrayBuffer, Map}
 import scala.collection.mutable.{Set => SET}
@@ -210,6 +211,19 @@ class Graph [TLabel: ClassTag] (val ch:      Array [SET [Int]],
         for (u <- 0 until size; v <- ch(u)) ch(v) += u
         this
     } // makeUndirected
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the equivalent immutable Graph.  Assumes the default `TLabel`
+     *  of type `String`.  For other types (e.g., `Double` use '_.toDouble'
+     *  rather than '.toString' in the last line of this method.
+     *  @see `scalation.graphalytics.Graph`
+     */
+    def toGraphIm: graphalytics.Graph  =
+    {
+        val ch_im = Array.ofDim [collection.immutable.Set [Int]] (ch.length)
+        for (i <- ch.indices) ch_im(i) = ch(i).toSet
+        new graphalytics.Graph (ch_im, label.map (_.toString), inverse, name)   // change based on TLabel
+    } // toGraphIm
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' digraph to a string in a shallow sense.  Large arrays are

@@ -10,8 +10,8 @@ package scalation.graphalytics
 
 import scala.collection.mutable.ListBuffer
 
-import scalation.animation.{AnimateCommand, DgAnimator}
-import scalation.animation.CommandType._
+//import scalation.animation.{AnimateCommand, DgAnimator}
+//import scalation.animation.CommandType._
 import scalation.random.Randi
 import scalation.scala2d.Colors._
 import scalation.scala2d.{Ellipse, QCurve, Rectangle}
@@ -275,12 +275,12 @@ class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
     def printColorTree ()
     {
         colors.printTree                     // print the ColorTree
-        colors.showAnimation                 // show the animation of the ColorTree hierarchy
+//      colors.showAnimation                 // show the animation of the ColorTree hierarchy
     } // printColorTree
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Animate the color DAG.
-     */
+     *
     def animateDAG ()
     {
         println ("Run DAGAnimation")
@@ -320,6 +320,7 @@ class ColorDAG (dimensions: Array [Int], maxIn: Int, maxOut: Int,
         } // for
         dga.animate (0, 100000)
     } // animateDAG
+     */
 
 } // ColorDAG class
 
@@ -343,7 +344,7 @@ object ColorDAGTest extends App
     dag.printDAG ()                                    // print the nodes and edges
     dag.printColors ()                                 // print inputs and output colors for each node
 //  dag.printInOut ()                                  // print the input and output lists for each node
-    dag.animateDAG ()                                  // animate the color DAG
+//  dag.animateDAG ()                                  // animate the color DAG
 
 } // ColorDAGTest
 

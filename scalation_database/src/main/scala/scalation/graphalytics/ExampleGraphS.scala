@@ -5,7 +5,8 @@
  *  @date    Tue Aug  9 16:39:41 EDT 2016
  *  @see     LICENSE (MIT style license file).
  *
- *  Graph Data Structure Using Mutable Sets
+ *  Graph Data Structure Using Immutable Sets
+ *  To use when `TLabel` is `String` convert file name from ".scalaa" to ".scala".
  */
 
 package scalation.graphalytics
@@ -13,10 +14,10 @@ package scalation.graphalytics
 import scala.collection.immutable.{Set => SET}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `ExampleGraphD` object contains example query and data digraphs in which
+/** The `ExampleGraphS` object contains example query and data digraphs in which
  *  the vertex label type `TLabel` is `Double`.
  */
-object ExampleGraphD
+object ExampleGraphS
 {
     // -----------------------------------------------------------------------
     // Simple data and query digraphs.
@@ -29,7 +30,7 @@ object ExampleGraphD
                                SET (0),                         // ch(2)
                                SET (4),                         // ch(3)
                                SET ()),                         // ch(4)
-                        Array (11.0, 10.0, 11.0, 11.0, 11.0),   // vertex labels
+                        Array ("11", "10", "11", "11", "11"),   // vertex labels
                         false, "g1")                            // inverse, name
 
     // query digraph q1 ------------------------------------------------------
@@ -37,7 +38,7 @@ object ExampleGraphD
     val q1 = new Graph (Array (SET (1, 2),                      // ch(0)
                                SET (),                          // ch(1)
                                SET (1)),                        // ch(2)
-                        Array (10.0, 11.0, 11.0),
+                        Array ("10", "11", "11"),
                         false, "q1")
 
     val g1p = new Graph (g1.ch, g1.label, true, g1.name)        // with parents
@@ -83,8 +84,8 @@ object ExampleGraphD
                                SET (),                        // ch(27)
                                SET (27, 29),                  // ch(28)
                                SET (22)),                     // ch(29)
-                        Array (10.0, 11.0, 12.0, 12.0, 12.0, 10.0, 11.0, 10.0, 12.0, 15.0, 12.0, 10.0, 11.0, 12.0, 11.0,
-                               10.0, 11.0, 12.0, 10.0, 10.0, 11.0, 12.0, 11.0, 10.0, 12.0, 11.0, 10.0, 12.0, 11.0, 10.0),
+                        Array ("10", "11", "12", "12", "12", "10", "11", "10", "12", "15", "12", "10", "11", "12", "11",
+                               "10", "11", "12", "10", "10", "11", "12", "11", "10", "12", "11", "10", "12", "11", "10"),
                         false, "g2")
 
 
@@ -94,7 +95,7 @@ object ExampleGraphD
                                SET (0, 2, 3),                 // ch(1)
                                SET (),                        // ch(2)
                                SET ()),                       // ch(3)
-                        Array (10.0, 11.0, 12.0, 12.0),
+                        Array ("10", "11", "12", "12"),
                         false, "q2")
 
     val g2p = new Graph (g2.ch, g2.label, true, g2.name)      // with parents
@@ -140,8 +141,8 @@ object ExampleGraphD
                                SET (),                        // ch(27)
                                SET (27, 29),                  // ch(28)
                                SET (22)),                     // ch(29)
-                        Array (10.0, 11.0, 12.0, 12.0, 12.0, 10.0, 11.0, 10.0, 12.0, 15.0, 12.0, 10.0, 11.0, 12.0, 11.0,
-                               10.0, 11.0, 12.0, 10.0, 10.0, 11.0, 12.0, 11.0, 10.0, 12.0, 11.0, 10.0, 12.0, 11.0, 10.0),
+                        Array ("10", "11", "12", "12", "12", "10", "11", "10", "12", "15", "12", "10", "11", "12", "11",
+                               "10", "11", "12", "10", "10", "11", "12", "11", "10", "12", "11", "10", "12", "11", "10"),
                         false, "g3")
 
 
@@ -151,11 +152,11 @@ object ExampleGraphD
                                SET (0, 2, 3),                 // ch(1)
                                SET (),                        // ch(2)
                                SET ()),                       // ch(3)
-                        Array (10.0, 11.0, 12.0, 12.0),
+                        Array ("10", "11", "12", "12"),
                         false, "q3")
 
     val g3p = new Graph (g3.ch, g3.label, true, g3.name)      // with parents
     val q3p = new Graph (q3.ch, q3.label, true, q3.name)      // with parents
 
-} // ExampleGraphD object
+} // ExampleGraphS object
 

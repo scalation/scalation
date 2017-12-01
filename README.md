@@ -229,6 +229,9 @@ Online <a href = "../home/theses/jain_thesis/bigdata_2014/BigDataCong2014_DualIs
 <td> <a href = "scalation_database/target/scala-2.12/api/index.html">DATABASE</a>
 <tr>
 <tr>
+<td> <a href = "scalation_database/target/scala-2.12/api/scalation/graphalytics/index.html"> scalation.graphalytics </a>
+<td> The `graphalytics` package contains classes, traits and objects for graph analytics on Trees, 'DAG's and Directed Graphs.  It provides an implicit conversion when needed for converting doubles to vectors. 
+<tr>
 <td> <a href = "scalation_database/target/scala-2.12/api/scalation/columnar_db/index.html"> scalation.columnar_db </a>
 <td> The `columar_db` package contains classes, traits and objects for columnar relational algebra, where columns are vectors from the `linalgebra` package. 
 <tr>
@@ -252,9 +255,6 @@ Online <a href = "../home/theses/jain_thesis/bigdata_2014/BigDataCong2014_DualIs
 <tr>
 <td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/model/index.html"> scalation.model </a>
 <td> The `model` package contains a trait giving a template for models to follow. 
-<tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/graphalytics/index.html"> scalation.graphalytics </a>
-<td> The `graphalytics` package contains classes, traits and objects for graph analytics on Trees, 'DAG's and Directed Graphs.  It provides an implicit conversion when needed for converting doubles to vectors. 
 <tr>
 <td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/calculus/index.html"> scalation.calculus </a>
 <td> The `calculus` package contains classes with methods for computing derivatives, gradient vectors, Jacobian matrices, integrals and basic operators in Functional Analysis. 
@@ -418,6 +418,9 @@ Online <a href = "../home/theses/jain_thesis/bigdata_2014/BigDataCong2014_DualIs
 <td> <a href = "scalation_database/src/main/scala/scalation">DATABASE</a>
 <tr>
 <tr>
+<td> <a href = "scalation_database/src/main/scala/scalation/graphalytics/"> scalation.graphalytics </a>
+<td> The `graphalytics` package contains classes, traits and objects for graph analytics on Trees, 'DAG's and Directed Graphs.  It provides an implicit conversion when needed for converting doubles to vectors. 
+<tr>
 <td> <a href = "scalation_database/src/main/scala/scalation/columnar_db/"> scalation.columnar_db </a>
 <td> The `columar_db` package contains classes, traits and objects for columnar relational algebra, where columns are vectors from the `linalgebra` package. 
 <tr>
@@ -441,9 +444,6 @@ Online <a href = "../home/theses/jain_thesis/bigdata_2014/BigDataCong2014_DualIs
 <tr>
 <td> <a href = "scalation_modeling/src/main/scala/scalation/model/"> scalation.model </a>
 <td> The `model` package contains a trait giving a template for models to follow. 
-<tr>
-<td> <a href = "scalation_modeling/src/main/scala/scalation/graphalytics/"> scalation.graphalytics </a>
-<td> The `graphalytics` package contains classes, traits and objects for graph analytics on Trees, 'DAG's and Directed Graphs.  It provides an implicit conversion when needed for converting doubles to vectors. 
 <tr>
 <td> <a href = "scalation_modeling/src/main/scala/scalation/calculus/"> scalation.calculus </a>
 <td> The `calculus` package contains classes with methods for computing derivatives, gradient vectors, Jacobian matrices, integrals and basic operators in Functional Analysis. 

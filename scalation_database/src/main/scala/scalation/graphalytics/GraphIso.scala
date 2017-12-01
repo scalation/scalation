@@ -44,6 +44,7 @@ class GraphIso (g: Graph, q: Graph)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphIsoTest` object is used to test the `GraphIso` class.
+ *  > run-main scalation.graphalytics.GraphIsoTest
  */
 object GraphIsoTest extends App
 {
@@ -51,7 +52,7 @@ object GraphIsoTest extends App
                                   SET (2, 3),
                                   SET (3),
                                   SET (1)),
-                           Array (2, 1, 2, 1),
+                           Array ("2", "1", "2", "1"),
                            false, "g")
         g.printG ()
         
@@ -59,13 +60,13 @@ object GraphIsoTest extends App
 //                         SET (2, 3),
 //                         SET (3),
 //                         SET (1))
-//      val label_q = Array (2, 1, 2, 1)
+//      val label_q = Array ("2", "1", "2", "1")
 //      val q = new Graph (adj_q, label_q, false)
         
         val q = new Graph (Array (SET (1, 2),
                                   SET (2),
                                   SET [Int] ()),
-                           Array (2, 1, 2),
+                           Array ("2", "1", "2"),
                            false, "q")
         q.printG ()
 

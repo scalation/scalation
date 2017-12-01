@@ -73,7 +73,7 @@ object ServiceNetworkTest extends App
     snet.printDAG                                             // print the nodes and edges
     snet.printColors                                          // print inputs and output colors for each node
 //  snet.printInOut                                           // print the input and ouput lists for each node
-    snet.animateDAG   
+//  snet.animateDAG   
 
 } // ServiceNetworkTest object
 

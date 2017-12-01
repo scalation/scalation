@@ -49,7 +49,8 @@ object TestGraphContainer
                                       SET (20),           // ch(21)
                                       SET [Int] (),       // ch(22)
                                       SET (22)),          // ch(23)
-                               Array (0, 1, 2, 0, 0, 3, 4, 2, 4, 3, 4, 3, 0, 2, 3, 4, 3, 4, 3, 4, 2, 0, 2, 0))
+                               Array ("0", "1", "2", "0", "0", "3", "4", "2", "4", "3", "4", "3",
+                                      "0", "2", "3", "4", "3", "4", "3", "4", "2", "0", "2", "0"))
 
     //------------------------------------------------------------------------
     // Query Graph
@@ -61,7 +62,7 @@ object TestGraphContainer
                                       SET (3, 2),        // DB - ch(1)
                                       SET (1),           // AI - ch(2)
                                       SET [Int] ()),     // SA - ch(3)
-                               Array (0, 3, 4, 2))
+                               Array ("0", "3", "4", "2"))
 
     //------------------------------------------------------------------------
     // Specified correct results for Simple Graph Simulation, Dual Graph Simulation

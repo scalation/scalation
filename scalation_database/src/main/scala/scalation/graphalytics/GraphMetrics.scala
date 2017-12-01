@@ -129,7 +129,7 @@ object GraphMetricsTest extends App
                               SET (3),                   // 1
                               SET (),                    // 2
                               SET ()),                   // 3
-                       Array (1, 0, 0, 0))                
+                       Array ("1", "0", "0", "0"))                
 
     g.printG ()
     val bfs = new GraphMetrics (g)

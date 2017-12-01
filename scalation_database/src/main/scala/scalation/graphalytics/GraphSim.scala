@@ -50,7 +50,7 @@ class GraphSim (g: Graph, q: Graph)
 
 } // GraphSim class
 
-import scalation.graphalytics.{ExampleGraphD => EX_GRAPH}
+import scalation.graphalytics.{ExampleGraphS => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSimTest` object is used to test the `GraphSim` class.

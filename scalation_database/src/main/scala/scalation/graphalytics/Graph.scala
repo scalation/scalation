@@ -184,7 +184,7 @@ object Graph
                                SET (0),                     // ch(2)
                                SET (4),                     // ch(3)
                                SET ()),                     // ch(4)
-                        Array (11, 10, 11, 11, 11),         // vertex labels
+                        Array ("11", "10", "11", "11", "11"),   // vertex labels
                         false, "g1")                        // inverse, name
 
     // query graph q1 --------------------------------------------------------
@@ -192,7 +192,7 @@ object Graph
     val q1 = new Graph (Array (SET (1, 2),                  // ch(0)
                                SET (),                      // ch(1)
                                SET (1)),                    // ch(2)
-                        Array (10, 11, 11),
+                        Array ("10", "11", "11"),
                         false, "q1")
 
     val g1p = new Graph (g1.ch, g1.label, true, g1.name)    // with parents
@@ -238,8 +238,8 @@ object Graph
                                SET (),                      // ch(27)
                                SET (27, 29),                // ch(28)
                                SET (22)),                   // ch(29)
-                       Array (10, 11, 12, 12, 12, 10, 11, 10, 12, 15, 12, 10, 11, 12, 11,
-                              10, 11, 12, 10, 10, 11, 12, 11, 10, 12, 11, 10, 12, 11, 10),
+                       Array ("10", "11", "12", "12", "12", "10", "11", "10", "12", "15", "12", "10", "11", "12", "11",
+                              "10", "11", "12", "10", "10", "11", "12", "11", "10", "12", "11", "10", "12", "11", "10"),
                               false, "g2")
 
     // query graph q2 --------------------------------------------------------
@@ -248,7 +248,7 @@ object Graph
                                SET (0, 2, 3),               // ch(1)
                                SET (),                      // ch(2)
                                SET ()),                     // ch(3)
-                        Array (10, 11, 12, 12),
+                        Array ("10", "11", "12", "12"),
                                false, "q2")
 
     val g2p = new Graph (g2.ch, g2.label, true, g2.name)    // with parents

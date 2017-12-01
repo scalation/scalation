@@ -241,10 +241,10 @@ object TreeLayoutTest extends App
    println ("--------------------------------------------------------------")
 
     val pred = Array (-1, 0, 0, 1, 1, 2, 2)
-    val labl = Array (10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0)
+    val labl = Array ("10", "11", "12", "13", "14", "15", "16")
     val tree = Tree (pred, labl, 3.0, "t")
     tree.printTree
-    tree.aniTree ()
+//  tree.aniTree ()
 
     val tl = new TreeLayout (tree)
     val (x, y) = tl.layout ()

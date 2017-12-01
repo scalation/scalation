@@ -33,7 +33,7 @@ class GraphDFS (g: Graph, bfs: Boolean = false)
     private val go    = Array.ofDim [Boolean] (g.size)            // go (unvisited) flags
     private var qu    = if (bfs) new STACK ()                     // vertex FIFO queue for BFS
                         else     new QUEUE ()                     // or stack (LIFO queue) for DFS
-    private var lab   = TLabel_DEFAULT                            // label to find
+    private var lab: TLabel = TLabel_DEFAULT                      // label to find
     private var dest  = -1                                        // destination vertex to reach
 
     def pred1 (j: Int): Boolean = g.label(j) == lab               // predicate to find label
@@ -174,7 +174,7 @@ object GraphDFSTest extends App
                               SET (6),                           // 11
                               SET [Int] ()),                     // 12
 //                            SET (8)),                          // 12
-                       Array (1, 2, 3, 4 , 5, 6, 13, 12, 11, 10, 9, 8, 7))   // labels
+                       Array ("1", "2", "3", "4", "5", "6", "13", "12", "11", "10", "9", "8", "7"))   // labels
 
     g.printG ()
     println ("Test DFS -----------------------------------------------------")
@@ -190,7 +190,7 @@ object GraphDFSTest extends App
     {
         println ("Test find method")
         for (lab <- 0 to 14) {
-            println (s"find ($lab)  = ${gs.find (lab)}")           // find (lab)
+            println (s"find ($lab)  = ${gs.find (lab.toString)}")  // find (lab)
         } // for
 
         println ("Test reach method")
