@@ -76,7 +76,7 @@ class TightSim [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel], duals: 
             else if (DEBUG)  println ("No match for ball centered at " + center + "\n")
         } // for
 
-        println (s"""SUMMARY:
+        if (DEBUG) println (s"""SUMMARY:
         bCenters                  = $bCenters
         Query Graph Diameter      = $qDiameter
         Number of Balls           = ${gCenters.size}

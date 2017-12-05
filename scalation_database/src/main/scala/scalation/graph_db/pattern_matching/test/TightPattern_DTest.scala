@@ -13,11 +13,11 @@ package test
 import scalation.graph_db.{ExampleMGraphD => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `TightTestPattern` object is used to test all the Tight Simulation pattern
+/** The `TightPattern_DTest` object is used to test all the Tight Simulation pattern
  *  matchers for labels of type `Double`.
- *  > run-main scalation.graph_db.pattern_matching.test.TightTestPattern
+ *  > run-main scalation.graph_db.pattern_matching.test.TightPattern_DTest
  */
-object TightTestPattern extends App
+object TightPattern_DTest extends App
 {
     val g2 = EX_GRAPH.g2p
     val q2 = EX_GRAPH.q2p
@@ -48,5 +48,5 @@ object TightTestPattern extends App
     (new MTightSim (g3, q3, new MDualSim2 (g3, q3))).test ("MTightSim2", Answers_g3.phi15)            // MTight Simulation 2       
     (new MTightSim (g3, q3, new MDualSimCAR (g3, q3))).test ("MTightSimCAR", Answers_g3.phi16)        // MTight Simulation CAR
  
-} // TightTestPattern object
+} // TightPattern_DTest object
 

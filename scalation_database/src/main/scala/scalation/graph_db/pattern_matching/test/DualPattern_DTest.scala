@@ -13,11 +13,11 @@ package test
 import scalation.graph_db.{ExampleMGraphD => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `DualTestPattern` object is used to test all the Dual Simulation pattern
+/** The `DualPatternTest_D` object is used to test all the Dual Simulation pattern
  *  matchers for labels of type `Double`.
- *  > run-main scalation.graph_db.pattern_matching.test.DualTestPattern
+ *  > run-main scalation.graph_db.pattern_matching.test.DualPatternTest_D
  */
-object DualTestPattern extends App
+object DualPatternTest_D extends App
 {
     val g2 = EX_GRAPH.g2p
     val q2 = EX_GRAPH.q2p
@@ -48,5 +48,5 @@ object DualTestPattern extends App
     (new MDualSim2 (g3, q3)).test ("MDualSim2", Answers_g3.phi7)           // MDual Simulation 2       
     (new MDualSimCAR (g3, q3)).test ("MDualSimCAR", Answers_g3.phi8)       // MDual Simulation CAR
  
-} // DUalTestPattern object
+} // DualPatternTest_D object
 

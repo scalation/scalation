@@ -11,13 +11,14 @@ package pattern_matching
 package test
 
 import scalation.graph_db.{ExampleMGraphS => EX_GRAPH}
+import scalation.util.banner
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `StrictTestPattern_S` object is used to test all the Strict Simulation pattern
+/** The `StrictPattern_STest` object is used to test all the Strict Simulation pattern
  *  matchers for labels of type `String`.
- *  > run-main scalation.graph_db.pattern_matching.test.StrictTestPattern_S
+ *  > run-main scalation.graph_db.pattern_matching.test.StrictPattern_STest
  */
-object StrictTestPattern_S extends App
+object StrictPattern_STest extends App
 {
     val g2  = EX_GRAPH.g2p
     val q2  = EX_GRAPH.q2p
@@ -63,5 +64,45 @@ object StrictTestPattern_S extends App
     (new MStrictSim (g3, q3, new MDualSim2X (g3, q3))).test ("MStrictSim2X", Answers_g3.phi11)          // MStrict Simulation 2 X on q5
     (new MStrictSim (g3, q3, new MDualSimCAR (g3, q3))).test ("MStrictSimCAR", Answers_g3.phi12)        // MStrict Simulation CAR
  
-} // StrictTestPattern_S object
+} // StrictPattern_STest object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `StrictPattern_STest2` object is used to test all the Strict Simulation pattern
+ *  matchers for labels of type `String` for randomly generated graphs.
+ *  > runMain scalation.graph_db.pattern_matching.test.StrictPattern_STest2
+ */
+object StrictPattern_STest2 extends App
+{
+    val gSize   = 200                                                   // number of vertices in g
+    val gLabels = 10                                                    // number of labels in g
+    val gDegree = 20                                                    // average out-degree for g
+    val qSize   = 10                                                    // number of vertices in g
+    val qDegree = 2                                                     // average out-degree for q
+    val inverse = true                                                  // include links to parents
+
+//  val stream  = 11                                                    // random number stream 0 to 999
+    for (stream <- 0 until 5) {
+        val rg = new GraphGen ("0", stream)                             // random graph generator
+        val g  = rg.genRandomConnectedGraph (gSize, gLabels, gDegree)   // data graph g
+        banner ("data graph")
+//      g.printG ()
+        println (GraphMetrics.stats (g))
+
+        val q  = rg.genBFSQuery (qSize, qDegree, g, inverse, "q")       // query graph q
+        banner ("query graph")
+//      q.printG ()
+        println (GraphMetrics.stats (q))
+
+        // Strict Simulation Pattern Matcher
+
+        banner ("StrictSim Test")
+        (new StrictSim (g, q, new DualSim (g, q))).test ("StrictSim")          // Strict Simulation
+        banner ("StrictSim2 Test")
+        (new StrictSim (g, q, new DualSim2 (g, q))).test ("StrictSim2")        // Strict Simulation 2
+        banner ("StrictSimCAR Test")
+        (new StrictSim (g, q, new DualSimCAR (g, q))).test ("StrictSimCAR")    // Strict Simulation CAR
+    } // for
+
+} // StrictPattern_STest2 object
 

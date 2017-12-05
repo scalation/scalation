@@ -13,13 +13,14 @@ import scala.collection.mutable.Map
 import scala.collection.mutable.{Set => SET}
 import scala.reflect.ClassTag
 
-import scalation.util.time
+import scalation.util.{banner, time}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DualIso` class provides an implementation for Subgraph Isomorphism
  *  that uses Dual Graph Simulation for pruning.
- *  @param g  the data graph  G(V, E, l)
- *  @param q  the query graph Q(U, D, k)
+ *  @param g      the data graph  G(V, E, l)
+ *  @param q      the query graph Q(U, D, k)
+ *  @param duals  the base dual simulation pattern matcher
  */
 class DualIso [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel], duals: GraphMatcher [TLabel])
       extends GraphMatcher (g, q)
@@ -46,7 +47,7 @@ class DualIso [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel], duals: G
         matches = SET [Array [SET [Int]]] ()               // initialize matches to empty
         val phi = duals.feasibleMates ()                   // initial mappings from label match
         refine (duals.prune (phi), 0)                      // recursively find all bijections
-        val psi = simplify (matches)                       // pull bijections out matches
+        val psi = simplify (matches)                       // pull bijections out of matches
         noBijections = false                               // results now available
         psi                                                // return the set of bijections
     } // bijections
@@ -124,6 +125,7 @@ class DualIso [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel], duals: G
      */
     private def simplify (matches: SET [Array [SET [Int]]]): SET [Array [Int]] =
     {
+        // FIX - may fail on .next method - provide a more robust implementation
         matches.map (m => m.map (set => set.iterator.next))
     } // simplify
 
@@ -134,13 +136,48 @@ class DualIso [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel], duals: G
      */
     def prune (phi: Array [SET [Int]]): Array [SET [Int]] = throw new UnsupportedOperationException ()
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Count the number of mappings between query graph vertices 'u_i' and their sets
+     *  of data graph vertices {v}, giving the number of distinct vertices and edges.
+     *  @param psi  the set of bijection
+     */
+    def countMappings (psi: SET [Array [Int]]): Pair =
+    {
+        val distVertices = SET [Int] ()
+        val distEdges    = SET [Pair] ()
+        for (pi <- psi) distVertices ++= pi
+        for (pi <- psi) {
+            for (v <- pi; v_c <- g.ch(v) if distVertices contains v_c) distEdges += ((v, v_c))
+        } // for
+        (distVertices.size, distEdges.size)
+    } // countMappings
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Test the Graph Iso Pattern Matcher.
+     *  @param mName  the name of graph pattern matcher
+     *  @param ans    the correct answer
+     */
+    def test (name: String, ans: SET [Array [Int]]): SET [Array [Int]] =
+    {
+        val psi = time { bijections () }                            // time the matcher
+        banner (s"query ${q.name} (${q.size}) via $name on data ${g.name} (${g.size})")
+//      for (pi <- psi) println (s"psi = ${pi.deep}")
+        println (s"number of matches = $numMatches")
+        println (s"(#distVertices, #distEdges) = ${countMappings (psi)}")
+
+        if (ans != null) {
+            // FIX - compare result with answer
+        } // if 
+        psi
+    } // test
+
 } // DualIso class
 
 import scalation.graph_db.{ExampleGraphD => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DualIsoTest` object is used to test the `DualIso` class.
- *  > run-main scalation.graph_db.pattern_matching.DualIsoTest
+ *  > runMain scalation.graph_db.pattern_matching.DualIsoTest
  */
 object DualIsoTest extends App
 {
@@ -152,17 +189,18 @@ object DualIsoTest extends App
     println (s"q.checkEdges = ${q.checkEdges}")
     q.printG ()
 
-    val matcher = new DualIso (g, q, new DualSim2 (g, q))                  // Dual Subgraph Isomorphism Pattern Matcher
-    val psi = time { matcher.bijections () }              // time the matcher
-    println ("Number of Matches: " + matcher.numMatches)
+    val matcher = new DualIso (g, q, new DualSim2 (g, q))             // Dual Subgraph Isomorphism Pattern Matcher
+    val psi = time { matcher.bijections () }                          // time the matcher
+    println (s"number of matches = ${matcher.numMatches}")
+    println (s"(vertices, edges) = ${matcher.countMappings (psi)}")
     for (p <- psi) println (s"psi = ${p.deep}")
 
-} // DualIsoTest
+} // DualIsoTest object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DualIsoTest2` object is used to test the `DualIso` class.
- *  > run-main scalation.graph_db.pattern_matching.DualIsoTest2
+ *  > runMain scalation.graph_db.pattern_matching.DualIsoTest2
  */
 object DualIsoTest2 extends App
 {
@@ -174,17 +212,18 @@ object DualIsoTest2 extends App
     println (s"q.checkEdges = ${q.checkEdges}")
     q.printG ()
 
-    val matcher = new DualIso (g, q, new DualSim2 (g, q))                  // Dual Subgraph Isomorphism Pattern Matcher
-    val psi = time { matcher.bijections () }              // time the matcher
-    println ("Number of Matches: " + matcher.numMatches)
+    val matcher = new DualIso (g, q, new DualSim2 (g, q))             // Dual Subgraph Isomorphism Pattern Matcher
+    val psi = time { matcher.bijections () }                          // time the matcher
+    println (s"number of matches = ${matcher.numMatches}")
+    println (s"(vertices, edges) = ${matcher.countMappings (psi)}")
     for (p <- psi) println (s"psi = ${p.deep}")
 
-} // DualIsoTest2
+} // DualIsoTest2 object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DualIsoTest3` object is used to test the `DualIso` class.
- *  > run-main scalation.graph_db.pattern_matching.DualIsoTest3
+ *  > runMain scalation.graph_db.pattern_matching.DualIsoTest3
  */
 object DualIsoTest3 extends App
 {
@@ -202,10 +241,11 @@ object DualIsoTest3 extends App
     println (s"q.checkEdges = ${q.checkEdges}")
     q.printG ()
 
-    val matcher = new DualIso (g, q, new DualSim2 (g, q))                  // Dual Subgraph Isomorphism Pattern Matcher
-    val psi = time { matcher.bijections () }              // time the matcher
-    println ("Number of Matches: " + matcher.numMatches)
+    val matcher = new DualIso (g, q, new DualSim2 (g, q))             // Dual Subgraph Isomorphism Pattern Matcher
+    val psi = time { matcher.bijections () }                          // time the matcher
+    println (s"number of matches = ${matcher.numMatches}")
+    println (s"(vertices, edges) = ${matcher.countMappings (psi)}")
     for (p <- psi) println (s"psi = ${p.deep}")
 
-} // DualIsoTest3
+} // DualIsoTest3 object
 

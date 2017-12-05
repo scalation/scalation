@@ -1588,10 +1588,10 @@ object MatrixI extends Error
         val u_dim = u(0).dim
         if (columnwise) {
             x = new MatrixI (u_dim, u.length)
-            for (j <- 0 until u.length) x.setCol (j, u(j))    // assign column vectors
+            for (j <- x.range2) x.setCol (j, u(j))       // assign column vectors
         } else {
             x = new MatrixI (u.length, u_dim)
-            for (i <- 0 until u_dim) x(i) = u(i)              // assign row vectors
+            for (i <- x.range1) x(i) = u(i)              // assign row vectors
         } // if
         x
     } // apply

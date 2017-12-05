@@ -217,12 +217,13 @@ class Graph [TLabel: ClassTag] (val ch:      Array [SET [Int]],
      *  of type `String`.  For other types (e.g., `Double` use '_.toDouble'
      *  rather than '.toString' in the last line of this method.
      *  @see `scalation.graphalytics.Graph`
+     *  @param name2  the name to give the new immutable Graph
      */
-    def toGraphIm: graphalytics.Graph  =
+    def toGraphIm (name2: String = name): graphalytics.Graph  =
     {
         val ch_im = Array.ofDim [collection.immutable.Set [Int]] (ch.length)
         for (i <- ch.indices) ch_im(i) = ch(i).toSet
-        new graphalytics.Graph (ch_im, label.map (_.toString), inverse, name)   // change based on TLabel
+        new graphalytics.Graph (ch_im, label.map (_.toString), inverse, name2)   // change based on TLabel
     } // toGraphIm
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -366,4 +367,20 @@ object GraphTest4 extends App
     g.printG ()
 
 } // GraphTest4 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphTest5` object is used to test the `Graph` class by calling
+ *  the apply in the `Graph` companion object.
+ *  > run-main scalation.graph_db.GraphTest5
+ */
+object GraphTest5 extends App
+{
+    import ExampleGraphS._
+    g2.printG ()
+
+    val g2im = g2.toGraphIm ("g2im") 
+    g2im.printG ()
+
+} // GraphTest5 object
 

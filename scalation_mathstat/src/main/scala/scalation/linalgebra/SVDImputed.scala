@@ -79,8 +79,8 @@ class SVDImputed (a: MatrixD, k: Int)
     /** Predict the final value for a missing value in the matrix.
      *  @see Application of Dimensionality Reduction in Recommender System -- A Case Study
      *  @see www.dtic.mil/get-tr-doc/pdf?AD=ADA439541
-     *  @oaram i  the row id
-     *  @oaram j  the column id
+     *  @param i  the row id
+     *  @param j  the column id
      */
     def predict (i: Int, j: Int): Double = (p(i) dot q.col(j)) + denormalize (i)
 

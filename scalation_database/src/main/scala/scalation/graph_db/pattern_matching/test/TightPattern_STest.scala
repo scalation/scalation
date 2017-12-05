@@ -11,13 +11,14 @@ package pattern_matching
 package test
 
 import scalation.graph_db.{ExampleMGraphS => EX_GRAPH}
+import scalation.util.banner
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `TightTestPattern_S` object is used to test all the Tight Simulation pattern
+/** The `TightPattern_STest` object is used to test all the Tight Simulation pattern
  *  matchers for labels of type `String`.
- *  > run-main scalation.graph_db.pattern_matching.test.TightTestPattern_S
+ *  > run-main scalation.graph_db.pattern_matching.test.TightPattern_STest
  */
-object TightTestPattern_S extends App
+object TightPattern_STest extends App
 {
     val g2  = EX_GRAPH.g2p
     val q2  = EX_GRAPH.q2p
@@ -64,5 +65,45 @@ object TightTestPattern_S extends App
     (new MTightSim (g3, q3, new MDualSim2X (g3, q3))).test ("MTightSim2X", Answers_g3.phi15)           // MTight Simulation 2 X on q5
     (new MTightSim (g3, q3, new MDualSimCAR (g3, q3))).test ("MTightSimCAR", Answers_g3.phi16)         // MTight Simulation CAR
  
-} // TightTestPattern_S object
+} // TightPattern_STest object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `TightPattern_STest2` object is used to test all the Tight Simulation pattern
+ *  matchers for labels of type `String` for randomly generated graphs.
+ *  > runMain scalation.graph_db.pattern_matching.test.TightPattern_STest2
+ */
+object TightPattern_STest2 extends App
+{
+    val gSize   = 200                                                   // number of vertices in g
+    val gLabels = 10                                                    // number of labels in g
+    val gDegree = 20                                                    // average out-degree for g
+    val qSize   = 10                                                    // number of vertices in g
+    val qDegree = 2                                                     // average out-degree for q
+    val inverse = true                                                  // include links to parents
+
+//  val stream  = 11                                                    // random number stream 0 to 999
+    for (stream <- 0 until 5) {
+        val rg = new GraphGen ("0", stream)                             // random graph generator
+        val g  = rg.genRandomConnectedGraph (gSize, gLabels, gDegree)   // data graph g
+        banner ("data graph")
+//      g.printG ()
+        println (GraphMetrics.stats (g))
+
+        val q  = rg.genBFSQuery (qSize, qDegree, g, inverse, "q")       // query graph q
+        banner ("query graph")
+//      q.printG ()
+        println (GraphMetrics.stats (q))
+
+        // Tight Simulation Pattern Matcher
+
+        banner ("TightSim Test")
+        (new TightSim (g, q, new DualSim (g, q))).test ("TightSim")          // Tight Simulation
+        banner ("TightSim2 Test")
+        (new TightSim (g, q, new DualSim2 (g, q))).test ("TightSim2")        // Tight Simulation 2
+        banner ("TightSimCAR Test")
+        (new TightSim (g, q, new DualSimCAR (g, q))).test ("TightSimCAR")    // Tight Simulation CAR
+    } // for
+
+} // TightPattern_STest2 object
 

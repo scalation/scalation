@@ -228,7 +228,7 @@ class MGraphGen [TLabel: ClassTag] (typeSelector: TLabel, stream: Int = 0)
     def genBFSQuery (size: Int, avDegree: Int, g: MGraph [TLabel], inverse: Boolean = false,
                      name: String = "g"): MGraph [TLabel] =
     {
-        val maxRestarts = 5000                                            // limit on retries
+        val maxRestarts = 1000                                            // limit on retries
         val nedges      = avDegree * size                                 // desired number of edges
 
         var nRestarts   = 0                                               // restarts so far
@@ -276,7 +276,7 @@ class MGraphGen [TLabel: ClassTag] (typeSelector: TLabel, stream: Int = 0)
                             chs2 += v_ch
                             edges += 1
                         } else {
-                           println ("genBFSquery: can't find enough child vertices for $v")
+                            println (s"genBFSquery: can't find enough child vertices for $v")
                         } // if
                     } // if
                 } // for
@@ -334,7 +334,6 @@ class MGraphGen [TLabel: ClassTag] (typeSelector: TLabel, stream: Int = 0)
         chs
     } // pickChildren
 
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return an array with labels distributed between 1 and 'nLabels'.
      *  based on a uniform distribution.
@@ -362,7 +361,6 @@ class MGraphGen [TLabel: ClassTag] (typeSelector: TLabel, stream: Int = 0)
     private def randDisteLabels (ch: Array [SET [Int]], eLabels: Int): Map [(Int, Int), TLabel] =
     {
         val elab = Map [(Int, Int), TLabel] ()
-
 
         setVariate (eLabels)                                                                // set rlg
         typeSelector match {
@@ -474,7 +472,7 @@ object MGraphGen
     def extractSubgraph [TLabel: ClassTag] (size: Int, g: MGraph [TLabel], inverse: Boolean = false, 
                                             name: String = "g", stream: Int = 0): MGraph [TLabel] =
     {
-        val maxRestarts = 5000
+        val maxRestarts = 1000
         var nRestarts   = 0
         var chMap: Map [Int, SET [Int]] = null
         var nodes = SET [Int] ()                                    // current set of extracted vertices

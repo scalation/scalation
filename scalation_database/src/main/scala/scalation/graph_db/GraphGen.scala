@@ -220,7 +220,7 @@ class GraphGen [TLabel: ClassTag] (typeSelector: TLabel, stream: Int = 0)
     def genBFSQuery (size: Int, avDegree: Int, g: Graph [TLabel], inverse: Boolean = false,
                      name: String = "g"): Graph [TLabel] =
     {
-        val maxRestarts = 5000                                            // limit on retries
+        val maxRestarts = 10                                              // limit on retries
         val nedges      = avDegree * size                                 // desired number of edges
 
         var nRestarts   = 0                                               // restarts so far
@@ -251,8 +251,10 @@ class GraphGen [TLabel: ClassTag] (typeSelector: TLabel, stream: Int = 0)
                 val v = q.dequeue                                         // candidate vertex v
                 val v_chs = g.ch(v)                                       // all its children
                 degree = 1 + rng.igen1 (avDegree * 2)                     // desired out-degree
-                val chs   = pickChildren (v, v_chs.toArray, degree)       // pick random subset of v's children
-                val chs2  = SET [Int] ()                                  // those making the cut
+                if (DEBUG) println (s"genBFSquery: v = $v, v_ch = $v_chs, degree = $degree")
+                val chs  = pickChildren (v, v_chs.toArray, degree)        // pick random subset of v's children
+                if (DEBUG) println (s"genBFSquery: pickChildren chs = $chs")
+                val chs2 = SET [Int] ()                                   // those making the cut
 
                 for (v_ch <- chs) {                                       // chs2: appropriate vertices from chs
                     degree = 1 + rng.igen1 (avDegree * 2)
@@ -268,16 +270,16 @@ class GraphGen [TLabel: ClassTag] (typeSelector: TLabel, stream: Int = 0)
                             chs2 += v_ch
                             edges += 1
                         } else {
-                           println ("genBFSquery: can't find enough child vertices for $v")
+                            if (DEBUG) println (s"genBFSquery: can't find enough child vertices for $v")
                         } // if
                     } // if
                 } // for
 
-                println (s"nodes = $nodes")
+                if (DEBUG) println (s"genBFSquery: nodes = $nodes")
                 chMap += (v -> (chMap.getOrElse (v, SET [Int] ()) ++ chs2))
             } // while
 
-            println (s"chMap = $chMap")
+            if (DEBUG) println (s"genBFSQuery: chMap = $chMap")
 
             if (edges > maxEdges) {                                       // if most edges so far, save as best
                 maxEdges = edges
@@ -313,7 +315,6 @@ class GraphGen [TLabel: ClassTag] (typeSelector: TLabel, stream: Int = 0)
      */
     private def pickChildren (v: Int, v_ch: Array [Int], degree: Int): SET [Int] =
     {
-        println (s"pickChildren: v = $v, v_ch = ${v_ch.deep}, degree = $degree")
         val chs = SET [Int] ()                                       // set of children to be formed
         var it  = 0                                                  // iteration counter
         do {
@@ -322,10 +323,8 @@ class GraphGen [TLabel: ClassTag] (typeSelector: TLabel, stream: Int = 0)
             it += 1
             if (it > 100 * degree) { println ("pickChildren: can't find enough children"); return SET [Int] () }
         } while (chs.size < degree)
-        println (s"pickChildren: chs = $chs")
         chs
     } // pickChildren
-
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return an array with labels distributed between 1 and 'nLabels'.
@@ -445,7 +444,7 @@ object GraphGen
     def extractSubgraph [TLabel: ClassTag] (size: Int, g: Graph [TLabel], inverse: Boolean = false, 
                                             name: String = "g", stream: Int = 0): Graph [TLabel] =
     {
-        val maxRestarts = 5000
+        val maxRestarts = 10
         var nRestarts   = 0
         var chMap: Map [Int, SET [Int]] = null
         var nodes = SET [Int] ()                                    // current set of extracted vertices
@@ -636,9 +635,9 @@ object GraphGenTest5 extends App
 
     banner ("GraphGenTest5: test genRandomConnectedGraph")
     val nVertices = 100
-    val nLabels   =    10
-    val avDegree  =    5     
-    var g = gGen.genRandomConnectedGraph (nVertices, nLabels, avDegree)
+    val nLabels   =  10
+    val avDegree  =   5     
+    val g = gGen.genRandomConnectedGraph (nVertices, nLabels, avDegree)
     println ("done generating data graph")
     println (GraphMetrics.stats (g))
 
@@ -691,7 +690,7 @@ object GraphGenTest7 extends App
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `GraphGenTest8` object is used to test the `MGraphGen` companion object
+/** The `GraphGenTest8` object is used to test the `GraphGen` companion object
  *  for generating both data and query graphs.
  *  > run-main scalation.graph_db.GraphGenTest8
  */
@@ -702,7 +701,7 @@ object GraphGenTest8 extends App
      g.printG ()
      println (GraphMetrics.stats (g))
      banner ("query graph")
-     val q = GraphGen.extractSubgraph(5, g)
+     val q = GraphGen.extractSubgraph (5, g)
      q.printG ()
      println (GraphMetrics.stats (q))
 

@@ -11,13 +11,14 @@ package pattern_matching
 package test
 
 import scalation.graph_db.{ExampleMGraphS => EX_GRAPH}
+import scalation.util.banner
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `GraphTestPattern_S` object is used to test all the Graph Simulation pattern
+/** The `GraphPattern_STest` object is used to test all the Graph Simulation pattern
  *  matchers for labels of type `String`.
- *  > run-main scalation.graph_db.pattern_matching.test.GraphTestPattern_S
+ *  > runMain scalation.graph_db.pattern_matching.test.GraphPattern_STest
  */
-object GraphTestPattern_S extends App
+object GraphPattern_STest extends App
 {
     val g2  = EX_GRAPH.g2p
     val q2  = EX_GRAPH.q2p
@@ -29,14 +30,13 @@ object GraphTestPattern_S extends App
     val q4w = EX_GRAPH.q4wp                                     // query graph with wildcards
     val q4x = EX_GRAPH.q4xp                                     // query graph with regex
 
-
     println (s"g2.checkEdges = ${g2.checkEdges}")
     q4w.printG ()
     q4x.printG ()
     println (s"q2.checkEdges = ${q2.checkEdges}")
     g4.printG ()
 
-    //Answers.convert (new MGraphSim (g4, q4).test ("MGraphSim", Answers_g2.phi5W))           // MDual Simulation W on q4W Wildcards
+    // Answers.convert (new MGraphSim (g4, q4).test ("MGraphSim", Answers_g2.phi5W))    // MGraph Simulation W on q4W Wildcards
 
     // Graph Simulation Pattern Matcher
 
@@ -66,5 +66,45 @@ object GraphTestPattern_S extends App
     (new MGraphSim2X (g3, q3)).test ("MGraphSim2X", Answers_g3.phi3)      // MGraph Simulation 2 Rx on q5 Regex
     (new MGraphSimCAR (g3, q3)).test ("MGraphSimCAR", Answers_g3.phi4)    // MGraph Simulation CAR
 
-} // GraphTestPattern_S object
+} // GraphPattern_STest object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphPattern_STest2` object is used to test all the Graph Simulation pattern
+ *  matchers for labels of type `String` for randomly generated graphs.
+ *  > runMain scalation.graph_db.pattern_matching.test.GraphPattern_STest2
+ */
+object GraphPattern_STest2 extends App
+{
+    val gSize   = 200                                                   // number of vertices in g
+    val gLabels = 10                                                    // number of labels in g
+    val gDegree = 20                                                    // average out-degree for g
+    val qSize   = 10                                                    // number of vertices in g
+    val qDegree = 2                                                     // average out-degree for q
+    val inverse = true                                                  // include links to parents
+
+//  val stream  = 11                                                    // random number stream 0 to 999
+    for (stream <- 0 until 5) {
+        val rg = new GraphGen ("0", stream)                             // random graph generator
+        val g  = rg.genRandomConnectedGraph (gSize, gLabels, gDegree)   // data graph g
+        banner ("data graph")
+//      g.printG ()
+        println (GraphMetrics.stats (g))
+
+        val q  = rg.genBFSQuery (qSize, qDegree, g, inverse, "q")       // query graph q
+        banner ("query graph")
+//      q.printG ()
+        println (GraphMetrics.stats (q))
+
+        // Graph Simulation Pattern Matcher
+
+        banner ("GraphSim Test")
+        (new GraphSim (g, q)).test ("GraphSim")                         // Graph Simulation
+        banner ("GraphSim2 Test")
+        (new GraphSim2 (g, q)).test ("GraphSim2")                       // Graph Simulation 2
+        banner ("GraphSimCAR Test")
+        (new GraphSimCAR (g, q)).test ("GraphSimCAR")                   // Graph Simulation CAR
+    } // for
+
+} // GraphPattern_STest2 object
 

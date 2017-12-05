@@ -13,13 +13,13 @@
 # build the scalation_mathstat subproject and copy its jar file to both dependent subprojects
 
 echo ================================= scalation_mathstat ===========================================
-echo // "cd scalation_mathstat; sbt compile package; sbt run-main scalation.GenIndexHtml"
+echo // "cd scalation_mathstat; sbt compile package; sbt runMain scalation.GenIndexHtml"
 echo // "cp target/scala-2.12/scalation_mathstat_2.12-1.4.jar ../scalation_database/lib"
 echo // "cp target/scala-2.12/scalation_mathstat_2.12-1.4.jar ../scalation_modeling/lib"
 echo // "cp target/scala-2.12/scalation_mathstat_2.12-1.4.jar ../scalation_models/lib"
 echo // "sbt clean; sbt doc; cd .."
 
-cd scalation_mathstat; sbt compile package; sbt "run-main scalation.GenIndexHtml"
+cd scalation_mathstat; sbt compile package; sbt "runMain scalation.GenIndexHtml"
 cp target/scala-2.12/scalation_mathstat_2.12-1.4.jar ../scalation_database/lib
 cp target/scala-2.12/scalation_mathstat_2.12-1.4.jar ../scalation_modeling/lib
 cp target/scala-2.12/scalation_mathstat_2.12-1.4.jar ../scalation_models/lib
@@ -29,7 +29,7 @@ sbt clean; sbt doc; cd ..
 # build the scalation_database subproject and copy its jar file to the dependent subproject
 
 echo ================================= scalation_database ===========================================
-echo // "cd scalation_database; sbt compile package
+echo // "cd scalation_database; sbt compile package"
 echo // "cp target/scala-2.12/scalation_database.2.12-1.4.jar ../scalation_modeling/lib"
 echo // "cp target/scala-2.12/scalation_database.2.12-1.4.jar ../scalation_models/lib"
 echo // "sbt clean; sbt doc; cd .."
@@ -43,7 +43,7 @@ sbt clean; sbt doc; cd ..
 # build the scalation_modeling subproject and copy its jar file to the dependent subproject
 
 echo ================================= scalation_modeling ===========================================
-echo // "cd scalation_modeling; sbt compile package
+echo // "cd scalation_modeling; sbt compile package"
 echo // "cp target/scala-2.12/scalation_modeling_2.12-1.4.jar ../scalation_models/lib"
 echo // "sbt clean; sbt doc; cd .."
 
