@@ -67,7 +67,7 @@ class DualSim [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel])
 
 } // DualSim class
 
-import scalation.graph_db.{ExampleGraphD => EX_GRAPH}
+import scalation.graph_db.{ExampleGraphS => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DualSimTest` object is used to test the `DualSim` class.
@@ -183,4 +183,25 @@ object DualSimTest5 extends App
     (new DualSim (g, q)).test ("DualSim")    // Dual Graph Simulation Pattern Matcher
 
 } // DualSimTest5 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `DualSimTest8` object is used to test the `DualSim` class.
+ *  This object tests the data graph g2 and query graph q2.
+ *  > run-main scalation.graph_db.pattern_matching.DualSimTest8
+ *
+object DualSimTest8 extends App
+{
+    val (g, q) = (EX_GRAPH.g5p, EX_GRAPH.q5p)
+
+    println (s"g.checkEdges = ${g.checkEdges}")
+    g.printG ()
+    println (s"q.checkEdges = ${q.checkEdges}")
+    q.printG ()
+
+    banner ("Dual Sim Test Aravind Dual")
+    (new DualSim (g, q)).test ("DualSim")    // Dual Simulation Pattern Matcher
+
+} // DualSimTest8 object
+ */
 

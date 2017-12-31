@@ -92,7 +92,7 @@ class MGraphSimCAR [TLabel: ClassTag] (g: MGraph [TLabel], q: MGraph [TLabel])
 
 } // MGraphSimCAR class
 
-import scalation.graph_db.{ExampleMGraphD => EX_GRAPH}
+import scalation.graph_db.{ExampleMGraphS => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphSimCARTest` object is used to test the `MGraphSimCAR` class.

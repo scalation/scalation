@@ -116,7 +116,7 @@ class MDualSimCAR [TLabel: ClassTag] (g: MGraph [TLabel], q: MGraph [TLabel])
 
 } // MDualSimCAR class
 
-import scalation.graph_db.{ExampleMGraphD => EX_GRAPH}
+import scalation.graph_db.{ExampleMGraphS => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualSimCARTest` object is used to test the `MDualSimCAR` class.

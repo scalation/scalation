@@ -66,7 +66,7 @@ class GraphSimCAR [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel])
 
 } // GraphSimCAR class
 
-import scalation.graph_db.{ExampleGraphD => EX_GRAPH}
+import scalation.graph_db.{ExampleGraphS => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSimCARTest` object is used to test the `GraphSimCAR` class.
@@ -176,4 +176,25 @@ object GraphSimCARTest5 extends App
     (new GraphSimCAR (g, q)).test ("GraphSimCAR")    // Graph Simulation Pattern Matcher
 
 } // GraphSimCARTest5 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphSimCARTest8` object is used to test the `GraphSimCAR` class.
+ *  This object tests the data graph g2 and query graph q2.
+ *  > run-main scalation.graph_db.pattern_matching.GraphSimCARTest8
+ *
+object GraphSimCARTest8 extends App
+{
+    val (g, q) = (EX_GRAPH.g5, EX_GRAPH.q5)
+
+    println (s"g.checkEdges = ${g.checkEdges}")
+    g.printG ()
+    println (s"q.checkEdges = ${q.checkEdges}")
+    q.printG ()
+
+    banner ("Graph SimCAR Test Aravind Graph")
+    (new GraphSimCAR (g, q)).test ("GraphSimCAR")    // Graph SimCARulation Pattern Matcher
+
+} // GraphSimCARTest8 object
+ */
 

@@ -28,7 +28,7 @@ import scalation.util.banner
 class StrictSim [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel], duals: GraphMatcher [TLabel]) 
       extends GraphMatcher [TLabel] (g, q)
 {
-    private val DEBUG     = false                                       // debug  flag
+    private val DEBUG     = false                                       // debug flag
     private val qmet      = new GraphMetrics (q.clone, false)           // creating graph metrics object of query graph
     private val dataSize  = g.size                                      // size of the data graph
     private val querySize = q.size                                      // size of the query graph
@@ -58,7 +58,7 @@ class StrictSim [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel], duals:
         if (phi.size == 0) { println ("No dual match."); return null }  // exit if no match after dual simulation
         if (DEBUG) println (s"phi = ${phi.deep}")
   
-        val newGraph = filterGraph (phi)      
+        val newGraph  = filterGraph (phi)      
         val qDiameter = qmet.diam                                       // get the query diameter
         val balls     = HashMap [Int, Ball [TLabel]] ()                 // map of balls: center -> ball               
         val matches   = HashMap [Int, Array [SET [Int]]] ()             // map of matches in balls: center -> match
@@ -207,7 +207,7 @@ class StrictSim [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel], duals:
 
 } // StrictSim class
 
-import scalation.graph_db.{ExampleGraphD => EX_GRAPH}
+import scalation.graph_db.{ExampleGraphS => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StrictSimTest` object is used to test the `StrictSim` class.

@@ -5,7 +5,7 @@
  *  @date    Wed Jul 31 20:51:48 EDT 2013
  *  @see     LICENSE (MIT style license file).  
  *
- *  > runMain scalation.UpVersionAll
+ *  > runMain scalation.ReplaceAll
  */
 
 package scalation
@@ -16,14 +16,14 @@ import collection.mutable.ArrayBuffer
 import scala.io._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `UpVersion` object is used to update the version number in the source code.
+/** The `Replace` object is used to replace a repeated pattern in the source code.
  *  After running, must restore 'pat1' in this file, since it will get updated.
  */
-object UpVersion
+object Replace
 {
     private val DEBUG      = true                      // debug flag
-    private val pat1       = "@version 1.3"            // pattern to find (change as needed)
-    private val pat2       = "@version 1.4"            // replacement pattern (change as needed)
+    private val pat1       = "> run-main"              // pattern to find (change as needed)
+    private val pat2       = "> runMain"               // replacement pattern (change as needed)
     private val SKIP       = "old"                     // do not process files in this directory
     private val sep        = File.separator            // file separator ('/' for UNIX, '\' for Windows)
     private val SRC_DIR    = "."                       // source directory
@@ -32,7 +32,7 @@ object UpVersion
 //  private val currentDir = SRC_DIR + sep + "main" + sep + "scala"
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Update the version number for the given source (.scala) file.
+    /** Update the pattern in the given source (.scala) file.
      *  @param f   the file to update
      *  @param fn  the file's name
      */
@@ -55,17 +55,17 @@ object UpVersion
     } // update
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Update the version number for all source (.scala) files in current module.
+    /** Update the pattern for all source (.scala) files in current module(s).
      */
     def updateAll ()
     {
-        println (s"Update version number in source code files starting from currentDir = $currentDir")
+        println (s"Update pattern in source code files starting from currentDir = $currentDir")
         println (s"from $pat1 to $pat2")
         updater (new File (currentDir))
     } // updateAll
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Recursively update the version number for each source (.scala) file.
+    /** Recursively update the pattern for each source (.scala) file.
      *  @param f  the root file/directory to examine
      */
     private def updater (f: File)
@@ -83,30 +83,29 @@ object UpVersion
         } catch { case _ : Throwable => }
     } // updater
 
-} // UpVersion object
+} // Replace object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The 'UpVersionFile' object updates the version number of a single source
- *  (.scala) file.
- *  > runMain scalation.UpVersionFile
+/** The `ReplaceFile` object updates the pattern in a single source (.scala) file.
+ *  > runMain scalation.ReplaceFile
  */
-object UpVersionFile extends App
+object ReplaceFile extends App
 {
-    val fn = "Test2.scala"
-    UpVersion.update (new File (fn), fn)
+    val fname = "Test2.scala"
+    Replace.update (new File (fname), fname)
 
-} // UpVersionFile
+} // ReplaceFile object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The 'UpVersionAll' object updates the version number of all source (.scala)
- *  files at or below the 'currentDir' (see 'UpVersion').
- *  > runMain scalation.UpVersionAll
+/** The `ReplaceAll` object updates the pattern in all source (.scala) files
+ *  at or below the 'currentDir'.
+ *  > runMain scalation.ReplaceAll
  */
-object UpVersionAll extends App
+object ReplaceAll extends App
 {
-    UpVersion.updateAll ()
+    Replace.updateAll ()
 
-} // UpVersionAll
+} // ReplaceAll object
 

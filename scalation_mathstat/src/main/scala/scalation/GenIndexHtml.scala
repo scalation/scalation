@@ -15,7 +15,7 @@ import scala.collection.mutable.ArrayBuffer
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GenIndexHtml` object is used to create "index.html" files in source code
  *  directories (main and test) to enable Web browsing of source code.
- *  > run-main scalation.GenIndexHtml
+ *  > runMain scalation.GenIndexHtml
  */
 object GenIndexHtml extends App
 {

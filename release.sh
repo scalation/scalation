@@ -10,7 +10,7 @@
 #     scalation_models   dependes on: scalation_mathstat; scalation_database; scalation_modeling
 
 #####################################################################################################
-# build the scalation_mathstat subproject and copy its jar file to both dependent subprojects
+# build the scalation_mathstat subproject and copy its jar file to all dependent subprojects
 
 echo ================================= scalation_mathstat ===========================================
 echo // "cd scalation_mathstat; sbt compile package; sbt runMain scalation.GenIndexHtml"
@@ -26,7 +26,7 @@ cp target/scala-2.12/scalation_mathstat_2.12-1.4.jar ../scalation_models/lib
 sbt clean; sbt doc; cd ..
 
 #####################################################################################################
-# build the scalation_database subproject and copy its jar file to the dependent subproject
+# build the scalation_database subproject and copy its jar file to all dependent subprojects
 
 echo ================================= scalation_database ===========================================
 echo // "cd scalation_database; sbt compile package"

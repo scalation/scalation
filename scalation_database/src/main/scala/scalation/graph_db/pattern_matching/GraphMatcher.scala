@@ -51,7 +51,7 @@ object LabelVer extends Enumeration
        (labelVer, edgeLabelX)    
     } // version
 
-} // LabelVersion
+} // LabelVer object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -62,6 +62,7 @@ object LabelVer extends Enumeration
  */
 abstract class GraphMatcher [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel])
 {
+    private   val DEBUG      = false              // debug flag
     protected val qRange     = 0 until q.size     // range for query graph vertices
     protected val gRange     = 0 until g.size     // range for data graph vertices
     protected val CHECK      = 1024               // check progress after this many matches

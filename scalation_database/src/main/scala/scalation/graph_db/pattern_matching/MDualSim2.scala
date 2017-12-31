@@ -74,7 +74,7 @@ class MDualSim2 [TLabel: ClassTag] (g: MGraph [TLabel], q: MGraph [TLabel])
 
 } // MDualSim2 class
 
-import scalation.graph_db.{ExampleMGraphD => EX_GRAPH}
+import scalation.graph_db.{ExampleMGraphS => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualSim2Test` object is used to test the `MDualSim2` class.

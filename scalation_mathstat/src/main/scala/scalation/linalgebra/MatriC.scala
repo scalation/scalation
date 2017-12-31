@@ -683,7 +683,7 @@ trait MatriC
     def sumAbs: Complex
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the column means of this matrix.
+    /** Compute the column means of 'this' matrix.
      */
     def mean: VectoC =
     {
@@ -693,10 +693,41 @@ trait MatriC
     } // mean
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the column means of 'this' matrix ignoring zero elements (e.g.,
+     *  a zero may indicate a missing value as in recommender systems).
+     */
+    def meanNZ: VectoC =
+    {
+        var cm = this(0).zero (dim2)
+        for (j <- range2) cm(j) = col (j).sum / (dim1.toComplex - col (j).countZero)
+        cm
+    } // meanNZ
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the 1-norm of 'this' matrix, i.e., the maximum 1-norm of the
      *  column vectors.  This is useful for comparing matrices '(a - b).norm1'.
+     *  @see en.wikipedia.org/wiki/Matrix_norm
      */
     def norm1: Complex = (for (j <- range2) yield col(j).norm1).max
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the (infinity) INF-norm of 'this' matrix, i.e., the maximum 1-norm
+     *  of the row vectors.
+     *  @see en.wikipedia.org/wiki/Matrix_norm
+     */
+    def normINF: Complex = (for (i <- range1) yield this(i).norm1).max
+
+     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     /** Compute the Frobenius-norm of 'this' matrix, i.e., the sum of the
+      *  absolute values squared of all the elements.
+      *  @see en.wikipedia.org/wiki/Matrix_norm#Frobenius_norm
+      */
+     def normF: Complex =
+     {
+         var sum = _0
+         for (i <- range1) sum += this(i).normSq
+         sqrt (sum).toComplex
+     } // normF
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the determinant of 'this' matrix.

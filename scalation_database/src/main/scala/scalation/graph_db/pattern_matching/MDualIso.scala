@@ -13,7 +13,7 @@ import scala.collection.mutable.Map
 import scala.collection.mutable.{Set => SET}
 import scala.reflect.ClassTag
 
-import scalation.graph_db.{ExampleMGraphD => EX_GRAPH}
+import scalation.graph_db.{ExampleMGraphS => EX_GRAPH}
 import scalation.util.time
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

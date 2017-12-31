@@ -72,7 +72,7 @@ class MGraphSim2 [TLabel: ClassTag] (g: MGraph [TLabel], q: MGraph [TLabel])
 
 } // MGraphSim2 class
 
-import scalation.graph_db.{ExampleMGraphD => EX_GRAPH}
+import scalation.graph_db.{ExampleMGraphS => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphSim2Test` object is used to test the `MGraphSim2` class.

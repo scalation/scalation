@@ -1907,14 +1907,18 @@ object MatrixLTest extends App
                                   5, 6,
                                   7, 8)
 
-    println ("aa        = " + aa)
-    println ("bb        = " + bb)
-    println ("aa * bb   = " + aa * bb)
-    println ("aa dot bz = " + (aa dot bz))
-    println ("aa.t * bz = " + aa.t * bz)
+    println ("aa         = " + aa)
+    println ("bb         = " + bb)
+    println ("aa * bb    = " + aa * bb)
+    println ("aa dot bz  = " + (aa dot bz))
+    println ("aa.t * bz  = " + aa.t * bz)
 
-    println ("aa dot cc   = " + (aa dot cc))
-    println ("aa.t * cc   = " + aa.t * cc)
+    println ("aa dot cc  = " + (aa dot cc))
+    println ("aa.t * cc  = " + aa.t * cc)
+
+    println ("aa.norm1   = " + aa.norm1)
+    println ("aa.normINF = " + aa.normINF)
+    println ("aa.normF   = " + aa.normF)
 
     aa *= bb
     println ("aa *= bb  = " + aa)

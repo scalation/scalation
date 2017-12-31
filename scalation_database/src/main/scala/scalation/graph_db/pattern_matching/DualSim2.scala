@@ -43,17 +43,23 @@ class DualSim2 [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel])
             for (u <- qRange; u_c <- q.ch(u)) {                   // for each u in q and its children u_c
                 if (DEBUG) { println (s"for u = $u, u_c = $u_c"); showMappings (phi) }
                 val newPhi = SET [Int] ()                         // subset of phi(u_c) having a parent in phi(u)
+                val v_rem   = SET [Int] ()                        // vertices to be removed
 
                 for (v <- phi(u)) {                               // for each v in g image of u
                     val phiInt = g.ch(v) & phi(u_c)               // children of v contained in phi(u_c)
                     if (phiInt.isEmpty) {
-                        phi(u) -= v                               // remove vertex v from phi(u)
-                        if (phi(u).isEmpty) return phi            // no match for vertex u => no overall match
+                        v_rem += v                                // add v to removal set
                         alter = true
+                        if (phi(u).isEmpty) return phi            // no match for vertex u => no overall match
                     } // if
                     // build newPhi to contain only those vertices in phi(u_c) which also have a parent in phi(u)
                     newPhi ++= phiInt
                 } // for
+
+                if (! v_rem.isEmpty) {
+                    phi(u) --= v_rem                          // remove vertices in v_rem from phi(u)
+                    if (phi(u).isEmpty) return phi            // no match for vertex u => no overall match
+                } // if
 
                 if (newPhi.isEmpty) return phi                    // empty newPhi => no match
                 if (newPhi.size < phi(u_c).size) alter = true     // since newPhi is smaller than phi(u_c)

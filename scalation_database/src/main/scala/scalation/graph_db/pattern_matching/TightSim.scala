@@ -208,7 +208,7 @@ class TightSim [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel], duals: 
 
 } // TightSim class
 
-import scalation.graph_db.{ExampleGraphD => EX_GRAPH}
+import scalation.graph_db.{ExampleGraphS => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TightSimTest` object is used to test the `TightSim` class.

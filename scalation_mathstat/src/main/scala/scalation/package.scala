@@ -98,7 +98,7 @@ package scalation
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The `scalationTest` object is used test the `scalation` package object.
-     *  > run-main scalation.scalationTest
+     *  > runMain scalation.scalationTest
      */
     object scalationTest extends App
     {

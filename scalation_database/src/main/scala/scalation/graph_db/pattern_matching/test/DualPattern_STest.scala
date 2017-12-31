@@ -10,6 +10,7 @@ package scalation.graph_db
 package pattern_matching
 package test
 
+import scalation.graphalytics.{DualSim => ImDualSim, DualSim2 => ImDualSim2}
 import scalation.graph_db.{ExampleMGraphS => EX_GRAPH}
 import scalation.util.banner
 
@@ -74,35 +75,79 @@ object DualPattern_STest extends App
  */
 object DualPattern_STest2 extends App
 {
-    val gSize   = 200                                                   // number of vertices in g
-    val gLabels = 10                                                    // number of labels in g
-    val gDegree = 20                                                    // average out-degree for g
-    val qSize   = 10                                                    // number of vertices in g
-    val qDegree = 2                                                     // average out-degree for q
-    val inverse = true                                                  // include links to parents
+    val UNIFORM = true                                                      // uniform vs. power law
+    val gLabels = 10                                                        // number of labels in g
+    val gDegree = 20                                                        // average out-degree for g
+    val qSize   = 10                                                        // number of vertices in g
+    val qDegree = 2                                                         // average out-degree for q
+    val inverse = true                                                      // include links to parents
 
-//  val stream  = 11                                                    // random number stream 0 to 999
-    for (stream <- 0 until 5) {
-        val rg = new GraphGen ("0", stream)                             // random graph generator
-        val g  = rg.genRandomConnectedGraph (gSize, gLabels, gDegree)   // data graph g 
-        banner ("data graph")
-//      g.printG ()
-        println (GraphMetrics.stats (g))
+    for (gSize <- 1000 to 5000 by 1000) {                                   // number of vertices in g
 
-        val q  = rg.genBFSQuery (qSize, qDegree, g, inverse, "q")       // query graph q
-        banner ("query graph")
-//      q.printG ()
-        println (GraphMetrics.stats (q))
+//      val stream  = 11                                                    // random number stream 0 to 999
+        for (stream <- 0 until 5) {
+            val rg = new GraphGen ("0", stream)                             // random graph generator
+            val g  = if (UNIFORM) rg.genRandomConnectedGraph (gSize, gLabels, gDegree)
+                     else rg.genPowerLawGraph (gSize, gLabels, gDegree)     // data graph g
+            banner ("data graph")
+//          g.printG ()
+            println (GraphMetrics.stats (g))
 
-        // Dual Simulation Pattern Matcher
+            val q  = rg.genBFSQuery (qSize, qDegree, g, inverse, "q")       // query graph q
+            banner ("query graph")
+            q.printG ()
+            println (GraphMetrics.stats (q))
 
-        banner ("DualSim Test")
-        (new DualSim (g, q)).test ("DualSim")                           // Dual Simulation
-        banner ("DualSim2 Test")
-        (new DualSim2 (g, q)).test ("DualSim2")                         // Dual Simulation 2
-        banner ("DualSimCAR Test")
-        (new DualSimCAR (g, q)).test ("DualSimCAR")                     // Dual Simulation CAR
+            // Dual Simulation Pattern Matcher
+
+            (new DualSim (g, q)).test ("DualSim")                           // Dual Simulation
+            (new DualSim2 (g, q)).test ("DualSim2")                         // Dual Simulation 2
+            (new DualSimCAR (g, q)).test ("DualSimCAR")                     // Dual Simulation CAR
+        } // for
     } // for
 
 } // DualPattern_STest2 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `DualPattern_STest3` object is used to test all the Dual Simulation pattern
+ *  matchers for labels of type `String` for randomly generated graphs.
+ *  > runMain scalation.graph_db.pattern_matching.test.DualPattern_STest3
+ */
+object DualPattern_STest3 extends App
+{
+    val UNIFORM = true                                                      // uniform vs. power law
+    val gLabels = 10                                                        // number of labels in g
+    val gDegree = 20                                                        // average out-degree for g
+    val qSize   = 10                                                        // number of vertices in g
+    val qDegree = 2                                                         // average out-degree for q
+    val inverse = true                                                      // include links to parents
+
+    for (gSize <- 1000 to 5000 by 1000) {                                   // number of vertices in g
+
+//      val stream  = 11                                                    // random number stream 0 to 999
+        for (stream <- 0 until 5) {
+            val rg = new GraphGen ("0", stream)                             // random graph generator
+            val g  = if (UNIFORM) rg.genRandomConnectedGraph (gSize, gLabels, gDegree)
+                     else rg.genPowerLawGraph (gSize, gLabels, gDegree)     // data graph g
+            banner ("data graph")
+//          g.printG ()
+            println (GraphMetrics.stats (g))
+
+            val q  = rg.genBFSQuery (qSize, qDegree, g, inverse, "q")       // query graph q
+            banner ("query graph")
+            q.printG ()
+            println (GraphMetrics.stats (q))
+
+            val gSIM = g.toGraphIm ("gSIM")
+            val qSIM = q.toGraphIm ("gSIM")
+
+            // Immutable Dual Simulation Pattern Matcher
+
+            (new ImDualSim (gSIM, qSIM)).test ("DualSim")                   // Dual Simulation
+            (new ImDualSim2 (gSIM, qSIM)).test ("DualSim2")                 // Dual Simulation 2
+        } // for
+    } // for
+
+} // DualPattern_STest3 object
 

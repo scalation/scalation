@@ -16,7 +16,7 @@ import scala.io.Source
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GenReadmeHtml` object is used to create the html tables for the api and
  *  src directories for convenient Web browsing.
- *  > run-main scalation.GenReadmeHtml
+ *  > runmain scalation.GenReadmeHtml
  */
 object GenReadmeHtml extends App
 {
@@ -133,15 +133,15 @@ $$ tar xvfz scalation_$scalationVer.tar.gz <br> <b>OR</b> <br>
 $$ unzip scalation_$scalationVer.zip
 </code></pre>
 
-<h4>3. To compile code or run apps, enter sbt and type compile, run-main or exit </h4>
+<h4>3. To compile code or run apps, enter sbt and type compile, runMain or exit </h4>
 
 <pre><code>
 $$ cd scalation_$scalationVer <br>
 $$ cd scalation_models <br>
 $$ sbt <br>
 > compile <br>
-> run-main apps.process.Bank <br>
-> run-main scalation.analytics.RegressionTest <br>
+> runMain apps.process.Bank <br>
+> runMain scalation.analytics.RegressionTest <br>
 > exit
 </code></pre>
 
@@ -251,8 +251,8 @@ $$ sbt <br>
 > compile <br>
 > package <br>
 > test <br>
-> run-main scalation.util.RunSpellCheck 'package-directory' <br>
-> run-main scalation.GenIndexHtml <br>
+> runMain scalation.util.RunSpellCheck 'package-directory' <br>
+> runMain scalation.GenIndexHtml <br>
 > clean <br>
 > doc <br>
 > exit

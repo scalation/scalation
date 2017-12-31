@@ -88,7 +88,7 @@ class DualSimCAR [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel])
 
 } // DualSimCAR class
 
-import scalation.graph_db.{ExampleGraphD => EX_GRAPH}
+import scalation.graph_db.{ExampleGraphS => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DualSimCARTest` object is used to test the `DualSimCAR` class.
@@ -204,4 +204,25 @@ object DualSimCARTest5 extends App
     (new DualSimCAR (g, q)).test ("DualSimCAR")    // Dual Graph Simulation Pattern Matcher
 
 } // DualSimCARTest5 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `DualSimCARTest8` object is used to test the `DualSimCAR` class.
+ *  This object tests the data graph g2 and query graph q2.
+ *  > run-main scalation.graph_db.pattern_matching.DualSimCARTest8
+ *
+object DualSimCARTest8 extends App
+{
+    val (g, q) = (EX_GRAPH.g5p, EX_GRAPH.q5p)
+
+    println (s"g.checkEdges = ${g.checkEdges}")
+    g.printG ()
+    println (s"q.checkEdges = ${q.checkEdges}")
+    q.printG ()
+
+    banner ("Dual SimCAR Test Aravind Dual")
+    (new DualSimCAR (g, q)).test ("DualSimCAR")    // Dual SimCARulation Pattern Matcher
+
+} // DualSimCARTest8 object
+ */
 

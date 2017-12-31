@@ -6,18 +6,20 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.util
+package scalation
 
 import scala.io.StdIn.readLine
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Replace` object is used to replace pattern pat1 with pat2.  It reads from
+/** The `ReplaceOne` object is used to replace pattern pat1 with pat2.  It reads from
  *  standard input and writes to standard output.
  */
-object Replace extends App
+object ReplaceOne extends App
 {
-    private val pat1 = " ::"     // pattern to find (change as needed)
-    private val pat2 = " *"      // replacement pattern (change as needed)
+//  private val pat1 = " ::"            // pattern to find (change as needed)
+//  private val pat2 = " *"             // replacement pattern (change as needed)
+    private val pat1 = "> run-main"     // pattern to find (change as needed)
+    private val pat2 = "> runMain"      // replacement pattern (change as needed)
     private var line = ""
 
     do {
@@ -25,5 +27,5 @@ object Replace extends App
         if (line != null) println (line.replace (pat1, pat2))
     } while (line != null)
 
-} // Replace object
+} // ReplaceOne object
 

@@ -57,7 +57,7 @@ class GraphSim [TLabel: ClassTag] (g: Graph [TLabel], q: Graph [TLabel])
 
 } // GraphSim class
 
-import scalation.graph_db.{ExampleGraphD => EX_GRAPH}
+import scalation.graph_db.{ExampleGraphS => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSimTest` object is used to test the `GraphSim` class.
@@ -167,4 +167,25 @@ object GraphSimTest5 extends App
     (new GraphSim (g, q)).test ("GraphSim")    // Graph Simulation Pattern Matcher
 
 } // GraphSimTest5 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphSimTest8` object is used to test the `GraphSim` class.
+ *  This object tests the data graph g2 and query graph q2.
+ *  > run-main scalation.graph_db.pattern_matching.GraphSimTest8
+ *
+object GraphSimTest8 extends App
+{
+    val (g, q) = (EX_GRAPH.g5, EX_GRAPH.q5)
+
+    println (s"g.checkEdges = ${g.checkEdges}")
+    g.printG ()
+    println (s"q.checkEdges = ${q.checkEdges}")
+    q.printG ()
+
+    banner ("Graph Sim Test Aravind Graph")
+    (new GraphSim (g, q)).test ("GraphSim")    // Graph Simulation Pattern Matcher
+
+} // GraphSimTest8 object
+ */
 

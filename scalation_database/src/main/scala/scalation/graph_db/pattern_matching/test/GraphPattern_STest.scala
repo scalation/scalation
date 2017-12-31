@@ -10,6 +10,7 @@ package scalation.graph_db
 package pattern_matching
 package test
 
+import scalation.graphalytics.{GraphSim => ImGraphSim, GraphSim2 => ImGraphSim2}
 import scalation.graph_db.{ExampleMGraphS => EX_GRAPH}
 import scalation.util.banner
 
@@ -76,35 +77,79 @@ object GraphPattern_STest extends App
  */
 object GraphPattern_STest2 extends App
 {
-    val gSize   = 200                                                   // number of vertices in g
-    val gLabels = 10                                                    // number of labels in g
-    val gDegree = 20                                                    // average out-degree for g
-    val qSize   = 10                                                    // number of vertices in g
-    val qDegree = 2                                                     // average out-degree for q
-    val inverse = true                                                  // include links to parents
+    val UNIFORM = true                                                      // uniform vs. power law
+    val gLabels = 10                                                        // number of labels in g
+    val gDegree = 20                                                        // average out-degree for g
+    val qSize   = 10                                                        // number of vertices in g
+    val qDegree = 2                                                         // average out-degree for q
+    val inverse = true                                                      // include links to parents
 
-//  val stream  = 11                                                    // random number stream 0 to 999
-    for (stream <- 0 until 5) {
-        val rg = new GraphGen ("0", stream)                             // random graph generator
-        val g  = rg.genRandomConnectedGraph (gSize, gLabels, gDegree)   // data graph g
-        banner ("data graph")
-//      g.printG ()
-        println (GraphMetrics.stats (g))
+    for (gSize <- 1000 to 5000 by 1000) {                                   // number of vertices in g
 
-        val q  = rg.genBFSQuery (qSize, qDegree, g, inverse, "q")       // query graph q
-        banner ("query graph")
-//      q.printG ()
-        println (GraphMetrics.stats (q))
+//      val stream  = 11                                                    // random number stream 0 to 999
+        for (stream <- 0 until 5) {
+            val rg = new GraphGen ("0", stream)                             // random graph generator
+            val g  = if (UNIFORM) rg.genRandomConnectedGraph (gSize, gLabels, gDegree)
+                     else rg.genPowerLawGraph (gSize, gLabels, gDegree)     // data graph g
+            banner ("data graph")
+//          g.printG ()
+            println (GraphMetrics.stats (g))
 
-        // Graph Simulation Pattern Matcher
+            val q  = rg.genBFSQuery (qSize, qDegree, g, inverse, "q")       // query graph q
+            banner ("query graph")
+            q.printG ()
+            println (GraphMetrics.stats (q))
 
-        banner ("GraphSim Test")
-        (new GraphSim (g, q)).test ("GraphSim")                         // Graph Simulation
-        banner ("GraphSim2 Test")
-        (new GraphSim2 (g, q)).test ("GraphSim2")                       // Graph Simulation 2
-        banner ("GraphSimCAR Test")
-        (new GraphSimCAR (g, q)).test ("GraphSimCAR")                   // Graph Simulation CAR
+            // Graph Simulation Pattern Matcher
+
+            (new GraphSim (g, q)).test ("GraphSim")                         // Graph Simulation
+            (new GraphSim2 (g, q)).test ("GraphSim2")                       // Graph Simulation 2
+            (new GraphSimCAR (g, q)).test ("GraphSimCAR")                   // Graph Simulation CAR
+        } // for
     } // for
 
 } // GraphPattern_STest2 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphPattern_STest3` object is used to test all the Graph Simulation pattern
+ *  matchers for labels of type `String` for randomly generated graphs.
+ *  > runMain scalation.graph_db.pattern_matching.test.GraphPattern_STest3
+ */
+object GraphPattern_STest3 extends App
+{
+    val UNIFORM = true                                                      // uniform vs. power law
+    val gLabels = 10                                                        // number of labels in g
+    val gDegree = 20                                                        // average out-degree for g
+    val qSize   = 10                                                        // number of vertices in g
+    val qDegree = 2                                                         // average out-degree for q
+    val inverse = true                                                      // include links to parents
+
+    for (gSize <- 1000 to 5000 by 1000) {                                   // number of vertices in g
+
+//      val stream  = 11                                                    // random number stream 0 to 999
+        for (stream <- 0 until 5) {
+            val rg = new GraphGen ("0", stream)                             // random graph generator
+            val g  = if (UNIFORM) rg.genRandomConnectedGraph (gSize, gLabels, gDegree)
+                     else rg.genPowerLawGraph (gSize, gLabels, gDegree)     // data graph g
+            banner ("data graph")
+//          g.printG ()
+            println (GraphMetrics.stats (g))
+
+            val q  = rg.genBFSQuery (qSize, qDegree, g, inverse, "q")       // query graph q
+            banner ("query graph")
+            q.printG ()
+            println (GraphMetrics.stats (q))
+
+            val gSIM = g.toGraphIm ("gSIM")
+            val qSIM = q.toGraphIm ("gSIM")
+
+            // Immutable Graph Simulation Pattern Matcher
+
+            (new ImGraphSim (gSIM, qSIM)).test ("GraphSim")                   // Graph Simulation
+            (new ImGraphSim2 (gSIM, qSIM)).test ("GraphSim2")                 // Graph Simulation 2
+        } // for
+    } // for
+
+} // GraphPattern_STest3 object
 

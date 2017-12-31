@@ -39,7 +39,7 @@ class Sorting [T <% Ordered[T]] (a: Array [T])
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the 'k'-median of the 'p' to 'r' partition of array 'a' using
      *  the `QuickSelect` algorithm.
-     *  @see http://en.wikipedia.org/wiki/Quickselect
+     *  @see en.wikipedia.org/wiki/Quickselect
      *  @param p  the left cursor
      *  @param r  the right cursor
      *  @param k  the type of median (k-th smallest element)
@@ -100,8 +100,8 @@ class Sorting [T <% Ordered[T]] (a: Array [T])
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Sort the 'p' to 'r' partition of array 'a' using `SelectionSort`.
-     *  @param p  the left cursor
-     *  @param r  the right cursor
+     *  @param p    the left cursor
+     *  @param r    the right cursor
      */
     def selsort (p: Int, r: Int)
     {
@@ -116,6 +116,23 @@ class Sorting [T <% Ordered[T]] (a: Array [T])
     /** Sort array 'a' using `SelectionSort`.
      */
     def selsort () { selsort (0, n-1) }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Partially sort array 'a' using `SelectionSort` returning the first/smallest
+     *  'k' elements.  Can be used for top-k or bottom-k selection.
+     *  @param k    the number of elements to sort and return
+     *  @param asc  whether to sort in ascending (true) or descending (false) order
+     */
+    def selsort (k: Int, asc: Boolean = true): Array [T] =
+    { 
+        for (i <- 0 until k) {
+            var l = i
+            if (asc) for (j <- i+1 until n if a(j) < a(l)) l = j
+            else     for (j <- i+1 until n if a(j) > a(l)) l = j
+            if (i != l) swap (i, l)
+        } // for
+        a.slice (0, k)
+    } // selsort
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     // Indirect Median and Sorting
@@ -221,6 +238,24 @@ class Sorting [T <% Ordered[T]] (a: Array [T])
     } // iselsort
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Partially, indirectly sort array 'a' using `SelectionSort` returning the
+     *  first/smallest 'k' elements.  Can be used for top-k or bottom-k selection.
+     *  @param k    the number of elements to sort and return
+     *  @param asc  whether to sort in ascending (true) or descending (false) order
+     */
+    def iselsort (k: Int, asc: Boolean = true): Array [Int] =
+    {
+        val rk = Array.range (0, n)                // rank order
+        for (i <- 0 until k) {
+            var l = i
+            if (asc) for (j <- i+1 until n if a(rk(j)) < a(rk(l))) l = j
+            else     for (j <- i+1 until n if a(rk(j)) > a(rk(l))) l = j
+            if (i != l) swap (rk, i, l)
+        } // for
+        rk.slice (0, k)                            // return rank
+    } // iselsort
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether the array 'a' is sorted.
      */
     def isSorted: Boolean =
@@ -304,6 +339,7 @@ object Sorting
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SortingTest` object is used to test the correctness and performance
  *  of the methods in the `Sorting` class that find 'k'-medians.
+ *  > runMain scalation.util.SortingTest
  */
 object SortingTest extends App
 {
@@ -357,12 +393,13 @@ object SortingTest extends App
         println ("median = " + md)
     } // for
 
-} // SortingTest
+} // SortingTest object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SortingTest2` object is used to test the correctness and performance
  *  of the sorting methods in the `Sorting` class.
+ *  > runMain scalation.util.SortingTest2
  */
 object SortingTest2 extends App
 {
@@ -418,5 +455,35 @@ object SortingTest2 extends App
         println ("isSorted = " + isrt.isSorted (rk))
     } // for
 
-} // SortingTest2
+} // SortingTest2 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SortingTest3` object is used to test the correctness of top-k and
+ *  bottom-k algorithms that are based on partial selection sort.
+ *  > runMain scalation.util.SortingTest3
+ */
+object SortingTest3 extends App
+{
+    // test top-k and bottom-k using selection sort
+    val k   = 3
+
+    println ("--------------------------------------------------------------")
+    val a1   = Array (9.0, 1.0, 8.0, 2.0, 7.0, 3.0, 6.0, 4.0, 5.0)
+    println ("Test direct: a1 = " + a1.deep)
+    val srt1 = new Sorting (a1)
+    val b1   = srt1.selsort (k)
+    println (s"selesort ($k) = ${b1.deep}")                   // bottom-k
+
+    val a2   = Array (9.0, 1.0, 8.0, 2.0, 7.0, 3.0, 6.0, 4.0, 5.0)
+    val srt2 = new Sorting (a2)
+    val b2   = srt2.selsort (k, false)
+    println (s"selesort ($k, false) = ${b2.deep}")            // top-k
+
+    val a3   = Array (9.0, 1.0, 8.0, 2.0, 7.0, 3.0, 6.0, 4.0, 5.0)
+    val srt3 = new Sorting (a3)
+    val b3   = srt3.iselsort (k, false)
+    println (s"iselesort ($k, false) = ${b3.deep}")            // indirect top-k
+
+} // SortingTest3 object
 
