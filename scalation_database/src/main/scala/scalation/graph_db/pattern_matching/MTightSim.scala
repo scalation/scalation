@@ -213,7 +213,7 @@ import scalation.graph_db.{ExampleMGraphS => EX_GRAPH}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MTightSimTest` object is used to test the `MTightSim` class.
  *  This object tests the data graph g1 and query graph q1.
- *  > run-main scalation.graph_db.pattern_matching.MTightSimTest
+ *  > runMain scalation.graph_db.pattern_matching.MTightSimTest
  */
 object MTightSimTest extends App
 {
@@ -238,7 +238,7 @@ object MTightSimTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MTightSimTest2` object is used to test the `MTightSim` class.
  *  This object tests the data graph g2 and query graph q2.
- *  > run-main scalation.graph_db.pattern_matching.MTightSimTest2
+ *  > runMain scalation.graph_db.pattern_matching.MTightSimTest2
  */
 object MTightSimTest2 extends App
 {
@@ -263,7 +263,7 @@ object MTightSimTest2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MTightSimTest3` object is used to test the `MTightSim` class.
  *  This object tests the data graph g3 and query graph q3.
- *  > run-main scalation.graph_db.pattern_matching.MTightSimTest3
+ *  > runMain scalation.graph_db.pattern_matching.MTightSimTest3
  */
 object MTightSimTest3 extends App
 {
@@ -288,7 +288,7 @@ object MTightSimTest3 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MTightSimTest4` object is used to test the `MTightSim` class.
  *  This object tests randomly (uniform) generated graphs.
- *  > run-main scalation.graph_db.pattern_matching.MTightSimTest4
+ *  > runMain scalation.graph_db.pattern_matching.MTightSimTest4
  */
 object MTightSimTest4 extends App
 {
@@ -320,7 +320,7 @@ object MTightSimTest4 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MTightSimTest5` object is used to test the `MTightSim` class.
  *  This object tests randomly (PowerLaw) generated graphs.
- *  > run-main scalation.graph_db.pattern_matching.MTightSimTest5
+ *  > runMain scalation.graph_db.pattern_matching.MTightSimTest5
  */
 object MTightSimTest5 extends App
 {
@@ -352,7 +352,7 @@ object MTightSimTest5 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MTightSimTest6` object is used to test the `MTightSim` class.
  *  This object tests graphs read from files.
- *  > run-main scalation.graph_db.pattern_matching.MTightSimTest6
+ *  > runMain scalation.graph_db.pattern_matching.MTightSimTest6
  */
 object MTightSimTest6 extends App
 {

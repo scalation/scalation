@@ -325,7 +325,7 @@ class Eigenvector (a: MatrixD, _e: VectorD = null)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `EigenTest` object is used to test the all the classes used in computing
  *  Eigenvalues and Eigenvectors for the non-symmetric/general case.
- *  > run-main scalation.linalgebra.EigenTest
+ *  > runMain scalation.linalgebra.EigenTest
  */
 object EigenTest extends App
 {

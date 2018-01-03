@@ -203,7 +203,7 @@ object Regression_WLS
  *  <p>
  *  Test regression and backward elimination.
  *  @see statmaster.sdu.dk/courses/st111/module03/index.html
- *  > run-main scalation.analytics.Regression_WLSTest
+ *  > runMain scalation.analytics.Regression_WLSTest
  */
 object Regression_WLSTest extends App
 {

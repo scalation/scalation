@@ -138,7 +138,7 @@ object SSShortestPath
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SSShortestPathTest` object is used to test the `SSShortestPath` class.
  *  Input is in the form of matrices (`MatrixD` or `SparseMatrixD`).
- *  > run-main scalation.graph_db.SSShortestPathTest
+ *  > runMain scalation.graph_db.SSShortestPathTest
  */
 object SSShortestPathTest extends App
 {
@@ -167,7 +167,7 @@ object SSShortestPathTest extends App
 /** The `SSShortestPathTest2` object is used to test the `SSShortestPath` class.
  *  Input is in the form of graphs (`MGraph`).
  *  @see http://thescipub.com/PDF/jcssp.2013.377.382.pdf (Fig. 1)
- *  > run-main scalation.graph_db.SSShortestPathTest2
+ *  > runMain scalation.graph_db.SSShortestPathTest2
  */
 object SSShortestPathTest2 extends App
 {
@@ -203,7 +203,7 @@ object SSShortestPathTest2 extends App
  *  Input is in the form of graphs (`MGraph`).  This test case requires
  *  `Tlabel` to be `VectorD`.  Should be commented out otherwise.
  *  @see thescipub.com/PDF/jcssp.2013.377.382.pdf (Fig. 1)
- *  > run-main scalation.graph_db.SSShortestPathTest3
+ *  > runMain scalation.graph_db.SSShortestPathTest3
  */
 //object SSShortestPathTest3 extends App
 //{

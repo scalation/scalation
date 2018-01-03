@@ -60,7 +60,7 @@ class NewtonRaphson (g: FunctionS2S, root: FunctionSelector = FiniteDifference)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NewtonRaphsonTest` object is used to test the `NewtonRaphson` class.
- *  > run-main scalation.minima.NewtonRaphsonTest
+ *  > runMain scalation.minima.NewtonRaphsonTest
  */
 object NewtonRaphsonTest extends App
 {

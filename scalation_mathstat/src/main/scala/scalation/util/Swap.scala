@@ -42,7 +42,7 @@ import Swap.swap
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This `SwapTest` is used to test the `Swap` object.
-    > run-main scalation.util.SwapTest
+    > runMain scalation.util.SwapTest
  */
 object SwapTest extends App
 {

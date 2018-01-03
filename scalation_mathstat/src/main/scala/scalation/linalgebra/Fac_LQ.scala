@@ -57,7 +57,7 @@ class Fac_LQ (aa: MatriD)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Fac_LQTest` object is used to test the `Fac_LQ` class.
- *  > run-main scalation.linalgebra.Fac_LQTest
+ *  > runMain scalation.linalgebra.Fac_LQTest
  */
 object Fac_LQTest extends App
 {

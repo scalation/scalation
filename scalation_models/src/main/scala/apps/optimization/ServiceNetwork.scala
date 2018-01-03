@@ -60,7 +60,7 @@ class ServiceNetwork (dimensions: Array [Int], maxIn: Int, maxOut: Int,
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ServiceNetworkTest` object is used to the run the `ServiceNetwork` example.
- *  > run-main apps.optimization.ServiceNetworkTest
+ *  > runMain apps.optimization.ServiceNetworkTest
  */
 object ServiceNetworkTest extends App
 {

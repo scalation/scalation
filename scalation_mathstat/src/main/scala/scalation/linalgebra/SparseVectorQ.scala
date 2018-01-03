@@ -1032,7 +1032,7 @@ object SparseVectorQ
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SparseVectorDTest` object tests the operations provided by `SparseVectorQ`.
- *  > run-main scalation.linalgebra.SparseVectorDTest
+ *  > runMain scalation.linalgebra.SparseVectorDTest
  */
 object SparseVectorQTest extends App
 {   
@@ -1083,7 +1083,7 @@ object SparseVectorQTest extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SparseVectorDTest2` object tests the dot product operation provided by `SparseVectorQ`.
- *  > run-main scalation.linalgebra.SparseVectorDTest2
+ *  > runMain scalation.linalgebra.SparseVectorDTest2
  */
 object SparseVectorQTest2 extends App
 {

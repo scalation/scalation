@@ -138,7 +138,7 @@ class ConjugateGradient (f: FunctionV2S, g: FunctionV2S = null,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ConjugateGradientTest` object is used to test the `ConjugateGradient` class.
- *  > run-main scalation.minima.ConjugateGradientTest
+ *  > runMain scalation.minima.ConjugateGradientTest
  */
 object ConjugateGradientTest extends App
 {

@@ -33,7 +33,7 @@ class DynBayesNetwork
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DynBayesNetworkTest` object is used to test the `DynBayesNetwork` class.
- *  > run-main scalation.analytics.classifier.DynBayesNetworkTest
+ *  > runMain scalation.analytics.classifier.DynBayesNetworkTest
  */
 object DynBayesNetworkTest extends App
 {

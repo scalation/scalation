@@ -194,7 +194,7 @@ class Model (name: String, animating: Boolean = false)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ModelTest` object is used to test the `Model` class.
- *  > run-main scalation.event.ModelTest
+ *  > runMain scalation.event.ModelTest
  */
 object ModelTest extends App
 {

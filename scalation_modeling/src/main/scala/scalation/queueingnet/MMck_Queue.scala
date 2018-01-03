@@ -120,7 +120,7 @@ class MMck_Queue (lambda: Double, mu: Double, c: Int = 1, k: Int = 1)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MMck_QueueTest` object is used to test the `MMck_Queue` class.
- *  > run-main scalation.queueingnet.MMck_QueueTest
+ *  > runMain scalation.queueingnet.MMck_QueueTest
  */
 object MMck_QueueTest extends App
 {

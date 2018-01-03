@@ -17,7 +17,7 @@ import scalation.linalgebra.MatrixD
  *  Note, each diagonal value must make their row sum to 0.
  *  @see scalation.state.MarkovTest, scalation.state.MarkovCTest for example
  *  test code for discrete-time and continuous-time Markov chains, respectively.
- *  > run-main apps.state.MarkovQueue
+ *  > runMain apps.state.MarkovQueue
  */
 object MarkovQueue extends App
 {

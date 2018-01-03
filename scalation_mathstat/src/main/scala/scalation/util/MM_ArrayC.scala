@@ -201,7 +201,7 @@ object MM_ArrayC
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MM_ArrayCTest` is used to test the `MM_ArrayC` class.
- *  > run-main scalation.util.MM_ArrayCTest
+ *  > runMain scalation.util.MM_ArrayCTest
  */
 object MM_ArrayCTest extends App
 {

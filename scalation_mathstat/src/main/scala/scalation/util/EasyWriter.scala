@@ -80,7 +80,7 @@ class EasyWriter (project: String, filename: String, private var toFile: Boolean
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `EasyWriterTest` object is used to test the `EasyWriter` class.
  *  It will write into a file, unless there is a command-line argument.
- *  > run-main scalation.util.EasyWriterTest
+ *  > runMain scalation.util.EasyWriterTest
  */
 object EasyWriterTest extends App
 {

@@ -15,7 +15,7 @@ import scalation.random.{Exponential, Uniform, Variate}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Machine` object defines a particular scenario under which to execute the
  *  machine model.
- *  > run-main apps.process.Machine
+ *  > runMain apps.process.Machine
  */
 object Machine extends App with Modelable
 {

@@ -91,7 +91,7 @@ import scalation.graph_db.{ExampleMGraphS => EX_GRAPH}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualSimWTest` object is used to test the `MDualSimW` class.
  *  This object tests the data graph g1 and query graph q1.
- *  > run-main scalation.graph_db.pattern_matching.MDualSimWTest
+ *  > runMain scalation.graph_db.pattern_matching.MDualSimWTest
  */
 object MDualSimWTest extends App
 {
@@ -110,7 +110,7 @@ object MDualSimWTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualSimWTest2` object is used to test the `MDualSimW` class.
  *  This object tests the data graph g2 and query graph q2.
- *  > run-main scalation.graph_db.pattern_matching.MDualSimWTest2
+ *  > runMain scalation.graph_db.pattern_matching.MDualSimWTest2
  */
 object MDualSimWTest2 extends App
 {
@@ -129,7 +129,7 @@ object MDualSimWTest2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualSimWTest3` object is used to test the `MDualSimW` class.
  *  This object tests the data graph g3 and query graph q3.
- *  > run-main scalation.graph_db.pattern_matching.MDualSimWTest3
+ *  > runMain scalation.graph_db.pattern_matching.MDualSimWTest3
  */
 object MDualSimWTest3 extends App
 {
@@ -148,7 +148,7 @@ object MDualSimWTest3 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualSimWTest4` object is used to test the `MDualSimW` class.
  *  This object tests randomly (uniform) generated graphs.
- *  > run-main scalation.graph_db.pattern_matching.MDualSimWTest4
+ *  > runMain scalation.graph_db.pattern_matching.MDualSimWTest4
  */
 object MDualSimWTest4 extends App
 {
@@ -174,7 +174,7 @@ object MDualSimWTest4 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualSimWTest5` object is used to test the `MDualSimW` class.
  *  This object tests randomly (PowerLaw) generated graphs.
- *  > run-main scalation.graph_db.pattern_matching.MDualSimWTest5
+ *  > runMain scalation.graph_db.pattern_matching.MDualSimWTest5
  */
 object MDualSimWTest5 extends App
 {
@@ -200,7 +200,7 @@ object MDualSimWTest5 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualSimWTest6` object is used to test the `MDualSimW` class.
  *  This object tests graphs read from files.
- *  > run-main scalation.graph_db.pattern_matching.MDualSimWTest6
+ *  > runMain scalation.graph_db.pattern_matching.MDualSimWTest6
  */
 object MDualSimWTest6 extends App
 {

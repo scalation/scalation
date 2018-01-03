@@ -193,7 +193,7 @@ class GoodnessOfFit_CS (d: VectorD, dmin: Double, dmax: Double, intervals: Int =
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GoodnessOfFit_CSTest` object is used to test the `GoodnessOfFit_CS` class.
  *  @see www.seattlecentral.edu/qelp/sets/057/057.html
- *  > run-main scalation.stat.GoodnessOfFit_CSTest
+ *  > runMain scalation.stat.GoodnessOfFit_CSTest
  */
 object GoodnessOfFit_CSTest extends App
 {

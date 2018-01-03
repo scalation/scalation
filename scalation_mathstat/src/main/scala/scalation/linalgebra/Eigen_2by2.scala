@@ -52,7 +52,7 @@ object Eigen_2by2 extends Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Eigen_2by2Test` is used to test the `Eigen_2by2` object.
- *  > run-main scalation.linalgebra.Eigen_2by2Test
+ *  > runMain scalation.linalgebra.Eigen_2by2Test
  */
 object Eigen_2by2Test extends App
 {

@@ -195,7 +195,7 @@ class GaussianFunc (a: Double, b: Double, c: Double)
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `IntegralTest2` object tests the numerical integrators on simple problems.
  *  Easy problems.
- *  > run-main scalation.calculus.IntegralTest
+ *  > runMain scalation.calculus.IntegralTest
  */
 object IntegralTest extends App
 {
@@ -223,7 +223,7 @@ object IntegralTest extends App
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `IntegralTest2` object tests the numerical integrators using the Gauss
  *  function that has no analytic solution.  Hard problem.
- *  > run-main scalation.calculus.IntegralTest2
+ *  > runMain scalation.calculus.IntegralTest2
  */
 object IntegralTest2 extends App
 {

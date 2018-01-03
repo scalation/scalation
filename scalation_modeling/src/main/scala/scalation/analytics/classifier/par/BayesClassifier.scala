@@ -319,7 +319,7 @@ import BayesClassifier.{me_default, test}
 /** The `BayesClassifierTest` object is used to test the `BayesClassifier` class.
  *  Classify whether a car is more likely to be stolen (1) or not (1).
  *  @see www.inf.u-szeged.hu/~ormandi/ai2/06-naiveBayes-example.pdf
- *  > run-main scalation.analytics.classifier.par.BayesClassifierTest
+ *  > runMain scalation.analytics.classifier.par.BayesClassifierTest
  */
 object BayesClassifierTest extends App
 {
@@ -375,7 +375,7 @@ object BayesClassifierTest extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BayesClassifierTest2` object is used to test the `BayesClassifier` class.
- *  > run-main scalation.analytics.classifier.par.BayesClassifierTest2
+ *  > runMain scalation.analytics.classifier.par.BayesClassifierTest2
  */
 object BayesClassifierTest2 extends App
 {
@@ -419,7 +419,7 @@ object BayesClassifierTest2 extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BayesClassifierTest3` object is used to test the `BayesClassifier` class.
- *  > run-main scalation.analytics.classifier.par.BayesClassifierTest3
+ *  > runMain scalation.analytics.classifier.par.BayesClassifierTest3
  */
 object BayesClassifierTest3 extends App
 {
@@ -459,7 +459,7 @@ object BayesClassifierTest3 extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BayesClassifierTest4` object is used to test the `BayesClassifier` class.
- *  > run-main scalation.analytics.classifier.par.BayesClassifierTest4
+ *  > runMain scalation.analytics.classifier.par.BayesClassifierTest4
  */
 object BayesClassifierTest4 extends App {
     val filename = BASE_DIR + "adult.txt"
@@ -498,7 +498,7 @@ object BayesClassifierTest4 extends App {
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BayesClassifierTest5` object is used to test the `BayesClassifier` class.
- *  > run-main scalation.analytics.classifier.par.BayesClassifierTest5
+ *  > runMain scalation.analytics.classifier.par.BayesClassifierTest5
  */
 object BayesClassifierTest5 extends App
 {
@@ -539,7 +539,7 @@ object BayesClassifierTest5 extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BayesClassifierTest6` object is used to test the `BayesClassifier` class.
- *  > run-main scalation.analytics.classifier.par.BayesClassifierTest6
+ *  > runMain scalation.analytics.classifier.par.BayesClassifierTest6
  */
 object BayesClassifierTest6 extends App
 {
@@ -579,7 +579,7 @@ object BayesClassifierTest6 extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BayesClassifierTest7` object is used to test the `BayesClassifier` class.
- *  > run-main scalation.analytics.classifier.par.BayesClassifierTest7
+ *  > runMain scalation.analytics.classifier.par.BayesClassifierTest7
  */
 object BayesClassifierTest7 extends App
 {
@@ -619,7 +619,7 @@ object BayesClassifierTest7 extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BayesClassifierTest8` object is used to test the `BayesClassifier` class.
- *  > run-main scalation.analytics.classifier.par.BayesClassifierTest8
+ *  > runMain scalation.analytics.classifier.par.BayesClassifierTest8
  */
 object BayesClassifierTest8 extends App
 {
@@ -659,7 +659,7 @@ object BayesClassifierTest8 extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BayesClassifierTest9` object is used to test the `BayesClassifier` class.
- *  > run-main scalation.analytics.classifier.par.BayesClassifierTest9
+ *  > runMain scalation.analytics.classifier.par.BayesClassifierTest9
  */
 object BayesClassifierTest9 extends App
 {
@@ -699,7 +699,7 @@ object BayesClassifierTest9 extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BayesClassifierTest10` object is used to test the `BayesClassifier` class.
- *  > run-main scalation.analytics.classifier.par.BayesClassifierTest10
+ *  > runMain scalation.analytics.classifier.par.BayesClassifierTest10
  */
 object BayesClassifierTest10 extends App
 {
@@ -739,7 +739,7 @@ object BayesClassifierTest10 extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BayesClassifierTest11` object is used to test the `BayesClassifier` class.
- *  > run-main scalation.analytics.classifier.par.BayesClassifierTest11
+ *  > runMain scalation.analytics.classifier.par.BayesClassifierTest11
  */
 object BayesClassifierTest11 extends App
 {

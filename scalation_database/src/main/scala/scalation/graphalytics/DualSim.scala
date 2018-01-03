@@ -61,7 +61,7 @@ class DualSim (g: Graph, q: Graph)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DualSimTest` object is used to test the `DualSim` class.
- *  > run-main scalation.graphalytics.DualSimTest
+ *  > runMain scalation.graphalytics.DualSimTest
  */
 object DualSimTest extends App
 {
@@ -80,7 +80,7 @@ object DualSimTest extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DualSimTest2` object is used to test the `DualSim` class.
- *  > run-main scalation.graphalytics.DualSimTest2
+ *  > runMain scalation.graphalytics.DualSimTest2
  */
 object DualSimTest2 extends App
 {
@@ -100,7 +100,7 @@ object DualSimTest2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DualSimTest3` object is used to test the `DualSim` class.  Read the
  *  query graph 'q' and data graph 'g' from files.
- *  > run-main scalation.graphalytics.DualSimTest3
+ *  > runMain scalation.graphalytics.DualSimTest3
  */
 object DualSimTest3 extends App
 {

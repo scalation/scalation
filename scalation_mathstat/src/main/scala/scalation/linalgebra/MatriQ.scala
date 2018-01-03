@@ -687,7 +687,7 @@ trait MatriQ
      */
     def mean: VectoQ =
     {
-        var cm = this(0).zero (dim2)
+        val cm = this(0).zero (dim2)
         for (j <- range2) cm(j) = col (j).sum / dim1.toRational
         cm
     } // mean
@@ -698,10 +698,37 @@ trait MatriQ
      */
     def meanNZ: VectoQ =
     {
-        var cm = this(0).zero (dim2)
-        for (j <- range2) cm(j) = col (j).sum / (dim1.toRational - col (j).countZero)
+        val cm = this(0).zero (dim2)
+        for (j <- range2) {
+            val nzs = dim1 - col (j).countZero
+            cm(j) = if (nzs > 0) col (j).sum / nzs.toRational else _0
+        } // for
         cm
     } // meanNZ
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the row means of 'this' matrix.
+     */
+    def meanR: VectoQ =
+    {
+        val rm = this(0).zero (dim1)
+        for (i <- range1) rm(i) = this(i).sum / dim2.toRational
+        rm
+    } // meanR
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the row means of 'this' matrix ignoring zero elements (e.g.,
+     *  a zero may indicate a missing value as in recommender systems).
+     */
+    def meanRNZ: VectoQ =
+    {
+        val rm = this(0).zero (dim1)
+        for (i <- range1) {
+            val nzs = dim2 - this(i).countZero
+            rm(i) = if (nzs > 0) this(i).sum / nzs.toRational else _0
+        } // for
+        rm
+    } // meanRNZ
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the 1-norm of 'this' matrix, i.e., the maximum 1-norm of the

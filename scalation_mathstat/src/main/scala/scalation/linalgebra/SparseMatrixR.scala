@@ -1603,7 +1603,7 @@ class SparseMatrixR (val d1: Int,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SparseMatrixRTest` object is used to test the `SparseMatrixR` class.
- *  > run-main scalation.linalgebra.SparseMatrixRTest
+ *  > runMain scalation.linalgebra.SparseMatrixRTest
  */
 object SparseMatrixRTest extends App
 {

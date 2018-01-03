@@ -124,7 +124,7 @@ object Query
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `QueryTest` object is used to test the `Query` class.  It converts
  *  a sequence of triples into a graph.
- *  > run-main scalation.graph_db.pattern_matching.QueryTest
+ *  > runMain scalation.graph_db.pattern_matching.QueryTest
  */
 object QueryTest extends App
 {
@@ -143,7 +143,7 @@ object QueryTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `QueryTest2` object is used to test the `Query` class.  It checks if
  *  variables or wildcards exist in a triple's labels.
- *  > run-main scalation.graph_db.pattern_matching.QueryTest2
+ *  > runMain scalation.graph_db.pattern_matching.QueryTest2
  */
 object QueryTest2 extends App
 {
@@ -168,7 +168,7 @@ object QueryTest2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `QueryTest3` object is used to test the `Query` class.  It converts
  *  a sequence of triples into a graph.
- *  > run-main scalation.graph_db.pattern_matching.QueryTest3
+ *  > runMain scalation.graph_db.pattern_matching.QueryTest3
  */
 object QueryTest3 extends App
 {

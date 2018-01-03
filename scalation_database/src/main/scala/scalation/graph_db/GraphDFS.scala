@@ -154,7 +154,7 @@ class GraphDFS [TLabel] (g: Graph [TLabel], bfs: Boolean = false)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphDFSTest` is used to test the `GraphDFS` class.
- *  > run-main scalation.graphalytics.mutable.GraphDFSTest
+ *  > runMain scalation.graphalytics.mutable.GraphDFSTest
  */
 object GraphDFSTest extends App
 {

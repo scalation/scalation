@@ -253,7 +253,7 @@ class StrictSim2 (g: Graph, q: Graph)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: ::::::::::::
 /** The `StrictSim2Test` object is used to test the `StrictSim2` class.
- *  > run-main scalation.graphalytics.StrictSim2Test
+ *  > runMain scalation.graphalytics.StrictSim2Test
  */
 object StrictSim2Test extends App 
 {
@@ -272,7 +272,7 @@ object StrictSim2Test extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: ::::::::::::
 /** The `StrictSim2Test2` object is used to test the `StrictSim2` class.
- *  > run-main scalation.graphalytics.StrictSimTest2
+ *  > runMain scalation.graphalytics.StrictSimTest2
  */
 object StrictSim2Test2 extends App 
 {
@@ -292,7 +292,7 @@ object StrictSim2Test2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StrictSim2Test3` object test the `StrictSim2` class by passing data graph
  *  and query graph relative file paths.
- *  > run-main scalation.graphalytics.StrictSim2Test3
+ *  > runMain scalation.graphalytics.StrictSim2Test3
  */
 object StrictSim2Test3 extends App 
 {

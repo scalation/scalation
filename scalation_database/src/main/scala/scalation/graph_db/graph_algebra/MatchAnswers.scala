@@ -92,7 +92,7 @@ object MatchAnswers
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MatchAnswersTest` object is used to test the `MatchAnswers` object.
- *  > run-main scalation.graphalytics.multi.MatchAnswersTest
+ *  > runMain scalation.graphalytics.multi.MatchAnswersTest
  */
 object MatchAnswersTest extends App
 {

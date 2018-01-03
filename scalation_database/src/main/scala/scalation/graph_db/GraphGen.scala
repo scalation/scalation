@@ -521,7 +521,7 @@ object GraphGen
 /** The `GraphGenTest` object is used to test the `GraphGen` class for building
  *  random graphs where a vertex's degree is uniformly distributed.
  *  This work build graphs with `Int` vertex labels.
- *  > run-main scalation.graph_db.GraphGenTest
+ *  > runMain scalation.graph_db.GraphGenTest
  */
 object GraphGenTest extends App
 {
@@ -549,7 +549,7 @@ object GraphGenTest extends App
 /** The `GraphGenTest2` object is used to test the `GraphGen` class for building
  *  random graphs where a vertex's degree is uniformly distributed.
  *  This work build graphs with `Double` vertex labels.
- *  > run-main scalation.graph_db.GraphGenTest2
+ *  > runMain scalation.graph_db.GraphGenTest2
  */
 object GraphGenTest2 extends App
 {
@@ -577,7 +577,7 @@ object GraphGenTest2 extends App
 /** The `GraphGenTest3` object is used to test the `GraphGen` class for building
  *  random graphs where a vertex's degree is uniformly distributed.
  *  This work build graphs with `String` vertex labels.
- *  > run-main scalation.graph_db.GraphGenTest3
+ *  > runMain scalation.graph_db.GraphGenTest3
  */
 object GraphGenTest3 extends App
 {
@@ -604,7 +604,7 @@ object GraphGenTest3 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphGenTest4` object is used to test the `GraphGen` class for building
  *  power law graphs.
- *  > run-main scalation.graph_db.GraphGenTest4
+ *  > runMain scalation.graph_db.GraphGenTest4
  */
 object GraphGenTest4 extends App
 {
@@ -627,7 +627,7 @@ object GraphGenTest4 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphGenTest5` object is used to test the `GraphGen` class for extracting
  *  query graphs from data graphs (note: data graph should be connected).
- *  > run-main scalation.graph_db.GraphGenTest5
+ *  > runMain scalation.graph_db.GraphGenTest5
  */
 object GraphGenTest5 extends App
 {
@@ -655,7 +655,7 @@ object GraphGenTest5 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphGenTest6` object is used to test the `GraphGen` companion object
  *  for generating both data and query graphs.
- *  > run-main scalation.graph_db.GraphGenTest6
+ *  > runMain scalation.graph_db.GraphGenTest6
  */
 object GraphGenTest6 extends App
 {
@@ -675,7 +675,7 @@ object GraphGenTest6 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphGenTest7` object is used to test the `GraphGen` companion object
  *  for generating data graphs.
- *  > run-main scalation.graph_db.GraphGenTest7
+ *  > runMain scalation.graph_db.GraphGenTest7
  */
 object GraphGenTest7 extends App
 {
@@ -692,7 +692,7 @@ object GraphGenTest7 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphGenTest8` object is used to test the `GraphGen` companion object
  *  for generating both data and query graphs.
- *  > run-main scalation.graph_db.GraphGenTest8
+ *  > runMain scalation.graph_db.GraphGenTest8
  */
 object GraphGenTest8 extends App
 {

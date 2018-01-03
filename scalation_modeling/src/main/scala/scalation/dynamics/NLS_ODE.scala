@@ -117,7 +117,7 @@ class NLS_ODE (z: VectorD, ts: VectorD, b_init: VectorD, private var w: VectorD 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VectorDTest` object tests the operations provided by `VectorD`.
- *  > run-main scalation.dynamics.NLS_ODETest
+ *  > runMain scalation.dynamics.NLS_ODETest
  */
 object NLS_ODETest extends App
 {

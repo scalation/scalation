@@ -24,7 +24,7 @@ import scalation.plot.Plot
  *  FIX - make a Scala DSL for readble system of Ordinary Differential Equations (ODEs)
  *  FIX - extend to Differential Algebraic Equations (DAEs)
  *  @see www.math.ucdavis.edu/~tracy/courses/math22B/22BBook.pdf
- *  > run-main apps.analytics.Pendulum
+ *  > runMain apps.analytics.Pendulum
  */
 object Pendulum extends App
 {

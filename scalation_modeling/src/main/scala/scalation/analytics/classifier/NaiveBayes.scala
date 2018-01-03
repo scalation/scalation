@@ -293,7 +293,7 @@ object NaiveBayes
 /** The `NaiveBayesTest` object is used to test the `NaiveBayes` class.
  *  Classify whether a car is more likely to be stolen (1) or not (1).
  *  @see www.inf.u-szeged.hu/~ormandi/ai2/06-naiveBayes-example.pdf
- *  > run-main scalation.analytics.classifier.NaiveBayesTest
+ *  > runMain scalation.analytics.classifier.NaiveBayesTest
  */
 object NaiveBayesTest extends App
 {
@@ -341,7 +341,7 @@ object NaiveBayesTest extends App
 /** The `NaiveBayesTest2` object is used to test the 'NaiveBayes' class.
  *  Given whether a person is Fast and/or Strong, classify them as making C = 1
  *  or not making C = 0 the football team.
- *  > run-main scalation.analytics.classifier.NaiveBayesTest2
+ *  > runMain scalation.analytics.classifier.NaiveBayesTest2
  */
 object NaiveBayesTest2 extends App
 {
@@ -387,7 +387,7 @@ object NaiveBayesTest2 extends App
 /** The `NaiveBayesTest3` object is used to test the 'NaiveBayes' class.
  *  @see archive.ics.uci.edu/ml/datasets/Lenses
  *  @see docs.roguewave.com/imsl/java/7.3/manual/api/com/imsl/datamining/NaiveBayesClassifierEx2.html
- *  > run-main scalation.analytics.classifier.NaiveBayesTest3
+ *  > runMain scalation.analytics.classifier.NaiveBayesTest3
  */
 object NaiveBayesTest3 extends App
 {
@@ -451,7 +451,7 @@ object NaiveBayesTest3 extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NaiveBayesTest4` object is used to test the 'NaiveBayes' class.
- *  > run-main scalation.analytics.classifier.NaiveBayesTest4
+ *  > runMain scalation.analytics.classifier.NaiveBayesTest4
  */
 object NaiveBayesTest4 extends App
 {
@@ -496,7 +496,7 @@ object NaiveBayesTest4 extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NaiveBayesTest5` object is used to test the 'NaiveBayes' class.
- *  > run-main scalation.analytics.classifier.NaiveBayesTest5
+ *  > runMain scalation.analytics.classifier.NaiveBayesTest5
  */
 object NaiveBayesTest5 extends App
 {

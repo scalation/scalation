@@ -332,7 +332,7 @@ class Tree (val root: TreeNode, depth: Double, val name: String = "tree")
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TreeTest` object is used to test the `Tree` class by randomly building
  *  a tree.
- *  > run-main scalation.graphalytics.TreeTest
+ *  > runMain scalation.graphalytics.TreeTest
  */
 object TreeTest extends App
 {
@@ -350,7 +350,7 @@ object TreeTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TreeTest2` object is used to test the `Tree` class by manually building
  *  a tree.
- *  > run-main scalation.graphalytics.TreeTest2
+ *  > runMain scalation.graphalytics.TreeTest2
  */
 object TreeTest2 extends App
 {
@@ -378,7 +378,7 @@ object TreeTest2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TreeTest3` object is used to test the `Tree` class by manually building
  *  a tree.
- *  > run-main scalation.graphalytics.TreeTest3
+ *  > runMain scalation.graphalytics.TreeTest3
  */
 object TreeTest3 extends App
 {
@@ -404,7 +404,7 @@ object TreeTest3 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TreeTest4` object is used to test the `Tree` class by manually building
  *  a tree.  No animation.
- *  > run-main scalation.graphalytics.TreeTest4
+ *  > runMain scalation.graphalytics.TreeTest4
  */
 object TreeTest4 extends App
 {

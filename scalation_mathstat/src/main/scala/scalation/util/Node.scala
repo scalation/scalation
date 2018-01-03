@@ -120,7 +120,7 @@ class Node [K <% Ordered [K]: ClassTag] (val isLeaf: Boolean = true, val half: I
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NodeTest` object is used to test the `Node` class.
- *  > run-main scalation.util.NodeTest
+ *  > runMain scalation.util.NodeTest
  */
 object NodeTest extends App
 {

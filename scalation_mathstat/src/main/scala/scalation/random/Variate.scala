@@ -1452,7 +1452,7 @@ case class Weibull (alpha: Double = 1.0, beta: Double = 2.0, stream: Int = 0)
 /** The `VariateTest` object conducts two simple tests of the Random Variate
  *  Generators: (1) Means Test and (2) Chi-square Goodness of Fit Test.
  *  FIX: need to add (3) Variance Test and (4) K-S Goodness of Fit Test.
- *  > run-main scalation.random.VariateTest
+ *  > runMain scalation.random.VariateTest
  */
 object VariateTest extends App
 {

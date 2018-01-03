@@ -135,7 +135,7 @@ class BoundedTreeWidthBN (g_in: MGraph [Double], kMax: Int)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BoundedTreeWidthBNTest` is used to test the `BoundedTreeWidthBN` class.
- *  > run-main scalation.graph_db.BoundedTreeWidthBNTest
+ *  > runMain scalation.graph_db.BoundedTreeWidthBNTest
  */
 object BoundedTreeWidthBNTest extends App
 {

@@ -250,7 +250,7 @@ class PatMatcherB (var regex: String)
 /** The `PatMatcherTest` object is used to test the `PatMatcher` vs. `PatMatcherB` classes.
  *  It compares the match results and performance of Java and Brics regex pattern matchers.
  *  @see http://lh3lh3.users.sourceforge.net/reb.shtml
- *  > run-main scalation.util.PatMatcherTest
+ *  > runMain scalation.util.PatMatcherTest
  */
 object PatMatcherTest extends App
 {
@@ -316,7 +316,7 @@ object PatMatcherTest extends App
 /** The `PatMatcherTest` object is used to test the `PatMatcher` vs. `PatMatcherB` classes.
  *  It compares the match results and performance of Java and Brics regex pattern matchers.
  *  @see http://lh3lh3.users.sourceforge.net/reb.shtml
- *  > run-main scalation.util.PatMatcherTest2
+ *  > runMain scalation.util.PatMatcherTest2
  *
 object PatMatcherTest2 extends App
 {

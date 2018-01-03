@@ -69,7 +69,7 @@ import scalation.graph_db.{ExampleGraphD => EX_GRAPH}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSim2Test` object is used to test the `GraphSim2` class.
  *  This object tests the data graph g1 and query graph q1.
- *  > run-main scalation.graph_db.pattern_matching.GraphSim2Test
+ *  > runMain scalation.graph_db.pattern_matching.GraphSim2Test
  */
 object GraphSim2Test extends App
 {
@@ -88,7 +88,7 @@ object GraphSim2Test extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSim2Test2` object is used to test the `GraphSim2` class.
  *  This object tests the data graph g2 and query graph q2.
- *  > run-main scalation.graph_db.pattern_matching.GraphSim2Test2
+ *  > runMain scalation.graph_db.pattern_matching.GraphSim2Test2
  */
 object GraphSim2Test2 extends App
 {
@@ -107,7 +107,7 @@ object GraphSim2Test2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSim2Test3` object is used to test the `GraphSim2` class.
  *  This object tests randomly (uniform) generated graphs.
- *  > run-main scalation.graph_db.pattern_matching.GraphSim2Test3
+ *  > runMain scalation.graph_db.pattern_matching.GraphSim2Test3
  */
 object GraphSim2Test3 extends App
 {
@@ -131,7 +131,7 @@ object GraphSim2Test3 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSim2Test4` object is used to test the `GraphSim2` class.
  *  This object tests randomly (PowerLaw) generated graphs.
- *  > run-main scalation.graph_db.pattern_matching.GraphSim2Test4
+ *  > runMain scalation.graph_db.pattern_matching.GraphSim2Test4
  */
 object GraphSim2Test4 extends App
 {
@@ -155,7 +155,7 @@ object GraphSim2Test4 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSim2Test5` object is used to test the `GraphSim2` class.
  *  This object tests graphs read from files.
- *  > run-main scalation.graph_db.pattern_matching.GraphSim2Test5
+ *  > runMain scalation.graph_db.pattern_matching.GraphSim2Test5
  */
 object GraphSim2Test5 extends App
 {

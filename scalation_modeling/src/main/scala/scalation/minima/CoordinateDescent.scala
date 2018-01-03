@@ -93,7 +93,7 @@ class CoordinateDescent (f: FunctionV2S, exactLS: Boolean = true)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CoordinateDescentTest` object is used to test the `CoordinateDescent` class.
- *  > run-main scalation.minima.CoordinateDescentTest
+ *  > runMain scalation.minima.CoordinateDescentTest
  */
 object CoordinateDescentTest extends App
 {

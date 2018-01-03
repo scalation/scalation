@@ -19,7 +19,7 @@ import scalation.stat.Statistic
 /** The `Bank` object defines a particular scenario under which to execute the
  *  Bank model.
  *  @see scalation.event.ModelTest for another example of test code.
- *  > run-main apps.event.Bank
+ *  > runMain apps.event.Bank
  */
 object Bank extends App with Modelable
 {

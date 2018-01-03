@@ -58,7 +58,7 @@ class RandomGraph (n: Int, p: Double, c: Int)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RandomGraphTest` object is used to test the `RandomGraph` class.
- *  > run-main scalation.analytics.cluterer.RandomGraphTest
+ *  > runMain scalation.analytics.cluterer.RandomGraphTest
  */
 object RandomGraphTest extends App
 {

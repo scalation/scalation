@@ -198,7 +198,7 @@ class Markov (tr: MatriD) extends Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MarkovTest` object tests the `Markov` class (Discrete-Time Markov Chains).
- *  > run-main scalation.state.MarkovTest
+ *  > runMain scalation.state.MarkovTest
  */
 object MarkovTest extends App
 {

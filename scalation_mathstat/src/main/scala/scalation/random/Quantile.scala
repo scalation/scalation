@@ -429,7 +429,7 @@ trait QuantileTest
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `QuantileTest_Uniform` object is used to test the 'uniformInv' method
  *  in the `Quantile` object.
- *  > run-main scalation.random.QuantileTest_Uniform
+ *  > runMain scalation.random.QuantileTest_Uniform
  */
 object QuantileTest_Uniform extends App with QuantileTest { test ("uniformInv") }
 
@@ -437,7 +437,7 @@ object QuantileTest_Uniform extends App with QuantileTest { test ("uniformInv") 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `QuantileTest_Exponential` object is used to test the 'exponentialInv' method
  *  in the `Quantile` object.
- *  > run-main scalation.random.QuantileTest_Exponential
+ *  > runMain scalation.random.QuantileTest_Exponential
  */
 object QuantileTest_Exponential extends App with QuantileTest { test ("exponentialInv") }
 
@@ -445,7 +445,7 @@ object QuantileTest_Exponential extends App with QuantileTest { test ("exponenti
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `QuantileTest_Empirical` object is used to test the 'empiricalInv' method
  *  in the `Quantile` object.
- *  > run-main scalation.random.QuantileTest_Empirical
+ *  > runMain scalation.random.QuantileTest_Empirical
  */
 object QuantileTest_Empirical extends App with QuantileTest { test ("empiricalInv") }
 
@@ -453,7 +453,7 @@ object QuantileTest_Empirical extends App with QuantileTest { test ("empiricalIn
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `QuantileTest_Normal` object is used to test the 'normalInv' method
  *  in the `Quantile` object.
- *  > run-main scalation.random.QuantileTest_Normal
+ *  > runMain scalation.random.QuantileTest_Normal
  */
 object QuantileTest_Normal extends App with QuantileTest { test ("normalInv") }
 
@@ -461,7 +461,7 @@ object QuantileTest_Normal extends App with QuantileTest { test ("normalInv") }
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `QuantileTest_StudentT` object is used to test the 'studentTInv' method
  *  in the `Quantile` object.
- *  > run-main scalation.random.QuantileTest_StudentT
+ *  > runMain scalation.random.QuantileTest_StudentT
  */
 object QuantileTest_StudentT extends App with QuantileTest { test ("studentTInv") }
 
@@ -469,7 +469,7 @@ object QuantileTest_StudentT extends App with QuantileTest { test ("studentTInv"
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `QuantileTest_ChiSquare` object is used to test the 'chiSquareInv' method
  *  in the `Quantile` object.
- *  > run-main scalation.random.QuantileTest_ChiSquare
+ *  > runMain scalation.random.QuantileTest_ChiSquare
  */
 object QuantileTest_ChiSquare extends App with QuantileTest { test ("chiSquareInv") }
 
@@ -477,7 +477,7 @@ object QuantileTest_ChiSquare extends App with QuantileTest { test ("chiSquareIn
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `QuantileTest_Fisher` object is used to test the 'fisherInv' method
  *  in the `Quantile` object.
- *  > run-main scalation.random.QuantileTest_Fisher
+ *  > runMain scalation.random.QuantileTest_Fisher
  */
 object QuantileTest_Fisher extends App with QuantileTest { test ("fisherInv") }
 

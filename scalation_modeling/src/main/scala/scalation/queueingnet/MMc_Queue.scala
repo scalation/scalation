@@ -108,7 +108,7 @@ class MMc_Queue (lambda: Double, mu: Double, c: Int = 1)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MMc_QueueTest` object is used to test the `MMc_Queue` class.
- *  > run-main scalation.queueingnet.MMc_QueueTest
+ *  > runMain scalation.queueingnet.MMc_QueueTest
  */
 object MMc_QueueTest extends App
 {

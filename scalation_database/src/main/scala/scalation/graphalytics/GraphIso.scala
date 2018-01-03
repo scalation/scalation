@@ -44,7 +44,7 @@ class GraphIso (g: Graph, q: Graph)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphIsoTest` object is used to test the `GraphIso` class.
- *  > run-main scalation.graphalytics.GraphIsoTest
+ *  > runMain scalation.graphalytics.GraphIsoTest
  */
 object GraphIsoTest extends App
 {

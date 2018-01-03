@@ -965,7 +965,7 @@ object MM_RelationEx
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MM_RelationTest` object tests the operations provided by `MM_Relation`.
- *  > run-main scalation.columnar_db.MM_RelationTest
+ *  > runMain scalation.columnar_db.MM_RelationTest
  */
 object MM_RelationTest extends App
 {
@@ -1024,7 +1024,7 @@ object MM_RelationTest extends App
 /** The `MM_RelationTest2` object tests the operations provided by `MM_Relation`.
  *  The relational algebra operators are given using Unicode.
  *  @see en.wikipedia.org/wiki/List_of_Unicode_characters
- *  > run-main scalation.columnar_db.MM_RelationTest2
+ *  > runMain scalation.columnar_db.MM_RelationTest2
  */
 object MM_RelationTest2 extends App
 {
@@ -1070,7 +1070,7 @@ object MM_RelationTest2 extends App
  *  It test various aggregate/OLAP operations on a simple data warehouse fact table.
  *  @see www.codeproject.com/Articles/652108/Create-First-Data-WareHouse
  *  FIX - allow entering doubles as "13" rather than "13.0"
- *  > run-main scalation.columnar_db.MM_RelationTest3
+ *  > runMain scalation.columnar_db.MM_RelationTest3
  */
 object MM_RelationTest3 extends App
 {
@@ -1161,7 +1161,7 @@ object MM_RelationTest3 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MM_RelationTest4` object tests conversion `MM_Relation` to a matrix.
- *  > run-main scalation.columnar_db.MM_RelationTest4
+ *  > runMain scalation.columnar_db.MM_RelationTest4
  */
 object MM_RelationTest4 extends App
 {

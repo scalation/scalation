@@ -298,7 +298,7 @@ class HMatrix4 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HMatrix4Test` object is used to test the `HMatrix4` class.
- *  > run-main scalation.linalgebra.gen.HMatrix4Test
+ *  > runMain scalation.linalgebra.gen.HMatrix4Test
  */
 object HMatrix4Test extends App
 {
@@ -312,7 +312,7 @@ object HMatrix4Test extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HMatrix4Test2` object is used to test the `HMatrix4` class.
- *  > run-main scalation.linalgebra.gen.HMatrix4Test2
+ *  > runMain scalation.linalgebra.gen.HMatrix4Test2
  */
 object HMatrix4Test2 extends App
 {

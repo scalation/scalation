@@ -133,7 +133,7 @@ class ExpSmoothing (y: VectoD, t: VectoD)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ExpSmoothingTest` object is used to test the `ExpSmoothing` class.
- *  > run-main scalation.analytics.ExpSmoothingTest
+ *  > runMain scalation.analytics.ExpSmoothingTest
  */
 object ExpSmoothingTest extends App
 {

@@ -83,7 +83,7 @@ class PortfolioOpt (r: MatrixD, label: Array [String])
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PortfolioOptTest` object is used to test the `PortfolioOpt` class.
  *  @see www.math.uni-magdeburg.de/~girlich/preprints/preprint0906.pdf
- *  > run-main apps.optimization.PortfolioOptTest
+ *  > runMain apps.optimization.PortfolioOptTest
  */
 object PortfolioOptTest extends App
 {

@@ -99,7 +99,7 @@ object Fac_QR
  *  @see www.ee.ucla.edu/~vandenbe/103/lectures/qr.pdf
  *  @see www.math.usm.edu/lambers/mat610/sum10/lecture9.pdf
  *  FIX: the 'nullspaceV' function need to be fixed.
- *  > run-main scalation.linalgebra.Fac_QRTest
+ *  > runMain scalation.linalgebra.Fac_QRTest
  */
 object Fac_QRTest extends App
 {
@@ -170,7 +170,7 @@ object Fac_QRTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Fac_QRTest2` object is used to test the correctness of the 'solve' method
  *  in the `Fac_QR` classes.
- *  > run-main scalation.linalgebra.Fac_QRTest2
+ *  > runMain scalation.linalgebra.Fac_QRTest2
  */
 object Fac_QRTest2 extends App
 {

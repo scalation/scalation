@@ -429,7 +429,7 @@ class MuGraphGen [TLabel: ClassTag] (typeSelector: TLabel)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The 'MuGraphGenTest' object is used to test the 'MuGraphGen' class for building
  *  random graphs where a vertex's degree is uniformly distributed.
- *  > run-main scalation.graphalytics.mutable.MuGraphGenTest
+ *  > runMain scalation.graphalytics.mutable.MuGraphGenTest
  */
 object MuGraphGenTest extends App
 {
@@ -456,7 +456,7 @@ object MuGraphGenTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The 'MuGraphGenTest2' object is used to test the 'MuGraphGen' class for building
  *  power law graphs.
- *  > run-main scalation.graphalytics.mutable.MuGraphGenTest2
+ *  > runMain scalation.graphalytics.mutable.MuGraphGenTest2
  */
 object MuGraphGenTest2 extends App
 {
@@ -479,7 +479,7 @@ object MuGraphGenTest2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuGraphGenTest3` object is used to test the `MuGraphGen` class for extracting
  *  query graphs from data graphs.
- *  > run-main scalation.graphalytics.mutable.MuGraphGenTest3
+ *  > runMain scalation.graphalytics.mutable.MuGraphGenTest3
  */
 object MuGraphGenTest3 extends App
 {

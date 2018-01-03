@@ -53,7 +53,7 @@ class GraphSim2 (g: Graph, q: Graph)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSim2Test` object is used to test the `GraphSim2` class.
- *  > run-main scalation.graphalytics.GraphSim2Test
+ *  > runMain scalation.graphalytics.GraphSim2Test
  */
 object GraphSim2Test extends App
 {
@@ -72,7 +72,7 @@ object GraphSim2Test extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSim2Test2` object is used to test the `GraphSim2` class.
- *  > run-main scalation.graphalytics.GraphSim2Test2
+ *  > runMain scalation.graphalytics.GraphSim2Test2
  */
 object GraphSim2Test2 extends App
 {
@@ -91,7 +91,7 @@ object GraphSim2Test2 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSim2Test3` object is used to test the `GraphSim2` class.
- *  > run-main scalation.graphalytics.GraphSim2Test3
+ *  > runMain scalation.graphalytics.GraphSim2Test3
  */
 object GraphSim2Test3 extends App
 {

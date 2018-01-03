@@ -395,7 +395,7 @@ object TANBayes
  *  Classify whether a car is more likely to be stolen (1) or not (1).
  *
  *  @see www.inf.u-szeged.hu/~ormandi/ai2/06-AugNaiveBayes-example.pdf
- *  > run-main scalation.analytics.classifier.TANBayesTest
+ *  > runMain scalation.analytics.classifier.TANBayesTest
  */
 object TANBayesTest extends App
 {
@@ -446,7 +446,7 @@ object TANBayesTest extends App
 /** The `TANBayesTest2` object is used to test the `TANBayes0` class.
  *  Given whether a person is Fast and/or Strong, classify them as making C = 1
  *  or not making C = 0 the football team.
- *  > run-main scalation.analytics.classifier.TANBayesTest2
+ *  > runMain scalation.analytics.classifier.TANBayesTest2
  */
 object TANBayesTest2 extends App
 {
@@ -492,7 +492,7 @@ object TANBayesTest2 extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TANBayesTest3` object is used to test the `TANBayes0` class.
- *  > run-main scalation.analytics.classifier.TANBayesTest3
+ *  > runMain scalation.analytics.classifier.TANBayesTest3
  */
 object TANBayesTest3 extends App
 {

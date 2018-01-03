@@ -687,7 +687,7 @@ trait CDFTest
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CDFTest_Uniform` object is used to test the 'UniformCDF' method in the
  *  `CDF` object.
- *  > run-main scalation.random.CDFTest_Uniform
+ *  > runMain scalation.random.CDFTest_Uniform
  */
 object CDFTest_Uniform extends App with CDFTest { test ("uniformCDF") }
 
@@ -695,7 +695,7 @@ object CDFTest_Uniform extends App with CDFTest { test ("uniformCDF") }
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CDFTest_Exponential` object is used to test the 'ExponentialCDF' method in the
  *  `CDF` object.
- *  > run-main scalation.random.CDFTest_Exponential
+ *  > runMain scalation.random.CDFTest_Exponential
  */
 object CDFTest_Exponential extends App with CDFTest { test ("exponentialCDF") }
 
@@ -703,7 +703,7 @@ object CDFTest_Exponential extends App with CDFTest { test ("exponentialCDF") }
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CDFTest_Weibull` object is used to test the 'WeibullCDF' method in the
  *  `CDF` object.
- *  > run-main scalation.random.CDFTest_Weibull
+ *  > runMain scalation.random.CDFTest_Weibull
  */
 object CDFTest_Weibull extends App with CDFTest { test ("weibullCDF") }
 
@@ -711,7 +711,7 @@ object CDFTest_Weibull extends App with CDFTest { test ("weibullCDF") }
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CDFTest_Empirical` object is used to test the 'buildEmpiricalCDF' method
  *  in the `CDF` object.
- *  > run-main scalation.random.CDFTest_Empirical
+ *  > runMain scalation.random.CDFTest_Empirical
  */
 object CDFTest_Empirical extends App
 {
@@ -725,7 +725,7 @@ object CDFTest_Empirical extends App
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CDFTest_Normal` object is used to test the 'normalCDF' method in the
  *  `CDF` object.
- *  > run-main scalation.random.CDFTest_Normal
+ *  > runMain scalation.random.CDFTest_Normal
  */
 object CDFTest_Normal extends App with CDFTest { test ("normalCDF") }
 
@@ -733,7 +733,7 @@ object CDFTest_Normal extends App with CDFTest { test ("normalCDF") }
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CDFTest_Normal` object is used to test difference between different
  *  implementations of the 'normalCDF' method in the `CDF` object.
- *  > run-main scalation.random.CDFTest_Normal_Diff
+ *  > runMain scalation.random.CDFTest_Normal_Diff
  */
 object CDFTest_Normal_Diff extends App with CDFTest
 {
@@ -745,7 +745,7 @@ object CDFTest_Normal_Diff extends App with CDFTest
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CDFTest_StudentT` object is used to test the 'studentTCDF' method in the
  *  `CDF` object.
- *  > run-main scalation.random.CDFTest_StudentT
+ *  > runMain scalation.random.CDFTest_StudentT
  */
 object CDFTest_StudentT extends App with CDFTest { test ("studentTCDF") }
 
@@ -753,7 +753,7 @@ object CDFTest_StudentT extends App with CDFTest { test ("studentTCDF") }
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CDFTest_ChiSquare` object is used to test the 'chiSquareCDF' method in the
  *  `CDF` object.
- *  > run-main scalation.random.CDFTest_ChiSquare
+ *  > runMain scalation.random.CDFTest_ChiSquare
  */
 object CDFTest_ChiSquare extends App with CDFTest { test ("chiSquareCDF") }
 
@@ -761,7 +761,7 @@ object CDFTest_ChiSquare extends App with CDFTest { test ("chiSquareCDF") }
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CDFTest_Fisher` object is used to test the 'fisherCDF' method in the
  *  `CDF` object.
- *  > run-main scalation.random.CDFTest_Fisher
+ *  > runMain scalation.random.CDFTest_Fisher
  */
 object CDFTest_Fisher extends App with CDFTest { test ("fisherCDF") }
 

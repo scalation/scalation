@@ -17,7 +17,7 @@ import scalation.util.banner
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TightPattern_STest` object is used to test all the Tight Simulation pattern
  *  matchers for labels of type `String`.
- *  > run-main scalation.graph_db.pattern_matching.test.TightPattern_STest
+ *  > runMain scalation.graph_db.pattern_matching.test.TightPattern_STest
  */
 object TightPattern_STest extends App
 {

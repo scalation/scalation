@@ -65,7 +65,7 @@ import TopSort.topSort
 /** The `TopSortTest` object tests the `TopSort` object using a directed
  *  graph.  Graphs are created by passing in an array of adjacency sets (one for
  *  each vertex).
- *  > run-main scalation.graphalytics.TopSortTest
+ *  > runMain scalation.graphalytics.TopSortTest
  */
 object TopSortTest extends App
 {

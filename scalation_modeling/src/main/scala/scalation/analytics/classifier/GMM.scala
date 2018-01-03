@@ -127,7 +127,7 @@ class GMM (x: VectorD, k: Int = 3)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GMMTest` object is used to test the `GMM` class.
- *  > run-main scalation.analytics.classifier.GMMTest
+ *  > runMain scalation.analytics.classifier.GMMTest
  */
 object GMMTest extends App
 {

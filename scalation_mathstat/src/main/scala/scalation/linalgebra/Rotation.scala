@@ -204,7 +204,7 @@ object Rotation
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RotationTest` object is used to test the `Rotation` object,
- *  > run-main scalation.linalgebra.RotationTest
+ *  > runMain scalation.linalgebra.RotationTest
  */
 object RotationTest extends App
 {

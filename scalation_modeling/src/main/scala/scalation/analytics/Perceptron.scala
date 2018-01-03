@@ -141,7 +141,7 @@ class Perceptron (x: MatrixD, y: VectorD, private var eta: Double = 1.0,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PerceptronTest` object is used to test the `Perceptron` class.  For this
  *  test, the initial weights are used for used for prediction.
- *  > run-main scalation.analytics.PerceptronTest
+ *  > runMain scalation.analytics.PerceptronTest
  */
 object PerceptronTest extends App
 {
@@ -164,7 +164,7 @@ object PerceptronTest extends App
 /** The `PerceptronTest2` object is used to test the `Perceptron` class.  For this
  *  test, training data is used to fit the weights before using them for prediction.
  *  @see www4.rgu.ac.uk/files/chapter3%20-%20bp.pdf
- *  > run-main scalation.analytics.PerceptronTest
+ *  > runMain scalation.analytics.PerceptronTest
  */
 object PerceptronTest2 extends App
 {

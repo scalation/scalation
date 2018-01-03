@@ -846,7 +846,7 @@ class SymTriMatrixN [T: ClassTag: Numeric] (val d1: Int)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SymTriMatrixNTest` object is used to test the `SymTriMatrixN` class.
- *  > run-main scalation.linalgebra.gen.SymTriMatrixNTest
+ *  > runMain scalation.linalgebra.gen.SymTriMatrixNTest
  */
 object SymTriMatrixNTest extends App
 {

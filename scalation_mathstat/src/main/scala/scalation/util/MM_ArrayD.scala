@@ -201,7 +201,7 @@ object MM_ArrayD
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MM_ArrayDTest` is used to test the `MM_ArrayD` class.
- *  > run-main scalation.util.MM_ArrayDTest
+ *  > runMain scalation.util.MM_ArrayDTest
  */
 object MM_ArrayDTest extends App
 {

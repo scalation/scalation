@@ -210,7 +210,7 @@ object MM_ArrayS
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MM_ArraySTest` is used to test the `MM_ArrayS` class.
- *  > run-main scalation.util.MM_ArraySTest
+ *  > runMain scalation.util.MM_ArraySTest
  */
 object MM_ArraySTest extends App
 {

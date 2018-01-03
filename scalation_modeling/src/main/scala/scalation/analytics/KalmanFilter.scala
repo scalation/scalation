@@ -73,7 +73,7 @@ class KalmanFilter (ff: MatrixD, hh: MatrixD, qq: MatrixD, rr: MatrixD, bb: Matr
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KalmanFilterTest` object is used to test the `KalmanFilter` class.
  *  @see en.wikipedia.org/wiki/Kalman_filter
- *  > run-main scalation.analytics.KalmanFilterTest
+ *  > runMain scalation.analytics.KalmanFilterTest
  */
 object KalmanFilterTest extends App
 {

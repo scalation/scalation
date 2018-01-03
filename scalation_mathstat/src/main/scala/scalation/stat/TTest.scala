@@ -173,7 +173,7 @@ object TTest
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TTestTest` object is used to test the `TTest` class.
  *  @see www.isixsigma.com/tools-templates/hypothesis-testing/making-sense-two-sample-t-test/
- *  > run-main scalation.stat.TTestTest
+ *  > runMain scalation.stat.TTestTest
  */
 object TTestTest extends App
 {

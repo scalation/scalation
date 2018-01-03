@@ -72,7 +72,7 @@ class MemoryMappedFileD (fname: String, sz: Int = 1024)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MemoryMappedFileDTest` is used to test the `MemoryMappedFileD` class.
- *  > run-main scalation.util.MemoryMappedFileDTest
+ *  > runMain scalation.util.MemoryMappedFileDTest
  */
 object MemoryMappedFileDTest extends App
 {

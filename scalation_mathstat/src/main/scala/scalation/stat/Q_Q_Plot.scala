@@ -109,7 +109,7 @@ object Q_Q_Plot
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Q_Q_PlotTest` object is used to test the `Q_Q_Plot` object:
  *  distribution vs. distribution.
- *  > run-main scalation.stat.Q_Q_PlotTest
+ *  > runMain scalation.stat.Q_Q_PlotTest
  */
 object Q_Q_PlotTest extends App
 {
@@ -124,7 +124,7 @@ object Q_Q_PlotTest extends App
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Q_Q_PlotTest2` object is used to test the `Q_Q_Plot` object:
  *  data vector vs. distribution.
- *  > run-main scalation.stat.Q_Q_PlotTest2
+ *  > runMain scalation.stat.Q_Q_PlotTest2
  */
 object Q_Q_PlotTest2 extends App
 {

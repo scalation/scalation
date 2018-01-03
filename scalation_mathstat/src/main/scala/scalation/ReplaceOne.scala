@@ -18,7 +18,7 @@ object ReplaceOne extends App
 {
 //  private val pat1 = " ::"            // pattern to find (change as needed)
 //  private val pat2 = " *"             // replacement pattern (change as needed)
-    private val pat1 = "> run-main"     // pattern to find (change as needed)
+    private val pat1 = "> runMain"     // pattern to find (change as needed)
     private val pat2 = "> runMain"      // replacement pattern (change as needed)
     private var line = ""
 

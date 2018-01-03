@@ -1301,7 +1301,7 @@ object RleMatrixQ
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RleMatrixQTest` object tests the operations provided by `MatrixQ` class.
- *  > run-main scalation.linalgebra.RleMatrixQTest
+ *  > runMain scalation.linalgebra.RleMatrixQTest
  */
 object RleMatrixQTest extends App
 {

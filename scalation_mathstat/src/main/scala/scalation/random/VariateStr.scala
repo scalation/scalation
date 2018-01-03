@@ -93,7 +93,7 @@ case class RandomWord (nWords: Int = 10, lRange: Range = 4 to 6, cRange: Range =
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RandomStrTest` object is used to test the Random Variate String (RVS)
  *  generator from the `RandomStr` class.
- *  > run-main scalation.random.RandomStrTest
+ *  > runMain scalation.random.RandomStrTest
  */
 object RandomStrTest extends App
 {
@@ -109,7 +109,7 @@ object RandomStrTest extends App
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RandomWordTest` object is used to test the Random Variate Word (RVW)
  *  generator from the `RandomWord` class.
- *  > run-main scalation.random.RandomWordTest
+ *  > runMain scalation.random.RandomWordTest
  */
 object RandomWordTest extends App
 {

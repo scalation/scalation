@@ -425,7 +425,7 @@ import Fac_LU.test
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Fac_LUTest` object is used to test the `Fac_LU` class.
  *  Test a Square Matrix.
- *  > run-main scalation.linalgebra.Fac_LUTest
+ *  > runMain scalation.linalgebra.Fac_LUTest
  */
 object Fac_LUTest extends App
 {
@@ -444,7 +444,7 @@ object Fac_LUTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Fac_LUTest2` object is used to test the `Fac_LU` class.
  *  Test a Rectangular Matrix.
- *  > run-main scalation.linalgebra.Fac_LUTest2
+ *  > runMain scalation.linalgebra.Fac_LUTest2
  */
 object Fac_LUTest2 extends App
 {

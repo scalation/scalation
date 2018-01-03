@@ -113,7 +113,7 @@ class StochasticGradient (fxy: (MatrixD, VectorD, VectorD) => Double, dx: Matrix
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StochasticGradientTest` object is used to test the `StochasticGradient` class.
  *  @see scalation.analytics.RegressionTest3
- *  > run-main scalation.minima.StochasticGradientTest
+ *  > runMain scalation.minima.StochasticGradientTest
  */
 object StochasticGradientTest extends App
 {

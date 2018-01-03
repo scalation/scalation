@@ -101,7 +101,7 @@ class GradientDescent (f: FunctionV2S, exactLS: Boolean = true)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GradientDescentTest` object is used to test the `GradientDescent` class.
- *  > run-main scalation.minima.GradientDescentTest
+ *  > runMain scalation.minima.GradientDescentTest
  */
 object GradientDescentTest extends App
 {

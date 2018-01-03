@@ -362,7 +362,7 @@ class HMatrix5 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HMatrix5Test` object is used to test the `HMatrix5` class.
- *  > run-main scalation.linalgebra.gen.HMatrix5Test
+ *  > runMain scalation.linalgebra.gen.HMatrix5Test
  */
 object HMatrix5Test extends App
 {
@@ -376,7 +376,7 @@ object HMatrix5Test extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HMatrix5Test2` object is used to test the `HMatrix5` class.
- *  > run-main scalation.linalgebra.gen.HMatrix5Test2
+ *  > runMain scalation.linalgebra.gen.HMatrix5Test2
  */
 object HMatrix5Test2 extends App
 {

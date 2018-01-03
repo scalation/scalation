@@ -90,7 +90,7 @@ import MultiSet._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MultiSetTest` object is used to test the `MultiSet` class.
- *  > run-main scalation.util.MultiSetTest
+ *  > runMain scalation.util.MultiSetTest
  */
 object MultiSetTest extends App 
 {

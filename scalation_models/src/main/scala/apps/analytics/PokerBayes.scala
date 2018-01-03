@@ -31,7 +31,7 @@ import scalation.util.{getFromURL_File, time}
  *
  *  @see archive.ics.uci.edu/ml/machine-learning-databases/poker/poker-hand.names
  *  @see archive.ics.uci.edu/ml/datasets/Poker+Hand
- *  > run-main apps.analytics.PokerBayes
+ *  > runMain apps.analytics.PokerBayes
  */
 object PokerBayes extends App
 {

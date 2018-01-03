@@ -186,7 +186,7 @@ object Poly
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PolyTest` object is used to test the `Poly` class.
- *  > run-main scalation.calculus.PolyTest
+ *  > runMain scalation.calculus.PolyTest
  */
 object PolyTest extends App
 {

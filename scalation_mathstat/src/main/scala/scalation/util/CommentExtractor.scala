@@ -18,7 +18,7 @@ import scala.util.matching.Regex
  *  (for example to send it to a spell checker).  It reads from standard input
  *  and writes to standard output.
  *  @see http://ostermiller.org/findcomment.html
- *  > run-main scalation.util.CommentExtractor
+ *  > runMain scalation.util.CommentExtractor
  */
 object CommentExtractor extends App
 {

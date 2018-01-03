@@ -302,7 +302,7 @@ object Graph
 /** The `GraphTest` object is used to test the `Graph` class using example
  *  digraphs from the `ExampleGraphI` object, which contains graph whose
  *  vertex labels are of type `Int`.
- *  > run-main scalation.graph_db.GraphTest
+ *  > runMain scalation.graph_db.GraphTest
  */
 object GraphTest extends App
 {
@@ -320,7 +320,7 @@ object GraphTest extends App
 /** The `GraphTest2` object is used to test the `Graph` class using example
  *  digraphs from the `ExampleGraphD` object, which contains graph whose
  *  vertex labels are of type `Double`.
- *  > run-main scalation.graph_db.GraphTest2
+ *  > runMain scalation.graph_db.GraphTest2
  */
 object GraphTest2 extends App
 {
@@ -337,7 +337,7 @@ object GraphTest2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphTest3` object is used to test the `Graph` class using the
  *  digraphs given in the `Graph` companion object.
- *  > run-main scalation.graph_db.GraphTest3
+ *  > runMain scalation.graph_db.GraphTest3
  */
 object GraphTest3 extends App
 {
@@ -354,7 +354,7 @@ object GraphTest3 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphTest4` object is used to test the `Graph` class by calling
  *  the apply in the `Graph` companion object.
- *  > run-main scalation.graph_db.GraphTest4
+ *  > runMain scalation.graph_db.GraphTest4
  */
 object GraphTest4 extends App
 {
@@ -372,7 +372,7 @@ object GraphTest4 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphTest5` object is used to test the `Graph` class by calling
  *  the apply in the `Graph` companion object.
- *  > run-main scalation.graph_db.GraphTest5
+ *  > runMain scalation.graph_db.GraphTest5
  */
 object GraphTest5 extends App
 {

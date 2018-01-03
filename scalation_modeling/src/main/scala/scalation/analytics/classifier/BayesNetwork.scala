@@ -122,7 +122,7 @@ class BayesNetwork (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array 
 /** The `BayesNetworkTest` object is used to test the `BayesNetwork` class.
  *  Ex: Classify whether a person has a Back Ache.
  *  @see www.eng.tau.ac.il/~bengal/BN.pdf
- *  > run-main sclation.analytics.classifier.BayesNetworkTest
+ *  > runMain sclation.analytics.classifier.BayesNetworkTest
  */
 object BayesNetworkTest extends App
 {

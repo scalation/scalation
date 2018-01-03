@@ -64,7 +64,7 @@ object Unicode
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `UnicodeTest` object is used to the `Unicode` object.
- *  > run-main scalation.util.UnicodeTest
+ *  > runMain scalation.util.UnicodeTest
  */
 object UnicodeTest extends App
 {

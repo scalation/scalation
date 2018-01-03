@@ -87,7 +87,7 @@ class LassoAdmm (a: MatrixD, b: VectorD, λ: Double = 0.01)
  *      y  =  b dot x  =  b_0 + b_1*x_1 + b_2*x_2.
  *  <p>
  *  @see statmaster.sdu.dk/courses/st111/module03/index.html
- *  > run-main scalation.minima.LassoAdmmTest
+ *  > runMain scalation.minima.LassoAdmmTest
  */
 object LassoAdmmTest extends App
 {

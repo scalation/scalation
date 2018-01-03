@@ -91,7 +91,7 @@ class Fac_QR_RR [MatT <: MatriD] (aa: MatT, needQ: Boolean = true)
  *  @see www.ee.ucla.edu/~vandenbe/103/lectures/qr.pdf
  *  @see www.math.usm.edu/lambers/mat610/sum10/lecture9.pdf
  *  FIX: the 'nullspaceV' function need to be fixed.
- *  > run-main scalation.linalgebra.Fac_QR_RRTest
+ *  > runMain scalation.linalgebra.Fac_QR_RRTest
  */
 object Fac_QR_RRTest extends App
 {

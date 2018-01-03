@@ -112,7 +112,7 @@ class TranRegression (x: MatrixD, y: VectorD, transform: FunctionS2S = log, tech
  *  <p>
  *      log (y)  =  b dot x  =  b_0 + b_1*x_1 + b_2*x_2.
  *  <p>
- *  > run-main scalation.analytics.TranRegressionTest
+ *  > runMain scalation.analytics.TranRegressionTest
  */
 object TranRegressionTest extends App
 {

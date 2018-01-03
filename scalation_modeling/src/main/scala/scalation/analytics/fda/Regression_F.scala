@@ -89,7 +89,7 @@ class Regression_F (y: VectorD, x: VectorD, t: VectorD, τ: VectorD, ord: Int = 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Regression_FTest` object is used to test the `Regression_F` class.
- *  > run-main scalation.analytics.fda.Regression_FTest
+ *  > runMain scalation.analytics.fda.Regression_FTest
  */
 object Regression_FTest extends App
 {
@@ -115,7 +115,7 @@ object Regression_FTest extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Regression_FTest2` object is used to test the `Regression_F` class.
- *  > run-main scalation.analytics.fda.Regression_FTest2
+ *  > runMain scalation.analytics.fda.Regression_FTest2
  */
 object Regression_FTest2 extends App
 {

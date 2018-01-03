@@ -54,7 +54,7 @@ class Cards
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Cards` object is used to test the `Cards` class.
- *  > run-main apps.game.CardsTest
+ *  > runMain apps.game.CardsTest
  */
 object CardsTest extends App
 {

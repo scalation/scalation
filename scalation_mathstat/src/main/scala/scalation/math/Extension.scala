@@ -72,7 +72,7 @@ class Double_Exp (val self: Double) extends AnyVal
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ExtensionTest` object is used to test the `Int_Exp`, `Long_Exp` and `Double_Exp`
  *  classes.
- *  > run-main scalation.math.ExtensionTest
+ *  > runMain scalation.math.ExtensionTest
  */
 object ExtensionTest extends App
 {

@@ -16,13 +16,13 @@ import scala.io.Source
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GenReadmeHtml` object is used to create the html tables for the api and
  *  src directories for convenient Web browsing.
- *  > runmain scalation.GenReadmeHtml
+ *  > runMain scalation.GenReadmeHtml
  */
 object GenReadmeHtml extends App
 {
     val SKIP         = "old"                                                       // do not process files in this directory
-    val moduleList   = Array("scalation_mathstat", "scalation_database", "scalation_modeling", "scalation_models")
-    val moduleNames  = Array("MATH AND STAT", "DATABASE", "MODELING", "APPLICATIONS")
+    val moduleList   = Array ("scalation_mathstat", "scalation_database", "scalation_modeling", "scalation_models")
+    val moduleNames  = Array ("MATH AND STAT", "DATABASE", "MODELING", "APPLICATIONS")
     val scalationVer = BASE.substring (BASE.lastIndexOf ('_') + 1)                 // ScalaTion version  (i.e., 1.4)
     val scalaVerFull = scala.util.Properties.versionNumberString                   // full scala version (i.e., 2.12.4)
     val scalaVer     = scalaVerFull.substring (0, scalaVerFull.lastIndexOf ('.'))  // main scala version (i.e., 2.12)
@@ -266,7 +266,7 @@ Currently the .jar files need to be copied (copy_jars.sh) into the lib directory
 </html>
 """
 
-    val readmeOut = new PrintWriter(BASE + ⁄ + "README.html")
+    val readmeOut = new PrintWriter (BASE + ⁄ + "README.html")
 
     readmeOut.println (prefix)
     readmeOut.println (Source.fromFile (fApi).mkString)
@@ -300,7 +300,7 @@ Currently the .jar files need to be copied (copy_jars.sh) into the lib directory
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Obtain the number of hyphens for the sub-packages.
-     *  @param depth    the depth of the project structure
+     *  @param depth  the depth of the project structure
      */
     def getHyphens (depth: Int): String =
     {
@@ -311,7 +311,7 @@ Currently the .jar files need to be copied (copy_jars.sh) into the lib directory
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Obtain the Descriptions of a package from its package.scala comments.
-     *  @param f    the package.scala file
+     *  @param f  the package.scala file
      */
     def getDescriptions (f: File): String =
     {

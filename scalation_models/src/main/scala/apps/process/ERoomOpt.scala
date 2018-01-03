@@ -21,7 +21,7 @@ import scalation.util.Monitor
  *  Cost is based on the daily pay for a nurse (8 hours * 30 dollars per hour), a doctor
  *  (8 hours * 60 dollars per hour) and a cost based on customer wait time (10 dollars
  *  per minute of mean waiting time).
- *  > run-main apps.process.ERoomOpt
+ *  > runMain apps.process.ERoomOpt
  */
 object ERoomOpt extends App
 {

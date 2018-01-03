@@ -16,7 +16,7 @@ import scalation.linalgebra.{MatrixI, VectorI}
  *  class.  Classify (No/Yes) whether a person will play tennis based on the
  *  measured integer-valued features.
  *  @see suanpalm3.kmutnb.ac.th/teacher/FileDL/choochart82255418560.pdf
- *  > run-main apps.analytics.TennisBayes
+ *  > runMain apps.analytics.TennisBayes
  */
 object TennisBayes extends App
 {

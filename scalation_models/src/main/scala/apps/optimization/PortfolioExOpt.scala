@@ -20,7 +20,7 @@ import scalation.minima.ConjugateGradient
 /** The `PortfolioExOpt` object solves the following Quadratic Programming 'QP' problem:
  *  Given 'n' investment instruments, find a combination/portfolio that
  *  minimizes risk for a given expected return.
- *  > run-main apps.optimization.PortfolioExOpt
+ *  > runMain apps.optimization.PortfolioExOpt
  */
 object PortfolioExOpt extends App
 {

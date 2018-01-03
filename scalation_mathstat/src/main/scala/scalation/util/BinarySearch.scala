@@ -47,7 +47,7 @@ import BinarySearch.search
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BinarySearchTest` object performs performance testing on `BinarySearch`. 
- *  > run-main scalation.util.BinarySearchTest
+ *  > runMain scalation.util.BinarySearchTest
  */
 object BinarySearchTest extends App
 {

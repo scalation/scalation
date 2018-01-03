@@ -135,7 +135,7 @@ class ANCOVA (x_ : MatrixD, t: VectorI, y: VectorD, levels: Int, technique: RegT
  *  <p>
  *      y  =  b dot x  =  b_0 + b_1*x_1 + b_2*x_2 + b_3*d_1 + b_4*d_2
  *  <p>
- *  > run-main scalation.analytics.ANCOVATest
+ *  > runMain scalation.analytics.ANCOVATest
  */
 object ANCOVATest extends App
 {

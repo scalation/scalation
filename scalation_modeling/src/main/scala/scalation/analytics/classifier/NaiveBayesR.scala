@@ -149,7 +149,7 @@ class NaiveBayesR (x: MatrixD, y: VectorI, fn: Array [String], k: Int, cn: Array
 /** The `NaiveBayesRTest` object is used to test the `NaiveBayesR` class.
  ** Ex: Classify whether a person is male (M) or female (F) based on the measured features.
  *  @see en.wikipedia.org/wiki/Naive_Bayes_classifier
- *  > run-main scalation.analytics.classifier.NaiveBayesRTest
+ *  > runMain scalation.analytics.classifier.NaiveBayesRTest
  */
 object NaiveBayesRTest extends App
 {

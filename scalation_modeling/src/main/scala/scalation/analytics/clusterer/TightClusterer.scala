@@ -189,7 +189,7 @@ class TightClusterer (x: MatrixD, k0: Int, kmin: Int, s: Int = 0)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TightClustererTest` is used to test the `TightClusterer` class.
- *  > run-main scalation.analytics.clusterer.TightClustererTest
+ *  > runMain scalation.analytics.clusterer.TightClustererTest
  */
 object TightClustererTest extends App
 {

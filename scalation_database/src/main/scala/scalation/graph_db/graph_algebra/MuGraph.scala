@@ -351,7 +351,7 @@ object MuGraph
 /** The `MuGraphTest` object is used to test the `MuGraph` class using examples
  *  from the `ExampleMuGraphD` object, which contains multi-digraphs whose vertex
  *  and edge labels are of type `Double`.
- *  > run-main scalation.graph_db.graph_algebra.MuGraphTest
+ *  > runMain scalation.graph_db.graph_algebra.MuGraphTest
  */
 object MuGraphTest extends App
 {
@@ -369,7 +369,7 @@ object MuGraphTest extends App
 /** The `MuGraphTest2` object is used to test the `MuGraph` class using examples
  *  from the `ExampleMuGraphD` object, which contains multi-digraphs whose vertex
  *  and edge labels are of type `String`.
- *  > run-main scalation.graph_db.graph_algebra.MuGraphTest2
+ *  > runMain scalation.graph_db.graph_algebra.MuGraphTest2
  */
 object MuGraphTest2 extends App
 {
@@ -386,7 +386,7 @@ object MuGraphTest2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuGraphTest3` object is used to test the `MuGraph` class using a
  *  randomly generated multi-digraph.
- *  > run-main scalation.graph_db.graph_algebra.MuGraphTest3
+ *  > runMain scalation.graph_db.graph_algebra.MuGraphTest3
  */
 object MuGraphTest3 extends App
 {

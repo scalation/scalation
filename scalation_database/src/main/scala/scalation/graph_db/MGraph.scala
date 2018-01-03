@@ -148,7 +148,7 @@ object MGraph
 /** The `MGraphTest` object is used to test the `MGraph` class using examples
  *  from the `ExampleMGraphI` object, which contains multi-digraphs whose vertex
  *  and edge labels are of type `Int`.
- *  > run-main scalation.graph_db.MGraphTest
+ *  > runMain scalation.graph_db.MGraphTest
  */
 object MGraphTest extends App
 {
@@ -166,7 +166,7 @@ object MGraphTest extends App
 /** The `MGraphTest2` object is used to test the `MGraph` class using examples
  *  from the `ExampleMGraphD` object, which contains multi-digraphs whose vertex
  *  and edge labels are of type `Double`.
- *  > run-main scalation.graph_db.MGraphTest2
+ *  > runMain scalation.graph_db.MGraphTest2
  */
 object MGraphTest2 extends App
 {

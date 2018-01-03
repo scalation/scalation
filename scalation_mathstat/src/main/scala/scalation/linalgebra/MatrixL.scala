@@ -1830,7 +1830,7 @@ object MatrixL extends Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MatrixLTest` object tests the operations provided by `MatrixL` class.
- *  > run-main scalation.linalgebra.MatrixLTest
+ *  > runMain scalation.linalgebra.MatrixLTest
  */
 object MatrixLTest extends App
 {

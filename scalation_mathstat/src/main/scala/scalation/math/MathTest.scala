@@ -15,7 +15,7 @@ import ExtremeD.{EPSILON, MIN_NORMAL}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MathTest` object is used to test the supplemental exponential, logarithmic
  *  and trigonmetric functions defined in the 'scalation.math' package object.
- *  > run-main scalation.math.MathTest
+ *  > runMain scalation.math.MathTest
  */
 object MathTest extends App
 {

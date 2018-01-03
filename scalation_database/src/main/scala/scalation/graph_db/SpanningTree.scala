@@ -77,7 +77,7 @@ class SpanningTree (g: Graph [Double])
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SpanningTreeTest` object is used to test the `SpanningTree` class.
- *  > run-main scalation.graph_db.SpanningTreeTest
+ *  > runMain scalation.graph_db.SpanningTreeTest
  */
 object SpanningTreeTest extends App
 {

@@ -562,7 +562,7 @@ object MGraphGen
 /** The 'MGraphGenTest' object is used to test the 'MGraphGen' class for building
  *  random graphs where a vertex's degree is uniformly distributed.
  *  This work build graphs with `Int` vertex/edge labels.
- *  > run-main scalation.graph_db.MGraphGenTest
+ *  > runMain scalation.graph_db.MGraphGenTest
  */
 object MGraphGenTest extends App
 {
@@ -590,7 +590,7 @@ object MGraphGenTest extends App
 /** The `MGraphGenTest2` object is used to test the `MGraphGen` class for building
  *  random graphs where a vertex's degree is uniformly distributed.
  *  This work build graphs with `Double` vertex/edge labels.
- *  > run-main scalation.graph_db.MGraphGenTest2
+ *  > runMain scalation.graph_db.MGraphGenTest2
  */
 object MGraphGenTest2 extends App
 {
@@ -618,7 +618,7 @@ object MGraphGenTest2 extends App
 /** The `MGraphGenTest3` object is used to test the `MGraphGen` class for building
  *  random graphs where a vertex's degree is uniformly distributed.
  *  This work build graphs with `String` vertex/edge labels.
- *  > run-main scalation.graph_db.MGraphGenTest3
+ *  > runMain scalation.graph_db.MGraphGenTest3
  */
 object MGraphGenTest3 extends App
 {
@@ -645,7 +645,7 @@ object MGraphGenTest3 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The 'MGraphGenTest4' object is used to test the 'MGraphGen' class for building
  *  power law graphs.
- *  > run-main scalation.graph_db.MGraphGenTest4
+ *  > runMain scalation.graph_db.MGraphGenTest4
  */
 object MGraphGenTest4 extends App
 {
@@ -668,7 +668,7 @@ object MGraphGenTest4 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphGenTest5` object is used to test the `MGraphGen` class for extracting
  *  query graphs from data graphs (note: data graph should be connected).
- *  > run-main scalation.graph_db.MGraphGenTest5
+ *  > runMain scalation.graph_db.MGraphGenTest5
  */
 object MGraphGenTest5 extends App
 {
@@ -697,7 +697,7 @@ object MGraphGenTest5 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphGenTest6` object is used to test the `MGraphGen` companion object
  *  for generating both data and query graphs.
- *  > run-main scalation.graph_db.MGraphGenTest6
+ *  > runMain scalation.graph_db.MGraphGenTest6
  */
 object MGraphGenTest6 extends App
 {
@@ -717,7 +717,7 @@ object MGraphGenTest6 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphGenTest7` object is used to test the `MGraphGen` companion object
  *  for generating data graphs.
- *  > run-main scalation.graph_db.MGraphGenTest7
+ *  > runMain scalation.graph_db.MGraphGenTest7
  */
 object MGraphGenTest7 extends App
 {
@@ -733,7 +733,7 @@ object MGraphGenTest7 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphGenTest8` object is used to test the `MGraphGen` companion object
  *  for generating both data and query graphs.
- *  > run-main scalation.graph_db.MGraphGenTest8
+ *  > runMain scalation.graph_db.MGraphGenTest8
  */
 object MGraphGenTest8 extends App
 {

@@ -72,7 +72,7 @@ object Householder
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HouseholderTest` object is used to test `Householder` object.
  *  @see www.math.siu.edu/matlab/tutorial4.pdf
- *  > run-main scalation.linalgebra.HouseholderTest
+ *  > runMain scalation.linalgebra.HouseholderTest
  */
 object HouseholderTest extends App
 {

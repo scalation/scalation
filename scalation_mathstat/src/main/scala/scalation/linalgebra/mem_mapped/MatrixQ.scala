@@ -1567,7 +1567,7 @@ object MatrixQ extends Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MatrixQTest` object tests the operations provided by `MatrixQ` class.
- *  > run-main scalation.linalgebra.MatrixQTest
+ *  > runMain scalation.linalgebra.MatrixQTest
  */
 object MatrixQTest extends App with PackageInfo
 {

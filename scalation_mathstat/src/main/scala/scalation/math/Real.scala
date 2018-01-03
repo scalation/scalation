@@ -732,7 +732,7 @@ object Real
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RealTest` object is used to test the `Real` class.
- *  > run-main scalation.math.RealTest
+ *  > runMain scalation.math.RealTest
  */
 object RealTest extends App
 {

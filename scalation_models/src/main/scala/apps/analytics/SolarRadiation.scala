@@ -21,7 +21,7 @@ import scalation.util.{timed}
  *  FIX: must download the following file.
  *  @see rredc.nrel.gov/solar/old_data/nsrdb/
  *  @see rredc.nrel.gov/solar/old_data/nsrdb/1961-1990/hourly/compressed/
- *  > run-main apps.analytics.SolarRadiation
+ *  > runMain apps.analytics.SolarRadiation
  */
 object SolarRadiation extends App
 {

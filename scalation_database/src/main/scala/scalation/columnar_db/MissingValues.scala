@@ -65,7 +65,7 @@ object MissingValues
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MissingValuesTest` object is used to test the `MissingValues` object.
- *  > run-main scalation.columnar_db.MissingValuesTest
+ *  > runMain scalation.columnar_db.MissingValuesTest
  */
 object MissingValuesTest extends App
 {

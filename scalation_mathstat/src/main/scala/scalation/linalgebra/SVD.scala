@@ -261,7 +261,7 @@ import SVDecomp._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDTest` is used to test the `SVD` class.
- *  > run-main scalation.linalgebra.SVDTest
+ *  > runMain scalation.linalgebra.SVDTest
  */
 object SVDTest extends App
 {
@@ -273,7 +273,7 @@ object SVDTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDTest2` object is used to test the `SVD` class.
  *  @see www.ling.ohio-state.edu/~kbaker/pubs/Singular_Value_Decomposition_Tutorial.pdf
- *  > run-main scalation.linalgebra.SVDTest2
+ *  > runMain scalation.linalgebra.SVDTest2
  */
 object SVDTest2 extends App
 {
@@ -284,7 +284,7 @@ object SVDTest2 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDTest3` object is used to test the `SVD` class.
- *  > run-main scalation.linalgebra.SVDTest3
+ *  > runMain scalation.linalgebra.SVDTest3
  */
 object SVDTest3 extends App
 {
@@ -295,7 +295,7 @@ object SVDTest3 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDTest4` object is used to test the `SVD` class.
- *  > run-main scalation.linalgebra.SVDTest4
+ *  > runMain scalation.linalgebra.SVDTest4
  */
 object SVDTest4 extends App
 {
@@ -306,7 +306,7 @@ object SVDTest4 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDTest5` object is used to test the `SVD` class.
- *  > run-main scalation.linalgebra.SVDTest5
+ *  > runMain scalation.linalgebra.SVDTest5
  */
 object SVDTest5 extends App
 {
@@ -317,7 +317,7 @@ object SVDTest5 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDTest6` object is used to test the `SVD` class.
- *  > run-main scalation.linalgebra.SVDTest6
+ *  > runMain scalation.linalgebra.SVDTest6
  */
 object SVDTest6 extends App
 {
@@ -330,7 +330,7 @@ object SVDTest6 extends App
 /** The `SVDTest7` object is used to test the `SVD` class.
  *  This test case currently fails as ScalaTion does not consider 9.18964e-09
  *  to be approximately zero.
- *  > run-main scalation.linalgebra.SVDTest7
+ *  > runMain scalation.linalgebra.SVDTest7
 */
 object SVDTest7 extends App
 {
@@ -341,7 +341,7 @@ object SVDTest7 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDTest8` object is used to test the `SVD` class.
- *  > run-main scalation.linalgebra.SVDTest7
+ *  > runMain scalation.linalgebra.SVDTest7
  */
 object SVDTest8 extends App
 {

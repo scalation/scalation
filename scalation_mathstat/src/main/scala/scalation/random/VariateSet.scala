@@ -215,7 +215,7 @@ case class RandomSetW (count: Int = 10, nWords: Int = 20, lRange: Range = 4 to 6
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VariateSetTest` object is used to test the Random Variate Set (RVS)
  *  generators from the classes derived from `VariateSet`.
- *  > run-main scalation.random.VariateSetTest
+ *  > runMain scalation.random.VariateSetTest
  */
 object VariateSetTest extends App
 {
@@ -236,7 +236,7 @@ object VariateSetTest extends App
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VariateSetTest2` object is used to test the Random Variate Set (RVS)
  *  generators from the classes derived from `VariateSet`.
- *  > run-main scalation.random.VariateSetTest2
+ *  > runMain scalation.random.VariateSetTest2
  */
 object VariateSetTest2 extends App
 {
@@ -252,7 +252,7 @@ object VariateSetTest2 extends App
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VariateSetTest3` object is used to test the Random Variate Set (RVS)
  *  generators from the classes derived from `VariateSet`.
- *  > run-main scalation.random.VariateSetTest3
+ *  > runMain scalation.random.VariateSetTest3
  */
 object VariateSetTest3 extends App
 {

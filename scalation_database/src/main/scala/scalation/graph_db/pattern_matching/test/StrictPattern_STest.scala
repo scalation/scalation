@@ -17,7 +17,7 @@ import scalation.util.banner
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StrictPattern_STest` object is used to test all the Strict Simulation pattern
  *  matchers for labels of type `String`.
- *  > run-main scalation.graph_db.pattern_matching.test.StrictPattern_STest
+ *  > runMain scalation.graph_db.pattern_matching.test.StrictPattern_STest
  */
 object StrictPattern_STest extends App
 {

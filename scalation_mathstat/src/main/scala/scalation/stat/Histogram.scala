@@ -185,7 +185,7 @@ class Canvas (frameW: Int, frameH: Int, value: VectorD, numIntervals: Int)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HistogramTest` object is used to test the `Histogram` class.
  *  As 'k' increases, the sum of Uniform approaches Normal.
- *  > run-main scalation.stat.HistogramTest
+ *  > runMain scalation.stat.HistogramTest
  */
 object HistogramTest extends App
 {

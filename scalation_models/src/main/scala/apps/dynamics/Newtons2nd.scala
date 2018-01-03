@@ -27,7 +27,7 @@ import scalation.plot.Plot
  *  @see     Diff%20Q/pdfscreen/projectoutline.pdf
  *  @see claymore.engineer.gvsu.edu/~lait/312/golfball.pdf
  *  The accuracies of 'RK' and 'DP' versus the exact solution (EX) are compared.
- *  > run-main apps.dynamics.Newtons2nd
+ *  > runMain apps.dynamics.Newtons2nd
  */
 object Newtons2nd extends App
 {

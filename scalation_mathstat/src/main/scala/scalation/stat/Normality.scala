@@ -53,7 +53,7 @@ object Normality
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NormalityTest` object is used to test the `Normality` object.
  *  @see www.seattlecentral.edu/qelp/sets/057/057.html
- *  > run-main scalation.stat.NormalityTest
+ *  > runMain scalation.stat.NormalityTest
  */
 object NormalityTest extends App
 {

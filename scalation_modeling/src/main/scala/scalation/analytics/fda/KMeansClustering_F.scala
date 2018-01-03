@@ -80,7 +80,7 @@ class KMeansClustering_F (x: MatrixD, t: VectorD, τ: VectorD, k: Int, s: Int = 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KMeansClustering_FTest` object is used to test the `KMeansClustering_F`
  *  class.
- *  > run-main scalation.analytics.fda.KMeansClustering_FTest
+ *  > runMain scalation.analytics.fda.KMeansClustering_FTest
  */
 object KMeansClustering_FTest extends App
 {

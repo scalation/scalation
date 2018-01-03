@@ -139,7 +139,7 @@ object SVDImputed
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDImputedTest` object is used to test the `SVDImputed` method.
-  *  > run-main scalation.linalgebra.SVDImputedTest
+  *  > runMain scalation.linalgebra.SVDImputedTest
   */
 object SVDImputedTest extends App
 {

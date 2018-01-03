@@ -20,7 +20,7 @@ import scalation.scala2d.Colors._
  *  by an protein enzyme.
  *  @see scalation.activity.PetriNetTest, scalation.activity.PetriNetRulesTest
  *  for more examples of test code.
- *  > run-main apps.activity.Reaction
+ *  > runMain apps.activity.Reaction
  */
 object Reaction extends App
 {

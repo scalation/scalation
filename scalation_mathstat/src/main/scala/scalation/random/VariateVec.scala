@@ -444,7 +444,7 @@ case class Multinomial (p: Array [Double] = Array (.4, .7, 1.0), n: Int = 5, str
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VariateVecTest` object is used to test the Random Variate Vector (RVV)
  *  generators from the classes derived from `VariateVec`.
- *  > run-main scalation.random.VariateVecTest
+ *  > runMain scalation.random.VariateVecTest
  */
 object VariateVecTest extends App
 {

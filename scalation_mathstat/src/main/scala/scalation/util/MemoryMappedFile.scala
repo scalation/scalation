@@ -74,7 +74,7 @@ class MemoryMappedFile (fname: String, sz: Int = 1024)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MemoryMappedFileTest` is used to test the `MemoryMappedFile` class.
- *  > run-main scalation.util.MemoryMappedFileTest
+ *  > runMain scalation.util.MemoryMappedFileTest
  */
 object MemoryMappedFileTest extends App
 {

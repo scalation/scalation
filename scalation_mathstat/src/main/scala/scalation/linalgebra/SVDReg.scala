@@ -127,7 +127,7 @@ class SVDReg (a: MatrixD, k: Int)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDRegTest` object is used to test the `SVDReg` method.
  *  @see `analytics.recommender.ModelBasedRecommender` for further testing
- *  > run-main scalation.linalgebra.SVDRegTest
+ *  > runMain scalation.linalgebra.SVDRegTest
  */
 object SVDRegTest extends App
 {

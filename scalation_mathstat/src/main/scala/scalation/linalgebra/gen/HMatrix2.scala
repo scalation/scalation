@@ -188,7 +188,7 @@ class HMatrix2 [T: ClassTag: Numeric] (val dim1: Int)
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HMatrix2Test` object is used to test the `HMatrix2` class, in cases
  *  where the 2nd dimension is fixed (i.e., for rectangular 2-dimensional hypermatrices).
- *  > run-main scalation.linalgebra.gen.HMatrix2Test
+ *  > runMain scalation.linalgebra.gen.HMatrix2Test
  */
 object HMatrix2Test extends App
 {
@@ -221,7 +221,7 @@ object HMatrix2Test extends App
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HMatrix2Test2` object is used to test the `HMatrix2` class, in cases
  *  where the 2nd dimension is varied based on the index of the first dimension 'i'
- *  > run-main scalation.linalgebra.gen.HMatrix2Test2
+ *  > runMain scalation.linalgebra.gen.HMatrix2Test2
  */
 object HMatrix2Test2 extends App
 {
@@ -255,7 +255,7 @@ object HMatrix2Test2 extends App
 /** The `HMatrix2Test3` object is used to test the `HMatrix2` class, in cases
  *  where the 2nd dimension is fixed (i.e., for rectangular 2-dimensional hypermatrices).
  *  Same as `HMatrix2Test`, but using `Double` rather than `Int`.
- *  > run-main scalation.linalgebra.gen.HMatrix2Test3
+ *  > runMain scalation.linalgebra.gen.HMatrix2Test3
  */
 object HMatrix2Test3 extends App
 {

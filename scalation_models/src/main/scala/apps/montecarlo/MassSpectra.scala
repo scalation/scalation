@@ -129,7 +129,7 @@ class MassSpectra (thres: Double = 1E-6, noise: Double = 1E-5)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MassSpectraTest` object is used to test the `MassSpectra` class.
- *  > run-main apps.montecarlo.MassSpectraTest
+ *  > runMain apps.montecarlo.MassSpectraTest
  */
 object MassSpectraTest extends App
 {

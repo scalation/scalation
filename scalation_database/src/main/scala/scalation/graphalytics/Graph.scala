@@ -260,7 +260,7 @@ object Graph
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphTest` object is used to test the `Graph` class using the graphs
  *  given in the `Graph` companion object.
- *  > run-main scalation.graphalytics.GraphTest
+ *  > runMain scalation.graphalytics.GraphTest
  */
 object GraphTest extends App
 {
@@ -276,7 +276,7 @@ object GraphTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphTest2` object is used to test the `Graph` class using a randomly
  *  generated graph.
- *  > run-main scalation.graphalytics.GraphTest2
+ *  > runMain scalation.graphalytics.GraphTest2
  */
 object GraphTest2 extends App
 {

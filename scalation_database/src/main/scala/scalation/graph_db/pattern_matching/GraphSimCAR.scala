@@ -71,7 +71,7 @@ import scalation.graph_db.{ExampleGraphS => EX_GRAPH}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSimCARTest` object is used to test the `GraphSimCAR` class.
  *  This object tests the data graph g1 and query graph q1.
- *  > run-main scalation.graph_db.pattern_matching.GraphSimCARTest
+ *  > runMain scalation.graph_db.pattern_matching.GraphSimCARTest
  */
 object GraphSimCARTest extends App
 {
@@ -90,7 +90,7 @@ object GraphSimCARTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSimCARTest2` object is used to test the `GraphSimCAR` class.
  *  This object tests the data graph g2 and query graph q2.
- *  > run-main scalation.graph_db.pattern_matching.GraphSimCARTest2
+ *  > runMain scalation.graph_db.pattern_matching.GraphSimCARTest2
  */
 object GraphSimCARTest2 extends App
 {
@@ -109,7 +109,7 @@ object GraphSimCARTest2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSimCARTest3` object is used to test the `GraphSimCAR` class.
  *  This object tests randomly (uniform) generated graphs.
- *  > run-main scalation.graph_db.pattern_matching.GraphSimCARTest3
+ *  > runMain scalation.graph_db.pattern_matching.GraphSimCARTest3
  */
 object GraphSimCARTest3 extends App
 {
@@ -133,7 +133,7 @@ object GraphSimCARTest3 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSimCARTest4` object is used to test the `GraphSimCAR` class.
  *  This object tests randomly (PowerLaw) generated graphs.
- *  > run-main scalation.graph_db.pattern_matching.GraphSimCARTest4
+ *  > runMain scalation.graph_db.pattern_matching.GraphSimCARTest4
  */
 object GraphSimCARTest4 extends App
 {
@@ -157,7 +157,7 @@ object GraphSimCARTest4 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSimCARTest5` object is used to test the `GraphSimCAR` class.
  *  This object tests graphs read from files.
- *  > run-main scalation.graph_db.pattern_matching.GraphSimCARTest5
+ *  > runMain scalation.graph_db.pattern_matching.GraphSimCARTest5
  */
 object GraphSimCARTest5 extends App
 {
@@ -181,7 +181,7 @@ object GraphSimCARTest5 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSimCARTest8` object is used to test the `GraphSimCAR` class.
  *  This object tests the data graph g2 and query graph q2.
- *  > run-main scalation.graph_db.pattern_matching.GraphSimCARTest8
+ *  > runMain scalation.graph_db.pattern_matching.GraphSimCARTest8
  *
 object GraphSimCARTest8 extends App
 {

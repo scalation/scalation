@@ -181,7 +181,7 @@ class QuasiNewton (f: FunctionV2S, g: FunctionV2S = null,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `QuasiNewtonTest` object is used to test the `QuasiNewton` class.
- *  > run-main scalation.minima.QuasiNewtonTest
+ *  > runMain scalation.minima.QuasiNewtonTest
  */
 object QuasiNewtonTest extends App
 {

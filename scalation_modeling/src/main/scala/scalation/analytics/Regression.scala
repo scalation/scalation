@@ -278,7 +278,7 @@ import Regression._
  *  <p>
  *  Test regression and backward elimination.
  *  @see statmaster.sdu.dk/courses/st111/module03/index.html
- *  > run-main scalation.analytics.RegressionTest
+ *  > runMain scalation.analytics.RegressionTest
  */
 object RegressionTest extends App
 {
@@ -309,7 +309,7 @@ object RegressionTest extends App
  *  <p>
  *  Test regression using QR Decomposition and Gaussian Elimination for computing
  *  the pseudo-inverse.
- *  > run-main scalation.analytics.RegressionTest2
+ *  > runMain scalation.analytics.RegressionTest2
  */
 object RegressionTest2 extends App
 {
@@ -340,7 +340,7 @@ object RegressionTest2 extends App
  *  <p>
  *  @see online.stat.psu.edu/online/development/stat501/12multicollinearity/05multico_vif.html
  *  @see online.stat.psu.edu/online/development/stat501/data/bloodpress.txt
- *  > run-main scalation.analytics.RegressionTest3
+ *  > runMain scalation.analytics.RegressionTest3
  */
 object RegressionTest3 extends App
 {
@@ -390,7 +390,7 @@ object RegressionTest3 extends App
  *  <p>
  *  @see online.stat.psu.edu/online/development/stat501/12multicollinearity/05multico_vif.html
  *  @see online.stat.psu.edu/online/development/stat501/data/bloodpress.txt
- *  > run-main scalation.analytics.RegressionTest4
+ *  > runMain scalation.analytics.RegressionTest4
  */
 object RegressionTest4 extends App
 {

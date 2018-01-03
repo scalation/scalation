@@ -538,7 +538,7 @@ class ARIMA (y: VectoD, t: VectoD, d: Int = 0)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ARIMATest` object is used to test the `ARIMA` class.
- *  > run-main scalation.analytics.ARIMATest
+ *  > runMain scalation.analytics.ARIMATest
  */
 object ARIMATest extends App
 {
@@ -572,7 +572,7 @@ object ARIMATest extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ARIMATest2` object is used to test the `ARIMA` class.
- *  > run-main scalation.analytics.ARIMATest2
+ *  > runMain scalation.analytics.ARIMATest2
  */
 object ARIMATest2 extends App
 {
@@ -617,7 +617,7 @@ object ARIMATest2 extends App
 /** The `ARIMATest3` object is used to test the `ARIMA` class.
  *  Forecasting lake levels.
  *  @see ???
- * > run-main scalation.analytics.ARIMATest3
+ * > runMain scalation.analytics.ARIMATest3
  */
 object ARIMATest3 extends App
 {
@@ -665,7 +665,7 @@ object ARIMATest3 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ARIMATest4` object is used to test the `ARIMA` class.
- * > run-main scalation.analytics.ARIMATest4
+ * > runMain scalation.analytics.ARIMATest4
  */
 object ARIMATest4 extends App
 {

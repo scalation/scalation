@@ -114,7 +114,7 @@ class StatFunction (xa: Functions)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StatFunctionTest` object is used to test the `StatFunction` class.
- *  > run-main scalation.analytics.fda.StatFunctionTest
+ *  > runMain scalation.analytics.fda.StatFunctionTest
  */
 object StatFunctionTest extends App
 {
@@ -143,7 +143,7 @@ object StatFunctionTest extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StatFunctionTest2` object is used to test the `StatFunction` object.
- *  > run-main scalation.analytics.fda.StatFunctionTest2
+ *  > runMain scalation.analytics.fda.StatFunctionTest2
  */
 object StatFunctionTest2 extends App
 {

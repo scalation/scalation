@@ -82,7 +82,7 @@ class Bidiagonal2 (private var a: MatrixD, m_by_n: Boolean = true)
 /** The `Bidiagonal2Test` object is used to test the `Bidiagonal2` class.
  *  bidiagonalization answer = [ (21.8, -.613), (12.8, 2.24, 0.) ]
  *  @see books.google.com/books?isbn=0801854148  (p. 252)
- *  > run-main scalation.linalgebra.Bidiagonal2Test
+ *  > runMain scalation.linalgebra.Bidiagonal2Test
  */
 object Bidiagonal2Test extends App
 {
@@ -108,7 +108,7 @@ object Bidiagonal2Test extends App
  *  bidiagonalization answer = [ (21.8, -.613), (12.8, 2.24, 0.) ]
  *  This version produces an 'm-by-m u' matrix.
  *  @see books.google.com/books?isbn=0801854148  (p. 252)
- *  > run-main scalation.linalgebra.Bidiagonal2Test2
+ *  > runMain scalation.linalgebra.Bidiagonal2Test2
  */
 object Bidiagonal2Test2 extends App
 {

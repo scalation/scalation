@@ -78,7 +78,7 @@ class MuDualSim [TLabel: ClassTag](g: MuGraph [TLabel], q: MuGraph [TLabel])
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuDualSimTest` object is used to test the `MuDualSim` class.
- *  > run-main scalation.graphalytics.multi.MuDualSimTest
+ *  > runMain scalation.graphalytics.multi.MuDualSimTest
  */
 object MuDualSimTest extends App
 {
@@ -119,7 +119,7 @@ object MuDualSimTest extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuDualSimTest2` object is used to test the `MuDualSim` class.
- *  > run-main scalation.graphalytics.multi.MuDualSimTest2
+ *  > runMain scalation.graphalytics.multi.MuDualSimTest2
  */
 object MuDualSimTest2 extends App
 {
@@ -144,7 +144,7 @@ object MuDualSimTest2 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuDualSimTest3` object is used to test the `MuDualSim` class.
- *  > run-main scalation.graphalytics.multi.MuDualSimTest3
+ *  > runMain scalation.graphalytics.multi.MuDualSimTest3
  */
 object MuDualSimTest3 extends App
 {
@@ -168,7 +168,7 @@ object MuDualSimTest3 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuDualSimTest4` object is used to test the `MuDualSim` class.
- *  > run-main scalation.graphalytics.multi.MuDualSimTest4
+ *  > runMain scalation.graphalytics.multi.MuDualSimTest4
  */
 //object MuDualSimTest4 extends App
 //{

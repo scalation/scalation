@@ -123,7 +123,7 @@ class MinSpanningTree (g: MGraph [Double], min: Boolean = true, undirected: Bool
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MinSpanningTreeTest` object is used to test the `MinSpanningTree` class.
- *  > run-main scalation.graph_db.MinSpanningTreeTest
+ *  > runMain scalation.graph_db.MinSpanningTreeTest
  */
 object MinSpanningTreeTest extends App
 {
@@ -143,7 +143,7 @@ object MinSpanningTreeTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MinSpanningTreeTest2` object is used to test the `MinSpanningTree` class.
  *  @see www.cse.ust.hk/~dekai/271/notes/L07/L07.pdf
- *  > run-main scalation.graph_db.MinSpanningTreeTest2
+ *  > runMain scalation.graph_db.MinSpanningTreeTest2
  */
 object MinSpanningTreeTest2 extends App
 {
@@ -179,7 +179,7 @@ object MinSpanningTreeTest2 extends App
 /** The `MinSpanningTreeTest3` object is used to test the `MinSpanningTree` class.
  *  This test the Maximum Spanning Tree option.
  *  @see www.cse.ust.hk/~dekai/271/notes/L07/L07.pdf
- *  > run-main scalation.graph_db.MinSpanningTreeTest3
+ *  > runMain scalation.graph_db.MinSpanningTreeTest3
  */
 object MinSpanningTreeTest3 extends App
 {

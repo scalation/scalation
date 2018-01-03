@@ -219,7 +219,7 @@ import SVDecomp._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDecompTest` object tests the equality of the `SVD` and `SVD2` classes.
- *  > run-main scalation.linalgebra.SVDecompTest
+ *  > runMain scalation.linalgebra.SVDecompTest
  */
 object SVDecompTest extends App
 {
@@ -231,7 +231,7 @@ object SVDecompTest extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDecompTest2` object tests the equality of the `SVD` and `SVD2` classes.
- *  > run-main scalation.linalgebra.SVDecompTest2
+ *  > runMain scalation.linalgebra.SVDecompTest2
  */
 object SVDecompTest2 extends App
 {
@@ -243,7 +243,7 @@ object SVDecompTest2 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDecompTest3` object tests the equality of the `SVD` and `SVD2` classes.
- *  > run-main scalation.linalgebra.SVDecompTest3
+ *  > runMain scalation.linalgebra.SVDecompTest3
  */
 object SVDecompTest3 extends App
 {
@@ -255,7 +255,7 @@ object SVDecompTest3 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDecompTest4` object tests the equality of the `SVD` and `SVD2` classes.
- *  > run-main scalation.linalgebra.SVDecompTest4
+ *  > runMain scalation.linalgebra.SVDecompTest4
  */
 object SVDecompTest4 extends App
 {
@@ -267,7 +267,7 @@ object SVDecompTest4 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDecompTest5` object tests the equality of the `SVD` and `SVD2` classes.
- *  > run-main scalation.linalgebra.SVDecompTest5
+ *  > runMain scalation.linalgebra.SVDecompTest5
  */
 object SVDecompTest5 extends App
 {
@@ -279,7 +279,7 @@ object SVDecompTest5 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDecompTest6` object tests the equality of the `SVD` and `SVD2` classes.
- *  > run-main scalation.linalgebra.SVDecompTest6
+ *  > runMain scalation.linalgebra.SVDecompTest6
  */
 object SVDecompTest6 extends App
 {
@@ -291,7 +291,7 @@ object SVDecompTest6 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDecompTest7` object tests the equality of the `SVD` and `SVD2` classes.
- *  > run-main scalation.linalgebra.SVDecompTest7
+ *  > runMain scalation.linalgebra.SVDecompTest7
  */
 object SVDecompTest7 extends App
 {
@@ -303,7 +303,7 @@ object SVDecompTest7 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVDecompTest8` object tests the equality of the `SVD` and `SVD2` classes.
- *  > run-main scalation.linalgebra.SVDecompTest8
+ *  > runMain scalation.linalgebra.SVDecompTest8
  */
 object SVDecompTest8 extends App
 {

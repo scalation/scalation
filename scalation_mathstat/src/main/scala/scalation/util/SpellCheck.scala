@@ -17,7 +17,7 @@ import scala.collection.mutable.Set
 /** The `RunSpellCheck` object is used to check the spelling of the a given package.
  *  The package directory (relative path) is entered as a command-line argument.
  *  Ex:  'scalation/math'
- *  > run-main scalation.util.RunSpellCheck <package directory>
+ *  > runMain scalation.util.RunSpellCheck <package directory>
  */
 object RunSpellCheck extends App
 {

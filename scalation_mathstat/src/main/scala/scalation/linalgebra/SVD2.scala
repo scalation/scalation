@@ -83,7 +83,7 @@ import SVDecomp._
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVD2Test` object is used to test the `SVD2` class.
  *  @see www.ling.ohio-state.edu/~kbaker/pubs/Singular_Value_Decomposition_Tutorial.pdf
- *  > run-main scalation.linalgebra.SVD2Test
+ *  > runMain scalation.linalgebra.SVD2Test
  */
 object SVD2Test extends App
 {
@@ -95,7 +95,7 @@ object SVD2Test extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVD2Test2` object is used to test the `SVD2` class.
  *  @see www.ling.ohio-state.edu/~kbaker/pubs/Singular_Value_Decomposition_Tutorial.pdf
- *  > run-main scalation.linalgebra.SVD2Test2
+ *  > runMain scalation.linalgebra.SVD2Test2
  */
 object SVD2Test2 extends App
 {
@@ -106,7 +106,7 @@ object SVD2Test2 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVD2Test3` object is used to test the `SVD2` class.
- *  > run-main scalation.linalgebra.SVD2Test3
+ *  > runMain scalation.linalgebra.SVD2Test3
  */
 object SVD2Test3 extends App
 {
@@ -117,7 +117,7 @@ object SVD2Test3 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVD2Test4` object is used to test the `SVD2` class.
- *  > run-main scalation.linalgebra.SVD2Test4
+ *  > runMain scalation.linalgebra.SVD2Test4
  */
 object SVD2Test4 extends App
 {
@@ -128,7 +128,7 @@ object SVD2Test4 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVD2Test5` object is used to test the `SVD2` class.
- *  > run-main scalation.linalgebra.SVD2Test5
+ *  > runMain scalation.linalgebra.SVD2Test5
  */
 object SVD2Test5 extends App
 {
@@ -139,7 +139,7 @@ object SVD2Test5 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVD2Test6` object is used to test the `SVD2` class.
- *  > run-main scalation.linalgebra.SVD2Test6
+ *  > runMain scalation.linalgebra.SVD2Test6
  */
 object SVD2Test6 extends App
 {
@@ -150,7 +150,7 @@ object SVD2Test6 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVD2Test7` object is used to test the `SVD2` class.
- *  > run-main scalation.linalgebra.SVD2Test7
+ *  > runMain scalation.linalgebra.SVD2Test7
  */
 object SVD2Test7 extends App
 {
@@ -161,7 +161,7 @@ object SVD2Test7 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVD2Test8` object is used to test the `SVD2` class.
- *  > run-main scalation.linalgebra.SVD2Test8
+ *  > runMain scalation.linalgebra.SVD2Test8
  */
 object SVD2Test8 extends App
 {

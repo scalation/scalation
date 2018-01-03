@@ -273,7 +273,7 @@ import scalation.linalgebra.MatrixI
 /** The `PGMHD3cpTest` object is used to test the `PGMHD3cp` class.
  *  Classify whether a car is more likely to be stolen (1) or not (1).
  *  @see www.inf.u-szeged.hu/~ormandi/ai2/06-naiveBayes-example.pdf
- *  > run-main scalation.analytics.classifier.PGMHD3cpTest
+ *  > runMain scalation.analytics.classifier.PGMHD3cpTest
  */
 object PGMHD3cpTest extends App
 {
@@ -321,7 +321,7 @@ object PGMHD3cpTest extends App
 /** The `PGMHD3cpTest2` object is used to test the 'PGMHD3cp' class.
  *  Given whether a person is Fast and/or Strong, classify them as making C = 1
  *  or not making C = 0 the football team.
- *  > run-main scalation.analytics.classifier.PGMHD3cpTest2
+ *  > runMain scalation.analytics.classifier.PGMHD3cpTest2
  */
 object PGMHD3cpTest2 extends App
 {
@@ -364,7 +364,7 @@ object PGMHD3cpTest2 extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PGMHD3cpTest3` object is used to test the 'PGMHD3cp' class.
- *  > run-main scalation.analytics.classifier.PGMHD3cpTest3
+ *  > runMain scalation.analytics.classifier.PGMHD3cpTest3
  */
 object PGMHD3cpTest3 extends App
 {

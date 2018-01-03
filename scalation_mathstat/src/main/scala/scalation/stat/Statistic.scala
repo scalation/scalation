@@ -383,7 +383,7 @@ object TimeStatistic
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StatisticTest` object is used to test the `Statistic` and `TimeStatistic`
  *  classes.
- *  > run-main scalation.stat.StatisticTest
+ *  > runMain scalation.stat.StatisticTest
  */
 object StatisticTest extends App
 {

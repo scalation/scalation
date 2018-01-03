@@ -72,7 +72,7 @@ import scalation.graph_db.{ExampleMGraphS => EX_GRAPH}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphSimTest` object is used to test the `MGraphSim` class.
  *  This object tests the data graph g1 and query graph q1.
- *  > run-main scalation.graph_db.pattern_matching.MGraphSimTest
+ *  > runMain scalation.graph_db.pattern_matching.MGraphSimTest
  */
 object MGraphSimTest extends App
 {
@@ -91,7 +91,7 @@ object MGraphSimTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphSimTest2` object is used to test the `MGraphSim` class.
  *  This object tests the data graph g2 and query graph q2.
- *  > run-main scalation.graph_db.pattern_matching.MGraphSimTest2
+ *  > runMain scalation.graph_db.pattern_matching.MGraphSimTest2
  */
 object MGraphSimTest2 extends App
 {
@@ -110,7 +110,7 @@ object MGraphSimTest2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphSimTest3` object is used to test the `MGraphSim` class.
  *  This object tests the data graph g3 and query graph q3.
- *  > run-main scalation.graph_db.pattern_matching.MGraphSimTest3
+ *  > runMain scalation.graph_db.pattern_matching.MGraphSimTest3
  */
 object MGraphSimTest3 extends App
 {
@@ -131,7 +131,7 @@ object MGraphSimTest3 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphSimTest4` object is used to test the `MGraphSim` class.
  *  This object tests randomly (uniform) generated graphs.
- *  > run-main scalation.graph_db.pattern_matching.MGraphSimTest4
+ *  > runMain scalation.graph_db.pattern_matching.MGraphSimTest4
  */
 object MGraphSimTest4 extends App
 {
@@ -155,7 +155,7 @@ object MGraphSimTest4 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphSimTest5` object is used to test the `MGraphSim` class.
  *  This object tests randomly (PowerLaw) generated graphs.
- *  > run-main scalation.graph_db.pattern_matching.MGraphSimTest5
+ *  > runMain scalation.graph_db.pattern_matching.MGraphSimTest5
  */
 object MGraphSimTest5 extends App
 {
@@ -179,7 +179,7 @@ object MGraphSimTest5 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphSimTest6` object is used to test the `MGraphSim` class.
  *  This object tests graphs read from files.
- *  > run-main scalation.graph_db.pattern_matching.MGraphSimTest6
+ *  > runMain scalation.graph_db.pattern_matching.MGraphSimTest6
  */
 object MGraphSimTest6 extends App
 {

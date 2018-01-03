@@ -16,7 +16,7 @@ import Answers._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphPatternTest` object is used to test all the Graph pattern matchers.
- *  > run-main scalation.graphalytics.GraphPatternTest
+ *  > runMain scalation.graphalytics.GraphPatternTest
  */
 object GraphPatternTest extends App
 {

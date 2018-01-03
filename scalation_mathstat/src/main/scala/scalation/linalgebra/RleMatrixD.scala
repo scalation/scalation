@@ -1301,7 +1301,7 @@ object RleMatrixD
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RleMatrixDTest` object tests the operations provided by `MatrixD` class.
- *  > run-main scalation.linalgebra.RleMatrixDTest
+ *  > runMain scalation.linalgebra.RleMatrixDTest
  */
 object RleMatrixDTest extends App
 {

@@ -232,7 +232,7 @@ object DArray
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DArrayTest` object tests the operations provided by `DArrayTest`.
- *  > run-main scalation.util.DArrayTest
+ *  > runMain scalation.util.DArrayTest
  */
 object DArrayTest extends App
 {  

@@ -104,7 +104,7 @@ trait Predictor
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PredictorTest` object tests all the classes in the `scalation.analytics`
  *  package that directly or indirectly extend the `Predictor` trait.
- *  > run-main scalation.analytics.PredictorTet
+ *  > runMain scalation.analytics.PredictorTet
  */
 object PredictorTest extends App
 {

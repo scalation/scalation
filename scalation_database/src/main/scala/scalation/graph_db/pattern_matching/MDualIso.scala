@@ -140,7 +140,7 @@ class MDualIso [TLabel: ClassTag] (g: MGraph [TLabel], q: MGraph [TLabel], duals
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualIsoTest` object is used to test the `MDualIso` class.
- *  > run-main scalation.graph_db.pattern_matching.DualIsoTest
+ *  > runMain scalation.graph_db.pattern_matching.DualIsoTest
  */
 object MDualIsoTest extends App
 {
@@ -162,7 +162,7 @@ object MDualIsoTest extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualIsoTest2` object is used to test the `MDualIso` class.
- *  > run-main scalation.graph_db.pattern_matching.DualIsoTest2
+ *  > runMain scalation.graph_db.pattern_matching.DualIsoTest2
  */
 object MDualIsoTest2 extends App
 {
@@ -184,7 +184,7 @@ object MDualIsoTest2 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualIsoTest3` object is used to test the `MDualIso` class.
- *  > run-main scalation.graph_db.pattern_matching.DualIsoTest3
+ *  > runMain scalation.graph_db.pattern_matching.DualIsoTest3
  */
 object MDualIsoTest3 extends App
 {

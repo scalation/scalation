@@ -1557,7 +1557,7 @@ class RleVectorL (val dim: Int, protected var v: ReArray [TripletL] = null)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RleVectorLTest` object tests the operations provided by `RleVectorL`.
- *  > run-main scalation.linalgebra.RleVectorLTest
+ *  > runMain scalation.linalgebra.RleVectorLTest
  */
 object RleVectorLTest extends App 
 {

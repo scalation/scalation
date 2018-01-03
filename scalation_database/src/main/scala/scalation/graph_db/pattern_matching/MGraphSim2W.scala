@@ -83,7 +83,7 @@ import scalation.graph_db.{ExampleMGraphS => EX_GRAPH}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphSim2WTest` object is used to test the `MGraphSim2W` class.
  *  This object tests the data graph g1 and query graph q1.
- *  > run-main scalation.graph_db.pattern_matching.MGraphSim2WTest
+ *  > runMain scalation.graph_db.pattern_matching.MGraphSim2WTest
  */
 object MGraphSim2WTest extends App
 {
@@ -102,7 +102,7 @@ object MGraphSim2WTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphSim2WTest2` object is used to test the `MGraphSim2W` class.
  *  This object tests the data graph g2 and query graph q2.
- *  > run-main scalation.graph_db.pattern_matching.MGraphSim2WTest2
+ *  > runMain scalation.graph_db.pattern_matching.MGraphSim2WTest2
  */
 object MGraphSim2WTest2 extends App
 {
@@ -121,7 +121,7 @@ object MGraphSim2WTest2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphSim2WTest3` object is used to test the `MGraphSim2W` class.
  *  This object tests the data graph g3 and query graph q3.
- *  > run-main scalation.graph_db.pattern_matching.MGraphSim2WTest3
+ *  > runMain scalation.graph_db.pattern_matching.MGraphSim2WTest3
  */
 object MGraphSim2WTest3 extends App
 {
@@ -140,7 +140,7 @@ object MGraphSim2WTest3 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphSim2WTest4` object is used to test the `MGraphSim2W` class.
  *  This object tests randomly (uniform) generated graphs.
- *  > run-main scalation.graph_db.pattern_matching.MGraphSim2WTest4
+ *  > runMain scalation.graph_db.pattern_matching.MGraphSim2WTest4
  */
 object MGraphSim2WTest4 extends App
 {
@@ -164,7 +164,7 @@ object MGraphSim2WTest4 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphSim2WTest5` object is used to test the `MGraphSim2W` class.
  *  This object tests randomly (PowerLaw) generated graphs.
- *  > run-main scalation.graph_db.pattern_matching.MGraphSim2WTest5
+ *  > runMain scalation.graph_db.pattern_matching.MGraphSim2WTest5
  */
 object MGraphSim2WTest5 extends App
 {
@@ -188,7 +188,7 @@ object MGraphSim2WTest5 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphSim2WTest6` object is used to test the `MGraphSim2W` class.
  *  This object tests graphs read from files.
- *  > run-main scalation.graph_db.pattern_matching.MGraphSim2WTest6
+ *  > runMain scalation.graph_db.pattern_matching.MGraphSim2WTest6
  */
 object MGraphSim2WTest6 extends App
 {

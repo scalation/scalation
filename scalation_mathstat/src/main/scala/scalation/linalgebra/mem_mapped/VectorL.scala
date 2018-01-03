@@ -975,7 +975,7 @@ object VectorL
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VectorLTest` object tests the operations provided by `VectorL`.
- *  > run-main scalation.linalgebra.mem_mapped.VectorLTest
+ *  > runMain scalation.linalgebra.mem_mapped.VectorLTest
  */
 object VectorLTest extends App
 {

@@ -192,7 +192,7 @@ class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: D
  *  <p>
  *  Test regression and backward elimination.
  *  @see http://statmaster.sdu.dk/courses/st111/module03/index.html
- *  > run-main scalation.analytics.LassoRegressionTest
+ *  > runMain scalation.analytics.LassoRegressionTest
  */
 object LassoRegressionTest extends App
 {

@@ -142,7 +142,7 @@ case class RandomMatD (dim1: Int = 5, dim2: Int = 10, max: Double = 20.0, min: D
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VariateMatTest` object is used to test the Random Variate Matrix (RVM)
  *  generators from the classes derived from `VariateMat`.
- *  > run-main scalation.random.VariateMatTest
+ *  > runMain scalation.random.VariateMatTest
  */
 object VariateMatTest extends App
 {

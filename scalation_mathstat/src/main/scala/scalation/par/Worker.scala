@@ -26,7 +26,7 @@ class Worker (task: (Int) => Any, i: Int) extends Thread
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `WorkerTest` object tests the `Worker` class vs. Scala's built-in '.par'
  *  on the matrix multiplication problem.
- *  > run-main scalation.frame.WorkerTest
+ *  > runMain scalation.frame.WorkerTest
  */
 object WorkerTest extends App
 {

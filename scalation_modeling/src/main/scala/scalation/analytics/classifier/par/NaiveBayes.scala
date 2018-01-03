@@ -333,7 +333,7 @@ import scalation.linalgebra.MatrixI
  *  Classify whether a car is more likely to be stolen (1) or not (1).
  *
  *  @see www.inf.u-szeged.hu/~ormandi/ai2/06-naiveBayes-example.pdf
- *  > run-main scalation.analytics.classifier.par.NaiveBayesTest
+ *  > runMain scalation.analytics.classifier.par.NaiveBayesTest
  */
 object NaiveBayesTest extends App
 {
@@ -381,7 +381,7 @@ object NaiveBayesTest extends App
 /** The `NaiveBayesTest2` object is used to test the 'NaiveBayes' class.
  *  Given whether a person is Fast and/or Strong, classify them as making C = 1
  *  or not making C = 0 the football team.
- *  > run-main scalation.analytics.classifier.par.NaiveBayesTest2
+ *  > runMain scalation.analytics.classifier.par.NaiveBayesTest2
  */
 object NaiveBayesTest2 extends App
 {
@@ -425,7 +425,7 @@ object NaiveBayesTest2 extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NaiveBayesTest3` object is used to test the 'NaiveBayes' class.
- *  > run-main scalation.analytics.classifier.par.NaiveBayesTest3
+ *  > runMain scalation.analytics.classifier.par.NaiveBayesTest3
  */
 object NaiveBayesTest3 extends App
 {

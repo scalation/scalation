@@ -156,7 +156,7 @@ class GraphDFS (g: Graph, bfs: Boolean = false)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphDFSTest` is used to test the `GraphDFS` class.
- *  > run-main scalation.graphalytics.GraphDFSTest
+ *  > runMain scalation.graphalytics.GraphDFSTest
  */
 object GraphDFSTest extends App
 {

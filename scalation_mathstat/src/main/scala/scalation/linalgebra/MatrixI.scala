@@ -1830,7 +1830,7 @@ object MatrixI extends Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MatrixITest` object tests the operations provided by `MatrixI` class.
- *  > run-main scalation.linalgebra.MatrixITest
+ *  > runMain scalation.linalgebra.MatrixITest
  */
 object MatrixITest extends App
 {

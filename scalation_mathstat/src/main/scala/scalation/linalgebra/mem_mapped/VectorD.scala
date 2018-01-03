@@ -975,7 +975,7 @@ object VectorD
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VectorDTest` object tests the operations provided by `VectorD`.
- *  > run-main scalation.linalgebra.mem_mapped.VectorDTest
+ *  > runMain scalation.linalgebra.mem_mapped.VectorDTest
  */
 object VectorDTest extends App
 {

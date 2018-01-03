@@ -195,7 +195,7 @@ class Bidiagonal [MatT <: MatriD] (a: MatT)
 /** The `BidiagonalTest` object is used to test the `Bidiagonal` class.
  *  bidiagonalization answer = [ (21.8, -.613), (12.8, 2.24, 0.) ]
  *  @see books.google.com/books?isbn=0801854148  (p. 252)
- *  > run-main scalation.linalgebra.BidiagonalTest
+ *  > runMain scalation.linalgebra.BidiagonalTest
  */
 object BidiagonalTest extends App
 {

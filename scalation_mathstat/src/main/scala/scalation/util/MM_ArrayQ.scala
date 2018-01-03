@@ -201,7 +201,7 @@ object MM_ArrayQ
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MM_ArrayQTest` is used to test the `MM_ArrayQ` class.
- *  > run-main scalation.util.MM_ArrayQTest
+ *  > runMain scalation.util.MM_ArrayQTest
  */
 object MM_ArrayQTest extends App
 {

@@ -89,7 +89,7 @@ class Brent (g: FunctionS2S, root: FunctionSelector = FiniteDifference)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BrentTest` object is used to test the `Brent` class.
- *  > run-main scalation.minima.BrentTest
+ *  > runMain scalation.minima.BrentTest
  */
 object BrentTest extends App
 {

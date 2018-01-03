@@ -18,7 +18,7 @@ import scalation.util.EasyWriter
 /** The `ClassSchedule` object is an app used for scheduling classes for a 2 year
  *  cycle of four semesters, excluding Summer semesters.  It illustrates the
  *  capabilties of the ScalaTion analytics database.
- *  > run-main apps.relalgebra.ClassSchedule
+ *  > runMain apps.relalgebra.ClassSchedule
  */
 object ClassSchedule extends App
 {

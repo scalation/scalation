@@ -15,7 +15,7 @@ import scalation.graph_db.{ExampleMGraphD => EX_GRAPH}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StrictPattern_DTest` object is used to test all the Strict Simulation pattern
  *  matchers for labels of type `Double`.
- *  > run-main scalation.graph_db.pattern_matching.StrictPattern_DTest
+ *  > runMain scalation.graph_db.pattern_matching.StrictPattern_DTest
  */
 object StrictPattern_DTest extends App
 {

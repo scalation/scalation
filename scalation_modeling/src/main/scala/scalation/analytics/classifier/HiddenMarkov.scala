@@ -253,7 +253,7 @@ class HiddenMarkov (ob: VectorI, m: Int, n: Int, private var pi: VectorD = null,
 /** The `HiddenMarkovTest` object is used to test the `HiddenMarkov` class.
  *  Given model '(pi, a, b)', determine the probability of the observations 'ob'.
  *  @see www.cs.sjsu.edu/~stamp/RUA/HMM.pdf (exercise 1).
- *  > run-main scalation.analytics.classifieu.HiddenMarkovTest
+ *  > runMain scalation.analytics.classifieu.HiddenMarkovTest
  */
 object HiddenMarkovTest extends App
 {
@@ -280,7 +280,7 @@ object HiddenMarkovTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HiddenMarkovTest2` object is used to test the `HiddenMarkov` class.
  *  Train the model (pi, a, b) based on the observed data.
- *  > run-main scalation.analytics.classifier.HiddenMarkovTest2
+ *  > runMain scalation.analytics.classifier.HiddenMarkovTest2
  */
 object HiddenMarkovTest2 extends App
 {

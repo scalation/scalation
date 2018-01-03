@@ -272,7 +272,7 @@ class MuStrictSim [TLabel: ClassTag] (g: MuGraph [TLabel], q: MuGraph [TLabel])
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuStrictSimTest` object is used to test the `MuStrictSim` class.
- *  > run-main scalation.graphalytics.multi.MuStrictSimTest
+ *  > runMain scalation.graphalytics.multi.MuStrictSimTest
  */
 object MuStrictSimTest extends App
 {
@@ -313,7 +313,7 @@ object MuStrictSimTest extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: ::::::::::::
 /** The `MuStrictSimTest2` object is used to test the `MuStrictSim` class.
- *  > run-main scalation.graphalytics.multi.MuStrictSimTest2
+ *  > runMain scalation.graphalytics.multi.MuStrictSimTest2
  */
 object MuStrictSimTest2 extends App 
 {
@@ -338,7 +338,7 @@ object MuStrictSimTest2 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuStrictSimTest3` object is used to test the `MuStrictlSim` class.
- *  > run-main scalation.graphalytics.multi.MuStrictSimTest3
+ *  > runMain scalation.graphalytics.multi.MuStrictSimTest3
  */
 object MuStrictSimTest3 extends App
 {
@@ -363,7 +363,7 @@ object MuStrictSimTest3 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuStrictSimTest3` object test the `MuStrictSim` class by passing data graph
  *  and query graph relative file paths.
- *  > run-main scalation.graphalytics.multi.MuStrictSimTest3
+ *  > runMain scalation.graphalytics.multi.MuStrictSimTest3
  */
 /*object MuStrictSimTest3 extends App 
 {

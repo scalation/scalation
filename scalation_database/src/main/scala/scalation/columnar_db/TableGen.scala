@@ -129,7 +129,7 @@ object TableGen
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TableGenTest` is used to test the `TableGen` object.  Create unpopulated
  *  tables and use the table generator to populate their columns.
- *  > run-main scalation.columnar_db.TableGenTest
+ *  > runMain scalation.columnar_db.TableGenTest
  */
 object TableGenTest extends App
 {

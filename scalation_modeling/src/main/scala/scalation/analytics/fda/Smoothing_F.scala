@@ -102,7 +102,7 @@ class Smoothing_F (y: VectorD, t: VectorD, private var τ: VectorD = null, ord: 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Smoothing_FTest` is used to test the `Smoothing_F` class.
- *  > run-main scalation.analytics.fda.Smoothing_FTest
+ *  > runMain scalation.analytics.fda.Smoothing_FTest
  */
 object Smoothing_FTest extends App
 {
@@ -129,7 +129,7 @@ object Smoothing_FTest extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Smoothing_FTest2` is used to test the `Smoothing_F` class.
- *  > run-main scalation.analytics.fda.Smoothing_FTest2
+ *  > runMain scalation.analytics.fda.Smoothing_FTest2
  */
 object Smoothing_FTest2 extends App
 {

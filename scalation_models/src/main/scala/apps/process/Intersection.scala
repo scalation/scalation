@@ -15,7 +15,7 @@ import scalation.random.{Bernoulli, Sharp, Uniform, Variate}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Intersection` object is used to run the `IntersectionModel` class.
- *  > run-main apps.process.Intersection
+ *  > runMain apps.process.Intersection
  */
 object Intersection extends App 
 {

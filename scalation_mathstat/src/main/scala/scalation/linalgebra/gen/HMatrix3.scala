@@ -203,7 +203,7 @@ class HMatrix3 [T: ClassTag: Numeric] (val dim1: Int, val dim2: Int)
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HMatrix3Test` object is used to test the `HMatrix3` class, in cases
  *  where the 3rd dimension is fixed (i.e., for cuboidic 3-dimensional hypermatrices).
- *  > run-main scalation.linalgebra.gen.HMatrix3Test
+ *  > runMain scalation.linalgebra.gen.HMatrix3Test
  */
 object HMatrix3Test extends App
 {
@@ -236,7 +236,7 @@ object HMatrix3Test extends App
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HMatrix3Test2` object is used to test the `HMatrix3` class, in cases
  *  where the 3rd dimension is varied based on the index of the second dimension 'j'
- *  > run-main scalation.linalgebra.gen.HMatrix3Test2
+ *  > runMain scalation.linalgebra.gen.HMatrix3Test2
  */
 object HMatrix3Test2 extends App
 {
@@ -270,7 +270,7 @@ object HMatrix3Test2 extends App
 /** The `HMatrix3Test3` object is used to test the `HMatrix3` class, in cases
  *  where the 3rd dimension is fixed (i.e., for cuboidic 3-dimensional hypermatrices).
  *  Same as `HMatrix3Test`, but using `Double` rather than `Int`.
- *  > run-main scalation.linalgebra.gen.HMatrix3Test3
+ *  > runMain scalation.linalgebra.gen.HMatrix3Test3
  */
 object HMatrix3Test3 extends App
 {

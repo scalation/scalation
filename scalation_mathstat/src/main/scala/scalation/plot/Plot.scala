@@ -188,7 +188,7 @@ class Canvas (x: VectoD, y: VectoD, z: VectoD, width: Int, height: Int)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PlotTest` object is used to test the `Plot` class.
- *  > run-main scalation.plot.PlotTest
+ *  > runMain scalation.plot.PlotTest
  */
 object PlotTest extends App
 {

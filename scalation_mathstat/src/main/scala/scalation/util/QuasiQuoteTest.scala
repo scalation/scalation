@@ -24,7 +24,7 @@ import scala.tools.reflect.ToolBox
 /** The `QuasiQuoteTest` object is used to test how Quasi-Quotes can be used for
  *  code generation.
  *  FIX: generate class files (.class) rather than execute the code
- *  > run-main scalation.util.QuasiQuoteTest 
+ *  > runMain scalation.util.QuasiQuoteTest 
  */
 object QuasiQuoteTest extends App
 {

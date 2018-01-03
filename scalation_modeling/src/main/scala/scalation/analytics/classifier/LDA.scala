@@ -81,7 +81,7 @@ class LDA (x: MatrixD, y: VectoI, fn: Array [String])
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `LDATest` is used to test the `LDA` class.
  *  @see people.revoledu.com/kardi/tutorial/LDA/Numerical%20Example.html
- *  > run-main scalation.analytics.classifier.LDATest
+ *  > runMain scalation.analytics.classifier.LDATest
  */
 object LDATest extends App
 {

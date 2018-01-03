@@ -255,7 +255,7 @@ import scalation.util.banner
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DifferentialTest` object is used to test the `Differential` object.
- *  > run-main scalation.calculus.DifferentialTest
+ *  > runMain scalation.calculus.DifferentialTest
  */
 object DifferentialTest extends App
 {
@@ -308,7 +308,7 @@ object DifferentialTest extends App
  *  trade-offs of using  1-sided and 2-sided derivative approximations as well as
  *  different values for h.
  *  @see www.rose-hulman.edu/~bryan/lottamath/diffgrad.pdf
- *  > run-main scalation.calculus.DifferentialTest2
+ *  > runMain scalation.calculus.DifferentialTest2
  */
 object DifferentialTest2 extends App
 {

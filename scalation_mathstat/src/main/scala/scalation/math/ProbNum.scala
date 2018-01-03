@@ -116,7 +116,7 @@ case class ProbNum (x: Double, p: Double = 1.0)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ProbNumTest` object is used to test the `ProbNum` class.
- *  > run-main scalation.math.ProbNumTest
+ *  > runMain scalation.math.ProbNumTest
  */
 object ProbNumTest extends App
 {

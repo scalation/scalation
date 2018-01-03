@@ -569,7 +569,7 @@ object TwoBAN_OS
 /** The `TwoBAN_OSTest` object is used to test the `TwoBAN_OS0` class.
  *  Classify whether a car is more likely to be stolen (1) or not (1).
  *  @see www.inf.u-szeged.hu/~ormandi/ai2/06-TwoBAN_OS0-example.pdf
- *  > run-main scalation.analytics.classifier.TwoBAN_OSTest
+ *  > runMain scalation.analytics.classifier.TwoBAN_OSTest
  */
 object TwoBAN_OSTest extends App
 {
@@ -620,7 +620,7 @@ object TwoBAN_OSTest extends App
 /** The `TwoBAN_OSTest2` object is used to test the `TwoBAN_OS0` class.
  *  Given whether a person is Fast and/or Strong, classify them as making C = 1
  *  or not making C = 0 the football team.
- *  > run-main scalation.analytics.classifier.TwoBAN_OSTest2
+ *  > runMain scalation.analytics.classifier.TwoBAN_OSTest2
  */
 object TwoBAN_OSTest2 extends App
 {
@@ -666,7 +666,7 @@ object TwoBAN_OSTest2 extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TwoBAN_OSTest3` object is used to test the `TwoBAN_OS0` class.
- *  > run-main scalation.analytics.classifier.TwoBAN_OSTest3
+ *  > runMain scalation.analytics.classifier.TwoBAN_OSTest3
  */
 object TwoBAN_OSTest3 extends App
 {

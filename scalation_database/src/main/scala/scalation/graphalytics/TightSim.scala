@@ -256,7 +256,7 @@ class TightSim (g: Graph, q: Graph)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: ::::::::::::
 /** The `TightSimTest` object is used to test the `TightSim` class.
- *  > run-main scalation.graphalytics.TightSimTest
+ *  > runMain scalation.graphalytics.TightSimTest
  */
 object TightSimTest extends App 
 {
@@ -275,7 +275,7 @@ object TightSimTest extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: ::::::::::::
 /** The `TightSimTest2` object is used to test the `TightSim` class.
- *  > run-main scalation.graphalytics.TightSimTest2
+ *  > runMain scalation.graphalytics.TightSimTest2
  */
 object TightSimTest2 extends App 
 {
@@ -295,7 +295,7 @@ object TightSimTest2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TightSimTest3` object test the `TightSim` class by passing data graph
  *  and query graph relative file paths.
- *  > run-main scalation.graphalytics.TightSimTest3
+ *  > runMain scalation.graphalytics.TightSimTest3
  */
 object TightSimTest3 extends App 
 {

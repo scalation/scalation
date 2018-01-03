@@ -337,7 +337,7 @@ class SupportVectorMachine (x: MatrixD, y: VectorI, fn: Array [String] = Array (
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SupportVectorMachineTest` is used to test the `SupportVectorMachine` class.
- *  > run-main scalation.analytics.classifier.SupportVectorMachineTest
+ *  > runMain scalation.analytics.classifier.SupportVectorMachineTest
  */
 object SupportVectorMachineTest extends App
 {

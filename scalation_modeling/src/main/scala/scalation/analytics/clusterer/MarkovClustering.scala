@@ -166,7 +166,7 @@ class MarkovClusterer (t: MatrixD, k: Int = 2, r: Double = 2.0)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MarkovClustererTest` object is used to test the `MarkovClusterer` class.
  *  @see www.cs.ucsb.edu/~xyan/classes/CS595D-2009winter/MCL_Presentation2.pdf
- ^  > run-main scalation.analytics.clusterer.MarkovClustererTest
+ ^  > runMain scalation.analytics.clusterer.MarkovClustererTest
  */
 object MarkovClustererTest extends App
 {
@@ -247,7 +247,7 @@ object MarkovClustererTest extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MarkovClustererTest2` object is used to test the `MarkovClusterer` class.
- ^  > run-main scalation.analytics.clusterer.MarkovClustererTest2
+ ^  > runMain scalation.analytics.clusterer.MarkovClustererTest2
  */
 object MarkovClustererTest2 extends App
 {

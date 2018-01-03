@@ -205,7 +205,7 @@ object GraphIO
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphIOTest` object is used to test the `GraphIO` class and object.
- *  > run-main scalation.graph_db.GraphIOTest
+ *  > runMain scalation.graph_db.GraphIOTest
  */
 object GraphIOTest extends App
 {

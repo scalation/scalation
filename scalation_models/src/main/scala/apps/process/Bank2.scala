@@ -20,7 +20,7 @@ import scalation.util.time
  *  (2) reducing the time through the transport by an order of magnitude.
  *  It also has animation turned off.
  *  @see scalation.process.ModelTest for another example of test code.
- *  > run-main apps.process.Bank2
+ *  > runMain apps.process.Bank2
  */
 object Bank2 extends App with Modelable
 {

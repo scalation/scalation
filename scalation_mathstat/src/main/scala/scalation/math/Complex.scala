@@ -438,7 +438,7 @@ object Complex
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ComplexTest` object is used to test the `Complex` class.
- *  > run-main scalation.math.ComplexTest
+ *  > runMain scalation.math.ComplexTest
  */
 object ComplexTest extends App
 {

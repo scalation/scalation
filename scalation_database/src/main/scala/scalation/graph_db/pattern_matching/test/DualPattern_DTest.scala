@@ -15,7 +15,7 @@ import scalation.graph_db.{ExampleMGraphD => EX_GRAPH}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DualPatternTest_D` object is used to test all the Dual Simulation pattern
  *  matchers for labels of type `Double`.
- *  > run-main scalation.graph_db.pattern_matching.test.DualPatternTest_D
+ *  > runMain scalation.graph_db.pattern_matching.test.DualPatternTest_D
  */
 object DualPatternTest_D extends App
 {

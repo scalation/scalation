@@ -20,7 +20,7 @@ import scalation.util.time
  *  <p>
  *      y  =  sigmoid (w dot x)  =  sigmoid (w0 + w1*x1 + w2*x2 + w3*x3)
  *  <p>
- *  > run-main apps.analytics.TempPerceptron
+ *  > runMain apps.analytics.TempPerceptron
  */
 object TempPerceptron extends App
 {

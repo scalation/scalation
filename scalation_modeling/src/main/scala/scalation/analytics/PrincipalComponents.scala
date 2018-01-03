@@ -105,7 +105,7 @@ class PrincipalComponents (x: MatrixD)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PrincipalComponentsTest` object is used to test the `PrincipalComponents` class.
  *  @see www.ce.yildiz.edu.tr/personal/songul/file/1097/principal_components.pdf
- *  > run-main scalation.analytics.PrincipalComponentsTest
+ *  > runMain scalation.analytics.PrincipalComponentsTest
  */
 object PrincipalComponentsTest extends App
 {

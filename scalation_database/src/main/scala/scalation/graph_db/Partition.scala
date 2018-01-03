@@ -183,7 +183,7 @@ class Partition [TLabel: ClassTag] (g: Graph [TLabel])
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PartitionTest` object is used to test the `Partition` class.
  *  This test uses random partitioning.
- *  > run-main scalation.graph_db.PartitionTest
+ *  > runMain scalation.graph_db.PartitionTest
  */
 object PartitionTest extends App
 {
@@ -211,7 +211,7 @@ object PartitionTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PartitionTest2` object is used to test the `Partition` class.
  *  This test uses ordered partitioning.
- *  > run-main scalation.graph_db.PartitionTest2
+ *  > runMain scalation.graph_db.PartitionTest2
  */
 object PartitionTest2 extends App
 {
@@ -239,7 +239,7 @@ object PartitionTest2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PartitionTest3` object is used to test the `Partition` class.
  *  This test uses label propagation for partitioning.
- *  > run-main scalation.graph_db.PartitionTest3
+ *  > runMain scalation.graph_db.PartitionTest3
  */
 object PartitionTest3 extends App
 {

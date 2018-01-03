@@ -137,7 +137,7 @@ class DualIso (g: Graph, q: Graph)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DualIsoTest` object is used to test the `DualIso` class.
- *  > run-main scalation.graphalytics.DualIsoTest
+ *  > runMain scalation.graphalytics.DualIsoTest
  */
 object DualIsoTest extends App
 {
@@ -159,7 +159,7 @@ object DualIsoTest extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DualIsoTest2` object is used to test the `DualIso` class.
- *  > run-main scalation.graphalytics.DualIsoTest2
+ *  > runMain scalation.graphalytics.DualIsoTest2
  */
 object DualIsoTest2 extends App
 {
@@ -181,7 +181,7 @@ object DualIsoTest2 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DualIsoTest3` object is used to test the `DualIso` class.
- *  > run-main scalation.graphalytics.DualIsoTest3
+ *  > runMain scalation.graphalytics.DualIsoTest3
  */
 object DualIsoTest3 extends App
 {

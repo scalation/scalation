@@ -77,7 +77,7 @@ class MuGraphSim (g: MuGraph [Double], q: MuGraph [Double])
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuGraphSimTest` object is used to test the `MuGraphSim` class.
- *  > run-main scalation.graphalytics.multi.MuGraphSimTest
+ *  > runMain scalation.graphalytics.multi.MuGraphSimTest
  */
 object MuGraphSimTest extends App
 {
@@ -118,7 +118,7 @@ object MuGraphSimTest extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuGraphSimTest2` object is used to test the `MuGraphSim` class.
- *  > run-main scalation.graphalytics.multi.MuGraphSimTest2
+ *  > runMain scalation.graphalytics.multi.MuGraphSimTest2
  */
 object MuGraphSimTest2 extends App
 {
@@ -143,7 +143,7 @@ object MuGraphSimTest2 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuGraphSimTest3` object is used to test the `MuGraphSim` class.
- *  > run-main scalation.graphalytics.multi.MuGraphSimTest3
+ *  > runMain scalation.graphalytics.multi.MuGraphSimTest3
  */
 object MuGraphSimTest3 extends App
 {
@@ -167,7 +167,7 @@ object MuGraphSimTest3 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuGraphSimTest4` object is used to test the `MuGraphSim` class.
- *  > run-main scalation.graphalytics.multi.MuGraphSimTest4
+ *  > runMain scalation.graphalytics.multi.MuGraphSimTest4
  */
 object MuGraphSimTest4 extends App
 {

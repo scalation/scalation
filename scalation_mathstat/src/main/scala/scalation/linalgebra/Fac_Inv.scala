@@ -52,7 +52,7 @@ class Fac_Inv [MatT <: MatriD] (a: MatT)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Fac_InvTest` object is used to test the `Fac_Inv` class.
- *  > run-main scalation.linalgebra.Fac_InvTest
+ *  > runMain scalation.linalgebra.Fac_InvTest
  */
 object Fac_InvTest extends App
 {

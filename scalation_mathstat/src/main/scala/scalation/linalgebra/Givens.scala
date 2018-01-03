@@ -149,7 +149,7 @@ object Givens
  *  and (2, 1).  A third rotation clears position (0, 1) but also puts a non-zero
  *  value at (1, 0).
  *  @see http://en.wikipedia.org/wiki/Givens_rotation
- *  > run-main scalation.linalgebra.GivensTest
+ *  > runMain scalation.linalgebra.GivensTest
  */
 object GivensTest extends App
 {

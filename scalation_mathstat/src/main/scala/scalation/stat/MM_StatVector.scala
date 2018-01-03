@@ -198,7 +198,7 @@ class MM_StatVector (val self: VectorD)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MM_StatVectorTest` object is used to test the `MM_StatVector` class.
- *  > run-main scalation.stat.MM_StatVectorTest
+ *  > runMain scalation.stat.MM_StatVectorTest
  */
 object MM_StatVectorTest extends App
 {

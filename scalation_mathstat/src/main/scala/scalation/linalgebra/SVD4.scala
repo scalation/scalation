@@ -301,7 +301,7 @@ import SVD4.{test, testBid}
 /** The `SVD4Test` object is used to test the `SVD4` class starting with a matrix that
  *  is already in bidiagonal form and gives eigenvalues of 28, 18 for the first step.
  *  @see ocw.mit.edu/ans7870/18/18.06/javademo/SVD/
- *  > run-main scalation.linalgebra.SVD4Test
+ *  > runMain scalation.linalgebra.SVD4Test
  */
 object SVD4Test extends App
 {
@@ -328,7 +328,7 @@ object SVD4Test extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVD4Test2` is used to test the `SVD4` class.
  *  Answer: singular values = (3.82983, 1.91368, 0.81866)
- *  > run-main scalation.linalgebra.SVD4Test2
+ *  > runMain scalation.linalgebra.SVD4Test2
  */
 object SVD4Test2 extends App
 {
@@ -347,7 +347,7 @@ object SVD4Test2 extends App
  *  the following Webspage are tried.
  *  @see www.mathstat.uottawa.ca/~phofstra/MAT2342/SVDproblems.pdf
  *  @see mysite.science.uottawa.ca/phofstra/MAT2342/SVDproblems.pdf
- *  > run-main scalation.linalgebra.SVD4Test3
+ *  > runMain scalation.linalgebra.SVD4Test3
  */
 object SVD4Test3 extends App
 {
@@ -372,7 +372,7 @@ object SVD4Test3 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVD4Test4` object is used to test the `SVD4` class starting with a general
  *  matrix.
- *  > run-main scalation.linalgebra.SVD4Test4
+ *  > runMain scalation.linalgebra.SVD4Test4
  */
 object SVD4Test4 extends App
 {
@@ -390,7 +390,7 @@ object SVD4Test4 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVD4Test5` is used to test the `SVD4` class on a problem where the matrix
  *  is not a square matrix.
- *  > run-main scalation.linalgebra.SVD4Test5
+ *  > runMain scalation.linalgebra.SVD4Test5
  */
 object SVD4Test5 extends App
 {
@@ -409,7 +409,7 @@ object SVD4Test5 extends App
 /** The `SVD4Test5` is used to test the `SVD4` class on a larger test problem.
  *  @see www.maths.manchester.ac.uk/~peterf/MATH48062/math48062%20Calculating%20and%20using%20the%20svd%20of%20a%20matrix.pdf
  *  FIX: this example does not work, in the sense that is does not converge to 'TOL'.
- *  > run-main scalation.linalgebra.SVD4Test6
+ *  > runMain scalation.linalgebra.SVD4Test6
  */
 object SVD4Test6 extends App
 {
@@ -428,7 +428,7 @@ object SVD4Test6 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SVD4Test6` object is used to test the `SVD4` companion object's computation
  *  of trailing submatrices.
- *  > run-main scalation.linalgebra.SVD4Test7
+ *  > runMain scalation.linalgebra.SVD4Test7
  */
 object SVD4Test7 extends App
 {

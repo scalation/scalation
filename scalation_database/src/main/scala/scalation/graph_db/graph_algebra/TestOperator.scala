@@ -15,7 +15,7 @@ import MuGraphAlgebra._
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TestOperators` object tests the correctness of query results of scalation
  *  against Neo4j on randomly generated graphs.
- *  > run-main scalation.graph_db.graph_algebra.TestOperators
+ *  > runMain scalation.graph_db.graph_algebra.TestOperators
  */
 object TestOperator extends App
 {

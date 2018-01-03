@@ -57,7 +57,7 @@ class MGc_Queue (lambda: Double, mu: Double, c: Int = 1, cv2: Double = 1.0)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGc_QueueTest` object is used to test the `MGc_Queue` class.
- *  > run-main scalation.queueingnet.MGc_QueueTest
+ *  > runMain scalation.queueingnet.MGc_QueueTest
  */
 object MGc_QueueTest extends App
 {

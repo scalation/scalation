@@ -316,7 +316,7 @@ object StatVector
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StatVectorTest` object is used to test the `StatVector` class.
  *  @see www.mathworks.com/help/stats/skewness.html
- *  > run-main scalation.stat.StatVectorTest
+ *  > runMain scalation.stat.StatVectorTest
  */
 object StatVectorTest extends App
 {
@@ -363,7 +363,7 @@ object StatVectorTest extends App
 /** The `StatVectorTest2` object provides an example of how to use the `StatVector`
  *  class to implement the Method of Independent Replications (MIR) following
  *  a simple two-stage procedure.
- *  > run-main scalation.stat.StatVectorTest2
+ *  > runMain scalation.stat.StatVectorTest2
  */
 object StatVectorTest2 extends App
 {
@@ -394,7 +394,7 @@ object StatVectorTest2 extends App
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StatVectorTest3` object is used to test the `StatVector` companion object.
  *  @see www.itl.nist.gov/div898/handbook/pmc/section5/pmc541.htm
- *  > run-main scalation.stat.StatVectorTest3
+ *  > runMain scalation.stat.StatVectorTest3
  */
 object StatVectorTest3 extends App
 {
@@ -431,7 +431,7 @@ object StatVectorTest3 extends App
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StatVectorTest4` object is used to test the `StatVector` companion object.
  *  @see www.itl.nist.gov/div898/software/dataplot/refman2/auxillar/corrmatr.htm
- *  > run-main scalation.stat.StatVectorTest4
+ *  > runMain scalation.stat.StatVectorTest4
  */
 object StatVectorTest4 extends App
 {
@@ -474,7 +474,7 @@ object StatVectorTest4 extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StatVectorTest5` is used to test the `StatVector` companion object.
- *  > run-main scalation.stat.StatVectorTest5
+ *  > runMain scalation.stat.StatVectorTest5
  */
 object StatVectorTest5 extends App
 {

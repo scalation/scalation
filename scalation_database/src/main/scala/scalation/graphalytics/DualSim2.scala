@@ -66,7 +66,7 @@ class DualSim2 (g: Graph, q: Graph)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DualSim2Test` object is used to test the `DualSim2` class.
- *  > run-main scalation.graphalytics.DualSim2Test
+ *  > runMain scalation.graphalytics.DualSim2Test
  */
 object DualSim2Test extends App
 {
@@ -85,7 +85,7 @@ object DualSim2Test extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DualSim2Test2` object is used to test the `DualSim2` class.
- *  > run-main scalation.graphalytics.DualSim2Test2
+ *  > runMain scalation.graphalytics.DualSim2Test2
  */
 object DualSim2Test2 extends App
 {
@@ -104,7 +104,7 @@ object DualSim2Test2 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DualSim2Test3` object is used to test the 'DualSim2' class.
- *  > run-main scalation.graphalytics.DualSim2Test3
+ *  > runMain scalation.graphalytics.DualSim2Test3
  */
 object DualSim2Test3 extends App
 {

@@ -278,7 +278,7 @@ class KMeansClusterer (x: MatrixD, k: Int, s: Int = 0, primary: Boolean = true, 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KMeansClustererTest` object is used to test the `KMeansClusterer` class.
- *  > run-main scalation.analytics.clusterer.KMeansClustererTest
+ *  > runMain scalation.analytics.clusterer.KMeansClustererTest
  */
 trait KMeansClustererTester
 {
@@ -313,7 +313,7 @@ trait KMeansClustererTester
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KMeansClustererTest` object is used to test the `KMeansClusterer` class.
- *  > run-main scalation.analytics.clusterer.KMeansClustererTest
+ *  > runMain scalation.analytics.clusterer.KMeansClustererTest
  */
 object KMeansClustererTest extends App with KMeansClustererTester
 {
@@ -341,7 +341,7 @@ object KMeansClustererTest extends App with KMeansClustererTester
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KMeansClustererTest2` object is used to test the `KMeansClusterer` class.
- *  > run-main scalation.analytics.clusterer.KMeansClustererTest
+ *  > runMain scalation.analytics.clusterer.KMeansClustererTest
  */
 object KMeansClustererTest2 extends App with KMeansClustererTester
 {
@@ -371,7 +371,7 @@ object KMeansClustererTest2 extends App with KMeansClustererTester
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KMeansClustererTest2` object is used to test the `KMeansClusterer` class.
- *  > run-main scalation.analytics.clusterer.KMeansClustererTest3
+ *  > runMain scalation.analytics.clusterer.KMeansClustererTest3
  */
 object KMeansClustererTest3 extends App with KMeansClustererTester
 {
@@ -404,7 +404,7 @@ object KMeansClustererTest3 extends App with KMeansClustererTester
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KMeansClustererTest4` object is used to test the `KMeansClusterer` class.
- *  > run-main scalation.analytics.clusterer.KMeansClustererTest4
+ *  > runMain scalation.analytics.clusterer.KMeansClustererTest4
  * 
 object KMeansClustererTest4 extends App with KMeansClustererTester
 {

@@ -18,7 +18,7 @@ import scalation.stat.Statistic
  *  Bank  model.  It is the same as `Bank`, except that causal links are added
  *  to enable the model to be animated as an Event Graph.
  *  @see scalation.event.ModelTest for another example of test code.
- *  > run-main apps.event.Bank2
+ *  > runMain apps.event.Bank2
  */
 object Bank2 extends App with Modelable
 {

@@ -975,7 +975,7 @@ object VectorC
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VectorCTest` object tests the operations provided by `VectorC`.
- *  > run-main scalation.linalgebra.mem_mapped.VectorCTest
+ *  > runMain scalation.linalgebra.mem_mapped.VectorCTest
  */
 object VectorCTest extends App
 {

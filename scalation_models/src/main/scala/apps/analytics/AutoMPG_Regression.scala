@@ -15,7 +15,7 @@ import scalation.linalgebra.{VectorD,  MatrixD}
 /** The `AutoMPG_Regression` object performs regression on the UCI AutoMPG
  *  dataset.
  *  @see archive.ics.uci.edu/ml/datasets/Auto+MPG
- *  > run-main apps.analytics.AutoMPG_Regression
+ *  > runMain apps.analytics.AutoMPG_Regression
  */
 object AutoMPG_Regression extends App
 {

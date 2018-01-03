@@ -222,7 +222,7 @@ object MGraphIO
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MGraphIOTest` object is used to test the `MGraphIO` class and object.
- *  > run-main scalation.graph_db.MGraphIOTest
+ *  > runMain scalation.graph_db.MGraphIOTest
  */
 object MGraphIOTest extends App
 {

@@ -131,7 +131,7 @@ class PolyRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = 
  *      y  =  b dot x  =  b_0 + b_1*t + b_2*t^2.
  *  <p>
  *  Note, the 'order' at which R-Squared drops is QR(7), Cholesky(14), SVD(6), Inverse(13).
- *  > run-main scalation.analytics.PolyRegressionTest
+ *  > runMain scalation.analytics.PolyRegressionTest
  */
 object PolyRegressionTest extends App
 {

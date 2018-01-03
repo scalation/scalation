@@ -21,7 +21,7 @@ import scalation.util.Monitor
  *  find the number of tellers that minimizes the overall cost function.  Cost is
  *  based on the daily pay for a teller (8 hours * 20 dollars per hour) and a
  *  cost based on customer wait time (10 dollars per minute of mean waiting time).
- *  > run-main apps.process.BankOpt2
+ *  > runMain apps.process.BankOpt2
  */
 object BankOpt2 extends App
 {

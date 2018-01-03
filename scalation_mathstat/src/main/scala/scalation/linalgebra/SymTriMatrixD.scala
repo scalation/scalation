@@ -1230,7 +1230,7 @@ object SymTriMatrixD extends Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SymTriMatrixDTest` object is used to test the `SymTriMatrixD` class.
- *  > run-main scalation.linalgebra.SymTriMatrixDTest
+ *  > runMain scalation.linalgebra.SymTriMatrixDTest
  */
 object SymTriMatrixDTest extends App
 {

@@ -312,7 +312,7 @@ object StrO
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StrNumTest` object is used to test the `StrNum` class.
- *  > run-main scalation.math.StrNumTest
+ *  > runMain scalation.math.StrNumTest
  */
 object StrNumTest extends App
 {

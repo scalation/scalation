@@ -1230,7 +1230,7 @@ object SymTriMatrixC extends Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SymTriMatrixCTest` object is used to test the `SymTriMatrixC` class.
- *  > run-main scalation.linalgebra.SymTriMatrixCTest
+ *  > runMain scalation.linalgebra.SymTriMatrixCTest
  */
 object SymTriMatrixCTest extends App
 {

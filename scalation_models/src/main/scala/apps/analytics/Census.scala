@@ -18,7 +18,7 @@ import scalation.util.{timed, time}
  *  census data.
  *  FIX: must download the following file.
  *  @see archive.ics.uci.edu/ml/machine-learning-databases/census1990-mld/
- *  > run-main apps.analytics.Census
+ *  > runMain apps.analytics.Census
  */
 object Census extends App
 {

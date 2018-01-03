@@ -60,7 +60,7 @@ class PrincipalComponents_F (xa: Functions, t: VectorD)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PrincipalComponents_FTest` object is used to test the `PrincipalComponents_F` class.
  *  @see www.ce.yildiz.edu.tr/personal/songul/file/1097/principal_components.pdf
- *  > run-main scalation.analytics.PrincipalComponents_FTest
+ *  > runMain scalation.analytics.PrincipalComponents_FTest
  */
 object PrincipalComponents_FTest extends App
 {

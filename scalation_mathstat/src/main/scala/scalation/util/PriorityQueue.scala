@@ -399,7 +399,7 @@ object PriorityQueue extends OrderedTraversableFactory [PriorityQueue]
  *  Note, element 'e1' has higher priority than 'e2' when 'e1 > e2'.
  *  To change from "largest first" to "smallest first", could use negative numbers
  *  or swap the comparison order.
- *  > run-main scalation.util.PriorityQueueTest
+ *  > runMain scalation.util.PriorityQueueTest
  */
 object PriorityQueueTest extends App
 {

@@ -1197,7 +1197,7 @@ object RelationEx
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RelationTest` object tests the operations provided by `Relation`.
- *  > run-main scalation.columnar_db.RelationTest
+ *  > runMain scalation.columnar_db.RelationTest
  */
 object RelationTest extends App
 {
@@ -1256,7 +1256,7 @@ object RelationTest extends App
 /** The `RelationTest2` object tests the operations provided by `Relation`.
  *  The relational algebra operators are given using Unicode.
  *  @see en.wikipedia.org/wiki/List_of_Unicode_characters
- *  > run-main scalation.columnar_db.RelationTest2
+ *  > runMain scalation.columnar_db.RelationTest2
  */
 object RelationTest2 extends App
 {
@@ -1302,7 +1302,7 @@ object RelationTest2 extends App
  *  It test various aggregate/OLAP operations on a simple data warehouse fact table.
  *  @see www.codeproject.com/Articles/652108/Create-First-Data-WareHouse
  *  FIX - allow entering doubles as "13" rather than "13.0"
- *  > run-main scalation.columnar_db.RelationTest3
+ *  > runMain scalation.columnar_db.RelationTest3
  */
 object RelationTest3 extends App
 {
@@ -1393,7 +1393,7 @@ object RelationTest3 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RelationTest4` object tests conversion `Relation` to a matrix.
- *  > run-main scalation.columnar_db.RelationTest4
+ *  > runMain scalation.columnar_db.RelationTest4
  */
 object RelationTest4 extends App
 {
@@ -1409,7 +1409,7 @@ object RelationTest4 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RelationTest5` object tests the interoperability between Relations and Matrices.
- *  > run-main scalation.columnar_db.RelationTest5
+ *  > runMain scalation.columnar_db.RelationTest5
  */
 object RelationTest5 extends App 
 {

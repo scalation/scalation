@@ -252,7 +252,7 @@ class StrictSim (g: Graph, q: Graph)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: ::::::::::::
 /** The `StrictSimTest` object is used to test the `StrictSim` class.
- *  > run-main scalation.graphalytics.StrictSimTest
+ *  > runMain scalation.graphalytics.StrictSimTest
  */
 object StrictSimTest extends App 
 {
@@ -271,7 +271,7 @@ object StrictSimTest extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: ::::::::::::
 /** The `StrictSimTest2` object is used to test the `StrictSim` class.
- *  > run-main scalation.graphalytics.StrictSimTest2
+ *  > runMain scalation.graphalytics.StrictSimTest2
  */
 object StrictSimTest2 extends App 
 {
@@ -291,7 +291,7 @@ object StrictSimTest2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StrictSimTest3` object test the `StrictSim` class by passing data graph
  *  and query graph relative file paths.
- *  > run-main scalation.graphalytics.StrictSimTest3
+ *  > runMain scalation.graphalytics.StrictSimTest3
  */
 object StrictSimTest3 extends App 
 {

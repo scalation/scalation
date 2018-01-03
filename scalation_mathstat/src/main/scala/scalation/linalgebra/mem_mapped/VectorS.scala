@@ -975,7 +975,7 @@ object VectorS
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VectorSTest` object tests the operations provided by `VectorS`.
- *  > run-main scalation.linalgebra.mem_mapped.VectorSTest
+ *  > runMain scalation.linalgebra.mem_mapped.VectorSTest
  */
 object VectorSTest extends App
 {

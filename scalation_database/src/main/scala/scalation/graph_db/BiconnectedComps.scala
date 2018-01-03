@@ -186,7 +186,7 @@ case class BiconnectedComp [TLabel] (g_ : Graph [TLabel])
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BiconnectedCompTest` object tests the `BiconnectedComp` class.
  *  @see www.geeksforgeeks.org/biconnected-components
- *  > run-main scalation.graph_db.BiconnectedCompTest
+ *  > runMain scalation.graph_db.BiconnectedCompTest
  */
 object BiconnectedCompTest extends App
 {
@@ -218,7 +218,7 @@ object BiconnectedCompTest extends App
 /** The `BiconnectedCompTest2` object tests the `BiconnectedComp` class.
  *  See Figure 7.a in
  *  @see pluto.huji.ac.il/~galelidan/papers/ElidanGouldJMLR.pdf
- *  > run-main scalation.graph_db.BiconnectedCompTest2
+ *  > runMain scalation.graph_db.BiconnectedCompTest2
  */
 object BiconnectedCompTest2 extends App
 {

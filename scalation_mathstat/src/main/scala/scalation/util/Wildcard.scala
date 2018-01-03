@@ -141,7 +141,7 @@ class Wildcard (val self: String)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `WildcardTest` object is used to test the `Wildcard` class.
- *  > run-main scalation.util.WildcardTest
+ *  > runMain scalation.util.WildcardTest
  */
 object WildcardTest extends App
 {

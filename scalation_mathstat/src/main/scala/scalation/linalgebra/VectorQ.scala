@@ -1108,7 +1108,7 @@ object VectorQ
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `VectorQTest` object tests the operations provided by `VectorQ`.
- *  > run-main scalation.linalgebra.VectorQTest
+ *  > runMain scalation.linalgebra.VectorQTest
  */
 object VectorQTest extends App
 {

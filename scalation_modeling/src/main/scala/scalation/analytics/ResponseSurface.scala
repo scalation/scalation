@@ -171,7 +171,7 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ResponseSurfaceTest` object is used to test the `ResponseSurface` class.
- *  > run-main scalation.analytics.ResponseSurfaceTest
+ *  > runMain scalation.analytics.ResponseSurfaceTest
  */
 object ResponseSurfaceTest extends App
 {

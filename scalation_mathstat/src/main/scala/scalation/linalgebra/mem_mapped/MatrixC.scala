@@ -1567,7 +1567,7 @@ object MatrixC extends Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MatrixCTest` object tests the operations provided by `MatrixC` class.
- *  > run-main scalation.linalgebra.MatrixCTest
+ *  > runMain scalation.linalgebra.MatrixCTest
  */
 object MatrixCTest extends App with PackageInfo
 {

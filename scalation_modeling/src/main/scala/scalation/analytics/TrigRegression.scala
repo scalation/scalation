@@ -139,7 +139,7 @@ class TrigRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = 
  *  <p>
  *      y  =  b dot x  =  b_0 + b_1*t + b_2*t^2.
  *  <p>
- *  > run-main scalation.analytics.TrigRegressionTest
+ *  > runMain scalation.analytics.TrigRegressionTest
  */
 object TrigRegressionTest extends App
 {

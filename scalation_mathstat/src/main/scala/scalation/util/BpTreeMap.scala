@@ -239,7 +239,7 @@ class BpTreeMap [K <% Ordered [K]: ClassTag, V: ClassTag] (half: Int = 2)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BpTreeMapTest` object is used to test the `BpTreeMap` class by inserting
  *  increasing key values.
- *  > run-main scalation.util.BpTreeMapTest
+ *  > runMain scalation.util.BpTreeMapTest
  */
 object BpTreeMapTest extends App
 {
@@ -266,7 +266,7 @@ object BpTreeMapTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BpTreeMapTest2` object is used to test the `BpTreeMap` class by inserting
  *  random key values.
- *  > run-main scalation.util.BpTreeMapTest2
+ *  > runMain scalation.util.BpTreeMapTest2
  */
 object BpTreeMapTest2 extends App
 {

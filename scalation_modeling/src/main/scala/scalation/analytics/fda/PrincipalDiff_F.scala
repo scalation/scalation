@@ -31,7 +31,7 @@ class PrincipalDiff (y: VectorD, t: VectorD, ldo: Any)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PrincipalDiffTest` object is used to test the `PrincipalDiff` class.
- *  > run-main scalation.analytics.fda.PrincipalDiffTest
+ *  > runMain scalation.analytics.fda.PrincipalDiffTest
  *  FIX - smoothing not working correctly
  */
 object PrincipalDiffTest extends App

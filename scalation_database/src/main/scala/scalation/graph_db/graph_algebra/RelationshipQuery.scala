@@ -12,7 +12,7 @@ import MuGraphAlgebra.{test, testSetup}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RelationshipQuery` object used to test the correctness of the results for
  *  relationship queries on a small graph, against the results produced by Neo4j
- *  > run-main scalation.graph_db.graph_algebra.RelationshipQuery.
+ *  > runMain scalation.graph_db.graph_algebra.RelationshipQuery.
  */
 object RelationshipQuery extends App
 {

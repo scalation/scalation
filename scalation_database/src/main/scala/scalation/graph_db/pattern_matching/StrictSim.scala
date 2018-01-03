@@ -212,7 +212,7 @@ import scalation.graph_db.{ExampleGraphS => EX_GRAPH}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StrictSimTest` object is used to test the `StrictSim` class.
  *  This object tests the data graph g1 and query graph q1.
- *  > run-main scalation.graph_db.pattern_matching.StrictSimTest
+ *  > runMain scalation.graph_db.pattern_matching.StrictSimTest
  */
 object StrictSimTest extends App
 {
@@ -233,7 +233,7 @@ object StrictSimTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StrictSimTest2` object is used to test the `StrictSim` class.
  *  This object tests the data graph g2 and query graph q2.
- *  > run-main scalation.graph_db.pattern_matching.StrictSimTest2
+ *  > runMain scalation.graph_db.pattern_matching.StrictSimTest2
  */
 object StrictSimTest2 extends App
 {
@@ -254,7 +254,7 @@ object StrictSimTest2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StrictSimTest3` object is used to test the `StrictSim` class.
  *  This object tests randomly (uniform) generated graphs.
- *  > run-main scalation.graph_db.pattern_matching.StrictSimTest3
+ *  > runMain scalation.graph_db.pattern_matching.StrictSimTest3
  */
 object StrictSimTest3 extends App
 {
@@ -282,7 +282,7 @@ object StrictSimTest3 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StrictSimTest4` object is used to test the `StrictSim` class.
  *  This object tests randomly (PowerLaw) generated graphs.
- *  > run-main scalation.graph_db.pattern_matching.StrictSimTest4
+ *  > runMain scalation.graph_db.pattern_matching.StrictSimTest4
  */
 object StrictSimTest4 extends App
 {
@@ -310,7 +310,7 @@ object StrictSimTest4 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `StrictSimTest5` object is used to test the `StrictSim` class.
  *  This object tests graphs read from files.
- *  > run-main scalation.graph_db.pattern_matching.StrictSimTest5
+ *  > runMain scalation.graph_db.pattern_matching.StrictSimTest5
  */
 object StrictSimTest5 extends App
 {

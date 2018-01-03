@@ -145,7 +145,7 @@ class MuDualIso [TLabel: ClassTag] (g: MuGraph [TLabel], q: MuGraph [TLabel])
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuDualIsoTest` object is used to test the `MuDualIso` class.
- *  > run-main scalation.graphalytics.multi.MuDualIsoTest
+ *  > runMain scalation.graphalytics.multi.MuDualIsoTest
  */
 object  MuDualIsoTest extends App
 {
@@ -193,7 +193,7 @@ object  MuDualIsoTest extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuDualIsoTest2` object is used to test the `MuDualIso` class.
- *  > run-main scalation.graphalytics.multi.MuDualIsoTest2
+ *  > runMain scalation.graphalytics.multi.MuDualIsoTest2
  */
 object MuDualIsoTest2 extends App
 {
@@ -222,7 +222,7 @@ object MuDualIsoTest2 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuDualIsoTest3` object is used to test the `MuDualIso` class.
- *  > run-main scalation.graphalytics.multi.MuDualIsoTest3
+ *  > runMain scalation.graphalytics.multi.MuDualIsoTest3
  */
 object MuDualIsoTest3 extends App
 {
@@ -250,7 +250,7 @@ object MuDualIsoTest3 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MuDualIsoTest4` object is used to test the `MuDualIso` class.
- *  > run-main scalation.graphalytics.multi.DualIsoTest4
+ *  > runMain scalation.graphalytics.multi.DualIsoTest4
  */
 /*object MuDualIsoTest4 extends App
 {

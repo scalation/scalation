@@ -219,7 +219,7 @@ class RevisedSimplex (a: MatrixD, b: VectorD, c: VectorD, var x_B: Array [Int] =
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RevisedSimplexTest` object is used to test the `RevisedSimplex` class.
- *  > run-main scalation.minima.RevisedSimplexTest
+ *  > runMain scalation.minima.RevisedSimplexTest
  */
 object RevisedSimplexTest extends App
 {

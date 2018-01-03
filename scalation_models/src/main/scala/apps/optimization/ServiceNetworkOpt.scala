@@ -14,7 +14,7 @@ import scalation.minima.Simplex
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ServiceNetworkOpt` object optimizes the service network by solving the
  *  following Linear Programming 'LP' Problem.
- *  > run-main apps.optimization.ServiceNetworkOpt
+ *  > runMain apps.optimization.ServiceNetworkOpt
  */
 object ServiceNetworkOpt extends App
 {

@@ -407,7 +407,7 @@ object OneBAN
 /** The `OneBANTest` object is used to test the `OneBAN` class.
  *  Classify whether a car is more likely to be stolen (1) or not (1).
  *  @see www.inf.u-szeged.hu/~ormandi/ai2/06-OneBAN-example.pdf
- *  > run-main scalation.analytics.classifier.OneBANTest
+ *  > runMain scalation.analytics.classifier.OneBANTest
  */
 object OneBANTest extends App
 {
@@ -458,7 +458,7 @@ object OneBANTest extends App
 /** The `OneBANTest2` object is used to test the `OneBAN` class.
  *  Given whether a person is Fast and/or Strong, classify them as making C = 1
  *  or not making C = 0 the football team.
- *  > run-main scalation.analytics.classifier.OneBANTest2
+ *  > runMain scalation.analytics.classifier.OneBANTest2
  */
 object OneBANTest2 extends App
 {
@@ -504,7 +504,7 @@ object OneBANTest2 extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `OneBANTest3` object is used to test the `OneBAN` class.
- * > run-main scalation.analytics.classifier.OneBANTest3
+ * > runMain scalation.analytics.classifier.OneBANTest3
  */
 object OneBANTest3 extends App
 {

@@ -126,7 +126,7 @@ object SimpleRegression
  *  <p>
  *      y = b0 + b1 * x
  *  <p>
- *  > run-main scalation.analytics.SimpleRegressionTest
+ *  > runMain scalation.analytics.SimpleRegressionTest
  */
 object SimpleRegressionTest extends App
 {
@@ -154,7 +154,7 @@ object SimpleRegressionTest extends App
  *      y = b dot x = (b_0, b_1) dot (1, x_1).
  *  <p>
  *  @see http://www.analyzemath.com/statistics/linear_regression.html
- *  > run-main scalation.analytics.SimpleRegressionTest2
+ *  > runMain scalation.analytics.SimpleRegressionTest2
  */
 object SimpleRegressionTest2 extends App
 {
@@ -194,7 +194,7 @@ object SimpleRegressionTest2 extends App
  *      y = b dot x = b_0 + b_1*x_1.
  *  <p>
  *  @see http://mathbits.com/mathbits/tisection/Statistics2/linear.htm
- *  > run-main scalation.analytics.SimpleRegressionTest3
+ *  > runMain scalation.analytics.SimpleRegressionTest3
  */
 object SimpleRegressionTest3 extends App
 {

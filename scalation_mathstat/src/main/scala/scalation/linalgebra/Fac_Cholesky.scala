@@ -77,7 +77,7 @@ class Fac_Cholesky [MatT <: MatriD] (a: MatT)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Fac_CholeskyTest` object is used to test the `Fac_Cholesky` class.
  *  @see ece.uwaterloo.ca/~dwharder/NumericalAnalysis/04LinearAlgebra/cholesky
- *  > run-main scalation.linalgebra.Fac_CholeskyTest
+ *  > runMain scalation.linalgebra.Fac_CholeskyTest
  */
 object Fac_CholeskyTest extends App
 {

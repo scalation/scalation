@@ -56,7 +56,7 @@ import Cycle.hasCycle
 /** The `CycleTest` object tests the `Cycle` class using a label-free precedence
  *  graph.  Graphs are created by passing in an array of adjacency sets (one for
  *  each vertex).
- *  > run-main scalation.graph_db.CycleTest
+ *  > runMain scalation.graph_db.CycleTest
  */
 object CycleTest extends App
 {

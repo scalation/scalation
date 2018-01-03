@@ -147,7 +147,7 @@ class HierClusterer (x: MatrixD, k: Int = 2)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HierClusterer` object is used to test the `HierClusterer` class.
- *  > run-main scalation.analytics.clusterer.HierClustererTest
+ *  > runMain scalation.analytics.clusterer.HierClustererTest
  */
 object HierClusterer extends App
 {
@@ -174,7 +174,7 @@ object HierClusterer extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HierClustererTest2` object is used to test the `HierClusterer` class.
- *  > run-main scalation.analytics.clusterer.HierClustererTest2
+ *  > runMain scalation.analytics.clusterer.HierClustererTest2
  */
 object HierClustererTest2 extends App
 {

@@ -1603,7 +1603,7 @@ class SparseMatrixQ (val d1: Int,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SparseMatrixQTest` object is used to test the `SparseMatrixQ` class.
- *  > run-main scalation.linalgebra.SparseMatrixQTest
+ *  > runMain scalation.linalgebra.SparseMatrixQTest
  */
 object SparseMatrixQTest extends App
 {

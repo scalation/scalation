@@ -121,7 +121,7 @@ import scalation.graph_db.{ExampleMGraphS => EX_GRAPH}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualSimCARTest` object is used to test the `MDualSimCAR` class.
  *  This object tests the data graph g1 and query graph q1.
- *  > run-main scalation.graph_db.pattern_matching.MDualSimCARTest
+ *  > runMain scalation.graph_db.pattern_matching.MDualSimCARTest
  */
 object MDualSimCARTest extends App
 {
@@ -140,7 +140,7 @@ object MDualSimCARTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualSimCARTest2` object is used to test the `MDualSimCAR` class.
  *  This object tests the data graph g2 and query graph q2.
- *  > run-main scalation.graph_db.pattern_matching.MDualSimCARTest2
+ *  > runMain scalation.graph_db.pattern_matching.MDualSimCARTest2
  */
 object MDualSimCARTest2 extends App
 {
@@ -159,7 +159,7 @@ object MDualSimCARTest2 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualSimCARTest3` object is used to test the `MDualSimCAR` class.
  *  This object tests the data graph g3 and query graph q3.
- *  > run-main scalation.graph_db.pattern_matching.MDualSimCARTest3
+ *  > runMain scalation.graph_db.pattern_matching.MDualSimCARTest3
  */
 object MDualSimCARTest3 extends App
 {
@@ -178,7 +178,7 @@ object MDualSimCARTest3 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualSimCARTest4` object is used to test the `MDualSimCAR` class.
  *  This object tests randomly (uniform) generated graphs.
- *  > run-main scalation.graph_db.pattern_matching.MDualSimCARTest4
+ *  > runMain scalation.graph_db.pattern_matching.MDualSimCARTest4
  */
 object MDualSimCARTest4 extends App
 {
@@ -204,7 +204,7 @@ object MDualSimCARTest4 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualSimCARTest5` object is used to test the `MDualSimCAR` class.
  *  This object tests randomly (PowerLaw) generated graphs.
- *  > run-main scalation.graph_db.pattern_matching.MDualSimCARTest5
+ *  > runMain scalation.graph_db.pattern_matching.MDualSimCARTest5
  */
 object MDualSimCARTest5 extends App
 {
@@ -230,7 +230,7 @@ object MDualSimCARTest5 extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MDualSimCARTest6` object is used to test the `MDualSimCAR` class.
  *  This object tests graphs read from files.
- *  > run-main scalation.graph_db.pattern_matching.MDualSimCARTest6
+ *  > runMain scalation.graph_db.pattern_matching.MDualSimCARTest6
  */
 object MDualSimCARTest6 extends App
 {

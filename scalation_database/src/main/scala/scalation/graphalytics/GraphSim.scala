@@ -54,7 +54,7 @@ import scalation.graphalytics.{ExampleGraphS => EX_GRAPH}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSimTest` object is used to test the `GraphSim` class.
- *  > run-main scalation.graphalytics.GraphSimTest
+ *  > runMain scalation.graphalytics.GraphSimTest
  */
 object GraphSimTest extends App
 {
@@ -73,7 +73,7 @@ object GraphSimTest extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSimTest2` object is used to test the `GraphSim` class.
- *  > run-main scalation.graphalytics.GraphSimTest2
+ *  > runMain scalation.graphalytics.GraphSimTest2
  */
 object GraphSimTest2 extends App
 {
@@ -92,7 +92,7 @@ object GraphSimTest2 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphSimTest3` object is used to test the `GraphSim` class.
- *  > run-main scalation.graphalytics.GraphSimTest3
+ *  > runMain scalation.graphalytics.GraphSimTest3
  *
 object GraphSimTest3 extends App
 {

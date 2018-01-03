@@ -248,7 +248,7 @@ class NelderMeadSimplex (f: FunctionV2S, n: Int)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NelderMeadSimplexTest` object is used to test the `NelderMeadSimplex` class.
- *  > run-main scalation.minima.NelderMeadSimplexTest
+ *  > runMain scalation.minima.NelderMeadSimplexTest
  */
 object NelderMeadSimplexTest extends App
 {

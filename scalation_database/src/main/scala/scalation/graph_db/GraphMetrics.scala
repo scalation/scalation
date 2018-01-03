@@ -128,7 +128,7 @@ object GraphMetrics
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GraphMetricsTest` object is used to test the `GraphMetrics` class.
  *  @see http://math.stackexchange.com/questions/240556/radius-diameter-and-center-of-graph
- *  > run-main scalation.garphalytics.mutable.GraphMetricsTest
+ *  > runMain scalation.garphalytics.mutable.GraphMetricsTest
  */
 object GraphMetricsTest extends App
 {

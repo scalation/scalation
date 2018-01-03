@@ -275,7 +275,7 @@ object ReArray
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ReArrayTest` object tests the operations provided by `ReArrayTest`.
- *  > run-main scalation.util.ReArrayTest
+ *  > runMain scalation.util.ReArrayTest
  */
 object ReArrayTest extends App
 {  

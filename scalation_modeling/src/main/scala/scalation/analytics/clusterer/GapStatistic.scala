@@ -133,7 +133,7 @@ object GapStatistic
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GapStatisticTest` object is used to test the `GapStatistic` object.
- *  > run-main scalation.analytics.clusterer.GapStatisticTest
+ *  > runMain scalation.analytics.clusterer.GapStatisticTest
  */
 object GapStatisticTest extends App
 {
@@ -155,7 +155,7 @@ object GapStatisticTest extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GapStatisticTest2` object is used to test the `GapStatistic` object.
- *  > run-main scalation.analytics.clusterer.GapStatisticTest2
+ *  > runMain scalation.analytics.clusterer.GapStatisticTest2
  */
 object GapStatisticTest2 extends App
 {

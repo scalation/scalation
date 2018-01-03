@@ -132,7 +132,7 @@ class B_Spline (ττ: VectorD, mMax: Int = 4)
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `B_SplineTest` object is used to test the `B_Spline` class.
  *  It tests the B-Spline functions for specific orders.
- *  > run-main scalation.analytics.fda.B_SplineTest
+ *  > runMain scalation.analytics.fda.B_SplineTest
  */
 object B_SplineTest extends App
 {
@@ -199,7 +199,7 @@ object B_SplineTest extends App
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `B_SplineTest2` object is used to test the `B_Spline` class.
  *  It tests the B-Spline functions using the general recurrence.
- *  > run-main scalation.analytics.fda.B_SplineTest2
+ *  > runMain scalation.analytics.fda.B_SplineTest2
  */
 object B_SplineTest2 extends App
 {
@@ -234,7 +234,7 @@ object B_SplineTest2 extends App
 /** The `B_SplineTest2` object is used to test the `B_Spline` class.
  *  It tests the B-Spline functions using the general recurrence and plots
  *  several basis functions using `PlotM`.
- *  > run-main scalation.analytics.fda.B_SplineTest3
+ *  > runMain scalation.analytics.fda.B_SplineTest3
  */
 object B_SplineTest3 extends App
 {

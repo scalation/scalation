@@ -234,7 +234,7 @@ class TreeLayout (t: Tree)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TreeLayoutTest` object is used to test the `TreeLayout` class.
- *  > run-main scalation.graphalytics.TreeLayoutTest
+ *  > runMain scalation.graphalytics.TreeLayoutTest
  */
 object TreeLayoutTest extends App
 {

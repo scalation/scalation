@@ -157,7 +157,7 @@ class Hilbert (f: FunctionS2S)
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HilbertTest` object is used to test the `Hilbert` class.
- *  > run-main scalation.calculus.HilbertTest
+ *  > runMain scalation.calculus.HilbertTest
  */
 object HilbertTest extends App
 {

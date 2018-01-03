@@ -140,7 +140,7 @@ object MakeSchema
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MakeSchemaTest` object is used to test the `MakeSchema` object.
- *  > run-main scalation.columnar_db.MakeSchemaTest
+ *  > runMain scalation.columnar_db.MakeSchemaTest
  */
 object MakeSchemaTest extends App
 {
@@ -184,7 +184,7 @@ object MakeSchemaTest extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MakeSchemaTest2` object is used to test the `MakeSchema` object.
- *  > run-main scalation.columnar_db.MakeSchemaTest2
+ *  > runMain scalation.columnar_db.MakeSchemaTest2
  */
 object MakeSchemaTest2 extends App
 {

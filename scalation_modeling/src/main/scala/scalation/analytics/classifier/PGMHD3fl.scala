@@ -253,7 +253,7 @@ object PGMHD3fl
 /** The `PGMHD3flTest` object is used to test the `PGMHD3fl` class.
  *  Classify whether a car is more likely to be stolen (1) or not (1).
  *  @see www.inf.u-szeged.hu/~ormandi/ai2/06-naiveBayes-example.pdf
- *  > run-main scalation.analytics.classifier.PGMHD3flTest
+ *  > runMain scalation.analytics.classifier.PGMHD3flTest
  */
 object PGMHD3flTest extends App
 {
@@ -302,7 +302,7 @@ object PGMHD3flTest extends App
 /** The `PGMHD3flTest2` object is used to test the 'PGMHD3fl' class.
  *  Given whether a person is Fast and/or Strong, classify them as making C = 1
  *  or not making C = 0 the football team.
- *  > run-main scalation.analytics.classifier.PGMHD3flTest2
+ *  > runMain scalation.analytics.classifier.PGMHD3flTest2
 object PGMHD3flTest2 extends App
 {
     // training-set -----------------------------------------------------------
@@ -345,7 +345,7 @@ object PGMHD3flTest2 extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PGMHD3flTest3` object is used to test the 'PGMHD3fl' class.
- *  > run-main scalation.analytics.classifier.PGMHD3flTest3
+ *  > runMain scalation.analytics.classifier.PGMHD3flTest3
 object PGMHD3flTest3 extends App
 {
     val filename = BASE_DIR + "breast-cancer.arff"

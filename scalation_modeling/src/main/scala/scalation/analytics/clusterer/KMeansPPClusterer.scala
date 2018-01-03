@@ -419,7 +419,7 @@ trait KMeansPPClustererTester
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KMeansPPClustererTest` object is used to test the `KMeansPlusPlusCluterer`
  *  class.
- *  > run-main scalation.analytics.clusterer.KMeansPPClustererTest
+ *  > runMain scalation.analytics.clusterer.KMeansPPClustererTest
  */
 object KMeansPPClustererTest
        extends App with KMeansPPClustererTester
@@ -441,7 +441,7 @@ object KMeansPPClustererTest
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KMeansPPClustererTest2` object is used to test the `KMeansPlusPlusCluterer`
  *  class.
- *  > run-main scalation.analytics.clusterer.KMeansPPClustererTest2
+ *  > runMain scalation.analytics.clusterer.KMeansPPClustererTest2
  */
 object KMeansPPClustererTest2
        extends App with KMeansPPClustererTester
@@ -465,7 +465,7 @@ object KMeansPPClustererTest2
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KMeansPPClustererTest3` object is used to test the `KMeansPlusPlusCluterer`
  *  class.
- *  > run-main scalation.analytics.clusterer.KMeansPPClustererTest3
+ *  > runMain scalation.analytics.clusterer.KMeansPPClustererTest3
  */
 object KMeansPPClustererTest3
        extends App with KMeansPPClustererTester
@@ -491,7 +491,7 @@ object KMeansPPClustererTest3
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KMeansPPClustererTest4` object is used to test the `KMeansPlusPlusCluterer`
  *  class.
- *  > run-main scalation.analytics.clusterer.KMeansPPClustererTest4
+ *  > runMain scalation.analytics.clusterer.KMeansPPClustererTest4
  */
 object KMeansPPClustererTest4
        extends App with KMeansPPClustererTester

@@ -18,7 +18,7 @@ import scalation.stat.Statistic
 /** The `CallCenter` object defines a particular scenario under which to execute
  *  the Call Center model.
  *  @see scalation.event.ModelTest for another example of test code.
- *  > run-main apps.event.CallCenter
+ *  > runMain apps.event.CallCenter
  */
 object CallCenter extends App with Modelable
 {

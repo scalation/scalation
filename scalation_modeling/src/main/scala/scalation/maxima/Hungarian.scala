@@ -224,7 +224,7 @@ object Hungarian
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HungarianTest` object is used to test the `Hungarian` class.
- *  > run-main scalation.maxima.HungarianTest
+ *  > runMain scalation.maxima.HungarianTest
  */
 object HungarianTest extends App
 {
@@ -262,7 +262,7 @@ object HungarianTest extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HungarianTest2` object is used to test the `Hungarian` class.
- *  > run-main scalation.maxima.HungarianTest2
+ *  > runMain scalation.maxima.HungarianTest2
  */
 object HungarianTest2 extends App
 {

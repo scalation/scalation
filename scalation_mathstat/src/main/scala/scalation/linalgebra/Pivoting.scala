@@ -40,7 +40,7 @@ trait Pivoting
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PivotingTest` is used to test the `Pivoting` trait.
- *  > run-main scalation.linalgebra.PivotingTest
+ *  > runMain scalation.linalgebra.PivotingTest
  */
 object PivotingTest extends App with Pivoting
 {

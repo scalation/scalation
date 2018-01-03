@@ -1123,7 +1123,7 @@ object BidMatrixI extends Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BidMatrixITest` object is used to test the `BidMatrixI` class.
- *  > run-main scalation.linalgebra.BidMatrixITest
+ *  > runMain scalation.linalgebra.BidMatrixITest
  */
 object BidMatrixITest extends App
 {

@@ -71,7 +71,7 @@ object Catalog
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `CatalogTest` object is used to test the `Catalog` object.
- *  > run-main scalation.columnar_db.CatalogTest
+ *  > runMain scalation.columnar_db.CatalogTest
  */
 object CatalogTest extends App
 {

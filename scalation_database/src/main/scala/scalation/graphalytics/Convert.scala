@@ -54,7 +54,7 @@ import Convert._
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ConvertTest` object is used to test the `Convert` object.
- *  > run-main scalation.graphalytics.ConvertTest
+ *  > runMain scalation.graphalytics.ConvertTest
  */
 object ConvertTest extends App
 {

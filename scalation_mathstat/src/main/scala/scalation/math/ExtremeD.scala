@@ -93,7 +93,7 @@ object ExtremeD
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ExtremeDTest` object is used to test the `ExtremeD` class.
- *  > run-main scalation.math.ExtremeDTest
+ *  > runMain scalation.math.ExtremeDTest
  */
 object ExtremeDTest extends App
 {
