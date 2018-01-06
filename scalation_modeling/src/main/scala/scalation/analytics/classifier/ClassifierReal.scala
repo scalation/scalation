@@ -46,6 +46,11 @@ abstract class ClassifierReal (x: MatriD, y: VectoI, fn: Array [String], k: Int,
     if (cn.length != k) flaw ("constructor", "cn.length must equal number of classes (k)")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return default values for binary input data (value count 'vc' set to 2).
+     */
+    def vc_default: VectorI = { val vc = new VectorI (n); vc.set (2); vc }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the number of data vectors in training/test-set (# rows).
      */
     def size: Int = m

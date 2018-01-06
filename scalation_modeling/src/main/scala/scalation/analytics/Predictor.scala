@@ -76,15 +76,17 @@ trait Predictor
     def residual: VectoD = e
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including 'sse', 'mae', rmse' and 'rSq'.
+    /** Return the quality of fit including 'sst', 'sse', 'mae', rmse' and 'rSq'.
+     *  Note, if 'sse > sst', the model introduces errors and the 'rSq' may be negative,
+     *  otherwise, R^2 ('rSq') ranges from 0 (weak) to 1 (strong).
      *  Override to add more quality of fit measures.
      */
-    def fit: VectoD = VectorD (sse, mae, rmse, rSq)
+    def fit: VectoD = VectorD (sst, sse, mae, rmse, rSq)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the fit.  Override when necessary.
      */
-    def fitLabels: Seq [String] = Seq ("sse", "mae", "rmse", "rSq")
+    def fitLabels: Seq [String] = Seq ("sst", "sse", "mae", "rmse", "rSq")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a new continuous data vector z, predict the y-value of f(z).

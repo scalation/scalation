@@ -1,6 +1,6 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  khalid Jahangeer, John Miller
+/** @author  Khalid Jahangeer, John Miller
  *  @version 1.4
  *  @date    Fri Aug  10 20:26:34 EDT 2017
  *  @see     LICENSE (MIT style license file).
