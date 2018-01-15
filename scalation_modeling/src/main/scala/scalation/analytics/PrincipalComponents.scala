@@ -139,7 +139,7 @@ object PrincipalComponentsTest extends App
      *  vectors t and p.
      *  @param i  the i-th Principal Component 'PC_i'
      */
-//  def solve (i: Int): Tuple2 [VectorD, VectorD] =
+//  def solve (i: Int): (VectorD, VectorD) =
 //  {
 //      var t  = x.col (i)                    // the scores for PC_i, initialized to i-th column of x
 //      var p  = new VectorD (1)              // the loadings for PC_i

@@ -25,7 +25,7 @@ import scalation.scala2d.Shapes.{BasicStroke, Dimension, Graphics, Graphics2D}
  *  @param numIntervals  the number of intervals (typically 5 to 100)
  *  @param _title        title of the histogram
  */
-class Histogram (value: VectorD, numIntervals: Int, _title: String = "Histogram")
+class Histogram (value: VectorD, numIntervals: Int = 40, _title: String = "Histogram")
       extends VizFrame (_title, null)
 {
     /** Create a drawing canvas

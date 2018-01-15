@@ -36,7 +36,7 @@ import RegTechnique._
  *  @param k          the maximum multiplier in the trig function (kwt)
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class TrigRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = QR)
+class TrigRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = QR)
       extends Predictor with Error
 {
     if (t.dim != y.dim) flaw ("constructor", "dimensions of t and y are incompatible")
@@ -120,7 +120,7 @@ class TrigRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = 
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new R-squared value and the new F statistic.
      */
-    def backElim (): Tuple3 [Int, VectoD, VectorD] = rg.backElim ()
+    def backElim (): (Int, VectoD, VectorD) = rg.backElim ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor 'VIF' for each variable to test

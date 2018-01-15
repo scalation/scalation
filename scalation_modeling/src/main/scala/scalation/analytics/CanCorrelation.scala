@@ -57,7 +57,7 @@ class CanCorrelation (x: MatrixD, y: MatrixD)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reduce the original data ...
      */
-    def reduce2 (): Tuple2 [MatrixD, MatrixD] =
+    def reduce2 (): (MatrixD, MatrixD) =
     {
         (null, null)    // FIX - to be implemented
     } // reduce
@@ -65,7 +65,7 @@ class CanCorrelation (x: MatrixD, y: MatrixD)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Approximately recover the original data ...
      */
-    def recover2 (): Tuple2 [MatrixD, MatrixD] =
+    def recover2 (): (MatrixD, MatrixD) =
     {
         (null, null)    // FIX - to be implemented
     } // recover

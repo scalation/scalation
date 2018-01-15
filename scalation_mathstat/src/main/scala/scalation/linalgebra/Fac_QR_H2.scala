@@ -43,9 +43,9 @@ class Fac_QR_H2 [MatT <: MatriD] (aa: MatT, needQ: Boolean = true)
      *  @see 5.1 and 5.2 in Matrix Computations
      *  @see QRDecomposition.java in Jama
      */
-    def factor ()
+    def factor (): Fac_QR_H2 [MatT] =
     {
-        if (factored) return
+        if (factored) return this
 
         for (k <- 0 until p) {                                  // for each column k in a
             val a_k = a.col (k, k)                              // A(k:m, k) column vector
@@ -68,6 +68,7 @@ class Fac_QR_H2 [MatT <: MatriD] (aa: MatT, needQ: Boolean = true)
         r.clean (TOL)                                           // comment out to avoid cleaning r matrix
 
         factored = true
+        this
     } // factor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

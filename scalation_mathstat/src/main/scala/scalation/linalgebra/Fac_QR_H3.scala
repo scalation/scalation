@@ -55,9 +55,9 @@ class Fac_QR_H3 (aa: MatrixD, needQ: Boolean = true)
     /** Factor matrix 'a' into the product of two matrices 'a = q * r', where
      *  'q' is an orthogonal matrix and 'r' is a right upper triangular matrix.
      */
-    def factor ()
+    def factor (): Fac_QR_H3 =                                  // FIX - add MatT parameter
     {
-        if (factored) return
+        if (factored) return this
 
         for (k <- 0 until p) {                                  // for each column k in a
             val a_k = a.col (k, k)                              // A(k:m, k) column vector
@@ -76,6 +76,7 @@ class Fac_QR_H3 (aa: MatrixD, needQ: Boolean = true)
         r.clean (TOL)                                           // comment out to avoid cleaning r matrix
 
         factored = true
+        this
     } // factor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

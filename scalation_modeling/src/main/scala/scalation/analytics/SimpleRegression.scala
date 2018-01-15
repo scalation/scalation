@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import scalation.linalgebra.{MatrixD, VectoD, VectorD}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.math.double_exp
 import scalation.plot.Plot
 import scalation.util.Error
@@ -24,7 +24,7 @@ import scalation.util.Error
  *  @param x  the input/design matrix augmented with a first column of ones
  *  @param y  the response vector
  */
-class SimpleRegression (x: MatrixD, y: VectorD)
+class SimpleRegression (x: MatriD, y: VectoD)
       extends Predictor with Error
 {
     if (x.dim2 != 2)     flaw ("constructor", "design matrix must have 2 columns")
@@ -113,7 +113,7 @@ object SimpleRegression
      *  @param x  the input/design m-by-1 vector
      *  @param y  the response m-vector
      */
-    def apply (x: VectorD, y: VectorD): SimpleRegression =
+    def apply (x: VectoD, y: VectoD): SimpleRegression =
     {
         new SimpleRegression (MatrixD.form_cw (1.0, x), y)
     } // apply

@@ -14,7 +14,7 @@ package scalation.analytics
 
 import scala.math.{exp, log, pow}
 
-import scalation.linalgebra.{MatrixD, VectoD, VectorD}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.minima.QuasiNewton
 import scalation.plot.Plot
 import scalation.util.Error
@@ -33,7 +33,7 @@ import RegTechnique._
  *  @param nonneg  whether to check that responses are nonnegative
  *  @param y       the response vector
  */
-class ExpRegression (x: MatrixD, nonneg: Boolean, y: VectorD)
+class ExpRegression (x: MatriD, nonneg: Boolean, y: VectoD)
       extends Predictor with Error
 {
     if (x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
@@ -139,6 +139,7 @@ class ExpRegression (x: MatrixD, nonneg: Boolean, y: VectorD)
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ExpRegressionTest` object tests `ExpRegression` class using the following
  *  exponential regression problem.
+ *  > runMain scalation.analytics.ExpRegressionTest
  */
 object ExpRegressionTest extends App
 {
@@ -165,7 +166,8 @@ object ExpRegressionTest extends App
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ExpRegressionTest2` object has a basic test for the `ExpRegression` class.
-  */
+ *  > runMain scalation.analytics.ExpRegressionTest
+ */
 object ExpRegressionTest2 extends App
 {
     import scalation.random.{Uniform, Exponential, Random}
@@ -176,7 +178,7 @@ object ExpRegressionTest2 extends App
      *  @param k  number of variables
      *  @return   (actual, estimated, r^2)
      */
-    def test (n: Int = 10000, k: Int = 5): Tuple5 [Int, Int, VectorD, VectoD, Double] =
+    def test (n: Int = 10000, k: Int = 5): (Int, Int, VectorD, VectoD, Double) =
     {
         val u = new Uniform (0, 1)     // uniform random
         val e = new Exponential (1)    // exponential error
@@ -198,7 +200,7 @@ object ExpRegressionTest2 extends App
         (n, k, b, erg.coefficient, erg.fit(0))
     } // test
 
-    val tests = Array.ofDim [Tuple5 [Int, Int, VectorD, VectoD, Double]] (10)
+    val tests = Array.ofDim [(Int, Int, VectorD, VectoD, Double)] (10)
 
     for (k <- 0 until tests.size) tests(k) = test(1000, k + 1)
 

@@ -35,7 +35,7 @@ trait SVDecomp
     /** Factor/deflate the matrix by iteratively turning elements not in the main
      *  diagonal to zero.
      */
-    def factor () { factor123 () }
+    def factor (): SVDecomp = { factor123 (); null }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the two factored matrices.

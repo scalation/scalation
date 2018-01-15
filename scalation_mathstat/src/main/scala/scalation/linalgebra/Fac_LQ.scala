@@ -34,12 +34,13 @@ class Fac_LQ (aa: MatriD)
      *  Then compute 'r' and 'q'.
      *  @see http://math.stackexchange.com/questions/1640695/rq-decomposition
      */
-    def factor ()
+    def factor (): Fac_LQ =                               // FIX - need type parameter MatT
     {
         val (qt, lt) = new Fac_QR_H (art).factor12 ()     // change `Fac-QR_H` class as needed
         l = lt.t
         q = qt.t
         factored = true 
+        this
     } // factor
 
     def factors: (MatriD, MatriD) = (l, q)

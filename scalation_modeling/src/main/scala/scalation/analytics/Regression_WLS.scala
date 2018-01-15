@@ -22,8 +22,10 @@ import Regression_WLS._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Regression_WLS` class supports weighted multiple linear regression.
- *  In this case, 'xx' is multi-dimensional [1, x_1, ... x_k].  Fit the parameter
- *  vector 'b' in the regression equation
+ *  In this case, 'xx' is multi-dimensional [1, xx_1, ... xx_k].
+ *  Weights are set to the inverse of a variable's variance, so they can compensate
+ *  for such variability (heteroscedasticity).  Fit the parameter  vector 'b' in
+ *  the regression equation
  *  <p>
  *      yy  =  b dot xx + e  =  b_0 + b_1 * xx_1 + ... b_k * xx_k + e
  *  <p>
@@ -35,7 +37,8 @@ import Regression_WLS._
  *  The data matrix 'xx' is reweighted 'x = rootW * xx' and the response vector 'yy'
  *  is reweighted 'y = rootW * yy' where 'rootW' is the square root of the weights.
  *  @see en.wikipedia.org/wiki/Least_squares#Weighted_least_squares
- *  These are then pass to OLS Regression.  Four factorization techniques are provided:
+ *  These are then passed to Ordinary Least Squares (OLS) Regression.
+ *  Five factorization techniques are provided:
  *  <p>
  *      'QR'         // QR Factorization: slower, more stable (default)
  *      'Cholesky'   // Cholesky Factorization: faster, less stable (reasonable choice)

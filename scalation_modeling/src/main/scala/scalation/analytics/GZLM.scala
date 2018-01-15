@@ -9,7 +9,7 @@
 package scalation.analytics
 
 import scalation.analytics.classifier.LogisticRegression
-import scalation.linalgebra.{MatrixD, VectorD, VectorI}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectoI, VectorI}
 import scalation.linalgebra.VectorD.one
 
 import RegTechnique._
@@ -30,7 +30,7 @@ object GZLM extends GLM
      *  @param y   the categorical response vector, y_i in {0, 1}
      *  @param cn  the names for both categories/classes
      */
-    def apply (x: MatrixD, y: VectorI, cn: Array [String]): LogisticRegression =
+    def apply (x: MatriD, y: VectoI, cn: Array [String]): LogisticRegression =
     {
         if (add_1)
             new LogisticRegression (one (x.dim1) +^: x, y, cn)
@@ -45,7 +45,7 @@ object GZLM extends GLM
      *  @param fn       the names for all factors
      *  @param poisson  whether it is `PoissonRegression`
      */
-    def apply (x: MatrixD, y: VectorI, fn: Array [String], poisson: Boolean): PoissonRegression =
+    def apply (x: MatriD, y: VectoI, fn: Array [String], poisson: Boolean): PoissonRegression =
     {
         if (add_1)
             new PoissonRegression (one (x.dim1) +^: x, y, fn)
@@ -59,7 +59,7 @@ object GZLM extends GLM
      *  @param nonneg  whether to check that responses are nonnegative
      *  @param y       the response vector
      */
-    def apply (x: MatrixD, nonneg: Boolean, y: VectorD): ExpRegression =
+    def apply (x: MatriD, nonneg: Boolean, y: VectorD): ExpRegression =
     {
         if (add_1)
             new ExpRegression (one (x.dim1) +^: x, nonneg, y)

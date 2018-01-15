@@ -54,7 +54,7 @@ import RegTechnique._
  *  @see en.wikipedia.org/wiki/Degrees_of_freedom_(statistics)
  *  @param x          the input/data m-by-n matrix
  *                        (augment with a first column of ones to include intercept in model)
- *  @param y          the response n vector
+ *  @param y          the response m-vector
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
 class Regression [MatT <: MatriD, VecT <: VectoD] (protected val x: MatT, protected val y: VecT,
@@ -241,7 +241,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (protected val x: MatT, protec
 object Regression
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Test various regression techniques.
+    /** Test the various regression techniques.
      *  @param x  the data matrix
      *  @param y  the response vector
      *  @param z  a vector to predict
@@ -375,7 +375,7 @@ object RegressionTest3 extends App
     println ("x = " + x)
     println ("y = " + y)
 
-    val z = VectorD(1.0,   46.0,   97.5,   7.0,    95.0)
+    val z = VectorD (1.0,   46.0,   97.5,   7.0,    95.0)
 
     test (x, y, z)
 
@@ -397,35 +397,35 @@ object RegressionTest4 extends App
     // 20 data points:      Constant      x_1     x_2    x_3      x_4
     //                                    Age  Weight    Dur   Stress
     val x = new MatrixD ((20, 5), 1.0,   47.0,   85.4,   5.1,    33.0,
-        1.0,   49.0,   94.2,   3.8,    14.0,
-        1.0,   49.0,   95.3,   8.2,    10.0,
-        1.0,   50.0,   94.7,   5.8,    99.0,
-        1.0,   51.0,   89.4,   7.0,    95.0,
-        1.0,   48.0,   99.5,   9.3,    10.0,
-        1.0,   49.0,   99.8,   2.5,    42.0,
-        1.0,   47.0,   90.9,   6.2,     8.0,
-        1.0,   49.0,   89.2,   7.1,    62.0,
-        1.0,   48.0,   92.7,   5.6,    35.0,
-        1.0,   47.0,   94.4,   5.3,    90.0,
-        1.0,   49.0,   94.1,   5.6,    21.0,
-        1.0,   50.0,   91.6,  10.2,    47.0,
-        1.0,   45.0,   87.1,   5.6,    80.0,
-        1.0,   52.0,  101.3,  10.0,    98.0,
-        1.0,   46.0,   94.5,   7.4,    95.0,
-        1.0,   46.0,   87.0,   3.6,    18.0,
-        1.0,   46.0,   94.5,   4.3,    12.0,
-        1.0,   48.0,   90.5,   9.0,    99.0,
-        1.0,   56.0,   95.7,   7.0,    99.0)
+                                  1.0,   49.0,   94.2,   3.8,    14.0,
+                                  1.0,   49.0,   95.3,   8.2,    10.0,
+                                  1.0,   50.0,   94.7,   5.8,    99.0,
+                                  1.0,   51.0,   89.4,   7.0,    95.0,
+                                  1.0,   48.0,   99.5,   9.3,    10.0,
+                                  1.0,   49.0,   99.8,   2.5,    42.0,
+                                  1.0,   47.0,   90.9,   6.2,     8.0,
+                                  1.0,   49.0,   89.2,   7.1,    62.0,
+                                  1.0,   48.0,   92.7,   5.6,    35.0,
+                                  1.0,   47.0,   94.4,   5.3,    90.0,
+                                  1.0,   49.0,   94.1,   5.6,    21.0,
+                                  1.0,   50.0,   91.6,  10.2,    47.0,
+                                  1.0,   45.0,   87.1,   5.6,    80.0,
+                                  1.0,   52.0,  101.3,  10.0,    98.0,
+                                  1.0,   46.0,   94.5,   7.4,    95.0,
+                                  1.0,   46.0,   87.0,   3.6,    18.0,
+                                  1.0,   46.0,   94.5,   4.3,    12.0,
+                                  1.0,   48.0,   90.5,   9.0,    99.0,
+                                  1.0,   56.0,   95.7,   7.0,    99.0)
     //  response BP
     val y = VectorD (105.0, 115.0, 116.0, 117.0, 112.0, 121.0, 121.0, 110.0, 110.0, 114.0,
-        114.0, 115.0, 114.0, 106.0, 125.0, 114.0, 106.0, 113.0, 110.0, 122.0)
+                     114.0, 115.0, 114.0, 106.0, 125.0, 114.0, 106.0, 113.0, 110.0, 122.0)
 
-    //  println ("model: y = b_0 + b_1*x1 + b_2*x_ + b3*x3 + b4*x42")
+//  println ("model: y = b_0 + b_1*x1 + b_2*x_ + b3*x3 + b4*x42")
     println ("model: y = b₀ + b₁∙x₁ + b₂∙x₂ + b₃∙x₃ + b₄∙x₄")
     println ("x = " + x)
     println ("y = " + y)
 
-    val z = VectorD(1.0,   46.0,   97.5,   7.0,    95.0)
+    val z = VectorD (1.0,   46.0,   97.5,   7.0,    95.0)
 
     val rg = new Regression (x, y)
     rg.train ()
@@ -435,3 +435,4 @@ object RegressionTest4 extends App
     println ("reduced model: fit = " + rg.backElim ())   // eliminate least predictive variable
 
 } // RegressionTest4 object
+

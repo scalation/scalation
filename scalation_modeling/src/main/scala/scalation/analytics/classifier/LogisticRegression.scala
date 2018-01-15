@@ -13,7 +13,7 @@ package classifier
 
 import scala.math.{exp, log}
 
-import scalation.linalgebra.{MatrixD, VectorD, VectoD, VectorI}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectoI, VectorI}
 import scalation.minima.QuasiNewton
 import scalation.plot.Plot
 
@@ -34,7 +34,7 @@ import ActivationFunc.sigmoid
  *  @param fn  the names for all factors
  *  @param cn  the names for both classes
  */
-class LogisticRegression (x: MatrixD, y: VectorI, fn: Array [String], cn: Array [String] = Array ("no", "yes"))
+class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String], cn: Array [String] = Array ("no", "yes"))
       extends ClassifierReal (x, y, fn, 2, cn)
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")

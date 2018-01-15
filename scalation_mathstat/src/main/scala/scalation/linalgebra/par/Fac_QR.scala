@@ -39,9 +39,9 @@ class Fac_QR (a: MatrixD)
     /** Factor matrix 'a' into the product of two matrices, 'a = q * r', returning
      *  both the orthogonal 'q' matrix and the right upper triangular 'r' matrix.
      */
-    def factor ()
+    def factor (): Fac_QR =                   // FIX - add MatT parameter
     {
-        if (factored) return
+        if (factored) return this
 
         for (j <- 0 until n) {                // for each column j
             val _norm = q.col(j).norm         // norm of the jth column
@@ -58,6 +58,7 @@ class Fac_QR (a: MatrixD)
          } // for
 
          factored = true
+         this
     } // factor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

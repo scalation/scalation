@@ -24,9 +24,11 @@ import Centering.center
 import RegTechnique._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `RidgeRegression` class supports multiple linear regression.  In this
- *  case, 'x' is multi-dimensional [x_1, ... x_k].  Both the input matrix 'x' and 
- *  the response vector 'y' are centered (zero mean).  Fit the parameter vector
+/** The `RidgeRegression` class supports multiple linear ridge regression.
+ *  In this case, 'x' is multi-dimensional [x_1, ... x_k].  Ridge regression puts
+ *  a penalty on the L2 norm of the parameters b to reduce the chance of them taking
+ *  on large values that may lead to less robust models.  Both the input matrix 'x'
+ *  and the response vector 'y' are centered (zero mean).  Fit the parameter vector
  *  'b' in the regression equation
  *  <p>
  *      y  =  b dot x + e  =  b_1 * x_1 + ... b_k * x_k + e
@@ -36,11 +38,12 @@ import RegTechnique._
  *  <p>
  *      b  =  fac.solve (.)  with regularization  x.t * x + λ * I
  *  <p>
- *  Four factorization techniques are provided:
+ *  Five factorization techniques are provided:
  *  <p>
  *      'QR'         // QR Factorization: slower, more stable (default)
  *      'Cholesky'   // Cholesky Factorization: faster, less stable (reasonable choice)
  *      'SVD'        // Singular Value Decomposition: slowest, most robust
+        'LU'         // LU Factorization: similar, but better than inverse
  *      'Inverse'    // Inverse/Gaussian Elimination, classical textbook technique 
  *  <p>
  *  @see statweb.stanford.edu/~tibs/ElemStatLearn/
@@ -75,7 +78,7 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
 
     type Fac_QR = Fac_QR_H [MatT]                              // change as needed
 
-    // SVD not yet implemented
+    // SVD not yet implemented - FIX check implementations
     private val fac: Factorization = technique match {         // select the factorization technique
         case QR       => { val x_ = (x ++ (ey * sqrt (lambda))).asInstanceOf [MatT];
                            new Fac_QR (x_) }                   // QR Factorization
@@ -84,6 +87,10 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
     } // match
     fac.factor ()                                              // factor the matrix, either X or X.t * X
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute x.t * x + λI.
+     *  @param λ  the shrinkage parameter
+     */
     def xtx_λI (λ: Double)
     {
         xtx_ = xtx.copy ().asInstanceOf [MatT]

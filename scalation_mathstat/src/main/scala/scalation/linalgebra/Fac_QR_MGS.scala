@@ -36,9 +36,9 @@ class Fac_QR_MGS (a: MatrixD)
      *  This algorithm uses Modified Gram-Schmidt 'MGS' orthogonalization.
      *  @see Algorithm 5.2.6 in Matrix Computations.
      */
-    def factor ()
+    def factor (): Fac_QR_MGS =                  // FIX - add MatT parameter
     {
-        if (factored) return
+        if (factored) return this
 
         for (j <- 0 until n) {                   // for each column j
             val _norm = q.col(j).norm            // norm of the jth column
@@ -56,6 +56,7 @@ class Fac_QR_MGS (a: MatrixD)
          r.clean (TOL)                           // comment out to avoid cleaning r matrix
 
          factored = true
+         this
     } // factor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

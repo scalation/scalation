@@ -37,13 +37,14 @@ class Fac_Cholesky [MatT <: MatriD] (a: MatT)
      *  It uses the Cholesky–Banachiewicz algorithm.
      *  @see introcs.cs.princeton.edu/java/95linear
      */
-    def factor ()
+    def factor (): Fac_Cholesky [MatT] =
     {
         for (i <- 0 until n; j <- 0 to i) {
             val diff = a(i, j) - (l(i) dot l(j))
             l(i, j)  = if (i == j) sqrt (diff) else  diff / l(j, j)
         } // for
         factored = true
+        this
     } // factor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

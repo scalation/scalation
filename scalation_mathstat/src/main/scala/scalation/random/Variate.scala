@@ -304,6 +304,7 @@ case class ChiSquare (df: Int = 2, stream: Int = 0)
 /** This class generates `Dice` random variates for a given distribution specified
  *  using a cumulative distribution function (cdf). This discrete RV models the
  *  roll of dice numbered 0, 1, ..., n-1.  Add 1 for 1 to n.
+ *  @see `Randi` for an easy way to use fair dice 'Randi (1, 6)'.
  *  @param cdf     the distribution function (cdf)
  *  @param stream  the random number stream
  */
@@ -1573,4 +1574,51 @@ object VariateTest extends App
     println ("trinom = " + trinom.pmf(0).deep)
 
 } // VariateTest object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `DiceTest` is used to test the `Randi` random variate generator for the
+ *  case of rolling two dice.  The probability mass function (pmf) is plotted.
+ *  > runMain scalation.random.DiceTest
+ */
+object DiceTest extends App
+{
+    import scalation.plot.Plot
+
+    val dice  = Randi (1, 6)
+    val x     = VectorD.range (0, 7)
+    val freq  = new VectorD (7)
+    val x2    = VectorD.range (0, 13)
+    val freq2 = new VectorD (13)
+    for (i <- 0 until 10000) {
+        val sum  = dice.igen
+        val sum2 = dice.igen + dice.igen
+        freq(sum)   += 1
+        freq2(sum2) += 1
+    } // for
+    println (s"x    = $x")
+    println (s"freq = $freq")
+    println (s"x2    = $x2")
+    println (s"freq2 = $freq2")
+    new Plot (x, freq)
+    new Plot (x2, freq2)
+
+} // DiceTest object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `CLTTest` is used to test the `Uniform` random variate generator for the
+ *  illustrating the Central Lmiit Theorem.  Try adding difference numbers of
+ *  random values and other distributions.
+ *  > runMain scalation.random.CLTTest
+ */
+object CLTTest extends App
+{
+    import scalation.stat.Histogram
+
+    val rvg = Uniform ()
+    val x = VectorD (for (i <- 0 until 100000) yield rvg.gen + rvg.gen + rvg.gen + rvg.gen)
+    new Histogram (x)
+
+} // CLTTest object
 

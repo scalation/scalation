@@ -12,7 +12,7 @@ package scalation.analytics
 
 import scala.math.{exp, log, round}
 
-import scalation.linalgebra.{MatrixD, VectoD, VectorD, VectorI}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectoI, VectorI}
 import scalation.math.Combinatorics.fac
 import scalation.minima.QuasiNewton
 import scalation.plot.Plot
@@ -32,7 +32,7 @@ import scalation.util.Error
  *  @param y   the integer response vector, y_i in {0, 1, ... }
  *  @param fn  the names of the features/variable
  */
-class PoissonRegression (x: MatrixD, y: VectorI, fn: Array [String] = null)
+class PoissonRegression (x: MatriD, y: VectoI, fn: Array [String] = null)
       extends Predictor with Error
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
@@ -141,7 +141,7 @@ class PoissonRegression (x: MatrixD, y: VectorI, fn: Array [String] = null)
      *  FIX or remove.
      *  @param z  the new integer vector to predict
      */
-//  def predict (z: VectorI): Tuple2 [Int, String] = predict (z.toDouble)
+//  def predict (z: VectorI): (Int, String) = predict (z.toDouble)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable
@@ -149,7 +149,7 @@ class PoissonRegression (x: MatrixD, y: VectorI, fn: Array [String] = null)
      *  vector, the new R-squared value and the new F statistic.
      *  FIX or remove.
      */
-//  def backElim (): Tuple4 [Int, VectorD, Double, Double] =
+//  def backElim (): (Int, VectorD, Double, Double) =
 //  {
 //      var j_max   = -1                     // index of variable to eliminate
 //      var b_max: VectorD = null            // parameter values for best solution

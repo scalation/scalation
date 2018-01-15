@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import scalation.linalgebra.{MatrixD, VectoD, VectorD}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.linalgebra.VectorD.one
 import scalation.util.{Error, time}
 
@@ -26,7 +26,8 @@ import RegTechnique._
  *  @param cubic      the order of the surface (defaults to quadratic, else cubic)
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, technique: RegTechnique = QR)
+class ResponseSurface (x_ : MatriD, y: VectoD, cubic: Boolean = false,
+                       technique: RegTechnique = QR)
       extends Predictor with Error
 {
     if (x_.dim1 != y.dim) flaw ("constructor", "the sizes of x_ and y are not compatible")
@@ -68,7 +69,7 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
      *  for 2D: p = (x_0, x_1) => 'VectorD (1, x_0, x_0^2, x_0*x_1, x_1, x_1^2)'
      *  @param p  the source vector/point for creating forms/terms
      */
-    def qForms (p: VectorD): VectorD =
+    def qForms (p: VectoD): VectorD =
     {
         val q = one (1) ++ p          // augmented vector: [ 1., p(0), ..., p(n-1) ]
         val z = new VectorD (nt)      // vector of all forms/terms
@@ -86,7 +87,7 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
      *                                        x_1, x_1^2, x_1^3)'
      *  @param p  the source vector/point for creating forms/terms
      */
-    def cForms (p: VectorD): VectorD =
+    def cForms (p: VectoD): VectorD =
     {
         val q = one (1) ++ p          // augmented vector: [ 1., p(0), ..., p(n-1) ]
         val z = new VectorD (nt)      // vector of all forms/terms
@@ -156,7 +157,7 @@ class ResponseSurface (x_ : MatrixD, y: VectorD, cubic: Boolean = false, techniq
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new R-squared value and the new F statistic.
      */
-    def backElim (): Tuple3 [Int, VectoD, VectorD] = rsm.backElim ()
+    def backElim (): (Int, VectoD, VectorD) = rsm.backElim ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor (VIF) for each variable to test

@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import scalation.linalgebra.{MatrixD, VectoD, VectorD}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.math.double_exp
 import scalation.plot.Plot
 import scalation.util.Error
@@ -26,7 +26,7 @@ import scalation.util.Error
  *  @param x  the input/design matrix
  *  @param y  the response vector
  */
-class SimplerRegression (x: MatrixD, y: VectorD)
+class SimplerRegression (x: MatriD, y: VectoD)
       extends Predictor with Error
 {
     if (x.dim2 != 1)     flaw ("constructor", "design matrix must have 1 columns")
@@ -74,8 +74,8 @@ class SimplerRegression (x: MatrixD, y: VectorD)
     override def diagnose (yy: VectoD)
     {
         super.diagnose (yy)
-        rBarSq   = 1.0 - (1.0-rSq) * r_df                 // R-bar-squared (adjusted R-squared)
-        fStat    = (sst - sse) * (m-2.0) / sse            // F statistic (msr / mse)
+        rBarSq = 1.0 - (1.0-rSq) * r_df                   // R-bar-squared (adjusted R-squared)
+        fStat  = (sst - sse) * (m-2.0) / sse              // F statistic (msr / mse)
     } // diagnose
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -110,7 +110,7 @@ object SimplerRegression
      *  @param x  the input/design m-by-1 vector
      *  @param y  the response m-vector
      */
-    def apply (x: VectorD, y: VectorD): SimplerRegression =
+    def apply (x: VectoD, y: VectoD): SimplerRegression =
     {
         val xx = new MatrixD (x.dim, 1)
         xx.setCol (0, x)

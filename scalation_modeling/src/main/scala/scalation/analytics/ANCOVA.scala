@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import scalation.linalgebra.{MatrixD, VectoD, VectorD, VectorI}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectoI, VectorI}
 import scalation.util.{Error, time}
 
 import RegTechnique._
@@ -36,7 +36,7 @@ import RegTechnique._
  *  @param levels     the number of treatment levels (1, ... levels)
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class ANCOVA (x_ : MatrixD, t: VectorI, y: VectorD, levels: Int, technique: RegTechnique = QR)
+class ANCOVA (x_ : MatriD, t: VectoI, y: VectoD, levels: Int, technique: RegTechnique = QR)
       extends Predictor  with Error
 {
     if (x_.dim1 != y.dim) flaw ("constructor", "dimensions of x_ and y are incompatible")
@@ -116,7 +116,7 @@ class ANCOVA (x_ : MatrixD, t: VectorI, y: VectorD, levels: Int, technique: RegT
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new R-squared value and the new F statistic.
      */
-    def backElim (): Tuple3 [Int, VectoD, VectorD] = rg.backElim ()
+    def backElim (): (Int, VectoD, VectorD) = rg.backElim ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor (VIF) for each variable to test

@@ -55,7 +55,7 @@ class Fac_LU [MatT <: MatriD] (a: MatT)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Factor matrix 'a' into the product of 'l' and 'u'.
      */
-    def factor () =
+    def factor (): Fac_LU [MatT] =
     {
         for (j <- l.range2) {                              // for each column j
             val col_j = l.col(j)()                         // array (copied from lu) holding column j
@@ -86,6 +86,7 @@ class Fac_LU [MatT <: MatriD] (a: MatT)
 
         factored = true
         split ()                                          // split l into l proper and u
+        this
     } // factor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -457,6 +458,21 @@ object Fac_LUTest2 extends App
     val b = VectorD (-0.2, -0.32, 13.52, 14.17, 35)
 
     test (a, b)
+
+} // Fac_LUTest2 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Fac_LUTest3` object is used to test the `Fac_LU` class.
+ *  > runMain scalation.linalgebra.Fac_LUTest3
+ */
+object Fac_LUTest3 extends App
+{
+    val x = new MatrixD ((2, 2), 1, 3,
+                                 2, 1)
+    val y = VectorD (1, 7)
+    println ("using inverse:          b = X^-1 y = " + x.inverse * y)
+    println ("using LU factorization: Lb = Uy    = " + { val lu = new Fac_LU (x); lu.factor ().solve (y) } )
 
 } // Fac_LUTest2 object
 

@@ -10,7 +10,7 @@ package scalation.analytics
 
 import scala.math.{exp, log}
 
-import scalation.linalgebra.{MatrixD, VectoD, VectorD}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.math.FunctionS2S
 import scalation.plot.Plot
 import scalation.util.{Error, time}
@@ -36,12 +36,13 @@ import RegTechnique._
  *  where 'x_pinv' is the pseudo-inverse.
  *  Caveat: this class does not provide transformations on columns of matrix 'x'.
  *  @see www.ams.sunysb.edu/~zhu/ams57213/Team3.pptx
- *  @param x          the design/data matrix
- *  @param y          the response vector
+ *  @param x          the design/data m-by-n matrix
+ *  @param y          the response m-vector
  *  @param transform  the transformation function (defaults to log)
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class TranRegression (x: MatrixD, y: VectorD, transform: FunctionS2S = log, technique: RegTechnique = QR)
+class TranRegression (x: MatriD, y: VectoD, transform: FunctionS2S = log,
+                      technique: RegTechnique = QR)
       extends Predictor with Error
 {
     if (x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
@@ -93,7 +94,7 @@ class TranRegression (x: MatrixD, y: VectorD, transform: FunctionS2S = log, tech
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new R-squared value and the new F statistic.
      */
-    def backElim (): Tuple3 [Int, VectoD, VectorD] = rg.backElim ()
+    def backElim (): (Int, VectoD, VectorD) = rg.backElim ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor 'VIF' for each variable to test

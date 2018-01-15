@@ -57,9 +57,9 @@ trait Predictor
     def diagnose (yy: VectoD)
     {
         val m = e.dim                               // number of instances
-        sse   = e dot e                             // sum of squares error
         sst   = (yy dot yy) - yy.sum~^2.0 / m       // sum of squares total
-        ssr   = sst - sse                           // sum of squares regression
+        sse   = e dot e                             // sum of squares error
+        ssr   = sst - sse                           // sum of squares regression (not returned by fit)
         mae   = e.norm1 / e.dim                     // mean absolute error
         rmse  = sqrt (sse / e.dim)                  // root mean square error
         rSq   = ssr / sst                           // coefficient of determination R^2

@@ -24,7 +24,7 @@ trait Factorization
      *  Q matrix in QR factorization when it is not needed, e.g., for regression.
      *  Class implementing the 'factor' method should set 'factored = true'.
      */
-    def factor ()
+    def factor (): Factorization
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the two factored matrices.

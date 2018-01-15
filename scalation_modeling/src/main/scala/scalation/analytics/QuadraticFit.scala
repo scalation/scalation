@@ -96,7 +96,7 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
     /** Given a grid of design points, create a design matrix 'xx' and response
      *  vector 'yy' returning them as a tuple.
      */
-    def response (): Tuple2 [MatrixD, VectorD] =
+    def response (): (MatrixD, VectorD) =
     {
         val xx = new MatrixD (grid.size, nt)  // design matrix
         val yy = new VectorD (grid.size)      // response vector

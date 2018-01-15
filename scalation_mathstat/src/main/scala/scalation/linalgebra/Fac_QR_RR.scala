@@ -48,9 +48,9 @@ class Fac_QR_RR [MatT <: MatriD] (aa: MatT, needQ: Boolean = true)
      *  @see 5.1 and 5.2 in Matrix Computations
      *  @see QRDecomposition.java in Jama
      */
-    override def factor ()
+    override def factor (): Fac_QR_RR [MatT] =
     {
-        if (factored) return
+        if (factored) return this
 
         val c = VectorD (for (j <- at.range1) yield at(j).normSq)  // length^2 of a's columns, at's rows
 
@@ -76,6 +76,7 @@ class Fac_QR_RR [MatT <: MatriD] (aa: MatT, needQ: Boolean = true)
         r.clean (TOL)                                              // comment out to avoid cleaning r matrix
 
         factored = true
+        this
     } // factor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

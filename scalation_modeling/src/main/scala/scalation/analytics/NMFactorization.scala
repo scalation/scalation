@@ -40,7 +40,7 @@ class NMFactorization (v: MatrixD,
      *  iteratively calling the 'update' method until the difference between
      *  'v' and its approximation 'vv = w * h' is sufficiently small.
      */
-    def factor (): Tuple2 [MatrixD, MatrixD] = 
+    def factor (): (MatrixD, MatrixD) = 
     {
         var vv: MatrixD = null                        // holds product of the factors (vv -> v)
 

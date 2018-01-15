@@ -34,7 +34,7 @@ import RegTechnique._
  *  @param k          the order of the polynomial
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class PolyRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = Cholesky)
+class PolyRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = Cholesky)
       extends Predictor with Error
 {
     if (t.dim != y.dim) flaw ("constructor", "dimensions of t and y are incompatible")
