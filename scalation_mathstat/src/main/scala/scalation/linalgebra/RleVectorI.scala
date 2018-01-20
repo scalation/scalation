@@ -1,9 +1,9 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author   Vishnu Gowda Harish, John Miller
- *  @version  1.3
- *  @date     Mon March 28 5:10:20 EDT 2016
- *  @see      LICENSE (MIT style license file).
+/** @author  Vishnu Gowda Harish, John Miller
+ *  @version 1.4
+ *  @date    Mon March 28 5:10:20 EDT 2016
+ *  @see     LICENSE (MIT style license file).
  */
 
 package scalation.linalgebra
@@ -533,12 +533,12 @@ class RleVectorI (val dim: Int, protected var v: ReArray [TripletI] = null)
         b match {
         case _: RleVectorI => this + b.asInstanceOf [RleVectorI]
         case _             => val c = new VectorI (dim)
-                              var k = 0
-                              for (i <- crange; j <- 0 until v(i).count) {        
-                                  c(k) = v(i).value + b(k)
-                                  k += 1
-                              } // for   
-                              c                              
+                               var k = 0
+                               for (i <- crange; j <- 0 until v(i).count) {        
+                                   c(k) = v(i).value + b(k)
+                                   k += 1
+                               } // for   
+                               c                              
         } // match       
     } // +
     
@@ -593,7 +593,7 @@ class RleVectorI (val dim: Int, protected var v: ReArray [TripletI] = null)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector add scalar 's._2' only at position 's._1' and return 
      *  the uncompressed vector
-     *  @param s  the (scalar, position) to subtract
+     *  @param s  the (scalar, position) to add
      */
     def + (s: (Int, Int)): VectoI = 
     {
@@ -605,7 +605,7 @@ class RleVectorI (val dim: Int, protected var v: ReArray [TripletI] = null)
                 k += 1
             } // for
         } // for    
-       c    
+        c    
     } // +
                   
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -664,8 +664,8 @@ class RleVectorI (val dim: Int, protected var v: ReArray [TripletI] = null)
      */
     def += (s: Int): RleVectorI = 
     { 
-      for (i <- crange) v(i).update (v(i).value + s, v(i).count, v(i).startPos)
-      this 
+        for (i <- crange) v(i).update (v(i).value + s, v(i).count, v(i).startPos)
+        this 
     } // +=
          
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -752,32 +752,32 @@ class RleVectorI (val dim: Int, protected var v: ReArray [TripletI] = null)
      */
     def - (s: (Int, Int)): VectoI = 
     {
-      val c = new VectorI (dim)
-      var k = 0
-      for (i <- crange) {        
-          for (j <- 0 until v(i).count) {
-              c(k) = if (v(i).startPos + j == s._1) v(i).value - s._2 else v(i).value
-              k += 1
-          } // for
-      }  // for    
-      c    
+        val c = new VectorI (dim)
+        var k = 0
+        for (i <- crange) {        
+            for (j <- 0 until v(i).count) {
+                c(k) = if (v(i).startPos + j == s._1) v(i).value - s._2 else v(i).value
+                k += 1
+            } // for
+        } // for    
+        c    
     } // -
-    
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Subtract in-place 'this' vector and vector 'b' and return the compressed 
      *  vector.
-     *  @param b  the vector to add
+     *  @param b  the vector to subtract
      */
     def -= (b: VectoI): RleVectorI = { for (i <- range) this(i) -= b(i); this }
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Subtract in-place 'this' vector and scalar 's' and return the compressed vector
-     *  @param s  the scalar to add
+     *  @param s  the scalar to subtract
      */
     def -= (s: Int): RleVectorI = 
     { 
-      for (i <- crange) v(i).update (v(i).value - s, v(i).count, v(i).startPos)
-      this 
+        for (i <- crange) v(i).update (v(i).value - s, v(i).count, v(i).startPos)
+        this 
     } // -=
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -845,16 +845,34 @@ class RleVectorI (val dim: Int, protected var v: ReArray [TripletI] = null)
         for (i <- crange)  c.v(i) = new TripletI (v(i).value * s, v(i).count, v(i).startPos) 
         c
     } // *
-       
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply 'this' vector by scalar 's._2' only at position 's._1' and return 
+     *  the uncompressed vector
+     *  @param s  the (scalar, position) to multiply by
+     */
+    def * (s: (Int, Int)): VectoI = 
+    {
+        val c = new VectorI (dim)
+        var k = 0
+        for (i <- crange) {        
+            for (j <- 0 until v(i).count) {
+                c(k) = if (v(i).startPos + j == s._1) v(i).value * s._2 else v(i).value
+                k += 1
+            } // for
+        }  // for    
+        c    
+    } // *
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to multiply by
      */
     def *= (b: VectoI): RleVectorI = { for (i <- range) this(i) *= b(i); this }
    
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and scalar 's'.
-     *  @param s  the scalar to add
+     *  @param s  the scalar to multiply by
      */
     def *= (s: Int): RleVectorI = 
     {  
@@ -928,20 +946,38 @@ class RleVectorI (val dim: Int, protected var v: ReArray [TripletI] = null)
         c
     } // /
        
-     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide 'this' vector by scalar 's._2' only at position 's._1' and return 
+     *  the uncompressed vector
+     *  @param s  the (scalar, position) to divide by
+     */
+    def / (s: (Int, Int)): VectoI = 
+    {
+        val c = new VectorI (dim)
+        var k = 0
+        for (i <- crange) {        
+            for (j <- 0 until v(i).count) {
+                c(k) = if (v(i).startPos + j == s._1) v(i).value / s._2 else v(i).value
+                k += 1
+            } // for
+        }  // for    
+        c    
+    } // /
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to divide by
      */
     def /= (b: VectoI): RleVectorI = { for (i <- range) this(i) /= b(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and scalar 's'.
-     *  @param s  the scalar to add
+     *  @param s  the scalar to divide by
      */
     def /= (s: Int): RleVectorI = 
     {  
-      for (i <- crange) v(i).update (v(i).value / s, v(i).count, v(i).startPos)
-      this 
+        for (i <- crange) v(i).update (v(i).value / s, v(i).count, v(i).startPos)
+        this 
     } // /=
        
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -962,7 +998,7 @@ class RleVectorI (val dim: Int, protected var v: ReArray [TripletI] = null)
      */
     def ~^= (s: Int): RleVectorI = 
     {  
-      for (i <- crange) v(i).update (v(i).value ~^ s, v(i).count, v(i).startPos); this
+        for (i <- crange) v(i).update (v(i).value ~^ s, v(i).count, v(i).startPos); this
     } // ~^=
        
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -985,17 +1021,16 @@ class RleVectorI (val dim: Int, protected var v: ReArray [TripletI] = null)
         var oldValue = ABS (oldTriple.value)
         var idx = 0
         c.v(idx) = oldTriple; idx += 1
-        for (i <- 1 until v.length) 
-            {          
-                 val currValue = ABS (v(i).value)
-                 if (currValue == oldValue) {
-                     oldTriple.update (oldTriple.value, oldTriple.count + v(i).count, oldTriple.startPos)
-                 } else {
-                     oldTriple = new TripletI (currValue, v(i).count, c.v(i-1).startPos + c.v(i-1).count)
-                     oldValue = oldTriple.value
-                     c.v(idx) = oldTriple; idx += 1
-                 } // if
-            } // for
+        for (i <- 1 until v.length) {          
+            val currValue = ABS (v(i).value)
+            if (currValue == oldValue) {
+                oldTriple.update (oldTriple.value, oldTriple.count + v(i).count, oldTriple.startPos)
+            } else {
+                oldTriple = new TripletI (currValue, v(i).count, c.v(i-1).startPos + c.v(i-1).count)
+                oldValue = oldTriple.value
+                c.v(idx) = oldTriple; idx += 1
+            } // if
+        } // for
         c
     } // abs
     
@@ -1037,7 +1072,7 @@ class RleVectorI (val dim: Int, protected var v: ReArray [TripletI] = null)
                 k += 1
             } // for
         }  // for    
-       c   
+        c   
     } // cumulate
       
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1299,8 +1334,8 @@ class RleVectorI (val dim: Int, protected var v: ReArray [TripletI] = null)
      */
     def indexWhere (p: (Int) => Boolean): Int = 
     {      
-      for (i <- crange if p (v(i).value)) return v(i).startPos
-     -1     
+        for (i <- crange if p (v(i).value)) return v(i).startPos
+       -1     
     } // indexWhere
     
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

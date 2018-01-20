@@ -225,7 +225,7 @@ trait VectoR
     def + (s: Real): VectoR
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add 'this' vector and scalar 's._2' only at position 's._1'.
+    /** Add 'this' vector and scalar 's._2' only at position 's._1', e.g., 'x + (3, 5.5)'.
      *  @param s  the (position, scalar) to add
      */
     def + (s: (Int, Real)): VectoR
@@ -260,20 +260,20 @@ trait VectoR
     def - (s: Real): VectoR
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' vector subtract scalar 's._2' only at position 's._1'.
+    /** From 'this' vector subtract scalar 's._2' only at position 's._1', e.g., 'x - (3, 5.5)'.
      *  @param s  the (position, scalar) to subtract
      */
     def - (s: (Int, Real)): VectoR
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to subtract
      */
     def -= (b: VectoR): VectoR
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place scalar 's'.
-     *  @param s  the scalar to add
+     *  @param s  the scalar to substract
      */
     def -= (s: Real): VectoR
  
@@ -290,14 +290,20 @@ trait VectoR
     def * (s: Real): VectoR
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply 'this' vector by scalar 's._2' only at position 's._1', e.g., 'x * (3, 5.5)'.
+     *  @param s  the (position, scalar) to multiply
+     */
+    def * (s: (Int, Real)): VectoR
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to multiply by
      */
     def *= (b: VectoR): VectoR
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and scalar 's'.
-     *  @param s  the scalar to add
+     *  @param s  the scalar to multiply by
      */
     def *= (s: Real): VectoR
 
@@ -314,14 +320,20 @@ trait VectoR
     def / (s: Real): VectoR
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide 'this' vector by scalar 's._2' only at position 's._1', e.g., 'x / (3, 5.5)'.
+     *  @param s  the (position, scalar) to divide
+     */
+    def / (s: (Int, Real)): VectoR
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to divide by
      */
     def /= (b: VectoR): VectoR
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and scalar 's'.
-     *  @param s  the scalar to add
+     *  @param s  the scalar to divide by
      */
     def /= (s: Real): VectoR
 

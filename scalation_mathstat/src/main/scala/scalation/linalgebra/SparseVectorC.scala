@@ -286,17 +286,13 @@ class SparseVectorC (val dim_ : Int,
     } // +
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add 'this' vector and scalar 's._2' only at position 's._1'.
+    /** Add 'this' vector and scalar 's._2' only at position 's._1' e.g., 'x + (3, 5.5).
      *  @param s  the (scalar, position) to add
      */
     def + (s: (Int, Complex)): SparseVectorC =
     {
         if (s._1 =~ _0) this
-        else {
-            val c = new SparseVectorC (this)
-            c(s._1) += s._2
-            c
-        } // if    
+        else { val c = new SparseVectorC (this); c(s._1) += s._2; c }
     } // +
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -338,28 +334,24 @@ class SparseVectorC (val dim_ : Int,
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' vector subtract scalar 's._2' only at position 's._1'.
+    /** From 'this' vector subtract scalar 's._2' only at position 's._1', e.g., 'x - (3, 5.5).
      *  @param s  the (scalar, position) to subtract
      */
     def - (s: (Int, Complex)): SparseVectorC =
     {
         if (s._1 =~ _0) this
-        else {
-            val c = new SparseVectorC (this)
-            c(s._1) -= s._2
-            c
-        } // if    
+        else { val c = new SparseVectorC (this); c(s._1) -= s._2; c }
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to subtract
      */
     def -= (b: VectoC): SparseVectorC = { for (i <- range) this(i) -= b(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place scalar 's'.
-     *  @param s  the scalar to add
+     *  @param s  the scalar to subtract
      */
     def -= (s: Complex): SparseVectorC = { for (i <- range) this(i) -= s; this }
  
@@ -381,19 +373,29 @@ class SparseVectorC (val dim_ : Int,
     def * (s: Complex): SparseVectorC =
     {
         val c = new SparseVectorC (dim)
-        if( s !=~ _0 ) for (x <- v) c(x._1) = x._2 * s  
+        if (s !=~ _0) for (x <- v) c(x._1) = x._2 * s  
         c
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply 'this' vector by scalar 's._2' only at position 's._1', e.g., 'x * (3, 5.5).
+     *  @param s  the (scalar, position) to multiply by
+     */
+    def * (s: (Int, Complex)): SparseVectorC =
+    {
+        if (s._1 =~ _0) this
+        else { val c = new SparseVectorC (this); c(s._1) *= s._2; c }
+    } // *
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to multiply by
      */
     def *= (b: VectoC): SparseVectorC = { for (x <- v) this(x._1) = x._2 * b(x._1); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and scalar 's'.
-     *  @param s  the scalar to add
+     *  @param s  the scalar to multiply by
      */
     def *= (s: Complex): SparseVectorC = { for (x <- v) this(x._1) = x._2 * s; this }
 
@@ -407,7 +409,7 @@ class SparseVectorC (val dim_ : Int,
         for (x <- v) c(x._1) = x._2 / b(x._1) 
         c    
     } // /
-    
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide 'this' vector by scalar 's'.
      *  @param s  the scalar to divide by
@@ -420,14 +422,24 @@ class SparseVectorC (val dim_ : Int,
     } // /
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide 'this' vector by scalar 's._2' only at position 's._1', e.g., 'x / (3, 5.5).
+     *  @param s  the (scalar, position) to divide by
+     */
+    def / (s: (Int, Complex)): SparseVectorC =
+    {
+        if (s._1 =~ _0) this
+        else { val c = new SparseVectorC (this); c(s._1) /= s._2; c }
+    } // /
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to divide by
      */
     def /= (b: VectoC): SparseVectorC = { for (x <- v) this(x._1) = x._2 / b(x._1); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and scalar 's'.
-     *  @param s  the scalar to add
+     *  @param s  the scalar to divide by
      */
     def /= (s: Complex): SparseVectorC = { for (x <- v) this(x._1) = x._2 / s; this }
     

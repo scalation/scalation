@@ -1,9 +1,9 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author   Vishnu Gowda Harish, Vinay Kumar Bingi, John Miller
- *  @version  1.3
- *  @date     Sat Oct 1 1:10:11 EDT 2016
- *  @see      LICENSE (MIT style license file).
+/** @author  Vishnu Gowda Harish, Vinay Kumar Bingi, John Miller
+ *  @version 1.4
+ *  @date    Sat Oct 1 1:10:11 EDT 2016
+ *  @see     LICENSE (MIT style license file).
  */
 
 package scalation.linalgebra

@@ -28,6 +28,7 @@ trait Predictor
     protected var ssr       = -1.0                  // sum of squares regression/model
     protected var sst       = -1.0                  // sum of squares total (ssr + sse)
     protected var mae       = -1.0                  // mean absolute error
+    protected var mse       = -1.0                  // mean squared error
     protected var rmse      = -1.0                  // root mean squared error
     protected var rSq       = -1.0                  // coefficient of determination (quality of fit)
 
@@ -49,8 +50,8 @@ trait Predictor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute diagostics for the predictor.  Override to add more diagostics.
-     *  Note, for 'rmse', 'sse' is divided by the number of instances 'm' rather
-     *  than degrees of freedom.
+     *  Note, for 'mse' and 'rmse', 'sse' is divided by the number of instances
+     *  'm' rather than the degrees of freedom.
      *  @see en.wikipedia.org/wiki/Mean_squared_error
      *  @param yy  the response vector
      */
@@ -60,8 +61,9 @@ trait Predictor
         sst   = (yy dot yy) - yy.sum~^2.0 / m       // sum of squares total
         sse   = e dot e                             // sum of squares error
         ssr   = sst - sse                           // sum of squares regression (not returned by fit)
-        mae   = e.norm1 / e.dim                     // mean absolute error
-        rmse  = sqrt (sse / e.dim)                  // root mean square error
+        mse   = sse / m                             // mean square error
+        rmse  = sqrt (mse)                          // root mean square error
+        mae   = e.norm1 / m                         // mean absolute error
         rSq   = ssr / sst                           // coefficient of determination R^2
     } // diagnose
 
@@ -81,12 +83,12 @@ trait Predictor
      *  otherwise, R^2 ('rSq') ranges from 0 (weak) to 1 (strong).
      *  Override to add more quality of fit measures.
      */
-    def fit: VectoD = VectorD (sst, sse, mae, rmse, rSq)
+    def fit: VectoD = VectorD (sst, sse, mse, rmse, mae, rSq)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the fit.  Override when necessary.
      */
-    def fitLabels: Seq [String] = Seq ("sst", "sse", "mae", "rmse", "rSq")
+    def fitLabels: Seq [String] = Seq ("sst", "sse", "mse", "rmse", "mae", "rSq")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a new continuous data vector z, predict the y-value of f(z).

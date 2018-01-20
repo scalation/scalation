@@ -474,5 +474,5 @@ object Fac_LUTest3 extends App
     println ("using inverse:          b = X^-1 y = " + x.inverse * y)
     println ("using LU factorization: Lb = Uy    = " + { val lu = new Fac_LU (x); lu.factor ().solve (y) } )
 
-} // Fac_LUTest2 object
+} // Fac_LUTest3 object
 

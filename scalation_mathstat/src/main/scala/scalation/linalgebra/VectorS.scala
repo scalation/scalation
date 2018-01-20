@@ -313,15 +313,10 @@ class VectorS (val dim: Int,
     } // +
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add 'this' vector and scalar 's._2' only at position 's._1'.
+    /** Add 'this' vector and scalar 's._2' only at position 's._1', e.g., 'x + (3, 5.5)'.
      *  @param s  the (position, scalar) to add
      */
-    def + (s: (Int, StrNum)): VectorS =
-    {
-        val c = new VectorS (dim)
-        for (i <- range) c.v(i) = if (i == s._1) v(i) + s._2 else v(i)
-        c
-    } // +
+    def + (s: (Int, StrNum)): VectorS = { val c = copy (); c.v(s._1) += s._2; c }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add in-place 'this' vector and vector 'b'.
@@ -385,31 +380,26 @@ class VectorS (val dim: Int,
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' vector subtract scalar 's._2' only at position 's._1'.
+    /** From 'this' vector subtract scalar 's._2' only at position 's._1', e.g., 'x - (3, 5.5)'.
      *  @param s  the (position, scalar) to subtract
      */
-    def - (s: (Int, StrNum)): VectorS =
-    {
-        val c = new VectorS (dim)
-        for (i <- range) c.v(i) = if (i == s._1) v(i) - s._2 else v(i)
-        c
-    } // -
+    def - (s: (Int, StrNum)): VectorS = { val c = copy (); c.v(s._1) -= s._2; c }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place vector 'b'.
-     *  @param b  the vector to add (any kind)
+     *  @param b  the vector to subtract (any kind)
      */
     def -= (b: VectoS): VectorS = { for (i <- range) v(i) -= b(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place vector 'b'.
-     *  @param b  the vector to add (same kind, more efficient)
+     *  @param b  the vector to subtract (same kind, more efficient)
      */
     def -= (b: VectorS): VectorS = { for (i <- range) v(i) -= b.v(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place scalar 's'.
-     *  @param s  the scalar to add
+     *  @param s  the scalar to subtract
      */
     def -= (s: StrNum): VectorS = { for (i <- range) v(i) -= s; this }
  
@@ -447,20 +437,26 @@ class VectorS (val dim: Int,
     } // *
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply 'this' vector by scalar 's._2' only at position 's._1', e.g., 'x * (3, 5.5)'.
+     *  @param s  the (position, scalar) to multiply
+     */
+    def * (s: (Int, StrNum)): VectorS = { val c = copy (); c.v(s._1) *= s._2; c }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add (any kind)
+     *  @param b  the vector to multiply by (any kind)
      */
     def *= (b: VectoS): VectorS = { for (i <- range) v(i) *= b(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add (same kind, more efficient)
+     *  @param b  the vector to multiply by (same kind, more efficient)
      */
     def *= (b: VectorS): VectorS = { for (i <- range) v(i) *= b.v(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and scalar 's'.
-     *  @param s  the scalar to add
+     *  @param s  the scalar to multiply by
      */
     def *= (s: StrNum): VectorS = { for (i <- range) v(i) *= s; this }
 
@@ -498,20 +494,26 @@ class VectorS (val dim: Int,
     } // /
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide 'this' vector by scalar 's._2' only at position 's._1', e.g., 'x / (3, 5.5)'.
+     *  @param s  the (position, scalar) to divide
+     */
+    def / (s: (Int, StrNum)): VectorS = { val c = copy (); c.v(s._1) /= s._2; c }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add (any kind)
+     *  @param b  the vector to divide by (any kind)
      */
     def /= (b: VectoS): VectorS = { for (i <- range) v(i) /= b(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add (same kind, more efficient)
+     *  @param b  the vector to divide by (same kind, more efficient)
      */
     def /= (b: VectorS): VectorS = { for (i <- range) v(i) /= b.v(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and scalar 's'.
-     *  @param s  the scalar to add
+     *  @param s  the scalar to divide by
      */
     def /= (s: StrNum): VectorS = { for (i <- range) v(i) /= s; this }
 

@@ -291,10 +291,10 @@ class VectorD (val dim: Int,
     } // +
  
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add 'this' vector and scalar 's._2' only at position 's._1'.
+    /** Add 'this' vector and scalar 's._2' only at position 's._1', 'x + (3, 5.5)'.
      *  @param s  the (position, scalar) to add
      */
-    def + (s: Tuple2 [Int, Double]): VectorD =
+    def + (s: (Int, Double)): VectorD =
     {
         val c = new VectorD (dim)
         for (i <- range.par) c.v(i) = if (i == s._1) v(i) + s._2 else v(i)
@@ -346,10 +346,10 @@ class VectorD (val dim: Int,
     } // -
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** From 'this' vector subtract scalar 's._2' only at position 's._1'.
+    /** From 'this' vector subtract scalar 's._2' only at position 's._1', 'x - (3, 5.5)'.
      *  @param s  the (position, scalar) to subtract
      */
-    def - (s: Tuple2 [Int, Double]): VectorD =
+    def - (s: (Int, Double)): VectorD =
     {
         val c = new VectorD (dim)
         for (i <- range.par) c.v(i) = if (i == s._1) v(i) - s._2 else v(i)
@@ -358,13 +358,13 @@ class VectorD (val dim: Int,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to subtract
      */
     def -= (b: VectoD): VectorD = { for (i <- range.par) v(i) -= b(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From 'this' vector subtract in-place scalar 's'.
-     *  @param s  the scalar to add
+     *  @param s  the scalar to subtract
      */
     def -= (s: Double): VectorD = { for (i <- range.par) v(i) -= s; this }
  
@@ -397,14 +397,25 @@ class VectorD (val dim: Int,
     def * (m: MatriD): VectorD = null  // m.t * this        // FIX
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply 'this' vector and scalar 's._2' only at position 's._1', 'x * (3, 5.5)'.
+     *  @param s  the (position, scalar) to multiply by
+     */
+    def * (s: (Int, Double)): VectorD =
+    {
+        val c = new VectorD (dim)
+        for (i <- range.par) c.v(i) = if (i == s._1) v(i) * s._2 else v(i)
+        c
+    } // *
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to multiply by
      */
     def *= (b: VectoD): VectorD = { for (i <- range.par) v(i) *= b(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' vector and scalar 's'.
-     *  @param s  the scalar to add
+     *  @param s  the scalar to multiply by
      */
     def *= (s: Double): VectorD = { for (i <- range.par) v(i) *= s; this }
 
@@ -431,14 +442,25 @@ class VectorD (val dim: Int,
     } // /
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide 'this' vector and scalar 's._2' only at position 's._1', 'x / (3, 5.5)'.
+     *  @param s  the (position, scalar) to divide by
+     */
+    def / (s: (Int, Double)): VectorD =
+    {
+        val c = new VectorD (dim)
+        for (i <- range.par) c.v(i) = if (i == s._1) v(i) / s._2 else v(i)
+        c
+    } // /
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and vector 'b'.
-     *  @param b  the vector to add
+     *  @param b  the vector to divide by
      */
     def /= (b: VectoD): VectorD = { for (i <- range.par) v(i) /= b(i); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Divide in-place 'this' vector and scalar 's'.
-     *  @param s  the scalar to add
+     *  @param s  the scalar to divide by
      */
     def /= (s: Double): VectorD = { for (i <- range.par) v(i) /= s; this }
 
