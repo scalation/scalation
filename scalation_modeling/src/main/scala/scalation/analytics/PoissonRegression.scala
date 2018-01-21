@@ -118,7 +118,7 @@ class PoissonRegression (x: MatriD, y: VectoI, fn: Array [String] = null)
     /** Return the quality of fit including 'rSquared'.  Assumes both train_null and
      *  train have already been called.
      */
-    override def fit: VectorD = 
+    override def fit: VectoD = 
     {
         pseudo_rSq = 1.0 - r_dev / n_dev
         VectorD (n_dev, r_dev, aic, pseudo_rSq)

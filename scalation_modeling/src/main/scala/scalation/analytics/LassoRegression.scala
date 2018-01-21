@@ -34,19 +34,13 @@ import RegTechnique._
  *  <p>
  *      b  =  x_pinv * y   [ alternative: b  =  solve (y) ]
  *  <p>
- *  where 'x_pinv' is the pseudo-inverse.  Three techniques are provided:
- *  <p>
- *      'QR'         // QR Factorization: slower, more stable (default)
- *      'Cholesky'   // Cholesky Factorization: faster, less stable (reasonable choice)
- *      'Inverse'    // Inverse/Gaussian Elimination, classical textbook technique (outdated)
- *  <p>
+ *  where 'x_pinv' is the pseudo-inverse.
  *  @see see.stanford.edu/materials/lsoeldsee263/05-ls.pdf
- *  @param x          the input/design m-by-n matrix augmented with a first column of ones
- *  @param y          the response vector
- *  @param λ0         the initial vale for the regularization weight
- *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
+ *  @param x   the input/design m-by-n matrix augmented with a first column of ones
+ *  @param y   the response vector
+ *  @param λ0  the initial vale for the regularization weight
  */
-class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: Double = 0.01, technique: RegTechnique = QR)
+class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: Double = 0.01)
       extends Predictor with Error
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
@@ -94,14 +88,15 @@ class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: D
      */
     def train (yy: VectoD)
     {
-        val g       = f(yy) _
-        val optimer = new CoordinateDescent (g)                 // Coordinate Descent optimizer
-//        val optimer = new GradientDescent (g)                 // Gradient Descent optimizer
-//        val optimer = new ConjugateGradient (g)               // Conjugate Gradient optimizer
-//        val optimer = new QuasiNewton (g)                     // Quasi-Newton optimizer
-//        val optimer = new NelderMeadSimplex (g, x.dim2)       // Nelder-Mead optimizer
-        val b0 = new VectorD (k+1)                              // initial guess for coefficient vector
-        b = optimer.solve (b0, 0.5)                             // find an optimal solution for coefficients
+//      val g       = f(yy) _
+//      val optimer = new CoordinateDescent (g)                 // Coordinate Descent optimizer
+//      val optimer = new GradientDescent (g)                   // Gradient Descent optimizer
+//      val optimer = new ConjugateGradient (g)                 // Conjugate Gradient optimizer
+//      val optimer = new QuasiNewton (g)                       // Quasi-Newton optimizer
+//      val optimer = new NelderMeadSimplex (g, x.dim2)         // Nelder-Mead optimizer
+//      val b0 = new VectorD (k+1)                              // initial guess for coefficient vector
+//      b = optimer.solve (b0, 0.5)                             // find an optimal solution for coefficients
+        b = LassoAdmm.solve (x.asInstanceOf [MatrixD], y, λ)
 
         e = yy - x * b                                          // residual/error vector
         diagnose (yy)                                           // compute diagostics
@@ -138,7 +133,7 @@ class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: D
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit.
      */
-    override def fit: VectorD = super.fit.asInstanceOf [VectorD] ++ VectorD (rBarSq, fStat, aic, bic)
+    override def fit: VectoD = super.fit.asInstanceOf [VectorD] ++ VectorD (rBarSq, fStat, aic, bic)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the fit.

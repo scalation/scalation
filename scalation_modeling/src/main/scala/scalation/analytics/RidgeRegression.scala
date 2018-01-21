@@ -159,7 +159,7 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit.
      */
-    override def fit: VectorD = super.fit.asInstanceOf [VectorD] ++ VectorD (rBarSq, fStat, aic, bic)
+    override def fit: VectoD = super.fit.asInstanceOf [VectorD] ++ VectorD (rBarSq, fStat, aic, bic)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the fit.
@@ -177,12 +177,12 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new quality of fit.
      */
-    def backElim (): (Int, VectoD, VectorD) =
+    def backElim (): (Int, VectoD, VectoD) =
     {
         val ir    =  2                                          // ft(ir) is rSq
         var j_max = -1                                          // index of variable to eliminate
         var b_max: VectoD = null                                // parameter values for best solution
-        var ft_max = VectorD.fill (fitLabels.size)(-1.0)        // optimize on quality of fit
+        var ft_max: VectoD = VectorD.fill (fitLabels.size)(-1.0)        // optimize on quality of fit
 
         for (j <- 1 to k) {
             val keep = m.toInt                                  // i-value large enough to not exclude any rows in slice

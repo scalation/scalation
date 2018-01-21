@@ -12,14 +12,12 @@
 
 package scalation.analytics
 
-import scala.math.{exp, log, pow}
+import scala.collection.immutable.ListMap
+import scala.math.{exp, log, sqrt}
 
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.minima.QuasiNewton
-import scalation.plot.Plot
 import scalation.util.Error
-
-import RegTechnique._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ExpRegression` class supports exponential regression.  In this case,
@@ -99,7 +97,8 @@ class ExpRegression (x: MatriD, nonneg: Boolean, y: VectoD)
         val bfgs = new QuasiNewton (ll)                        // minimizer for -2LL
         b        = bfgs.solve (b0)                             // find optimal solution for parameters
 
-        e = y / (x * b)                                        // residual/error vector e
+//      e = y / (x * b)                                        // residual/error vector e
+        e = y - (x * b).map (exp _)                            // residual/error vector e
         diagnose (y)                                           // compute diagonostics
     } // train
 
@@ -119,7 +118,7 @@ class ExpRegression (x: MatriD, nonneg: Boolean, y: VectoD)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit.
      */
-    override def fit: VectorD = super.fit.asInstanceOf [VectorD] ++ VectorD (rBarSq, fStat, aic, bic)
+    override def fit: VectoD = super.fit.asInstanceOf [VectorD] ++ VectorD (rBarSq, fStat, aic, bic)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the fit.
@@ -132,6 +131,24 @@ class ExpRegression (x: MatriD, nonneg: Boolean, y: VectoD)
      *  @param z  the new vector to predict
      */
     def predict (z: VectoD): Double = exp (b dot z)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build a map of diagnostics metrics for the overall quality of fit.
+     */
+    override def metrics: Map [String, Any] =
+    {
+        ListMap ("Degrees of Freedom"    -> (df),
+                 "Effective DF"          -> (m - b.count (_ != 0) - 1),
+                 "Residual stdErr"       -> "%.4f".format (sqrt (sse / (df))),
+                 "R-Squared"             -> "%.4f".format (rSq),
+                 "Adjusted R-Squared"    -> "%.4f".format (rBarSq),
+                 "F-Statistic"           -> "%.4f".format (fStat),
+                 "SSE"                   -> "%.4f".format (sse),
+                 "RMSE"                  -> "%.4f".format (rmse),
+                 "AIC"                   -> "%.4f".format (aic),
+                 "BIC"                   -> "%.4f".format (bic))
+    } // metrics
+
 
 } // ExpRegression class
 

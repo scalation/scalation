@@ -8,6 +8,7 @@
 
 package scalation.analytics
 
+import scala.collection.immutable.ListMap
 import scala.math.sqrt
 
 import scalation.linalgebra.{VectoD, VectorD, VectoI}
@@ -102,13 +103,23 @@ trait Predictor
      */
     def predict (z: VectoI): Double = predict (z.toDouble)
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build a map of selected quality of fit measures/metrics.
+     */
+    def metrics: Map [String, Any] =
+    {
+        ListMap ("R-Squared" -> "%.4f".format (rSq),
+                 "SSE"       -> "%.4f".format (sse),
+                 "RMSE"      -> "%.4f".format (rmse))
+    } // metrics
+
 } // Predictor trait
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PredictorTest` object tests all the classes in the `scalation.analytics`
  *  package that directly or indirectly extend the `Predictor` trait.
- *  > runMain scalation.analytics.PredictorTet
+ *  > runMain scalation.analytics.PredictorTest
  */
 object PredictorTest extends App
 {

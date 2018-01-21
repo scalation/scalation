@@ -75,7 +75,7 @@ trait Classifier
     /** Test the accuracy of the classified results by cross-validation, returning
      *  the accuracy.  The "test data" starts at 'testStart' and ends at 'testEnd',
      *  the rest of the data is "training data'.
-     *  @param nx  the number of crosses and cross-validations (defaults to 5x).
+     *  @param nx  the number of crosses and cross-validations (defaults to 10x).
      */
     def crossValidate (nx: Int = 10): Double =
     {

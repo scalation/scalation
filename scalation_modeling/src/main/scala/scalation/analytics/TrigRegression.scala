@@ -94,7 +94,7 @@ class TrigRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = QR
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit.
      */
-    override def fit: VectorD = rg.fit
+    override def fit: VectoD = rg.fit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the fit.
@@ -120,7 +120,7 @@ class TrigRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = QR
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new R-squared value and the new F statistic.
      */
-    def backElim (): (Int, VectoD, VectorD) = rg.backElim ()
+    def backElim (): (Int, VectoD, VectoD) = rg.backElim ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor 'VIF' for each variable to test

@@ -32,6 +32,7 @@ class GoldenSectionLS (f: FunctionS2S)
     private val MAX_ITER  = 10                          // maximum number of expansion iterations
     private val G_RATIO   = (1.0 + sqrt (5.0)) / 2.0    // the golden ratio (1.618033988749895)
     private val G_SECTION = G_RATIO / (1.0 + G_RATIO)   // the golden section number (0.6180339887498949)
+    private val τ         = 0.005                       // tolerance for breaking the iterations - FIX - generalize
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** A recursive golden section search requiring only one functional evaluation
@@ -50,14 +51,15 @@ class GoldenSectionLS (f: FunctionS2S)
         if (DEBUG) println ("gsection: left = " + left + ", x1 = " + x1 + ", x2 = " + x2 +
                                                          ", x3 = " + x3 + ", f2 = " + f2)
         val dist = x3 - x1
-        if (dist < EPSILON) return (x1 + x3) / 2.0    // mid point
+//      if (dist < EPSILON) return (x1 + x3) / 2.0       // mid point
+        if (dist < τ * (abs (x2) + abs (x4)) || dist < EPSILON) return (x1 + x3) / 2.0    // mid point
         if (left) {
-            x4 = x3 - G_SECTION * dist                // search left:  x1 < x4 < x2 < x3
+            x4 = x3 - G_SECTION * dist                   // search left:  x1 < x4 < x2 < x3
             f4 = f(x4)
             if (f4 < f2) gsection (true,  x1, x4, x2, f4)
             else         gsection (false, x4, x2, x3, f2)
         } else {
-            x4 = x1 + G_SECTION * dist                // search right: x1 < x2 < x4 < x3
+            x4 = x1 + G_SECTION * dist                   // search right: x1 < x2 < x4 < x3
             f4 = f(x4)
             if (f2 < f4) gsection (true,  x1, x2, x4, f2)
             else         gsection (false, x2, x4, x3, f4)

@@ -112,27 +112,29 @@ trait GLM
      *  @param x          the input/design m-by-n matrix
      *  @param y          the response m-vector
      *  @param transform  the transformation function (e.g., log)
+     *  @param transInv   the inverse transformation function (e.g., exp)
      */
-    def apply (x: MatrixD, y: VectorD, transform: FunctionS2S): TranRegression =
+    def apply (x: MatrixD, y: VectorD, transform: FunctionS2S, tranInv: FunctionS2S): TranRegression [MatrixD, VectorD] =
     {
         if (add_1)
-            new TranRegression (one (x.dim1) +^: x, y, transform, technique)
+            new TranRegression (one (x.dim1) +^: x, y, transform, tranInv, technique)
         else
-            new TranRegression (x, y, transform, technique)
+            new TranRegression (x, y, transform, tranInv, technique)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Transformed Multiple Linear Regression model.
      *  @param xy         the combined input/design m-by-n matrix and response m-vector
-     *  @param transform  the transformation function
+     *  @param transform  the transformation function (e.g., log)
+     *  @param transInv   the inverse transformation function (e.g., exp)
      */
-    def apply (xy: MatrixD, transform: FunctionS2S): TranRegression =
+    def apply (xy: MatrixD, transform: FunctionS2S, tranInv: FunctionS2S): TranRegression [MatrixD, VectorD] =
     {
         if (add_1)
             new TranRegression (one (xy.dim1) +^: xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1),
-                            transform, technique)
+                                transform, tranInv, technique)
         else
-            new TranRegression (xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1), transform, technique)
+            new TranRegression (xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1), transform, tranInv, technique)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -185,7 +187,7 @@ trait GLM
      *  @param y      the response vector
      *  @param cubic  the order of the surface (false for quadratic, true for cubic)
      */
-    def apply (x_ : MatrixD, y: VectorD, cubic: Boolean): ResponseSurface =
+    def apply (x_ : MatrixD, y: VectorD, cubic: Boolean): ResponseSurface [MatrixD, VectorD] =
     {
         new ResponseSurface (x_, y, cubic)
     } // apply

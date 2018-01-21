@@ -8,6 +8,7 @@
 
 package scalation.analytics
 
+import scala.collection.immutable.ListMap
 import scala.math.{abs, log, pow, sqrt}
 
 import scalation.linalgebra._
@@ -24,7 +25,7 @@ object RegTechnique extends Enumeration
     type RegTechnique = Value
     val QR, Cholesky, SVD, LU, Inverse = Value
     val techniques = Array (QR, Cholesky, SVD, LU, Inverse)
-    
+   
 } // RegTechnique
 
 import RegTechnique._
@@ -120,6 +121,16 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (protected val x: MatT, protec
     def train () { train (y) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the error and useful diagnostics.
+     *  @param yy   the response vector
+     */
+    protected def eval (yy: VectoD)
+    {
+        e = yy - x * b                                         // compute residual/error vector e
+        diagnose (yy)                                          // compute diagnostics
+    } // eval
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute diagostics for the regression model.
      *  @param yy  the response vector
      */
@@ -147,7 +158,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (protected val x: MatT, protec
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit.
      */
-    override def fit: VectorD = super.fit.asInstanceOf [VectorD] ++ VectorD (rBarSq, fStat, aic, bic)
+    override def fit: VectoD = super.fit.asInstanceOf [VectorD] ++ VectorD (rBarSq, fStat, aic, bic)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the fit. 
@@ -173,12 +184,12 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (protected val x: MatT, protec
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector and the new quality of fit.
      */
-    def backElim (): (Int, VectoD, VectorD) =
+    def backElim (): (Int, VectoD, VectoD) =
     {
         val ir    =  2                                               // ft(2) is rSq
         var j_max = -1                                               // index of variable to eliminate
         var b_max =  b                                               // parameter values for best solution
-        var ft_max = VectorD.fill (fitLabels.size)(-1.0)             // optimize on quality of fit
+        var ft_max: VectoD = VectorD.fill (fitLabels.size)(-1.0)     // optimize on quality of fit
 
         for (j <- 1 to k) {
             val keep = m.toInt                                       // i-value large enough to not exclude any rows in slice
@@ -210,6 +221,24 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (protected val x: MatT, protec
         } // for
         vifV
     } // vif
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build a map of diagnostics metrics for the overall quality of fit.
+     */
+    override def metrics: Map [String, Any] =
+    {
+        ListMap ("Degrees of Freedom"    -> (df),
+                 "Effective DF"          -> (m - b.count(_ != 0) - 1),
+                 "Residual stdErr"       -> "%.4f".format (sqrt (sse / (df))),
+                 "R-Squared"             -> "%.4f".format (rSq),
+                 "Adjusted R-Squared"    -> "%.4f".format (rBarSq),
+                 "F-Statistic"           -> "%.4f".format (fStat),
+                 "SSE"                   -> "%.4f".format (sse),
+                 "RMSE"                  -> "%.4f".format (rmse),
+                 "RRSE"                  -> "%.4f".format (rmse / sqrt (((y - y.mean)~^2).mean)),
+                 "AIC"                   -> "%.4f".format (aic),
+                 "BIC"                   -> "%.4f".format (bic))
+    } // metrics
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Print results and diagnostics for each predictor 'x_j' and the overall

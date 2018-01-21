@@ -1,8 +1,8 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  John Miller
+/** @author  John Miller, Mustafa Nural
  *  @version 1.4
- *  @date    Sun Jan 18 15:06:16 EST 2015
+ *  @date    Sat Jan 20 15:41:27 EST 2018
  *  @see     LICENSE (MIT style license file).
  */
 
@@ -12,8 +12,6 @@ import scala.math.{exp, log}
 
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.math.FunctionS2S
-import scalation.plot.Plot
-import scalation.util.{Error, time}
 
 import RegTechnique._
 
@@ -36,75 +34,46 @@ import RegTechnique._
  *  where 'x_pinv' is the pseudo-inverse.
  *  Caveat: this class does not provide transformations on columns of matrix 'x'.
  *  @see www.ams.sunysb.edu/~zhu/ams57213/Team3.pptx
- *  @param x          the design/data m-by-n matrix
- *  @param y          the response m-vector
+ *  @param x          the design/data matrix
+ *  @param y          the response vector
  *  @param transform  the transformation function (defaults to log)
+ *  @param transInv  the inverse transformation function to rescale predictions to original y scale (defaults to exp)
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class TranRegression (x: MatriD, y: VectoD, transform: FunctionS2S = log,
-                      technique: RegTechnique = QR)
-      extends Predictor with Error
+class TranRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT,  transform: FunctionS2S = log,
+                     transInv: FunctionS2S = exp, technique: RegTechnique = QR)
+      extends Regression (x, y.map (transform), technique)
 {
-    if (x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
-
-    val yt = y.map (transform)                        // transform the response vector
-    val rg = new Regression (x, yt, technique)        // regular multiple linear regression
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Retrain the predictor by fitting the parameter vector (b-vector) in the
-     *  multiple regression equation
-     *  <p>
-     *      yy  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_1, x_2 ... x_k] + e
-     *  <p>
-     *  using the least squares method.
-     *  @param yy  the response vector
-     */
-    def train (yy: VectoD) { rg.train (yy.map (transform)) }
+    if (x.dim1 <= x.dim2) throw new IllegalArgumentException ("not enough data rows in matrix to use regression")
+    if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
+    if (! y.isNonnegative)
+        throw new IllegalArgumentException ("y must be positive for transformed regression (log, sqrt")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  regression equation on 'yt'.
+    /** Compute the error and useful diagnostics
+     *  @param yy   the response vector
      */
-    def train () { rg.train (yt) }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the vector of residuals/errors.
-     */
-    override def residual: VectoD = rg.residual
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit.
-     */
-    override def fit: VectorD = rg.fit
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the labels for the fit.
-     */
-    override def fitLabels: Seq [String] = rg.fitLabels
+    override protected def eval (yy: VectoD) =
+    {
+        e = y - (x * b).map (transInv)      // residual/error vector
+        diagnose(y)
+    } // eval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
      *  e.g., (b_0, b_1, b_2) dot (1, z_1, z_2).
      *  @param z  the new vector to predict
      */
-    def predict (z: VectoD): Double = rg.predict (z)
+    override def predict (z: VectoD): Double = transInv (b dot z)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform backward elimination to remove the least predictive variable
-     *  from the model, returning the variable to eliminate, the new parameter
-     *  vector, the new R-squared value and the new F statistic.
+    /** Predict the value of y = f(z) by evaluating the formula y = b dot z for
+     *  each row of matrix z.
+     *  @param z    the new matrix to predict
      */
-    def backElim (): (Int, VectoD, VectorD) = rg.backElim ()
+    override def predict (z: MatT): VectoD = (z * b).map (transInv)
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Variance Inflation Factor 'VIF' for each variable to test
-     *  for multi-collinearity by regressing 'xj against the rest of the variables.
-     *  A VIF over 10 indicates that over 90% of the variance of 'xj' can be predicted
-     *  from the other variables, so 'xj' is a candidate for removal from the model.
-     */
-    def vif: VectorD = rg.vif
-
-} // TranRegression class
+} // TranRegression
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

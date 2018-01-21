@@ -112,7 +112,7 @@ class ExpSmoothing (y: VectoD, t: VectoD)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit including 'rSquared'. Not providing 'rBarSq'.
      */
-    override def fit: VectorD = super.fit.asInstanceOf [VectorD] ++ VectorD (fStat)
+    override def fit: VectoD = super.fit.asInstanceOf [VectorD] ++ VectorD (fStat)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the fit. 

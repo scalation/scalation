@@ -1,83 +1,133 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  John Miller
- *  @version 1.4
- *  @date    Mon Apr 24 21:28:06 EDT 2017
- *  @see     LICENSE (MIT style license file).
- *
- *  @author Simon Lucey 2012 (MatLab version)
- *  @see www.simonlucey.com/lasso-using-admm/
- *  Coverted to Scala with change of variables
+/** @author John Miller, Mustafa Nural
+ *  @version 1.3
+ *  @date Mon Apr 24 21:28:06 EDT 2017
+ *  @see LICENSE (MIT style license file).
+
+ *  @see https://web.stanford.edu/~boyd/papers/admm_distr_stats.html
+ *  Adjusted from Boyd implementation
  */
 
 package scalation.minima
 
-import scala.math.{abs, max, min}
+import scala.collection.mutable
+import scala.math.{abs, max, sqrt}
+import scala.util.control.Breaks._
 
-import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.linalgebra._
 import scalation.math.{double_exp, sign}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `LassoAdmm` class performs LASSO regression using Alternating Direction
- *  Method of Multipliers (ADMM).  Minimize the following objective function to
- *  find an optimal solutions for 'x'.
- *  <p>
- *      argmin_x (1/2)||Ax − b||_2^2 + λ||x||_1
+ * Method of Multipliers (ADMM).  Minimize the following objective function to
+ * find an optimal solutions for 'x'.
+ * <p>
+ *     argmin_x (1/2)||Ax − b||_2^2 + λ||x||_1
  *
- *      A = data matrix
- *      b = response vector
- *      λ = weighting on the l_1 penalty
- *      x = solution (coefficient vector)
- *  <p>
- *  @see euler.stat.yale.edu/~tba3/stat612/lectures/lec23/lecture23.pdf
- *  @param a  the data matrix
- *  @param b  the response vector
- *  @param λ  the regularization l_1 penalty weight
+ *     A = data matrix
+ *     b = response vector
+ *     λ = weighting on the l_1 penalty
+ *     x = solution (coefficient vector)
+ * <p>
+ *
+ * @see euler.stat.yale.edu/~tba3/stat612/lectures/lec23/lecture23.pdf
+ * @see https://web.stanford.edu/~boyd/papers/admm_distr_stats.html
  */
-class LassoAdmm (a: MatrixD, b: VectorD, λ: Double = 0.01)
+object LassoAdmm
 {
-    private val DEBUG   = true                               // debug flag
-    private val maxIter = 100                                // maximum number of iterations
-    private val maxRho  = 5.0                                // maximum value for ρ
-    private var ρ       = 1E-4                               // set initial value for ρ to be quite low
+    private val DEBUG   = false     // debug flag
+    private val maxIter = 5000      // maximum number of iterations
 
-    private val (m, n) = (a.dim1, a.dim2)                    // # rows, # columns in data matrix
-    private val ata    = a.t * a                             // a transpose times a
-    private val ρI     = new MatrixD (n, n)                  // to hold ρ * I
+    val ρ               = 1         // augmented lagrangian parameter
+    private val α       = 1.5       // relaxation parameter
+
+    private val ABSTOL  = 1e-4      // Absolute tolerance
+    private val RELTOL  = 1e-2      // Relative tolerance
+
+    private var warmStartMap = new mutable.HashMap[MatriD,(VectoD, VectoD)]
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reset the warm start map.
+     */
+    def reset = warmStartMap = new mutable.HashMap [MatriD, (VectoD, VectoD)]
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' using ADMM.
+     * @param a the data matrix
+     * @param b the response vector
+     * @param λ the regularization l_1 penalty weight
      */
-    def solve (): VectorD =
+    def solve (a: MatrixD, b: VectoD, λ: Double = 0.01): VectoD =
     {
-        var x: VectorD = null                                // the solution (coefficient vector)
-        var z = new VectorD (n)                              // the ? vector - FIX - may need to randomize
-        val l = new VectorD (n)                              // the Lagrangian vector
+        val at  = a.t
+        val ata = at * a
+        for (i <- ata.range1) ata(i, i) += ρ    //ata_ρI
+        val ata_ρI_inv = ata.inverse
 
-        for (k <- 0 until maxIter) {                         // FIX - break loop if no progress
+        solveCached (ata_ρI_inv, at * b, λ)
+    } // solve
 
-            ρI.setDiag (ρ)
-            x  = (ata + ρI).inverse * (a.t * b + z * ρ - l)  // solve sub-problem for x 
-            z  = fast_sthresh (x + l/ρ, λ/ρ)                 // solve sub-problem for z
-            l += (x - z) * ρ                                 // update the Lagrangian l
-            ρ  = min (maxRho, ρ * 1.1)                       // increase ρ slowly
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve for 'x' using ADMM using cached factorizations for efficiency.
+     *  @param ata_ρI_inv   cached (a.t * a + ρI)^-1
+     *  @param atb          cached a.t * b
+     *  @param λ            the regularization l_1 penalty weight
+     */
+    def solveCached (ata_ρI_inv: MatriD, atb: VectoD, λ: Double): VectoD =
+    {
+        val n = ata_ρI_inv.dim1             // # rows, # columns in data matrix
 
+        var x: VectoD     = null            // the solution (coefficient vector)
+        var x_hat: VectoD = null            // the solution (coefficient vector)
+        var z: VectoD     = null            // the ? vector
+        var l: VectoD     = null            // the Lagrangian vector
+
+        if (warmStartMap.contains (ata_ρI_inv)) {
+            z = warmStartMap (ata_ρI_inv)._1
+            l = warmStartMap (ata_ρI_inv)._2
+        } else {
+            z = new VectorD (n)
+            l = new VectorD (n)
+        } // if
+
+        var z_old: VectoD = null
+
+        breakable { for (k <- 0 until maxIter) {
+            z_old = z
+
+            x     = ata_ρI_inv * (atb + (z - l) * ρ ) // solve sub-problem for x
+            x_hat = x * α + z_old * (1 - α)
+            z     = fast_sthresh (x_hat + l, λ / ρ)
+            l    += x_hat - z
+
+            val r_norm = (x - z).norm
+            val s_norm = ((z - z_old) * -ρ).norm
+
+            val eps_pri  = sqrt(n) * ABSTOL + RELTOL * max (x.norm, -z.norm)
+            val eps_dual = sqrt(n) * ABSTOL + RELTOL * (l * ρ).norm
+
+            // @see https://web.stanford.edu/~boyd/papers/admm/lasso/lasso.html
+            // break loop if no progress
+            if (r_norm < eps_pri && s_norm < eps_dual) break
             if (DEBUG) println (s"on iteration $k: x = $x")
-        } // for
+        }} // breakable for
+
+        warmStartMap.put (ata_ρI_inv, (z, l))
         x
     } // solve
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the fast soft thresholding function.
-     *  @param v    the vector to threshold
-     *  @param thr  the threshold
+     *  @param v   the vector to threshold
+     *  @param thr the threshold
      */
-    def fast_sthresh (v: VectorD, thr: Double): VectorD =
+    def fast_sthresh (v: VectoD, thr: Double): VectoD =
     {
         VectorD (for (i <- v.range) yield sign (max (abs (v(i)) - thr, 0.0), v(i)))
     } // fast_sthresh
 
-} // LassoAdmm class
+} // LassoAdmm object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -98,8 +148,7 @@ object LassoAdmmTest extends App
                                  1.0,  1.0, 101.0)
     val b = VectorD (745.0, 895.0, 442.0, 440.0, 1598.0)         // response vector
 
-    val admm = new LassoAdmm (a, b)
-    val x    = admm.solve ()                                     // optimal coefficient vector
+    val x    = LassoAdmm.solve (a, b)                            // optimal coefficient vector
     val e    = b - a * x                                         // error vector
     val sse  = e dot e                                           // sum of squared errors
     val sst  = (b dot b) - b.sum~^2.0 / b.dim.toDouble           // total sum of squares
