@@ -124,7 +124,7 @@ class ANCOVA (x_ : MatriD, t: VectoI, y: VectoD, levels: Int, technique: RegTech
      *  A VIF over 10 indicates that over 90% of the variance of 'xj' can be predicted
      *  from the other variables, so 'xj' is a candidate for removal from the model.
      */
-    def vif: VectorD = rg.vif
+    def vif: VectoD = rg.vif
 
 } // ANCOVA class
 

@@ -37,7 +37,7 @@ import RegTechnique._
  *  @param x          the design/data matrix
  *  @param y          the response vector
  *  @param transform  the transformation function (defaults to log)
- *  @param transInv  the inverse transformation function to rescale predictions to original y scale (defaults to exp)
+ *  @param transInv   the inverse transformation function to rescale predictions to original y scale (defaults to exp)
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
 class TranRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT,  transform: FunctionS2S = log,

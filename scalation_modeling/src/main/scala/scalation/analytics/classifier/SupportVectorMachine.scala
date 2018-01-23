@@ -14,7 +14,7 @@ import scala.collection.mutable.Set
 import scala.math.abs
 import scala.util.control.Breaks
 
-import scalation.linalgebra.{MatrixD, VectorD, VectoD, VectorI}
+import scalation.linalgebra.{MatrixD, VectoD, VectorD, VectoI, VectorI}
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -27,7 +27,7 @@ import scalation.util.Error
  *  @param fn  the factor names
  *  @param cn  the class names
  */
-class SupportVectorMachine (x: MatrixD, y: VectorI, fn: Array [String] = Array (), cn: Array [String] = Array ("-", "+"))
+class SupportVectorMachine (x: MatrixD, y: VectoI, fn: Array [String] = Array (), cn: Array [String] = Array ("-", "+"))
       extends ClassifierReal (x, y, fn, 2, cn)
 {
     type Pair = Tuple2 [Double, Double]
@@ -120,7 +120,7 @@ class SupportVectorMachine (x: MatrixD, y: VectorI, fn: Array [String] = Array (
      *  -1 means it belongs to the negative class.
      *  @param z  the vector to classify
      */
-//  def classify (z: VectorI): Tuple2 [Int, String] =
+//  def classify (z: VectoI): Tuple2 [Int, String] =
 //  {
 //      val zd = new VectorD (z.dim)
 //      for (j <- 0 until z.dim) zd(j) = z(j).toDouble

@@ -10,7 +10,7 @@ package scalation.analytics.classifier
 
 import scala.util.Random
 
-import scalation.linalgebra.{MatrixD, VectorI, VectorD, VectoD}
+import scalation.linalgebra.{MatrixD, VectoD, VectorD, VectoI, VectorI}
 import scalation.random.RandomVecI
 import scalation.util.Error
 
@@ -29,7 +29,7 @@ import scalation.util.Error
  *  @param fn  feature names (array of string)
  *  @param cn  class names (array of string)
  */
-class RandomForest (x: MatrixD, y: VectorI, nF: Int, bR: Double, fS: Int, k: Int, s: Int,
+class RandomForest (x: MatrixD, y: VectoI, nF: Int, bR: Double, fS: Int, k: Int, s: Int,
                     val fn: Array [String], val cn: Array [String])
       extends ClassifierReal (x, y, fn, k , cn) with Error
 {
@@ -62,7 +62,7 @@ class RandomForest (x: MatrixD, y: VectorI, nF: Int, bR: Double, fS: Int, k: Int
      *  and the selected features 'index'.
      *  @param subSample  the sub-sample to select from
      */
-    def selectSubFeatures (subSample: MatrixD): (MatrixD, VectorI) =
+    def selectSubFeatures (subSample: MatrixD): (MatrixD, VectoI) =
     {
         val rvv         = RandomVecI (min = 0, max = subSample.dim2-1, dim = fS, unique = true)
         val index       = rvv.igen

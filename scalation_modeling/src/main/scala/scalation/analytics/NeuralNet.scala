@@ -35,7 +35,7 @@ import ActivationFunc._
  *  @param h    the number of neurons in the hidden layer
  *  @param eta  the learning/convergence rate
  */
-class NeuralNet (x: MatrixD, y: MatrixD, h: Int, eta: Double = 1.0)
+class NeuralNet (x: MatriD, y: MatriD, h: Int, eta: Double = 1.0)
       extends Predictor with Error
 {
     private val MAX_ITER = 200                  // maximum number of iterations
@@ -53,15 +53,15 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int, eta: Double = 1.0)
                                            h + " hidden, " + 
                                            p + " output nodes")
 
-    private var w:  MatrixD = null        // weight matrix between input and hidden layers
-    private var v:  MatrixD = null        // weight matrix between hidden and output layers
+    private var w: MatriD = null          // weight matrix between input and hidden layers
+    private var v: MatriD = null          // weight matrix between hidden and output layers
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the initial weight matrices 'w and 'v' manually before training.
      *  @param w0   the initial weights for w
      *  @param v0   the initial weights for v
      */
-    def setWeights (w0: MatrixD, v0: MatrixD) { w  = w0; v  = v0 }
+    def setWeights (w0: MatriD, v0: MatriD) { w  = w0; v  = v0 }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the initial weight matrices 'w' and 'v' randomly with a value in (0, 1)
@@ -116,7 +116,7 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int, eta: Double = 1.0)
      *  @param yy  the effective output layer training data/matrix
      *  @param ww  the weights between these two layers
      */
-    def minimizeError (xx: MatrixD, yy: MatrixD, ww: MatrixD): Double =
+    def minimizeError (xx: MatriD, yy: MatriD, ww: MatriD): Double =
     {
         val _1  = new VectorD (yy.dim2); _1.set (1.0)  // one vector
         var sse = 0.0                                  // 1/2 sum of squared errors
@@ -139,7 +139,7 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int, eta: Double = 1.0)
     /** Return the fit (weight matrix 'w' and weight matrix 'v').
      *  FIX - make compatible with `Predictor`
      */
-    def fit2: (MatrixD, MatrixD) = (w, v)
+    def fit2: (MatriD, MatriD) = (w, v)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit.
@@ -173,7 +173,7 @@ class NeuralNet (x: MatrixD, y: MatrixD, h: Int, eta: Double = 1.0)
     /** Given several input vectors 'zi', predict the output/response vectors 'zo'.
      *  @param zi  the new input vectors (stored as rows in a matrix)
      */
-    def predictAll (zi: MatriD): MatrixD =
+    def predictAll (zi: MatriD): MatriD =
     {
         null            // FIX: to be implemented
     } // predictAll

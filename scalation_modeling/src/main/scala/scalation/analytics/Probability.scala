@@ -10,7 +10,7 @@ package scalation.analytics
 
 import scala.math.abs
 
-import scalation.linalgebra.{MatrixD, VectorD, VectorI}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectorI}
 import scalation.linalgebra.MatrixD.outer
 import scalation.math.{logb, log2}
 import scalation.plot.Plot
@@ -46,28 +46,28 @@ object Probability
      *  The elements of the vector must be non-negative and add to one.
      *  @param px  the probability vector
      */
-    def isProbability (px: VectorD): Boolean = px.min () >= 0.0 && abs (px.sum - 1.0) < EPSILON
+    def isProbability (px: VectoD): Boolean = px.min () >= 0.0 && abs (px.sum - 1.0) < EPSILON
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether the matrix 'pxy' is a legitimate joint "probability matrix".
      *  The elements of the matrix must be non-negative and add to one.
      *  @param pxy  the probability matrix
      */
-    def isProbability (pxy: MatrixD): Boolean = pxy.min () >= 0.0 && abs (pxy.sum - 1.0) < EPSILON
+    def isProbability (pxy: MatriD): Boolean = pxy.min () >= 0.0 && abs (pxy.sum - 1.0) < EPSILON
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given two independent random variables 'X' and 'Y', compute their
      *  "joint probability", which is the outer product of their probability
      *  vectors 'px' and 'py', i.e., P(X = x_i, Y = y_j).
      */
-    def jointProbXY (px: VectorD, py: VectorD): MatrixD = outer (px, py)
+    def jointProbXY (px: VectoD, py: VectoD): MatriD = outer (px, py)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a joint probability matrix 'pxy', compute the "marginal probability"
      *  for random variable 'X', i.e, P(X = x_i).
      *  @param pxy  the probability matrix
      */
-    def margProbX (pxy: MatrixD): VectorD =
+    def margProbX (pxy: MatriD): VectoD =
     {
         val px = new VectorD (pxy.dim1)
         for (i <- 0 until pxy.dim1) px(i) = pxy(i).sum
@@ -79,7 +79,7 @@ object Probability
      *  for random variable 'Y', i.e, P(Y = y_j).
      *  @param pxy  the probability matrix
      */
-    def margProbY (pxy: MatrixD): VectorD =
+    def margProbY (pxy: MatriD): VectoD =
     {
         val py = new VectorD (pxy.dim2)
         for (j <- 0 until pxy.dim2) py(j) = pxy.col(j).sum
@@ -91,7 +91,7 @@ object Probability
      *  for random variable 'X' given random variable 'Y', i.e, P(X = x_i|Y = y_j).
      *  @param pxy  the joint probability matrix
      */
-    def condProbX_Y (pxy: MatrixD): MatrixD =
+    def condProbX_Y (pxy: MatriD): MatriD =
     {
         val px   = margProbX (pxy)
         val px_y = new MatrixD (pxy.dim1, pxy.dim2)
@@ -104,7 +104,7 @@ object Probability
      *  for random variable 'Y' given random variable 'X', i.e, P(Y = y_j|X = x_i).
      *  @param pxy  the joint probability matrix
      */
-    def condProbY_X (pxy: MatrixD): MatrixD =
+    def condProbY_X (pxy: MatriD): MatriD =
     {
         val py   = margProbY (pxy)
         val py_x = new MatrixD (pxy.dim2, pxy.dim1)
@@ -118,7 +118,7 @@ object Probability
      *  @see http://en.wikipedia.org/wiki/Entropy_%28information_theory%29
      *  @param px  the probability vector
      */
-    def entropy (px: VectorD): Double =
+    def entropy (px: VectoD): Double =
     {
         var sum = 0.0
         for (p <- px if p > 0.0) sum -= p * log2 (p)
@@ -131,7 +131,7 @@ object Probability
      *  @see http://en.wikipedia.org/wiki/Entropy_%28information_theory%29
      *  @param px  the probability vector
      */
-    def entropy_k (px: VectorD): Double =
+    def entropy_k (px: VectoD): Double =
     {
         val k = px.dim           // let the base k = # elements in probability vector
         var sum = 0.0
@@ -144,7 +144,7 @@ object Probability
      *  of random variables 'X' and 'Y'.
      *  @param pxy  the joint probability matrix
      */
-    def entropy (pxy: MatrixD): Double =
+    def entropy (pxy: MatriD): Double =
     {
         var sum = 0.0
         for (i <- 0 until pxy.dim1; j <- 0 until pxy.dim2) {
@@ -161,7 +161,7 @@ object Probability
      *  @param pxy   the joint probability matrix
      *  @param px_y  the conditional probability matrix
      */
-    def entropy (pxy: MatrixD, px_y: MatrixD): Double =
+    def entropy (pxy: MatriD, px_y: MatriD): Double =
     {
         if (pxy.dim1 != px_y.dim1 || pxy.dim2 != px_y.dim2)
             flaw ("entropy", "joint and conditional probability matrices are not compatible")
@@ -179,7 +179,7 @@ object Probability
      *  for random variables 'X' and 'Y'.
      *  @param pxy  the probability matrix
      */
-    def muInfo (pxy: MatrixD): Double =
+    def muInfo (pxy: MatriD): Double =
     {
         val px = margProbX (pxy)
         val py = margProbY (pxy)

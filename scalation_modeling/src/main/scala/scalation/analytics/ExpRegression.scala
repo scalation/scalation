@@ -55,7 +55,7 @@ class ExpRegression (x: MatriD, nonneg: Boolean, y: VectoD)
      *  @see www.statisticalhorizons.com/wp-content/uploads/Allison.StatComp.pdf
      *  @param b  the parameters to fit
      */
-    def ll (b: VectorD): Double = 
+    def ll (b: VectoD): Double = 
     {
         var sum = 0.0
         for (i <- 0 until y.dim) {
@@ -70,7 +70,7 @@ class ExpRegression (x: MatriD, nonneg: Boolean, y: VectoD)
      *  the null model (the one that does not consider the effects of x(i)).
      *  @param b  the parameters to fit
      */
-    def ll_null (b: VectorD): Double =
+    def ll_null (b: VectoD): Double =
     {
         var sum = 0.0
         for (i <- 0 until y.dim) {

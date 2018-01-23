@@ -52,7 +52,7 @@ class TrigRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = QR
      *  '[1, sin (wt), cos (wt), sin (2wt), cos (2wt), ...]'.
      *  @param t  the scalar to expand into the vector
      */
-    def expand (t: Double): VectorD = 
+    def expand (t: Double): VectoD = 
     {
         val wt = w * t
         val v = new VectorD (1 + 2 * k)
@@ -128,7 +128,7 @@ class TrigRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = QR
      *  A VIF over 10 indicates that over 90% of the variance of 'xj' can be predicted
      *  from the other variables, so 'xj' is a candidate for removal from the model.
      */
-    def vif: VectorD = rg.vif
+    def vif: VectoD = rg.vif
 
 } // TrigRegression class
 

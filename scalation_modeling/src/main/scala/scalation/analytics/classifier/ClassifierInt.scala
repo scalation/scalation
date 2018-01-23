@@ -60,20 +60,20 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int, 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return default values for binary input data (value count 'vc' set to 2).
      */
-    def vc_default: VectorI = { val vc = new VectorI (n); vc.set (2); vc }
+    def vc_default: VectoI = { val vc = new VectorI (n); vc.set (2); vc }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return value counts calculated from the input data.
      *  May wish to call 'shiftToZero' before calling this method.
      */
-    def vc_fromData: VectorI = VectorI (for (j <- x.range2) yield x.col(j).max() + 1)
+    def vc_fromData: VectoI = VectorI (for (j <- x.range2) yield x.col(j).max() + 1)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return value counts calculated from the input data.
      *  May wish to call 'shiftToZero' before calling this method.
      *  @param rg  the range of columns to be considered
      */
-    def vc_fromData2 (rg: Range): VectorI = VectorI (for (j <- rg) yield x.col(j).max() + 1)
+    def vc_fromData2 (rg: Range): VectoI = VectorI (for (j <- rg) yield x.col(j).max() + 1)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Shift the 'x' Matrix so that the minimum value for each column equals zero.
@@ -112,7 +112,7 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int, 
      *  @param xx  the integer-valued test vectors stored as rows of a matrix
      *  @param yy  the test classification vector, where 'yy_i = class' for row 'i' of 'xx'
      */
-    def test (xx: MatrixI, yy: VectorI): Double =
+    def test (xx: MatrixI, yy: VectoI): Double =
     {
         val mm = xx.dim1
         if (yy.dim != mm) flaw ("test", "yy.dim must equal test-set size (mm)")
@@ -126,7 +126,7 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int, 
      *  of correct classifications.
      *  @param itest  indices of the instances considered test data
      */
-    override def test (itest: VectorI): Double =
+    override def test (itest: VectoI): Double =
     {
         var correct = 0
         for (i <- itest if classify (x(i))._1 == y(i)) correct += 1

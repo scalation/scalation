@@ -159,7 +159,7 @@ class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
      *  @param f_CX     joint frequency table of C and X
      *  @param f_CXZ    joint frequency table of C, X, and Z, where X and Z are features/columns
      */
-    protected override def updateFreq (i: Int, f_C: VectorI, f_X: HMatrix2[Int], f_CX: HMatrix3[Int], f_CXZ: HMatrix5[Int])
+    protected override def updateFreq (i: Int, f_C: VectoI, f_X: HMatrix2 [Int], f_CX: HMatrix3 [Int], f_CXZ: HMatrix5 [Int])
     {
         val yi   = y(i)                                       // get the class for ith row
         f_C(yi) += 1                                          // decrement frequency for class yi
@@ -176,7 +176,7 @@ class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create MaxSpanningTree from conditional mutual information
      */
-    def maxSpanningTree (ch: Array[SET[Int]], elabel: Map[(Int, Int), Double]): MinSpanningTree =
+    def maxSpanningTree (ch: Array [SET [Int]], elabel: Map [(Int, Int), Double]): MinSpanningTree =
     {
         val g = new MGraph (ch, Array.ofDim(n), elabel)
         new MinSpanningTree (g, false, false)     // param 2 = false means max spanning tree
@@ -253,7 +253,7 @@ class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the parent.
      */
-    def getParent: VectorI = parent
+    def getParent: VectoI = parent
 
 } // TANBayes0 class
 
@@ -368,7 +368,7 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
      *  row of the data matrix.
      *  @param i  the index for current data row
      */
-    protected override def updateFreq (i: Int, f_C: VectorI, f_X: HMatrix2[Int], f_CX: HMatrix3[Int], f_CXZ: HMatrix5[Int])
+    protected override def updateFreq (i: Int, f_C: VectoI, f_X: HMatrix2 [Int], f_CX: HMatrix3 [Int], f_CXZ: HMatrix5 [Int])
     {
         val yi   = y(i)                                       // get the class for ith row
         f_C(yi) -= 1                                          // decrement frequency for class yi

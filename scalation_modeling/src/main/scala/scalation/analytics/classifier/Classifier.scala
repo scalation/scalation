@@ -64,7 +64,7 @@ trait Classifier
      *  of correct classifications.
      *  @param itest  the indices of the instances considered test data
      */
-    def test (itest: VectorI): Double = 0.0
+    def test (itest: VectoI): Double = 0.0
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /**  Reset the frequency and probability tables.

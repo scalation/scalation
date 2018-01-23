@@ -172,7 +172,7 @@ abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int
      *  data matrix. Only to be used for CMI frequency calculations.
      *  @param i  the index for current data row
      */
-    protected def updateFreq (i: Int, f_C: VectorI, f_X: HMatrix2[Int], f_CX: HMatrix3[Int], f_CXZ: HMatrix5[Int]) {}
+    protected def updateFreq (i: Int, f_C: VectoI, f_X: HMatrix2[Int], f_CX: HMatrix3[Int], f_CXZ: HMatrix5[Int]) {}
 
 } // BayesClassifier class
 

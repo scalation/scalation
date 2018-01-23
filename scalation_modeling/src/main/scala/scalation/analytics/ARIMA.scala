@@ -16,7 +16,7 @@ package scalation.analytics
 import scala.math.{log, max, min}
 import scala.util.control.Breaks.{breakable, break}
 
-import scalation.linalgebra.{MatrixD, VectoD, VectorD}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.math.double_exp
 import scalation.minima.QuasiNewton
 import scalation.plot.Plot
@@ -82,7 +82,7 @@ class ARIMA (y: VectoD, t: VectoD, d: Int = 0)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Difference the time series.
      */
-    def difference (): VectorD =
+    def difference (): VectorD =                                                // FIX - should return trait - currently fails
     {
         d match {
             case 0 => xx
@@ -167,7 +167,7 @@ class ARIMA (y: VectoD, t: VectoD, d: Int = 0)
      *  The last row of the matrix gives 'AR' coefficients.
      *  @see www.stat.tamu.edu/~suhasini/teaching673/time_series.pdf
      */
-    def durbinLevinson: MatrixD =
+    def durbinLevinson: MatriD =
     {
         val psi = new MatrixD (m+1, m+1)
         val r   = new VectorD (m+1); r(0) = ac(0)
@@ -392,7 +392,7 @@ class ARIMA (y: VectoD, t: VectoD, d: Int = 0)
     } // hannanRissanen
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Comput the objective function for MLE optimization.  FIX
+    /** Compute the objective function for MLE optimization.  FIX
      *  @see halweb.uc3m.es/esp/Personal/personas/amalonso/esp/TSAtema9.pdf
      *  @param φθ  a single vector of AR and MA coefficients
      */

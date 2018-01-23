@@ -50,7 +50,7 @@ class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String
     protected val f_CXP  = new HMatrix4 [Int](k, n)     // conditional frequency counts for variable/feature j: xj
     protected val p_X_CP = new HMatrix4 [Double](k, n)  // conditional probabilities for variable/feature j: xj
 
-    protected var featureOrder: VectorI = null
+    protected var featureOrder: VectoI = null
     protected val permutedVec = PermutedVecI (VectorI.range(0, n), ranStream)
 
     if (vc == null) {
@@ -254,7 +254,7 @@ class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the parent.
      */
-    override def getParent: VectorI = parent
+    override def getParent: VectoI = parent
 
 } // OneBAN0 class
 

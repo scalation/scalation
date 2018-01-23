@@ -48,7 +48,7 @@ class BayesNetwork (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array 
      *  as the product of each of its element's conditional probability.
      *  @param x  the vector of variables
      */
-    def jp (x: VectorI): Double =
+    def jp (x: VectoI): Double =
     {
         var prod = 1.0
         for (i <- 0 until x.dim) prod *= cp (i, x.select(dag.parent (i)) ++ x(i))
@@ -60,7 +60,7 @@ class BayesNetwork (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array 
      *  @param i    the 'i'th variable (whose conditional probability is sought)
      *  @param key  the values of 'x_i's parents and 'x_i'
      */
-    def cp (i: Int, key: VectorI): Double =
+    def cp (i: Int, key: VectoI): Double =
     {
         if (DEBUG) println ("cp: find key " + key + " hashCode = " + key.hashCode +
                             " in table " + i + ":\n" + table(i))
@@ -100,7 +100,7 @@ class BayesNetwork (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array 
      *  The vector 'z' id first converted to an integer valued vector by rounding.
      *  @param z  the data vector to classify
      */
-//  def classify (z: VectorD): Tuple2 [Int, String] =
+//  def classify (z: VectoD): Tuple2 [Int, String] =
 //  {
 //      val z_int = new VectorI (z.dim)
 //      for (i <- 0 until z.dim) z_int(i) = round (z(i)).toInt

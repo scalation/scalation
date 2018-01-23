@@ -11,7 +11,7 @@ package scalation.analytics
 import scala.math.pow
 
 import scalation.calculus.Differential.FunctionV2S
-import scalation.linalgebra.{MatrixD, VectoD, VectorD}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.math.double_exp
 import scalation.minima.QuasiNewton
 
@@ -57,7 +57,7 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
 
     /** Regression class for performing multiple regression
      */
-    private var reg: Regression [MatrixD, VectorD] = _
+    private var reg: Regression [MatriD, VectoD] = _
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a center point x, form a square grid around it.  This can be used
@@ -67,7 +67,7 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
      *  @param d  the distance to move on each step
      *  @param m  move m steps above and below x(i) for each dimension i
      */
-    def formGrid (xc: VectorD, xs: VectorD)
+    def formGrid (xc: VectoD, xs: VectoD)
     {
         nxt = 0                                     // reset the vector counter
         val x = new VectorD (n)
@@ -96,7 +96,7 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
     /** Given a grid of design points, create a design matrix 'xx' and response
      *  vector 'yy' returning them as a tuple.
      */
-    def response (): (MatrixD, VectorD) =
+    def response (): (MatriD, VectoD) =
     {
         val xx = new MatrixD (grid.size, nt)  // design matrix
         val yy = new VectorD (grid.size)      // response vector
@@ -115,7 +115,7 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
      *  for 2D:  'VectorD (1., x(0), x(0)~^2., x(1), x(1)*x(0), x(1)~^2.)'
      *  @param x  the source vector for creating forms/terms
      */
-    def qForms (x: VectorD): VectorD =
+    def qForms (x: VectoD): VectoD =
     {
         val y  = x.oneAt (0, 1) ++ x    // augmented vector: [ 1., x(0), ..., x(n-1) ]
         val z  = new VectorD (nt)       // vector of all forms/terms
@@ -131,7 +131,7 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
      *  for 2D:  b(0) + b(1)*x(0) + b(2)*x(0)~^2. + b(3)*x(1) + b(4)*x(1)*x(0) + b(5)*x(1)~^2.
      *  @param x  the point whose functional value is to be predicted
      */
-    def qFormsEval (x: VectorD): Double =
+    def qFormsEval (x: VectoD): Double =
     {
         val y   = x.oneAt (0, 1) ++ x    // augmented vector: [ 1., x(0), ..., x(n-1) ]
         var k   = 0
@@ -146,7 +146,7 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
      *  @param xx  the data/design matrix
      *  @param yy  the response vector
      */
-    def fit (xx: MatrixD, yy: VectorD)
+    def fit (xx: MatriD, yy: VectoD)
     {
         reg = new Regression (xx, yy)
         reg.train ()
@@ -176,7 +176,7 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
  */
 object QuadraticFitTest extends App
 {
-    def f(x: VectorD): Double = (x(0) - 10.0)~^2.0 + (x(1) - 20.0)~^2.0 + 1.0
+    def f(x: VectoD): Double = (x(0) - 10.0)~^2.0 + (x(1) - 20.0)~^2.0 + 1.0
 
     // form the grid
     val xc = VectorD (5.0, 10.0)                     // center of the grid
@@ -201,7 +201,7 @@ object QuadraticFitTest extends App
     println ("yp = " + yp)                           // predicted y value at x1
 
     // find minimal point in response surface
-    def fp (x: VectorD): Double = qf.qFormsEval (x)  // prediction function
+    def fp (x: VectoD): Double = qf.qFormsEval (x)  // prediction function
     
     val bfgs = new QuasiNewton (fp)                  // optimize using nonlinear programming
     val x = bfgs.solve (xc)
@@ -217,7 +217,7 @@ object QuadraticFitTest extends App
  */
 object QuadraticFitTest2 extends App
 {
-    def f(x: VectorD): Double = (x(0) - 10.0)~^2.0 + (x(1) - 20.0)~^2.0 + (x(2) - 5.0)~^2.0 + 1.0
+    def f(x: VectoD): Double = (x(0) - 10.0)~^2.0 + (x(1) - 20.0)~^2.0 + (x(2) - 5.0)~^2.0 + 1.0
 
     // form the grid
     val xc = VectorD (10.0, 20.0, 10.0)              // center to orgin
@@ -236,7 +236,7 @@ object QuadraticFitTest2 extends App
     qf.fit (xx, yy)                                  // use multiple regression to fit surface
 
     // find minimal point in response surface
-    def fp (x: VectorD): Double = qf.qFormsEval (x)  // prediction function
+    def fp (x: VectoD): Double = qf.qFormsEval (x)  // prediction function
     
     val bfgs = new QuasiNewton (fp)                  // optimize using nonlinear programming
     val x = bfgs.solve (xc)
@@ -255,7 +255,7 @@ object QuadraticFitTest3 extends App
 
     val e = Normal ()                                // standard normal distribution
 
-    def f(x: VectorD): Double = (x(0) - 10.0)~^2.0 + (x(1) - 20.0)~^2.0 + (x(2) - 5.0)~^2.0 + 1.0 + e.gen
+    def f(x: VectoD): Double = (x(0) - 10.0)~^2.0 + (x(1) - 20.0)~^2.0 + (x(2) - 5.0)~^2.0 + 1.0 + e.gen
 
     // form the grid
     val xc = VectorD (10.0, 20.0, 10.0)              // center to orgin
@@ -275,7 +275,7 @@ object QuadraticFitTest3 extends App
 //  qf.reduce ()                                     // use a reduce model
 
     // find minimal point in response surface
-    def fp (x: VectorD): Double = qf.qFormsEval (x)  // prediction function
+    def fp (x: VectoD): Double = qf.qFormsEval (x)   // prediction function
 
     val bfgs = new QuasiNewton (fp)                  // optimize using nonlinear programming
     val x = bfgs.solve (xc)

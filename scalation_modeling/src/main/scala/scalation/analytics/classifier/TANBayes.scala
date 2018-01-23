@@ -245,7 +245,7 @@ class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the parent.
      */
-    override def getParent: VectorI = parent
+    override def getParent: VectoI = parent
 
 } // TANBayes0 class
 

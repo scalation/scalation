@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.plot.Plot
 import scalation.random.NormalVec
 
@@ -22,7 +22,7 @@ import scalation.random.NormalVec
  *  @param rr  the observation noise covariance matrix
  *  @param bb  the optional control-input matrix
  */
-class KalmanFilter (ff: MatrixD, hh: MatrixD, qq: MatrixD, rr: MatrixD, bb: MatrixD = null)
+class KalmanFilter (ff: MatriD, hh: MatriD, qq: MatriD, rr: MatriD, bb: MatriD = null)
 {
    private val MAX_ITER = 20
    private val doPlot   = true
@@ -39,11 +39,11 @@ class KalmanFilter (ff: MatrixD, hh: MatrixD, qq: MatrixD, rr: MatrixD, bb: Matr
     *  @param dt  the time increment (delta t)
     *  @param u   the control vector
     */
-   def solve (x0: VectorD, dt: Double, u: VectorD = null): VectorD =
+   def solve (x0: VectoD, dt: Double, u: VectoD = null): VectoD =
    {
        var x  = x0                                     // initial state vector
        var t  = 0.0                                    // initial time
-       var pp = new MatrixD (n, n)
+       var pp: MatriD = new MatrixD (n, n)
 
        for (k <- 0 until MAX_ITER) {
 
@@ -56,7 +56,7 @@ class KalmanFilter (ff: MatrixD, hh: MatrixD, qq: MatrixD, rr: MatrixD, bb: Matr
            pp = ff * pp * ff.t + qq                    // new predicted covariance
 
            // update
-           val v  = NormalVec (_0, rr).gen             // observation noise
+           val v  = NormalVec (_0, rr.asInstanceOf [MatrixD]).gen             // observation noise - FIX - should work in trait
            val z  = hh * x + v                         // new observation
            val y  = z - hh * x                         // measurement residual
            val ss = hh * pp * hh.t + rr                // residual covariance

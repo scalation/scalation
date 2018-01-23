@@ -211,13 +211,13 @@ class VectorR (val dim: Int,
     override def slice (from: Int, till: Int = dim): VectorR = new VectorR (till - from, v.slice (from, till))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Split 'this' vector into 'k' arrays of equal sizes (perhaps except for the last one)
-     *  @param k  the number of pieces the vector is to be splitted
+    /** Split 'this' vector into 'k' arrays of equal sizes (perhaps except for the last one).
+     *  @param k  the number of pieces the vector is to be split into
      */
-    def split (k: Int): Array [VectorR] =
+    override def split (k: Int): Array [VectoR] =
     {
         if (k <= 0) flaw ("split", "k must be a positive integer")
-        val pieces = Array.ofDim [VectorR] (k)
+        val pieces = Array.ofDim [VectoR] (k)
         val size = dim / k
         for (i <- 0 until k-1) pieces(i) = slice (i*size, (i+1)*size)
         pieces(k-1) = slice ((k-1)*size, dim)

@@ -53,7 +53,7 @@ class ResponseSurface2 (x_ : MatriD, y: VectoD, cubic: Boolean = false,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create all forms/terms for each point placing them in a new matrix.
      */
-    def allForms (): MatrixD =
+    def allForms (): MatriD =
     {
         val xa = new MatrixD (x_.dim1, nt)
         for (i <- 0 until x_.dim1)
@@ -69,7 +69,7 @@ class ResponseSurface2 (x_ : MatriD, y: VectoD, cubic: Boolean = false,
      *  for 2D: p = (x_0, x_1) => 'VectorD (1, x_0, x_0^2, x_0*x_1, x_1, x_1^2)'
      *  @param p  the source vector/point for creating forms/terms
      */
-    def qForms (p: VectoD): VectorD =
+    def qForms (p: VectoD): VectoD =
     {
         val q = one (1) ++ p          // augmented vector: [ 1., p(0), ..., p(n-1) ]
         val z = new VectorD (nt)      // vector of all forms/terms
@@ -87,7 +87,7 @@ class ResponseSurface2 (x_ : MatriD, y: VectoD, cubic: Boolean = false,
      *                                        x_1, x_1^2, x_1^3)'
      *  @param p  the source vector/point for creating forms/terms
      */
-    def cForms (p: VectoD): VectorD =
+    def cForms (p: VectoD): VectoD =
     {
         val q = one (1) ++ p          // augmented vector: [ 1., p(0), ..., p(n-1) ]
         val z = new VectorD (nt)      // vector of all forms/terms
@@ -165,7 +165,7 @@ class ResponseSurface2 (x_ : MatriD, y: VectoD, cubic: Boolean = false,
      *  A VIF over 10 indicates that over 90% of the variance of 'xj' can be predicted
      *  from the other variables, so 'xj' is a candidate for removal from the model.
      */
-    def vif: VectorD = rsm.vif
+    def vif: VectoD = rsm.vif
 
 } // ResponseSurface2 class
 

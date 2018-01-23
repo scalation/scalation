@@ -57,7 +57,7 @@ class ExpSmoothing (y: VectoD, t: VectoD)
     /** Smooth the times series data.
      *  @param α_new  the new smoothing parameter, skip to use default
      */
-    def smooth (α_new: Double = α): VectorD =
+    def smooth (α_new: Double = α): VectoD =
     {
         α = α_new
         val α_1 = 1.0 - α

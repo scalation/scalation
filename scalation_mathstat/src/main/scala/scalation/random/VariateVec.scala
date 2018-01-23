@@ -10,7 +10,7 @@ package scalation.random
 
 import scala.math.{abs, exp, Pi, round, sqrt}
 
-import scalation.linalgebra.{Fac_Cholesky, MatrixD, VectorD, VectorI, VectorS}
+import scalation.linalgebra._
 import scalation.math.double_exp
 import scalation.math.Combinatorics.{choose, fac}
 import scalation.math.ExtremeD.NaN
@@ -43,7 +43,7 @@ abstract class VariateVec (stream: Int = 0)
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the vector mean for the particular distribution.
      */
-    def mean: VectorD
+    def mean: VectoD
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the probability function (pf):
@@ -51,18 +51,18 @@ abstract class VariateVec (stream: Int = 0)
      *  the probability mass function (pmf) for discrete RVV's.
      *  @param z  the mass point/vector whose probability is sought
      */
-    def pf (z: VectorD): Double
+    def pf (z: VectoD): Double
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine the next random double vector for the particular distribution.
      */
-    def gen: VectorD
+    def gen: VectoD
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine the next random integer vector for the particular distribution.
      *  It is only valid for discrete random variates.
      */
-    def igen: VectorI
+    def igen: VectoI
 
 } // VariateVec class
 
@@ -82,21 +82,21 @@ case class ProbabilityVec (n: Int, d: Double = 0.5, stream: Int = 0)
 
     if (d < 0.0 || d > 1.0) flaw ("constructor", "d must be in [0, 1]")
 
-    def mean: VectorD = mu
+    def mean: VectoD = mu
 
-    def pf (z: VectorD): Double =
+    def pf (z: VectoD): Double =
     {
         0.0    // FIX
     } // pf
 
-    def gen: VectorD =
+    def gen: VectoD =
     {
         val z = new VectorD (n)
         for (i <- 0 until n) z(i) = 1.0 + (rng.gen - .5) * d
         z / z.sum
     } // gen
     
-    def igen: VectorI = gen.toInt
+    def igen: VectoI = gen.toInt
      
 } // ProbabilityVec class
 
@@ -111,16 +111,16 @@ case class ProbabilityVec (n: Int, d: Double = 0.5, stream: Int = 0)
  *  @param cov     the covariance matrix
  *  @param stream  the random number stream
  */
-case class NormalVec (mu: VectorD, cov: MatrixD, stream: Int = 0)
+case class NormalVec (mu: VectoD, cov: MatrixD, stream: Int = 0)
      extends VariateVec (stream)
 {
     private val normal = Normal (0.0, 1.0, stream)           // generator for standard normals
     private val c_cov  = new Fac_Cholesky (cov).factor1 ()   // compute Cholesky Factorization of cov
                              .asInstanceOf [MatrixD]
 
-    def mean: VectorD = mu
+    def mean: VectoD = mu
 
-    def pf (z: VectorD): Double =
+    def pf (z: VectoD): Double =
     {
         val n    = z.dim.toDouble                        // n-dimensional vectors
         val z_mu = z - mu                                // subtract mean
@@ -128,30 +128,35 @@ case class NormalVec (mu: VectorD, cov: MatrixD, stream: Int = 0)
         exp (-.5 * zz) / sqrt ((2.0 * Pi)~^n * abs (cov.det))
     } // pf
 
-    def gen: VectorD =
+    def gen: VectoD =
     {
         val z = new VectorD (mu.dim)
         for (i <- 0 until mu.dim) z(i) = normal.gen
         c_cov * z + mu                                   // Cholesky covariance * standard Normal + mean
     } // gen
 
-    def igen: VectorI = gen.toInt
+    def igen: VectoI = gen.toInt
 
 } // NormalVec class
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/**
+/** The `Dir` class generates Dirichlet random variables.  The Dirichlet distribution
+ *  is the distribution over the space of multinomial distributions.
+ *  @see www.quora.com/What-is-an-intuitive-explanation-of-the-Dirichlet-distribution
+ *  @see en.wikipedia.org/wiki/Dirichlet_distribution
+ *  @param alpha   the concentration parameters
+ *  @param stream  the random number stream
  */
-case class Dir (alpha: VectorD, stream: Int = 0)
+case class Dir (alpha: VectoD, stream: Int = 0)
 {
     import scalation.math.Combinatorics.gammaF
 
     private val a_sum = alpha.sum
 
-    def mean: VectorD = alpha / a_sum
+    def mean: VectoD = alpha / a_sum
 
-    def pf (z: VectorD): Double =
+    def pf (z: VectoD): Double =
     {
         var prod = 1.0
         for (i <- alpha.range) {
@@ -161,12 +166,14 @@ case class Dir (alpha: VectorD, stream: Int = 0)
         prod * gammaF (a_sum)
     } // pf
 
-    def gen: VectorD =
+    def gen: VectoD =
     {
-        null                 // FIX - to be implemented
+        val y  = VectorD (for (i <- alpha.range) yield Gamma (alpha(i), 1.0, stream).gen)
+        val sy = y.sum
+        y / sy
     } // gen
 
-    def igen: VectorI = gen.toInt
+    def igen: VectoI = gen.toInt
 
 } // Dir class
 
@@ -177,17 +184,17 @@ case class Dir (alpha: VectorD, stream: Int = 0)
  *  @param x       the vector of doubles to permute
  *  @param stream  the random number stream
  */
-case class PermutedVecD (x: VectorD, stream: Int = 0)
+case class PermutedVecD (x: VectoD, stream: Int = 0)
      extends VariateVec (stream)
 {
     private val mu  = x.sum / x.dim.toDouble            // mean
     private val rng = Randi0 (x.dim-1, stream)          // random integer generator
 
-    def mean: VectorD = VectorD.fill (x.dim)(mu)
+    def mean: VectoD = VectorD.fill (x.dim)(mu)
 
-    def pf (z: VectorD): Double = 1.0 / fac (x.dim)
+    def pf (z: VectoD): Double = 1.0 / fac (x.dim)
 
-    def gen: VectorD = 
+    def gen: VectoD = 
     {
         val y = new VectorD (x)                         // copy vector x
         for (i <- 0 until x.dim) {
@@ -197,7 +204,7 @@ case class PermutedVecD (x: VectorD, stream: Int = 0)
         y
     } // igen
 
-    def igen: VectorI = gen.toInt
+    def igen: VectoI = gen.toInt
 
 } // PermutedVecD class
 
@@ -208,7 +215,7 @@ case class PermutedVecD (x: VectorD, stream: Int = 0)
  *  @param x       the vector of integers to permute
  *  @param stream  the random number stream
  */
-case class PermutedVecI (x: VectorI, stream: Int = 0)
+case class PermutedVecI (x: VectoI, stream: Int = 0)
      extends VariateVec (stream)
 {
     _discrete = true
@@ -216,13 +223,13 @@ case class PermutedVecI (x: VectorI, stream: Int = 0)
     private val mu  = x.sum / x.dim.toDouble            // mean
     private val rng = Randi0 (3 * x.dim, stream)        // random integer generator
 
-    def mean: VectorD = VectorD.fill (x.dim)(mu)
+    def mean: VectoD = VectorD.fill (x.dim)(mu)
 
-    def pf (z: VectorD): Double = 1.0 / fac (x.dim)
+    def pf (z: VectoD): Double = 1.0 / fac (x.dim)
 
-    def gen: VectorD = igen.toDouble
+    def gen: VectoD = igen.toDouble
 
-    def igen: VectorI =
+    def igen: VectoI =
     {
         val y = new VectorI (x)                         // copy vector x
         for (i <- 0 until x.dim) {
@@ -254,13 +261,13 @@ case class RandomVecSample (pop: Int, samp: Int, stream: Int = 0)
     private val mu  = pop / 2.0                         // mean
     private val rng = Randi0 (pop-1, stream)            // random integer generator
 
-    def mean: VectorD = VectorD.fill (samp)(mu)
+    def mean: VectoD = VectorD.fill (samp)(mu)
 
-    def pf (z: VectorD): Double = 1.0 / fac (pop)
+    def pf (z: VectoD): Double = 1.0 / fac (pop)
 
-    def gen: VectorD = igen.toDouble
+    def gen: VectoD = igen.toDouble
 
-    def igen: VectorI =
+    def igen: VectoI =
     {
         val y = VectorI.range (0, pop)                  // generate vector containing 0, 1, ... pop-1
         for (i <- 0 until samp) {
@@ -292,18 +299,18 @@ case class RandomVecD (dim: Int = 10, max: Double = 20.0, min: Double = 0.0,
     private val rn  = Random (stream)                   // random number generator
     private val ri  = Randi0 (runLength, stream)        // random integer for repetition
     
-    def mean: VectorD = VectorD.fill (dim)(mu)
+    def mean: VectoD = VectorD.fill (dim)(mu)
 
-    def pf (z: VectorD): Double = 1.0 / (max - min) ~^ dim
+    def pf (z: VectoD): Double = 1.0 / (max - min) ~^ dim
 
-    def igen: VectorI = gen.toInt
+    def igen: VectoI = gen.toInt
 
-    def gen: VectorD =
+    def gen: VectoD =
     {
         VectorD (for (i <- 0 until dim) yield if (rn.gen < density) rng.gen else 0.0)
     } // gen
 
-    def repgen: VectorD =
+    def repgen: VectoD =
     {
         val v   = new VectorD (dim)
         var cnt = 0
@@ -342,13 +349,13 @@ case class RandomVecI (dim: Int = 10, max: Int = 20, min: Int = 10, skip: Int = 
     private val mu  = (max - min) / 2.0                 // mean
     private val rng = Randi0 (max, stream)              // random integer generator
 
-    def mean: VectorD = VectorD.fill (dim)(mu)
+    def mean: VectoD = VectorD.fill (dim)(mu)
 
-    def pf (z: VectorD): Double = 1.0 / (max - min) ~^ dim
+    def pf (z: VectoD): Double = 1.0 / (max - min) ~^ dim
 
-    def gen: VectorD = igen.toDouble
+    def gen: VectoD = igen.toDouble
 
-    def igen: VectorI =
+    def igen: VectoI =
     {
         val y   = new VectorI (dim)
         var num = 0
@@ -378,15 +385,15 @@ case class RandomVecS (dim: Int = 10, unique: Boolean = true, stream: Int = 0)
     private val mu     = NaN                               // mean
     private val rng    = RandomStr (stream = stream)       // random string generator
 
-    def mean: VectorD = VectorD.fill (dim)(mu)
+    def mean: VectoD = VectorD.fill (dim)(mu)
 
-    def pf (z: VectorD): Double = NaN
+    def pf (z: VectoD): Double = NaN
 
-    def gen: VectorD = sgen.toDouble
+    def gen: VectoD = sgen.toDouble
 
-    def igen: VectorI = sgen.toInt
+    def igen: VectoI = sgen.toInt
 
-    def sgen: VectorS =
+    def sgen: VectoS =
     {
         val y   = new VectorS (dim)
         var str = ""
@@ -424,9 +431,9 @@ case class Multinomial (p: Array [Double] = Array (.4, .7, 1.0), n: Int = 5, str
 
     private val dice = Dice (p, stream)
 
-    val mean: VectorD = VectorD.fill (p.length)(dice.mean)
+    val mean: VectoD = VectorD.fill (p.length)(dice.mean)
 
-    def pf (z: VectorD): Double =
+    def pf (z: VectoD): Double =
     {
         val x = z.toInt
         var prob = choose (n, x(0), x(1)).toDouble
@@ -434,9 +441,9 @@ case class Multinomial (p: Array [Double] = Array (.4, .7, 1.0), n: Int = 5, str
         prob
     } // pf
 
-    def gen: VectorD = igen.toDouble
+    def gen: VectoD = igen.toDouble
 
-    def igen: VectorI = VectorI (for (i <- p.indices) yield dice.igen)
+    def igen: VectoI = VectorI (for (i <- p.indices) yield dice.igen)
 
 } // Multinomial class
 

@@ -42,7 +42,7 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String], cn: Array [S
     private val DEBUG      = false                    // debug flag
     private val k          = x.dim2 - 1               // number of variables 
     private val r_df       = (n-1.0) / (n-k-1.0)      // ratio of degrees of freedom
-    private var b: VectorD = null                     // parameter vector (b_0, b_1, ... b_k)
+    private var b: VectoD  = null                     // parameter vector (b_0, b_1, ... b_k)
     private var n_dev      = -1.0                     // null dev: -2LL, for null model (intercept only)
     private var r_dev      = -1.0                     // residual dev: -2LL, for full model
     private var aic        = -1.0                     // Akaike’s Information Criterion
@@ -55,7 +55,7 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String], cn: Array [S
      *  @see www.statisticalhorizons.com/wp-content/uploads/Allison.StatComp.pdf
      *  @param b  the parameters to fit
      */
-    def ll (b: VectorD): Double =
+    def ll (b: VectoD): Double =
     {
         var sum = 0.0
         for (i <- 0 until x.dim1) {
@@ -73,7 +73,7 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String], cn: Array [S
      *  @see www.statisticalhorizons.com/wp-content/uploads/Allison.StatComp.pdf
      *  @param b  the parameters to fit
      */
-    def ll_null (b: VectorD): Double =
+    def ll_null (b: VectoD): Double =
     {
         var sum = 0.0
         val bx = b(0)                                       // only use the intercept
@@ -122,7 +122,7 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String], cn: Array [S
     /** Return the fit (parameter vector b, quality of fit). Assumes both
      *  train_null and train have already been called.
      */
-    def fit: Tuple5 [VectorD, Double, Double, Double, Double] = 
+    def fit: (VectoD, Double, Double, Double, Double) = 
     {
         pseudo_rSq = 1.0 - r_dev / n_dev
         (b, n_dev, r_dev, aic, pseudo_rSq)
@@ -144,7 +144,7 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String], cn: Array [S
      *  for an integer vector.
      *  @param z  the new integer vector to classify
      */
-//  def classify (z: VectorI): (Int, String, Double) = classify (z.toDouble)
+//  def classify (z: VectoI): (Int, String, Double) = classify (z.toDouble)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset or re-initialize the frequency tables and the probability tables.
@@ -163,7 +163,7 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String], cn: Array [S
 //  def backElim (): Tuple4 [Int, VectorD, Double, Double] =
 //  {
 //      var j_max   = -1                     // index of variable to eliminate
-//      var b_max: VectorD = null            // parameter values for best solution
+//      var b_max: VectoD = null             // parameter values for best solution
 //      var rSq_max = -1.0                   // currently maximizing R squared
 //      var fS_max  = -1.0                   // could optimize on F statistic
 //
@@ -184,7 +184,7 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String], cn: Array [S
      *  from the other variables, so 'xj' is a candidate for removal from the model.
      *  FIX or remove
      */
-//  def vif: VectorD =
+//  def vif: VectoD =
 //  {
 //      val vifV = new VectorD (k)           // VIF vector
 //      for (j <- 1 to k) {
@@ -246,7 +246,7 @@ object LogisticRegressionTest extends App
     val y = VectorI (0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0,
                      0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1)
 
-    var z: VectorD = null
+    var z: VectoD = null
 
     println ("x = " + x)
     println ("y = " + y)

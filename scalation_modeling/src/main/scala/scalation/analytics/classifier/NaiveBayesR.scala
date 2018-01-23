@@ -10,7 +10,7 @@ package scalation.analytics.classifier
 
 import scala.math.{ceil, floor}
 
-import scalation.linalgebra.{MatrixD, VectorD, VectoD, VectorI}
+import scalation.linalgebra.{MatrixD, VectoD, VectorD, VectoI, VectorI}
 import scalation.random.Normal
 import scalation.stat.vectorD2StatVector
 
@@ -32,7 +32,7 @@ import scalation.stat.vectorD2StatVector
  *  @param k   the number of classes
  *  @param cn  the names for all classes
  */
-class NaiveBayesR (x: MatrixD, y: VectorI, fn: Array [String], k: Int, cn: Array [String])
+class NaiveBayesR (x: MatrixD, y: VectoI, fn: Array [String], k: Int, cn: Array [String])
       extends ClassifierReal (x, y, fn, k, cn)
 {
     private val DEBUG   = false                   // debug flag
@@ -44,7 +44,7 @@ class NaiveBayesR (x: MatrixD, y: VectorI, fn: Array [String], k: Int, cn: Array
     private val varc = new MatrixD (k, n)         // variance for each class, feature
 
     private val cd   = Array.ofDim [Double => Double] (k, n)  // conditional density functions
-    private var prob: VectorD = null
+    private var prob: VectoD = null
 
     if (DEBUG) println ("correlation matrix = " + cor)
 
@@ -87,7 +87,7 @@ class NaiveBayesR (x: MatrixD, y: VectorI, fn: Array [String], k: Int, cn: Array
      *  @param x_j  the vector for feature j given class c.
      *  @param intervals  the number intervals
      */
-    def calcHistogram (x_j: VectorD, intervals: Int): VectorD =
+    def calcHistogram (x_j: VectoD, intervals: Int): VectoD =
     {
         val minVal = floor (x_j.min ())
         val maxVal = ceil (x_j.max () + EPSILON)

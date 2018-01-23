@@ -13,7 +13,7 @@ package scalation.analytics
 
 import scala.util.control.Breaks.{breakable, break}
 
-import scalation.linalgebra.{Eigenvalue, Eigenvector, MatrixD, VectorD}
+import scalation.linalgebra.{Eigenvalue, Eigenvector, MatriD, MatrixD, VectoD, VectorD}
 import scalation.linalgebra.MatrixD.outer
 import scalation.util.Error
 
@@ -29,7 +29,7 @@ import scalation.util.Error
  *  @param x  the x data matrix
  *  @param y  the y data matrix
  */
-class CanCorrelation (x: MatrixD, y: MatrixD)
+class CanCorrelation (x: MatriD, y: MatriD)
       extends Reducer with Error                   // FIX - reducer or predictor?
 {
     if (! x.isRectangular) flaw ("constructor", "x matrix must be rectangular")
@@ -41,7 +41,7 @@ class CanCorrelation (x: MatrixD, y: MatrixD)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reduce the original data ...
      */
-    def reduce (): MatrixD =
+    def reduce (): MatriD =
     {
         null    // FIX - to be implemented
     } // reduce
@@ -49,7 +49,7 @@ class CanCorrelation (x: MatrixD, y: MatrixD)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Approximately recover the original data ...
      */
-    def recover (): MatrixD =
+    def recover (): MatriD =
     {
         null    // FIX - to be implemented
     } // recover

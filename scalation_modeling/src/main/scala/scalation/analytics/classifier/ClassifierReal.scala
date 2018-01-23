@@ -48,7 +48,7 @@ abstract class ClassifierReal (x: MatriD, y: VectoI, fn: Array [String], k: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return default values for binary input data (value count 'vc' set to 2).
      */
-    def vc_default: VectorI = { val vc = new VectorI (n); vc.set (2); vc }
+    def vc_default: VectoI = { val vc = new VectorI (n); vc.set (2); vc }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the number of data vectors in training/test-set (# rows).
@@ -87,7 +87,7 @@ abstract class ClassifierReal (x: MatriD, y: VectoI, fn: Array [String], k: Int,
      *  @param xx  the real-valued test vectors stored as rows of a matrix
      *  @param yy  the test classification vector, where 'yy_i = class for row i of xx'
      */
-    def test (xx: MatrixD, yy: VectorI): Double =
+    def test (xx: MatrixD, yy: VectoI): Double =
     {
         val mm = xx.dim1
         if (yy.dim != mm) flaw ("test", "yy.dim must equal test-set size (mm)")

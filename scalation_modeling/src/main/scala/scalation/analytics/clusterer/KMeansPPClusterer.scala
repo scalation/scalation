@@ -14,7 +14,7 @@ package scalation.analytics.clusterer
 import scala.collection.mutable.Set
 import scala.util.control.Breaks.{breakable, break}
 
-import scalation.linalgebra.{MatrixD, VectorD, VectorI}
+import scalation.linalgebra.{MatrixD, VectorD, VectoI, VectorI}
 import scalation.random.{Discrete, Randi, Uniform, PermutedVecI, RandomVecI}
 import scalation.util.{banner, Error}
 
@@ -303,10 +303,10 @@ object KMeansPPClusterer
 {
     import scalation.random.PermutedVecI
 
-    private var streams = VectorI.range (0, 1000)               // vector of random number streams
+    private var streams: VectoI = VectorI.range (0, 1000)               // vector of random number streams
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a vector this is a permutation of the current vector of random number streams.
+    /** Create a vector that is a permutation of the current vector of random number streams.
      *  @param stream  the stream to use in this process
      */
     def permuteStreams (stream: Int = 0)

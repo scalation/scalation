@@ -25,8 +25,9 @@ import RegTechnique._
  *  @param cubic      the order of the surface (defaults to quadratic, else cubic)
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class ResponseSurface [MatT <: MatriD, VecT <: VectoD] (x_ : MatT, y: VecT, cubic: Boolean = false, technique: RegTechnique = QR)
-      extends Regression (ResponseSurface.allForms (x_, cubic), y = y, technique = technique)
+class ResponseSurface [MatT <: MatriD, VecT <: VectoD] (x_ : MatT, y: VecT, cubic: Boolean = false,
+                       technique: RegTechnique = QR)
+      extends Regression (ResponseSurface.allForms (x_, cubic), y, technique)
 {
     private val n = x_.dim2                     // The dimensionality (2D, 3D, etc.) of points in matrix x_
 

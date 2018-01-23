@@ -8,7 +8,7 @@
 
 package scalation.analytics
 
-import scalation.linalgebra.MatrixD
+import scalation.linalgebra.MatriD
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Reducer` trait provides a common framework for several data reduction
@@ -20,13 +20,13 @@ trait Reducer
     /** Given the original data matrix, produce a lower dimensionality matrix
      *  that maintains most of the descriptive power of the original matrix.
      */
-    def reduce (): MatrixD
+    def reduce (): MatriD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Approximately recover the original matrix.  The new matrix will have
      *  the same dimensionality, but will have some lose of information.
      */
-    def recover (): MatrixD
+    def recover (): MatriD
 
 } // Reducer trait
 

@@ -38,7 +38,7 @@ import scalation.util.Unicode.sub
  * @param y  the response vector
  * @param λ0 the initial vale for the regularization weight
  */
-class LassoRegression2 [MatT <: MatriD, VecT <: VectorD](x: MatT, y: VecT, λ0: Double = -1.0)
+class LassoRegression2 [MatT <: MatriD, VecT <: VectoD](x: MatT, y: VecT, λ0: Double = -1.0)
       extends Predictor with Error
 {
     if (y != null && x.dim1 != y.dim) flaw("constructor", "dimensions of x and y are incompatible")
@@ -67,7 +67,7 @@ class LassoRegression2 [MatT <: MatriD, VecT <: VectorD](x: MatT, y: VecT, λ0: 
     private var λ = -1.0
     private val nx: Int = 10 // Number of folds for cross validation
 
-    private var foldIndices: Array[VectorI] = null
+    private var foldIndices: Array[VectoI] = null
 
     private val xtxFolds: Array [MatriD] = new Array [MatriD](nx)
     private val xtyFolds: Array [VectoD] = new Array [VectoD](nx)
@@ -157,7 +157,7 @@ class LassoRegression2 [MatT <: MatriD, VecT <: VectorD](x: MatT, y: VecT, λ0: 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /**
      */
-    private def test (itest: VectorI, b: VectoD) = for (i <- itest) e(i) = y(i) - predict(x(i), b)
+    private def test (itest: VectoI, b: VectoD) = for (i <- itest) e(i) = y(i) - predict(x(i), b)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /**

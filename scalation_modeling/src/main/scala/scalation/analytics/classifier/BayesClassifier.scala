@@ -10,7 +10,7 @@ package scalation.analytics.classifier
 
 import scala.collection.mutable.ListBuffer
 import scalation.columnar_db.Relation
-import scalation.linalgebra.{MatriI, MatrixD, MatrixI, VectoI, VectorD, VectorI}
+import scalation.linalgebra.{MatrixD, MatriI, MatrixI, VectoD, VectorD, VectoI, VectorI}
 import scalation.linalgebra.gen.{HMatrix2, HMatrix3, HMatrix5}
 import scalation.math.log2
 
@@ -78,7 +78,7 @@ abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int
     {
         val p_CXZ = new HMatrix5 [Double] (k, n, n, vca, vca)          // Joint probability of C, X, and Z, where X, Z are features/columns
         val p_CX  = new HMatrix3 [Double] (k, n, vca)                  // Joint probability of C and X
-        var p_C: VectorD = null
+        var p_C: VectoD = null
 
         reset ()
         for (i <- idx) updateFreq (i)
@@ -116,7 +116,7 @@ abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int
      *  @param p_CX  the joint probability of C and X
      *  @param p_CXZ the joint probability of C, X, and Z
      */
-    def cmiJoint (p_C: VectorD, p_CX: HMatrix3 [Double], p_CXZ: HMatrix5 [Double]): MatrixD =
+    def cmiJoint (p_C: VectoD, p_CX: HMatrix3 [Double], p_CXZ: HMatrix5 [Double]): MatrixD =
     {
         val cmiMx = new MatrixD (p_CX.dim2, p_CX.dim2)
         for (c <- 0 until k) {                               // check each class, where k = p_C.size

@@ -48,7 +48,7 @@ class PolyRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = Ch
     /** Expand the scalar 't' into a vector of powers of 't':  [1, t, t^2 ... t^k].
      *  @param t  the scalar to expand into the vector
      */
-    def expand (t: Double): VectorD = 
+    def expand (t: Double): VectoD = 
     {
         val v = new VectorD (1 + k)
         for (j <- 0 to k) v(j) = t~^j
@@ -119,7 +119,7 @@ class PolyRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = Ch
      *  A VIF over 10 indicates that over 90% of the variance of 'xj' can be predicted
      *  from the other variables, so 'xj' is a candidate for removal from the model.
      */
-    def vif: VectorD = rg.vif
+    def vif: VectoD = rg.vif
 
 } // PolyRegression class
 

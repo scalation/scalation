@@ -10,7 +10,7 @@ package scalation.analytics
 
 import scala.math.{ceil, min}
 
-import scalation.linalgebra.MatrixD
+import scalation.linalgebra.{MatriD, MatrixD}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NMFactorization` class factors a matrix 'v' into two non negative matrices 
@@ -20,9 +20,7 @@ import scalation.linalgebra.MatrixD
  *  @param loops  the number of iterations before checking the termination condition  
  *  @param r      factor the m-by-n matrix 'v' in to two factors: an m-by-r and r-by-n matrix  
  */ 
-class NMFactorization (v: MatrixD, 
-		       loops: Int = 10,
-		       var r: Int = 0)
+class NMFactorization (v: MatriD, loops: Int = 10, var r: Int = 0)
 {
     private val m = v.dim1                  // number of rows in matrix v
     private val n = v.dim2     	            // number of columns in matrix v
@@ -42,7 +40,7 @@ class NMFactorization (v: MatrixD,
      */
     def factor (): (MatrixD, MatrixD) = 
     {
-        var vv: MatrixD = null                        // holds product of the factors (vv -> v)
+        var vv: MatriD = null                         // holds product of the factors (vv -> v)
 
         println ("Original Matrix to Factor v = " + v)
         var converged = false                         // convergence flag

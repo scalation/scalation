@@ -59,7 +59,7 @@ object Vec
      *  @param x  the vector to access
      *  @param i  the index position 
      */
-    def apply (x: Vec, iv: VectorI): Vec =
+    def apply (x: Vec, iv: VectoI): Vec =
     {
         x match {
         case _: VectorC => x.asInstanceOf [VectorC].select (iv)

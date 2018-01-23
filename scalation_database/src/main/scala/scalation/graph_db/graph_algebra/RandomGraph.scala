@@ -12,7 +12,7 @@ package graph_algebra
 import scala.collection.mutable.{ArrayBuffer, Map, Set => SET}
 import scala.reflect.ClassTag
 
-import scalation.linalgebra.VectorS
+import scalation.linalgebra._
 import scalation.random.{Randi,Randi0, RandomSetW, RandomVecS,Bernoulli}
 import scalation.math.double_exp
 
@@ -61,13 +61,13 @@ class RandomGraph [TLabel: ClassTag] (nVertices: Int, nLabels: Int, nEdges: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Generate the labels for vertices.
      */
-    def genVLabels: VectorS = RandomVecS (nLabels, true, stream).sgen
+    def genVLabels: VectoS = RandomVecS (nLabels, true, stream).sgen
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Assigns the vertex labels to the vertices.
      *  @param  vlabs the vector of labels to be assigned for vertices
      */
-    def assignVLabels (vlabs: VectorS): Array [String] =
+    def assignVLabels (vlabs: VectoS): Array [String] =
     {
         val lv     = Array.ofDim [String] (nVertices)
         val rLabel = Randi0 (nLabels - 1, stream)                         // replaced nLables with nVertices

@@ -195,6 +195,12 @@ trait VectoL
     override def slice (from: Int, till: Int = dim): VectoL = null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Split 'this' vector into 'k' arrays of equal sizes (perhaps except for the last one).
+     *  @param k  the number of pieces the vector is to be split into
+     */
+    def split (k: Int): Array [VectoL] = null
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select a subset of elements of 'this' vector corresponding to a 'basis'.
      *  @param basis  the set of index positions (e.g., 0, 2, 5)
      */

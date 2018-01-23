@@ -69,7 +69,7 @@ class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: D
      *  @param yy  the response vector
      *  @param b   the vector of coefficients/parameters
      */
-    def f (yy: VectoD)(b: VectorD): Double =
+    def f (yy: VectoD)(b: VectoD): Double =
     {
         e = yy - x * b                                          // calculate the residuals/error
         e dot e + λ * b.norm1 

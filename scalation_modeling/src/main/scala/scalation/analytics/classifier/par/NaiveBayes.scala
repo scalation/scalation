@@ -148,7 +148,7 @@ class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [
      *  @param f_C      frequency table of class C
      *  @param f_CX     joint frequency table of C and X
      */
-    protected def updateFreq (i: Int, f_C: VectorI, f_CX: HMatrix3[Int])
+    protected def updateFreq (i: Int, f_C: VectoI, f_CX: HMatrix3[Int])
     {
         val yi   = y(i)                                       // get the class for ith row
         f_C(yi) += 1                                          // decrement frequency for class yi
@@ -280,7 +280,7 @@ class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
     /** Decrement frequency counters based on the 'i'th row of the data matrix.
      *  @param i  the index for current data row
      */
-    protected override def updateFreq (i: Int, f_C: VectorI, f_CX: HMatrix3[Int])
+    protected override def updateFreq (i: Int, f_C: VectoI, f_CX: HMatrix3[Int])
     {
         val yi   = y(i)                                       // get the class for ith row
         f_C(yi) -= 1                                          // decrement frequency for class yi

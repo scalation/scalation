@@ -9,7 +9,7 @@
 package scalation.analytics.classifier
 
 import scalation.linalgebra.{MatrixD, VectoD, VectorD, VectoI, VectorI}
-import scalation.stat.StatVector.{cov, mean}
+import scalation.stat.StatVector.cov
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `LDA` class implements a Linear Discriminant Analysis 'LDA' classifier.
@@ -30,8 +30,8 @@ class LDA (x: MatrixD, y: VectoI, fn: Array [String])
         println ("x1 = " + x1)
     } // if
 
-    private val mu0  = mean (x0)
-    private val mu1  = mean (x1)
+    private val mu0  = x0.mean
+    private val mu1  = x1.mean
     private val sig  = cov (x)
     private val sig0 = cov (x0)
     private val sig1 = cov (x1)

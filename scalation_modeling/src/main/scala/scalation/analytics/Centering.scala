@@ -21,7 +21,7 @@ object Centering
      *  @param x     the input matrix to center
      *  @param mu_x  the vector of column means of matrix x
      */
-    def center (x: MatriD, mu_x: VectoD): MatrixD =
+    def center (x: MatriD, mu_x: VectoD): MatriD =
     {
         val x_c = new MatrixD (x.dim1, x.dim2)
         for (j <- 0 until x.dim2) {

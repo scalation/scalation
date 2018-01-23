@@ -10,7 +10,7 @@ package scalation.analytics.classifier
 
 import scala.math.log
 
-import scalation.linalgebra.{MatrixD, VectoD, VectorD, VectoI, VectorI}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectoI, VectorI}
 import scalation.random.ProbabilityVec
 
 // U N D E R   D E V E L O P M E N T 
@@ -35,9 +35,9 @@ import scalation.random.ProbabilityVec
  *  @param a   the state transition probability matrix (n-by-n)
  *  @param b   the observation probability matrix (n-by-m)
  */
-class HiddenMarkov (ob: VectorI, m: Int, n: Int, private var pi: VectorD = null,
-                                                 private var a:  MatrixD = null,
-                                                 private var b:  MatrixD = null)
+class HiddenMarkov (ob: VectoI, m: Int, n: Int, private var pi: VectoD = null,
+                                                private var a:  MatriD = null,
+                                                private var b:  MatriD = null)
       extends Classifier
 {
     private val MIT = 1000                           // Maximum ITerations
@@ -194,7 +194,7 @@ class HiddenMarkov (ob: VectorI, m: Int, n: Int, private var pi: VectorD = null,
      *  @param testStart  the beginning of test region (inclusive).
      *  @param testEnd    the end of test region (exclusive).
      */
-    def train2 (testStart: Int, testEnd: Int): Tuple3 [VectorD, MatrixD, MatrixD] =
+    def train2 (testStart: Int, testEnd: Int): Tuple3 [VectoD, MatriD, MatriD] =
     {
         var oldLogPr = 0.0
         for (it <- 0 to MIT) {                    // up to Maximum ITerations

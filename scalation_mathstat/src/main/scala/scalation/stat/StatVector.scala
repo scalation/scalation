@@ -10,7 +10,7 @@ package scalation.stat
 
 import scala.math.{ceil, sqrt}
 
-import scalation.linalgebra.{MatrixD, VectorD, VectorI}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectorI}
 import scalation.linalgebra.MatrixD.eye
 import scalation.math.double_exp
 import scalation.random.Normal
@@ -212,15 +212,16 @@ object StatVector
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the mean vector containing the means of each column of matrix 'x'.
      *  @param x  the matrix whose column means are sought
-     */
+     *
     def mean (x: MatrixD): VectorD = VectorD (for (j <- x.range2) yield x.col(j).mean)
+     */
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Center the input matrix 'x' to zero mean, column-wise, by subtracting the mean.
      *  @param x     the input matrix to center
      *  @param mu_x  the vector of column means of matrix x
      */
-    def center (x: MatrixD, mu_x: VectorD): MatrixD = x - mu_x
+    def center (x: MatriD, mu_x: VectoD): MatriD = x - mu_x
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the sample covariance matrix for the columns of matrix 'x'.
@@ -228,7 +229,7 @@ object StatVector
      */
     def cov (x: MatrixD): MatrixD =
     {
-        val z = x - mean (x)
+        val z = x - x.mean
         (z.t * z) / (x.dim1.toDouble - 1.0)
     } // cov
 
@@ -238,7 +239,7 @@ object StatVector
      */
     def pcov (x: MatrixD): MatrixD =
     {
-        val z = x - mean (x)
+        val z = x - x.mean
         (z.t * z) / x.dim1.toDouble
     } // pcov
 
@@ -406,13 +407,13 @@ object StatVectorTest3 extends App
                                  4.3, 2.1, 0.62,
                                  4.1, 2.2, 0.63)
 
-    val mu = mean (x)
+    val mu = x.mean
     val cx = center (x, mu)
                                  
     println ("-" * 60)
     println (s"x           = $x}")                   // x matrix
     println ("-" * 60)
-    println (s"mean (x)    = $mu")                   // mean vector
+    println (s"x.mean      = $mu")                   // mean vector
     println ("-" * 60)
     println (s"cov (x)     = ${cov (x)}")            // sample covariance matrix
     println ("-" * 60)
@@ -447,13 +448,13 @@ object StatVectorTest4 extends App
                                  40.1, 10.0, 18.6, 174.5,
                                  45.9, 12.0, 20.4, 185.7)
 
-    val mu = mean (x)
+    val mu = x.mean
     val cx = center (x, mu)
 
     println ("-" * 60)
     println (s"x           = $x}")                   // x matrix
     println ("-" * 60)
-    println (s"mean (x)    = $mu")                   // mean vector
+    println (s"x.mean      = $mu")                   // mean vector
     println ("-" * 60)
     println (s"cov (x)     = ${cov (x)}")            // sample covariance matrix
     println ("-" * 60)

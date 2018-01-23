@@ -38,7 +38,7 @@ import ActivationFunc._
  *  @param afunc   the activation function (mapping scalar => scalar)
  *  @param afuncV  the activation function (mapping vector => vector)
  */
-class Perceptron (x: MatrixD, y: VectorD, private var eta: Double = 1.0,
+class Perceptron (x: MatriD, y: VectoD, private var eta: Double = 1.0,
                   afunc: FunctionS2S = sigmoid _, afuncV: FunctionV_2V = sigmoidV _)
       extends Predictor with Error
 {
@@ -57,7 +57,7 @@ class Perceptron (x: MatrixD, y: VectorD, private var eta: Double = 1.0,
     /** Set the initial weight vector 'b' manually before training.
      *  @param w0  the initial weights for b
      */
-    def setWeights (w0: VectorD) { b  = w0; check (y) }
+    def setWeights (w0: VectoD) { b  = w0; check (y) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the initial weight vector 'b' with values in (0, 1) before training.

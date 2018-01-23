@@ -13,7 +13,7 @@ package scalation.analytics.classifier
 import scala.math.log
 
 import scalation.columnar_db.Relation
-import scalation.linalgebra.{MatriI, MatrixI, VectoI, VectorD, VectorI}
+import scalation.linalgebra.{MatriI, MatrixI, VectoD, VectorD, VectoI, VectorI}
 import scalation.linalgebra.gen.HMatrix3
 import scalation.util.banner
 
@@ -164,7 +164,7 @@ class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [
     /** Take the log of the given probability vector.
      *  @param p  the given probability vector
      */
-    protected def vlog (p: VectorD): VectorD = p.map (log (_))
+    protected def vlog (p: VectoD): VectoD = p.map (log (_))
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset or re-initialize all the population and probability vectors and

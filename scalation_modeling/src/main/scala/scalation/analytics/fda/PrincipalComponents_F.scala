@@ -14,8 +14,8 @@
 package scalation.analytics.fda
 
 import scalation.analytics.{PrincipalComponents, Reducer}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.math.Functions
-import scalation.linalgebra.{MatrixD, VectorD}
 
 import StatFunction.toMatrix
 
@@ -39,20 +39,20 @@ class PrincipalComponents_F (xa: Functions, t: VectorD)
      *  highest eigenvalues.
      *  @param k  the number of Principal Components 'PC's to find
      */
-    def findPCs (k: Int): MatrixD = pca.findPCs (k)
+    def findPCs (k: Int): MatriD = pca.findPCs (k)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply the zero mean data matrix by the feature matrix to reduce
      *  dimensionality.
      */
-    def reduce (): MatrixD = pca.reduce ()
+    def reduce (): MatriD = pca.reduce ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Approximately recover the original data by multiplying the reduced matrix
      *  by the inverse (via transpose) of the feature matrix and then adding back
      *  the means.
      */
-    def recover: MatrixD = pca.recover
+    def recover: MatriD = pca.recover
 
 } // PrincipalComponents_F class
 

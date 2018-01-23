@@ -27,7 +27,7 @@ import scalation.random.{Normal, RandomVecI}
  *  @param x  the data vector
  *  @param k  the number of components in the mixture
  */
-class GMM (x: VectorD, k: Int = 3)
+class GMM (x: VectoD, k: Int = 3)
       extends Classifier
 {
     private val DEBUG    = true                                      // debug flag
@@ -41,7 +41,7 @@ class GMM (x: VectorD, k: Int = 3)
     private val phi      = new VectorD (k); phi.set (1.0 / k)        // set int weight to 1/k
     private val gamma    = new MatrixD (n, k)                        // hold conditional probabilities
 
-    private var mu0: VectorD = null                                  // to hold previous mu values
+    private var mu0: VectoD = null                                   // to hold previous mu values
 
     private var normal: Seq [Normal] = null                          // Normal (Gaussian) distributions
 

@@ -59,7 +59,7 @@ object GZLM extends GLM
      *  @param nonneg  whether to check that responses are nonnegative
      *  @param y       the response vector
      */
-    def apply (x: MatriD, nonneg: Boolean, y: VectorD): ExpRegression =
+    def apply (x: MatriD, nonneg: Boolean, y: VectoD): ExpRegression =
     {
         if (add_1)
             new ExpRegression (one (x.dim1) +^: x, nonneg, y)

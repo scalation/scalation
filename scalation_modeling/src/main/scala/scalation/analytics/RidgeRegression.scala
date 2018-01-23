@@ -201,7 +201,7 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
      *  A VIF over 10 indicates that over 90% of the variance of 'xj' can be predicted
      *  from the other variables, so 'xj' is a candidate for removal from the model.
      */
-    def vif: VectorD =
+    def vif: VectoD =
     {
         val ir   =  2                                           // ft(ir) is rSq
         val vifV = new VectorD (k)                              // VIF vector

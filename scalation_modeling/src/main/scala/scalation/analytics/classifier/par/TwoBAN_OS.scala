@@ -71,12 +71,12 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
 
     protected val vca = vc.toArray
 
-    f_X   = new HMatrix2[Int] (n, vca)                                    // Frequency of X
+    f_X   = new HMatrix2 [Int] (n, vca)                                   // Frequency of X
     f_CX  = new HMatrix3 [Int] (k, n, vca)                                // Joint frequency of C and X
     f_CXZ = new HMatrix5 [Int] (k, n, n, vca, vca)                        // Joint frequency of C, X, and Z, where X, Z are features/columns
 
     protected val scoreArray = new VectorD (maxRandomRestarts)
-    protected val featOrderArray = Array.ofDim [VectorI] (maxRandomRestarts)
+    protected val featOrderArray = Array.ofDim [VectoI] (maxRandomRestarts)
 
     if (DEBUG) println ("value count vc      = " + vc)
 
@@ -174,7 +174,7 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
      *  @param f_CX     joint frequency table of C and X
      *  @param f_CXZ    joint frequency table of C, X, and Z, where X and Z are features/columns
      */
-    protected override def updateFreq (i: Int, f_C: VectorI, f_X: HMatrix2[Int], f_CX: HMatrix3[Int], f_CXZ: HMatrix5[Int])
+    protected override def updateFreq (i: Int, f_C: VectoI, f_X: HMatrix2 [Int], f_CX: HMatrix3 [Int], f_CXZ: HMatrix5 [Int])
     {
         val yi   = y(i)                                       // get the class for ith row
         f_C(yi) += 1                                          // decrement frequency for class yi
@@ -276,7 +276,7 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
      *  @param featureOrder     order of the features
      *  @param cmiMx            the Conditional Mutual Information matrix
      */
-    def computeParent (featureOrder: VectorI = featureOrder, cmiMx: MatrixD): MatrixI =
+    def computeParent (featureOrder: VectoI = featureOrder, cmiMx: MatrixD): MatrixI =
     {
         val parent = new MatrixI (n, 2)
         parent.set(-1)
@@ -332,7 +332,7 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
      *                    i.e., the 'Conditional Mutual Information' criterion.
      *  @param c          index of criterion
      */
-    private def testSwapping (featureOrder: VectorI, j: Int, criterion: VectoD, c: Int, cmiMx: MatrixD)
+    private def testSwapping (featureOrder: VectoI, j: Int, criterion: VectoD, c: Int, cmiMx: MatrixD)
     {
         if (DEBUG) {
             println ("Test swapping...")
@@ -355,7 +355,7 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
      *  @param tabu             tabu list of features
      *  @param j                index of 'featureOrder'
      */
-    private def swapFeatures (featureOrder: VectorI, tabu: TabuFeatures, j: Int)
+    private def swapFeatures (featureOrder: VectoI, tabu: TabuFeatures, j: Int)
     {
         featureOrder.swap (j, j + 1)
         tabu.addTaboo (featureOrder(j), featureOrder(j + 1), n / 3)
@@ -563,7 +563,7 @@ class TwoBAN_OS (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
      *  @param f_CX     joint frequency table of C and X
      *  @param f_CXZ    joint frequency table of C, X, and Z, where X and Z are features/columns
      */
-    protected override def updateFreq (i: Int, f_C: VectorI, f_X: HMatrix2[Int], f_CX: HMatrix3[Int], f_CXZ: HMatrix5[Int])
+    protected override def updateFreq (i: Int, f_C: VectoI, f_X: HMatrix2[Int], f_CX: HMatrix3[Int], f_CXZ: HMatrix5[Int])
     {
         val yi   = y(i)                                       // get the class for ith row
         f_C(yi) -= 1                                          // decrement frequency for class yi

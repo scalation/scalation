@@ -10,7 +10,7 @@ package scalation.analytics
 
 import scala.math.log
 
-import scalation.linalgebra.{MatrixD, VectoD, VectorD}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.math.double_exp
 import scalation.minima.QuasiNewton
 import scalation.plot.Plot
@@ -32,8 +32,8 @@ import scalation.util.Error
  *  @param f       the non-linear function f(x, b) to fit
  *  @param b_init  the initial guess for the parameter vector b
  */
-class NonLinRegression (x: MatrixD, y: VectorD, f: (VectoD, VectoD) => Double,
-                        b_init: VectorD)
+class NonLinRegression (x: MatriD, y: VectoD, f: (VectoD, VectoD) => Double,
+                        b_init: VectorD)                                         // FIX - should be trait - currently fails
       extends Predictor with Error
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")

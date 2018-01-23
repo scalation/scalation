@@ -11,11 +11,13 @@
 
 package scalation.analytics
 
+// FIX - eliminate dependency on MatrixD
+
 import scala.util.control.Breaks.{breakable, break}
 
-import scalation.linalgebra.{Eigenvalue, Eigenvector, MatrixD, VectoD, VectorD}
+import scalation.linalgebra.{Eigenvalue, Eigenvector, MatriD, MatrixD, VectoD, VectorD}
 import scalation.linalgebra.MatrixD.outer
-import scalation.stat.StatVector.{center, mean}
+import scalation.stat.StatVector.center
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -26,7 +28,7 @@ import scalation.util.Error
  *  matrix).
  *  @param x  the data matrix to reduce, stored column-wise
  */
-class PrincipalComponents (x: MatrixD)
+class PrincipalComponents (x: MatriD)
       extends Reducer with Error
 {
     if (! x.isRectangular) flaw ("constructor", "x matrix must be rectangular")
@@ -37,14 +39,14 @@ class PrincipalComponents (x: MatrixD)
     private val M        = x.dim1                            // the number of data points (rows)
     private val MR       = M.toDouble                        // M as a real number
     private val N        = x.dim2                            // the number of variables (columns)
-    private val mu       = mean (x)                          // the mean vector (column means)
+    private val mu       = x.mean                            // the mean vector (column means)
     private val xc       = center (x, mu)                    // center x (shift mean to zero)
     private val cov      = (xc mdot xc) / (MR - 1.0)         // the covariance matrix (from mean zero data)
-    private val eigenVal = (new Eigenvalue (cov)).getE ()    // the eigenvalues of cov
+    private val eigenVal = (new Eigenvalue (cov.asInstanceOf [MatrixD])).getE ()    // the eigenvalues of cov
     private val eigenVec = computeEigenVectors (eigenVal)    // the eigenvectors for cov
 
-    private var featureMat: MatrixD = null                   // the feature matrix
-    private var reducedMat: MatrixD = null                   // the reduced matrix
+    private var featureMat: MatriD = null                    // the feature matrix
+    private var reducedMat: MatriD = null                    // the reduced matrix
 
     if (DEBUG) {
         println ("-" * 60)
@@ -64,9 +66,9 @@ class PrincipalComponents (x: MatrixD)
     /** Compute the unit eigenvectors for the covariance matrix.
      *  @param eVal  the vector of eigenvalues for the covariance matrix
      */
-    private def computeEigenVectors (eVal: VectorD): MatrixD =
+    private def computeEigenVectors (eVal: VectoD): MatriD =
     {
-        val eigenVec = (new Eigenvector (cov, eigenVal)).getV                 // the eigenvectors for cov
+        val eigenVec = (new Eigenvector (cov.asInstanceOf [MatrixD], eigenVal)).getV                 // the eigenvectors for cov
         for (j <- 0 until N) eigenVec.setCol (j, eigenVec.col(j).normalizeU)  // want unit vectors
         eigenVec
     } // computeEigenVectors
@@ -76,7 +78,7 @@ class PrincipalComponents (x: MatrixD)
      *  highest eigenvalues.
      *  @param k  the number of Principal Components 'PC's to find
      */
-    def findPCs (k: Int): MatrixD =
+    def findPCs (k: Int): MatriD =
     {
         featureMat = eigenVec(0 until N, 0 until k)     // store in feature matrix
         featureMat
@@ -86,7 +88,7 @@ class PrincipalComponents (x: MatrixD)
     /** Multiply the zero mean data matrix by the feature matrix to reduce
      *  dimensionality.
      */
-    def reduce (): MatrixD =
+    def reduce (): MatriD =
     {
         reducedMat = x * featureMat                     // store in reduced matrix
         reducedMat
@@ -97,7 +99,7 @@ class PrincipalComponents (x: MatrixD)
      *  by the inverse (via transpose) of the feature matrix and then adding back
      *  the means.
      */
-    def recover: MatrixD = reducedMat * featureMat.t + mu
+    def recover: MatriD = reducedMat * featureMat.t + mu
 
 } // PrincipalComponents class
 

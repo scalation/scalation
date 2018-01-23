@@ -68,7 +68,7 @@ class PoissonRegression (x: MatriD, y: VectoI, fn: Array [String] = null)
      *  @see dept.stat.lsa.umich.edu/~kshedden/Courses/Stat600/Notes/glm.pdf
      *  @param b  the parameters to fit
      */
-    def ll_null (b: VectorD): Double =
+    def ll_null (b: VectoD): Double =
     {
         var sum = 0.0
         for (i <- 0 until x.dim1) {
@@ -149,10 +149,10 @@ class PoissonRegression (x: MatriD, y: VectoI, fn: Array [String] = null)
      *  vector, the new R-squared value and the new F statistic.
      *  FIX or remove.
      */
-//  def backElim (): (Int, VectorD, Double, Double) =
+//  def backElim (): (Int, VectoD, Double, Double) =
 //  {
 //      var j_max   = -1                     // index of variable to eliminate
-//      var b_max: VectorD = null            // parameter values for best solution
+//      var b_max: VectoD = null            // parameter values for best solution
 //      var rSq_max = -1.0                   // currently maximizing R squared
 //      var fS_max  = -1.0                   // could optimize on F statistic
 //
@@ -173,7 +173,7 @@ class PoissonRegression (x: MatriD, y: VectoI, fn: Array [String] = null)
      *  from the other variables, so 'xj' is a candidate for removal from the model.
      *  FIX or remove.
      */
-//  def vif: VectorD =
+//  def vif: VectoD =
 //  {
 //      val vifV = new VectorD (k)           // VIF vector
 //      for (j <- 1 to k) {
@@ -234,7 +234,7 @@ object PoissonRegressionTest extends App
     val y = VectorI (0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0,
                      0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1)
 
-    var z: VectorD = null
+    var z: VectoD = null
 
     println ("x = " + x)
     println ("y = " + y)
