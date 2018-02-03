@@ -85,7 +85,7 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
      *      y  =  b dot x + e  =  [b_1, ... b_k] dot [x_1, ... x_k] + e
      *  using the least squares method.
      */
-    def train ()
+    def train (): RidgeRegression =
     {
         b        = if (x_pinv == null) fac.solve (y)
                    else x_pinv * y                              // x parameter vector [b_1, ... b_k]
@@ -96,6 +96,7 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
         rSquared = ssr / sst                                    // coefficient of determination (R-squared)
         rBarSq   = 1.0 - (1.0-rSquared) * r_df                  // R-bar-squared (adjusted R-squared)
         fStat    = ssr * (m-k-1.0)  / (sse * k)                 // F statistic (msr / mse)
+        this
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -105,7 +106,7 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
      *  using the least squares method.
      *  @param yy  the new response vector
      */
-    def train (yy: VectoD)
+    def train (yy: VectoD): RidgeRegression =
     {
         b        = if (x_pinv == null) fac.solve (yy)
                    else x_pinv * yy                             // x parameter vector [b_1, ... b_k]
@@ -116,7 +117,18 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
         rSquared = ssr / sst                                    // coefficient of determination
         rBarSq   = 1.0 - (1.0-rSquared) * r_df                  // R-bar-squared (adjusted R-squared)
         fStat    = ssr * (m-k-1.0)  / (sse * k)                 // F statistic (msr / mse)
+        this
     } // train
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the error and useful diagnostics.
+     *  @param yy   the response vector
+     */
+    def eval (yy: VectoD = y)
+    {
+        e = yy - x * b                                         // compute residual/error vector e
+        diagnose (yy)                                          // compute diagnostics
+    } // eval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit including 'rSquared'.
@@ -143,7 +155,7 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
         for (j <- 1 to k) {
             val keep = m.toInt                        // i-value large enough to not exclude any rows in slice
             val rg_j = new RidgeRegression (x.sliceExclude (keep, j), y)       // regress with x_j removed
-            rg_j.train ()
+            rg_j.train ().eval ()
             val b  = rg_j.coefficient
             val ft = rg_j.fit
             if (ft(0) > ft_max(0)) { j_max = j; b_max = b; ft_max = ft }
@@ -164,7 +176,7 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
             val keep = m.toInt               // i-value large enough to not exclude any rows in slice
             val x_j  = x.col(j)                                           // x_j is jth column in x
             val rg_j = new RidgeRegression (x.sliceExclude (keep, j), x_j)     // regress with x_j removed
-            rg_j.train ()
+            rg_j.train ().eval ()
             vifV(j-1) =  1.0 / (1.0 - rg_j.fit(0))                        // store vif for x_1 in vifV(0)
         } // for
         vifV
@@ -232,7 +244,7 @@ object RidgeRegressionTest extends App
     println ("x_c = " + x_c + "\ny_c = " + y_c + "\nz_c = " + z_c)
 
     val rrg = new RidgeRegression (x_c, y_c)
-    rrg.train ()
+    rrg.train ().eval ()
     println ("fit = " + rrg.fit)
     val yp = rrg.predict (z_c) + mu_y                     // predict y for one point
     println ("predict (" + z + ") = " + yp)
@@ -274,7 +286,7 @@ object RidgeRegressionTest2 extends App
     println ("-------------------------------------------------")
     println ("Fit the parameter vector b using QR Factorization")
     rrg = new RidgeRegression (x, y)
-    rrg.train ()
+    rrg.train ().eval ()
     println ("fit = " + rrg.fit)
     val yp = rrg.predict (z)                         // predict y for on3 point
     println ("predict (" + z + ") = " + yp)
@@ -326,7 +338,7 @@ object RidgeRegressionTest3 extends App
                      114.0, 115.0, 114.0, 106.0, 125.0, 114.0, 106.0, 113.0, 110.0, 122.0)
 
     val rrg = new RidgeRegression (x, y)
-    time { rrg.train () }
+    time { rrg.train ().eval () }
 
     println ("fit      = " + rrg.fit)       // fit model y = b_1*x_1 + b_2*x_2 + b_3*x_3 + b_4*x_4
     println ("vif      = " + rrg.vif)       // test multi-colinearity (VIF)

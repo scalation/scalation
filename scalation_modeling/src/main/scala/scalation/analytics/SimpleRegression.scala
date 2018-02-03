@@ -47,7 +47,7 @@ class SimpleRegression (x: MatriD, y: VectoD)
      *  @see www.analyzemath.com/statistics/linear_regression.html
      *  @param yy  the response vector
      */
-    def train (yy: VectoD)
+    def train (yy: VectoD): SimpleRegression =
     {
         val x1  = x.col(1)                                // get column 1 of x = [1.0, x1]
         val sx  = x1.sum                                  // sum of x values
@@ -60,21 +60,30 @@ class SimpleRegression (x: MatriD, y: VectoD)
         b(1) = (m * sxy - sx * sy) / (m * ssx - sx*sx)    // slope
         b(0) = (sy - b(1) * sx) / m                       // intercept
 
-        e = y - x * b                                     // residual/error vector
-        diagnose (y)                                      // compute diagnostics
+        this
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  simple regression equation for the response passed into the class 'y'.
      */
-    def train () { train (y) }
+    def train (): SimpleRegression = train (y)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the error and useful diagnostics.
+     *  @param yy   the response vector
+     */
+    def eval (yy: VectoD = y)
+    {
+        e = yy - x * b                                         // compute residual/error vector e
+        diagnose (yy)                                          // compute diagnostics
+    } // eval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute diagostics for the regression model.
      *  @param yy  the response vector
      */
-    override def diagnose (yy: VectoD)
+    override protected def diagnose (yy: VectoD)
     {
         super.diagnose (yy)
         rBarSq   = 1.0 - (1.0-rSq) * r_df                 // R-bar-squared (adjusted R-squared)
@@ -139,7 +148,7 @@ object SimpleRegressionTest extends App
     println ("y = " + y)
 
     val rg = SimpleRegression (x, y)
-    rg.train ()
+    rg.train ().eval ()
 
     println ("coefficient = " + rg.coefficient)
     println ("            = " + rg.fitLabels)
@@ -170,7 +179,7 @@ object SimpleRegressionTest2 extends App
     println ("y = " + y)
 
     val rg = new SimpleRegression (x, y)
-    rg.train ()
+    rg.train ().eval ()
 
     println ("coefficient = " + rg.coefficient)
     println ("            = " + rg.fitLabels)
@@ -210,7 +219,7 @@ object SimpleRegressionTest3 extends App
     val x  = MatrixD.form_cw (1.0, x1)       // form matrix x from vector x1
 
     val rg = new SimpleRegression (x, y)
-    rg.train ()
+    rg.train ().eval ()
 
     println ("coefficient = " + rg.coefficient)
     println ("            = " + rg.fitLabels)

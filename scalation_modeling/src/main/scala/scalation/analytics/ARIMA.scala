@@ -354,11 +354,11 @@ class ARIMA (y: VectoD, t: VectoD, d: Int = 0)
         for (j <- 0 until p) ax.setCol (j, x.slice(cap - j - 1, n - j - 1))
         for (j <- 0 until q) ax.setCol (p + j, e.slice(cap - j - 1, n - j - 1))
 
-        if (DEBUG) println(s"ax = $ax")
-        if (DEBUG) println(s"ay = $ay")
+        if (DEBUG) println (s"ax = $ax")
+        if (DEBUG) println (s"ay = $ay")
 
         var reg = new Regression (ax, ay)
-        reg.train ()
+        reg.train ().eval ()
         var φθ = reg.coefficient
         if (DEBUG) println (s"initial φθ = $φθ")
 
@@ -384,7 +384,7 @@ class ARIMA (y: VectoD, t: VectoD, d: Int = 0)
             for (j <- 0 until q) ax.setCol(p + j, e.slice(cap - j - 1, n - j - 1))
 
             reg = new Regression (ax, ay)
-            reg.train ()
+            reg.train ().eval ()
             φθ = reg.coefficient
             if (DEBUG) println (s"updated φθ = $φθ")
         }} // breakable for
@@ -477,18 +477,29 @@ class ARIMA (y: VectoD, t: VectoD, d: Int = 0)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train/fit an `ARIMA` model to times the series data.  Must call setPQ first.
      */
-    def train (yy: VectoD)
+    def train (yy: VectoD): ARIMA =
     {
         if (p > 0 && q == 0)      est_ar (p)
         else if (p == 0 && q > 0) est_ma (q)
         else if (p > 0 && q > 0)  est_arma (p, q)
         else flaw ("train", "either p or q must be at least one")
+        this
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train/fit an `ARIMA` model to the times series data on 'y'.
      */
-    def train () { train (y) }
+    def train (): ARIMA =  train (y)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the error and useful diagnostics.
+     *  @param yy   the response vector
+     */
+    def eval (yy: VectoD = y)
+    {
+        e = yy - x * b                                         // compute residual/error vector e
+//      diagnose (yy)                                          // compute diagnostics
+    } // eval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** For all the time points, predict all the values of 'y = f(t)'.

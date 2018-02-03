@@ -70,7 +70,7 @@ class Regression_WLS [MatT <: MatriD, VecT <: VectoD] (xx: MatT, yy: VecT, techn
     /** Compute diagostics for the regression model.
      *  @param yy  the response vector
      */
-    override def diagnose (yy: VectoD)
+    override protected def diagnose (yy: VectoD)
     {
         pre    = xx * b                                        // predicted response vector
         sse    = e dot e                                       // sum of squared errors
@@ -128,12 +128,12 @@ object Regression_WLS
         if (w0 == null) {
             val k = x.dim2 - 1
             val ols_y = new Regression (x, y, technique)       // run OLS on data
-            ols_y.train ()
+            ols_y.train ().eval ()
             val e = ols_y.residual                             // deviations/errors
             val r = e.map ((a: Double) => sqrt (abs (a)))      // root absolute deviations (rad's)
 
             val ols_r = new Regression (x, r, technique)       // run OLS on rad
-            ols_r.train ()
+            ols_r.train ().eval ()
             val rp = ols_r.predict (x)                         // predicted rad
             w = rp.recip * (k + 1)                             // set weight vector for WLS to reciprocal of rp
 //          w = rp.recip                                       // set weight vector for WLS to reciprocal of rp
@@ -177,7 +177,7 @@ object Regression_WLS
         for (tec <- techniques) {                              // use 'tec' Factorization
             banner (s"Fit the parameter vector b using $tec")
             val rg = new Regression_WLS (x, y, tec)
-            rg.train ()
+            rg.train ().eval ()
             println ("w   = " + rg.weights)
             println ("b   = " + rg.coefficient)
             println (rg.fitLabels)
@@ -204,7 +204,6 @@ object Regression_WLS
  *  <p>
  *      y  =  b dot x  =  b_0 + b_1*x_1 + b_2*x_2.
  *  <p>
- *  Test regression and backward elimination.
  *  @see statmaster.sdu.dk/courses/st111/module03/index.html
  *  > runMain scalation.analytics.Regression_WLSTest
  */

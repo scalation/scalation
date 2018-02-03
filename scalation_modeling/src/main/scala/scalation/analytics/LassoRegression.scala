@@ -1,12 +1,10 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  John Miller
+/** @author  John Miller, Mustafa Nural
  *  @version 1.4
  *  @date    Tue Apr 18 14:24:14 EDT 2017
  *  @see     LICENSE (MIT style license file).
  */
-
-//  U N D E R   D E V E L O P M E N T
 
 package scalation.analytics
 
@@ -30,15 +28,10 @@ import RegTechnique._
  *      y  =  b dot x + e  =  b_0 + b_1 * x_1 + ... b_k * x_k + e
  *  <p>
  *  where 'e' represents the residuals (the part not explained by the model).
- *  Use Least-Squares (minimizing the residuals) to fit the parameter vector
- *  <p>
- *      b  =  x_pinv * y   [ alternative: b  =  solve (y) ]
- *  <p>
- *  where 'x_pinv' is the pseudo-inverse.
  *  @see see.stanford.edu/materials/lsoeldsee263/05-ls.pdf
- *  @param x   the input/design m-by-n matrix augmented with a first column of ones
+ *  @param x   the input/design m-by-n matrix
  *  @param y   the response vector
- *  @param λ0  the initial vale for the regularization weight
+ *  @param λ0  the initial value for the regularization weight
  */
 class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: Double = 0.01)
       extends Predictor with Error
@@ -86,7 +79,7 @@ class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: D
      *  @see `scalation.minima.LassoAdmm`
      *  @param yy  the response vector
      */
-    def train (yy: VectoD)
+    def train (yy: VectoD): LassoRegression [MatT, VecT] =
     {
 //      val g       = f(yy) _
 //      val optimer = new CoordinateDescent (g)                 // Coordinate Descent optimizer
@@ -97,22 +90,30 @@ class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: D
 //      val b0 = new VectorD (k+1)                              // initial guess for coefficient vector
 //      b = optimer.solve (b0, 0.5)                             // find an optimal solution for coefficients
         b = LassoAdmm.solve (x.asInstanceOf [MatrixD], y, λ)
-
-        e = yy - x * b                                          // residual/error vector
-        diagnose (yy)                                           // compute diagostics
+        this
     } // train
 
    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  multiple regression equation for the response passed into the class 'y'.
      */
-    def train () { train (y) }
+    def train (): LassoRegression [MatT, VecT] = train (y)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the error and useful diagnostics.
+     *  @param yy   the response vector
+     */
+    def eval (yy: VectoD = y)
+    {
+        e = yy - x * b                                         // compute residual/error vector e
+        diagnose (yy)                                          // compute diagnostics
+    } // eval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute diagostics for the regression model.
      *  @param yy  the response vector
      */
-    override def diagnose (yy: VectoD)
+    override protected def diagnose (yy: VectoD)
     {
         super.diagnose (yy)
         rBarSq   = 1.0 - (1.0-rSq) * r_df                        // R-bar-squared (adjusted R-squared)
@@ -185,7 +186,6 @@ class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: D
  *  <p>
  *      y  =  b dot x  =  b_0 + b_1*x_1 + b_2*x_2.
  *  <p>
- *  Test regression and backward elimination.
  *  @see http://statmaster.sdu.dk/courses/st111/module03/index.html
  *  > runMain scalation.analytics.LassoRegressionTest
  */
@@ -206,7 +206,7 @@ object LassoRegressionTest extends App
     println ("y = " + y)
 
     val rg = new LassoRegression (x, y)
-    rg.train ()
+    rg.train ().eval ()
     println ("b = " + rg.coefficient)
     rg.report ()
 

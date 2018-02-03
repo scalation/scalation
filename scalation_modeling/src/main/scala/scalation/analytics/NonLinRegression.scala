@@ -63,6 +63,16 @@ class NonLinRegression (x: MatriD, y: VectoD, f: (VectoD, VectoD) => Double,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
+     *  non-linear regression equation for the response passed into the class 'yy'.
+     */
+    def train (yy: VectoD): NonLinRegression =
+    {
+        throw new UnsupportedOperationException ("train (yy) not implemented yet")
+        null
+    } // train
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  non-linear regression equation
      *  <p>
      *      y = f(x, b)
@@ -72,25 +82,29 @@ class NonLinRegression (x: MatriD, y: VectoD, f: (VectoD, VectoD) => Double,
      *           If the regression can be linearized, use linear regression for
      *           starting solution.
      */
-    def train ()
+    def train (): NonLinRegression =
     {
         val bfgs = new QuasiNewton (sseF)                      // minimize sse using NLP
         b        = bfgs.solve (b_init)                         // estimate for b from optimizer
 
-        diagnose (y)                                           // compute diagonostics
+        this
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  non-linear regression equation for the response passed into the class 'y'.
+    /** Compute the error and useful diagnostics.
+     *  @param yy   the response vector
      */
-    def train (yy: VectoD) { throw new UnsupportedOperationException ("train (yy) not implemented yet") }
+    def eval (yy: VectoD = y)
+    {
+        e = yy - x * b                                         // compute residual/error vector e
+        diagnose (yy)                                          // compute diagnostics
+    } // eval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute diagostics for the regression model.
      *  @param yy  the response vector
      */
-    override def diagnose (yy: VectoD)
+    override protected def diagnose (yy: VectoD)
     {
         sse    = sseF (b.asInstanceOf [VectorD])               // residual/error sum of squares
         sst    = (yy dot yy) - yy.sum~^2.0 / m.toDouble        // total sum of squares
@@ -146,7 +160,7 @@ object NonLinRegressionTest extends App
     val b_init = VectorD (4.04, .038)                                   // initial guess for parameter vector b
 
     val rg = new NonLinRegression (x, y, f, b_init)
-    rg.train ()
+    rg.train ().eval ()
     println ("fit = " + rg.fit)
 
     val z  = VectorD (1); z(0) = 50.0             // predict y for one point

@@ -18,7 +18,7 @@ import scala.math.{log, sqrt}
 import scalation.linalgebra._
 import scalation.minima.GoldenSectionLS
 import scalation.plot.Plot
-import scalation.util.{Error, time}
+import scalation.util.{banner, Error, time}
 
 import Centering.center
 import RegTechnique._
@@ -34,7 +34,8 @@ import RegTechnique._
  *      y  =  b dot x + e  =  b_1 * x_1 + ... b_k * x_k + e
  *  <p>
  *  where 'e' represents the residuals (the part not explained by the model).
- *  Use Least-Squares (minimizing the residuals) to fit the parameter vector
+ *  Use Least-Squares (minimizing the residuals) to solve for the parameter vector 'b'
+ *  using the regularized Normal Equations:
  *  <p>
  *      b  =  fac.solve (.)  with regularization  x.t * x + λ * I
  *  <p>
@@ -43,14 +44,14 @@ import RegTechnique._
  *      'QR'         // QR Factorization: slower, more stable (default)
  *      'Cholesky'   // Cholesky Factorization: faster, less stable (reasonable choice)
  *      'SVD'        // Singular Value Decomposition: slowest, most robust
-        'LU'         // LU Factorization: similar, but better than inverse
+ *      'LU'         // LU Factorization: similar, but better than inverse
  *      'Inverse'    // Inverse/Gaussian Elimination, classical textbook technique 
  *  <p>
  *  @see statweb.stanford.edu/~tibs/ElemStatLearn/
  *  @param x          the centered input/design m-by-n matrix NOT augmented with a first column of ones
- *  @param y          the centered response vector
+ *  @param y          the centered response m-vector
  *  @param lambda_    the shrinkage parameter (0 => OLS) in the penalty term 'lambda * b dot b'
- *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
+ *  @param technique  the technique used to solve for b in (x.t*x + lambda*I)*b = x.t*y
  */
 class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda_ : Double = 0.1,
                        technique: RegTechnique = Cholesky)
@@ -106,23 +107,31 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
      *  using the least squares method.
      *  @param yy  the response vector
      */
-    def train (yy: VectoD)
+    def train (yy: VectoD): RidgeRegression [MatT, VecT] =
     {
         b = technique match {                                  // solve for coefficient vector b
             case QR       => fac.solve (yy ++ new VectorD (y.dim))  // FIX - give formula
             case Cholesky => fac.solve (x.t * yy)                   // L * L.t * b = X.t * yy
             case _        => fac.solve (x.t * yy)                   // b = (X.t * X)^-1 * X.t * yy
         } // match
-
-        e = yy - x * b                                         // compute residual/error vector
-        diagnose (yy)                                          // compute diagonostics
+        this
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  multiple regression equation using the least squares method on 'y'.
      */
-    def train () { train (y) }
+    def train (): RidgeRegression [MatT, VecT] = train (y)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the error and useful diagnostics.
+     *  @param yy   the response vector
+     */
+    def eval (yy: VectoD = y)
+    {
+        e = yy - x * b                                         // compute residual/error vector e
+        diagnose (yy)                                          // compute diagnostics
+    } // eval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find an optimal value for the shrinkage parameter 'λ' using Generalized
@@ -147,7 +156,7 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
     /** Compute diagostics for the regression model.
      *  @param yy  the response vector
      */
-    override def diagnose (yy: VectoD)
+    override protected def diagnose (yy: VectoD)
     {
         super.diagnose (yy)
         rBarSq = 1.0 - (1.0-rSq) * r_df                        // R-bar-squared (adjusted R-squared)
@@ -173,13 +182,27 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
     def predict (z: VectoD): Double = b dot z
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform backward elimination to remove the least predictive variable
-     *  from the model, returning the variable to eliminate, the new parameter
-     *  vector, the new quality of fit.
+    /** Perform forward selection to add the most predictive variable to the existing
+     *  model, returning the variable to add, the new parameter vector and the new
+     *  quality of fit.  May be called repeatedly.
+     *  @param cols  the columns of matrix x included in the existing model
      */
-    def backElim (): (Int, VectoD, VectoD) =
+    def forwardSel (cols: Set [Int]): (Int, VectoD, VectoD) =
     {
-        val ir    =  2                                          // ft(ir) is rSq
+        // FIX - update implementation
+        null
+    } // forwardSel
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform backward elimination to remove the least predictive variable from
+     *  the existing model, returning the variable to eliminate, the new parameter
+     *  vector, the new quality of fit.  May be called repeatedly.
+     *  FIX - update implementation
+     *  @param cols  the columns of matrix x to be included in the existing model
+     */
+    def backwardElim (cols: Set [Int]): (Int, VectoD, VectoD) =
+    {
+        val ir    =  index_rSq                                  // fit(ir) is rSq
         var j_max = -1                                          // index of variable to eliminate
         var b_max: VectoD = null                                // parameter values for best solution
         var ft_max: VectoD = VectorD.fill (fitLabels.size)(-1.0)        // optimize on quality of fit
@@ -187,13 +210,13 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
         for (j <- 1 to k) {
             val keep = m.toInt                                  // i-value large enough to not exclude any rows in slice
             val rg_j = new RidgeRegression (x.sliceExclude (keep, j), y)    // regress with x_j removed
-            rg_j.train ()
+            rg_j.train ().eval ()
             val b  = rg_j.coefficient
             val ft = rg_j.fit
             if (ft(ir) > ft_max(ir)) { j_max = j; b_max = b; ft_max = ft }
         } // for
         (j_max, b_max, ft_max)
-    } // backElim
+    } // backwardElim
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor 'VIF' for each variable to test
@@ -203,13 +226,13 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
      */
     def vif: VectoD =
     {
-        val ir   =  2                                           // ft(ir) is rSq
+        val ir   = index_rSq                                    // fit(ir) is rSq
         val vifV = new VectorD (k)                              // VIF vector
         for (j <- 1 to k) {
             val keep = m.toInt                                  // i-value large enough to not exclude any rows in slice
             val x_j  = x.col(j)                                               // x_j is jth column in x
             val rg_j = new RidgeRegression (x.sliceExclude (keep, j), x_j)    // regress with x_j removed
-            rg_j.train ()
+            rg_j.train ().eval ()
             vifV(j-1) =  1.0 / (1.0 - rg_j.fit(ir))             // store vif for x_1 in vifV(0)
         } // for
         vifV
@@ -229,8 +252,8 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
  */
 object RidgeRegressionTest extends App
 {
-    // 5 data points: x_1 coordinate, x_2 coordinate
-    val x = new MatrixD ((5, 2), 36.0,  66.0,               // 5-by-3 matrix
+    // 5 data points:             x_0    x_1
+    val x = new MatrixD ((5, 2), 36.0,  66.0,               // 5-by-2 matrix
                                  37.0,  68.0,
                                  47.0,  64.0,
                                  32.0,  53.0,
@@ -247,17 +270,19 @@ object RidgeRegressionTest extends App
     val mu_z = z.mean                 // mean of z
     val x_c  = center (x, mu_x)       // centered x (columnwise)
     val y_c  = y - mu_y               // centered y
-    val z_c  = z - mu_z               // centered y
+    val z_c  = z - mu_z               // centered z
 
     println ("x_c = " + x_c + "\ny_c = " + y_c + "\nz_c = " + z_c)
 
     val rrg = new RidgeRegression (x_c, y_c)
-    rrg.train ()
+    rrg.train ().eval ()
+    println (rrg.fitLabels)
     println ("fit = " + rrg.fit)
     val yp = rrg.predict (z_c) + mu_y                     // predict y for one point
     println ("predict (" + z + ") = " + yp)
 
-    println ("reduced model: fit = " + rrg.backElim ())   // eliminate least predictive variable
+    val cols = Set (0) ++ Array.range (1, x.dim2)
+    println ("reduced model: fit = " + rrg.backwardElim (cols))   // eliminate least predictive variable
 
 } // RidgeRegressionTest object
 
@@ -268,13 +293,11 @@ object RidgeRegressionTest extends App
  *  <p>
  *      y  =  b dot x  =  b_1*x1 + b_2*x_2.
  *  <p>
- *  Test regression using QR Decomposition and Gaussian Elimination for computing
- *  the pseudo-inverse.
  */
 object RidgeRegressionTest2 extends App
 {
-    // 4 data points: constant term, x_1 coordinate, x_2 coordinate
-    val x = new MatrixD ((4, 2), 1.0, 1.0,                  // 4-by-3 matrix
+    // 4 data points:            x_1  x_2
+    val x = new MatrixD ((4, 2), 1.0, 1.0,                  // 4-by-2 matrix
                                  1.0, 2.0,
                                  2.0, 1.0,
                                  2.0, 2.0)
@@ -284,12 +307,14 @@ object RidgeRegressionTest2 extends App
     println ("x = " + x)
     println ("y = " + y)
 
-    println ("-------------------------------------------------")
-    println ("Fit the parameter vector b")
+    banner ("Fit the parameter vector b")
     val rrg = new RidgeRegression (x, y)
-    rrg.train ()
-    println ("fit = " + rrg.fit)
-    val yp = rrg.predict (z)                         // predict y for on3 point
+    rrg.train ().eval ()
+    println ("coefficient = " + rrg.coefficient)
+    println ("              " + rrg.fitLabels)
+    println ("fit         = " + rrg.fit)
+
+    val yp = rrg.predict (z)                         // predict y for one point
     println ("predict (" + z + ") = " + yp)
 
 } // RidgeRegressionTest2 object
@@ -333,10 +358,13 @@ object RidgeRegressionTest3 extends App
                      114.0, 115.0, 114.0, 106.0, 125.0, 114.0, 106.0, 113.0, 110.0, 122.0)
 
     val rrg = new RidgeRegression (x, y)
-    time { rrg.train () }
+    time { rrg.train ().eval () }
 
-    println ("fit      = " + rrg.fit)       // fit model y = b_1*x_1 + b_2*x_2 + b_3*x_3 + b_4*x_4
-    println ("vif      = " + rrg.vif)       // test multi-collinearity (VIF)
+    println ("coefficient = " + rrg.coefficient)
+    println ("              " + rrg.fitLabels)
+    println ("fit         = " + rrg.fit)           // fit model y = b_1*x_1 + b_2*x_2 + b_3*x_3 + b_4*x_4
+
+    println ("vif         = " + rrg.vif)           // test multi-collinearity (VIF)
 
 } // RidgeRegressionTest3 object
 

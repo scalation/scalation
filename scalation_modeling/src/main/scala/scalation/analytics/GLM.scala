@@ -251,7 +251,7 @@ object GLMTest extends App
     val levels = 3
 /*
     val glm    = GLM ( /* TBD */ )
-    glm.train ()
+    glm.train ().eval ()
     println ("fit = " + glm.fit)
 
     val yp = glm.predict (z)

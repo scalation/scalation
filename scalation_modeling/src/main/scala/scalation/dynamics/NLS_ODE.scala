@@ -82,19 +82,34 @@ class NLS_ODE (z: VectorD, ts: VectorD, b_init: VectorD, private var w: VectorD 
     /** Train the predictor by fitting the parameter vector (b-vector) using a
      *  non-linear least squares method.
      */
-    def train ()
+    def train (yy: VectoD): NLS_ODE =
     {
-        println (s"initial objectiveF ($b_init) = ${objectiveF (b_init)}")
-        val bfgs = new QuasiNewton (objectiveF)                // minimize sse using NLP
-        b        = bfgs.solve (b_init)                         // estimate for b from optimizer
-        println (s"final objectiveF ($b) = ${objectiveF (b)}")
+        throw new UnsupportedOperationException ("train (yy) not implemented yet")
+        null
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) using a
      *  non-linear least squares method.
      */
-    def train (yy: VectoD) { throw new UnsupportedOperationException ("train (yy) not implemented yet") }
+    def train (): NLS_ODE =
+    {
+        println (s"initial objectiveF ($b_init) = ${objectiveF (b_init)}")
+        val bfgs = new QuasiNewton (objectiveF)                // minimize sse using NLP
+        b        = bfgs.solve (b_init)                         // estimate for b from optimizer
+        println (s"final objectiveF ($b) = ${objectiveF (b)}")
+        this
+    } // train
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the error and useful diagnostics.  FIX
+     *  @param yy   the response vector
+     */
+    def eval (yy: VectoD)
+    {
+//      e = yy - x * b                                         // compute residual/error vector e
+//      diagnose (yy)                                          // compute diagnostics
+    } // eval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit.

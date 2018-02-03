@@ -8,6 +8,7 @@
 
 package scalation.analytics
 
+import scala.collection.mutable.Set
 import scala.math.{cos, Pi, sin}
 
 import scalation.linalgebra.{MatrixD, VectoD, VectorD}
@@ -25,11 +26,12 @@ import RegTechnique._
  *                                  b_3 sin (2wt) + b_4 cos (2wt) + ... + e
  *  <p>
  *  where 'e' represents the residuals (the part not explained by the model).
- *  Use Least-Squares (minimizing the residuals) to fit the parameter vector
+ *  Use Least-Squares (minimizing the residuals) to solve for the parameter vector 'b'
+ *  using the Normal Equations:
  *  <p>
- *      b  =  x_pinv * y
+ *      x.t * x * b  =  x.t * y
+ *      b  =  fac.solve (.)
  *  <p>
- *  where 'x_pinv' is the pseudo-inverse.
  *  @see link.springer.com/article/10.1023%2FA%3A1022436007242#page-1
  *  @param t          the input vector: t_i expands to x_i
  *  @param y          the response vector
@@ -73,13 +75,23 @@ class TrigRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = QR
      *  using the least squares method.
      *  @param yy  the response vector
      */
-    def train (yy: VectoD) { rg.train (yy) }
+    def train (yy: VectoD): Regression [MatrixD, VectoD] = rg.train (yy)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  regression equation using 'y'.
      */
-    def train () { rg.train () }
+    def train (): Regression [MatrixD, VectoD] = rg.train ()
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the error and useful diagnostics.
+     *  @param yy   the response vector
+     */ 
+    def eval (yy: VectoD = y)
+    {
+        e = yy - x * b                                         // compute residual/error vector e
+        diagnose (yy)                                          // compute diagnostics
+    } // eval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector of coefficients.
@@ -116,11 +128,20 @@ class TrigRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = QR
     def predict (z: VectoD): Double = rg.predict (z)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform backward elimination to remove the least predictive variable
-     *  from the model, returning the variable to eliminate, the new parameter
-     *  vector, the new R-squared value and the new F statistic.
+    /** Perform forward selection to add the most predictive variable to the existing
+     *  model, returning the variable to add, the new parameter vector and the new
+     *  quality of fit.  May be called repeatedly.
+     *  @param cols  the columns of matrix x included in the existing model
      */
-    def backElim (): (Int, VectoD, VectoD) = rg.backElim ()
+    def forwardSel (cols: Set [Int]): (Int, VectoD, VectoD) = rg.forwardSel (cols)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform backward elimination to remove the least predictive variable from
+     *  the existing model, returning the variable to eliminate, the new parameter
+     *  vector and the new quality of fit.  May be called repeatedly.
+     *  @param cols  the columns of matrix x included in the existing model
+     */
+    def backwardElim (cols: Set [Int]): (Int, VectoD, VectoD) = rg.backwardElim (cols)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor 'VIF' for each variable to test
@@ -155,7 +176,7 @@ object TrigRegressionTest extends App
 
     val order = 8
     val trg   = new TrigRegression (t, y, order)
-    trg.train ()
+    trg.train ().eval ()
 
     println (trg.fitLabels)
     println ("fit         = " + trg.fit)

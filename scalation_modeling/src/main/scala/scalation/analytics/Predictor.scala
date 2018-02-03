@@ -19,7 +19,7 @@ import scalation.math.double_exp
  *  A predictor is for potentially unbounded responses (real or integer).
  *  When the number of distinct responses is bounded by some relatively small
  *  integer 'k', a classifier is likdely more appropriate.
- *  Note, the 'train' method must be called first.
+ *  Note, the 'train' method must be called first followed by 'eval'.
  */
 trait Predictor
 {
@@ -36,18 +36,23 @@ trait Predictor
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a set of data vectors 'x's and their corresponding responses 'yy's,
      *  train the prediction function 'yy = f(x)' by fitting its parameters.
-     *  The 'x' values must be provided by the implementing class.  Also, 'train'
-     *  must call 'diagnose'.
+     *  The 'x' values must be provided by the implementing class.
      *  @param yy  the response vector
      */
-    def train (yy: VectoD)
+    def train (yy: VectoD): Predictor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a set of data vectors 'x's and their corresponding responses 'y's,
      *  passed into the implementing class, train the prediction function 'y = f(x)'
      *  by fitting its parameters.
      */
-    def train ()
+    def train (): Predictor
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the error and useful diagnostics.
+     *  @param yy  the response vector
+     */
+    def eval (yy: VectoD)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute diagostics for the predictor.  Override to add more diagostics.
@@ -56,13 +61,13 @@ trait Predictor
      *  @see en.wikipedia.org/wiki/Mean_squared_error
      *  @param yy  the response vector
      */
-    def diagnose (yy: VectoD)
+    protected def diagnose (yy: VectoD)
     {
         val m = e.dim                               // number of instances
         sst   = (yy dot yy) - yy.sum~^2.0 / m       // sum of squares total
         sse   = e dot e                             // sum of squares error
         ssr   = sst - sse                           // sum of squares regression (not returned by fit)
-        mse   = sse / m                             // mean square error
+        mse   = sse / m                             // raw mean square error
         rmse  = sqrt (mse)                          // root mean square error
         mae   = e.norm1 / m                         // mean absolute error
         rSq   = ssr / sst                           // coefficient of determination R^2
@@ -82,9 +87,12 @@ trait Predictor
     /** Return the quality of fit including 'sst', 'sse', 'mae', rmse' and 'rSq'.
      *  Note, if 'sse > sst', the model introduces errors and the 'rSq' may be negative,
      *  otherwise, R^2 ('rSq') ranges from 0 (weak) to 1 (strong).
+     *  Note that 'rSq' is the last or fifth measure (5).
      *  Override to add more quality of fit measures.
      */
     def fit: VectoD = VectorD (sst, sse, mse, rmse, mae, rSq)
+
+    val index_rSq = 5                               // index of rSq           
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the fit.  Override when necessary.

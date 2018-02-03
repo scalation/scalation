@@ -127,6 +127,12 @@ package object math
     } // pow
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the square of 'x'.
+     *  @param x  the number to sqaure
+     */
+    def sq (x: Double): Double = x * x
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find the 'y'-th root of 'x', i.e.,  'x ~^ 1/y' for scala Longs.
      *  'r = x ~^ 1/y' is largest long integer 'r' such that 'r ~^ y <= x'.
      *  @see http://en.wikipedia.org/wiki/Shifting_nth_root_algorithm

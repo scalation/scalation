@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author John Miller, Mustafa Nural
- *  @version 1.3
+ *  @version 1.4
  *  @date Mon Apr 24 21:28:06 EDT 2017
  *  @see LICENSE (MIT style license file).
 
@@ -45,7 +45,7 @@ object LassoAdmm
     private val ABSTOL  = 1e-4      // Absolute tolerance
     private val RELTOL  = 1e-2      // Relative tolerance
 
-    private var warmStartMap = new mutable.HashMap[MatriD,(VectoD, VectoD)]
+    private var warmStartMap = new mutable.HashMap [MatriD, (VectoD, VectoD)]
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset the warm start map.
@@ -54,15 +54,15 @@ object LassoAdmm
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Solve for 'x' using ADMM.
-     * @param a the data matrix
-     * @param b the response vector
-     * @param λ the regularization l_1 penalty weight
+     *  @param a the data matrix
+     *  @param b the response vector
+     *  @param λ the regularization l_1 penalty weight
      */
     def solve (a: MatrixD, b: VectoD, λ: Double = 0.01): VectoD =
     {
         val at  = a.t
         val ata = at * a
-        for (i <- ata.range1) ata(i, i) += ρ    //ata_ρI
+        for (i <- ata.range1) ata(i, i) += ρ    // ata_ρI
         val ata_ρI_inv = ata.inverse
 
         solveCached (ata_ρI_inv, at * b, λ)
@@ -96,7 +96,7 @@ object LassoAdmm
         breakable { for (k <- 0 until maxIter) {
             z_old = z
 
-            x     = ata_ρI_inv * (atb + (z - l) * ρ ) // solve sub-problem for x
+            x     = ata_ρI_inv * (atb + (z - l) * ρ )    // solve sub-problem for x
             x_hat = x * α + z_old * (1 - α)
             z     = fast_sthresh (x_hat + l, λ / ρ)
             l    += x_hat - z
@@ -104,8 +104,8 @@ object LassoAdmm
             val r_norm = (x - z).norm
             val s_norm = ((z - z_old) * -ρ).norm
 
-            val eps_pri  = sqrt(n) * ABSTOL + RELTOL * max (x.norm, -z.norm)
-            val eps_dual = sqrt(n) * ABSTOL + RELTOL * (l * ρ).norm
+            val eps_pri  = sqrt (n) * ABSTOL + RELTOL * max (x.norm, -z.norm)
+            val eps_dual = sqrt (n) * ABSTOL + RELTOL * (l * ρ).norm
 
             // @see https://web.stanford.edu/~boyd/papers/admm/lasso/lasso.html
             // break loop if no progress

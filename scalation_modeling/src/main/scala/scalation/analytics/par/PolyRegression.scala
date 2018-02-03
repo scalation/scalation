@@ -63,7 +63,7 @@ class PolyRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = 
      *      y  =  b dot x + e  =  [b_0, ... b_k] dot [1, t, t^2 ... t^k] + e
      *  using the least squares method.
      */
-    def train () { rg.train () }
+    def train (): Regression = rg.train ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Retrain the predictor by fitting the parameter vector (b-vector) in the
@@ -72,7 +72,13 @@ class PolyRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = 
      *  using the least squares method.
      *  @param yy  the new response vector
      */
-    def train (yy: VectoD) { rg.train (yy) }
+    def train (yy: VectoD): Regression = rg.train (yy)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the error and useful diagnostics.
+     *  @param yy   the response vector
+     */
+    def eval (yy: VectoD = y) { rg.eval (yy) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit including 'rSquared'.
@@ -132,7 +138,7 @@ object PolyRegressionTest extends App
 
     val order = 8
     val prg   = new PolyRegression (t, y, order)
-    prg.train ()
+    prg.train ().eval ()
     println ("fit = " + prg.fit)
 
     val z = 10.5                                  // predict y for one point

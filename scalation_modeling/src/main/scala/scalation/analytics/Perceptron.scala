@@ -57,7 +57,7 @@ class Perceptron (x: MatriD, y: VectoD, private var eta: Double = 1.0,
     /** Set the initial weight vector 'b' manually before training.
      *  @param w0  the initial weights for b
      */
-    def setWeights (w0: VectoD) { b  = w0; check (y) }
+    def setWeights (w0: VectoD) { b  = w0; eval (y) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the initial weight vector 'b' with values in (0, 1) before training.
@@ -67,7 +67,7 @@ class Perceptron (x: MatriD, y: VectoD, private var eta: Double = 1.0,
     {
         val rvg = new RandomVecD (n, 1.0, stream = stream)    // change i to get different random numbers
         b       = rvg.gen
-        check (y)
+        eval (y)
     } // setWeights
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -80,27 +80,27 @@ class Perceptron (x: MatriD, y: VectoD, private var eta: Double = 1.0,
     /** Given training data 'x' and 'yy', fit the parameter/weight vector 'b'.
      *  @param yy  the output vector
      */
-    def train (yy: VectoD)
+    def train (yy: VectoD): Perceptron =
     {
         if (b == null) setWeights ()                          // initialize parameters/weights
         minimizeError (yy)                                    // adjust weights b to minimize sse
-        check (yy)
+        this
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given training data 'x' and 'y', fit the parameter/weight vector 'b'.
      */
-    def train () { train (y) }
+    def train (): Perceptron = train (y)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given training data 'x' and 'yy', fit the parameter/weight vector 'b'.
      *  @param yy  the output vector
      */
-    def check (yy: VectoD)
+    def eval (yy: VectoD = y)
     { 
         e = yy - afuncV (x * b)                               // compute residual/error vector 
         diagnose (yy)                                         // compute diagonostics
-    } // check
+    } // eval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Minimize the error in the prediction by adjusting the weight vector 'b'.
@@ -206,7 +206,7 @@ object PerceptronTest2 extends App
         banner (s"PerceptronTest2: Fit the parameter vector b using optimization with learning rate $eta")
 
         nn.reset (eta)
-        nn.train ()                                  // fit the weights using training data
+        nn.train ().eval ()                          // fit the weights using training data
         println ("b   = " + nn.coefficient)
         println (nn.fitLabels)
         println ("fit = " + nn.fit)
@@ -219,7 +219,7 @@ object PerceptronTest2 extends App
     banner ("PerceptronTest2: Compare with Linear Regression")
 
     val rg = new Regression (x, y)                  // create a Rgression model
-    rg.train ()
+    rg.train ().eval ()
     println ("b   = " + rg.coefficient)
     println (rg.fitLabels)
     println ("fit = " + rg.fit)

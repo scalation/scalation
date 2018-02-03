@@ -9,10 +9,12 @@
 package scalation.analytics
 
 import scala.collection.immutable.ListMap
+import scala.collection.mutable.Set
 import scala.math.{abs, log, pow, sqrt}
 
 import scalation.linalgebra._
 import scalation.plot.Plot
+import scalation.stat.StatVector.corr
 import scalation.random.CDF.studentTCDF
 import scalation.util.{banner, Error, time}
 import scalation.util.Unicode.sub
@@ -38,11 +40,13 @@ import RegTechnique._
  *      y  =  b dot x + e  =  b_0 + b_1 * x_1 + ... b_k * x_k + e
  *  <p>
  *  where 'e' represents the residuals (the part not explained by the model).
- *  Use Least-Squares (minimizing the residuals) to fit the parameter vector
+ *  Use Least-Squares (minimizing the residuals) to solve the parameter vector 'b'
+ *  using the Normal Equations:
  *  <p>
+ *      x.t * x * b  =  x.t * y 
  *      b  =  fac.solve (.)
  *  <p>
- *  Four factorization techniques are provided:
+ *  Five factorization techniques are provided:
  *  <p>
  *      'QR'         // QR Factorization: slower, more stable (default)
  *      'Cholesky'   // Cholesky Factorization: faster, less stable (reasonable choice)
@@ -65,7 +69,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (protected val x: MatT, protec
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
     if (x.dim1 < x.dim2) flaw ("constructor", "NEGATIVE df - not enough data rows in matrix to use regression")
 
-    private val   DEBUG  = false                               // debug flag
+    private   val DEBUG  = true                                // debug flag
     protected val k      = x.dim2 - 1                          // number of variables (k = n-1) FIX - assumes intercept
     protected val m      = x.dim1.toDouble                     // number of data points (rows) as a double
     protected val df     = (m - k - 1).toInt                   // degrees of freedom
@@ -100,7 +104,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (protected val x: MatT, protec
      *  using the ordinary least squares 'OLS' method.
      *  @param yy  the response vector
      */
-    def train (yy: VectoD)
+    def train (yy: VectoD): Regression [MatT, VecT] =
     {
         b = technique match {                                  // solve for coefficient vector b
             case QR       => fac.solve (yy)                    // R * b = Q.t * yy
@@ -109,22 +113,20 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (protected val x: MatT, protec
             case LU       => fac.solve (x.t * yy)              // b = (X.t * X) \ X.t * yy
             case _        => fac.solve (x.t * yy)              // b = (X.t * X)^-1 * X.t * yy
         } // match
-
-        e = yy - x * b                                         // compute residual/error vector e
-        diagnose (yy)                                          // compute diagonostics
+        this
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  multiple regression equation for the response passed into the class 'y'.
      */
-    def train () { train (y) }
+    def train (): Regression [MatT, VecT] = train (y)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.
      *  @param yy   the response vector
      */
-    protected def eval (yy: VectoD)
+    def eval (yy: VectoD = y)
     {
         e = yy - x * b                                         // compute residual/error vector e
         diagnose (yy)                                          // compute diagnostics
@@ -134,7 +136,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (protected val x: MatT, protec
     /** Compute diagostics for the regression model.
      *  @param yy  the response vector
      */
-    override def diagnose (yy: VectoD)
+    override protected def diagnose (yy: VectoD)
     {
         super.diagnose (yy)
         rBarSq = 1.0 - (1.0-rSq) * r_df                        // R-bar-squared (adjusted R-squared)
@@ -180,27 +182,56 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (protected val x: MatT, protec
     def predict (z: MatT): VectoD = z * b
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform backward elimination to remove the least predictive variable
-     *  from the model, returning the variable to eliminate, the new parameter
-     *  vector and the new quality of fit.
+    /** Perform forward selection to add the most predictive variable to the existing
+     *  model, returning the variable to add, the new parameter vector and the new
+     *  quality of fit.  May be called repeatedly.
+     *  @param cols  the columns of matrix x included in the existing model
      */
-    def backElim (): (Int, VectoD, VectoD) =
+    def forwardSel (cols: Set [Int]): (Int, VectoD, VectoD) =
     {
-        val ir    =  2                                               // ft(2) is rSq
+        val ir    =  index_rSq                                       // fit(ir) is rSq
         var j_max = -1                                               // index of variable to eliminate
         var b_max =  b                                               // parameter values for best solution
         var ft_max: VectoD = VectorD.fill (fitLabels.size)(-1.0)     // optimize on quality of fit
 
-        for (j <- 1 to k) {
-            val keep = m.toInt                                       // i-value large enough to not exclude any rows in slice
-            val rg_j = new Regression (x.sliceExclude (keep, j), y)  // regress with x_j removed
-            rg_j.train ()
+        for (j <- 1 to k if ! (cols contains j)) {
+            val cols_j = cols + j
+            if (DEBUG) println ("forewardElim: cols_j = " + cols_j)
+            val rg_j = new Regression (x.selectCols (cols_j.toArray), y)  // regress with x_j added
+            rg_j.train ().eval ()
             val bb = rg_j.coefficient
             val ft = rg_j.fit
             if (ft(ir) > ft_max(ir)) { j_max = j; b_max = bb; ft_max = ft }
         } // for
         (j_max, b_max, ft_max)
-    } // backElim
+    } // forwardSel
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform backward elimination to remove the least predictive variable from
+     *  the existing model, returning the variable to eliminate, the new parameter
+     *  vector and the new quality of fit.  May be called repeatedly.
+     *  @param cols  the columns of matrix x  included in the existing model
+     */
+    def backwardElim (cols: Set [Int]): (Int, VectoD, VectoD) =
+    {
+        val ir    =  index_rSq                                       // fit(ir) is rSq
+        var j_max = -1                                               // index of variable to eliminate
+        var b_max =  b                                               // parameter values for best solution
+        var ft_max: VectoD = VectorD.fill (fitLabels.size)(-1.0)     // optimize on quality of fit
+        val keep = m.toInt                                           // i-value large enough to not exclude any rows in slice
+
+        for (j <- 1 to k if cols contains j) {
+//          val rg_j = new Regression (x.sliceExclude (keep, j), y)  // regress with x_j removed
+            val cols_j = cols - j
+            if (DEBUG) println ("backwardElim: cols_j = " + cols_j)
+            val rg_j = new Regression (x.selectCols (cols_j.toArray), y)  // regress with x_j removed
+            rg_j.train ().eval ()
+            val bb = rg_j.coefficient
+            val ft = rg_j.fit
+            if (ft(ir) > ft_max(ir)) { j_max = j; b_max = bb; ft_max = ft }
+        } // for
+        (j_max, b_max, ft_max)
+    } // backwardElim
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor 'VIF' for each variable to test
@@ -210,14 +241,15 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (protected val x: MatT, protec
      */
     def vif: VectoD =
     {
-        val ir   =  2                                           // ft(ir) is rSq
-        val vifV = new VectorD (k)                              // VIF vector
+        val ir   = index_rSq                                         // fit(ir) is rSq
+        val vifV = new VectorD (k)                                   // VIF vector
+        val keep = m.toInt                                           // i-value large enough to not exclude any rows in slice
+
         for (j <- 1 to k) {
-            val keep = m.toInt                                  // i-value large enough to not exclude any rows in slice
-            val x_j  = x.col(j)                                          // x_j is jth column in x
-            val rg_j = new Regression (x.sliceExclude (keep, j), x_j)    // regress with x_j removed
-            rg_j.train ()
-            vifV(j-1) =  1.0 / (1.0 - rg_j.fit(ir))             // store vif for x_1 in vifV(0)
+            val x_j  = x.col(j)                                         // x_j is jth column in x
+            val rg_j = new Regression (x.sliceExclude (keep, j), x_j)   // regress with x_j removed
+            rg_j.train ().eval ()
+            vifV(j-1) =  1.0 / (1.0 - rg_j.fit(ir))                  // store vif for x_1 in vifV(0)
         } // for
         vifV
     } // vif
@@ -280,7 +312,7 @@ object Regression
         for (tec <- techniques) {                              // use 'tec' Factorization
             banner (s"Fit the parameter vector b using $tec")
             val rg = new Regression (x, y, tec)
-            rg.train ()
+            rg.train ().eval ()
             println ("b   = " + rg.coefficient)
             println ("fit = " + rg.fit)
             rg.report ()
@@ -305,7 +337,6 @@ import Regression._
  *  <p>
  *      y  =  b dot x  =  b_0 + b_1*x_1 + b_2*x_2.
  *  <p>
- *  Test regression and backward elimination.
  *  @see statmaster.sdu.dk/courses/st111/module03/index.html
  *  > runMain scalation.analytics.RegressionTest
  */
@@ -336,8 +367,6 @@ object RegressionTest extends App
  *  <p>
  *      y = b dot x = b_0 + b_1*x1 + b_2*x_2.
  *  <p>
- *  Test regression using QR Decomposition and Gaussian Elimination for computing
- *  the pseudo-inverse.
  *  > runMain scalation.analytics.RegressionTest2
  */
 object RegressionTest2 extends App
@@ -408,6 +437,8 @@ object RegressionTest3 extends App
 
     test (x, y, z)
 
+    println ("corr (x) = " + corr (x))                   // correlations of column vectors in x
+
 } // RegressionTest3 object
 
 
@@ -457,11 +488,33 @@ object RegressionTest4 extends App
     val z = VectorD (1.0,   46.0,   97.5,   7.0,    95.0)
 
     val rg = new Regression (x, y)
-    rg.train ()
+    rg.train ().eval (y)
+    banner ("Parameter Estimation and Quality of Fit")
+    println ("b = " + rg.coefficient)
+    println (rg.fitLabels)
+    println (rg.fit ())
+    banner ("Full Report")
     rg.report ()
 
-    println ("vif      = " + rg.vif)                     // test multi-colinearity (VIF)*/
-    println ("reduced model: fit = " + rg.backElim ())   // eliminate least predictive variable
+    banner ("Collinearity Diagnostics")
+    println ("corr (x) = " + corr (x))                       // correlations of column vectors in x
+    println ("vif      = " + rg.vif)                         // test multi-colinearity (VIF)*/
+
+    banner ("Forward Selection Test")
+    val fcols = Set (0)
+    for (l <- 1 until x.dim2) {
+        val (x_j, b_j, fit_j) = rg.forwardSel (fcols)        // add most predictive variable
+        println (s"forward model: add x_j = $x_j with b = $b_j \n fit = $fit_j")
+        fcols += x_j
+    } // for
+
+    banner ("Backward Elimination Test")
+    val bcols = Set (0) ++ Array.range (1, x.dim2)
+    for (l <- 1 until x.dim2) {
+        val (x_j, b_j, fit_j) = rg.backwardElim (bcols)     // eliminate least predictive variable
+        println (s"backward model: remove x_j = $x_j with b = $b_j \n fit = $fit_j")
+        bcols -= x_j
+    } // for
 
 } // RegressionTest4 object
 

@@ -8,6 +8,8 @@
 
 package apps.analytics
 
+import scala.collection.mutable.Set
+
 import scalation.analytics.Regression
 import scalation.analytics.RegTechnique._
 import scalation.linalgebra.{MatrixD, VectorD}
@@ -59,7 +61,7 @@ object TempRegression extends App
     time { rg.train () }
     println ("full model: fit = " + rg.fit)
     println ("predict (" + z + ") = " + rg.predict (z))
-    println ("reduced model: fit = " + rg.backElim ())
+    println ("reduced model: fit  = " + rg.backwardElim (Set (0) ++ Array.range (1, x.dim2)))
 
     println ("-------------------------------------------------")
     println ("Fit the parameter vector b using Cholesky Factorization")
@@ -67,7 +69,7 @@ object TempRegression extends App
     time { rg.train () }
     println ("full model: fit = " + rg.fit)
     println ("predict (" + z + ") = " + rg.predict (z))
-    println ("reduced model: fit = " + rg.backElim ())
+    println ("reduced model: fit  = " + rg.backwardElim (Set (0) ++ Array.range (1, x.dim2)))
 
     println ("-------------------------------------------------")
     println ("Fit the parameter vector b using Matrix Inversion")
@@ -75,7 +77,7 @@ object TempRegression extends App
     time { rg.train () }
     println ("full model: fit = " + rg.fit)
     println ("predict (" + z + ") = " + rg.predict (z))
-    println ("reduced model: fit = " + rg.backElim ())
+    println ("reduced model: fit  = " + rg.backwardElim (Set (0) ++ Array.range (1, x.dim2)))
 
 } // TempRegression
 

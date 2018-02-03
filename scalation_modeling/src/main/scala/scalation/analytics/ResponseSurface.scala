@@ -29,7 +29,7 @@ class ResponseSurface [MatT <: MatriD, VecT <: VectoD] (x_ : MatT, y: VecT, cubi
                        technique: RegTechnique = QR)
       extends Regression (ResponseSurface.allForms (x_, cubic), y, technique)
 {
-    private val n = x_.dim2                     // The dimensionality (2D, 3D, etc.) of points in matrix x_
+    private val n = x_.dim2                     // the dimensionality (2D, 3D, etc.) of points in matrix x_
 
     if (x.dim1 <= x.dim2) throw new IllegalArgumentException ("not enough data rows in matrix to use regression")
 
@@ -53,6 +53,7 @@ class ResponseSurface [MatT <: MatriD, VecT <: VectoD] (x_ : MatT, y: VecT, cubi
     } // predict
 
 } // ResponseSurface class
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ResponseSurface` companion object provides methods for creating
@@ -159,7 +160,7 @@ object ResponseSurfaceTest extends App
         114.0, 115.0, 114.0, 106.0, 125.0, 114.0, 106.0, 113.0, 110.0, 122.0)
 
     val rsm = new ResponseSurface (x, y)
-    rsm.train ()
+    rsm.train ().eval ()
 
     println (rsm.fitLabels)
     println ("fit         = " + rsm.fit)

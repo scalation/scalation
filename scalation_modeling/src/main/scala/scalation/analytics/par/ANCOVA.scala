@@ -75,7 +75,7 @@ class ANCOVA (x_ : MatrixD, t: VectorI, y: VectorD, levels: Int, technique: RegT
      *      y  =  b dot x + e  =  [b_0, ... b_k+l] dot [1, x_1, ..., d_1, ...] + e
      *  using the least squares method.
      */
-    def train () { rg.train () }
+    def train (): Regression = rg.train ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Retrain the predictor by fitting the parameter vector (b-vector) in the
@@ -84,7 +84,13 @@ class ANCOVA (x_ : MatrixD, t: VectorI, y: VectorD, levels: Int, technique: RegT
      *  using the least squares method.
      *  @param yy  the new response vector
      */
-    def train (yy: VectoD) { rg.train (yy) }
+    def train (yy: VectoD): Regression = rg.train (yy)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the error and useful diagnostics.
+     *  @param yy   the response vector
+     */
+    def eval (yy: VectoD = y) { rg.eval (yy) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit including 'rSquared'.
@@ -141,7 +147,7 @@ object ANCOVATest extends App
 
     val levels = 3
     val anc    = new ANCOVA (x, t, y, levels)
-    anc.train ()
+    anc.train ().eval ()
     println ("fit = " + anc.fit)
 
     val yp = anc.predict (z)

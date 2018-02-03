@@ -80,7 +80,7 @@ class ExpSmoothing (y: VectoD, t: VectoD)
      *  FIX - use either a penalty or cross-validation, else α -> 1
      *  @param yy  the response vector
      */
-    def train (yy: VectoD)
+    def train (yy: VectoD): ExpSmoothing =
     {
         val α1    = α                                          // initial value for α
         val sse_1 = f_obj (α1)                                 // initial sum of squared errors
@@ -89,7 +89,7 @@ class ExpSmoothing (y: VectoD, t: VectoD)
         val sse_2 = f_obj (α2)                                 // optimized sum of squared errors
         println (s"(α1, sse_1) = ($α1, $sse_1) vs. (α2, sse_2) = ($α2, $sse_2)")
         α = if (sse_1 < sse_2) α1 else α2
-        diagnose (y)
+        this
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -97,13 +97,23 @@ class ExpSmoothing (y: VectoD, t: VectoD)
      *  the smoothing parameter 'α' that minimizes the sum of squared errors (sse).
      *  Use the response passed into the class 'y'.
      */
-    def train () { train (y) }
+    def train (): ExpSmoothing  = train (y)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the error and useful diagnostics.
+     *  @param yy   the response vector
+     */
+    def eval (yy: VectoD = y)
+    {
+        e = yy - predict (t)                                   // compute residual/error vector e
+        diagnose (yy)                                          // compute diagnostics
+    } // eval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute diagostics for the Exponential Smoothing model.
      *  @param yy  the response vector
      */
-    override def diagnose (yy: VectoD)
+    override protected def diagnose (yy: VectoD)
     {
         super.diagnose (yy)
         fStat = ((sst - sse) * df) / sse                       // F statistic (msr / mse)
@@ -147,13 +157,13 @@ object ExpSmoothingTest extends App
 
     banner ("Customized Exponential Smoothing")
     val s = ts.smooth ().copy                                  // use customized α
-    ts.diagnose (y)
+    ts.eval (y)
     println (s"fit = ${ts.fit}")
     println (s"predict (s) = ${ts.predict (s)}")
     new Plot (t, y, s, "Plot of y, s vs. t")
 
     banner ("Optimized Exponential Smoothing")
-    ts.train ()                                                // use optimal α
+    ts.train ().eval ()                                        // use optimal α
     val s2 = ts.smooth ()
     println (s"fit = ${ts.fit}")
     println (s"predict (s2) = ${ts.predict (s2)}")

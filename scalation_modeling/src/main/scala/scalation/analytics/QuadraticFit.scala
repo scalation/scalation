@@ -8,6 +8,7 @@
 
 package scalation.analytics
 
+import scala.collection.mutable.Set
 import scala.math.pow
 
 import scalation.calculus.Differential.FunctionV2S
@@ -149,7 +150,7 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
     def fit (xx: MatriD, yy: VectoD)
     {
         reg = new Regression (xx, yy)
-        reg.train ()
+        reg.train ().eval ()
         b = reg.coefficient                     // coefficients in regression equation
         println ("b = " + b)
         println ("fit = " + reg.fit)            // coefficient of determination, etc.
@@ -161,7 +162,8 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
      */
     def reduce ()
     {
-        val res = reg.backElim ()
+        val cols = Set (0) ++ Array.range (1, nt)
+        val res = reg.backwardElim (cols)
         b = res._2                              // coefficients in regression equation
         println ("b = " + b)
         println ("fit = " + res._3)             // coefficient of determination

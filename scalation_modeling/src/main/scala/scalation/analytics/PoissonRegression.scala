@@ -10,6 +10,7 @@
 
 package scalation.analytics
 
+import scala.collection.mutable.Set
 import scala.math.{exp, log, round}
 
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectoI, VectorI}
@@ -83,14 +84,18 @@ class PoissonRegression (x: MatriD, y: VectoI, fn: Array [String] = null)
      *  (b-vector) in the Poisson regression equation using maximum likelihood.
      *  @param yy  the response vector
      */
-    def train (yy: VectoD) { throw new UnsupportedOperationException ("train (yy) not implemeted yet") }
+    def train (yy: VectoD): PoissonRegression =
+    {
+        throw new UnsupportedOperationException ("train (yy) not implemeted yet")
+        null
+    } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** For the full model, train the predictor by fitting the parameter vector
      *  (b-vector) in the Poisson regression equation using maximum likelihood.
      *  Do this by minimizing '-2LL'.
      */
-    def train ()
+    def train (): PoissonRegression = 
     {
          val b0   = new VectorD (x.dim2)         // use b_0 = 0 for starting guess for parameters
          val bfgs = new QuasiNewton (ll)         // minimizer for -2LL
@@ -98,6 +103,7 @@ class PoissonRegression (x: MatriD, y: VectoI, fn: Array [String] = null)
          b     = bfgs.solve (b0)                 // find optimal solution for parameters
          r_dev = ll (b)                          // measure of fitness for full model
          aic   = r_dev + 2.0 * x.dim2
+         this
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -113,6 +119,16 @@ class PoissonRegression (x: MatriD, y: VectoI, fn: Array [String] = null)
          val b_n = bfgs.solve (b0)               // find optimal solution for parameters
          n_dev   = ll_null (b_n)                 // measure of fitness for null nodel
     } // train_null
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the error and useful diagnostics.
+     *  @param yy   the response vector
+     */
+    def eval (yy: VectoD = y.toDouble)
+    {
+        e = yy - x * b                                         // compute residual/error vector e
+        diagnose (yy)                                          // compute diagnostics
+    } // eval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit including 'rSquared'.  Assumes both train_null and
@@ -149,22 +165,22 @@ class PoissonRegression (x: MatriD, y: VectoI, fn: Array [String] = null)
      *  vector, the new R-squared value and the new F statistic.
      *  FIX or remove.
      */
-//  def backElim (): (Int, VectoD, Double, Double) =
+//  def backwardElim (cols: Set [Int]): (Int, VectoD, VectoD) =
 //  {
 //      var j_max   = -1                     // index of variable to eliminate
-//      var b_max: VectoD = null            // parameter values for best solution
+//      var b_max: VectoD = null             // parameter values for best solution
 //      var rSq_max = -1.0                   // currently maximizing R squared
 //      var fS_max  = -1.0                   // could optimize on F statistic
 //
 //      for (j <- 1 to k) {
 //          val keep = n.toInt               // i-value large enough to not exclude any rows in slice
 //          val rg_j = new PoissonRegression (x.sliceExclude (keep, j), y)       // regress with x_j removed
-//          rg_j.train ()
+//          rg_j.train ().eval ()
 //          val (b, rSq, fS, rBar) =  rg_j.fit
 //          if (rSq > rSq_max) { j_max = j; b_max = b; rSq_max = rSq; fS_max = fS}
 //      } // for
 //      (j_max, b_max, rSq_max, fS_max)
-//    } // backElim
+//  } // backwardElim
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor 'VIF' for each variable to test
@@ -180,7 +196,7 @@ class PoissonRegression (x: MatriD, y: VectoI, fn: Array [String] = null)
 //          val keep = n.toInt               // i-value large enough to not exclude any rows in slice
 //          val x_j  = x.col(j)                                               // x_j is jth column in x
 //          val rg_j = new PoissonRegression (x.sliceExclude (keep, j), x_j)    // regress with x_j removed
-//          rg_j.train ()
+//          rg_j.train ().eval ()
 //          vifV(j-1) =  1.0 / (1.0 - rg_j.fit._2)                            // store vif for x_1 in vifV(0)
 //      } // for
 //      vifV
@@ -241,7 +257,7 @@ object PoissonRegressionTest extends App
 
     val rg = new PoissonRegression (x, y)
     rg.train_null ()                                    // train based on null model
-    rg.train ()                                         // train based on full model
+    rg.train ().eval ()                                 // train based on full model
     val b  = rg.coefficient                             // obtain coefficients
     val ft = rg.fit                                     // obtain quality of fit
 
@@ -322,7 +338,7 @@ object PoissonRegressionTest2 extends App
 //  val rg = new PoissonRegression (x(0 until x.dim1, 0 until 2), y, fn)
     val rg = new PoissonRegression (x, y, fn)
     rg.train_null ()                                    // train based on null model
-    rg.train ()                                         // train based on full model
+    rg.train ().eval ()                                 // train based on full model
 
     println ("---------------------------------------------------------------")
     println ("Poisson Regression Regression Results")

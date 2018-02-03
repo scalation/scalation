@@ -8,6 +8,8 @@
 
 package scalation.analytics
 
+import scala.collection.mutable.Set
+
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectoI, VectorI}
 import scalation.util.{Error, time}
 
@@ -24,11 +26,12 @@ import RegTechnique._
                                   +  b_k+1 * d_1  +  b_k+2 * d_2  +  ... b_k+l * d_l + e
  *  <p>
  *  where 'e' represents the residuals (the part not explained by the model).
- *  Use Least-Squares (minimizing the residuals) to fit the parameter vector
+ *  Use Least-Squares (minimizing the residuals) to solve for the parameter vector 'b'
+ *  using the Normal Equations:
  *  <p>
- *      b  =  x_pinv * y
+ *      x.t * x * b  =  x.t * y
+ *      b  =  fac.solve (.)
  *  <p>
- *  where 'x_pinv' is the pseudo-inverse.
  *  @see see.stanford.edu/materials/lsoeldsee263/05-ls.pdf
  *  @param x_         the data/design matrix of continuous variables
  *  @param t          the treatment/categorical variable vector
@@ -76,13 +79,19 @@ class ANCOVA (x_ : MatriD, t: VectoI, y: VectoD, levels: Int, technique: RegTech
      *  using the least squares method.
      *  @param yy  the response vector
      */
-    def train (yy: VectoD) { rg.train (yy) }
+    def train (yy: VectoD): Regression [MatrixD, VectoD] = rg.train (yy)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  regression equation using the least squares method on 'y'.
      */
-    def train () { rg.train () }
+    def train (): Regression [MatrixD, VectoD] = rg.train ()
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the error and useful diagnostics.
+     *  @param yy   the response vector
+     */
+    def eval (yy: VectoD = y) { rg.eval (yy) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector of coefficients.
@@ -112,11 +121,20 @@ class ANCOVA (x_ : MatriD, t: VectoI, y: VectoD, levels: Int, technique: RegTech
     def predict (z: VectoD): Double = rg.predict (z)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform backward elimination to remove the least predictive variable
-     *  from the model, returning the variable to eliminate, the new parameter
-     *  vector, the new R-squared value and the new F statistic.
+    /** Perform forward selection to add the most predictive variable to the existing
+     *  model, returning the variable to add, the new parameter vector and the new
+     *  quality of fit.  May be called repeatedly.
+     *  @param cols  the columns of matrix x included in the existing model
      */
-    def backElim (): (Int, VectoD, VectoD) = rg.backElim ()
+    def forwardSel (cols: Set [Int]): (Int, VectoD, VectoD) = rg.forwardSel (cols)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform backward elimination to remove the least predictive variable from
+     *  the existing model, returning the variable to eliminate, the new parameter
+     *  vector and the new quality of fit.  May be called repeatedly.
+     *  @param cols  the columns of matrix x included in the existing model
+     */
+    def backwardElim (cols: Set [Int]): (Int, VectoD, VectoD) = rg.backwardElim (cols)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor (VIF) for each variable to test
@@ -156,7 +174,7 @@ object ANCOVATest extends App
 
     val levels = 3
     val anc    = new ANCOVA (x, t, y, levels)
-    anc.train ()
+    anc.train ().eval ()
 
     println (anc.fitLabels)
     println ("fit         = " + anc.fit)

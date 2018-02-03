@@ -81,12 +81,26 @@ class NeuralNet (x: MatriD, y: MatriD, h: Int, eta: Double = 1.0)
     /** Given training data 'x' and 'y', fit the weight matrices 'w' and 'v'.
      *  @param yy  the response vector
      */
-    def train (yy: VectoD) { throw new UnsupportedOperationException ("train (yy) not implemented yet") }
+    def train (yy: VectoD): NeuralNet =
+    {
+        throw new UnsupportedOperationException ("train (yy) not implemented yet")
+        null
+    } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given training data 'x' and 'y', fit the weight matrices 'w' and 'v'.
      */
-    def train () { if (w == null) setWeights (); backProp () }
+    def train (): NeuralNet = { if (w == null) setWeights (); backProp (); this }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the error and useful diagnostics.  FIX
+     *  @param yy   the response vector
+     */
+    def eval (yy: VectoD = y(0))                               // FIX - extend to matrices
+    {
+        e = yy - x * b                                         // compute residual/error vector e
+//      diagnose (yy)                                          // compute diagnostics
+    } // eval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Use back propagation to adjust the weight matrices 'w' and 'v' to make the
@@ -225,7 +239,7 @@ object NeuralNetTest2 extends App
     println ("=== target output vector: y(0) = " + y(0))
     println ("--- initial output vector: zo = " + ann.predictAll (x(0)))
 
-    ann.train ()                               // fit the weights using training data
+    ann.train ().eval ()                             // fit the weights using training data
 
     println ("+++ trained output vector: zo = " + ann.predictAll (x(0)))
 

@@ -85,13 +85,17 @@ class ExpRegression (x: MatriD, nonneg: Boolean, y: VectoD)
      *  exponential regression equation.
      *  @param yy  the response vector
      */
-    def train (yy: VectoD) { throw new UnsupportedOperationException ("train (yy) not implemented yet") }
+    def train (yy: VectoD): ExpRegression =
+    {
+        throw new UnsupportedOperationException ("train (yy) not implemented yet")
+        null
+    } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  exponential regression equation.
      */
-    def train ()
+    def train (): ExpRegression =
     {
         val b0   = new VectorD (x.dim2)                        // use b_0 = 0 for starting guess for parameters
         val bfgs = new QuasiNewton (ll)                        // minimizer for -2LL
@@ -99,14 +103,24 @@ class ExpRegression (x: MatriD, nonneg: Boolean, y: VectoD)
 
 //      e = y / (x * b)                                        // residual/error vector e
         e = y - (x * b).map (exp _)                            // residual/error vector e
-        diagnose (y)                                           // compute diagonostics
+        this
     } // train
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the error and useful diagnostics.
+     *  @param yy   the response vector
+     */
+    def eval (yy: VectoD = y)
+    {
+        e = yy - x * b                                         // compute residual/error vector e
+        diagnose (yy)                                          // compute diagnostics
+    } // eval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute diagostics for the regression model.
      *  @param yy  the response vector
      */
-    override def diagnose (yy: VectoD)
+    override protected def diagnose (yy: VectoD)
     {
         super.diagnose (yy)
         rBarSq = 1.0 - (1.0-rSq) * r_df                        // R-bar-squared (adjusted R-squared)
@@ -172,7 +186,7 @@ object ExpRegressionTest extends App
     println ("y = " + y)
 
     val erg = new ExpRegression (x, true, y)
-    erg.train ()
+    erg.train ().eval ()
     println ("fit = " + erg.fit)
 
     val yp = erg.predict (z)
@@ -212,7 +226,7 @@ object ExpRegressionTest2 extends App
         for (i <- 0 until y.dim) y(i) = exp (x(i) dot b) * e.gen
 
         val erg = new ExpRegression (x, true, y)
-        erg.train ()
+        erg.train ().eval ()
 
         (n, k, b, erg.coefficient, erg.fit(0))
     } // test
