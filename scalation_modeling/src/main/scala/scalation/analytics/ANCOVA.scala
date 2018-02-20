@@ -79,13 +79,13 @@ class ANCOVA (x_ : MatriD, t: VectoI, y: VectoD, levels: Int, technique: RegTech
      *  using the least squares method.
      *  @param yy  the response vector
      */
-    def train (yy: VectoD): Regression [MatrixD, VectoD] = rg.train (yy)
+    def train (yy: VectoD = y): Regression [MatrixD, VectoD] = rg.train (yy)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  regression equation using the least squares method on 'y'.
      */
-    def train (): Regression [MatrixD, VectoD] = rg.train ()
+//    def train (): Regression [MatrixD, VectoD] = rg.train ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.

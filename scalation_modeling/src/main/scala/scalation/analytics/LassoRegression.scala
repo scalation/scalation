@@ -79,7 +79,7 @@ class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: D
      *  @see `scalation.minima.LassoAdmm`
      *  @param yy  the response vector
      */
-    def train (yy: VectoD): LassoRegression [MatT, VecT] =
+    def train (yy: VectoD = y): LassoRegression [MatT, VecT] =
     {
 //      val g       = f(yy) _
 //      val optimer = new CoordinateDescent (g)                 // Coordinate Descent optimizer
@@ -97,7 +97,7 @@ class LassoRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, λ0: D
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  multiple regression equation for the response passed into the class 'y'.
      */
-    def train (): LassoRegression [MatT, VecT] = train (y)
+//    def train (): LassoRegression [MatT, VecT] = train (y)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.

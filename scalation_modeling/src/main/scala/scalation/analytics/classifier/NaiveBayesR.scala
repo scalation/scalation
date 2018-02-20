@@ -109,13 +109,14 @@ class NaiveBayesR (x: MatrixD, y: VectoI, fn: Array [String], k: Int, cn: Array 
      *  @param testStart  starting index of test region (inclusive) used in cross-validation
      *  @param testEnd    ending index of test region (exclusive) used in cross-validation
      */
-    def train (testStart: Int, testEnd: Int)    // FIX - use parameters 
+    def train (itest: IndexedSeq [Int]): NaiveBayesR =   // FIX - use parameters 
     {
         calcStats ()
         for (c <- 0 until k; j <- 0 until n) {
             cd(c)(j) = (z_j => Normal (mean(c, j), varc(c, j)).pf (z_j))
         } // for
         prob = pop / md           // probability = class population / training-set size
+        this
     } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -124,7 +125,7 @@ class NaiveBayesR (x: MatrixD, y: VectoI, fn: Array [String], k: Int, cn: Array 
      *  Return the best class, its name and its relative probability.
      *  @param z  the data vector to classify
      */
-    def classify (z: VectoD): (Int, String, Double) =
+    override def classify (z: VectoD): (Int, String, Double) =
     {
         for (c <- 0 until k; j <- 0 until n) prob(c) *= cd(c)(j)(z(j))
         if (DEBUG) println ("prob = " + prob)

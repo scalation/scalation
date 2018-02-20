@@ -48,7 +48,8 @@ abstract class ClassifierReal (x: MatriD, y: VectoI, fn: Array [String], k: Int,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return default values for binary input data (value count 'vc' set to 2).
      */
-    def vc_default: VectoI = { val vc = new VectorI (n); vc.set (2); vc }
+    def vc_default: Array [Int] = Array.fill (n)(2)
+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the number of data vectors in training/test-set (# rows).
@@ -68,17 +69,16 @@ abstract class ClassifierReal (x: MatriD, y: VectoI, fn: Array [String], k: Int,
         classify (zd)
     } // classify
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the quality of the training with a test-set and return the fraction
      *  of correct classifications.
-     *  @param testStart  beginning of test region (inclusive)
-     *  @param testEnd    end of test region (exclusive)
+     *  @param itest  indices of the instances considered test data
      */
-    def test (testStart: Int, testEnd: Int): Double =
+    def test (itest: IndexedSeq [Int]): Double =
     {
         var correct = 0
-        for (i <- testStart until testEnd if classify (x(i))._1 == y(i)) correct += 1
-        correct / (testEnd - testStart).toDouble
+        for (i <- itest if classify (x(i))._1 == y(i)) correct += 1
+        correct / itest.size.toDouble
     } // test
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

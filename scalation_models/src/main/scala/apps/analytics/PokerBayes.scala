@@ -61,7 +61,7 @@ object PokerBayes extends App
     val cn = Array ("Nothing", "One pair",   "Two pairs",      "Three of a kind", "Straight",
                     "Flush",   "Full house", "Four of a kind", "Straight flush",  "Royal flush")
 
-    val vc = VectorI (4, 13, 4, 13, 4, 13, 4, 13, 4, 13)          // value count: distinct values for each feature
+    val vc = Array (4, 13, 4, 13, 4, 13, 4, 13, 4, 13)            // value count: distinct values for each feature
 
     val nb  = NaiveBayes (xy, fn, k, cn, vc)                      // create a Naive Bayes classifier
     val tnb = TANBayes (xy, fn, k, cn, 1.0, vc)                   // create a Tree Augmented Naive Bayes classifier

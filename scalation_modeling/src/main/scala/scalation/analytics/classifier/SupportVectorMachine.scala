@@ -61,10 +61,9 @@ class SupportVectorMachine (x: MatrixD, y: VectoI, fn: Array [String] = Array ()
     /** Train uses SMO (Sequential Minimum Optimization) algorithm to solves the 
      *  optimization problem for the weight vector 'w' and the threshold 'b' for 
      *  the model '(w dot z) - b'.
-     *  @param testStart  starting index of test region (inclusive) used in cross-validation.
-     *  @param testEnd    ending index of test region (exclusive) used in cross-validation.
+     *  @param itest  the indices of the test data
      */
-    def train (testStart: Int, testEnd: Int)         // FIX - use these parameters
+    def train (itest: IndexedSeq [Int]): SupportVectorMachine =      // FIX - use this parameters
     {
         // Fill Set I_1 and I_4, as initially alp[i] = 0
         // Initialize i_Up to any index of class +1 
@@ -100,7 +99,8 @@ class SupportVectorMachine (x: MatrixD, y: VectoI, fn: Array [String] = Array ()
             else if (nChanged == 0 ) checkAll = true
         } // while
         
-        b = (b_Low + b_Up) / 2.0          
+        b = (b_Low + b_Up) / 2.0
+        this
     } // train
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -109,7 +109,7 @@ class SupportVectorMachine (x: MatrixD, y: VectoI, fn: Array [String] = Array ()
      *  -1 means it belongs to the negative class.
      *  @param z  the vector to classify
      */
-    def classify (z: VectoD): (Int, String, Double) =
+    override def classify (z: VectoD): (Int, String, Double) =
     {
         if ((w dot z) >= b) (1, "+", -1.0) else (-1, "-", -1.0)   // FIX - need metric
     } // classify

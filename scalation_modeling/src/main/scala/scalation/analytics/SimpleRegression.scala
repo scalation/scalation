@@ -47,7 +47,7 @@ class SimpleRegression (x: MatriD, y: VectoD)
      *  @see www.analyzemath.com/statistics/linear_regression.html
      *  @param yy  the response vector
      */
-    def train (yy: VectoD): SimpleRegression =
+    def train (yy: VectoD = y): SimpleRegression =
     {
         val x1  = x.col(1)                                // get column 1 of x = [1.0, x1]
         val sx  = x1.sum                                  // sum of x values
@@ -67,7 +67,7 @@ class SimpleRegression (x: MatriD, y: VectoD)
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  simple regression equation for the response passed into the class 'y'.
      */
-    def train (): SimpleRegression = train (y)
+//    def train (): SimpleRegression = train (y)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.

@@ -8,8 +8,11 @@
 
 package scalation.analytics
 
+import scala.collection.mutable.Set
+
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.linalgebra.VectorD.one
+import scalation.util.banner
 
 import RegTechnique._
 
@@ -65,9 +68,9 @@ object ResponseSurface
     /** The number of quadratic, linear and constant forms/terms (3, 6, 10, 15, ...)
      *  of cubic, quadratic, linear and constant forms/terms (4, 10, 20, 35, ...)
      *  @param n        number of predictors
-     *  @param cubic    the order of the surface
+     *  @param cubic    the order of the surface (2 for quadratic, 3 for cubic)
      */
-    def numTerms (n: Int, cubic: Boolean) =
+    def numTerms (n: Int, cubic: Boolean = false) =
     {
         if (cubic) (n + 1) * (n + 2) * (n + 3) / 6
         else       (n + 1) * (n + 2) / 2
@@ -75,6 +78,8 @@ object ResponseSurface
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create all forms/terms for each point placing them in a new matrix.
+     *  @param x      the input data matrix
+     *  @param cubic  the order of the surface (2 for quadratic, 3 for cubic)
      */
     def allForms (x: MatriD, cubic: Boolean): MatriD =
     {
@@ -135,6 +140,7 @@ object ResponseSurface
  */
 object ResponseSurfaceTest extends App
 {
+    //                            x1      x2
     val x = new MatrixD ((20, 2), 47.0,   85.4,
                                   49.0,   94.2,
                                   49.0,   95.3,
@@ -157,14 +163,31 @@ object ResponseSurfaceTest extends App
                                   56.0,   95.7)
     //  response BP
     val y = VectorD (105.0, 115.0, 116.0, 117.0, 112.0, 121.0, 121.0, 110.0, 110.0, 114.0,
-        114.0, 115.0, 114.0, 106.0, 125.0, 114.0, 106.0, 113.0, 110.0, 122.0)
+                     114.0, 115.0, 114.0, 106.0, 125.0, 114.0, 106.0, 113.0, 110.0, 122.0)
 
-    val rsm = new ResponseSurface (x, y)
-    rsm.train ().eval ()
+    val rsr = new ResponseSurface (x, y)
+    rsr.train ().eval ()
+    val nTerms = ResponseSurface.numTerms (2)
+    println ("nTerms      = " + nTerms)
+    println ("coefficient = " + rsr.coefficient)
+    println ("              " + rsr.fitLabels)
+    println ("fit         = " + rsr.fit)
 
-    println (rsm.fitLabels)
-    println ("fit         = " + rsm.fit)
-    println ("coefficient = " + rsm.coefficient)
+    banner ("Forward Selection Test")
+    val fcols = Set (0)
+    for (l <- 1 until nTerms) {
+        val (x_j, b_j, fit_j) = rsr.forwardSel (fcols)        // add most predictive variable
+        println (s"forward model: add x_j = $x_j with b = $b_j \n fit = $fit_j")
+        fcols += x_j
+    } // for
+
+    banner ("Backward Elimination Test")
+    val bcols = Set (0) ++ Array.range (1, nTerms)
+    for (l <- 1 until nTerms) {
+        val (x_j, b_j, fit_j) = rsr.backwardElim (bcols)     // eliminate least predictive variable
+        println (s"backward model: remove x_j = $x_j with b = $b_j \n fit = $fit_j")
+        bcols -= x_j
+    } // for
 
 } // ResponseSurfaceTest object
 

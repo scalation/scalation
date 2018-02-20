@@ -183,18 +183,16 @@ class HiddenMarkov (ob: VectoI, m: Int, n: Int, private var pi: VectoD = null,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the Hidden Markov Model using the observation vector 'ob' to
      *  determine the model 'pi, 'a' and 'b'.
-     *  @param testStart  the beginning of test region (inclusive).
-     *  @param testEnd    the end of test region (exclusive).
+     *  @param itestStart  the indices of the test data
      */
-    def train (testStart: Int, testEnd: Int) { train2 (testStart, testEnd) }
+    def train (itest: IndexedSeq [Int]): HiddenMarkov = { train2 (itest); this }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the Hidden Markov Model using the observation vector 'ob' to
      *  determine the model 'pi, 'a' and 'b' and return the model.
-     *  @param testStart  the beginning of test region (inclusive).
-     *  @param testEnd    the end of test region (exclusive).
+     *  @param itestStart  the indices of the test data
      */
-    def train2 (testStart: Int, testEnd: Int): Tuple3 [VectoD, MatriD, MatriD] =
+    def train2 (itest: IndexedSeq [Int]): (VectoD, MatriD, MatriD) =   // FIX - use this argument
     {
         var oldLogPr = 0.0
         for (it <- 0 to MIT) {                    // up to Maximum ITerations
@@ -231,7 +229,7 @@ class HiddenMarkov (ob: VectoI, m: Int, n: Int, private var pi: VectoD = null,
      *  returning the best class, its name and its relative probability.
      *  @param z  the vector to classify
      */
-    def classify (z: VectoD): (Int, String, Double) = classify (z.toInt)
+    override def classify (z: VectoD): (Int, String, Double) = classify (z.toInt)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset global variables.  So far, not needed.
@@ -241,10 +239,9 @@ class HiddenMarkov (ob: VectoI, m: Int, n: Int, private var pi: VectoD = null,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the quality of the training with a test-set and return the fraction
      *  of correct classifications.
-     *  @param testStart  the beginning of test region (inclusive).
-     *  @param testEnd    the end of test region (exclusive).
+     *  @param itestStart  the indices of the test data
      */
-    def test (testStart: Int, testEnd: Int): Double = ???   // FIX - implement
+    def test (itest: IndexedSeq [Int]): Double = ???   // FIX - implement
 
 } // HiddenMarkov
 
@@ -287,7 +284,7 @@ object HiddenMarkovTest2 extends App
     val ob  = VectorI (0, 1, 0, 2)                                // observations
     val hmm = new HiddenMarkov (ob, 3, 2)                         // model (pi, a, b) to be determined
     println ("Train the Hidden Markov Model")
-    println ("HMM model = " + hmm.train2 (0, 0))
+    println ("HMM model = " + hmm.train2 (null))
 
 } // HiddenMarkovTest2 object
 

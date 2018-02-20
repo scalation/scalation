@@ -11,13 +11,15 @@ package scalation.analytics
 import scala.collection.mutable.Set
 
 import scalation.linalgebra.{MatrixD, VectoD, VectorD, VectoI, VectorI}
-import scalation.util.Error
+import scalation.plot.Plot
+import scalation.util.{banner, Error}
 
 import RegTechnique._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `ANOVA` class supports one-way ANalysis Of VAriance (ANOVA).  It is
- *  framed using General Linear Model 'GLM' notation and supports the use of one
+/** The `ANOVA1` class supports one-way ANalysis Of VAriance (ANOVA), i.e,
+ *  it allows only one binary/categorial treatment variable.  It is framed using
+ *  General Linear Model 'GLM' notation and supports the use of one
  *  binary/categorical treatment variable 't'.  This is done by introducing
  *  dummy variables 'd_j' to distinguish the treatment level.  The problem is
  *  again to fit the parameter vector 'b' in the following equation
@@ -32,28 +34,41 @@ import RegTechnique._
  *      b  =  fac.solve (.)
  *  <p>
  *  @see psych.colorado.edu/~carey/Courses/PSYC5741/handouts/GLM%20Theory.pdf
- *  @param t          the treatment/categorical variable vector
+ *  @param t          the binary/categorical treatment variable vector
  *  @param y          the response vector
  *  @param levels     the number of treatment levels (1, ... levels)
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class ANOVA (t: VectoI, y: VectoD, levels: Int, technique: RegTechnique = QR)
+class ANOVA1 (t: VectoI, y: VectoD, levels: Int, technique: RegTechnique = QR)
       extends Predictor with Error
 {
     if (t.dim != y.dim) flaw ("constructor", "dimensions of t and y are incompatible")
 
-    val x = new MatrixD (y.dim, levels)                    // design matrix
-    assignDummyVars ()                                     // assign values for dummy variables
-    val rg = new Regression (x, y, technique)              // regular multiple linear regression
+    val x = new MatrixD (y.dim, levels)                           // design matrix
+    assignDummyVars ()                                            // assign values for dummy variables
+    val rg = new Regression (x, y, technique)                     // regular multiple linear regression
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Assign values for the dummy variables based on a treatment variable's level 'lev'.
+     *  @param lev  treatment level of the variable
+     */
+    def assignDummyVar (lev: Int): VectorD =
+    {
+         val tvec = new VectorD (levels)
+         tvec(0) = 1.0
+         if (lev < 1 || lev > levels) flaw ("assignDummyVar", "treatment level is out of range")
+         if (lev < levels) tvec(lev) = 1.0
+         tvec
+    } // assignDummyVar
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Assign values for the dummy variables based on the treatment vector 't'.
      */
-    def assignDummyVars ()
+    def assignDummyVars (tt: VectoI = t)
     {
-        for (i <- 0 until x.dim1) {
-            x(i, 0) = 1.0                                       // first column is always one
-            val lev = t(i)                                      // treatment level for ith item
+        for (i <- tt.range) {
+            x(i, 0) = 1.0                                         // first column is always one
+            val lev = tt(i)                                       // treatment level for ith item
             if (lev < 1 || lev > levels) flaw ("assignDummyVars", "treatment level is out of range")
             if (lev < levels) x(i, lev) = 1.0
         } // for
@@ -102,6 +117,13 @@ class ANOVA (t: VectoI, y: VectoD, levels: Int, technique: RegTechnique = QR)
      *  e.g., (b_0, b_1, b_2) dot (1, z_1, z_2).
      *  @param z  the new vector to predict
      */
+    def predict (z: Int): Double = rg.predict (assignDummyVar (z))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
+     *  e.g., (b_0, b_1, b_2) dot (1, z_1, z_2).
+     *  @param z  the new vector to predict
+     */
     def predict (z: VectoD): Double = rg.predict (z)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -128,32 +150,43 @@ class ANOVA (t: VectoI, y: VectoD, levels: Int, technique: RegTechnique = QR)
      */
     def vif: VectoD = rg.vif
 
-} // ANOVA class
+} // ANOVA1 class
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `ANOVATest` object tests the `ANOVA` class using the following
+/** The `ANOVA1Test` object tests the `ANOVA1` class using the following
  *  regression equation.
  *  <p>
  *      y  =  b dot x  =  b_0 + b_1*d_1 + b_2*d_2
  *  <p>
+ *  > runMain scalation.analytics.ANOVA1Test
  */
-object ANOVATest extends App
+object ANOVA1Test extends App
 {
-    val t = VectorI (1, 1, 2, 2, 3)                              // treatments levels
-    val y = VectorD (745.0, 895.0, 442.0, 440.0, 1598.0)         // response vector
-    val z = VectorD (1.0, 20.0, 80.0, 1.0)
+    val t  = VectorI (1, 1, 1, 2, 2, 2, 3, 3, 3)                 // treatment level data
+    val y  = VectorD (755.0, 865.0, 815.0,
+                      442.0, 420.0, 401.0,
+                      282.0, 250.0, 227.0)                       // response vector
+    val z  = VectorD (1.0, 20.0, 80.0, 1.0)
 
     println ("t = " + t)
     println ("y = " + y)
 
     val levels = 3
-    val anc    = new ANOVA (t, y, levels)
-    anc.train ().eval ()
-    println ("fit = " + anc.fit)
+    val arg    = new ANOVA1 (t, y, levels)
+    arg.train ().eval ()
+    println ("coefficient = " + arg.coefficient)
+    println ("              " + arg.fitLabels)
+    println ("fit         = " + arg.fit)
 
-    val yp = anc.predict (z)
-    println ("predict (" + z + ") = " + yp)
+    val yp1 = arg.predict (z)                                     // predict for one point
+    println ("predict (" + z + ") = " + yp1)
 
-} // ANOVATest object
+    banner ("test predictions")
+    val yp = new VectorD (y.dim)
+    for (i <- yp.range) yp(i) = arg.predict (t(i))
+    println (s" y = $y \n yp = $yp")
+    new Plot (t.toDouble, y, yp, "ANOVA1")
+
+} // ANOVA1Test object
 

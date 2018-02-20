@@ -75,10 +75,9 @@ class GMM (x: VectoD, k: Int = 3)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the model to determine values for the parameter vectors 'mu' and 'sig2'.
-     *  @param testStart  the beginning of test region (inclusive).
-     *  @param testEnd    the end of test region (exclusive).
+     *  @param itest  the indices of test data
      */
-    def train (testStart: Int, testEnd: Int)
+    def train (itest: IndexedSeq [Int]): GMM =                 // FIX - use this argument
     {
         breakable { for (it <- 1 to MAX_ITER) {
            exp_step ()
@@ -90,13 +89,14 @@ class GMM (x: VectoD, k: Int = 3)
            } // if
            if ((mu - mu0).norm1 < TOL) break
         }} // breakable for
+        this
     } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Classify the first point in vector 'z'.
      *  @param z  the vector to be classified.
      */
-    def classify (z: VectoD): (Int, String, Double) = 
+    override def classify (z: VectoD): (Int, String, Double) = 
     {
         val p = VectorD (for (j <- 0 until k) yield normal(j).pf (z(0)))
         if (DEBUG) println (s"p = $p")
@@ -110,7 +110,11 @@ class GMM (x: VectoD, k: Int = 3)
      */
     def classify (z: VectoI): (Int, String, Double) = classify (z.toDouble)
 
-    def test (testStart: Int, testEnd: Int): Double = ???
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Test ...
+     *  @param itest  the indices of test data
+     */
+    def test (itest: IndexedSeq [Int]): Double = ???
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset ...  FIX

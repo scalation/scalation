@@ -85,18 +85,9 @@ class ExpRegression (x: MatriD, nonneg: Boolean, y: VectoD)
      *  exponential regression equation.
      *  @param yy  the response vector
      */
-    def train (yy: VectoD): ExpRegression =
+    def train (yy: VectoD = y): ExpRegression =
     {
-        throw new UnsupportedOperationException ("train (yy) not implemented yet")
-        null
-    } // train
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  exponential regression equation.
-     */
-    def train (): ExpRegression =
-    {
+        // FIX - currently works for yy = y
         val b0   = new VectorD (x.dim2)                        // use b_0 = 0 for starting guess for parameters
         val bfgs = new QuasiNewton (ll)                        // minimizer for -2LL
         b        = bfgs.solve (b0)                             // find optimal solution for parameters
@@ -105,6 +96,12 @@ class ExpRegression (x: MatriD, nonneg: Boolean, y: VectoD)
         e = y - (x * b).map (exp _)                            // residual/error vector e
         this
     } // train
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the predictor by fitting the parameter vector (b-vector) in the
+     *  exponential regression equation.
+     */
+//    def train (): ExpRegression = train (y)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.

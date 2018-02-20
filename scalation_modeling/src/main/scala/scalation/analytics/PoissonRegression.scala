@@ -84,19 +84,9 @@ class PoissonRegression (x: MatriD, y: VectoI, fn: Array [String] = null)
      *  (b-vector) in the Poisson regression equation using maximum likelihood.
      *  @param yy  the response vector
      */
-    def train (yy: VectoD): PoissonRegression =
+    def train (yy: VectoD = y.toDouble): PoissonRegression =
     {
-        throw new UnsupportedOperationException ("train (yy) not implemeted yet")
-        null
-    } // train
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** For the full model, train the predictor by fitting the parameter vector
-     *  (b-vector) in the Poisson regression equation using maximum likelihood.
-     *  Do this by minimizing '-2LL'.
-     */
-    def train (): PoissonRegression = 
-    {
+         // FIX - yy currently not used
          val b0   = new VectorD (x.dim2)         // use b_0 = 0 for starting guess for parameters
          val bfgs = new QuasiNewton (ll)         // minimizer for -2LL
 
@@ -105,6 +95,13 @@ class PoissonRegression (x: MatriD, y: VectoI, fn: Array [String] = null)
          aic   = r_dev + 2.0 * x.dim2
          this
     } // train
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** For the full model, train the predictor by fitting the parameter vector
+     *  (b-vector) in the Poisson regression equation using maximum likelihood.
+     *  Do this by minimizing '-2LL'.
+     */
+//    def train (): PoissonRegression = train (y)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** For the null model, train the classifier by fitting the parameter vector

@@ -62,13 +62,13 @@ class KNN_Classifier (x: MatriD, y: VectoI, fn: Array [String], k: Int, cn: Arra
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Training involves resetting the data structures before each classification.
      *  It uses lazy training, so most of it is done during classification.
-     *  @param testStart  starting index of test region (inclusive) used in cross-validation.
-     *  @param testEnd    ending index of test region (exclusive) used in cross-validation.
+     *  @param itest  the indices of the test data
      */
-    def train (testStart: Int, testEnd: Int)    // FIX - use these parameters
+    def train (itest: IndexedSeq [Int]): KNN_Classifier =    // FIX - use this parameters
     {
         for (i <- 0 until knn) topK(i)  = (-1, MAX_DOUBLE)   // initialize top-knn
         for (j <- 0 until k) count(j) = 0                    // initialize counters
+        this
     } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -77,7 +77,7 @@ class KNN_Classifier (x: MatriD, y: VectoI, fn: Array [String], k: Int, cn: Arra
      *  Return the best class, its name and its votes
      *  @param z  the vector to classify
      */
-    def classify (z: VectoD): (Int, String, Double) =
+    override def classify (z: VectoD): (Int, String, Double) =
     {
         kNearest (z)                                         // set top-knn to knn nearest
         for (i <- 0 until knn) count(y(topK(i)._1)) += 1     // tally per class

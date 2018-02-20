@@ -132,14 +132,14 @@ class PGMHD3fl (x: MatriI, z: MatriI, y: MatriI, fn: Array [String], cn: Array [
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier by computing frequencies, inflows and scores.
-     *  @param testStart  starting index of test region (inclusive) used in cross-validation.
-     *  @param testEnd    ending index of test region (exclusive) used in cross-validation.
+     *  @param itest  the indices of the test data
      */
-    def train (testStart: Int, testEnd: Int)
+    def train (itest: IndexedSeq [Int]): PGMHD3fl =
     {
-        frequencies (testStart, testEnd)                       // compute frequencies skipping test region
+        frequencies (0 until m diff itest)                    // compute frequencies skipping test region
 
         if (DEBUG) banner ("train (testStart, testEnd)")
+        this
     } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -168,17 +168,6 @@ class PGMHD3fl (x: MatriI, z: MatriI, y: MatriI, fn: Array [String], cn: Array [
             println ("x_cl  = " + x_cl)                        // classification score for X's
         } // if
     } // frequencies
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the classifier by computing frequencies, inflows and scores.
-     *  @param itrain indices of the instances considered train data
-     */
-    override def train (itrain: IndexedSeq [Int])
-    {
-        frequencies (itrain)                                   // compute frequencies skipping test region
-
-        if (DEBUG) banner ("train (itrain)")
-    } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'u', classify it returning the class(es)

@@ -107,7 +107,7 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
      *  using the least squares method.
      *  @param yy  the response vector
      */
-    def train (yy: VectoD): RidgeRegression [MatT, VecT] =
+    def train (yy: VectoD = y): RidgeRegression [MatT, VecT] =
     {
         b = technique match {                                  // solve for coefficient vector b
             case QR       => fac.solve (yy ++ new VectorD (y.dim))  // FIX - give formula
@@ -121,7 +121,7 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  multiple regression equation using the least squares method on 'y'.
      */
-    def train (): RidgeRegression [MatT, VecT] = train (y)
+//    def train (): RidgeRegression [MatT, VecT] = train (y)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.

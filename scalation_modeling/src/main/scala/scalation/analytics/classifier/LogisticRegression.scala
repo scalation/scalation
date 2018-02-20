@@ -91,10 +91,9 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String], cn: Array [S
      *  FIX: Use improved BFGS implementation or IRWLS
      *  @see stats.stackexchange.com/questions/81000/calculate-coefficients-in-a-logistic-regression-with-r
      *  @see en.wikipedia.org/wiki/Iteratively_reweighted_least_squares
-     *  @param testStart  starting index of test region (inclusive) used in cross-validation.
-     *  @param testEnd    ending index of test region (exclusive) used in cross-validation.
+     *  @param itestStart  the indices of test test data
      */
-    def train (testStart: Int, testEnd: Int)    // FIX - use these parameters
+    def train (itest: IndexedSeq [Int]): LogisticRegression =     // FIX - use these parameters
     {
          val b0   = new VectorD (x.dim2)        // use b_0 = 0 for starting guess for parameters
          val bfgs = new QuasiNewton (ll)        // minimizer for -2LL
@@ -102,6 +101,7 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String], cn: Array [S
          b     = bfgs.solve (b0)                // find optimal solution for parameters
          r_dev = ll (b)                         // measure of fitness for full model
          aic   = r_dev + 2.0 * x.dim2
+         this
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -133,7 +133,7 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String], cn: Array [S
      *  Return the best class, its name and FIX.
      *  @param z  the new vector to classify
      */
-    def classify (z: VectoD): (Int, String, Double) =
+    override def classify (z: VectoD): (Int, String, Double) =
     {
         val c = if (sigmoid (b dot z) > 0.5) 1 else 0
         (c, cn(c), -1.0)                                    // Fix - need metric

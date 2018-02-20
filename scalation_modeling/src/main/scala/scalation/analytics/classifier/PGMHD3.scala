@@ -39,7 +39,7 @@ import BayesClassifier.me_default
  *  @param me  use m-estimates (me == 0 => regular MLE estimates)
  */
 class PGMHD3 (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-                  private var vc: VectoI = null, me: Float = me_default)
+                  private var vc: Array [Int] = null, me: Float = me_default)
       extends BayesClassifier (x, y, fn, k, cn)
 {
     private val DEBUG  = true                              // debug flag
@@ -60,8 +60,8 @@ class PGMHD3 (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: Arr
     if (vc == null) {
         shiftToZero; vc = vc_fromData                      // determine 'vc' from data
     } // if
-    val vc_x = vc.slice (0, nx)().toArray
-    val vc_z = vc.slice (nx, n)().toArray
+    val vc_x = vc.slice (0, nx)
+    val vc_z = vc.slice (nx, n)
 
     computeParent ()
     computeVcp ()
@@ -72,11 +72,11 @@ class PGMHD3 (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: Arr
     probZ.alloc (vc_z, vcp)
 
     if (DEBUG) {
-        println ("value count vc     = " + vc)
+        println ("value count vc     = " + vc.deep)
         println ("value count vc_x   = " + vc_x.deep)
         println ("value count vc_z   = " + vc_z.deep)
         println ("correlation matrix = " + cor)
-        println ("value count vcP    = " + vcp.deep)
+        println ("value count vcp    = " + vcp.deep)
         println ("Z's parent         = " + parent)
     } // if
 
@@ -111,41 +111,13 @@ class PGMHD3 (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: Arr
     } // buildModel
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Count the frequencies for 'y' having class 'i' and value 'x' for cases 0, 1, ...
-     *  Only the test region from 'testStart' to 'testEnd' is skipped, the rest is
-     *  training data.
-     *  @param testStart  starting index of test region (inclusive) used in cross-validation
-     *  @param testEnd    ending index of test region (exclusive) used in cross-validation
-     */
-    private def frequencies (testStart: Int, testEnd: Int)
-    {
-        if (DEBUG) banner ("frequencies (testStart, testEnd)")
-        for (l <- 0 until m if l < testStart || l >= testEnd) {
-            // l = lth row of data matrix x
-            val i = y(l)                                       // get the class
-            popC(i) += 1                                       // increment ith class
-            for (j <- 0 until n) {
-                if (j < nx) popX(i, j, x(l, j))    += 1                         // increment ith class, jth feature, x value
-                else        popZ(i, j-nx, x(l, j), x(l, parent(j-nx))) += 1     // increment ith class, jth feature, z value
-            } // for
-        } // for
-
-        if (DEBUG) {
-            println ("popC = " + popC)                         // #(C = i)
-            println ("popX = " + popX)                         // #(X_j = x & C = i)
-            println ("popZ = " + popZ)                         // #(Z_j = z & C = i)
-        } // if
-    } // frequencies
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier by computing the probabilities for C, and the
      *  conditional probabilities for X_j.
-     *  @param testStart  starting index of test region (inclusive) used in cross-validation.
-     *  @param testEnd    ending index of test region (exclusive) used in cross-validation.
+     *  @param itest  the indices of test data
      */
-    def train (testStart: Int, testEnd: Int)
+    def train (itest: IndexedSeq [Int]): PGMHD3 =
     {
-        frequencies (testStart, testEnd)                       // compute frequencies skipping test region
+        frequencies (0 until m diff itest)                       // compute frequencies skipping test region
 
         if (DEBUG) banner ("train (testStart, testEnd)")
         for (i <- 0 until k) {
@@ -172,6 +144,7 @@ class PGMHD3 (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: Arr
             println ("probX = " + probX)                       // P(X_j = x | C = i)
             println ("probZ = " + probZ)                       // P(Z_j = z | C = i)
         } // if
+        this
     } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -199,42 +172,6 @@ class PGMHD3 (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: Arr
             println ("popZ = " + popZ)                         // #(Z_j = z & C = i)
         } // if
     } // frequencies
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the classifier by computing the probabilities for C, and the
-     *  conditional probabilities for X_j.
-     *  @param itrain indices of the instances considered train data
-     */
-    override def train (itrain: IndexedSeq [Int])
-    {
-        frequencies (itrain)                                   // compute frequencies skipping test region
-
-        if (DEBUG) banner ("train (itrain)")
-        for (i <- 0 until k) {
-            // for each class i
-            val pci = popC(i).toDouble                         // population of class i
-            probC(i) = pci / md                                // probability of class i
-
-            for (j <- 0 until nx) {                            // for each feature j
-            val me_vc = me / vc_x(j).toDouble
-                for (xj <- 0 until vc_x(j)) {                  // for each value for feature j: xj
-                    probX(i, j, xj) = (popX(i, j, xj) + me_vc) / (pci + me)
-                } // for
-            } // for
-            for (j <- 0 until nz) {                            // for each feature j
-            val me_vc = me / vc_z(j).toDouble
-                for (zj <- 0 until vc_z(j); zp <- 0 until vc_x(parent(j))) {  // for each value of feature j: zj and each value of zj's parent: zp
-                    probZ(i, j, zj, zp) = (popZ(i, j, zj, zp) + me_vc) / (pci + me)
-                } // for
-            } // for
-        } // for
-
-        if (DEBUG) {
-            println ("probC = " + probC)                       // P(C = i)
-            println ("probX = " + probX)                       // P(X_j = x | C = i)
-            println ("probZ = " + probZ)                       // P(Z_j = z | C = i)
-        } // if
-    } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'z', classify it returning the class number
@@ -293,7 +230,7 @@ object PGMHD3
      *  @param me  use m-estimates (me == 0 => regular MLE estimates)
      */
     def apply (xy: MatriI, nx: Int, fn: Array [String], k: Int, cn: Array [String],
-               vc: VectoI = null, me: Float = me_default) =
+               vc: Array [Int] = null, me: Float = me_default) =
     {
         new PGMHD3 (xy(0 until xy.dim1, 0 until xy.dim2 - 1), nx, xy.col(xy.dim2 - 1), fn, k, cn,
             vc, me)

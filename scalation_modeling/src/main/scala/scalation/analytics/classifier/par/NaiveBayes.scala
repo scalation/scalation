@@ -45,8 +45,8 @@ import BayesClassifier.me_default
  *  @param me           use m-estimates (me == 0 => regular MLE estimates)
  *  @param PARALLELISM  the level of parallelism, the number of threads to use
  */
-class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-                  private var vc: VectoI = null, me: Double = me_default, private val PARALLELISM: Int = Runtime.getRuntime().availableProcessors())
+class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String], protected var vc: Array [Int] = null,
+                   me: Double = me_default, private val PARALLELISM: Int = Runtime.getRuntime ().availableProcessors ())
       extends BayesClassifier (x, y, fn, k, cn, PARALLELISM)
 {
     private val DEBUG = false                                // debug flag
@@ -55,21 +55,10 @@ class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [
         shiftToZero; vc = vc_fromData                        // set value counts from data
     } // if
 
-    protected val vca = vc.toArray
+    f_CX  = new HMatrix3 [Int] (k, n, vc)                    // frequency counts for class yi & feature xj
+    protected val p_X_C = new HMatrix3 [Double] (k, n, vc)   // conditional probabilities for feature xj given class yi
 
-    f_CX  = new HMatrix3 [Int] (k, n, vca)                   // frequency counts for class yi & feature xj
-    protected val p_X_C = new HMatrix3 [Double] (k, n, vca)  // conditional probabilities for feature xj given class yi
-
-    if (DEBUG) println ("distinct value count vc = " + vc)
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the classifier by computing the probabilities for C, and the
-     *  conditional probabilities for X_j.
-     *
-     *  @param testStart  starting index of test region (inclusive) used in cross-validation.
-     *  @param testEnd    ending index of test region (exclusive) used in cross-validation.
-     */
-    def train (testStart: Int, testEnd: Int) = train (testStart until testEnd)
+    if (DEBUG) println ("distinct value count vc = " + vc.deep)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier by computing the probabilities for C, and the
@@ -77,13 +66,13 @@ class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [
      *  the "subtraction" method to achieve efficiency.
      *  @param itest  indices of the instances considered testing data
      */
-    override def train (itest: IndexedSeq [Int])
+    override def train (itest: IndexedSeq [Int]): NaiveBayes0 =
     {
-        val idx = if (additive) 0 until m diff itest
-                  else          itest
+        val idx = if (additive) 0 until m diff itest else itest
         frequencies (idx)
         if (DEBUG) banner ("train (itest)")
         train2 ()
+        this
     } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -121,7 +110,7 @@ class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [
 
         for(w <- (0 until PARALLELISM).par) {
             f_Cw(w) = new VectorI (k)
-            f_CXw(w) = new HMatrix3 [Int] (k, n, vca)
+            f_CXw(w) = new HMatrix3 [Int] (k, n, vc)
         } // for
 
         val paraRange = (0 until PARALLELISM).par
@@ -201,7 +190,7 @@ object NaiveBayes0
      *  @param PARALLELISM  the level of parallelism, the number of threads to use
      */
     def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
-               vc: VectoI = null, me: Double = me_default, PARALLELISM: Int = Runtime.getRuntime().availableProcessors()) =
+               vc: Array [Int] = null, me: Double = me_default, PARALLELISM: Int = Runtime.getRuntime().availableProcessors()) =
     {
         new NaiveBayes0 (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn, vc, me, PARALLELISM)
     } // apply
@@ -222,20 +211,18 @@ object NaiveBayes0
  *  @param me           use m-estimates (me == 0 => regular MLE estimates)
  *  @param PARALLELISM  the level of parallelism, the number of threads to use
  */
-class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-                   private var vc: VectoI = null, me: Double = me_default, private val PARALLELISM: Int = Runtime.getRuntime().availableProcessors())
-        extends NaiveBayes0 (x, y, fn, k, cn, vc, me, PARALLELISM)
+class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String], vc_ : Array [Int] = null,
+                  me: Double = me_default, private val PARALLELISM: Int = Runtime.getRuntime ().availableProcessors ())
+        extends NaiveBayes0 (x, y, fn, k, cn, vc_, me, PARALLELISM)
 {
     private val DEBUG = false                              // debug flag
 
     private val g_f_C  = new VectorI (k)                   // global frequency counts (using entire dataset) for class yi
-    private var g_f_CX = new HMatrix3 [Int] (k, n, vca)    // global frequency counts (using entire dataset) for class yi & feature xj
+    private var g_f_CX = new HMatrix3 [Int] (k, n, vc)     // global frequency counts (using entire dataset) for class yi & feature xj
 
     additive = false
 
-    if (vc == null) vc = new VectorI (vca.length, vca)
-
-    if (DEBUG) println ("distinct value count vc = " + vc)
+    if (DEBUG) println ("distinct value count vc = " + vc.deep)
 
     frequenciesAll()
 
@@ -250,7 +237,7 @@ class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
 
         for(w <- (0 until PARALLELISM).par) {
             g_f_Cw(w) = new VectorI (k)
-            g_f_CXw(w) = new HMatrix3 [Int] (k, n, vca)
+            g_f_CXw(w) = new HMatrix3 [Int] (k, n, vc)
         } // for
 
         val paraRange = (0 until PARALLELISM).par
@@ -318,7 +305,7 @@ object NaiveBayes
      *  @param PARALLELISM  the level of parallelism, the number of threads to use
      */
     def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
-               vc: VectoI = null, me: Double = me_default, PARALLELISM: Int = Runtime.getRuntime().availableProcessors()) =
+               vc: Array [Int] = null, me: Double = me_default, PARALLELISM: Int = Runtime.getRuntime().availableProcessors()) =
     {
         new NaiveBayes (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn, vc, me, PARALLELISM)
     } // apply

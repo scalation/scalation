@@ -30,7 +30,7 @@ import scalation.util.Error
  *  @param vc  the value count array indicating number of distinct values per feature
  */
 class DecisionTreeID3 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-                      private var vc: VectoI = null)
+                      private var vc: Array [Int] = null)
       extends ClassifierInt (x, y, fn, k, cn)
 {
     abstract class Node
@@ -117,10 +117,11 @@ class DecisionTreeID3 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Arr
      *  @param testStart  starting index of test region (inclusive) used in cross-validation.
      *  @param testEnd    ending index of test region (exclusive) used in cross-validation.
      */
-    def train (testStart: Int, testEnd: Int)    // FIX - use these parameters
+    def train (itest: IndexedSeq [Int]): DecisionTreeID3 =    // FIX - use these parameters
     {
         tree = buildTree (List [Tuple2 [Int, Int]] ())
         println (tree)
+        this
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -195,7 +196,7 @@ object DecisionTreeID3
      *  @param cn  the names for all classes
      *  @param vc  the value count array indicating number of distinct values per feature
      */
-    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String], vc: VectoI = null) =
+    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String], vc: Array [Int] = null) =
     {
         new DecisionTreeID3 (xy(0 until xy.dim1, 0 until xy.dim2-1), xy.col(xy.dim2-1), fn, k, cn, vc)
     } // apply
@@ -233,11 +234,11 @@ object DecisionTreeID3Test extends App
                                     0,     1,     1,     1)       // day 14
     // day:           1  2  3  4  5  6  7  8  9 10 11 12 13 14
     val y  = VectorI (0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0)   // classification vector: 0(No), 1(Yes))
-    val vc = VectorI (3, 3, 2, 2)                                 // distinct values for each feature
+    val vc = Array (3, 3, 2, 2)                                   // distinct values for each feature
     val fn = Array ("Outlook", "Temp", "Humidity", "Wind")
     println ("x  = " + x)
     println ("y  = " + y)
-    println ("vc = " + vc)
+    println ("vc = " + vc.deep)
     println ("---------------------------------------------------------------")
 
     // train the classifier ---------------------------------------------------

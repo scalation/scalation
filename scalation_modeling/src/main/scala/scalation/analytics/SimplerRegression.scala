@@ -48,7 +48,7 @@ class SimplerRegression (x: MatriD, y: VectoD)
      *  using the least squares method.
      *  @param yy  the response vector
      */
-    def train (yy: VectoD): SimplerRegression =
+    def train (yy: VectoD = y): SimplerRegression =
     {
         val x0  = x.col(0)                                // get column 0 of x = [x0]
         val ssx = x0 dot x0                               // sum of squares x0
@@ -64,7 +64,7 @@ class SimplerRegression (x: MatriD, y: VectoD)
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  simple regression equation for the response passed into the class 'y'.
      */
-    def train (): SimplerRegression = train (y)
+//    def train (): SimplerRegression = train (y)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.

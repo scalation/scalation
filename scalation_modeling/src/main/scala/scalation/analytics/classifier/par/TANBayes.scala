@@ -43,14 +43,14 @@ import BayesClassifier.me_default
  *  @param me           use m-estimates (me == 0 => regular MLE estimates)
  *  @param PARALLELISM  the level of parallelism, the number of threads to use
  */
-class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-                me: Double = me_default, private var vc: VectoI = null, private val PARALLELISM: Int = Runtime.getRuntime().availableProcessors())
+class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String], me: Double = me_default,
+                 protected var vc: Array [Int] = null, private val PARALLELISM: Int = Runtime.getRuntime().availableProcessors())
       extends BayesClassifier (x, y, fn, k, cn, PARALLELISM)
 {
     private val DEBUG  = false                            // debug flag
 
     protected var parent = new VectorI (n)                // vector holding the parent for each feature/variable
-    protected val vcp    = new VectorI (n)                // value count for the parent
+    protected val vcp    = Array.ofDim [Int] (n)          // value count for the parent
 
     protected val f_CXP  = new HMatrix4 [Int] (k, n)      // conditional frequency counts for variable/feature j: xj
     protected val p_X_CP = new HMatrix4 [Double] (k, n)   // conditional probabilities for variable/feature j: xj
@@ -59,35 +59,25 @@ class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
         shiftToZero; vc = vc_fromData                     // set value counts from data
     } // if
 
-    protected val vca = vc.toArray
-
-    f_CXZ = new HMatrix5 [Int] (k, n, n, vca, vca)        // local joint frequency (using partial dataset, i.e. when using cross validation) of C, X, and Z, where X, Z are features/columns
-    f_CX  = new HMatrix3 [Int] (k, n, vca)                // local joint frequency of C and X
-    f_X   = new HMatrix2 [Int] (n, vca)                   // local frequency of X
+    f_CXZ = new HMatrix5 [Int] (k, n, n, vc, vc)          // local joint frequency (using partial dataset, i.e. when using cross validation)
+                                                          // of C, X, and Z, where X, Z are features/columns
+    f_CX  = new HMatrix3 [Int] (k, n, vc)                 // local joint frequency of C and X
+    f_X   = new HMatrix2 [Int] (n, vc)                    // local frequency of X
 
     if (DEBUG) {
-        println ("value count vc      = " + vc)
-        println ("value count vcp     = " + vcp)
+        println ("value count vc      = " + vc.deep)
+        println ("value count vcp     = " + vcp.deep)
         println ("parent features par = " + parent)
     } // if
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier by computing the probabilities for C, and the
      *  conditional probabilities for X_j.
-     *  @param testStart  starting index of test region (inclusive) used in cross-validation.
-     *  @param testEnd    ending index of test region. (exclusive) used in cross-validation.
-     */
-    def train (testStart: Int, testEnd: Int) = train (testStart until testEnd)
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the classifier by computing the probabilities for C, and the
-     *  conditional probabilities for X_j.
      *  @param itest  indices of the instances considered testing data
      */
-    override def train (itest: IndexedSeq [Int])
+    override def train (itest: IndexedSeq [Int]): TANBayes0 =
     {
-        val idx = if (additive) 0 until m diff itest
-                  else          itest
+        val idx = if (additive) 0 until m diff itest else itest
         computeParent (idx)                             // frequency computations are also done here
         computeVcp ()
         f_CXP.alloc (vc, vcp)
@@ -95,6 +85,7 @@ class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
         copyFreqCXP ()
         train2 ()
         if (smooth) smoothParam (itest.size)
+        this
     } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -128,7 +119,7 @@ class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
      */
     def computeParent (idx: IndexedSeq [Int])
     {
-        val cmiMx = calcCMI (idx, vca)
+        val cmiMx = calcCMI (idx, vc)
         for (j1 <- (0 until n).par if fset(j1); j2 <- (0 until j1).par if fset(j2)) cmiMx(j1, j2) = cmiMx(j2, j1)
 
         val ch       = Array.fill [SET[Int]] (n)(SET())
@@ -184,11 +175,13 @@ class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the value counts of each parent feature based on the parent vector.
+     *  Let 1 be the default value count when there is no parent.
      */
     def computeVcp ()
     {
-        vcp.set(1)                                // set default value count to 1
-        for (j <- (0 until n).par if (fset(j) && parent(j) > -1)) vcp(j) = vc(parent(j))
+        for (j <- (0 until n).par) {
+            vcp(j) = if (fset(j) && parent(j) > -1) vc(parent(j)) else 1
+        } // for
     } // computeVcp
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -275,7 +268,7 @@ object TANBayes0
      *  @param PARALLELISM  the level of parallelism, the number of threads to use
      */
     def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
-               me: Double = me_default, vc: VectoI = null, PARALLELISM: Int = Runtime.getRuntime().availableProcessors()) =
+               me: Double = me_default, vc: Array [Int] = null, PARALLELISM: Int = Runtime.getRuntime().availableProcessors()) =
     {
         new TANBayes0 (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn,
                       me, vc, PARALLELISM)
@@ -297,24 +290,22 @@ object TANBayes0
  *  @param me           use m-estimates (me == 0 => regular MLE estimates)
  *  @param PARALLELISM  the level of parallelism, the number of threads to use
  */
-class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-                 me: Double = me_default, private var vc: VectoI = null, private val PARALLELISM: Int = Runtime.getRuntime().availableProcessors())
-        extends TANBayes0 (x, y, fn, k, cn, me, vc, PARALLELISM)
+class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String], me: Double = me_default,
+                vc_ : Array [Int] = null, private val PARALLELISM: Int = Runtime.getRuntime().availableProcessors())
+        extends TANBayes0 (x, y, fn, k, cn, me, vc_, PARALLELISM)
 {
     private val DEBUG  = false                                     // debug flag
 
-    if (vc == null) vc = new VectorI (vca.length, vca)
-
-    private var g_f_CXZ = new HMatrix5 [Int] (k, n, n, vca, vca)   // global joint frequency (using entire dataset) of C, X, and Z, where X, Z are features/columns
-    private var g_f_CX  = new HMatrix3 [Int] (k, n, vca)           // global joint frequency of C and X
+    private var g_f_CXZ = new HMatrix5 [Int] (k, n, n, vc, vc)     // global joint frequency (using entire dataset) of C, X, and Z, where X, Z are features/columns
+    private var g_f_CX  = new HMatrix3 [Int] (k, n, vc)            // global joint frequency of C and X
     private val g_f_C   = new VectorI (k)                          // global frequency of C
-    private var g_f_X   = new HMatrix2[Int] (n, vca)               // global frequency of X
+    private var g_f_X   = new HMatrix2[Int] (n, vc)                // global frequency of X
 
     additive = false
 
     if (DEBUG) {
-        println ("value count vc      = " + vc)
-        println ("value count vcp     = " + vcp)
+        println ("value count vc      = " + vc.deep)
+        println ("value count vcp     = " + vcp.deep)
         println ("parent features par = " + parent)
     } // if
 
@@ -327,15 +318,15 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
     {
         val size     = m / PARALLELISM + 1
         val g_f_Cw   = Array.ofDim [VectorI] (PARALLELISM)
-        val g_f_Xw   = Array.ofDim [HMatrix2[Int]] (PARALLELISM)
-        val g_f_CXw  = Array.ofDim [HMatrix3 [Int]](PARALLELISM)
-        val g_f_CXZw = Array.ofDim [HMatrix5 [Int]](PARALLELISM)
+        val g_f_Xw   = Array.ofDim [HMatrix2 [Int]] (PARALLELISM)
+        val g_f_CXw  = Array.ofDim [HMatrix3 [Int]] (PARALLELISM)
+        val g_f_CXZw = Array.ofDim [HMatrix5 [Int]] (PARALLELISM)
 
         for (w <- (0 until PARALLELISM).par) {
             g_f_Cw (w)   = new VectorI (k)
-            g_f_Xw (w)   = new HMatrix2 [Int] (n, vca)
-            g_f_CXw (w)  = new HMatrix3 [Int] (k, n, vca)
-            g_f_CXZw (w) = new HMatrix5 [Int] (k, n, n, vca, vca)
+            g_f_Xw (w)   = new HMatrix2 [Int] (n, vc)
+            g_f_CXw (w)  = new HMatrix3 [Int] (k, n, vc)
+            g_f_CXZw (w) = new HMatrix5 [Int] (k, n, n, vc, vc)
         } // for
 
         val paraRange = (0 until PARALLELISM).par
@@ -420,7 +411,7 @@ object TANBayes
      *  @param PARALLELISM  the level of parallelism, the number of threads to use
      */
     def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
-               me: Double = me_default, vc: VectoI = null, PARALLELISM: Int = Runtime.getRuntime().availableProcessors()) =
+               me: Double = me_default, vc: Array [Int] = null, PARALLELISM: Int = Runtime.getRuntime().availableProcessors()) =
     {
         new TANBayes (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn,
             me, vc, PARALLELISM)

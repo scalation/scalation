@@ -32,7 +32,7 @@ import scalation.analytics.Probability.entropy
  *  @param vc      the value count array indicating number of distinct values per feature
  */
 class DecisionTreeC45 (val x: MatriD, val y: VectoI, fn: Array [String], isCont: Array [Boolean],
-                       k: Int, cn: Array [String], private var vc: VectoI = null)
+                       k: Int, cn: Array [String], private var vc: Array [Int] = null)
       extends ClassifierReal (x, y, fn, k, cn)
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -223,13 +223,13 @@ class DecisionTreeC45 (val x: MatriD, val y: VectoI, fn: Array [String], isCont:
      *  @param interval train the tree using the features index within 
      *  
      */
-    def train (interval: VectoI)    // FIX - use these parameters
+    def train (interval: IndexedSeq [Int]): DecisionTreeC45 =    // FIX - use these parameters
     {
         if (DEBUG) {
             println ("train: inputs:")
             println ("\t x      = " + x)
             println ("\t y      = " + y)
-            println ("\t vc     = " + vc)
+            println ("\t vc     = " + vc.deep)
             println ("\t isCont = " + isCont.deep)
         } // if
 
@@ -247,38 +247,7 @@ class DecisionTreeC45 (val x: MatriD, val y: VectoI, fn: Array [String], isCont:
         if (DEBUG) println ("train: \noptimal feature is " + opt._1 + " with a gain of " + opt._2)
         
         buildTree (opt)
-    } // train
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the classifier, i.e., determine which feature provides the most
-      *  information gain and select it as the root of the decision tree.
-      *  @param testStart  starting index of test region (inclusive) used in cross-validation.
-      *  @param testEnd    ending index of test region (exclusive) used in cross-validation.
-      */
-    def train (testStart: Int, testEnd: Int)    // FIX - use these parameters
-    {
-        if (DEBUG) {
-            println ("train: inputs:")
-            println ("\t x      = " + x)
-            println ("\t y      = " + y)
-            println ("\t vc     = " + vc)
-            println ("\t isCont = " + isCont.deep)
-        } // if
-
-        for (f <- 0 until n if isCont(f)) calThreshold (f)    // set threshold for cont. features
-        var opt = (0, gain (0))                               // compute gain for feature 0
-
-        if (DEBUG) println ("train: for feature " + opt._1 + " the gain is " + opt._2)
-
-        for (f <- 1 until n) {
-            val fgain = gain (f)                              // compute gain for feature f
-            if (DEBUG) println ("train: for feature " + f + " the gain is " + fgain)
-            if (fgain > opt._2) opt = (f, fgain)              // save feature giving best gain
-        } // for
-
-        if (DEBUG) println ("train: \noptimal feature is " + opt._1 + " with a gain of " + opt._2)
-
-        buildTree (opt)
+        this
     } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -302,7 +271,7 @@ class DecisionTreeC45 (val x: MatriD, val y: VectoI, fn: Array [String], isCont:
                         println (" --> Leaf = " + root.next)
                         println ("\t x      = " + next._1)
                         println ("\t y      = " + next._2)
-                        println ("\t vc     = " + vc)
+                        println ("\t vc     = " + vc.deep)
                         println ("\t isCont = " + isCont.deep)
                     } // if
                 } else {
@@ -422,7 +391,7 @@ object DecisionTreeC45
      *  @param vc      the value count array indicating number of distinct values per feature
      */
     def apply (xy: MatriD, fn: Array [String], isCont: Array [Boolean], k: Int, cn: Array [String],
-              vc: VectoI = null) =
+               vc: Array [Int] = null) =
     {
         new DecisionTreeC45 (xy(0 until xy.dim1, 0 until xy.dim2-1), xy.col(xy.dim2-1).toInt, fn, isCont, k, cn, vc)
     } // apply
@@ -462,7 +431,7 @@ object DecisionTreeC45_Test extends App
                                      0,     1,     1,     1)      // day 14
     // day:           1  2  3  4  5  6  7  8  9 10 11 12 13 14
     val y  = VectorI (0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0)   // classification vector: 0(No), 1(Yes))
-    val vc = VectorI (3, 3, 2, 2)                                 // distinct values for each feature
+    val vc = Array (3, 3, 2, 2)                                   // distinct values for each feature
     val fn = Array ("Outlook", "Temp", "Humidity", "Wind")        // feature names
     val flag = Array (false, false, false, false)                 // is continuous
     val cn = Array("No","Yes")
@@ -482,15 +451,15 @@ object DecisionTreeC45_Test extends App
 //                                 2,     71,     80,    1)    
 //                                 
 //  val y  = VectorI (0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0)     // classification vector: 0(No), 1(Yes))
-//  val vc = VectorI (3, 3, 2, 2)                                   // distinct values for each feature
+//  val vc = Array (3, 3, 2, 2)                                     // distinct values for each feature
 //  val flag = Array (false, true, true, false)
 
     // train the classifier ---------------------------------------------------
-    val cl = new DecisionTreeC45 (x, y, fn, flag, 2, vc=vc, cn=cn)      // create the classifier
+    val cl = new DecisionTreeC45 (x, y, fn, flag, 2, vc = vc, cn = cn)      // create the classifier
     cl.train ()
     cl.printTree ()
     val t = VectorD(1,2,1,0)
-    println("result" +cl.classify(t))
+    println("result" + cl.classify(t))
 //  test sample ------------------------------------------------------------
 //  val z = VectorD (2, 100, 77.5, 0)                               // new data vector to classify
 //  println ("--- classify " + z + " = " + cl.classify (z) + "\n")

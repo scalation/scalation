@@ -28,11 +28,11 @@ trait BayesMetrics
      *  @param k     the number of classes
      *  @param me    the m-estimate value
      */
-    def logLikelihood (vc: VectoI, vcp1: VectoI, vcp2: VectoI, popX: HMatrix5 [Int], k: Int, me: Float = me_default): Double =
+    def logLikelihood (vc: Array [Int], vcp1: VectoI, vcp2: VectoI, popX: HMatrix5 [Int], k: Int, me: Float = me_default): Double =
     {
         var ll = 0.0
         // loop through all features, and all parent configurations
-        for (j <- 0 until vc.dim; i <- 0 until k) {
+        for (j <- 0 until vc.length; i <- 0 until k) {
             val me_vc = me / vc(j).toDouble
 
             for (xp1 <- 0 until vcp1(j); xp2 <- 0 until vcp2(j)) {
@@ -53,10 +53,10 @@ trait BayesMetrics
      *  @param k     the number of classes
      *  @param me    the m-estimate value
      */
-    def aic (vc: VectoI, vcp1: VectoI, vcp2: VectoI, popX: HMatrix5 [Int], k: Int, me: Float = me_default): Double =
+    def aic (vc: Array [Int], vcp1: VectoI, vcp2: VectoI, popX: HMatrix5 [Int], k: Int, me: Float = me_default): Double =
     {
         var sum = 0.0
-        for (j <- 0 until vc.dim) sum += (vc(j) - 1) * (vcp1(j) * vcp2(j))
+        for (j <- 0 until vc.length) sum += (vc(j) - 1) * (vcp1(j) * vcp2(j))
         logLikelihood (vc, vcp1, vcp2, popX, k, me) - sum
     } // aic
 

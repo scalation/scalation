@@ -81,16 +81,18 @@ class NeuralNet (x: MatriD, y: MatriD, h: Int, eta: Double = 1.0)
     /** Given training data 'x' and 'y', fit the weight matrices 'w' and 'v'.
      *  @param yy  the response vector
      */
-    def train (yy: VectoD): NeuralNet =
+    def train (yy: VectoD = y.col(0)): NeuralNet =
     {
-        throw new UnsupportedOperationException ("train (yy) not implemented yet")
-        null
+        // FIX - yy currently not used
+        if (w == null) setWeights ()
+        backProp ()
+        this
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given training data 'x' and 'y', fit the weight matrices 'w' and 'v'.
      */
-    def train (): NeuralNet = { if (w == null) setWeights (); backProp (); this }
+//    def train (): NeuralNet = train (y)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.  FIX

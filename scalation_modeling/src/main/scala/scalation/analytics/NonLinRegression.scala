@@ -63,12 +63,22 @@ class NonLinRegression (x: MatriD, y: VectoD, f: (VectoD, VectoD) => Double,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  non-linear regression equation for the response passed into the class 'yy'.
+     *  non-linear regression equation for the response vector 'yy'.
+     *  <p>
+     *      y = f(x, b)
+     *  <p>
+     *  using the least squares method.
+     *  Caveat:  Optimizer may converge to an unsatisfactory local optima.
+     *           If the regression can be linearized, use linear regression for
+     *           starting solution.
+     *  @param yy  the response vector to work with
      */
-    def train (yy: VectoD): NonLinRegression =
+    def train (yy: VectoD = y): NonLinRegression =
     {
-        throw new UnsupportedOperationException ("train (yy) not implemented yet")
-        null
+        val bfgs = new QuasiNewton (sseF)                      // minimize sse using NLP
+        b        = bfgs.solve (b_init)                         // estimate for b from optimizer
+
+        this
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -82,13 +92,7 @@ class NonLinRegression (x: MatriD, y: VectoD, f: (VectoD, VectoD) => Double,
      *           If the regression can be linearized, use linear regression for
      *           starting solution.
      */
-    def train (): NonLinRegression =
-    {
-        val bfgs = new QuasiNewton (sseF)                      // minimize sse using NLP
-        b        = bfgs.solve (b_init)                         // estimate for b from optimizer
-
-        this
-    } // train
+//    def train (): NonLinRegression = train (y)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.

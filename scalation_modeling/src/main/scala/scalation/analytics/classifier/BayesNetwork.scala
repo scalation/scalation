@@ -72,9 +72,10 @@ class BayesNetwork (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array 
      *  @param testStart  starting index of test region (inclusive) used in cross-validation.
      *  @param testEnd    ending index of test region (exclusive) used in cross-validation.
      */
-    def train (testStart: Int, testEnd: Int)    // FIX - use these parameters
+    def train (itest: IndexedSeq [Int]): BayesNetwork =      // FIX - use these parameters
     {
         // FIX - to be implemented
+        this
     } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

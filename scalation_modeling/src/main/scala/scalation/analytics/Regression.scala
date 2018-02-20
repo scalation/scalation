@@ -102,9 +102,9 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (protected val x: MatT, protec
      *      yy  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_1 , ... x_k] + e
      *  <p>
      *  using the ordinary least squares 'OLS' method.
-     *  @param yy  the response vector
+     *  @param yy  the response vector to work with (defaults to y)
      */
-    def train (yy: VectoD): Regression [MatT, VecT] =
+    def train (yy: VectoD = y): Regression [MatT, VecT] =
     {
         b = technique match {                                  // solve for coefficient vector b
             case QR       => fac.solve (yy)                    // R * b = Q.t * yy
@@ -117,14 +117,8 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (protected val x: MatT, protec
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  multiple regression equation for the response passed into the class 'y'.
-     */
-    def train (): Regression [MatT, VecT] = train (y)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.
-     *  @param yy   the response vector
+     *  @param yy  the response vector
      */
     def eval (yy: VectoD = y)
     {
@@ -198,7 +192,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (protected val x: MatT, protec
             val cols_j = cols + j
             if (DEBUG) println ("forewardElim: cols_j = " + cols_j)
             val rg_j = new Regression (x.selectCols (cols_j.toArray), y)  // regress with x_j added
-            rg_j.train ().eval ()
+            rg_j.train (y).eval ()
             val bb = rg_j.coefficient
             val ft = rg_j.fit
             if (ft(ir) > ft_max(ir)) { j_max = j; b_max = bb; ft_max = ft }
@@ -221,11 +215,10 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (protected val x: MatT, protec
         val keep = m.toInt                                           // i-value large enough to not exclude any rows in slice
 
         for (j <- 1 to k if cols contains j) {
-//          val rg_j = new Regression (x.sliceExclude (keep, j), y)  // regress with x_j removed
             val cols_j = cols - j
             if (DEBUG) println ("backwardElim: cols_j = " + cols_j)
             val rg_j = new Regression (x.selectCols (cols_j.toArray), y)  // regress with x_j removed
-            rg_j.train ().eval ()
+            rg_j.train (y).eval ()
             val bb = rg_j.coefficient
             val ft = rg_j.fit
             if (ft(ir) > ft_max(ir)) { j_max = j; b_max = bb; ft_max = ft }
@@ -248,7 +241,7 @@ class Regression [MatT <: MatriD, VecT <: VectoD] (protected val x: MatT, protec
         for (j <- 1 to k) {
             val x_j  = x.col(j)                                         // x_j is jth column in x
             val rg_j = new Regression (x.sliceExclude (keep, j), x_j)   // regress with x_j removed
-            rg_j.train ().eval ()
+            rg_j.train (y).eval ()
             vifV(j-1) =  1.0 / (1.0 - rg_j.fit(ir))                  // store vif for x_1 in vifV(0)
         } // for
         vifV
@@ -312,7 +305,7 @@ object Regression
         for (tec <- techniques) {                              // use 'tec' Factorization
             banner (s"Fit the parameter vector b using $tec")
             val rg = new Regression (x, y, tec)
-            rg.train ().eval ()
+            rg.train (y).eval ()
             println ("b   = " + rg.coefficient)
             println ("fit = " + rg.fit)
             rg.report ()
@@ -517,4 +510,36 @@ object RegressionTest4 extends App
     } // for
 
 } // RegressionTest4 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RegressionTest5` object tests `Regression` class using the following
+ *  regression equation.
+ *  <p>
+ *      y = b dot x = b_0 + b_1*x1 + b_2*x_2.
+ *  <p>
+ *  > runMain scalation.analytics.RegressionTest5
+ */
+object RegressionTest5 extends App
+{
+    // 4 data points: constant term, x_1 coordinate, x_2 coordinate
+    val x = new MatrixD ((7, 3), 1.0, 1.0, 1.0,                  // 4-by-3 matrix
+                                 1.0, 1.0, 2.0,
+                                 1.0, 2.0, 1.0,
+                                 1.0, 2.0, 2.0,
+                                 1.0, 2.0, 3.0,
+                                 1.0, 3.0, 2.0,
+                                 1.0, 3.0, 3.0)
+    val y = VectorD (6.0, 8.0, 9.0, 11.0, 13.0, 13.0, 16.0)
+    val z = VectorD (1.0, 1.0, 3.0)
+    //var rg: Regression [MatrixD, VectorD] = _
+
+//  println ("model: y = b_0 + b_1*x1 + b_2*x_2")
+    println ("model: y = b₀ + b₁*x₁ + b₂*x₂")
+    println ("x = " + x)
+    println ("y = " + y)
+
+    test (x, y, z)
+
+} // RegressionTest5 object
 

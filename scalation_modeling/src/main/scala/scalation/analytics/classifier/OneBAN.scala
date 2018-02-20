@@ -39,13 +39,13 @@ import BayesClassifier.me_default
  * @param thres the correlation threshold between 2 features for possible parent-child relationship
  */
 class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String],
-             private var vc: VectoI = null, me: Float = me_default, thres: Double = 0.0)
+             protected var vc: Array [Int] = null, me: Float = me_default, thres: Double = 0.0)
         extends BayesClassifier(x, y, fn, k, cn)
 {
     private val DEBUG = false                           // debug flag
 
     protected val parent = new VectorI (n)              // vector holding the parent for each feature/variable
-    protected val vcp = new VectorI (n)                 // value count for the parent
+    protected val vcp    = Array.ofDim [Int] (n)        // value count for the parent
 
     protected val f_CXP  = new HMatrix4 [Int](k, n)     // conditional frequency counts for variable/feature j: xj
     protected val p_X_CP = new HMatrix4 [Double](k, n)  // conditional probabilities for variable/feature j: xj
@@ -57,15 +57,14 @@ class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String
         shiftToZero; vc = vc_fromData                   // set value counts from data
     } // if
 
-    protected val vca = vc.toArray
-
-    f_CXZ   = new HMatrix5 [Int] (k, n, n, vca, vca)   // local joint frequency (using partial dataset, i.e. when using cross validation) of C, X, and Z, where X, Z are features/columns
-    f_CX    = new HMatrix3 [Int] (k, n, vca)           // local joint frequency of C and X
-    f_X     = new HMatrix2 [Int] (n, vca)              // local frequency of X
+    f_CXZ   = new HMatrix5 [Int] (k, n, n, vc, vc)      // local joint frequency (using partial dataset, i.e. when using cross validation) of
+                                                        // C, X, and Z, where X, Z are features/columns
+    f_CX    = new HMatrix3 [Int] (k, n, vc)             // local joint frequency of C and X
+    f_X     = new HMatrix2 [Int] (n, vc)                // local frequency of X
 
     if (DEBUG) {
-        println("value count vc      = " + vc)
-        println("value count vcp     = " + vcp)
+        println("value count vc      = " + vc.deep)
+        println("value count vcp     = " + vcp.deep)
         println("parent features parent = " + parent)
     } // if
 
@@ -78,19 +77,11 @@ class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier by computing the probabilities for C, and the
-     *  conditional probabilities for X_j.
-     *  @param testStart  starting index of test region (inclusive) used in cross-validation.
-     *  @param testEnd    ending index of test region. (exclusive) used in cross-validation.
-     */
-    def train (testStart: Int, testEnd: Int) = train (testStart until testEnd)
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the classifier by computing the probabilities for C, and the
      *  conditional probabilities for X_j. This is the quick version that uses
      *  the "subtraction" method to achieve efficiency.
      *  @param itest  indices of the instances considered testing data
      */
-    override def train (itest: IndexedSeq [Int])
+    override def train (itest: IndexedSeq [Int]): OneBAN0 =
     {
         val idx = if (additive) 0 until m diff itest
                   else          itest
@@ -102,6 +93,7 @@ class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String
         copyFreqCXP ()
         train2 ()
         if (smooth) smoothParam(itest.size)
+        this
     } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -110,13 +102,13 @@ class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String
      */
     private def train2 ()
     {
-        p_C = f_C.toDouble / md                                 // prior probability for class yi
+        p_C = nu_y.toDouble / md                                 // prior probability for class yi
         for (i <- 0 until k; j <- 0 until n if fset(j)) {
             // for each class yi & feature xj
             val me_vc = me / vc(j).toDouble
             for (xj <- 0 until vc(j); xp <- 0 until vcp(j)) {
                 val d = if (parent(j) > -1) f_CX(i, parent(j), xp)
-                else f_C(i)
+                else nu_y(i)
                 // for each value for feature j: xj, par(j): xp
                 p_X_CP(i, j, xj, xp) = (f_CXP(i, j, xj, xp) + me_vc) / (d + me)
             } // for
@@ -135,7 +127,7 @@ class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String
      */
     def computeParent (idx: IndexedSeq [Int])
     {
-        val cmiMx = calcCMI (idx, vca)
+        val cmiMx = calcCMI (idx, vc)
         for (j1 <- 0 until n if fset(j1); j2 <- 0 until j1 if fset(j2)) cmiMx(j1, j2) = cmiMx(j2, j1)
 
         for (i <- 0 until n if fset(i)) {
@@ -173,7 +165,7 @@ class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String
     protected override def updateFreq (i: Int)
     {
         val yi = y(i)                                    // get the class for ith row
-        f_C(yi) += 1                                     // decrement frequency for class yi
+        nu_y(yi) += 1                                     // decrement frequency for class yi
         for (j <- x.range2 if fset(j)) {
             f_X(j, x(i, j)) += 1
             f_CX(yi, j, x(i, j)) += 1
@@ -186,11 +178,13 @@ class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the value counts of each parent feature based on the parent vector.
+     *  Let 1 be the default value count when there is no parent.
      */
     def computeVcp ()
     {
-        vcp.set(1)                                   // set default value count to 1
-        for (j <- 0 until n if (fset(j) && parent(j) > -1)) vcp(j) = vc(parent(j))
+        for (j <- 0 until n) {
+            vcp(j) = if (fset(j) && parent(j) > -1) vc(parent(j)) else 1
+        } // for
     } // computeVcp
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -208,7 +202,7 @@ class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String
                 val pj = parent(j)
                 for (xj <- 0 until vc(j); xp <- 0 until vcp(j)) {
 
-                    val f_px = if (pj > -1) f_CX(i, pj, xp) else f_C(i)
+                    val f_px = if (pj > -1) f_CX(i, pj, xp) else nu_y(i)
 
                     // NOTE: two alternative priors, may work better for some datasets
 //                  val theta0 = f_CXP(i, j, xj, xp) / (md - testSize)
@@ -245,7 +239,7 @@ class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String
      */
     def reset()
     {
-        f_C.set(0)
+        nu_y.set(0)
         f_CX.set(0)
         f_X.set(0)
         f_CXZ.set(0)
@@ -274,7 +268,7 @@ object OneBAN0
      *  @param thres  the correlation threshold between 2 features for possible parent-child relationship
      */
     def apply(xy: MatriI, fn: Array[String], k: Int, cn: Array[String],
-              vc: VectoI = null, me: Float = me_default, thres: Double = 0.1) =
+              vc: Array [Int] = null, me: Float = me_default, thres: Double = 0.1) =
     {
         new OneBAN0(xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn,
             vc, me, thres)
@@ -297,23 +291,21 @@ object OneBAN0
  * @param thres the correlation threshold between 2 features for possible parent-child relationship
  */
 class OneBAN (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String],
-               private var vc: VectoI = null, me: Float = me_default, thres: Double = 0.0)
-        extends OneBAN0(x, y, fn, k, cn, vc, me, thres)
+              vc_ : Array [Int] = null, me: Float = me_default, thres: Double = 0.0)
+        extends OneBAN0(x, y, fn, k, cn, vc_, me, thres)
 {
     private val DEBUG  = false                                     // debug flag
 
-    if (vc == null) vc = new VectorI (vca.length, vca)
-
-    private val g_f_CXZ = new HMatrix5 [Int] (k, n, n, vca, vca)   // global joint frequency (using entire dataset) of C, X, and Z, where X, Z are features/columns
-    private val g_f_CX  = new HMatrix3 [Int] (k, n, vca)           // global joint frequency of C and X
-    private val g_f_C   = new VectorI (k)                          // global frequency of C
-    private val g_f_X   = new HMatrix2[Int] (n, vca)               // global frequency of X
+    private val g_f_CXZ = new HMatrix5 [Int] (k, n, n, vc, vc)     // global joint frequency (using entire dataset) of C, X, and Z, where X, Z are features/columns
+    private val g_f_CX  = new HMatrix3 [Int] (k, n, vc)            // global joint frequency of C and X
+    private val g_nu_y   = new VectorI (k)                          // global frequency of C
+    private val g_f_X   = new HMatrix2[Int] (n, vc)                // global frequency of X
 
     additive = false
 
     if (DEBUG) {
-        println ("value count vc      = " + vc)
-        println ("value count vcp     = " + vcp)
+        println ("value count vc      = " + vc.deep)
+        println ("value count vcp     = " + vcp.deep)
         println ("parent features par = " + parent)
     } // if
 
@@ -326,7 +318,7 @@ class OneBAN (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String]
     {
         for (i <- 0 until m) {
             val yi = y(i)
-            g_f_C(yi) += 1
+            g_nu_y(yi) += 1
             for (j <- 0 until n if fset(j)) {
                 g_f_X(j, x(i, j)) += 1
                 g_f_CX(yi, j, x(i, j)) += 1
@@ -347,7 +339,7 @@ class OneBAN (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String]
     protected override def updateFreq (i: Int)
     {
         val yi   = y(i)                                       // get the class for ith row
-        f_C(yi) -= 1                                          // decrement frequency for class yi
+        nu_y(yi) -= 1                                          // decrement frequency for class yi
         for (j <- x.range2 if fset(j)) {
             f_X(j, x(i, j)) -= 1
             f_CX (yi, j, x(i, j)) -= 1
@@ -364,7 +356,7 @@ class OneBAN (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String]
     override def reset ()
     {
         for (i <- 0 until k) {
-            f_C(i) = g_f_C(i)
+            nu_y(i) = g_nu_y(i)
             for (j <- x.range2 if fset(j); xj <- 0 until vc(j)) {
                 if (i == 0) f_X(j, xj) = g_f_X(j, xj)
                 f_CX(i, j, xj) = g_f_CX(i, j, xj)
@@ -394,7 +386,7 @@ object OneBAN
      *  @param thres  the correlation threshold between 2 features for possible parent-child relationship
      */
     def apply(xy: MatriI, fn: Array[String], k: Int, cn: Array[String],
-              vc: VectoI = null, me: Float = me_default, thres: Double = 0.1) =
+              vc: Array [Int] = null, me: Float = me_default, thres: Double = 0.1) =
     {
         new OneBAN (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn,
             vc, me, thres)

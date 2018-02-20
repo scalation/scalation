@@ -10,6 +10,7 @@ package scalation.analytics.classifier
 
 import scala.math.round
 import scala.util.control.Breaks.{break, breakable}
+
 import scalation.linalgebra.{MatriD, MatriI, MatrixD, MatrixI, VectoD, VectoI, VectorI}
 import scalation.stat.vectorD2StatVector
 import scalation.util.{Error, getFromURL_File}
@@ -17,13 +18,14 @@ import scalation.util.{Error, getFromURL_File}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ClassifierInt` abstract class provides a common foundation for several
  *  classifiers that operate on integer-valued data.
- *  @param x   the integer-valued training/test data vectors stored as rows of a matrix
- *  @param y   the training/test classification vector, where y_i = class for row i of the matrix x
+ *  @param x   the integer-valued data vectors stored as rows of a matrix
+ *  @param y   the integer-valued classification vector, where y_i = class for row i of matrix x
  *  @param fn  the names for all features/variables
  *  @param k   the number of classes
  *  @param cn  the names for all classes
  */
-abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String])
+abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int,
+                              cn: Array [String])
          extends Classifier with Error
 {
     /** the number of data vectors in training/test-set (# rows)
@@ -53,27 +55,27 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int, 
     if (cn.length != k) flaw ("constructor", "cn.length must equal number of classes (k)")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the number of data vectors in training/test-set (# rows).
+    /** Return the number of data vectors/points in the entire dataset (training + testing),
      */
     def size: Int = m
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return default values for binary input data (value count 'vc' set to 2).
      */
-    def vc_default: VectoI = { val vc = new VectorI (n); vc.set (2); vc }
+    def vc_default: Array [Int] = Array.fill (n)(2)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return value counts calculated from the input data.
      *  May wish to call 'shiftToZero' before calling this method.
      */
-    def vc_fromData: VectoI = VectorI (for (j <- x.range2) yield x.col(j).max() + 1)
+    def vc_fromData: Array [Int] = (for (j <- x.range2) yield x.col(j).max() + 1).toArray
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return value counts calculated from the input data.
      *  May wish to call 'shiftToZero' before calling this method.
      *  @param rg  the range of columns to be considered
      */
-    def vc_fromData2 (rg: Range): VectoI = VectorI (for (j <- rg) yield x.col(j).max() + 1)
+    def vc_fromData2 (rg: Range): Array [Int] = (for (j <- rg) yield x.col(j).max() + 1).toArray
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Shift the 'x' Matrix so that the minimum value for each column equals zero.
@@ -81,29 +83,15 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int, 
     def shiftToZero () { x -= VectorI (for (j <- x.range2) yield x.col(j).min()) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given a new continuous data vector 'z', determine which class it belongs
-     *  to, by first rounding it to an integer-valued vector.
-     *  Return the best class, its name and its relative probability
-     *  @param z  the vector to classify
-     */
-    def classify (z: VectoD): (Int, String, Double) =
-    {
-        val zi = new VectorI (z.dim)
-        for (j <- 0 until z.dim) zi(j) = (round (z(j))).toInt
-        classify (zi)
-    } // classify
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the quality of the training with a test-set and return the fraction
      *  of correct classifications.
-     *  @param testStart  beginning of test region (inclusive)
-     *  @param testEnd    end of test region (exclusive)
+     *  @param itest  indices of the instances considered test data
      */
-    def test (testStart: Int, testEnd: Int): Double =
+    def test (itest: IndexedSeq [Int]): Double =
     {
         var correct = 0
-        for (i <- testStart until testEnd if classify (x(i))._1 == y(i)) correct += 1
-        correct / (testEnd - testStart).toDouble
+        for (i <- itest if classify (x(i))._1 == y(i)) correct += 1
+        correct / itest.size.toDouble
     } // test
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -119,18 +107,6 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int, 
         var correct = 0
         for (i <- 0 until mm if classify (xx(i))._1 == yy(i)) correct += 1
         correct / mm.toDouble
-    } // test
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Test the quality of the training with a test-set and return the fraction
-     *  of correct classifications.
-     *  @param itest  indices of the instances considered test data
-     */
-    override def test (itest: VectoI): Double =
-    {
-        var correct = 0
-        for (i <- itest if classify (x(i))._1 == y(i)) correct += 1
-        correct / itest.dim.toDouble
     } // test
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

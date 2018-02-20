@@ -11,8 +11,9 @@ package scalation.analytics
 import scala.collection.immutable.ListMap
 import scala.math.sqrt
 
-import scalation.linalgebra.{VectoD, VectorD, VectoI}
+import scalation.linalgebra.{MatriD, VectoD, VectorD, VectoI}
 import scalation.math.double_exp
+import scalation.stat.Statistic
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Predictor` trait provides a common framework for several predictors.
@@ -46,7 +47,7 @@ trait Predictor
      *  passed into the implementing class, train the prediction function 'y = f(x)'
      *  by fitting its parameters.
      */
-    def train (): Predictor
+//    def train (): Predictor
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.
@@ -121,7 +122,48 @@ trait Predictor
                  "RMSE"      -> "%.4f".format (rmse))
     } // metrics
 
+    def build (x: MatriD, y: VectoD): Predictor = ???
+
 } // Predictor trait
+
+
+object Predictor
+{
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /*  Use 'k'-fold cross-validation to compute test quality of fit measures by
+     *  dividing the dataset into a test dataset and a training dataset.
+     *  The test dataset starts at 'testStart' and ends at 'testEnd', while
+     *  the rest of the data is training dataset".
+     *  @param k  the number of crosses and cross-validations (defaults to 10x).
+     *
+    def crossValidate (x: MatriD, y: VectoD, alg: Predictor, k: Int = 10): Array [Statistic] =
+    {
+        val stats = Array.fill (alg.fitLabels.length) (new Statistic ())
+        val tSize = x.dim1 / k 
+
+        var model = alg
+        var i = 0
+        do {
+            val tRange = Range (i * tSize, (i+1) * tSize)   // row range for test dataset
+            val x_te = x.slice (tRange)                     // test data matrix
+            val y_te = y.slice (tRange)                     // test response vector
+            val x_tr = x.sliceExclude (tRange)              // training data matrix
+            val y_tr = y.sliceExclude (tRange)              // training response vector
+            model = model.build (x_tr, y_tr)                // build next model for next training dataset
+            model.eval (x_te, y_te)                         // evaluate model on testing dataset
+            val qm = model.fit                              // get quality of fit measures
+            for (i <- qm.indices) stats(i).tally (qm(i))    // tally these measures
+            i += 1
+        } while (i < k)
+
+        println ("------------------------------------------------------------")
+        println ("stats = " + stats.deep)
+        println ("------------------------------------------------------------")
+        stats
+    } // crossValidate
+     */
+
+} // Predictor object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

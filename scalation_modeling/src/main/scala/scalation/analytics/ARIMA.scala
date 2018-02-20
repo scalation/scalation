@@ -476,8 +476,9 @@ class ARIMA (y: VectoD, t: VectoD, d: Int = 0)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train/fit an `ARIMA` model to times the series data.  Must call setPQ first.
+     *  @param yy  the response vector to work with
      */
-    def train (yy: VectoD): ARIMA =
+    def train (yy: VectoD = y): ARIMA =
     {
         if (p > 0 && q == 0)      est_ar (p)
         else if (p == 0 && q > 0) est_ma (q)
@@ -489,7 +490,7 @@ class ARIMA (y: VectoD, t: VectoD, d: Int = 0)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train/fit an `ARIMA` model to the times series data on 'y'.
      */
-    def train (): ARIMA =  train (y)
+//    def train (): ARIMA =  train (y)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.

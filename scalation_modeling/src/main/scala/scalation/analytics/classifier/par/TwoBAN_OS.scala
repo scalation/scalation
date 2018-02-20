@@ -36,7 +36,6 @@ import BayesClassifier.me_default
  *
  *  This classifier uses the standard cross-validation technique.
  *  ------------------------------------------------------------------------------
- *
  *  @param x            the integer-valued data vectors stored as rows of a matrix
  *  @param y            the class vector, where y(l) = class for row l of the matrix, x(l)
  *  @param fn           the names for all features/variables
@@ -47,16 +46,15 @@ import BayesClassifier.me_default
  *  @param thres        the correlation threshold between 2 features for possible parent-child relationship
  *  @param PARALLELISM  the level of parallelism, the number of threads to use
  */
-class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-                     private var vc: VectoI = null, thres: Double = 0.0, me: Double = me_default,
-                     private val PARALLELISM: Int = Runtime.getRuntime().availableProcessors())
+class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String], protected var vc: Array [Int] = null,
+                  thres: Double = 0.0, me: Double = me_default, private val PARALLELISM: Int = Runtime.getRuntime ().availableProcessors ())
       extends BayesClassifier (x, y, fn, k, cn, PARALLELISM)
 {
     private val DEBUG = false                                             // debug flag
 
     protected var parent = new MatrixI (n, 2)                             // vector holding the parent for each feature/variable
-    protected val vcp1   = new VectorI (n)                                // value count for parent 1
-    protected val vcp2   = new VectorI (n)                                // value count for parent 2
+    protected val vcp1   = Array.ofDim [Int] (n)                          // value count for parent 1
+    protected val vcp2   = Array.ofDim [Int] (n)                          // value count for parent 2
 
     protected val maxRandomRestarts = 48                                  // maximum number of random restarts
     protected val permutedVec  = PermutedVecI (VectorI.range(0, n), ranStream)
@@ -69,24 +67,14 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
         shiftToZero; vc = vc_fromData                                     // set to default for binary data (2)
     } // if
 
-    protected val vca = vc.toArray
-
-    f_X   = new HMatrix2 [Int] (n, vca)                                   // Frequency of X
-    f_CX  = new HMatrix3 [Int] (k, n, vca)                                // Joint frequency of C and X
-    f_CXZ = new HMatrix5 [Int] (k, n, n, vca, vca)                        // Joint frequency of C, X, and Z, where X, Z are features/columns
+    f_X   = new HMatrix2 [Int] (n, vc)                                    // Frequency of X
+    f_CX  = new HMatrix3 [Int] (k, n, vc)                                 // Joint frequency of C and X
+    f_CXZ = new HMatrix5 [Int] (k, n, n, vc, vc)                          // Joint frequency of C, X, and Z, where X, Z are features/columns
 
     protected val scoreArray = new VectorD (maxRandomRestarts)
     protected val featOrderArray = Array.ofDim [VectoI] (maxRandomRestarts)
 
-    if (DEBUG) println ("value count vc      = " + vc)
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the classifier by computing the probabilities for C, and the
-     *  conditional probabilities for X_j.
-     *  @param testStart starting index of test region (inclusive) used in cross-validation.
-     *  @param testEnd   ending index of test region. (exclusive) used in cross-validation.
-     */
-    def train (testStart: Int, testEnd: Int) = train (testStart until testEnd)
+    if (DEBUG) println ("value count vc = " + vc.deep)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier by computing the probabilities for C, and the
@@ -94,15 +82,15 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
      *  the "subtraction" method to achieve efficiency.
      *  @param itest  indices of the instances considered testing data
      */
-    override def train (itest: IndexedSeq [Int])
+    override def train (itest: IndexedSeq [Int]): TwoBAN_OS0 =
     {
-        val idx = if (additive) 0 until m diff itest
-                  else          itest
-        val cmiMx = calcCMI (idx, vca)
+        val idx = if (additive) 0 until m diff itest else itest
+        val cmiMx = calcCMI (idx, vc)
         learnStructure (cmiMx)
         copyFreqCXPP (if (additive) idx else 0 until m diff itest)
         train2 ()
         if (smooth) smoothParam (itest.size)
+        this
     } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -229,8 +217,10 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
                 breakable { while (true) {
                     localScores.set(Double.MinValue)
                     // swapping j-1th & jth and j+1th & j+2th elements in the featureOrder
-                    if (toSwap > 0 && tabu.notInTaboo(featureOrder(toSwap - 1), featureOrder(toSwap))) testSwapping(featureOrder, toSwap - 1, localScores, 0, cmiMx)
-                    if (toSwap + 2 < n && tabu.notInTaboo(featureOrder(toSwap + 1), featureOrder(toSwap + 2))) testSwapping(featureOrder, toSwap + 1, localScores, 1, cmiMx)
+                    if (toSwap > 0 && tabu.notInTaboo (featureOrder(toSwap - 1), featureOrder(toSwap)))
+                        testSwapping (featureOrder, toSwap - 1, localScores, 0, cmiMx)
+                    if (toSwap + 2 < n && tabu.notInTaboo (featureOrder(toSwap + 1), featureOrder(toSwap + 2)))
+                        testSwapping (featureOrder, toSwap + 1, localScores, 1, cmiMx)
 
                     if (localScores.max() > localMax) {
                         localMax = localScores.max
@@ -295,14 +285,13 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the value counts of each parent feature based on the parent matrix.
+     *  Let 1 be the default value count when there is no parent.
      */
     def computeVcp ()
     {
-        vcp1.set(1) // set default value count to 1 for parent 1
-        vcp2.set(1) // set default value count to 1 for parent 2
-        for (j <- (0 until n).par if fset(j) && parent(j, 0) > -1) {
-            vcp1(j) = vc(parent(j, 0))
-            if (parent(j, 1) > -1) vcp2(j) = vc(parent(j, 1))
+        for (j <- (0 until n).par) {
+            vcp1(j) = if (fset(j) && parent(j, 0) > -1) vc(parent(j, 0)) else 1
+            vcp2(j) = if (fset(j) && parent(j, 0) > -1 && parent(j, 1) > -1) vc(parent(j, 1)) else 1
         } // for
     } // computeVcp
 
@@ -454,9 +443,8 @@ object TwoBAN_OS0
      *  @param thres        the correlation threshold between 2 features for possible parent-child relationship
      *  @param PARALLELISM  the level of parallelism, the number of threads to use
      */
-    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
-              vc: VectoI = null, thres: Double = 0.0, me: Double = me_default,
-              PARALLELISM: Int = Runtime.getRuntime().availableProcessors()) =
+    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String], vc: Array [Int] = null,
+               thres: Double = 0.0, me: Double = me_default, PARALLELISM: Int = Runtime.getRuntime ().availableProcessors ()) =
     {
         new TwoBAN_OS0 (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn,
                             vc, thres, me, PARALLELISM)
@@ -489,23 +477,20 @@ object TwoBAN_OS0
  *  @param thres        the correlation threshold between 2 features for possible parent-child relationship
  *  @param PARALLELISM  the level of parallelism, the number of threads to use
  */
-class TwoBAN_OS (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-                  private var vc: VectoI = null, thres: Double = 0.0, me: Double = me_default,
-                  private val PARALLELISM: Int = Runtime.getRuntime().availableProcessors())
-        extends TwoBAN_OS0 (x, y, fn, k, cn, vc, thres, me, PARALLELISM)
+class TwoBAN_OS (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String], vc_ : Array [Int] = null,
+                 thres: Double = 0.0, me: Double = me_default, private val PARALLELISM: Int = Runtime.getRuntime ().availableProcessors ())
+        extends TwoBAN_OS0 (x, y, fn, k, cn, vc_, thres, me, PARALLELISM)
 {
     private val DEBUG = false                                         // debug flag
 
-    if (vc == null) vc = new VectorI (vca.length, vca)
-
-    private var g_f_CXZ = new HMatrix5 [Int] (k, n, n, vca, vca)      // global joint frequency of C, X, and Z, where X, Z are features/columns
-    private var g_f_CX  = new HMatrix3 [Int] (k, n, vca)              // global joint frequency of C and X
+    private var g_f_CXZ = new HMatrix5 [Int] (k, n, n, vc, vc)        // global joint frequency of C, X, and Z, where X, Z are features/columns
+    private var g_f_CX  = new HMatrix3 [Int] (k, n, vc)               // global joint frequency of C and X
     private val g_f_C   = new VectorI (k)                             // global frequency of C
-    private var g_f_X   = new HMatrix2[Int] (n, vca)                  // global frequency of X
+    private var g_f_X   = new HMatrix2[Int] (n, vc)                   // global frequency of X
 
     additive = false
 
-    if (DEBUG) println ("value count vc = " + vc)
+    if (DEBUG) println ("value count vc = " + vc.deep)
 
     frequenciesAll ()
 
@@ -523,9 +508,9 @@ class TwoBAN_OS (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
 
         for (w <- 0 until PARALLELISM) {
             g_f_Cw (w)   = new VectorI (k)
-            g_f_Xw (w)   = new HMatrix2 [Int] (n, vca)
-            g_f_CXw (w)  = new HMatrix3 [Int] (k, n, vca)
-            g_f_CXZw (w) = new HMatrix5 [Int] (k, n, n, vca, vca)
+            g_f_Xw (w)   = new HMatrix2 [Int] (n, vc)
+            g_f_CXw (w)  = new HMatrix3 [Int] (k, n, vc)
+            g_f_CXZw (w) = new HMatrix5 [Int] (k, n, n, vc, vc)
         } // for
 
         val paraRange = (0 until PARALLELISM).par
@@ -614,9 +599,8 @@ object TwoBAN_OS
      *  @param thres        the correlation threshold between 2 features for possible parent-child relationship
      *  @param PARALLELISM  the level of parallelism, the number of threads to use
      */
-    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
-               vc: VectoI = null, thres: Double = 0.0, me: Double = me_default,
-               PARALLELISM: Int = Runtime.getRuntime().availableProcessors()) =
+    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String], vc: Array [Int] = null,
+               thres: Double = 0.0, me: Double = me_default, PARALLELISM: Int = Runtime.getRuntime().availableProcessors()) =
     {
         new TwoBAN_OS (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn,
             vc, thres, me, PARALLELISM)

@@ -13,7 +13,7 @@ import scala.math.{cos, Pi, sin}
 
 import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.plot.Plot
-import scalation.util.{Error, time}
+import scalation.util.{banner, Error, time}
 
 import RegTechnique._
 
@@ -46,7 +46,7 @@ class TrigRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = QR
 
     private val w = (2.0 * Pi) / (t.max() - t.min())           // base displacement angle in radians
     private val x = new MatrixD (t.dim, 1 + 2 * k)             // design matrix built from t
-    for (i <- 0 until t.dim) x(i) = expand (t(i))
+    for (i <- t.range) x(i) = expand (t(i))
     private val rg = new Regression (x, y, technique)          // regular multiple linear regression
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -75,13 +75,13 @@ class TrigRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = QR
      *  using the least squares method.
      *  @param yy  the response vector
      */
-    def train (yy: VectoD): Regression [MatrixD, VectoD] = rg.train (yy)
+    def train (yy: VectoD = y): Regression [MatrixD, VectoD] = rg.train (yy)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
      *  regression equation using 'y'.
      */
-    def train (): Regression [MatrixD, VectoD] = rg.train ()
+//    def train (): Regression [MatrixD, VectoD] = rg.train ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.
@@ -158,33 +158,81 @@ class TrigRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = QR
 /** The `TrigRegressionTest` object tests `TrigRegression` class using the following
  *  regression equation.
  *  <p>
- *      y  =  b dot x  =  b_0 + b_1*t + b_2*t^2.
+ *      y  =  b dot x  =  b_0 + b_1 sin wt + b_2 cos wt + ... b_2k-1 sin kwt + b_2k cos kwt + e
  *  <p>
+ *  The data is generated from a noisy cubic function.
  *  > runMain scalation.analytics.TrigRegressionTest
  */
 object TrigRegressionTest extends App
 {
     import scalation.random.Normal
 
-    val noise = Normal (0.0, 500.0)
+    val noise = Normal (0.0, 10000.0)
     val t     = VectorD.range (0, 100)
     val y     = new VectorD (t.dim)
-    for (i <- 0 until 100) y(i) = 10.0 - 10.0 * i + i*i + noise.gen
+    for (i <- 0 until 100) { val x = (i - 40)/2.0; y(i) = 1000.0 + x + x*x + x*x*x + noise.gen }
 
     println ("t = " + t)
     println ("y = " + y)
 
-    val order = 8
-    val trg   = new TrigRegression (t, y, order)
+    val harmonics = 8
+    val trg   = new TrigRegression (t, y, harmonics)
     trg.train ().eval ()
-
-    println (trg.fitLabels)
-    println ("fit         = " + trg.fit)
     println ("coefficient = " + trg.coefficient)
+    println ("              " + trg.fitLabels)
+    println ("fit         = " + trg.fit)
 
-    val z = 10.5                                  // predict y for one point
-    val yp = trg.predict (z)
-    println ("predict (" + z + ") = " + yp)
+    val z   = 10.5                                  // predict y for one point
+    val yp1 = trg.predict (z)
+    println ("predict (" + z + ") = " + yp1)
+
+    banner ("test predictions")
+    val yp = t.map (trg.predict (_))
+    println (s" y = $y \n yp = $yp")
+    new Plot (t, y, yp, "TrigRegression")
 
 } // TrigRegressionTest object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `TrigRegressionTest2` object tests `TrigRegression` class using the following
+ *  regression equation.
+ *  <p>
+ *      y  =  b dot x  =  b_0 + b_1 sin wt + b_2 cos wt + ... b_2k-1 sin kwt + b_2k cos kwt + e
+ *  <p>
+ *  The data is generated from periodic noisy cubic functions.
+ *  > runMain scalation.analytics.TrigRegressionTest2
+ */
+object TrigRegressionTest2 extends App
+{
+    import scalation.random.Normal
+
+    val noise = Normal (0.0, 10.0)
+    val t     = VectorD.range (0, 200)
+    val y     = new VectorD (t.dim)
+    for (i <- 0 until 5) {
+        for (j <- 0 until 20) { val x = j - 4;  y(40*i+j) = 100.0 + x + x*x + x*x*x + noise.gen }
+        for (j <- 0 until 20) { val x = 16 - j; y(40*i+20+j) = 100.0 + x + x*x + x*x*x + noise.gen }
+    } // for
+
+    println ("t = " + t)
+    println ("y = " + y)
+
+    val harmonics = 16
+    val trg   = new TrigRegression (t, y, harmonics)
+    trg.train ().eval ()
+    println ("coefficient = " + trg.coefficient)
+    println ("              " + trg.fitLabels)
+    println ("fit         = " + trg.fit)
+
+    val z   = 10.5                                  // predict y for one point
+    val yp1 = trg.predict (z)
+    println ("predict (" + z + ") = " + yp1)
+
+    banner ("test predictions")
+    val yp = t.map (trg.predict (_))
+    println (s" y = $y \n yp = $yp")
+    new Plot (t, y, yp, "TrigRegression")
+
+} // TrigRegressionTest2 object
 

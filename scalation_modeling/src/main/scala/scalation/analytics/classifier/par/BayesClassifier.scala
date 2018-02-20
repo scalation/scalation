@@ -28,7 +28,8 @@ import scalation.math.log2
  *  `SelTAN`           - Selective Tree Augmented Naive Bayes classifier
  *  `TwoBAN_OS`        - Ordering-based Bayesian Network with k = 2
  */
-abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String], private val PARALLELISM: Int = Runtime.getRuntime().availableProcessors())
+abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
+                                private val PARALLELISM: Int = Runtime.getRuntime ().availableProcessors ())
         extends ClassifierInt (x, y, fn, k, cn) with BayesMetrics
 {
     protected var smooth   = true                    // flag for using parameter smoothing
@@ -199,7 +200,7 @@ object BayesClassifier
      *  @param me  use m-estimates (me == 0 => regular MLE estimates)
      */
     def apply (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-               vc: VectoI, me: Double, PARALLELISM: Int): NaiveBayes =
+               vc: Array [Int], me: Double, PARALLELISM: Int): NaiveBayes =
     {
         new NaiveBayes (x, y, fn, k, cn, vc, me, PARALLELISM)
     } // apply
@@ -215,7 +216,7 @@ object BayesClassifier
      *  @param me  use m-estimates (me == 0 => regular MLE estimates)
      */
     def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
-               vc: VectoI, me: Double, PARALLELISM: Int): NaiveBayes =
+               vc: Array [Int], me: Double, PARALLELISM: Int): NaiveBayes =
     {
         NaiveBayes (xy, fn, k, cn, vc, me, PARALLELISM)
     } // apply
@@ -231,7 +232,7 @@ object BayesClassifier
      *  @param me     use m-estimates (me == 0 => regular MLE estimates)
      */
     def apply (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-               me: Double, vc: VectoI, PARALLELISM: Int): TANBayes =
+               me: Double, vc: Array [Int], PARALLELISM: Int): TANBayes =
     {
         new TANBayes (x, y, fn, k, cn, me, vc, PARALLELISM)
     } // apply
@@ -246,7 +247,7 @@ object BayesClassifier
      *  @param me     use m-estimates (me == 0 => regular MLE estimates)
      */
     def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
-               me: Double, vc: VectoI, PARALLELISM: Int): TANBayes =
+               me: Double, vc: Array [Int], PARALLELISM: Int): TANBayes =
     {
         TANBayes (xy, fn, k, cn, me, vc, PARALLELISM)
     } // apply
@@ -263,7 +264,7 @@ object BayesClassifier
      *  @param thres the correlation threshold between 2 features for possible parent-child relationship
      */
     def apply (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-               vc: VectoI, thres: Double, me: Double, PARALLELISM: Int): TwoBAN_OS =
+               vc: Array [Int], thres: Double, me: Double, PARALLELISM: Int): TwoBAN_OS =
     {
         new TwoBAN_OS (x, y, fn, k, cn, vc, thres, me, PARALLELISM)
     } // apply
@@ -278,7 +279,7 @@ object BayesClassifier
      *  @param thres the correlation threshold between 2 features for possible parent-child relationship
      */
     def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
-               vc: VectoI, thres: Double, me: Double, PARALLELISM: Int): TwoBAN_OS =
+               vc: Array [Int], thres: Double, me: Double, PARALLELISM: Int): TwoBAN_OS =
     {
         TwoBAN_OS (xy, fn, k, cn, vc, thres, me, PARALLELISM)
     } // apply
@@ -342,7 +343,7 @@ object BayesClassifierTest extends App
     val fn = Array ("Color", "Type", "Origin")                 // feature/variable names
     val k  = 2                                                 // number of classes
     val cn = Array ("No", "Yes")                               // class names
-    val vc = null.asInstanceOf [VectoI]                        // use default value count
+    val vc = null.asInstanceOf [Array [Int]]                   // use default value count
     val me = me_default                                        // me-estimates
     val th = 0.0                                               // threshold
 
@@ -352,23 +353,13 @@ object BayesClassifierTest extends App
 
     val PARALLELISM = if (args.nonEmpty) args(0).toInt else Runtime.getRuntime().availableProcessors()
 
-    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM)
-    test (nb,         "Naive Bayes")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM);     test (nb,     "Naive Bayes")
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM);     test (tan,    "TAN Bayes")
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM); test (twoban, "2-BAN-OS")
 
-    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM)
-    test (tan,        "TAN Bayes")
-
-    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM)
-    test (twoban,     "2-BAN-OS")
-
-    nb.featureSelection ()
-    test (nb,         "Selective Naive Bayes")
-
-    tan.featureSelection ()
-    test (tan,        "Selective TAN Bayes")
-
-    twoban.featureSelection ()
-    test (twoban,     "Selective 2-BAN-OS")
+    nb.featureSelection ();     test (nb,     "Selective Naive Bayes")
+    tan.featureSelection ();    test (tan,    "Selective TAN Bayes")
+    twoban.featureSelection (); test (twoban, "Selective 2-BAN-OS")
 
 } // BayesClassifierTest object
 
@@ -390,29 +381,19 @@ object BayesClassifierTest2 extends App
         "Single Epithelial Cell Size", "Bare Nuclei", "Bland Chromatin", "Normal Nucleoli", "Mitoses")
     val k  = 2
     val cn = Array ("benign", "malignant")
-    val vc = VectorI (11, 11, 11, 11, 11, 11, 11, 11, 11)      // value count
+    val vc = Array (11, 11, 11, 11, 11, 11, 11, 11, 11)        // value count
     val me = me_default                                        // me-estimates
     val th = 0.0                                               // threshold
 
     val PARALLELISM = if (args.nonEmpty) args(0).toInt else Runtime.getRuntime().availableProcessors()
 
-    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM)
-    test (nb,         "Naive Bayes")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM);     test (nb,     "Naive Bayes")
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM);     test (tan,    "TAN Bayes")
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM); test (twoban, "2-BAN-OS")
 
-    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM)
-    test (tan,        "TAN Bayes")
-
-    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM)
-    test (twoban,     "2-BAN-OS")
-
-    nb.featureSelection ()
-    test (nb,         "Selective Naive Bayes")
-
-    tan.featureSelection ()
-    test (tan,        "Selective TAN Bayes")
-
-    twoban.featureSelection ()
-    test (twoban,     "Selective 2-BAN-OS")
+    nb.featureSelection ();     test (nb,     "Selective Naive Bayes")
+    tan.featureSelection ();    test (tan,    "Selective TAN Bayes")
+    twoban.featureSelection (); test (twoban, "Selective 2-BAN-OS")
 
 } // BayesClassifierTest2 object
 
@@ -430,29 +411,19 @@ object BayesClassifierTest3 extends App
     val fn = data.colName.toArray.slice (0, xy.dim2 - 1)
     val k  = 2
     val cn = Array ("0", "1")                                  // class names
-    val vc = null.asInstanceOf [VectoI]                        // use default value count
+    val vc = null.asInstanceOf [Array [Int]]                   // use default value count
     val me = me_default                                        // me-estimates
     val th = 0.0                                               // threshold
 
     val PARALLELISM = if (args.nonEmpty) args(0).toInt else Runtime.getRuntime().availableProcessors()
 
-    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM)
-    test (nb,         "Naive Bayes")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM);     test (nb,     "Naive Bayes")
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM);     test (tan,    "TAN Bayes")
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM); test (twoban, "2-BAN-OS")
 
-    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM)
-    test (tan,        "TAN Bayes")
-
-    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM)
-    test (twoban,     "2-BAN-OS")
-
-    nb.featureSelection ()
-    test (nb,         "Selective Naive Bayes")
-
-    tan.featureSelection ()
-    test (tan,        "Selective TAN Bayes")
-
-    twoban.featureSelection ()
-    test (twoban,     "Selective 2-BAN-OS")
+    nb.featureSelection ();     test (nb,     "Selective Naive Bayes")
+    tan.featureSelection ();    test (tan,    "Selective TAN Bayes")
+    twoban.featureSelection (); test (twoban, "Selective 2-BAN-OS")
 
 } // BayesClassifierTest3 object
 
@@ -469,29 +440,19 @@ object BayesClassifierTest4 extends App {
     val fn = Array ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
     val k  = 2
     val cn = Array ("0", "1")                                  // class names
-    val vc = null.asInstanceOf [VectoI]                        // use default value count
+    val vc = null.asInstanceOf [Array [Int]]                   // use default value count
     val me = me_default                                        // me-estimates
     val th = 0.0                                               // threshold
 
     val PARALLELISM = if (args.nonEmpty) args(0).toInt else Runtime.getRuntime().availableProcessors()
 
-    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM)
-    test (nb,         "Naive Bayes")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM);     test (nb,     "Naive Bayes")
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM);     test (tan,    "TAN Bayes")
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM); test (twoban, "2-BAN-OS")
 
-    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM)
-    test (tan,        "TAN Bayes")
-
-    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM)
-    test (twoban,     "2-BAN-OS")
-
-    nb.featureSelection ()
-    test (nb,         "Selective Naive Bayes")
-
-    tan.featureSelection ()
-    test (tan,        "Selective TAN Bayes")
-
-    twoban.featureSelection ()
-    test (twoban,     "Selective 2-BAN-OS")
+    nb.featureSelection ();     test (nb,     "Selective Naive Bayes")
+    tan.featureSelection ();    test (tan,    "Selective TAN Bayes")
+    twoban.featureSelection (); test (twoban, "Selective 2-BAN-OS")
 
 } // BayesClassifierTest4 object
 
@@ -510,29 +471,19 @@ object BayesClassifierTest5 extends App
     val k  = 26
     val cn = Array ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
                     "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z")      // class names
-    val vc = null.asInstanceOf [VectoI]                        // use default value count
+    val vc = null.asInstanceOf [Array [Int]]                   // use default value count
     val me = me_default                                        // me-estimates
     val th = 0.0                                               // threshold
 
     val PARALLELISM = if (args.nonEmpty) args(0).toInt else Runtime.getRuntime().availableProcessors()
 
-    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM)
-    test (nb,         "Naive Bayes")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM);     test (nb,     "Naive Bayes")
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM);     test (tan,    "TAN Bayes")
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM); test (twoban, "2-BAN-OS")
 
-    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM)
-    test (tan,        "TAN Bayes")
-
-    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM)
-    test (twoban,     "2-BAN-OS")
-
-    nb.featureSelection ()
-    test (nb,         "Selective Naive Bayes")
-
-    tan.featureSelection ()
-    test (tan,        "Selective TAN Bayes")
-
-    twoban.featureSelection ()
-    test (twoban,     "Selective 2-BAN-OS")
+    nb.featureSelection ();     test (nb,     "Selective Naive Bayes")
+    tan.featureSelection ();    test (tan,    "Selective TAN Bayes")
+    twoban.featureSelection (); test (twoban, "Selective 2-BAN-OS")
 
 } // BayesClassifierTest5 object
 
@@ -550,29 +501,19 @@ object BayesClassifierTest6 extends App
     val fn = data.colName.toArray.slice (0, xy.dim2 - 1)
     val k  = 2
     val cn = Array ("0", "1")                                  // class names
-    val vc = null.asInstanceOf [VectoI]                        // use default value count
+    val vc = null.asInstanceOf [Array [Int]]                   // use default value count
     val me = me_default                                        // me-estimates
     val th = 0.0                                               // threshold
 
     val PARALLELISM = if (args.nonEmpty) args(0).toInt else Runtime.getRuntime().availableProcessors()
 
-    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM)
-    test (nb,         "Naive Bayes")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM);     test (nb,     "Naive Bayes")
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM);     test (tan,    "TAN Bayes")
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM); test (twoban, "2-BAN-OS")
 
-    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM)
-    test (tan,        "TAN Bayes")
-
-    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM)
-    test (twoban,     "2-BAN-OS")
-
-    nb.featureSelection ()
-    test (nb,         "Selective Naive Bayes")
-
-    tan.featureSelection ()
-    test (tan,        "Selective TAN Bayes")
-
-    twoban.featureSelection ()
-    test (twoban,     "Selective 2-BAN-OS")
+    nb.featureSelection ();     test (nb,     "Selective Naive Bayes")
+    tan.featureSelection ();    test (tan,    "Selective TAN Bayes")
+    twoban.featureSelection (); test (twoban, "Selective 2-BAN-OS")
 
 } // BayesClassifierTest6 object
 
@@ -590,29 +531,19 @@ object BayesClassifierTest7 extends App
     val fn = data.colName.toArray.slice (0, xy.dim2 - 1)
     val k  = 2
     val cn = Array ("0", "1")                                  // class names
-    val vc = null.asInstanceOf [VectoI]                        // use default value count
+    val vc = null.asInstanceOf [Array [Int]]                   // use default value count
     val me = me_default                                        // me-estimates
     val th = 0.0                                               // threshold
 
     val PARALLELISM = if (args.nonEmpty) args(0).toInt else Runtime.getRuntime().availableProcessors()
 
-    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM)
-    test (nb,         "Naive Bayes")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM);     test (nb,     "Naive Bayes")
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM);     test (tan,    "TAN Bayes")
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM); test (twoban, "2-BAN-OS")
 
-    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM)
-    test (tan,        "TAN Bayes")
-
-    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM)
-    test (twoban,     "2-BAN-OS")
-
-    nb.featureSelection ()
-    test (nb,         "Selective Naive Bayes")
-
-    tan.featureSelection ()
-    test (tan,        "Selective TAN Bayes")
-
-    twoban.featureSelection ()
-    test (twoban,     "Selective 2-BAN-OS")
+    nb.featureSelection ();     test (nb,     "Selective Naive Bayes")
+    tan.featureSelection ();    test (tan,    "Selective TAN Bayes")
+    twoban.featureSelection (); test (twoban, "Selective 2-BAN-OS")
 
 } // BayesClassifierTest7 object
 
@@ -630,29 +561,19 @@ object BayesClassifierTest8 extends App
     val fn = data.colName.toArray.slice (0, xy.dim2 - 1)
     val k  = 3
     val cn = Array ("0", "1", "2")                             // class names
-    val vc = null.asInstanceOf [VectoI]                        // use default value count
+    val vc = null.asInstanceOf [Array [Int]]                   // use default value count
     val me = me_default                                        // me-estimates
     val th = 0.0                                               // threshold
 
     val PARALLELISM = if (args.nonEmpty) args(0).toInt else Runtime.getRuntime().availableProcessors()
 
-    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM)
-    test (nb,         "Naive Bayes")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM);     test (nb,     "Naive Bayes")
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM);     test (tan,    "TAN Bayes")
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM); test (twoban, "2-BAN-OS")
 
-    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM)
-    test (tan,        "TAN Bayes")
-
-    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM)
-    test (twoban,     "2-BAN-OS")
-
-    nb.featureSelection ()
-    test (nb,         "Selective Naive Bayes")
-
-    tan.featureSelection ()
-    test (tan,        "Selective TAN Bayes")
-
-    twoban.featureSelection ()
-    test (twoban,     "Selective 2-BAN-OS")
+    nb.featureSelection ();     test (nb,     "Selective Naive Bayes")
+    tan.featureSelection ();    test (tan,    "Selective TAN Bayes")
+    twoban.featureSelection (); test (twoban, "Selective 2-BAN-OS")
 
 } // BayesClassifierTest8 object
 
@@ -670,29 +591,19 @@ object BayesClassifierTest9 extends App
     val fn = data.colName.toArray.slice (0, xy.dim2 - 1)
     val k  = 3
     val cn = Array ("0", "1", "2")                             // class names
-    val vc = null.asInstanceOf [VectoI]                        // use default value count
+    val vc = null.asInstanceOf [Array [Int]]                   // use default value count
     val me = me_default                                        // me-estimates
     val th = 0.0                                               // threshold
 
     val PARALLELISM = if (args.nonEmpty) args(0).toInt else Runtime.getRuntime().availableProcessors()
 
-    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM)
-    test (nb,         "Naive Bayes")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM);     test (nb,     "Naive Bayes")
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM);     test (tan,    "TAN Bayes")
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM); test (twoban, "2-BAN-OS")
 
-    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM)
-    test (tan,        "TAN Bayes")
-
-    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM)
-    test (twoban,     "2-BAN-OS")
-
-    nb.featureSelection ()
-    test (nb,         "Selective Naive Bayes")
-
-    tan.featureSelection ()
-    test (tan,        "Selective TAN Bayes")
-
-    twoban.featureSelection ()
-    test (twoban,     "Selective 2-BAN-OS")
+    nb.featureSelection ();     test (nb,     "Selective Naive Bayes")
+    tan.featureSelection ();    test (tan,    "Selective TAN Bayes")
+    twoban.featureSelection (); test (twoban, "Selective 2-BAN-OS")
 
 } // BayesClassifierTest9 object
 
@@ -710,29 +621,19 @@ object BayesClassifierTest10 extends App
     val fn = data.colName.toArray.slice (0, xy.dim2 - 1)
     val k  = 5
     val cn = Array ("0", "1", "2", "3", "4")                   // class names
-    val vc = null.asInstanceOf [VectoI]                        // use default value count
+    val vc = null.asInstanceOf [Array [Int]]                   // use default value count
     val me = me_default                                        // me-estimates
     val th = 0.0                                               // threshold
 
     val PARALLELISM = if (args.nonEmpty) args(0).toInt else Runtime.getRuntime().availableProcessors()
 
-    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM)
-    test (nb,         "Naive Bayes")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM);     test (nb,     "Naive Bayes")
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM);     test (tan,    "TAN Bayes")
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM); test (twoban, "2-BAN-OS")
 
-    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM)
-    test (tan,        "TAN Bayes")
-
-    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM)
-    test (twoban,     "2-BAN-OS")
-
-    nb.featureSelection ()
-    test (nb,         "Selective Naive Bayes")
-
-    tan.featureSelection ()
-    test (tan,        "Selective TAN Bayes")
-
-    twoban.featureSelection ()
-    test (twoban,     "Selective 2-BAN-OS")
+    nb.featureSelection ();     test (nb,     "Selective Naive Bayes")
+    tan.featureSelection ();    test (tan,    "Selective TAN Bayes")
+    twoban.featureSelection (); test (twoban, "Selective 2-BAN-OS")
 
 } // BayesClassifierTest10 object
 
@@ -751,29 +652,19 @@ object BayesClassifierTest11 extends App
     val k  = 18
     val cn = Array ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
                     "10", "11", "12", "13", "14", "15", "16", "17")     // class names
-    val vc = null.asInstanceOf [VectoI]                        // use default value count
+    val vc = null.asInstanceOf [Array [Int]]                   // use default value count
     val me = me_default                                        // me-estimates
     val th = 0.0                                               // threshold
 
     val PARALLELISM = if (args.nonEmpty) args(0).toInt else Runtime.getRuntime().availableProcessors()
 
-    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM)
-    test (nb,         "Naive Bayes")
+    val nb     = BayesClassifier (xy, fn, k, cn, vc, me, PARALLELISM);     test (nb,     "Naive Bayes")
+    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM);     test (tan,    "TAN Bayes")
+    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM); test (twoban, "2-BAN-OS")
 
-    val tan    = BayesClassifier (xy, fn, k, cn, me, vc, PARALLELISM)
-    test (tan,        "TAN Bayes")
-
-    val twoban = BayesClassifier (xy, fn, k, cn, vc, th, me, PARALLELISM)
-    test (twoban,     "2-BAN-OS")
-
-    nb.featureSelection ()
-    test (nb,         "Selective Naive Bayes")
-
-    tan.featureSelection ()
-    test (tan,        "Selective TAN Bayes")
-
-    twoban.featureSelection ()
-    test (twoban,     "Selective 2-BAN-OS")
+    nb.featureSelection ();     test (nb,     "Selective Naive Bayes")
+    tan.featureSelection ();    test (tan,    "Selective TAN Bayes")
+    twoban.featureSelection (); test (twoban, "Selective 2-BAN-OS")
 
 } // BayesClassifierTest11 object
 

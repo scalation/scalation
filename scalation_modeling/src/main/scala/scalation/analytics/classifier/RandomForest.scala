@@ -76,37 +76,38 @@ class RandomForest (x: MatrixD, y: VectoI, nF: Int, bR: Double, fS: Int, k: Int,
      *  @param testStart  the beginning of test region (inclusive).
      *  @param testEnd    the end of test region (exclusive).
      */
-    def train (testStart:Int, testEnd:Int)
+    def train (itest: IndexedSeq [Int]): RandomForest =             // FIX - implementation ignore argument
     {
         println ("=== Start Training ===")
         val isC = Array.fill (x.dim2)(true)
-        val vc  = VectorI.fill (x.dim2)(2)
+        val vc  = Array.fill (x.dim2)(2)
         for (i <- 0 until nF) {
             val temp    = createSubsample ()
             val feature = temp.selectCols (Range (0, temp.dim2-1).toArray)
             val selectTarget = temp.col (temp.dim2-1).toInt
             forest(i) = new DecisionTreeC45 (feature, selectTarget, fn, isCont = isC, k = k, cn = cn, vc = vc)
-            forest(i).train (selectSubFeatures (x)._2)
+            forest(i).train (selectSubFeatures (x)._2())
             if (DEBUG) {
                 println (s"===Tree$i===")
-                println (forest(i).printTree())
+                println (forest(i).printTree ())
             }//if
         } // for
-        println ("=== Training Completed ===")
+        this
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Classify the vector 'z' by voting within randomized trees, returning the class index,
      *  class name and the probability (not used in Random Forest, always -1.0)
-     *  @param z  the vetcotr to be classified
+     *  @param z  the vector to be classified
      */
-    def classify (z: VectoD): (Int, String, Double) =
+    override def classify (z: VectoD): (Int, String, Double) =
     {
         if (DEBUG) println (s"predict for $z:")
         var result = new VectorI (k)
         for (i <- 0 until nF) {
             result(forest(i).classify (z)._1) += 1
-            if (DEBUG) println (s"for tree$i, predict class = ${cn(forest(i).classify (z)._1)}")}
+            if (DEBUG) println (s"for tree$i, predict class = ${cn(forest(i).classify (z)._1)}")
+        } // for
         (result.argmax (), cn(result.argmax ()), -1.0)
     } // classify
 

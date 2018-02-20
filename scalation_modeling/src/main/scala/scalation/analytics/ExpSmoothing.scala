@@ -80,7 +80,7 @@ class ExpSmoothing (y: VectoD, t: VectoD)
      *  FIX - use either a penalty or cross-validation, else α -> 1
      *  @param yy  the response vector
      */
-    def train (yy: VectoD): ExpSmoothing =
+    def train (yy: VectoD = y): ExpSmoothing =
     {
         val α1    = α                                          // initial value for α
         val sse_1 = f_obj (α1)                                 // initial sum of squared errors
@@ -97,7 +97,7 @@ class ExpSmoothing (y: VectoD, t: VectoD)
      *  the smoothing parameter 'α' that minimizes the sum of squared errors (sse).
      *  Use the response passed into the class 'y'.
      */
-    def train (): ExpSmoothing  = train (y)
+//    def train (): ExpSmoothing  = train (y)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.

@@ -80,7 +80,7 @@ class Perceptron (x: MatriD, y: VectoD, private var eta: Double = 1.0,
     /** Given training data 'x' and 'yy', fit the parameter/weight vector 'b'.
      *  @param yy  the output vector
      */
-    def train (yy: VectoD): Perceptron =
+    def train (yy: VectoD = y): Perceptron =
     {
         if (b == null) setWeights ()                          // initialize parameters/weights
         minimizeError (yy)                                    // adjust weights b to minimize sse
@@ -90,7 +90,7 @@ class Perceptron (x: MatriD, y: VectoD, private var eta: Double = 1.0,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given training data 'x' and 'y', fit the parameter/weight vector 'b'.
      */
-    def train (): Perceptron = train (y)
+//    def train (): Perceptron = train (y)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given training data 'x' and 'yy', fit the parameter/weight vector 'b'.

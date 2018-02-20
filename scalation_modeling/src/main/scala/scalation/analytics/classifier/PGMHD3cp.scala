@@ -39,7 +39,7 @@ import BayesClassifier.me_default
  *  @param me  use m-estimates (me == 0 => regular MLE estimates)
  */
 class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-                private var vc: VectoI = null, me: Float = me_default)
+                private var vc: Array [Int] = null, me: Float = me_default)
       extends BayesClassifier (x, y, fn, k, cn)
 {
     private val DEBUG  = true                              // debug flag
@@ -60,8 +60,8 @@ class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: A
     if (vc == null) {
         shiftToZero; vc = vc_fromData                      // set value counts from the data
     } // if
-    val vc_x = vc.slice (0, nx)().toArray                  // distinct value counts for X-features
-    val vc_z = vc.slice (nx, n)().toArray                  // distinct value counts for Z-features
+    val vc_x = vc.slice (0, nx)                            // distinct value counts for X-features
+    val vc_z = vc.slice (nx, n)                            // distinct value counts for Z-features
 
     computeParent ()
     computeVcp ()
@@ -107,62 +107,23 @@ class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: A
     } // buildModel
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Count the frequencies for 'y' having class 'i' and value 'x' for cases 0, 1, ...
-     *  Only the test region from 'testStart' to 'testEnd' is skipped, the rest is
-     *  training data.
-     *  @param testStart  starting index of test region (inclusive) used in cross-validation
-     *  @param testEnd    ending index of test region (exclusive) used in cross-validation
-     */
-    private def frequencies (testStart: Int, testEnd: Int)
-    {
-        if (DEBUG) banner ("frequencies (testStart, testEnd)")
-        for (l <- 0 until m if l < testStart || l >= testEnd) {
-            // l = l-th row of data matrix x
-            val i = y(l)                                       // get the class for l-th tow
-
-            for (j <- 0 until n) {
-                if (j < nx) {
-                    val x_j = x(l, j)                          // get value for j-th X-feature
-//                  f_X(j, x_j)     += 1                       // f_X
-                    f_CX(i, j, x_j) += 1                       // f_CX
-                } else {
-                    val jj = j - nx                            // index from start of Z region
-                    val z_j = x(l, j)                          // get value for j-th Z-feature
-                    val jp = parent (jj)                       // X_jp is parent of Z_j
-                    val x_jp = x(l, jp)                        // get value for jp-th X-feature
-//                  f_XZ(jp, jj, x_jp, z_j) += 1               // f_XZ
-                    f_CXZ_(i, jj, z_j, x_jp) += 1              // f_CXZ
-                } // if
-            } // for
-
-        } // for
-
-        if (DEBUG) {
-//          println ("f_X   = " + f_X)                         // #(X_j = x)
-            println ("f_CX  = " + f_CX)                        // #(C = i & X_j = x)
-//          println ("f_XZ  = " + f_XZ)                        // #(X_jp = x & Z_j = z)
-            println ("f_CXZ = " + f_CXZ)                       // #(C = i & X_jp = x & Z_j = z)
-        } // if
-    } // frequencies
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier by computing the probabilities for C, and the
      *  conditional probabilities for X_j.
-     *  @param testStart  starting index of test region (inclusive) used in cross-validation.
-     *  @param testEnd    ending index of test region (exclusive) used in cross-validation.
+     *  @param itest  the indeices of the test data
      */
-    def train (testStart: Int, testEnd: Int)
+    def train (itest: IndexedSeq [Int]): PGMHD3cp =
     {
-        frequencies (testStart, testEnd)                       // compute frequencies skipping test region
+        frequencies (0 until m diff itest)                    // compute frequencies skipping test region
 
         if (DEBUG) banner ("train (testStart, testEnd)")
+        this
     } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the frequencies for 'y' having class 'i' and value 'x' for cases 0, 1, ...
      *  Only the test region from 'testStart' to 'testEnd' is skipped, the rest is
      *  training data.
-     *  @param itrain indices of the instances considered train data
+     *  @param itrain  indices of the instances considered train data
      */
     private def frequencies (itrain: IndexedSeq [Int])
     {
@@ -195,18 +156,6 @@ class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: A
             println ("f_CXZ = " + f_CXZ)                       // #(C = i & X_jp = x & Z_j = z)
         } // if
     } // frequencies
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the classifier by computing the probabilities for C, and the
-     *  conditional probabilities for X_j.
-     *  @param itrain indices of the instances considered train data
-     */
-    override def train (itrain: IndexedSeq [Int])
-    {
-        frequencies (itrain)                                   // compute frequencies skipping test region
-
-        if (DEBUG) banner ("train (itrain)")
-    } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'u', classify it returning the class number
@@ -260,7 +209,7 @@ object PGMHD3cp
      *  @param me  use m-estimates (me == 0 => regular MLE estimates)
      */
     def apply (xy: MatriI, nx: Int, fn: Array [String], k: Int, cn: Array [String],
-               vc: VectoI = null, me: Float = me_default) =
+               vc: Array [Int] = null, me: Float = me_default) =
     {
         new PGMHD3cp (xy(0 until xy.dim1, 0 until xy.dim2 - 1), nx, xy.col(xy.dim2 - 1), fn, k, cn, vc, me)
     } // apply
