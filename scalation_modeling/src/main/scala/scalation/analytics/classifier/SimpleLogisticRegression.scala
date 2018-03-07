@@ -6,8 +6,6 @@
  *  @see     LICENSE (MIT style license file).
  */
 
-// FIX: needs improved optimization
-
 package scalation.analytics
 package classifier
 
@@ -21,11 +19,11 @@ import scalation.util.banner
 import ActivationFunc.sigmoid
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `LogisticRegression` class supports (binomial) logistic regression.  In this
- *  case, 'x' may be multi-dimensional '[1, x_1, ... x_k]'.  Fit the parameter
- *  vector 'b' in the logistic regression equation
+/** The `SimpleLogisticRegression` class supports (binomial) logistic regression.
+ *  In this case, 'x' is two-dimensional '[1, x_1]'.  Fit the parameter vector
+ *  'b' in the logistic regression equation
  *  <p>
- *      logit (p_y)  =  b dot x + e  =  b_0 + b_1 * x_1 + ... b_k * x_k + e
+ *      logit (p_y)  =  b dot x + e  =  b_0 + b_1 * x_1 + e
  *  <p>
  *  where 'e' represents the residuals (the part not explained by the model)
  *  and 'y' is now binary.
@@ -35,8 +33,8 @@ import ActivationFunc.sigmoid
  *  @param fn  the names for all features/variables
  *  @param cn  the names for both classes
  */
-class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String] = null,
-                          cn: Array [String] = Array ("no", "yes"))
+class SimpleLogisticRegression (x: MatriD, y: VectoI, fn: Array [String] = Array ("one", "x1"),
+                                cn: Array [String] = Array ("no", "yes"))
       extends ClassifierReal (x, y, fn, 2, cn)
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
@@ -60,9 +58,9 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String] = null,
     def ll (b: VectoD): Double =
     {
         var sum = 0.0
+        var bx  = 0.0                                       // beta
         for (i <- y.range) {
-            val bx = b dot x(i)
-//          sum += y(i) * bx - log (1.0 + exp (bx))
+            bx = b(0) + b(1) * x(i, 1)
             sum += y(i) * bx - bx - log (exp (-bx) + 1.0)   // less prone to overflow (infinity)
         } // for
         -2.0 * sum                                          // set up for minimization
@@ -80,7 +78,6 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String] = null,
         var sum = 0.0
         val bx = b(0)                                       // only use the intercept
         for (i <- y.range) {
-//          sum += y(i) * bx - log (1.0 + exp (bx))
             sum += y(i) * bx - bx - log (exp (-bx) + 1.0)   // less prone to overflow (infinity)
         } // for
         -2.0 * sum                                          // set up for minimization
@@ -93,9 +90,9 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String] = null,
      *  FIX: Use improved BFGS implementation or IRWLS
      *  @see stats.stackexchange.com/questions/81000/calculate-coefficients-in-a-logistic-regression-with-r
      *  @see en.wikipedia.org/wiki/Iteratively_reweighted_least_squares
-     *  @param itestStart  the indices of test test data
+     *  @param itest  the indices of test data
      */
-    def train (itest: IndexedSeq [Int]): LogisticRegression =     // FIX - use these parameters
+    def train (itest: IndexedSeq [Int]): SimpleLogisticRegression =     // FIX - use these parameters
     {
          val b0   = new VectorD (x.dim2)        // use b_0 = 0 for starting guess for parameters
          val bfgs = new QuasiNewton (ll)        // minimizer for -2l
@@ -127,7 +124,7 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String] = null,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the fit (parameter vector b, quality of fit). Assumes both
-     *  'train_null' and 'train' have already been called.
+     *  train_null and train have already been called.
      */
     def fit: VectoD = 
     {
@@ -140,8 +137,6 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String] = null,
      */
     def fitLabels: Seq [String] = Seq ("n_dev", "r_dev", "aic", "pseudo_rSq")
 
-    val index_prSq = 3
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Classify the value of y = f(z) by evaluating the formula y = sigmoid (b dot z).
      *  Return the best class, its name and FIX.
@@ -150,7 +145,7 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String] = null,
     override def classify (z: VectoD): (Int, String, Double) =
     {
         val c = if (sigmoid (b dot z) > 0.5) 1 else 0
-        (c, cn(c), -1.0)                                    // FIX - need metric
+        (c, cn(c), -1.0)                                    // Fix - need metric
     } // classify
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -160,76 +155,44 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String] = null,
      */
     override def classify (z: VectoI): (Int, String, Double) = classify (z.toDouble)
 
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform forward selection to add the most predictive variable to the existing
-     *  model, returning the variable to add, the new parameter vector and the new
-     *  quality of fit.  May be called repeatedly.
-     *  FIX - implement method
-     *  @param cols  the columns of matrix x included in the existing model
-     */
-    def forwardSel (cols: Set [Int]): (Int, VectoD, VectoD) = ???
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform backward elimination to remove the least predictive variable from
-     *  the existing model, returning the variable to eliminate, the new parameter
-     *  vector and the new quality of fit.  May be called repeatedly.
-     *  FIX - use cols parameter
-     *  @param cols  the columns of matrix x  included in the existing model
-     */
-    def backwardElim (cols: Set [Int]): (Int, VectoD, VectoD) =
-    {
-        val ir    =  index_prSq                                    // fit(ir) is prSq
-        var j_max = -1                                             // index of variable to eliminate
-        var b_max: VectoD = null                                   // parameter values for best solution
-        var ft_max: VectoD = VectorD.fill (fitLabels.size)(-1.0)   // optimize on quality of fit
-        val keep = m                                               // i-value large enough to not exclude any rows in slice
-  
-        for (j <- 1 to k) {
-            val rg_j = new LogisticRegression (x.sliceExclude (keep, j), y)    // regress with x_j removed
-            rg_j.train ()
-            val bb = rg_j.coefficient
-            val ft = rg_j.fit
-            if (ft(ir) > ft_max(ir)) { j_max = j; b_max = bb; ft_max = ft }
-        } // for
-        (j_max, b_max, ft_max)
-    } // backwardElim
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Variance Inflation Factor (VIF) for each variable to test
-     *  for multi-collinearity by regressing 'xj' against the rest of the variables.
-     *  A VIF over 10 indicates that over 90% of the variance of 'xj' can be predicted
-     *  from the other variables, so 'xj' is a candidate for removal from the model.
-     *  FIX or remove
-     */
-    def vif: VectoD =
-    {
-        val vifV = new VectorD (k)           // VIF vector
-        for (j <- 1 to k) {
-            val keep = m                     // i-value large enough to not exclude any rows in slice
-            val x_j  = x.col(j)                                                 // x_j is jth column in x
-            val rg_j = new Regression (x.sliceExclude (keep, j), x_j)           // regress with x_j removed
-            rg_j.train ()
-            vifV(j-1) =  1.0 / (1.0 - rg_j.fit(rg_j.index_rSq))            // store vif for x_1 in vifV(0)
-        } // for
-        vifV
-    } // vif
-
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset or re-initialize the frequency tables and the probability tables.
      */
     def reset () { /* Not Applicable */ }
 
-} // LogisticRegression class
+} // SimpleLogisticRegression class
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `LogisticRegressionTest` object tests the `LogisticRegression` class.
+/** The `SimpleLogisticRegression` companion object provide factory methods.
+ */
+object SimpleLogisticRegression
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a `SimpleLogisticRegression` object. 
+     *  @param x1  the vector of values for the predictor
+     *  @param y   the binary response vector, y_i in {0, 1}
+     *  @param fn  the names for all factors
+     *  @param cn  the names for both classes
+     */
+    def apply (x1: VectorD, y: VectorI, fn: Array [String] = Array ("one", "x1"),
+               cn: Array [String] = Array ("no", "yes")): SimpleLogisticRegression =
+    {
+        new SimpleLogisticRegression (MatrixD.++^ (VectorD.one (x1.dim), x1), y, fn, cn)
+    } // apply
+
+} // SimpleLogisticRegression object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SimpleLogisticRegressionTest` object tests the `SimpleLogisticRegression` class
+ *  on the mtcars dataseet.
  *  @see www.cookbook-r.com/Statistical_analysis/Logistic_regression/
  *  Answer: b = (-8.8331, 0.4304),
- *          n_dev = 43.860, r_dev = 25.533, aci = 29.533, pseudo_rSq = 0.4178
- *  > runMain scalation.analytics.classifier.LogisticRegressionTest
+ *          n_dev = 43.860, r_dev = 25.533, aic = 29.533, pseudo_rSq = 0.4178
+ *  > runMain scalation.analytics.classifier.SimpleLogisticRegressionTest
  */
-object LogisticRegressionTest extends App
+object SimpleLogisticRegressionTest extends App
 {
     // 32 data points:            One    Mpg
     val x = new MatrixD ((32, 2), 1.0,  21.0,        //  1 - Mazda RX4 
@@ -265,6 +228,7 @@ object LogisticRegressionTest extends App
                                   1.0,  15.0,        // 31 - Maserati Bora
                                   1.0,  21.4)        // 32 - Volvo 142E
 
+    // V/S (e.g., V-6 vs. I-4)
     val y = VectorI (0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0,
                      0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1)
 
@@ -275,11 +239,11 @@ object LogisticRegressionTest extends App
 
     val fn = Array ("One", "Mpg")
 
-    val rg = new LogisticRegression (x, y, fn)
+    val rg = new SimpleLogisticRegression (x, y, fn)
     rg.train_null ()                                    // train based on null model
     rg.train ()                                         // train based on full model
 
-    banner ("Logistic Regression Results")
+    banner ("Simple Logistic Regression Results")
     println ("b = " + rg.coefficient)
     println (rg.fitLabels)
     println (rg.fit)
@@ -290,83 +254,50 @@ object LogisticRegressionTest extends App
     z = VectorD (1.0, 30.0)                             // classify point z
     println ("classify (" + z + ") = " + rg.classify (z))
 
-} // LogisticRegressionTest object
+    println ("acc = " + rg.crossValidate (10, true))
+
+    for (b_0 <- -9.0 to -8.0 by 0.1; b_1 <- 0.0 to 1.0 by 0.1) {
+        val b = VectorD (b_0, b_1)
+        println (s"ll ($b) = ${rg.ll (b)}")
+    } // for
+
+    val yp = VectorD (for (i <- x.range1) yield rg.classify (x(i))._1.toDouble)
+
+    new Plot (x.col(1), y.toDouble, yp)
+
+} // SimpleLogisticRegressionTest object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `LogisticRegressionTest` object tests the `LogisticRegression` class.
- *  @see statmaster.sdu.dk/courses/st111/module03/index.html
- *  @see www.stat.wisc.edu/~mchung/teaching/.../GLM.logistic.Rpackage.pdf
- *  > runMain scalation.analytics.classifier.classifier.LogisticRegressionTest2
+/** The `SimpleLogisticRegressionTest2` object tests the `SimpleLogisticRegression` class.
+ *  @see www.cookbook-r.com/Statistical_analysis/Logistic_regression/
+ *  Answer: b = (-8.8331, 0.4304),
+ *          n_dev = 43.860, r_dev = 25.533, aic = 29.533, pseudo_rSq = 0.4178
+ *  > runMain scalation.analytics.classifier.SimpleLogisticRegressionTest2
  */
-object LogisticRegressionTest2 extends App
+object SimpleLogisticRegressionTest2 extends App
 {
-    // 40 data points:            One     Low  Medium    High
-    val x = new MatrixD ((40, 4), 1.0,  102.0,   89.0,    0.0,
-                                  1.0,    7.0,  233.0,    1.0,
-                                  1.0,    0.0,    4.0,   41.0,
-                                  1.0,    8.0,   37.0,   13.0,
-                                  1.0,   40.0,   79.0,   26.0,
-                                  1.0,    0.0,  625.0,  156.0,
-                                  1.0,    0.0,   12.0,   79.0,
-                                  1.0,    0.0,    3.0,  119.0,
-                                  1.0,  115.0,  136.0,   65.0,
-                                  1.0,  428.0,  416.0,  435.0,
-                                  1.0,   34.0,  174.0,   56.0,
-                                  1.0,    0.0,    0.0,   37.0,
-                                  1.0,   97.0,  162.0,   89.0,
-                                  1.0,   56.0,   47.0,  132.0,
-                                  1.0, 1214.0, 1515.0,  324.0,
-                                  1.0,   30.0,  103.0,  161.0,
-                                  1.0,    8.0,   11.0,  158.0,
-                                  1.0,   52.0,  155.0,  144.0,
-                                  1.0,  142.0,  119.0,   24.0,
-                                  1.0, 1370.0, 2968.0, 1083.0,
-                                  1.0,  790.0,  161.0,  231.0,
-                                  1.0, 1142.0,  157.0,  131.0,
-                                  1.0,    0.0,    2.0,   49.0,
-                                  1.0,    0.0,    0.0,   50.0,
-                                  1.0,    5.0,   68.0,   49.0,
-                                  1.0,    0.0,    0.0,   48.0,
-                                  1.0,    0.0,    6.0,   40.0,
-                                  1.0,    1.0,    8.0,   64.0,
-                                  1.0,    0.0,  998.0,  551.0,
-                                  1.0,  253.0,   99.0,   60.0,
-                                  1.0, 1395.0,  799.0,  244.0,
-                                  1.0,    0.0,    0.0,   50.0,
-                                  1.0,    1.0,   68.0,  145.0,
-                                  1.0, 1318.0, 1724.0,  331.0,
-                                  1.0,    0.0,    0.0,   79.0,
-                                  1.0,    3.0,   31.0,   37.0,
-                                  1.0,  195.0,  108.0,  206.0,
-                                  1.0,    0.0,   15.0,  121.0,
-                                  1.0,    0.0,  278.0,  513.0,
-                                  1.0,    0.0,    0.0,  253.0)
+    // Mpg
+    val x1 = VectorD (21.0, 21.0, 22.8, 21.4, 18.7, 18.1, 14.3, 24.4, 22.8, 19.2, 17.8, 16.4, 17.3, 15.2, 10.4, 10.4,
+                      14.7, 32.4, 30.4, 33.9, 21.5, 15.5, 15.2, 13.3, 19.2, 27.3, 26.0, 30.4, 15.8, 19.7, 15.0, 21.4)
 
-    val y = VectorI (0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1,
-                     1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1)
+    // V/S (e.g., V-6 vs. I-4)
+    val y = VectorI (0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0,
+                     0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1)
 
-    val fn = Array ("One", "Low", "Medium", "High")
-    val cn = Array ("no", "yes")
-
-    println ("x = " + x)
-    println ("y = " + y)
-
-//  val rg = new LogisticRegression (x(0 until x.dim1, 0 until 2), y, fn, cn)
-    val rg = new LogisticRegression (x, y, fn, cn)
+    val rg = SimpleLogisticRegression (x1, y)
     rg.train_null ()                                    // train based on null model
     rg.train ()                                         // train based on full model
 
-    banner ("Logistic Regression Results")
+    banner ("Simple Logistic Regression Results")
     println ("b = " + rg.coefficient)
     println (rg.fitLabels)
     println (rg.fit)
 
-    val z  = VectorD (1.0, 100.0, 100.0, 100.0)         // classify point z
-    println ("classify (" + z + ") = " + rg.classify (z))
+    val srg = SimpleRegression (x1, y.toDouble)
+    srg.train ().eval ()
+    println (srg.fitLabels)
+    println (srg.fit)
 
-//  new Plot (x.col(1), y, yyp)
-//  new Plot (x.col(2), y, yyp)
-
-} // LogisticRegressionTest2 object
+} // SimpleLogisticRegressionTest2
 

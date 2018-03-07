@@ -9,6 +9,7 @@
 package scalation.analytics.classifier
 
 import scalation.linalgebra.{VectoD, VectorD, VectoI, VectorI}
+import scalation.util.banner
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NullModel` class implements an Integer-Based Null Model Classifier,
@@ -90,6 +91,7 @@ object NullModelTest extends App
 {
     import ExampleTennis._
 
+    banner ("Tennis Example")
     val y = xy.col (4)                                                  // 4th column
     println ("y = " + y)
     println ("-" * 60)

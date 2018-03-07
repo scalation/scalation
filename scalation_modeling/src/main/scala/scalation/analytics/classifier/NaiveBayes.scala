@@ -175,7 +175,6 @@ object NaiveBayes0
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a `NaiveBayes0` object, passing 'x' and 'y' together in one matrix.
-     *
      *  @param xy  the data vectors along with their classifications stored as rows of a matrix
      *  @param fn  the names of the features
      *  @param k   the number of classes
@@ -276,6 +275,7 @@ object NaiveBayes
 
 } // NaiveBayes object
 
+
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NaiveBayesTest` object is used to test the 'NaiveBayes' class.
  *  > runMain scalation.analytics.classifier.NaiveBayesTest
@@ -284,6 +284,7 @@ object NaiveBayesTest extends App
 {
     import ExampleTennis._
 
+    banner ("Tennis Example")
     println ("xy = " + xy)
     println ("---------------------------------------------------------------")
 

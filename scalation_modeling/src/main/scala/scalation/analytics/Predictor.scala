@@ -88,7 +88,7 @@ trait Predictor
     /** Return the quality of fit including 'sst', 'sse', 'mae', rmse' and 'rSq'.
      *  Note, if 'sse > sst', the model introduces errors and the 'rSq' may be negative,
      *  otherwise, R^2 ('rSq') ranges from 0 (weak) to 1 (strong).
-     *  Note that 'rSq' is the last or fifth measure (5).
+     *  Note that 'rSq' is the last or number 5 measure.
      *  Override to add more quality of fit measures.
      */
     def fit: VectoD = VectorD (sst, sse, mse, rmse, mae, rSq)

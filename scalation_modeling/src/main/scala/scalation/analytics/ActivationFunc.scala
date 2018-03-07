@@ -10,7 +10,8 @@ package scalation.analytics
 
 import scala.math.{exp, log}
 
-import scalation.linalgebra.VectoD
+import scalation.linalgebra.{VectoD, VectorD}
+import scalation.plot.Plot
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ActivationFunc` object contains common Activation functions.
@@ -24,7 +25,7 @@ object ActivationFunc
      *  @param a  the shift parameter
      *  @param b  the spread parameter
      */
-    def logistic (t: Double, a: Double, b: Double): Double = 1.0 / (1.0 + exp (-(a + b*t)))
+    def logistic (t: Double, a: Double = 0.0, b: Double = 1.0): Double = 1.0 / (1.0 + exp (-(a + b*t)))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the vector of values of the 'logistic' function applied to vector 't'.
@@ -33,10 +34,9 @@ object ActivationFunc
      *  @param a  the shift parameter
      *  @param b  the spread parameter
      */
-    def logisticV (t: VectoD, a: Double, b: Double): VectoD = 
+    def logisticV (t: VectoD, a: Double = 0.0, b: Double = 1.0): VectoD = 
     {
-        for (i <- 0 until t.dim) t(i) = 1.0 / (1.0 + exp (-(a + b*t(i))))
-        t
+        VectorD (for (i <- t.range) yield 1.0 / (1.0 + exp (-(a + b*t(i)))))
     } // logisticV
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -46,6 +46,11 @@ object ActivationFunc
      *  @param p  the probability, a number between 0 and 1.
      */
     def logit (p: Double): Double = log (p / (1.0 - p))
+
+    def logitV (p: VectoD): VectoD =
+    {
+        VectorD (for (i <- p.range) yield log (p(i) / (1.0 - p(i))))
+    } // logitV
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the value of the 'sigmoid' function at 't'.  This is a special case of
@@ -62,8 +67,7 @@ object ActivationFunc
      */
     def sigmoidV (t: VectoD): VectoD =
     {
-        for (i <- 0 until t.dim) t(i) = 1.0 / (1.0 + exp (-t(i)))
-        t
+        VectorD (for (i <- t.range) yield 1.0 / (1.0 + exp (-t(i))))
     } // sigmoidV
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -79,9 +83,26 @@ object ActivationFunc
      */
     def gaussianV (t: VectoD): VectoD =
     {
-        for (i <- 0 until t.dim) t(i) = exp (-t(i) * t(i))
-        t
+        VectorD (for (i <- t.range) yield exp (-t(i) * t(i)))
     } // gaussianV
 
 } // ActivationFunc object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `ActivationFuncTest` is used to test the `ActivationFunc` object.
+ *  > runMain scalation.analytics.ActivationFuncTest
+ */
+object ActivationFuncTest extends App
+{
+    import ActivationFunc._
+
+    val t = VectorD.range (-30, 30) / 6.0
+    val p = VectorD.range (1, 59) / 60.0
+    val logist = logisticV (t); new Plot (t, logist, null, "t vs. logist")
+    val logit  = logitV (p);    new Plot (p, logit,  null, "p vs. logit")
+    val sigmo  = sigmoidV (t);  new Plot (t, sigmo,  null, "t vs. sigmo")
+    val gauss  = gaussianV (t); new Plot (t, gauss,  null, "t vs. gauss")
+
+} // ActivationFuncTest
 

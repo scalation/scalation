@@ -12,7 +12,7 @@ import scala.math.{ceil, floor}
 import scala.collection.mutable.HashMap
 
 import scalation.analytics.Probability.entropy
-import scalation.linalgebra.{MatriI, MatrixI, VectorD, VectoI, VectorI}
+import scalation.linalgebra.{MatriI, MatrixI, VectoD, VectorD, VectoI, VectorI}
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -36,7 +36,7 @@ class DecisionTreeID3 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Arr
     abstract class Node
     case class FeatureNode (f: Int, branches: HashMap [Int, Node]) extends Node
     case class LeafNode (y: Int) extends Node
-    type Path = List [Tuple2 [Int, Int]]
+    type Path = List [(Int, Int)]
     
     private val DEBUG    = false                  // debug flag
     private val y_prob   = new VectorD (k)        // probability that class c occurs
@@ -57,7 +57,7 @@ class DecisionTreeID3 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Arr
      *  @param dset   the list of data set tuples to consider (e.g. value, row index)
      *  @param value  one of the possible values for this feature (e.g., 1 (High))
      */
-    def frequency (dset: Array [Tuple2 [Int, Int]], value: Int): Tuple2 [Double, VectorD] =
+    def frequency (dset: Array [(Int, Int)], value: Int): (Double, VectoD) =
     {
         val prob  = new VectorD (k)     // probability vector for a given feature and value
         var count = 0.0
@@ -73,7 +73,7 @@ class DecisionTreeID3 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Arr
      *  @param f  the feature to consider (e.g., 2 (Humidity))
      *  @param p  the path
      */
-    def dataset (f: Int, path: Path): Array [Tuple2 [Int, Int]] =
+    def dataset (f: Int, path: Path): Array [(Int, Int)] =
     {
         val col = x.col(f).apply.zipWithIndex 
         col.filter (t => path.forall (tt => x(t._2, tt._1) == tt._2)).map (t => (t._1, y(t._2))).toArray
@@ -119,7 +119,7 @@ class DecisionTreeID3 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Arr
      */
     def train (itest: IndexedSeq [Int]): DecisionTreeID3 =    // FIX - use these parameters
     {
-        tree = buildTree (List [Tuple2 [Int, Int]] ())
+        tree = buildTree (List [(Int, Int)] ())
         println (tree)
         this
     } // train

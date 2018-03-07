@@ -14,6 +14,7 @@ import scalation.columnar_db.Relation
 import scalation.graph_db.{MGraph, MinSpanningTree, Pair}
 import scalation.linalgebra.{MatriI, MatrixI, VectorD, VectoI, VectorI}
 import scalation.linalgebra.gen.{HMatrix2, HMatrix3, HMatrix4, HMatrix5}
+import scalation.util.banner
 
 import BayesClassifier.me_default
 
@@ -383,13 +384,39 @@ object TANBayes
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `TANBayesTest` object is used to test the `TANBayes0` class.
- *  Classify whether a car is more likely to be stolen (1) or not (1).
- *
- *  @see www.inf.u-szeged.hu/~ormandi/ai2/06-AugNaiveBayes-example.pdf
+/** The `TANBayesTest` object is used to test the 'TANBayes' class.
  *  > runMain scalation.analytics.classifier.TANBayesTest
  */
 object TANBayesTest extends App
+{
+    import ExampleTennis._
+
+    banner ("Tennis Example")
+    println ("xy = " + xy)
+    println ("---------------------------------------------------------------")
+
+    val nb0 = TANBayes0 (xy, fn, k, cn)                                 // create a classifier
+    val nb  = TANBayes  (xy, fn, k, cn)                                 // create a classifier
+    nb0.train ()                                                        // train the classifier
+    nb.train ()                                                         // train the classifier
+
+    val z = VectorI (2, 2, 1, 1)                                        // new data vector to classify
+    println ("Use nb0 to classify (" + z + ") = " + nb0.classify (z))
+    println ("Use nb  to classify (" + z + ") = " + nb.classify (z))
+
+    println ("nb0 cv accu = " + nb0.crossValidateRand (10, true))
+    println ("nb  cv accu = " + nb.crossValidateRand (10, true))
+
+} // TANBayesTest object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `TANBayesTest2` object is used to test the `TANBayes0` class.
+ *  Classify whether a car is more likely to be stolen (1) or not (1).
+ *  @see www.inf.u-szeged.hu/~ormandi/ai2/06-AugNaiveBayes-example.pdf
+ *  > runMain scalation.analytics.classifier.TANBayesTest2
+ */
+object TANBayesTest2 extends App
 {
     // x0: Color:   Red (1), Yellow (0)
     // x1: Type:    SUV (1), Sports (0)
@@ -431,16 +458,16 @@ object TANBayesTest extends App
     println ("tan0 cv accu = " + tan0.crossValidateRand())  // cross validate the classifier
     println ("tan  cv accu = " + tan.crossValidateRand())   // cross validate the classifier
 
-} // TANBayesTest object
+} // TANBayesTest2 object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `TANBayesTest2` object is used to test the `TANBayes0` class.
+/** The `TANBayesTest3` object is used to test the `TANBayes0` class.
  *  Given whether a person is Fast and/or Strong, classify them as making C = 1
  *  or not making C = 0 the football team.
- *  > runMain scalation.analytics.classifier.TANBayesTest2
+ *  > runMain scalation.analytics.classifier.TANBayesTest3
  */
-object TANBayesTest2 extends App
+object TANBayesTest3 extends App
 {
     // training-set -----------------------------------------------------------
     // x0: Fast
@@ -479,14 +506,14 @@ object TANBayesTest2 extends App
     println ("tan0 cv accu = " + tan0.crossValidateRand())    // cross validate the classifier
     println ("tan  cv accu = " + tan.crossValidateRand())     // cross validate the classifier
 
-} // TANBayesTest2 object
+} // TANBayesTest3 object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `TANBayesTest3` object is used to test the `TANBayes0` class.
- *  > runMain scalation.analytics.classifier.TANBayesTest3
+/** The `TANBayesTest4` object is used to test the `TANBayes0` class.
+ *  > runMain scalation.analytics.classifier.TANBayesTest4
  */
-object TANBayesTest3 extends App
+object TANBayesTest4 extends App
 {
     val filename = BASE_DIR + "breast-cancer.arff"
     var data = Relation (filename, -1, null)
@@ -508,4 +535,5 @@ object TANBayesTest3 extends App
     println("tan0 cv accu = " + tan0.crossValidateRand())       // cross validate the classifier
     println("tan  cv accu = " + tan.crossValidateRand())        // cross validate the classifier
 
-} // TANBayesTest3 object
+} // TANBayesTest4 object
+

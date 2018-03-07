@@ -137,7 +137,27 @@ trait Classifier
     } // crossValidateRand
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /**  Reset the frequency counters.
+    /** Compare the actual class 'y' vector versus the predicted class 'yp' vector,
+     *  returning tp, tn, fn, fp.
+     *  @see www.dataschool.io/simple-guide-to-confusion-matrix-terminology
+     *  @param y   the actual class labels
+     *  @param yp  the precicted class labels
+     */
+    def actualVpredicted (y: VectoI, yp: VectoI): Map [String, Double] =
+    {
+        var tp, tn, fn, fp = 0
+        for (i <- y.range) {
+            val sum = y(i) + yp(i)
+            if (sum == 2) tp += 1
+            else if (sum == 0) tn += 1
+            else if (y(i) == 1) fn += 1
+            else fp += 1
+        } // for
+        Map ("tp" -> tp, "tn" -> tn, "fn" -> fn, "fp" -> fp)
+    } // actualVpredicted
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reset the frequency counters.
      */
     def reset ()
 

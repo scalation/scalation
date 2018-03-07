@@ -10,36 +10,39 @@ package scalation.analytics.classifier
 
 import scala.math.{ceil, floor}
 
-import scalation.linalgebra.{MatrixD, VectoD, VectorD, VectoI, VectorI}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectoI, VectorI}
+import scalation.plot.Plot
 import scalation.random.Normal
 import scalation.stat.vectorD2StatVector
+import scalation.util.banner
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NaiveBayesR` class implements a Gaussian Naive Bayes Classifier, which
  *  is the most commonly used such classifier for continuous input data.  The
  *  classifier is trained using a data matrix 'x' and a classification vector 'y'.
  *  Each data vector in the matrix is classified into one of 'k' classes numbered
- *  0, ..., k-1.  Prior probabilities are calculated based on the population of
- *  each class in the training-set.  Relative posterior probabilities are computed
- *  by multiplying these by values computed using conditional density functions
+ *  0, ..., k-1.  Class probabilities are calculated based on the frequency of
+ *  each class in the training-set.  Relative probabilities are computed  by
+ *  multiplying these by values computed using conditional density functions
  *  based on the Normal (Gaussian) distribution.  The classifier is naive, because
  *  it assumes feature independence and therefore simply multiplies the conditional
  *  densities.
  *-----------------------------------------------------------------------------
  *  @param x   the real-valued data vectors stored as rows of a matrix
- *  @param y   the class vector, where y(l) = class for row l of the matrix x, x(l)
+ *  @param y   the class vector, where y_i = class for row i of the matrix x, x(i)
  *  @param fn  the names for all features/variables
  *  @param k   the number of classes
  *  @param cn  the names for all classes
  */
-class NaiveBayesR (x: MatrixD, y: VectoI, fn: Array [String], k: Int, cn: Array [String])
+class NaiveBayesR (x: MatriD, y: VectoI, fn: Array [String], k: Int = 2,
+                   cn: Array [String] = Array ("no", "yes"))
       extends ClassifierReal (x, y, fn, k, cn)
 {
     private val DEBUG   = false                   // debug flag
     private val EPSILON = 1E-9                    // number close to zero
     private val cor     = calcCorrelation         // feature correlation matrix
 
-    private val pop  = new VectorD (k)            // numbers in class 0, ..., k-1
+    private val nu_y = new VectorD (k)            // frequency counts for classes 0, ..., k-1
     private val mean = new MatrixD (k, n)         // mean for each class, feature
     private val varc = new MatrixD (k, n)         // variance for each class, feature
 
@@ -55,8 +58,8 @@ class NaiveBayesR (x: MatrixD, y: VectoI, fn: Array [String], k: Int, cn: Array 
     def calcStats ()
     {
         for (i <- 0 until m) {                  // for each data vector in training-set
-            val c = y(i)                        // given classification for ith data vector
-            pop(c) += 1.0                       // count the number in each class
+            val c    = y(i)                     // given classification for ith data vector
+            nu_y(c) += 1.0                      // count the number in each class
             for (j <- 0 until n) {              // for each feature
                 val d = x(i, j)                 // jth data value
                 mean(c, j) += d                 // running total for sum
@@ -65,17 +68,17 @@ class NaiveBayesR (x: MatrixD, y: VectoI, fn: Array [String], k: Int, cn: Array 
         } // for 
     
         for (c <- 0 until k) {                  // for each class
-            val pc = pop(c)                     // population of class c in training-set
+            val mc = nu_y(c)                    // frequency of class c in training-set
             for (j <- 0 until n) {              // for each feature
-                mean(c, j) /= pc                                               // compute mean
+                mean(c, j) /= mc                                                 // compute mean
                 val mean_cj = mean(c, j)
-                varc(c, j) =  (varc(c, j) - pc * mean_cj*mean_cj) / (pc - 1.0)   // compute variance
+                varc(c, j)  = (varc(c, j) - mc * mean_cj*mean_cj) / (mc - 1.0)   // compute variance - FIX - check
             } // for
         } // for
     
         if (DEBUG) {
             println ("fn   = " + fn)            // feature names
-            println ("pop  = " + pop)           // population vector (k classes)
+            println ("nu_y = " + nu_y)          // frequency vector (k classes)
             println ("prob = " + prob)          // probability vector (k classes)
             println ("mean = " + mean)          // mean matrix (k classes, n features)
             println ("varc = " + varc)          // variance matrix (k classes, n features)
@@ -115,7 +118,7 @@ class NaiveBayesR (x: MatrixD, y: VectoI, fn: Array [String], k: Int, cn: Array 
         for (c <- 0 until k; j <- 0 until n) {
             cd(c)(j) = (z_j => Normal (mean(c, j), varc(c, j)).pf (z_j))
         } // for
-        prob = pop / md           // probability = class population / training-set size
+        prob = nu_y / md              // probability = class frequency / training-set size
         this
     } // train
 
@@ -138,7 +141,7 @@ class NaiveBayesR (x: MatrixD, y: VectoI, fn: Array [String], k: Int, cn: Array 
      */
     def reset ()
     {
-        pop.set (0)
+        nu_y.set (0)
         mean.set (0)
         varc.set (0)
     } // reset
@@ -146,13 +149,77 @@ class NaiveBayesR (x: MatrixD, y: VectoI, fn: Array [String], k: Int, cn: Array 
 } // NaiveBayesR class
 
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** `NaiveBayesR` is the companion object for the `NaiveBayesR` class.
+ */
+object NaiveBayesR
+{
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a `NaiveBayesR` object, passing 'x' and 'y' together in one matrix.
+     *  @param xy  the data vectors along with their classifications stored as rows of a matrix
+     *  @param fn  the names of the features
+     *  @param k   the number of classes
+     */
+    def apply (xy: MatriD, fn: Array [String], k: Int = 2, cn: Array [String] = Array ("no", "yes")): NaiveBayesR =
+    {
+        new NaiveBayesR (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1).toInt, fn, k, cn)
+    } // apply
+
+} // NaiveBayesR object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NaiveBayesRTest` object is used to test the `NaiveBayesR` class.
- ** Ex: Classify whether a person is male (M) or female (F) based on the measured features.
- *  @see en.wikipedia.org/wiki/Naive_Bayes_classifier
+ *  @see people.revoledu.com/kardi/tutorial/LDA/Numerical%20Example.html
  *  > runMain scalation.analytics.classifier.NaiveBayesRTest
  */
 object NaiveBayesRTest extends App
+{
+    // features/variable:
+    // x1: curvature
+    // x2: diameter
+    // y:  classification: pass (0), fail (1)
+    //                            x1    x2    y
+    val xy = new MatrixD ((7, 3), 2.95, 6.63, 0,
+                                  2.53, 7.79, 0,
+                                  3.57, 5.65, 0,
+                                  3.16, 5.47, 0,
+                                  2.58, 4.46, 1,
+                                  2.16, 6.22, 1,
+                                  3.27, 3.52, 1)
+
+    val fn = Array ("curvature", "diameter")                   // feature names
+    val cn = Array ("pass", "fail")                            // class names
+    val cl = NaiveBayesR (xy, fn, 2, cn)                       // create NaiveBayesR classifier
+    cl.train ()
+
+    banner ("classify")
+    val z  = VectorD (2.81, 5.46)
+    println (s"classify ($z) = ${cl.classify (z)}")
+
+    banner ("test")
+    val x  = xy.sliceCol (0, 2)
+    val y  = xy.col (2).toInt
+    val yp = new VectorI (xy.dim1)                             // predicted class vector
+    for (i <- x.range1) yp(i) = cl.classify (x(i))._1
+    println (s" y = $y \n yp = $yp")
+    println (cl.actualVpredicted (y, yp))                      // compare y vs. yp
+
+    val t = VectorD.range (0, x.dim1)
+    new Plot (t, y.toDouble, yp.toDouble, "y(black)/yp(red) vs. t")
+    new Plot (x.col(0), y.toDouble, yp.toDouble, "y(black)/yp(red) vs. x1")
+    new Plot (x.col(1), y.toDouble, yp.toDouble, "y(black)/yp(red) vs. x2")
+
+} // NaiveBayesRTest object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `NaiveBayesRTest2` object is used to test the `NaiveBayesR` class.
+ *  Ex: Classify whether a person is male (M) or female (F) based on the measured features.
+ *  @see en.wikipedia.org/wiki/Naive_Bayes_classifier
+ *  > runMain scalation.analytics.classifier.NaiveBayesRTest2
+ */
+object NaiveBayesRTest2 extends App
 {
     // training-set -----------------------------------------------------------
     // x0: Height
@@ -187,5 +254,5 @@ object NaiveBayesRTest extends App
     val z = VectorD (6.0, 130, 8.0)                             // new data vector to classify
     println ("--- classify " + z + " = " + nbr.classify (z) + "\n")
 
-} // NaiveBayesRTest object
+} // NaiveBayesRTest2 object
 

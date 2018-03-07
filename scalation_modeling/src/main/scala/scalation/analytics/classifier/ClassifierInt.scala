@@ -100,7 +100,7 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int,
      *  @param xx  the integer-valued test vectors stored as rows of a matrix
      *  @param yy  the test classification vector, where 'yy_i = class' for row 'i' of 'xx'
      */
-    def test (xx: MatrixI, yy: VectoI): Double =
+    def test (xx: MatriI, yy: VectoI): Double =
     {
         val mm = xx.dim1
         if (yy.dim != mm) flaw ("test", "yy.dim must equal test-set size (mm)")
@@ -115,13 +115,9 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int,
      */
     def calcCorrelation: MatriD =
     {
-        val fea = for (j <- 0 until n) yield  x.col(j).toDouble.toDense
+        val fea = for (j <- 0 until n) yield x.col(j).toDouble.toDense
         val cor = new MatrixD (n, n)
-        for (j1 <- 0 until n; j2 <- 0 until j1) {
-//          println ("fea (j1) = " + fea(j1))
-//          println ("fea (j2) = " + fea(j2))
-            cor(j1, j2) = fea(j1) corr fea(j2)
-        } // for
+        for (j1 <- 0 until n; j2 <- 0 until j1) cor(j1, j2) = fea(j1) corr fea(j2)
         cor
     } // calcCorrelation
 
@@ -134,16 +130,12 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int,
      */
     def calcCorrelation2 (zrg: Range, xrg: Range): MatriD =
     {
-        val zfea = for (j <- zrg) yield  x.col(j).toDouble.toDense
-        val xfea = for (j <- xrg) yield  x.col(j).toDouble.toDense
+        val zfea = for (j <- zrg) yield x.col(j).toDouble.toDense
+        val xfea = for (j <- xrg) yield x.col(j).toDouble.toDense
         val cor = new MatrixD (zfea.size, xfea.size)
-        for (j1 <- 0 until cor.dim1; j2 <- 0 until cor.dim2) {
-            //println ("fea (j1) = " + fea(j1))
-            //println ("fea (j2) = " + fea(j2))
-            cor(j1, j2) = zfea(j1) corr xfea(j2)
-        } // for
+        for (j1 <- 0 until cor.dim1; j2 <- 0 until cor.dim2) cor(j1, j2) = zfea(j1) corr xfea(j2)
         cor
-    } // calcCorrelation
+    } // calcCorrelation2
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform feature selection on the classifier. Use backward elimination
@@ -158,10 +150,10 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int,
         var accuracy = crossValidateRand ()
         if (DEBUG) println ("Initial accuracy with no feature removed: " + accuracy)
 
-        //keep removing one feature at a time until no more feature should be removed
-        breakable{ while (true) {
-            var minDiff      = 1.0
-            var toRemove     = -1
+        // keep removing one feature at a time until no more feature should be removed
+        breakable { while (true) {
+            var minDiff  = 1.0
+            var toRemove = -1
             if (DEBUG) println ("Try to remove each feature and achieve best accuracy...")
 
             for (j <- 0 until n if fset(j)) {
@@ -196,7 +188,6 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int,
         println ("The following features have remained: " + remained)
         println ("The following features were removed: " + removed)
         if (DEBUG) println ("NOTE: The classifier must be re-trained before classifying any instances.")
-
     } // featureSelection
 
 } // ClassifierInt abstract class

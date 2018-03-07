@@ -36,11 +36,8 @@ class DAG (val parent: Array [Array [Int]])
 /** The `BayesClassifier` object provides factory methods for building Bayesian
  *  classifiers.  The following types of classifiers are currently supported:
  *  `NaiveBayes`       - Naive Bayes classifier
- *  `SelNaiveBayes`    - Selective Naive Bayes classifier
  *  `OneBAN`           - Augmented Naive Bayes (1-BAN) classifier
- *  `SelOneBAN`        - Augmented Selective Naive Bayes (Selective 1-BAN) classifier
  *  `TANBayes`         - Tree Augmented Naive Bayes classifier
- *  `SelTANBayes`      - Selective Tree Augmented Naive Bayes classifier
  *  `TwoBAN_OS`        - Ordering-based Bayesian Network (2-BAN with Order Swapping)
  *-----------------------------------------------------------------------------
  *  @param x   the integer-valued data vectors stored as rows of a matrix
@@ -58,7 +55,7 @@ abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int
     protected var additive = true                    // flag to use additive approach for training/cross-validation
 
     protected val nu_y = new VectorI (k)             // frequency counts for classes 0, ..., k-1
-    protected var p_C = new VectorD (k)              // probabilities for classes 0, ..., k-1
+    protected var p_C  = new VectorD (k)             // probabilities for classes 0, ..., k-1
 
     protected var f_X:   HMatrix2 [Int] = null       // Frequency of X
     protected var f_CX:  HMatrix3 [Int] = null       // Joint frequency of C and X

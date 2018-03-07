@@ -4,6 +4,8 @@
  *  @version 1.4
  *  @date    Sat Jan  9 21:48:57 EST 2016
  *  @see     LICENSE (MIT style license file).
+ *
+ *  FIX - extend the code to work for k > 2.
  */
 
 package scalation.analytics.classifier
@@ -17,18 +19,23 @@ import scalation.util.banner
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `LDA` class implements a Linear Discriminant Analysis 'LDA' classifier.
  *  It places a vector into a group according to its maximal discriminant function.
+ *  FIX - currently only works when the number of classes 'k' = 2.
  *  @see en.wikipedia.org/wiki/Linear_discriminant_analysis
  *  @param x   the real-valued training/test data vectors stored as rows of a matrix
  *  @param y   the training/test classification vector, where y_i = class for row i of the matrix x
  *  @param fn  the names for all features/variables
+ *  @param k   the number of classes (k in {0, 1, ...k-1}
  *  @param cn  the names for all classes
  */
-class LDA (x: MatrixD, y: VectoI, fn: Array [String], cn: Array [String] = Array ("no", "yes"))
-      extends ClassifierReal (x, y, fn, 2, cn)
+class LDA (x: MatrixD, y: VectoI, fn: Array [String], k: Int = 2,
+           cn: Array [String] = Array ("no", "yes"))
+      extends ClassifierReal (x, y, fn, k, cn)
 {
-    private val DEBUG = true                                                           // debug flag
-    private val x1 = (MatrixD (for (i <- 0 until x.dim1 if y(i) == 0) yield x(i))).t   // group 1
-    private val x2 = (MatrixD (for (i <- 0 until x.dim1 if y(i) == 1) yield x(i))).t   // group 2
+    private val DEBUG = true                                                       // debug flag
+    private val x1 = (MatrixD (for (i <- x.range1 if y(i) == 0) yield x(i))).t     // group 1
+    private val x2 = (MatrixD (for (i <- x.range1 if y(i) == 1) yield x(i))).t     // group 2
+
+    if (k != 2) flaw ("constructor", "k must equal 2 in current implementation")
 
     if (DEBUG) {
         banner ("grouped matrices")
@@ -87,7 +94,7 @@ class LDA (x: MatrixD, y: VectoI, fn: Array [String], cn: Array [String] = Array
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset method not applicable.
      */
-    def reset (): Unit = ???
+    def reset () { /* Not Applicable */ }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Classify vector 'z' by computing its discriminant function 'f' for each
@@ -127,12 +134,23 @@ object LDATest extends App
 
     val fn = Array ("curvature", "diameter")                   // feature names
     val cn = Array ("pass", "fail")                            // class names
-    val cl = new LDA (x, y, fn, cn)                            // create the LDA classifier
+    val cl = new LDA (x, y, fn, 2, cn)                         // create the LDA classifier
     cl.train ()
 
     banner ("classify")
     val z  = VectorD (2.81, 5.46)
     println (s"classify ($z) = ${cl.classify (z)}")
+
+    banner ("test")
+    val yp = new VectorI (x.dim1)                              // predicted class vector
+    for (i <- x.range1) yp(i) = cl.classify (x(i))._1
+    println (s" y = $y \n yp = $yp")
+    println (cl.actualVpredicted (y, yp))                      // compare y vs. yp
+
+    val t = VectorD.range (0, x.dim1)
+    new Plot (t, y.toDouble, yp.toDouble, "y(black)/yp(red) vs. t")
+    new Plot (x.col(0), y.toDouble, yp.toDouble, "y(black)/yp(red) vs. x1")
+    new Plot (x.col(1), y.toDouble, yp.toDouble, "y(black)/yp(red) vs. x2")
 
 } // LDATestObject
 

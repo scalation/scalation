@@ -28,7 +28,8 @@ import scalation.linalgebra.VectorD
  */
 trait Minimizer
 {
-    protected val EPSILON  = 1E-8               // number close to zero - roughly root of machine epsilon
+    protected val EPSILON  = 1E-10              // number close to zero
+                                                //   between machine epsilon and its square root
     protected val TOL      = 100.0 * EPSILON    // default tolerance level more relaxed
     protected val STEP     = 1.0                // default initial step size
     protected val MAX_ITER = 500                // maximum number of major steps/iterations 
