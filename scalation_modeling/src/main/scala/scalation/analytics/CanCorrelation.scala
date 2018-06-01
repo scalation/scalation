@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sat Sep 14 20:47:08 EDT 2013
  *  @see     LICENSE (MIT style license file).
  *  @see     http://en.wikipedia.org/wiki/Canonical_correlation

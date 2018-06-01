@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Mon Nov 14 15:21:25 EST 2011
  *  @see     LICENSE (MIT style license file).
  */
@@ -11,9 +11,8 @@ package scalation.analytics
 import scala.collection.mutable.Set
 import scala.math.pow
 
-import scalation.calculus.Differential.FunctionV2S
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
-import scalation.math.double_exp
+import scalation.math.{double_exp, FunctionV2S}
 import scalation.minima.QuasiNewton
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -58,7 +57,7 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
 
     /** Regression class for performing multiple regression
      */
-    private var reg: Regression [MatriD, VectoD] = _
+    private var reg: Regression = _
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a center point x, form a square grid around it.  This can be used

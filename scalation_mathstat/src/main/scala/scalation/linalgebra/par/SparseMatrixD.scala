@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Yung Long Li 
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sat Jan 12 15:15:41 EST 2013
  *  @see     LICENSE (MIT style license file).
  */
@@ -312,14 +312,14 @@ class SparseMatrixD (val d1: Int,
      *  @param row  the row to exclude
      *  @param col  the column to exclude
      */
-    def sliceExclude (row: Int, col: Int): SparseMatrixD =
+    def sliceEx (row: Int, col: Int): SparseMatrixD =
     {
         val c = new SparseMatrixD (dim1 - 1, dim2 - 1)
         for (i <- range1 if i != row) for (j <- range2 if j != col) {
             if (v(i) contains j) c.v(i - oneIf (i > row))(j - oneIf (j > col)) = this(i, j)
         } // for
         c
-    } // sliceExclude
+    } // sliceEx
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select rows from this matrix according to the given index/basis.
@@ -1513,7 +1513,7 @@ class SparseMatrixD (val d1: Int,
 
         var sum = 0.0
         for (j <- range2) {
-            val b = sliceExclude (0, j)   // the submatrix that excludes row 0 and column j
+            val b = sliceEx (0, j)            // the submatrix that excludes row 0 and column j
             sum += (if (j % 2 == 0) this(0, j) * (if (b.dim1 == 1) b(0, 0) else b.det)
                     else          - this(0, j) * (if (b.dim1 == 1) b(0, 0) else b.det))
         } // for

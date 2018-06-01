@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Mon Sep 24 19:00:23 EDT 2012
  *  @see     LICENSE (MIT style license file).
  */
@@ -9,9 +9,7 @@
 package scalation.analytics
 
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
-import scalation.math.double_exp
 import scalation.plot.Plot
-import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SimpleRegression` class supports simple linear regression.  In this case,
@@ -25,17 +23,9 @@ import scalation.util.Error
  *  @param y  the response vector
  */
 class SimpleRegression (x: MatriD, y: VectoD)
-      extends Predictor with Error
+      extends PredictorMat (x, y)
 {
     if (x.dim2 != 2)     flaw ("constructor", "design matrix must have 2 columns")
-    if (x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
-
-    private val k        = 1                              // number of variables (k = n-1 where n = 2)
-    private val m        = x.dim1.toDouble                // number of data points (rows)
-    private val r_df     = (m-1.0) / (m-2.0)              // ratio of degrees of freedom
-
-    private var rBarSq   = -1.0                           // adjusted R-squared
-    private var fStat    = -1.0                           // F statistic (quality of fit)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
@@ -64,48 +54,14 @@ class SimpleRegression (x: MatriD, y: VectoD)
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  simple regression equation for the response passed into the class 'y'.
+    /** Perform 'k'-fold cross-validation.
+     *  @param k      the number of folds
+     *  @param rando  whether to use randomized cross-validation
      */
-//    def train (): SimpleRegression = train (y)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the error and useful diagnostics.
-     *  @param yy   the response vector
-     */
-    def eval (yy: VectoD = y)
+    def crossVal (k: Int = 10, rando: Boolean = true)
     {
-        e = yy - x * b                                         // compute residual/error vector e
-        diagnose (yy)                                          // compute diagnostics
-    } // eval
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute diagostics for the regression model.
-     *  @param yy  the response vector
-     */
-    override protected def diagnose (yy: VectoD)
-    {
-        super.diagnose (yy)
-        rBarSq   = 1.0 - (1.0-rSq) * r_df                 // R-bar-squared (adjusted R-squared)
-        fStat    = (sst - sse) * (m-2.0) / sse            // F statistic (msr / mse)
-    } // diagnose
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including.
-     */
-    override def fit: VectoD = super.fit.asInstanceOf [VectorD] ++ VectorD (rBarSq, fStat)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the labels for the fit.
-     */
-    override def fitLabels: Seq [String] = super.fitLabels ++ Seq ("rBarSq", "fStat")
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
-     *  i.e., [b0, b1] dot [1, z1].
-     *  @param z  the new vector to predict
-     */
-    def predict (z: VectoD): Double = b dot z
+        crossValidate ((x: MatriD, y: VectoD) => new SimpleRegression (x, y), k, rando)
+    } // crossVal
 
 } // SimpleRegression class
 
@@ -151,8 +107,7 @@ object SimpleRegressionTest extends App
     rg.train ().eval ()
 
     println ("coefficient = " + rg.coefficient)
-    println ("            = " + rg.fitLabels)
-    println ("fit         = " + rg.fit)
+    println ("fitMap      = " + rg.fitMap)
 
 } // SimpleRegressionTest object
 
@@ -182,8 +137,7 @@ object SimpleRegressionTest2 extends App
     rg.train ().eval ()
 
     println ("coefficient = " + rg.coefficient)
-    println ("            = " + rg.fitLabels)
-    println ("fit         = " + rg.fit)
+    println ("fitMap      = " + rg.fitMap)
 
     val z  = VectorD (1.0, 5.0)               // predict y for one point
     val yp = rg.predict (z)
@@ -222,8 +176,7 @@ object SimpleRegressionTest3 extends App
     rg.train ().eval ()
 
     println ("coefficient = " + rg.coefficient)
-    println ("            = " + rg.fitLabels)
-    println ("fit         = " + rg.fit)
+    println ("fitMap      = " + rg.fitMap)
 
     val z  = VectorD (1.0, 15.0)             // predict y for one point
     val yp = rg.predict (z)

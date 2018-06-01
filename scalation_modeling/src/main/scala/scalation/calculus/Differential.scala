@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Mon Jan 28 17:18:16 EST 2013
  *  @see     LICENSE (MIT style license file).
  *
@@ -12,8 +12,8 @@ package scalation.calculus
 
 import scala.math.sqrt
 
-import scalation.linalgebra.{MatrixD, VectoD, VectorD}
-import scalation.math.FunctionS2S
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
+import scalation.math._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Differential` object contains functions for computing derivatives, partial
@@ -21,10 +21,6 @@ import scalation.math.FunctionS2S
  */
 object Differential
 {
-    type FunctionV2S  = VectorD => Double      // function of a vector - VectorD
-    type FunctionV_2S = VectoD  => Double      // function of a vector - VectoD  - base trait
-    type FunctionV2V  = VectorD => VectorD     // vector-valued function of a vector - VectorD
-    type FunctionV_2V = VectoD  => VectoD      // vector-valued function of a vector - VectoD  - base trait
     type FunctionsV   = Array [FunctionV2S]    // array of vector functions
 
     private var h   = 1E-6                     // default step size used for estimating derivatives

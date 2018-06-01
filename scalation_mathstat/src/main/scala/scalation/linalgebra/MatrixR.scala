@@ -2,7 +2,7 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @builder scalation.linalgebra.bld.BldMatrix
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun Sep 16 14:09:25 EDT 2012
  *  @see     LICENSE (MIT style license file).
  */
@@ -138,6 +138,19 @@ class MatrixR (d1: Int,
     def apply (): Array [Array [Real]] = v
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get the rows from 'this' matrix according to the given index/basis.
+     *  The new matrix is formed by referencing rows in the current matrix,
+     *  thereby saving space.
+     *  @param iv  the row index vector
+     */
+    override def apply (iv: VectoI): MatrixR =
+    {
+        val a = Array.ofDim [Array [Real]] (iv.dim)
+        for (i <- a.indices) a(i) = v(iv(i))
+        new MatrixR (a.length, dim2, a)
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' matrix's element at the 'i,j'-th index position to the scalar 'x'.
      *  @param i  the row index
      *  @param j  the column index
@@ -190,19 +203,38 @@ class MatrixR (d1: Int,
     def set (i: Int, u: VectoR, j: Int = 0) { for (k <- 0 until u.dim) v(i)(k+j) = u(k) }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' `MatrixR` into a `MatrixI`.
+    /** Convert 'this' `MatrixR` into an integer matrix `MatrixI`.
      */
     def toInt: MatrixI =
     {
         val c = new MatrixI (dim1, dim2)
-        for (i <- range1) c.v(i) = v(i).map (_.toInt)
+        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j).toInt
         c
     } // toInt
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' `MatrixR` into a double matrix `MatrixD`.
+     */
+    def toDouble: MatrixD =
+    {
+        val c = new MatrixD (dim1, dim2)
+        for (i <- range1; j <- range2) c.v(i)(j) = v(i)(j).toDouble
+        c
+    } // toDouble
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' matrix to a dense matrix.
      */
     def toDense: MatrixR = this
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Map the elements of 'this' matrix by applying the mapping function 'f'.
+     *  @param f  the function to apply
+     */
+    override def map (f: VectoR => VectoR): MatrixR =
+    {
+        MatrixR (for (i <- range1) yield f(new VectorR (v(i).length, v(i))), false)
+    } // map
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice 'this' matrix row-wise 'from' to 'end'.
@@ -211,7 +243,7 @@ class MatrixR (d1: Int,
      */
     def slice (from: Int, end: Int): MatrixR =
     {
-        if (from >= end) return new MatrixR (0, 0)
+        if (from >= end) return new MatrixR (0, dim2)
         new MatrixR (end - from, dim2, v.slice (from, end))
     } // slice
 
@@ -222,7 +254,7 @@ class MatrixR (d1: Int,
      */
     def sliceCol (from: Int, end: Int): MatrixR =
     {
-        if (from >= end) return new MatrixR (0, 0)
+        if (from >= end) return new MatrixR (dim1, 0)
         val c = new MatrixR (dim1, end - from)
         for (i <- c.range1; j <- c.range2) c.v(i)(j) = v(i)(j + from)
         c
@@ -248,14 +280,14 @@ class MatrixR (d1: Int,
      *  @param row  the row to exclude (0 until dim1, set to dim1 to keep all rows)
      *  @param col  the column to exclude (0 until dim2, set to dim2 to keep all columns)
      */
-    def sliceExclude (row: Int, col: Int): MatrixR =
+    def sliceEx (row: Int, col: Int): MatrixR =
     {
         val c = new MatrixR (dim1 - oneIf (row < dim1), dim2 - oneIf (col < dim2))
         for (i <- range1 if i != row) for (j <- range2 if j != col) {
             c.v(i - oneIf (i > row))(j - oneIf (j > col)) = v(i)(j)
         } // for
         c
-    } // sliceExclude
+    } // sliceEx
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select rows from 'this' matrix according to the given index/basis.
@@ -268,19 +300,6 @@ class MatrixR (d1: Int,
         for (i <- c.range1; j <- c.range2) c.v(i)(j) = v(rowIndex(i))(j)
         c
     } // selectRows
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Select rows from 'this' matrix according to the given index/basis.
-     *  The new matrix is formed by referencing rows in the current matrix,
-     *  thereby saving space.
-     *  @param rowIndex  the row index positions (e.g., (0, 2, 5))
-     */
-    def selectRows2 (rowIndex: Array [Int]): MatrixR =
-    {
-        val a = Array.ofDim [Array [Real]] (rowIndex.length)
-        for (i <- a.indices) a(i) = v(rowIndex(i))
-        new MatrixR (a.length, dim2, a)
-    } // selectRows2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get column 'col' from the matrix, returning it as a vector.
@@ -940,6 +959,13 @@ class MatrixR (d1: Int,
     } // **
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply 'this' matrix by matrix 'b' elementwise (Hadamard product).
+     *  @see en.wikipedia.org/wiki/Hadamard_product_(matrices)
+     *  @param b  the matrix to multiply by
+     */
+    override def ** (b: MatriR): MatrixR = MatrixR (for (i <- range1) yield this(i) * b(i), false)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' matrix by vector 'u' to produce another matrix 'a_ij * u_j'.
      *  @param u  the vector to multiply by
      */
@@ -1494,7 +1520,7 @@ class MatrixR (d1: Int,
         var sum = _0
         var b: MatrixR = null
         for (j <- range2) {
-            b = sliceExclude (0, j)   // the submatrix that excludes row 0 and column j
+            b = sliceEx (0, j)             // the submatrix that excludes row 0 and column j
             sum += (if (j % 2 == 0) v(0)(j) * (if (b.dim1 == 1) b.v(0)(0) else b.det)
                     else           -v(0)(j) * (if (b.dim1 == 1) b.v(0)(0) else b.det))
         } // for 
@@ -1576,6 +1602,15 @@ object MatrixR extends Error
      *  @param sp_  the new separating character
      */
     def setSp (sp_ : Char) { sp = sp_ }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a matrix from a two-dimensional array 'u'.
+     *  @param u  the 2D array for the matrix
+     */
+    def apply (u: Array [Array [Real]]): MatrixR =
+    {
+        new MatrixR (u.length, u(0).length, u)
+    } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a matrix and assign values from a sequence/array of vectors 'u'.
@@ -1876,10 +1911,10 @@ object MatrixRTest extends App
     z *= z                                       // in-place matrix multiplication
     println ("z squared    = " + z)
     val zz1 = zz.selectRows (Array (0, 2))
-    val zz2 = zz.selectRows2 (Array (0, 2))
+    val zz2 = zz(VectorI (0, 2))
     zz(0, 0) = -3
-    println ("zz.selectRows  = " + zz1)
-    println ("zz.selectRows2 = " + zz2)
+    println ("zz.selectRows = " + zz1)
+    println ("zz.apply      = " + zz2)
 
     val w = new MatrixR ((2, 3), 2,  3, 5, 
                                 -4,  2, 3)

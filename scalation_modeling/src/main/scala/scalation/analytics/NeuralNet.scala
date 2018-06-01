@@ -1,249 +1,204 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
- *  @date    Mon Jan 21 14:43:50 EST 2013
+ *  @version 1.5
+ *  @date    Fri Mar 16 15:13:38 EDT 2018
  *  @see     LICENSE (MIT style license file).
- *  @see     http://page.mi.fu-berlin.de/rojas/neural/chapter/K7.pdf
+ *
+ *  @see     hebb.mit.edu/courses/9.641/2002/lectures/lecture03.pdf
  */
-
-// U N D E R   D E V E L O P M E N T
 
 package scalation.analytics
 
-import scala.math.exp
-import scala.util.control.Breaks.{break, breakable}
+import scala.math.sqrt
 
-import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
-import scalation.linalgebra.MatrixD.outer
-import scalation.random.Random
+import scalation.linalgebra._
+import scalation.stat.Statistic
+import scalation.random.PermutedVecI
 import scalation.util.Error
 
-import ActivationFunc._
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `NeuralNet` companion object provides default values for hyper-parameters.
+ */
+object NeuralNet
+{
+    val DEFAULT_ETA    = 0.1                                              // the learning rate
+    val DEFAULT_EPOCHS = 1000                                             // the maximum number of training epochs
+} // NeuralNet
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `NeuralNet` class supports basic 3-layer (input, hidden and output) Neural
- *  Networks.  Given several input and output vectors (training data), fit the weights
- *  connecting the layers, so that for a new input vector 'zi', the net can predict
- *  the output vector 'zo' ('zh' is the intermediate value at the hidden layer), i.e.,
- *  <p>
- *      zi --> zh = f (w * zi) --> zo = g (v * zh)
- *  <p>
- *  Note, w_0 and v_0 are treated as biases, so zi_0 and zh_0 must be 1.0.
- *  @param x    the input matrix (training data consisting of m input vectors)
- *  @param y    the output matrix (training data consisting of m output vectors)
- *  @param h    the number of neurons in the hidden layer
- *  @param eta  the learning/convergence rate
+/** The `NeuralNet` abstract class provides the basic structure and API for
+ *  a variety of Neural Networks.
+ *  @param x           the m-by-nx input matrix (training data consisting of m input vectors)
+ *  @param y           the m-by-ny output matrix (training data consisting of m output vectors)
+ *  @param eta         the learning/convergence rate (adjustable)
+ *  @param max_epochs  the maximum number of training epochs/iterations (fixed)
  */
-class NeuralNet (x: MatriD, y: MatriD, h: Int, eta: Double = 1.0)
-      extends Predictor with Error
+abstract class NeuralNet (x: MatriD, y: MatriD,
+                          protected var eta: Double,
+                          protected val max_epochs: Int)
+         extends Predictor with Error
 {
-    private val MAX_ITER = 200                  // maximum number of iterations
-    private val EPSILON  = 1E-6                 // number close to zero
-    private val DEBUG    = true                 // debug flag
-    private val m        = x.dim1               // number of data points
-    private val n        = x.dim2               // dimensionality of the input
-    private val p        = y.dim2               // dimensionality of the output
-    private val hh       = new MatrixD (m, h)   // used to hold hidden layer values
-    private val _11      = VectorD (1.0)
+    private   val DEBUG   = true
+    protected val m       = x.dim1                                        // number of data points (input vectors)
+    protected val nx      = x.dim2                                        // dimensionality of the input
+    protected val ny      = y.dim2                                        // dimensionality of the output
+    protected val _1      = VectorD.one (m)                               // vector of all ones
+    private   val stream  = 0                                             // random number stream to use
+    private   val permGen = PermutedVecI (VectorI.range (0, m), stream)   // permutation generator
 
-    if (y.dim1 != m) flaw ("constructor", "dimensions of x and y are incompatible")
+    if (y.dim1 != m) flaw ("constructor", "row dimensions of x and y are incompatible")
 
-    println ("Create a Neural Net with " + n + " input, " +
-                                           h + " hidden, " + 
-                                           p + " output nodes")
-
-    private var w: MatriD = null          // weight matrix between input and hidden layers
-    private var v: MatriD = null          // weight matrix between hidden and output layers
+    protected val fitA = Array.ofDim [Fit] (ny)
+    for (k <- fitA.indices) fitA(k) = new Fit (y.col(k), nx, (nx-1, m - nx))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the initial weight matrices 'w and 'v' manually before training.
-     *  @param w0   the initial weights for w
-     *  @param v0   the initial weights for v
+    /** Return the weight matrix.
      */
-    def setWeights (w0: MatriD, v0: MatriD) { w  = w0; v  = v0 }
+    def weights: Array [MatriD]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Set the initial weight matrices 'w' and 'v' randomly with a value in (0, 1)
-     *  before training.
-     *  @param i  the random number stream to use
+    /** Set the initial weight matrix (ces) with values in (0, limit) before training.
+     *  @param stream  the random number stream to use
+     *  @param limit   the maximum value for any weight
      */
-    def setWeights (i: Int = 0)
+    def setWeights (stream: Int = 0, limit: Double = 1.0 / sqrt (nx))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reset the learning rate 'eta'.  Also, randomly generates new weights.
+     *  @param eta_  the learning rate
+     */
+    def reset (eta_ : Double) { eta = eta_; setWeights () }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given training data 'x' and 'y', fit the parameter/weight matrix.
+     */
+    def train (): NeuralNet
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given training data 'x' and 'yy', fit the parameter/weight matrix.
+     *  @param yy  the vector of outputs for the first variable (currently ignored)
+     */
+    def train (yy: VectoD): NeuralNet = train ()
+
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Evaluate the quality of the fit for the parameter weight matrices on the
+     *  the entire dataset or the training dataset.
+     */
+    def eval ()
     {
-        val rn = new Random (i)           // change i to get different random numbers
-        w      = new MatrixD (n, h)
-        v      = new MatrixD (h, p)
-        for (i <- 0 until n; j <- 0 until h) w(i)(j) = rn.gen
-        for (i <- 0 until h; j <- 0 until p) v(i)(j) = rn.gen
-    } // setWeights
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given training data 'x' and 'y', fit the weight matrices 'w' and 'v'.
-     *  @param yy  the response vector
-     */
-    def train (yy: VectoD = y.col(0)): NeuralNet =
-    {
-        // FIX - yy currently not used
-        if (w == null) setWeights ()
-        backProp ()
-        this
-    } // train
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given training data 'x' and 'y', fit the weight matrices 'w' and 'v'.
-     */
-//    def train (): NeuralNet = train (y)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the error and useful diagnostics.  FIX
-     *  @param yy   the response vector
-     */
-    def eval (yy: VectoD = y(0))                               // FIX - extend to matrices
-    {
-        e = yy - x * b                                         // compute residual/error vector e
-//      diagnose (yy)                                          // compute diagnostics
+        val yp = predict (x)                                             // predict output/responses
+        val e  = y - yp                                                  // error matrix
+        for (k <- e.range2) fitA(k).diagnose (e.col(k))                  // compute diagonostics, per column
     } // eval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Use back propagation to adjust the weight matrices 'w' and 'v' to make the
-     *  predictions more accurate.  First adjust the 'v' weights (hidden to output layer)
-     *  and then move back to adjust the 'w' weights (input to hidden layer).
-     *  @see http://www4.rgu.ac.uk/files/chapter3%20-%20bp.pdf
-     *  @see http://ufldl.stanford.edu/wiki/index.php/Backpropagation_Algorithm
+    /** Evaluate the quality of the fit for the parameter/weight matrices on the
+     *  test dataset.
+     *  @param xx  the test input data matrix
+     *  @param yy  the test output response matrix
      */
-    def backProp ()
+    def eval (xx: MatriD, yy: MatriD)
     {
-        breakable { for (k <- 0 until MAX_ITER) {               // kth learning phase
-           var sse = 0.0                                        // sum error over layers
-           for (i <- 0 until m) hh(i) = _11 ++ sigmoidV (w * x(i))      // values for hidden layer
-           sse += minimizeError (hh, y, v)                      // adjust v weights (hidden -> output)
-           sse += minimizeError (x, hh, w)                      // adjust w weights (input  -> hidden)
-           println ("weights for " + k + "th phase: w = " + w + "\nv = " + v)
-           if (sse < EPSILON) break                             // break when error is small enough
-        }} // for
-    }  // backProp
+        val yp = predict (xx)                                            // predict output/responses
+        val e  = yy - yp                                                 // error matrix
+        for (k <- e.range2) fitA(k).diagnose (e.col(k))                  // compute diagonostics, per column
+    } // eval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Minimize the error in the prediction by adjusting the weight vector 'w'.
-     *  The error 'eo' is simply the difference between the target value 'yi' and the
-     *  predicted value 'zo'.  Minimize 1/2 of the dot product of error with itself
-     *  using gradient-descent.
-     *  @param xx  the effective input layer training data/matrix
-     *  @param yy  the effective output layer training data/matrix
-     *  @param ww  the weights between these two layers
+    /** Return the labels for the quality of fit measures.
      */
-    def minimizeError (xx: MatriD, yy: MatriD, ww: MatriD): Double =
-    {
-        val _1  = new VectorD (yy.dim2); _1.set (1.0)  // one vector
-        var sse = 0.0                                  // 1/2 sum of squared errors
+    def fitLabel: Seq [String] = fitA(0).fitLabel
 
-        for (i <- 0 until m) {                         // for each example in training set
-            val xi = xx(i)                             // ith input value (vector)
-            val yi = yy(i)                             // ith target output value (vector)
-            val zo = sigmoidV (ww * xi)                // ith predicted output value (vector)
-            val eo = yi - zo                           // error = target - predicted
-            val gr = outer (xi, eo * zo * (_1 - zo))   // -gradients of 1/2 dot product of error
-            println (gr.dim1 + ", " + gr.dim2)
-            w   += gr * eta                            // adjust w weights (input -> output)
-            sse += .5 * (eo dot eo)
-            if (DEBUG) println ("error eo = " + eo + " = [ yi = " + yi + " - zo = " + zo + " ]")
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Show 'fitMap' for each y-column.
+     */
+    def fitMap ()
+    {
+        var sst, sse = 0.0
+        for (k <- fitA.indices) {
+            val fit_k = fitA(k).fitMap
+            println (s"For column $k: fitMap = \n $fit_k")
+            sst += fit_k ("sst").toDouble
+            sse += fit_k ("sse").toDouble
         } // for
-        sse
-    } // minimizeError
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the fit (weight matrix 'w' and weight matrix 'v').
-     *  FIX - make compatible with `Predictor`
-     */
-    def fit2: (MatriD, MatriD) = (w, v)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit.
-     */
-    override def fit: VectoD = new VectorD (0)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the labels for the fit.
-     */
-    override def fitLabels: Seq [String] = Seq ()
+        val rSq = (sst - sse) / sst
+        println (s"overall: rSq = $rSq, sst = $sst, sse = $sse")
+    } // fitMap
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given an input vector 'zi', predict the output/response vector 'zo'.
-     *  For the hidden to output layer bias, prepend the hidden values with a one (_11).
-     *  @param zi  the new input vector
+    /** Given a new input vector 'z', predict the output/response value 'f(z)'.
+     *  Return only the first output variable's value.
+     *  @param z  the new input vector
      */
-    def predictAll (zi: VectoD): VectoD = 
+    def predict (z: VectoD): Double = predictV (z)(0)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a new input vector 'z', predict the output/response vector 'f(z)'.
+     *  @param z  the new input vector
+     */
+    def predictV (z: VectoD): VectoD
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a new input matrix 'z', predict the output/response matrix 'f(z)'.
+     *  @param z  the new input matrix
+     */
+    def predict (z: MatriD): MatriD
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /*  Use 'k'-fold cross-validation to compute test quality of fit measures by
+     *  dividing the dataset into a test dataset and a training dataset.
+     *  The test dataset is defined by 'tRange' and the rest of the data is training dataset".
+     *  @param x      the input data matrix
+     *  @param y      the output response matrix
+     *  @param algor  the prediction algorithm being applied (e.g., `NeuralNet_3L`)
+     *  @param k      the number of crosses and cross-validations (defaults to 10x).
+     *  @param rando  whether to use randomized cross-validation
+     */
+    def crossValidate (algor: (MatriD, MatriD) => NeuralNet, k: Int = 10,
+                       rando: Boolean = true): Array [Statistic] =
     {
-        val zh = _11 ++ sigmoidV (w * zi)    // augmented hidden values
-        sigmoidV (v * zh)                    // predicted output values
-    } // predictAll
+        val stats   = Array.fill (ny * fitLabel.length) (new Statistic ())
+        val indices = if (rando) permGen.igen.split (k)
+                      else       VectorI (0 until m).split (k)
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given an input vector 'zi', predict the output/response scalar 'zo(0)'.
-     *  May use this method if the output is one dimensional or interested in 1st value.
-     *  @param zi  the new input vector
+        for (idx <- indices) {
+            val idxa = idx.toArray
+            val x_te = x(idx)                                    // test data matrix
+            val y_te = y(idx)                                    // test response vector
+            val x_tr = x.selectRowsEx (idxa)                     // training data matrix
+            val y_tr = y.selectRowsEx (idxa)                     // training response vector
+
+            if (DEBUG) {
+                println ("x_te = " + x_te)
+                println ("y_te = " + y_te)
+                println ("x_tr = " + x_tr)
+                println ("y_tr = " + y_tr)
+            } // if
+
+            val model = algor (x_tr, y_tr)                       // construct next model using training dataset
+            model.train ()                                       // train the model
+            model.eval (x_te, y_te)                              // evaluate model on test dataset
+            for (j <- 0 until ny) {
+                val qm = model.fitA(j).fit                       // get quality of fit measures
+                val qs = qm.size
+                for (q <- qm.indices) stats(j*qs + q).tally (qm(q))   // tally these measures
+            } // for
+        } // for
+
+        if (DEBUG) println ("stats = " + stats.deep)
+        stats
+    } // crossValidate
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The 'crossVal' abstract method must be coded in implementing classes to
+     *  call the above 'crossValidate' method.  The 'algor' parameter may be
+     *  specified as a lambda function to create the prediction algorithm.
+     *  @param k      the number of crosses and cross-validations (defaults to 10x).
+     *  @param rando  whether to use randomized cross-validation
      */
-    def predict (zi: VectoD): Double = predictAll (zi)(0)
+    def crossVal (k: Int = 10, rando: Boolean = true)
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given several input vectors 'zi', predict the output/response vectors 'zo'.
-     *  @param zi  the new input vectors (stored as rows in a matrix)
-     */
-    def predictAll (zi: MatriD): MatriD =
-    {
-        null            // FIX: to be implemented
-    } // predictAll
-
-} // NeuralNet class
-
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `NeuralNetTest` object is used to test the `NeuralNet` class.  For this
- *  test, the initial weights are used for used for prediction.
- */
-object NeuralNetTest extends App
-{
-    val x   = new MatrixD (1, 3)                   // training data - input vectors (not used)
-    val y   = new MatrixD (1, 3)                   // training data - output vectors (not used)
-    val ann = new NeuralNet (x, y, 2)              // create a Neural Net
-
-    val w  = new MatrixD ((2, 3), 0.0, 0.5, 0.0,   // weight matrix w (input to hidden layer)
-                                  0.0, 0.5, 0.5)
-    val v  = new MatrixD ((2, 3), 0.0, 0.5, 0.5,   // weight matrix v (hidden to output layer)
-                                  0.0, 0.0, 0.0)
-    ann.setWeights (w, v)                          // set initial weights and biases
-
-    val zi = VectorD (1.0, 1.0, 1.0)               // predict output zo from input zi
-    println ("input vector:  zi = " + zi)
-    println ("output vector: zo = " + ann.predictAll (zi))
-
-} // NeuralNetTest object
-
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `NeuralNetTest2` object is used to test the `NeuralNet` class.  For this
- *  test, training data is used to fit the weights before using them for prediction.
- *  @see http://www4.rgu.ac.uk/files/chapter3%20-%20bp.pdf
- */
-object NeuralNetTest2 extends App
-{
-    val x   = new MatrixD ((1, 3), 1.0, 0.35, 0.9)   // training data - input vectors
-    val y   = new MatrixD ((1, 1), .5)               // training data - output vectors
-    val ann = new NeuralNet (x, y, 2)                // create a Neural Net
-
-    val w  = new MatrixD ((2, 3), 0.0, 0.1, 0.4,     // weight matrix w (input to hidden layer)
-                                  0.0, 0.8, 0.6)
-    val v  = new MatrixD ((1, 3), 0,0, 0.3, 0.9)     // weight matrix v (hidden to output layer)
-
-    ann.setWeights (w, v)                            // set initial weights
-
-    println ("input vector:  x(0) = " + x(0))
-    println ("=== target output vector: y(0) = " + y(0))
-    println ("--- initial output vector: zo = " + ann.predictAll (x(0)))
-
-    ann.train ().eval ()                             // fit the weights using training data
-
-    println ("+++ trained output vector: zo = " + ann.predictAll (x(0)))
-
-} // NeuralNetTest2 object
+} // NeuralNet abstract class
 

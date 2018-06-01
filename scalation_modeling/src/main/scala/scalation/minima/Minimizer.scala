@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Wed Oct 24 16:25:29 EDT 2012
  *  @see     LICENSE (MIT style license file).
  */
@@ -28,6 +28,8 @@ import scalation.linalgebra.VectorD
  */
 trait Minimizer
 {
+    type Pair = (VectorD, VectorD)              // pair of vectors
+
     protected val EPSILON  = 1E-10              // number close to zero
                                                 //   between machine epsilon and its square root
     protected val TOL      = 100.0 * EPSILON    // default tolerance level more relaxed

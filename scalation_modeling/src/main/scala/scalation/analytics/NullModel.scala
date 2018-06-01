@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Fri Jan  5 14:03:36 EST 2018
  *  @see     LICENSE (MIT style license file).
  */
@@ -24,22 +24,11 @@ import scalation.util.Error
  *  @param y  the response vector
  */
 class NullModel (y: VectoD)
-      extends Predictor with Error
+      extends Fit (y, 1, (1, y.dim)) with Predictor with Error
 {
-    private val k        = 0                              // number of variables
-    private val m        = y.dim.toDouble                 // number of data points (rows)
-    private val r_df     = (m-1.0) / (m-2.0)              // ratio of degrees of freedom
-
-    private var rBarSq   = -1.0                           // adjusted R-squared
-    private var fStat    = -1.0                           // F statistic (quality of fit)
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  simpler regression equation
-     *  <p>
-     *      y = b dot x + e  = b0 + e
-     *  <p>
-     *  using the least squares method.
+     *  simpler regression equation.
      *  @param yy  the response vector
      */
     def train (yy: VectoD = y): NullModel =
@@ -50,34 +39,12 @@ class NullModel (y: VectoD)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.
-     *  @param yy   the response vector
      */
-    def eval (yy: VectoD = y)
+    def eval ()
     {
-        e = yy - b(0)                                          // compute residual/error vector e
-        diagnose (yy)                                          // compute diagnostics
+        e = y - b(0)                                      // compute residual/error vector e
+        diagnose (e)                                      // compute diagnostics
     } // eval
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute diagostics for the regression model.
-     *  @param yy  the response vector
-     */
-    override protected def diagnose (yy: VectoD)
-    {
-        super.diagnose (yy)
-        rBarSq = 1.0 - (1.0-rSq) * r_df                   // R-bar-squared (adjusted R-squared)
-        fStat  = (sst - sse) * (m-2.0) / sse              // F statistic (msr / mse)
-    } // diagnose
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including.
-     */
-    override def fit: VectoD = super.fit.asInstanceOf [VectorD] ++ VectorD (rBarSq, fStat)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the labels for the fit.
-     */
-    override def fitLabels: Seq [String] = super.fitLabels ++ Seq ("rBarSq", "fStat")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of 'y = f(z)' by evaluating the formula 'y = b dot z',
@@ -107,8 +74,7 @@ object NullModelTest extends App
     rg.train ().eval ()
 
     println ("coefficient = " + rg.coefficient)
-    println ("            = " + rg.fitLabels)
-    println ("fit         = " + rg.fit)
+    println ("fitMap      = " + rg.fitMap)
 
     val z  = VectorD (5)                                // predict y for one point
     val yp = rg.predict (z)
@@ -135,8 +101,7 @@ object NullModelTest2 extends App
     rg.train ().eval ()
 
     println ("coefficient = " + rg.coefficient)
-    println ("            = " + rg.fitLabels)
-    println ("fit         = " + rg.fit)
+    println ("fitMap      = " + rg.fitMap)
 
     val z  = VectorD (5.0)                              // predict y for one point
     val yp = rg.predict (z)

@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sat Sep  8 13:53:16 EDT 2012
  *  @see     LICENSE (MIT style license file).
  */
@@ -190,20 +190,19 @@ object NaiveBayesRTest extends App
 
     val fn = Array ("curvature", "diameter")                   // feature names
     val cn = Array ("pass", "fail")                            // class names
-    val cl = NaiveBayesR (xy, fn, 2, cn)                       // create NaiveBayesR classifier
-    cl.train ()
+    val nbr = NaiveBayesR (xy, fn, 2, cn)                       // create NaiveBayesR classifier
+    nbr.train ()
 
     banner ("classify")
     val z  = VectorD (2.81, 5.46)
-    println (s"classify ($z) = ${cl.classify (z)}")
+    println (s"classify ($z) = ${nbr.classify (z)}")
 
     banner ("test")
     val x  = xy.sliceCol (0, 2)
     val y  = xy.col (2).toInt
-    val yp = new VectorI (xy.dim1)                             // predicted class vector
-    for (i <- x.range1) yp(i) = cl.classify (x(i))._1
-    println (s" y = $y \n yp = $yp")
-    println (cl.actualVpredicted (y, yp))                      // compare y vs. yp
+    val yp = nbr.classify (xy.sliceCol (0, xy.dim2-1))
+    println (nbr.fitLabel)
+    println (nbr.fit (y, yp))
 
     val t = VectorD.range (0, x.dim1)
     new Plot (t, y.toDouble, yp.toDouble, "y(black)/yp(red) vs. t")

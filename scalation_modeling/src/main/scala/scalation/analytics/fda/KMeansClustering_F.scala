@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Mon Oct 10 16:42:21 EDT 2016
  *  @see     LICENSE (MIT style license file).
  *
@@ -12,6 +12,7 @@
 package scalation.analytics.fda
 
 import scalation.analytics.clusterer.{Clusterer, KMeansClusterer}
+import scalation.calculus.DB_Spline
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.util.banner
 
@@ -65,9 +66,10 @@ class KMeansClustering_F (x: MatrixD, t: VectorD, τ: VectorD, k: Int, s: Int = 
      */
     private def smooth ()
     {
+        val bf = new DB_Spline (t)
         for (i <- x.range1) {                         // for each vector/row in matrix x
-//          val moo = new Smoothing_F (x(i), t, t.dim-3)
-            val moo = new Smoothing_F (x(i), t, τ)
+//          val moo = new Smoothing_F (x(i), t, τ)
+            val moo = new Smoothing_F (x(i), t, bf)
             val c   = moo.train ()
             if (DEBUG) println ("c = " + c)
             for (j <- x.range2) xs(i, j) = moo.predict (t(j))

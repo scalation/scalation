@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Casey Bowman
- *  @version 1.4
+ *  @version 1.5
  *  @date    Mon Mar 24 22:08:32 EDT 2014
  *  @see     LICENSE (MIT style license file).
  *
@@ -49,7 +49,7 @@ object StreamMaker
         println ("\n" +
                  "//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n" +
                  "/** @author  John Miller, Casey Bowman (code generated)\n" +
-                 " *  @version 1.4\n" +
+                 " *  @version 1.5\n" +
                  " *  @date    " + new Date () + "\n" +
                  " *  @see     LICENSE (MIT style license file).\n" +
                  " */\n" +

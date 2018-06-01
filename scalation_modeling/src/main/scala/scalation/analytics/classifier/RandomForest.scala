@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Dong Yu Yu, John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Fri Jan  5 16:54:27 EST 2018
  *  @see     LICENSE (MIT style license file).
  */
@@ -12,7 +12,6 @@ import scala.util.Random
 
 import scalation.linalgebra.{MatrixD, VectoD, VectorD, VectoI, VectorI}
 import scalation.random.RandomVecI
-import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RandomForest` class uses randomness for building descision trees in classification.
@@ -31,7 +30,7 @@ import scalation.util.Error
  */
 class RandomForest (x: MatrixD, y: VectoI, nF: Int, bR: Double, fS: Int, k: Int, s: Int,
                     val fn: Array [String], val cn: Array [String])
-      extends ClassifierReal (x, y, fn, k , cn) with Error
+      extends ClassifierReal (x, y, fn, k , cn)
 {
     private val DEBUG  = false
     private val xy     = x.:^+(y.toDouble)

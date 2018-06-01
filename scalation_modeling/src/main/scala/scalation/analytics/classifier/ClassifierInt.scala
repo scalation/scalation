@@ -1,19 +1,20 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun Sep 23 21:14:14 EDT 2012
  *  @see     LICENSE (MIT style license file).
  */
 
 package scalation.analytics.classifier
 
-import scala.math.round
 import scala.util.control.Breaks.{break, breakable}
 
 import scalation.linalgebra.{MatriD, MatriI, MatrixD, MatrixI, VectoD, VectoI, VectorI}
 import scalation.stat.vectorD2StatVector
 import scalation.util.{Error, getFromURL_File}
+
+import Round.roundVec
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ClassifierInt` abstract class provides a common foundation for several
@@ -30,11 +31,11 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int,
 {
     /** the number of data vectors in training/test-set (# rows)
      */
-    protected val m = x.dim1
+    protected val m = y.dim
 
     /** the number of features/variables (# columns)
      */
-    protected val n = x.dim2
+    protected val n = if (x == null) 0 else x.dim2
 
     /** the training-set size as a Double
      */
@@ -49,8 +50,8 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int,
      */
     protected val fset = Array.fill [Boolean](n)(true)
 
-    if (y.dim != m)     flaw ("constructor", "y.dim must equal training-set size (m)")
-    if (fn.length != n) flaw ("constructor", "fn.length must equal feature-set size (n)")
+    if (x != null && x.dim1 != m)     flaw ("constructor", "y.dim must equal training-set size (m)")
+    if (fn != null && fn.length != n) flaw ("constructor", "fn.length must equal feature-set size (n)")
     if (k >= m)         flaw ("constructor", "k must be less than training-set size (m)")
     if (cn.length != k) flaw ("constructor", "cn.length must equal number of classes (k)")
 
@@ -81,6 +82,23 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int,
     /** Shift the 'x' Matrix so that the minimum value for each column equals zero.
      */
     def shiftToZero () { x -= VectorI (for (j <- x.range2) yield x.col(j).min()) }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a new continuous data vector 'z', determine which class it fits into,
+     *  returning the best class, its name and its relative probability.
+     *  Override in classes that require precise real values for classification.
+     *  @param z  the real vector to classify
+     */
+    def classify (z: VectoD): (Int, String, Double) = classify (roundVec (z))
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Classify all of the row vectors in matrix 'xx'.
+     *  @param xx  the row vectors to classify
+     */
+    def classify (xx: MatriI): VectoI =
+    {
+        VectorI (for (i <- xx.range1) yield classify (xx(i))._1)
+    } // classify
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the quality of the training with a test-set and return the fraction
@@ -175,7 +193,7 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int,
                 if (DEBUG) {
                     println ("Feature " + toRemove + " has been removed.")
                     println ("The new accuracy is " + accuracy + " after removing feature " + toRemove)
-                }
+                } // if
             } else {
                 if (DEBUG) println ("No more features can/should be removed.")
                 break

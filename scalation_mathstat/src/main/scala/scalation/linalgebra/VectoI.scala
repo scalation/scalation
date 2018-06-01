@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Fri Jan 29 15:43:08 EST 2016
  *  @see     LICENSE (MIT style license file).
  */
@@ -124,6 +124,12 @@ trait VectoI
     def apply (): IndexedSeq [Int]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get 'this' vector's elements that are given in the index vector.
+     *  @param iv  the index vector
+     */
+    def apply (iv: VectoI): VectoI = ???
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' vector's element at the 'i'-th index position. 
      *  @param i  the given index
      *  @param x  the value to assign
@@ -188,11 +194,23 @@ trait VectoI
     def map (f: Int => Int): VectoI
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Slice 'this' vector 'from' to 'end'.
+    /** Slice 'this' vector 'from' to 'end'.  Override in implementing classes.
      *  @param from  the start of the slice (included)
      *  @param till  the end of the slice (excluded)
      */
     override def slice (from: Int, till: Int = dim): VectoI = null
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Slice 'this' vector over the given range 'rg'.
+     *  @param rg  the range specifying the slice
+     */
+    def slice (rg: Range): VectoI = slice (rg.start, rg.end)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Slice 'this' vector excluding the given range 'rg'.
+     *  @param rg  the excluded range of the slice
+     */
+    def sliceEx (rg: Range): VectoI = slice (0, rg.start) ++ slice (rg.end, dim)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Split 'this' vector into 'k' arrays of equal sizes (perhaps except for the last one).
@@ -205,6 +223,12 @@ trait VectoI
      *  @param basis  the set of index positions (e.g., 0, 2, 5)
      */
     def select (basis: Array [Int]): VectoI
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Select all elements of 'this' vector excluding ones in the 'basis'.
+     *  @param basis  the index positions to be excluded
+     */
+    def selectEx (basis: Array [Int]): VectoI = select ((range diff basis).toArray)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Concatenate 'this' vector and vector' b'.

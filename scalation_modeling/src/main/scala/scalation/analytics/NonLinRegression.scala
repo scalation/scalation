@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Wed Feb 20 17:39:57 EST 2013
  *  @see     LICENSE (MIT style license file).
  */
@@ -34,20 +34,11 @@ import scalation.util.Error
  */
 class NonLinRegression (x: MatriD, y: VectoD, f: (VectoD, VectoD) => Double,
                         b_init: VectorD)                                         // FIX - should be trait - currently fails
-      extends Predictor with Error
+      extends PredictorMat (x, y)
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
 
     private val DEBUG  = false                                 // debug flag
-    private val k      = x.dim2 - 1                            // number of variables (k = n-1
-    private val m      = x.dim1                                // number of data points (rows in matrix x)
-    private val df     = (m - k - 1).toInt                     // degrees of freedom
-    private val r_df   = (m-1.0) / (m-k-1.0)                   // ratio of degrees of freedom
-
-    private var rBarSq = -1.0                                  // adjusted R-squared
-    private var fStat  = -1.0                                  // F statistic (quality of fit)
-    private var aic    = -1.0                                  // Akaike Information Criterion (AIC)
-    private var bic    = -1.0                                  // Bayesian Information Criterion (BIC)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Function to compute the Sum of Squares Error 'SSE' for given values for
@@ -82,60 +73,30 @@ class NonLinRegression (x: MatriD, y: VectoD, f: (VectoD, VectoD) => Double,
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  non-linear regression equation
-     *  <p>
-     *      y = f(x, b)
-     *  <p>
-     *  using the least squares method.
-     *  Caveat:  Optimizer may converge to an unsatisfactory local optima.
-     *           If the regression can be linearized, use linear regression for
-     *           starting solution.
-     */
-//    def train (): NonLinRegression = train (y)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.
-     *  @param yy   the response vector
      */
-    def eval (yy: VectoD = y)
+    override def eval ()
     {
-        e = yy - x * b                                         // compute residual/error vector e
-        diagnose (yy)                                          // compute diagnostics
+        e = y - x * b                                         // compute residual/error vector e
+        diagnose (e)                                          // compute diagnostics
     } // eval
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute diagostics for the regression model.
-     *  @param yy  the response vector
-     */
-    override protected def diagnose (yy: VectoD)
-    {
-        sse    = sseF (b.asInstanceOf [VectorD])               // residual/error sum of squares
-        sst    = (yy dot yy) - yy.sum~^2.0 / m.toDouble        // total sum of squares
-        rSq    = (sst - sse) / sst                             // coefficient of determination R^2
-
-        rBarSq = 1.0 - (1.0-rSq) * r_df                        // R-bar-squared (adjusted R-squared)
-        fStat  = (sst - sse) * df  / (sse * k)                 // F statistic (msr / mse)
-        aic    = m * log (sse) - m * log (m) + 2.0 * (k+1)     // Akaike Information Criterion (AIC)
-        bic    = aic + (k+1) * (log (m) - 2.0)                 // Bayesian Information Criterion (BIC)
-    } // diagnose
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit.
-     */
-    override def fit: VectoD = super.fit.asInstanceOf [VectorD] ++ VectorD (rBarSq, fStat, aic, bic)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the labels for the fit.
-     */
-    override def fitLabels: Seq [String] = super.fitLabels ++ Seq ("rBarSq", "fStat", "aic", "bic")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = f(z, b),
      *  i.e.0, (b0, b1) dot (1.0, z1).
      *  @param z  the new vector to predict
      */
-    def predict (z: VectoD): Double = f(z, b)
+    override def predict (z: VectoD): Double = f(z, b)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform 'k'-fold cross-validation.
+     *  @param k      the number of folds
+     *  @param rando  whether to use randomized cross-validation
+     */
+    def crossVal (k: Int = 10, rando: Boolean = true)
+    {
+        crossValidate ((x: MatriD, y: VectoD) => new Perceptron (x, y), k, rando)
+    } // crossVal
 
 } // NonLinRegression class
 

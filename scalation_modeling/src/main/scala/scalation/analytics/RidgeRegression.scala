@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sat Jan 31 20:59:02 EST 2015
  *  @see     LICENSE (MIT style license file).
  *
@@ -18,9 +18,9 @@ import scala.math.{log, sqrt}
 import scalation.linalgebra._
 import scalation.minima.GoldenSectionLS
 import scalation.plot.Plot
-import scalation.util.{banner, Error, time}
+import scalation.util.banner
 
-import Centering.center
+import MatrixTransform.center
 import RegTechnique._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -53,35 +53,22 @@ import RegTechnique._
  *  @param lambda_    the shrinkage parameter (0 => OLS) in the penalty term 'lambda * b dot b'
  *  @param technique  the technique used to solve for b in (x.t*x + lambda*I)*b = x.t*y
  */
-class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda_ : Double = 0.1,
-                       technique: RegTechnique = Cholesky)
-      extends Predictor with Error
+class RidgeRegression (x: MatriD, y: VectoD, lambda_ : Double = 0.1, technique: RegTechnique = Cholesky)
+      extends PredictorMat (x, y)
 {
-    if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
-    if (x.dim1 <= x.dim2) flaw ("constructor", "not enough data rows in matrix to use regression")
-
     private val DEBUG  = true                                  // debug flag
-    private val k      = x.dim2 - 1                            // number of variables (k = n-1)
-    private val m      = x.dim1.toDouble                       // number of data points (rows)
-    private val df     = (m - k - 1).toInt                     // degrees of freedom
-    private val r_df   = (m-1.0) / df                          // ratio of degrees of freedom
 
-    private var rBarSq = -1.0                                  // adjusted R-squared
-    private var fStat  = -1.0                                  // F statistic (quality of fit)
-    private var aic    = -1.0                                  // Akaike Information Criterion (AIC)
-    private var bic    = -1.0                                  // Bayesian Information Criterion (BIC)
-
-    //* Compute x.t * x and add lambda to the diagonal
+    // compute x.t * x and add lambda to the diagonal
     private val xtx    = x.t * x
     private val lambda = if (lambda_ <= 0.0) gcv (y) else lambda_
-    private var xtx_ : MatT = null.asInstanceOf [MatT]; xtx_λI (lambda)
+    private var xtx_ : MatriD = null.asInstanceOf [MatriD]; xtx_λI (lambda)
     private val ey     = MatrixD.eye (x.dim1, x.dim2)          // identity matrix
 
-    type Fac_QR = Fac_QR_H [MatT]                              // change as needed
+    type Fac_QR = Fac_QR_H [MatriD]                            // change as needed
 
     // SVD not yet implemented - FIX check implementations
     private val fac: Factorization = technique match {         // select the factorization technique
-        case QR       => { val x_ = (x ++ (ey * sqrt (lambda))).asInstanceOf [MatT];
+        case QR       => { val x_ = (x ++ (ey * sqrt (lambda))).asInstanceOf [MatriD]
                            new Fac_QR (x_) }                   // QR Factorization
         case Cholesky => new Fac_Cholesky (xtx_)               // Cholesky Factorization
         case _        => new Fac_Inv (xtx_)                    // Inverse Factorization
@@ -94,7 +81,7 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
      */
     def xtx_λI (λ: Double)
     {
-        xtx_ = xtx.copy ().asInstanceOf [MatT]
+        xtx_ = xtx.copy ().asInstanceOf [MatriD]
         for (i <- xtx_.range1) xtx_(i, i) += λ
     } // xtx_λI
 
@@ -107,7 +94,7 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
      *  using the least squares method.
      *  @param yy  the response vector
      */
-    def train (yy: VectoD = y): RidgeRegression [MatT, VecT] =
+    def train (yy: VectoD = y): RidgeRegression =
     {
         b = technique match {                                  // solve for coefficient vector b
             case QR       => fac.solve (yy ++ new VectorD (y.dim))  // FIX - give formula
@@ -116,22 +103,6 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
         } // match
         this
     } // train
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  multiple regression equation using the least squares method on 'y'.
-     */
-//    def train (): RidgeRegression [MatT, VecT] = train (y)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the error and useful diagnostics.
-     *  @param yy   the response vector
-     */
-    def eval (yy: VectoD = y)
-    {
-        e = yy - x * b                                         // compute residual/error vector e
-        diagnose (yy)                                          // compute diagnostics
-    } // eval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Find an optimal value for the shrinkage parameter 'λ' using Generalized
@@ -144,6 +115,7 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
         {
             xtx_λI (λ)
             train (yy)
+            val sse = e dot e
             if (sse.isNaN) throw new ArithmeticException ("sse is NaN")
             sse
         } // f_sse
@@ -151,35 +123,6 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
         val gs = new GoldenSectionLS (f_sse _)
         gs.search ()
     } // gcv
-
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute diagostics for the regression model.
-     *  @param yy  the response vector
-     */
-    override protected def diagnose (yy: VectoD)
-    {
-        super.diagnose (yy)
-        rBarSq = 1.0 - (1.0-rSq) * r_df                        // R-bar-squared (adjusted R-squared)
-        fStat  = ((sst - sse) * df) / (sse * k)                // F statistic (msr / mse)
-        aic    = m * log (sse) - m * log (m) + 2.0 * (k+1)     // Akaike Information Criterion (AIC)
-        bic    = aic + (k+1) * (log (m) - 2.0)                 // Bayesian Information Criterion (BIC)
-    } // diagnose
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit.
-     */
-    override def fit: VectoD = super.fit.asInstanceOf [VectorD] ++ VectorD (rBarSq, fStat, aic, bic)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the labels for the fit.
-     */
-    override def fitLabels: Seq [String] = super.fitLabels ++ Seq ("rBarSq", "fStat", "aic", "bic")
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula below.
-     *  @param z  the new vector to predict
-     */
-    def predict (z: VectoD): Double = b dot z
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform forward selection to add the most predictive variable to the existing
@@ -202,14 +145,14 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
      */
     def backwardElim (cols: Set [Int]): (Int, VectoD, VectoD) =
     {
-        val ir    =  index_rSq                                  // fit(ir) is rSq
-        var j_max = -1                                          // index of variable to eliminate
-        var b_max: VectoD = null                                // parameter values for best solution
-        var ft_max: VectoD = VectorD.fill (fitLabels.size)(-1.0)        // optimize on quality of fit
+        val ir    =  index_rSq                                       // fit(ir) is rSq
+        var j_max = -1                                               // index of variable to eliminate
+        var b_max: VectoD = null                                     // parameter values for best solution
+        var ft_max: VectoD = VectorD.fill (fitLabel.size)(-1.0)      // optimize on quality of fit
 
         for (j <- 1 to k) {
-            val keep = m.toInt                                  // i-value large enough to not exclude any rows in slice
-            val rg_j = new RidgeRegression (x.sliceExclude (keep, j), y)    // regress with x_j removed
+            val keep = m.toInt                                       // i-value large enough to not exclude any rows in slice
+            val rg_j = new RidgeRegression (x.sliceEx (keep, j), y)  // regress with x_j removed
             rg_j.train ().eval ()
             val b  = rg_j.coefficient
             val ft = rg_j.fit
@@ -226,17 +169,27 @@ class RidgeRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, lambda
      */
     def vif: VectoD =
     {
-        val ir   = index_rSq                                    // fit(ir) is rSq
-        val vifV = new VectorD (k)                              // VIF vector
+        val ir   = index_rSq                                           // fit(ir) is rSq
+        val vifV = new VectorD (k)                                     // VIF vector
         for (j <- 1 to k) {
-            val keep = m.toInt                                  // i-value large enough to not exclude any rows in slice
-            val x_j  = x.col(j)                                               // x_j is jth column in x
-            val rg_j = new RidgeRegression (x.sliceExclude (keep, j), x_j)    // regress with x_j removed
+            val keep = m.toInt                                         // i-value large enough to not exclude any rows in slice
+            val x_j  = x.col(j)                                        // x_j is jth column in x
+            val rg_j = new RidgeRegression (x.sliceEx (keep, j), x_j)  // regress with x_j removed
             rg_j.train ().eval ()
-            vifV(j-1) =  1.0 / (1.0 - rg_j.fit(ir))             // store vif for x_1 in vifV(0)
+            vifV(j-1) =  1.0 / (1.0 - rg_j.fit(ir))                    // store vif for x_1 in vifV(0)
         } // for
         vifV
     } // vif
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform 'k'-fold cross-validation.
+     *  @param k      the number of folds
+     *  @param rando  whether to use randomized cross-validation
+     */
+    def crossVal (k: Int = 10, rando: Boolean = true)
+    {
+        crossValidate ((x: MatriD, y: VectoD) => new RidgeRegression (x, y), k, rando)
+    } // crossVal
 
 } // RidgeRegression class
 
@@ -276,8 +229,7 @@ object RidgeRegressionTest extends App
 
     val rrg = new RidgeRegression (x_c, y_c)
     rrg.train ().eval ()
-    println (rrg.fitLabels)
-    println ("fit = " + rrg.fit)
+    println ("fitMap = " + rrg.fitMap)
     val yp = rrg.predict (z_c) + mu_y                     // predict y for one point
     println ("predict (" + z + ") = " + yp)
 
@@ -311,8 +263,7 @@ object RidgeRegressionTest2 extends App
     val rrg = new RidgeRegression (x, y)
     rrg.train ().eval ()
     println ("coefficient = " + rrg.coefficient)
-    println ("              " + rrg.fitLabels)
-    println ("fit         = " + rrg.fit)
+    println ("fitMap      = " + rrg.fitMap)
 
     val yp = rrg.predict (z)                         // predict y for one point
     println ("predict (" + z + ") = " + yp)
@@ -358,11 +309,10 @@ object RidgeRegressionTest3 extends App
                      114.0, 115.0, 114.0, 106.0, 125.0, 114.0, 106.0, 113.0, 110.0, 122.0)
 
     val rrg = new RidgeRegression (x, y)
-    time { rrg.train ().eval () }
+    rrg.train ().eval ()
 
     println ("coefficient = " + rrg.coefficient)
-    println ("              " + rrg.fitLabels)
-    println ("fit         = " + rrg.fit)           // fit model y = b_1*x_1 + b_2*x_2 + b_3*x_3 + b_4*x_4
+    println ("fitMap      = " + rrg.fitMap)        // fit model y = b_1*x_1 + b_2*x_2 + b_3*x_3 + b_4*x_4
 
     println ("vif         = " + rrg.vif)           // test multi-collinearity (VIF)
 

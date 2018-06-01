@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Michael Cotterell
- *  @version 1.4
+ *  @version 1.5
  *  @date    Wed Feb 20 17:39:57 EST 2013
  *  @see     LICENSE (MIT style license file).
  */
@@ -53,7 +53,7 @@ import Regression_WLS._
  *  @param technique  the technique used to solve for b in x.t*w*x*b = x.t*w*y
  *  @param w          the weight vector (if null, computed in companion object)
  */
-class Regression_WLS [MatT <: MatriD, VecT <: VectoD] (xx: MatT, yy: VecT, technique: RegTechnique = QR,
+class Regression_WLS (xx: MatriD, yy: VectoD, technique: RegTechnique = QR,
                       private var w: VectoD = null)
       extends Regression ({ setWeights (xx, yy, technique, w); reweightX (xx, w) }, reweightY (yy, w), technique)
 {
@@ -62,39 +62,25 @@ class Regression_WLS [MatT <: MatriD, VecT <: VectoD] (xx: MatT, yy: VecT, techn
     if (w == null) w = Regression_WLS.weights
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the weight vector
+    /** Return the weight vector.
      */
     def weights: VectoD = w
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute diagostics for the regression model.
-     *  @param yy  the response vector
+    /** Compute diagostics for the regression model.  Must override due to weights.
+     *  @param e  the error vector 
      */
-    override protected def diagnose (yy: VectoD)
+    override def diagnose (e: VectoD, w_ : VectoD, yp: VectoD) { super.diagnose (e, w, xx * b) }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform 'k'-fold cross-validation.
+     *  @param k      the number of folds
+     *  @param rando  whether to use randomized cross-validation
+     */
+    override def crossVal (k: Int = 10, rando: Boolean = true)
     {
-        pre    = xx * b                                        // predicted response vector
-        sse    = e dot e                                       // sum of squared errors
-        ssr    = (w * (pre - (w * pre / w.sum).sum)~^2.0).sum  // regression sum of squares
-        sst    = ssr + sse                                     // total sum of squares
-        rmse   = sqrt (sse / e.dim)                            // root mean square error
-        rSq    = (sst - sse) / sst                             // coefficient of determination R^2
-        rBarSq = 1.0 - (1.0-rSq) * r_df                        // R-bar-squared (adjusted R-squared)
-        fStat  = ((sst - sse) * df) / (sse * k)                // F statistic (msr / mse)
-        aic    = m * log (sse) - m * log (m) + 2.0 * (k+1)     // Akaike Information Criterion (AIC)
-        bic    = aic + (k+1) * (log (m) - 2.0)                 // Bayesian Information Criterion (BIC)
-
-        val facCho = if (technique == Cholesky) fac            // reuse Cholesky factorization
-                     else new Fac_Cholesky (x.t * x)           // create a Cholesky factorization
-        val l_inv  = facCho.factor1 ().inverse                 // take inverse of l from Cholesky factorization
-        val varEst = sse / df                                  // variance estimate
-        val varCov = l_inv.t * l_inv * varEst                  // variance-covariance matrix
-
-        stdErr = varCov.getDiag ().map (sqrt (_))              // standard error of coefficients
-        t      = b / stdErr                                    // Student's T statistic
-
-        p = if (df > 0) t.map ((x: Double) => 2.0 * studentTCDF (-abs (x), df))   // p values
-            else -VectorD.one (k+1)
-    } // diagnose
+        crossValidate ((x: MatriD, y: VectoD) => new Regression_WLS (x, y), k, rando)
+    } // crossVal
 
  } // Regression_WLS class
 
@@ -122,8 +108,7 @@ object Regression_WLS
      *  @param technique  the technique used to solve for b in x.t*w*x*b = x.t*w*y
      *  @param w          the weight vector (if null, computed it)
      */
-    def setWeights [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT, technique: RegTechnique = QR,
-                    w0: VectoD = null)
+    def setWeights (x: MatriD, y: VectoD, technique: RegTechnique = QR, w0: VectoD = null)
     {
         if (w0 == null) {
             val k = x.dim2 - 1
@@ -178,12 +163,11 @@ object Regression_WLS
             banner (s"Fit the parameter vector b using $tec")
             val rg = new Regression_WLS (x, y, tec)
             rg.train ().eval ()
-            println ("w   = " + rg.weights)
-            println ("b   = " + rg.coefficient)
-            println (rg.fitLabels)
-            println ("fit = " + rg.fit)
-            println ("e   = " + rg.residual)
-            rg.report ()
+            println ("w      = " + rg.weights)
+            println ("b      = " + rg.coefficient)
+            println ("e      = " + rg.residual)
+            println ("fitMap = " + rg.fitMap)
+            rg.summary ()
 
             val yp = rg.predict (z)                            // predict y for one point
             println ("predict (" + z + ") = " + yp)

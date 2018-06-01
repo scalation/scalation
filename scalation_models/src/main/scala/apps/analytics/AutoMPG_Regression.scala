@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Hao Peng, John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Tue Sep 29 14:14:15 EDT 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -417,7 +417,7 @@ object AutoMPG_Regression extends App
     println ("model: y = b₀ + b₁*x₁ + b₂*x₂ + b₃*x₃ + b₄*x₄ + b₅*x₅ + b₆*x₆")
     rg.train ()
     println ("b = " + rg.coefficient)
-    rg.report
+    rg.fitMap
 
 } // AutoMPG_Regression object
 

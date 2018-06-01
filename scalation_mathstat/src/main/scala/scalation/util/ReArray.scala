@@ -1,6 +1,7 @@
+
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author   Vishnu Gowda Harish, John Miller
- *  @version  1.0
+/** @author   Vishnu Gowda Harish, John Miller, Yang Fan
+ *  @version  1.4
  *  @date     Mon May 23 5:10:20 EDT 2016
  *  @see      LICENSE (MIT style license file).
  *
@@ -11,9 +12,11 @@ package scalation.util
 
 import scala.Array.newBuilder
 import scala.collection.generic.{GenericCompanion, GenericTraversableTemplate}
-import scala.collection.mutable.IndexedSeqOptimized
+import scala.collection.mutable
+import scala.collection.mutable.{HashMap, IndexedSeqOptimized}
 import scala.compat.Platform
 import scala.reflect.ClassTag
+import scalation.linalgebra.Vec
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ReArray` class provides an implementation of mutable, resizable/dynamic arrays.  It is based
@@ -48,10 +51,10 @@ class ReArray [A] (_length: Int = 0, _array: Array [A] = null) (implicit arg0: C
     
     /** Set the size of `ReArray`.
      */
-    protected var size0: Int = if (_array == null) _length else _array.length
-    
+    protected var size0: Int = if (_array == null) 0 else _array.length
+
     ensureSize (initialSize)    // ensure that the internal array has at least `initialSize` cells
-     
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set the companion to null as not required for our implementation.
      */
@@ -60,7 +63,7 @@ class ReArray [A] (_length: Int = 0, _array: Array [A] = null) (implicit arg0: C
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the initial size of the `ReArray`.
      */
-    protected def initialSize: Int = math.max (16, _length);
+    protected def initialSize: Int = math.max (50, _length);
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the length of 'this' `ReArray`.
@@ -73,7 +76,7 @@ class ReArray [A] (_length: Int = 0, _array: Array [A] = null) (implicit arg0: C
      */
     def apply (i: Int) =
     {
-        if (i >= size0) throw new IndexOutOfBoundsException (i.toString)
+        if (i >= array.length) throw new IndexOutOfBoundsException (i.toString)
         array(i).asInstanceOf [A]
     } // apply
     
@@ -90,7 +93,7 @@ class ReArray [A] (_length: Int = 0, _array: Array [A] = null) (implicit arg0: C
     {
         val top = size                             // made local for performance
         var i   = 0
-        //while (i < top) { f (array(i).asInstanceOf [A]); i += 1 }
+//      while (i < top) { f (array(i).asInstanceOf [A]); i += 1 }
         while (i < top) { f (array(i)); i += 1 }
     } // foreach
    
@@ -117,8 +120,8 @@ class ReArray [A] (_length: Int = 0, _array: Array [A] = null) (implicit arg0: C
     {
         val arrayLength: Long = array.length         // use a Long to prevent overflows
         if (n > arrayLength) {
-            var newSize = arrayLength * 2l
-            while (n > newSize) newSize *= 2l
+            var newSize = arrayLength * 5l
+            while (n > newSize) newSize *= 5l
             if (newSize > Int.MaxValue) newSize = Int.MaxValue   // don't exceed Int.MaxValue
 
             val newArray = new Array [A] (newSize.toInt)
@@ -147,7 +150,7 @@ class ReArray [A] (_length: Int = 0, _array: Array [A] = null) (implicit arg0: C
     {
         require (sz <= size0)
         size0 = sz
-//      while (size0 > sz) { size0 -= 1; array(size0) = _  }
+//      while (size0 > sz) { size0 -= 1; array(size0) = _ }
     } // reduceToSize
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -172,12 +175,13 @@ class ReArray [A] (_length: Int = 0, _array: Array [A] = null) (implicit arg0: C
     override def update (idx: Int, elem: A)
     {
         try {
-            if (idx >= size0) throw new IndexOutOfBoundsException (idx.toString)
+            if (idx >= array.length) throw new IndexOutOfBoundsException (idx.toString)
             array(idx) = elem
+            if(idx >= size0) size0 = size0+1
         } catch {
             case e: IndexOutOfBoundsException => expand (idx + 1)
                                                  array(idx) = elem
-        } // try-catch
+        } // try
     } // update
   
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -233,9 +237,25 @@ class ReArray [A] (_length: Int = 0, _array: Array [A] = null) (implicit arg0: C
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' `ReArray` to a string.
      */
-    override def toString: String = "Re" + array.slice (0, size0).deep    
+    override def toString: String = "Re" + array.slice (0, size0).deep
 
-} // ReArray
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Intersect 'this' `ReArray` with `ReArray` 'b'.
+     *  @param b  the ReArray to intersect with
+     */
+    def intersect (b: ReArray [A]): ReArray [A] =
+    {
+        var result = new ReArray [A] ()
+        for (nb <- b) if (contains (nb)) result.update (result.length, nb)
+        result
+    } // intersect
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Clear the `ReArray`.
+     */
+    def clear () { array = new Array [A] (math.max (initialSize, 1)) }
+
+} // ReArray class
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -275,7 +295,7 @@ object ReArray
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ReArrayTest` object tests the operations provided by `ReArrayTest`.
- *  > runMain scalation.util.ReArrayTest
+ *  > run-main scalation.util.ReArrayTest
  */
 object ReArrayTest extends App
 {  
@@ -291,7 +311,7 @@ object ReArrayTest extends App
     println ("b = " + b)
     println ("c = " + c)
     println ("d = " + d)
-    println ("e = " + e.deep)   
+    println ("e = " + e.deep)
 
 } // ReArrayTest object
 

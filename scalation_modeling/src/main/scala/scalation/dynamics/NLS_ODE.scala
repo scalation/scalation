@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Mon Oct 12 15:38:31 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *
@@ -15,9 +15,9 @@
 package scalation.dynamics
 
 import scalation.analytics.Predictor
-import scalation.calculus.Differential.FunctionV_2S
 import scalation.linalgebra.{VectoD, VectorD}
 import scalation.linalgebra.VectorD.one
+import scalation.math.FunctionV_2S
 import scalation.minima.QuasiNewton
 import scalation.util.Error
 
@@ -103,9 +103,8 @@ class NLS_ODE (z: VectorD, ts: VectorD, b_init: VectorD, private var w: VectorD 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.  FIX
-     *  @param yy   the response vector
      */
-    def eval (yy: VectoD)
+    def eval ()
     {
 //      e = yy - x * b                                         // compute residual/error vector e
 //      diagnose (yy)                                          // compute diagnostics
@@ -114,12 +113,12 @@ class NLS_ODE (z: VectorD, ts: VectorD, b_init: VectorD, private var w: VectorD 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit.
      */
-    override def fit: VectorD = VectorD (objectiveF (b))       // FIX - add more indicators of quality
+    def fit: VectorD = VectorD (objectiveF (b))       // FIX - add more indicators of quality
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the fit.
      */
-    override def fitLabels: Seq [String] = Seq ("objectiveF")
+    def fitLabels: Seq [String] = Seq ("objectiveF")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of 'y = f(zz)'.

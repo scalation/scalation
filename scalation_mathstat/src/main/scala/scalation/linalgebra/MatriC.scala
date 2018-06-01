@@ -2,7 +2,7 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @builder scalation.linalgebra.bld.BldMatri
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun Sep 16 14:09:25 EDT 2012
  *  @see     LICENSE (MIT style license file).
  */
@@ -110,6 +110,13 @@ trait MatriC
     def apply (i: Int, jr: Range): VectoC = this(i)(jr)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get the rows indicated by the index vector 'iv'
+     *  FIX - implement in all implementing classes
+     *  @param iv  the vector of row indices
+     */
+    def apply (iv: VectoI): MatriC = ???
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' matrix's element at the 'i,j'-th index position to the scalar 'x'.
      *  @param i  the row index
      *  @param j  the column index
@@ -195,18 +202,11 @@ trait MatriC
     } // foreach
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Slice 'this' matrix row-wise 'from' to 'end'.
-     *  @param from  the start row of the slice (inclusive)
-     *  @param end   the end row of the slice (exclusive)
+    /** Map the elements of 'this' matrix by applying the mapping function 'f'.
+     *  FIX - remove ??? and implement in all implementing classes
+     *  @param f  the function to apply
      */
-    def slice (from: Int, end: Int): MatriC
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Slice 'this' matrix column-wise 'from' to 'end'.
-     *  @param from  the start column of the slice (inclusive)
-     *  @param end   the end column of the slice (exclusive)
-     */
-    def sliceCol (from: Int, end: Int): MatriC
+    def map (f: VectoC => VectoC): MatriC = ???
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice 'this' matrix row-wise 'r_from' to 'r_end' and column-wise 'c_from' to 'c_end'.
@@ -218,17 +218,49 @@ trait MatriC
     def slice (r_from: Int, r_end: Int, c_from: Int, c_end: Int): MatriC
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Slice 'this' matrix row-wise 'from' to 'end'.
+     *  @param from  the start row of the slice (inclusive)
+     *  @param end   the end row of the slice (exclusive)
+     */
+    def slice (from: Int, end: Int): MatriC
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Slice 'this' matrix row-wise over the given range 'rg'.
+     *  @param rg  the range specifying the slice
+     */
+    def slice (rg: Range): MatriC = slice (rg.start, rg.end)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Slice 'this' matrix row-wise excluding the given range 'rg'.
+     *  @param rg  the excluded range of the slice
+     */
+    def sliceEx (rg: Range): MatriC = slice (0, rg.start) ++ slice (rg.end, dim1)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Slice 'this' matrix excluding the given 'row' and 'column'.
      *  @param row  the row to exclude
      *  @param col  the column to exclude
      */
-    def sliceExclude (row: Int, col: Int): MatriC
+    def sliceEx (row: Int, col: Int): MatriC
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Slice 'this' matrix column-wise 'from' to 'end'.
+     *  @param from  the start column of the slice (inclusive)
+     *  @param end   the end column of the slice (exclusive)
+     */
+    def sliceCol (from: Int, end: Int): MatriC
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select rows from 'this' matrix according to the given index/basis 'rowIndex'.
      *  @param rowIndex  the row index positions (e.g., (0, 2, 5))
      */
     def selectRows (rowIndex: Array [Int]): MatriC
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Select all rows from 'this' matrix excluding the rows from the given 'rowIndex'.
+     *  @param rowIndex  the row indices to exclude
+     */
+    def selectRowsEx (rowIndex: Array [Int]): MatriC = selectRows ((range1 diff rowIndex).toArray)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get column 'col' starting 'from' in 'this' matrix, returning it as a vector.
@@ -418,6 +450,14 @@ trait MatriC
      *  @param u  the vector to multiply by
      */
     def ** (u: VectoC): MatriC
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply 'this' matrix by matrix 'b' elementwise (Hadamard product).
+     *  @see en.wikipedia.org/wiki/Hadamard_product_(matrices)
+     *  FIX - remove ??? and implement in all implementing classes
+     *  @param b  the matrix to multiply by
+     */
+    def ** (b: MatriC): MatriC = ???
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Multiply in-place 'this' matrix by vector 'u' to produce another matrix 'a_ij * u_j'.

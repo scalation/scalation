@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Khalifeh Al-Jadda, John A. Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Mon Aug 15 13:13:15 EDT 2016
  *  @see     LICENSE (MIT style license file).
  */

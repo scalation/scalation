@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Mustafa Nural
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sat Jan 20 16:05:52 EST 2018
  *  @see     LICENSE (MIT style license file).
  */
@@ -28,8 +28,7 @@ import RegTechnique._
  *  @param cubic      the order of the surface (defaults to quadratic, else cubic)
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class ResponseSurface [MatT <: MatriD, VecT <: VectoD] (x_ : MatT, y: VecT, cubic: Boolean = false,
-                       technique: RegTechnique = QR)
+class ResponseSurface (x_ : MatriD, y: VectoD, cubic: Boolean = false, technique: RegTechnique = QR)
       extends Regression (ResponseSurface.allForms (x_, cubic), y, technique)
 {
     private val n = x_.dim2                     // the dimensionality (2D, 3D, etc.) of points in matrix x_
@@ -54,6 +53,16 @@ class ResponseSurface [MatT <: MatriD, VecT <: VectoD] (x_ : MatT, y: VecT, cubi
         else       for (i <- 0 to n; j <- i to n)              { sum += b(l) * q(i) * q(j);        l += 1 }
         sum
     } // predict
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform 'k'-fold cross-validation.
+     *  @param k      the number of folds
+     *  @param rando  whether to use randomized cross-validation
+     */
+    override def crossVal (k: Int = 10, rando: Boolean = true)
+    {
+        crossValidate ((x: MatriD, y: VectoD) => new ResponseSurface (x, y), k, rando)
+    } // crossVa
 
 } // ResponseSurface class
 
@@ -170,8 +179,7 @@ object ResponseSurfaceTest extends App
     val nTerms = ResponseSurface.numTerms (2)
     println ("nTerms      = " + nTerms)
     println ("coefficient = " + rsr.coefficient)
-    println ("              " + rsr.fitLabels)
-    println ("fit         = " + rsr.fit)
+    println ("fitMap      = " + rsr.fitMap)
 
     banner ("Forward Selection Test")
     val fcols = Set (0)

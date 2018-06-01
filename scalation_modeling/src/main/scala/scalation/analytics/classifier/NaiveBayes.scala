@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Hao Peng
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sat Sep  8 13:53:16 EDT 2012
  *  @see     LICENSE (MIT style license file).
  *
@@ -41,11 +41,14 @@ import BayesClassifier.me_default
  *  @param vc  the value count (number of distinct values) for each feature
  *  @param me  use m-estimates (me == 0 => regular MLE estimates)
  */
-class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
+class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String] = null,
+                   k: Int = 2, cn: Array [String] = Array ("no", "yes"),
                    protected var vc: Array [Int] = null, me: Double = me_default)
       extends BayesClassifier (x, y, fn, k, cn)
 {
     private val DEBUG = false                                // debug flag
+
+    if (cn.length != k) flaw ("constructor", "# class names != # classes")
 
     if (vc == null) {
         shiftToZero; vc = vc_fromData                        // set value counts from data
@@ -201,7 +204,8 @@ object NaiveBayes0
  *  @param vc  the value count (number of distinct values) for each feature
  *  @param me  use m-estimates (me == 0 => regular MLE estimates)
  */
-class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
+class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String] = null,
+                  k: Int = 2, cn: Array [String] = Array ("no", "yes"),
                   vc_ : Array [Int] = null, me: Float = me_default)
         extends NaiveBayes0 (x, y, fn, k, cn, vc_, me)
 {
@@ -348,6 +352,10 @@ object NaiveBayesTest2 extends App
     println ("Use nb0 to classify (" + z2 + ") = " + nb0.classify (z2))
     println ("Use nb  to classify (" + z2 + ") = " + nb.classify (z2))
 
+    val yp = nb.classify (x)
+    println (nb.fitLabel)
+    println (nb.fit (y, yp))
+
 } // NaiveBayesTest2 object
 
 
@@ -488,4 +496,47 @@ object NaiveBayesTest5 extends App
     println ("nb  cv accu = " + nb.crossValidateRand ())
 
 } // NaiveBayesTest5 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `NaiveBayesTest6` object is used to test the 'NaiveBayes' class.
+ *  > runMain scalation.analytics.classifier.NaiveBayesTest6
+ */
+object NaiveBayesTest6 extends App
+{
+    // training-set -----------------------------------------------------------
+    // x0: 
+    // x1: 
+    // y:  Classification (No/0, Yes/1)
+    // features:                  x0 x1  y
+    val xy = new MatrixI ((9, 3), 0, 0, 0,
+                                  0, 1, 0,
+                                  0, 2, 1,
+                                  1, 0, 0,
+                                  1, 1, 0,
+                                  1, 2, 1,
+                                  2, 0, 1,
+                                  2, 1, 1,
+                                  2, 2, 1)
+    val x = xy.sliceCol (0, 2)
+
+    val fn = Array ("Fast", "Strong")                     // feature names
+    val cn = Array ("No", "Yes")                          // class names
+
+    println ("xy = " + xy)
+    println ("---------------------------------------------------------------")
+    println ("x = " + x)
+    println ("---------------------------------------------------------------")
+
+    val nb  = NaiveBayes  (xy, fn, 2, cn, null)           // create the classifier
+    nb.train ()                                           // train the classifier
+
+    // test samples -----------------------------------------------------------
+    for (i <- x.range1) {
+        println ("Use nb to classify (" + x(i) + ") = " + nb.classify (x(i)))
+    } // for
+
+    println ("nb  cv accu = " + nb.crossValidateRand ())  // cross validate the classifier
+
+} // NaiveBayesTest6 object
 

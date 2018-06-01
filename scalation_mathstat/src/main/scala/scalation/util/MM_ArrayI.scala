@@ -2,7 +2,7 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller 
  *  @builder scalation.util.bld.BldMM_Array
- *  @version 1.4
+ *  @version 1.5
  *  @date    Thu Sep 24 14:03:17 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *

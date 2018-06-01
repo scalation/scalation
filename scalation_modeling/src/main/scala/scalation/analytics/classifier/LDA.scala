@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sat Jan  9 21:48:57 EST 2016
  *  @see     LICENSE (MIT style license file).
  *
@@ -27,11 +27,11 @@ import scalation.util.banner
  *  @param k   the number of classes (k in {0, 1, ...k-1}
  *  @param cn  the names for all classes
  */
-class LDA (x: MatrixD, y: VectoI, fn: Array [String], k: Int = 2,
-           cn: Array [String] = Array ("no", "yes"))
+class LDA (x: MatrixD, y: VectoI, fn: Array [String] = null,
+           k: Int = 2, cn: Array [String] = Array ("no", "yes"))
       extends ClassifierReal (x, y, fn, k, cn)
 {
-    private val DEBUG = true                                                       // debug flag
+    private val DEBUG = false                                                      // debug flag
     private val x1 = (MatrixD (for (i <- x.range1 if y(i) == 0) yield x(i))).t     // group 1
     private val x2 = (MatrixD (for (i <- x.range1 if y(i) == 1) yield x(i))).t     // group 2
 
@@ -92,11 +92,6 @@ class LDA (x: MatrixD, y: VectoI, fn: Array [String], k: Int = 2,
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Reset method not applicable.
-     */
-    def reset () { /* Not Applicable */ }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Classify vector 'z' by computing its discriminant function 'f' for each
      *  group and return the group index with the maximun value for 'f'.
      */
@@ -108,6 +103,11 @@ class LDA (x: MatrixD, y: VectoI, fn: Array [String], k: Int = 2,
         if (DEBUG) println ("f = " + f)
         if (f._1 > f._2) (0, cn(0), 0.0) else (1, cn(1), 1.0)
     } // classify
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reset method not applicable.
+     */
+    def reset () { /* Not Applicable */ }
 
 } // LDA class
 
@@ -134,18 +134,19 @@ object LDATest extends App
 
     val fn = Array ("curvature", "diameter")                   // feature names
     val cn = Array ("pass", "fail")                            // class names
-    val cl = new LDA (x, y, fn, 2, cn)                         // create the LDA classifier
-    cl.train ()
+    val lda = new LDA (x, y, fn, 2, cn)                        // create the LDA classifier
+    lda.train ()
 
     banner ("classify")
     val z  = VectorD (2.81, 5.46)
-    println (s"classify ($z) = ${cl.classify (z)}")
+    println (s"classify ($z) = ${lda.classify (z)}")
 
     banner ("test")
-    val yp = new VectorI (x.dim1)                              // predicted class vector
-    for (i <- x.range1) yp(i) = cl.classify (x(i))._1
-    println (s" y = $y \n yp = $yp")
-    println (cl.actualVpredicted (y, yp))                      // compare y vs. yp
+    val yp = lda.classify (x)
+    println ("y  = " + y)
+    println ("yp = " + yp)
+    println (lda.fitLabel)
+    println (lda.fit (y, yp))
 
     val t = VectorD.range (0, x.dim1)
     new Plot (t, y.toDouble, yp.toDouble, "y(black)/yp(red) vs. t")

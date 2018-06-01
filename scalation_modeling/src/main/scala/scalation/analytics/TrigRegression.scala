@@ -1,14 +1,14 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Mon Feb  2 18:18:15 EST 2015
  *  @see     LICENSE (MIT style license file).
  */
 
 package scalation.analytics
 
-import scala.collection.mutable.Set
+import scala.collection.mutable.{ListMap, Map, Set}
 import scala.math.{cos, Pi, sin}
 
 import scalation.linalgebra.{MatrixD, VectoD, VectorD}
@@ -35,83 +35,34 @@ import RegTechnique._
  *  @see link.springer.com/article/10.1023%2FA%3A1022436007242#page-1
  *  @param t          the input vector: t_i expands to x_i
  *  @param y          the response vector
- *  @param k          the maximum multiplier in the trig function (kwt)
+ *  @param ord        the order (k), maximum multiplier in the trig function (kwt)
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class TrigRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = QR)
-      extends Predictor with Error
+class TrigRegression (t: VectoD, y: VectoD, ord: Int, technique: RegTechnique = QR)
+      extends PredictorVec (t, y, ord)
 {
-    if (t.dim != y.dim) flaw ("constructor", "dimensions of t and y are incompatible")
-    if (t.dim <= k)     flaw ("constructor", "not enough data points for the given order")
-
     private val w = (2.0 * Pi) / (t.max() - t.min())           // base displacement angle in radians
-    private val x = new MatrixD (t.dim, 1 + 2 * k)             // design matrix built from t
+    private val x = new MatrixD (t.dim, 1 + 2 * ord)           // design matrix built from t
     for (i <- t.range) x(i) = expand (t(i))
-    private val rg = new Regression (x, y, technique)          // regular multiple linear regression
+
+    rg = new Regression (x, y, technique)                      // regular multiple linear regression
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Expand the scalar 't' into a vector of powers of 't': 
+    /** Expand the scalar 't' into a vector of powers of  trig terms/columns:
      *  '[1, sin (wt), cos (wt), sin (2wt), cos (2wt), ...]'.
      *  @param t  the scalar to expand into the vector
      */
     def expand (t: Double): VectoD = 
     {
         val wt = w * t
-        val v = new VectorD (1 + 2 * k)
+        val v = new VectorD (1 + 2 * ord)
         v(0) = 1.0
-        for (j <- 1 to k) {
+        for (j <- 1 to ord) {
             v(2*j-1) = sin (j * wt)
             v(2*j)   = cos (j * wt)
         } // for
         v
     } // expand
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  multiple regression equation
-     *  <p>
-     *      yy  =  b dot x + e  =  [b_0, ... b_k] dot [expanded t] + e
-     *  <p>
-     *  using the least squares method.
-     *  @param yy  the response vector
-     */
-    def train (yy: VectoD = y): Regression [MatrixD, VectoD] = rg.train (yy)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  regression equation using 'y'.
-     */
-//    def train (): Regression [MatrixD, VectoD] = rg.train ()
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the error and useful diagnostics.
-     *  @param yy   the response vector
-     */ 
-    def eval (yy: VectoD = y)
-    {
-        e = yy - x * b                                         // compute residual/error vector e
-        diagnose (yy)                                          // compute diagnostics
-    } // eval
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the vector of coefficients.
-     */
-    override def coefficient: VectoD = rg.coefficient
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the vector of residuals/errors.
-     */
-    override def residual: VectoD = rg.residual
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit.
-     */
-    override def fit: VectoD = rg.fit
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the labels for the fit.
-     */
-    override def fitLabels: Seq [String] = rg.fitLabels
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot expand (z),
@@ -120,36 +71,16 @@ class TrigRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = QR
      */
     def predict (z: Double): Double = rg.predict (expand (z))
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
-     *  e.g., (b_0, b_1, b_2) dot (1, z_1, z_2).
-     *  @param z  the new vector to predict
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform 'k'-fold cross-validation.
+     *  @param ord    the maximum multiplier in the trig function (kwt)
+     *  @param k      the number of folds
+     *  @param rando  whether to use randomized cross-validation
      */
-    def predict (z: VectoD): Double = rg.predict (z)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform forward selection to add the most predictive variable to the existing
-     *  model, returning the variable to add, the new parameter vector and the new
-     *  quality of fit.  May be called repeatedly.
-     *  @param cols  the columns of matrix x included in the existing model
-     */
-    def forwardSel (cols: Set [Int]): (Int, VectoD, VectoD) = rg.forwardSel (cols)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform backward elimination to remove the least predictive variable from
-     *  the existing model, returning the variable to eliminate, the new parameter
-     *  vector and the new quality of fit.  May be called repeatedly.
-     *  @param cols  the columns of matrix x included in the existing model
-     */
-    def backwardElim (cols: Set [Int]): (Int, VectoD, VectoD) = rg.backwardElim (cols)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Variance Inflation Factor 'VIF' for each variable to test
-     *  for multi-collinearity by regressing 'xj' against the rest of the variables.
-     *  A VIF over 10 indicates that over 90% of the variance of 'xj' can be predicted
-     *  from the other variables, so 'xj' is a candidate for removal from the model.
-     */
-    def vif: VectoD = rg.vif
+    def crossVal (ord: Int, k: Int = 10, rando: Boolean = true)
+    {
+        crossValidate ((t: VectoD, y: VectoD, ord) => new TrigRegression (t, y, ord), k, rando)
+    } // crossVal
 
 } // TrigRegression class
 
@@ -179,8 +110,7 @@ object TrigRegressionTest extends App
     val trg   = new TrigRegression (t, y, harmonics)
     trg.train ().eval ()
     println ("coefficient = " + trg.coefficient)
-    println ("              " + trg.fitLabels)
-    println ("fit         = " + trg.fit)
+    println ("fitMap      = " + trg.fitMap)
 
     val z   = 10.5                                  // predict y for one point
     val yp1 = trg.predict (z)
@@ -222,8 +152,7 @@ object TrigRegressionTest2 extends App
     val trg   = new TrigRegression (t, y, harmonics)
     trg.train ().eval ()
     println ("coefficient = " + trg.coefficient)
-    println ("              " + trg.fitLabels)
-    println ("fit         = " + trg.fit)
+    println ("fitMap      = " + trg.fitMap)
 
     val z   = 10.5                                  // predict y for one point
     val yp1 = trg.predict (z)

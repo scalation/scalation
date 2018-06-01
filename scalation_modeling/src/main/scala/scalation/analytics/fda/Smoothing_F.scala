@@ -1,8 +1,8 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  John Miller
- *  @version 1.4
- *  @date    Thu Sep 22 21:45:58 EDT 2016
+/** @author  Michael Cotterell, John Miller, Hao Peng, Dong-Yu Yu
+ *  @version 1.5
+ *  @date    Fri Mar 24 20:24:40 2017
  *  @see     LICENSE (MIT style license file).
  *
  *  @see open.uct.ac.za/bitstream/item/16664/thesis_sci_2015_essomba_rene_franck.pdf?sequence=1
@@ -13,10 +13,28 @@
 
 package scalation.analytics.fda
 
-import scalation.analytics.RidgeRegression
-import scalation.linalgebra.{MatrixD, VectoD, VectorD}
-import scalation.plot.{FPlot, Plot}
+import scala.math.Pi
+
+import scalation.analytics.RegTechnique.{Cholesky, Inverse, LU, RegTechnique}
+import scalation.calculus.{B_Spline, BasisFunction, DB_Spline, DBasisFunction, DFourier, DRadial}
+import scalation.calculus.DBasisFunction._
+import scalation.calculus.RadialType._
+import scalation.linalgebra._
+import scalation.plot.Plot
+import scalation.random.Normal
 import scalation.util.Error
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SmoothingMethod` object provides enumerations defining various smoothing methods
+ */
+object SmoothingMethod extends Enumeration
+{
+    type SmoothingMethod = Value
+    val ROUGHNESS, RIDGE, OLS = Value
+
+} // SmoothingMethod
+
+import SmoothingMethod._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Smoothing_F` class fits a time-dependent data vector 'y' to B-Splines.
@@ -26,51 +44,160 @@ import scalation.util.Error
  *  <p>
  *  where 'x' is the signal, 'ε' is the noise, 'c' is a coefficient vector and
  *  'Φ(t)' is a vector of basis functions. 
- *-----------------------------------------------------------------------------
- *  @param y    the (raw) data points/vector
- *  @param t    the data time points/vector
- *  @param τ    the time points/vector for the knots
- *  @param n    the number of basis functions to use
- *  @param ord  the order (degree+1) of B-Splines (2, 3, 4, 5 or 6)
+ *  @param y            the (raw) data points/vector
+ *  @param t            the data time points/vector
+ *  @param bf           the basis function (with derivatives) object
+ *  @param lambda       the regularization parameter (>= 0 or -1 to use GCV)
+ *  @param method       the smoothing method
+ *  @param technique    the factorization technique
  */
-class Smoothing_F (y: VectorD, t: VectorD, private var τ: VectorD = null, ord: Int = 4)
-      extends Error
+class Smoothing_F (y: VectoD, t: VectoD, bf: DBasisFunction, lambda: Double = -1,
+                   method: SmoothingMethod = ROUGHNESS, technique: RegTechnique = Cholesky)
+        extends Error
 {
-    private val DEBUG = true                   // debug flag
-    private val GAP   = 5                      // gap between time points and knots
-    private val m     = t.dim                  // number of data time points
-    if (τ == null) τ  = makeKnots
-    private val n     = τ.dim                  // number of time points for the knots
+    private val DEBUG = false                   // debug flag
+    private val m     = y.dim                   // number of data time points
+    private val ord   = bf.getOrder             // order of the basis function
+
+    private var Φ:   MatrixD = null             // the design matrix
+    private var Φt:  MatrixD = null             // Φ.t (transpose)
+    private var ΦtΦ: MatrixD = null             // Φt * Φ
+    private var Σ:   MatrixD = null             // the penalty matrix, if method == ROUGHNESS
+    private var Φty: VectorD = null             // Φt * y
+
+    private val ns    = bf.size (ord)           // number of basis functions
+    private val I     = MatrixD.eye (ns)        // identity matrix
+
+    private var λopt  = lambda                  // regularization parameter
+    private var c: VectoD = null                // coefficient vector
+    private var e: VectoD = null                // residual/error vector
+    private var sse   = 0.0                     // sum of squared error
+
+    def getLambda = λopt
 
     if (y.dim != m) flaw ("constructor", "require # data points == # data time points")
-    if (n > m)      flaw ("constructor", "require # knot points <= # data time points")
-
-    private val phi = new MatrixD (m, n)       // at time ti, value of jth spline
-    private var c: VectoD = null               // coefficient vector
-
-    private val bs = new B_Spline (τ, ord)     // use B-Spline basis functions
-
-    if (DEBUG) println (s"m = $m, n = $n")
-
-    def makeKnots: VectorD = VectorD.range (0, (m/GAP + ord)) / (m/GAP.toDouble)
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the model, i.e., determine the optimal cofficients 'c' for the
-     *  basis functions.
+    /** Find the partial fit for the model using one of several training 
+     *  methods. If you multitply the training data by this `MatrixD`, then you
+     *  get the symmetric "hat" matrix. If you multitply this `MatrixD` by the
+     *  response vector, then you will get the vector estimated model
+     *  coefficients.
+     *  @param λ  the regularization parameter
+     */
+    private def pfit (λ: Double): MatrixD =
+    {
+        method match {
+            case ROUGHNESS => (ΦtΦ + (Σ * λ)).inverse * Φt
+            case RIDGE     => (ΦtΦ + (I * λ)).inverse * Φt
+            case OLS       => ΦtΦ.inverse * Φt
+        } // match
+    } // pfit
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Calculate the correlation matrix for the basis functions.
+     *  @param yy   data vector
+     *  @param k    lag parameter for auto-covariance
+     */
+    def calcCov (yy: VectorD, k: Int = 1): MatrixD =
+    {
+        import scalation.stat.vectorD2StatVector
+        val avar = yy.variance
+        val cov  = MatrixD.eye (yy.dim) * avar
+        val acov = yy.acov (k)
+        for (i <- 0 until yy.dim - 1) {
+            cov(i, i+1) = acov
+            cov(i+1, i) = acov
+        } // for
+        cov
+    } // calcCov
+    
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Computes the "hat" matrix.
+     *  @param λ  the regularization parameter
+     */
+    private def H (λ: Double) : MatrixD = Φ * pfit (λ)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the model, i.e., determine the optimal coeifficient 'c' for the
+     *  basis functions by finding optimal Lamdba to minimize gcv.
      */
     def train (): VectoD =
     {
-        form_phi ()
-/*
-        if (DEBUG) println ("phi = " + phi)
-        c = (phi.t * phi).inverse * phi.t * y            // may produce NaN
-*/
-        val lambda = 0.01
-        val rrg = new RidgeRegression (phi, y, lambda)   
-        rrg.train ()
-        c = rrg.coefficient
+        if (Φ == null) {
+            val cachedMx = if (method == ROUGHNESS) bf.getCache (ord, t)
+                           else                     bf.asInstanceOf [BasisFunction].getCache (ord, t)
+                                                                    // no penalty matrix if not using roughness penalty
+            Φ   = cachedMx (0)
+            Φt  = cachedMx (1)
+            ΦtΦ = cachedMx (2)
+            if (method == ROUGHNESS) Σ = cachedMx (3)
+            Φty = Φt * y
+        } // if
+
+        if (method != OLS && λopt == -1) useGCV ()
+        updateC (λopt)
+        e   = y - Φ * c
+        sse = e dot e
         c
     } // train
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the degrees of freedom based on the trace of hat matrix.
+     *  @param λ  the regularization parameter
+     */
+    private def df (λ: Double): Double = H (λ).trace
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the Generalized Cross Validation (GCV) score.
+     *  @param λ  the regularization parameter
+     */
+    private def gcv (λ: Double): Double = (m / (m - df (λ))) * (sse / (m - df (λ)))
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Use the Generalized Cross Validation (GCV) method to find the optimal
+     *  λ value. It finds the λ that minimizes the GCV score. 
+     */
+    private def useGCV ()
+    {
+        import scalation.minima.GoldenSectionLS
+
+        def f (λ: Double): Double =
+        {
+            updateC (λ)
+            e   = y - Φ * c
+            sse = e dot e
+            gcv (λ)
+        } // f
+
+        val gs   = new GoldenSectionLS (f)
+        val step = 1
+        λopt     = gs.search (step)
+        if (DEBUG) println (s"λopt = $λopt")
+    } // useGCV
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Update the parameter vector 'c' using various smoothing x factorization
+     *  techniques
+     *  @param λ  the regularization parameter
+     */
+    private def updateC (λ: Double)
+    {
+        val mx = method match {
+            case ROUGHNESS => (ΦtΦ + (Σ * λ))
+            case RIDGE     => (ΦtΦ + (I * λ))
+            case OLS       => ΦtΦ
+        } // match
+
+        val fac = technique match {                           // select the factorization technique
+            case Cholesky => new Fac_Cholesky (mx)            // Cholesky Factorization
+            case LU       => new Fac_LU (mx)                  // LU Factorization
+            case _        => new Fac_Inv (mx)                 // Inverse Factorization
+        } // match
+
+        fac.factor ()
+        c = fac.solve (Φty)
+    } // updateC
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the y-value at time point 'tt'.
@@ -79,7 +206,41 @@ class Smoothing_F (y: VectorD, t: VectorD, private var τ: VectorD = null, ord: 
     def predict (tt: Double): Double =
     {
         var sum = 0.0
-        for (j <- 0 until n) sum += c(j) * bs.bb (ord) (j, tt)
+        for (j <- bf.range (ord)) sum += c(j) * bf (ord)(j)(tt)
+        sum
+    } // predict
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Predict the 1st derivative value at time point 'tt'.
+     *  @param tt  the given time point
+     */
+    def d1predict (tt: Double): Double =
+    {
+        var sum = 0.0
+        for (j <- bf.range (ord)) sum += c(j) * bf.d1bf (ord)(j)(tt)
+        sum
+    } // d1predict
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Predict the 2nd derivative value at time point 'tt'.
+     *  @param tt  the given time point
+     */
+    def d2predict (tt: Double): Double =
+    {
+        var sum = 0.0
+        for (j <- bf.range (ord)) sum += c(j) * bf.d2bf (ord)(j)(tt)
+        sum
+    } // d2predict
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Predict the n-th derivative value at time point 'tt'.
+     *  @param n   the n-th derivative to be computed
+     *  @param tt  the given time point
+     */
+    def dnpredict (n: Int)(tt: Double): Double =
+    {
+        var sum = 0.0
+        for (j <- bf.range (ord)) sum += c(j) * bf.dnbf (n)(ord)(j)(tt)
         sum
     } // predict
 
@@ -87,15 +248,42 @@ class Smoothing_F (y: VectorD, t: VectorD, private var τ: VectorD = null, ord: 
     /** Predict the y-values at all time points in vector 'tv'.
      *  @param tv  the given vector of time points
      */
-    def predict (tv: VectorD): VectorD = tv.map (predict (_))
+    def predict (tv: VectoD): VectoD = tv.map (predict (_))
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Form the phi matrix by evaluating the basis functions at the time points.
+    /** Predict the 1st derivative values at all time points in vector 'tv'.
+     *  @param tv  the given vector of time points
      */
-    private def form_phi ()
-    {
-        for (i <- t.indices; j <- 0 until n) phi (i, j) = bs.bb (ord) (j, t(i))
-    } // form_phi
+    def d1predict (tv: VectoD): VectoD = tv.map (d1predict (_))
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Predict the 2nd derivative values at all time points in vector 'tv'.
+     *  @param tv  the given vector of time points
+     */
+    def d2predict (tv: VectoD): VectoD = tv.map (d2predict (_))
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Predict the n-th derivative values at all time points in vector 'tv'.
+     *  @param n   the n-th derivative to be computed
+     *  @param tv  the given vector of time points
+     */
+    def dnpredict (n: Int, tv: VectoD): VectoD = tv.map (dnpredict (n)(_))
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Predict the the basis functions
+     *  @param tt  the given vector of time points
+     */
+    def plotBasis (tt: VectoD = t) = plot (bf, ord, tt)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get the Basis Function object
+     */
+    def getBasis = bf
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the vector of residuals/errors.
+     */
+    def residual: VectoD = e
 
 } // Smoothing_F class
 
@@ -107,48 +295,43 @@ class Smoothing_F (y: VectorD, t: VectorD, private var τ: VectorD = null, ord: 
 object Smoothing_FTest extends App
 {
     import scalation.random.Normal
+    import math.pow
 
-    val normal = Normal ()                                           // normal random variate generator
-    val t = VectorD.range (0, 100) / 100.0                           // time points
-    val y = t.map ((x: Double) => 3.0 + 2.0 * x * x + normal.gen)    // raw data points
+    val normal1 = Normal (0, 100.0)                                  // normal random variate generator
+    val normal2 = Normal (0, 5000.0)                                 // normal random variate generator
+    val normal3 = Normal (0, 100.0)                                  // normal random variate generator
 
-    for (ord <- 2 to 6) {
-//      val τ   = VectorD.range (0, 20 + ord) / 20.0                 // time points for knots
-        val τ   = null                                               // let `Smoothing_F` nake the knots
-        val moo = new Smoothing_F (y, t, τ, ord)                     // smoother
+    val t      = VectorD.range (0, 100) / 17.00                      // time points
+    val tt     = VectorD.range (0, 1000) / 170.00                    // time points
+    val y      = t.map ((x: Double) => pow(x-4, 5) + 5.0 * pow(x-4, 4) - 20.0 * pow(x-4, 2) + 4.0 * (x-4))
+    val z      = y.map ((e: Double) => e + (if (e < 2) normal1.gen else if (e < 3) normal2.gen else normal3.gen))
+    val mMin   = 4 // 2                                              // minimum order to try
+    val mMax   = 4                                                   // maximum order to try
+    val method = SmoothingMethod.ROUGHNESS                           // smoothing method
+    val lambda = -1
+    val gap    = 10
+    val k      = 2
+
+    new Plot (t, y, z, s"TRUE DATA vs. WITH NOISE")
+
+    val L    = y.max () - y.min ()                                   // period length
+    val w    = 2.0 * Pi / L                                          // fundamental frequency estimate
+
+    val radialType = GAUSSIAN
+    val centers = VectorD (0.0 until 100.0/17 by 0.5)
+
+    for (ord <- mMin to mMax) {
+        val bf = new DB_Spline (t, ord)                              // choose a basis function to use
+//      val bf = new DFourier  (w, ord)
+//      val bf = new DRadial (centers, radialType)
+
+        val moo = new Smoothing_F (z, t, bf, lambda = lambda, method = method)     // smoother (use GCV)
+        moo.plotBasis (tt)
         val c   = moo.train ()                                       // train -> set coefficients
-
-        println (s"y = $y \nt = $t \nc = $c")
-
-        val x = moo.predict (t)                                      // predict for all time points
-        new Plot (t, y, x, s"B-Spline Fit: ord = $ord")
+        val x   = moo.predict (t)                                    // predict for all time points
+        new Plot (t, z, x, s"B-Spline Fit: ord = $ord; λ = ${moo.getLambda}")
+        new Plot (t, y, x, s"TRUTH vs. SMOOTHED")
     } // for
 
 } // Smoothing_FTest object
-
-
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `Smoothing_FTest2` is used to test the `Smoothing_F` class.
- *  > runMain scalation.analytics.fda.Smoothing_FTest2
- */
-object Smoothing_FTest2 extends App
-{
-    import scalation.random.Normal
-
-    val normal = Normal ()
-    val t  = VectorD.range (0, 100) / 100.0
-    val t2 = VectorD.range (0, 1000) / 1000.0
-    val y  = t.map ((x: Double) => 3.0 + 2.0 * x * x + normal.gen)
-
-    for (ord <- 2 to 6) {
-        val τ   = VectorD.range (0, 20 + ord) / 20.0
-        val moo = new Smoothing_F (y, t, τ, ord)
-        val c   = moo.train ()
-
-        println (s"y = $y \nt = $t \nc = $c")
-
-        new FPlot (t, y, t2, moo.predict, s"B-Spline Fit: ord = $ord")
-    } // for
-
-} // Smoothing_FTest2 object
 

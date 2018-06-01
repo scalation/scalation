@@ -2,7 +2,7 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @builder scalation.linalgebra.bld.BldBidMatrix
- *  @version 1.4
+ *  @version 1.5
  *  @date    Mon May 19 15:52:24 EDT 2014
  *  @see     LICENSE (MIT style license file).
  */
@@ -312,10 +312,10 @@ class BidMatrixQ (val d1: Int)
      *  @param row  the row to exclude
      *  @param col  the column to exclude
      */
-    def sliceExclude (row: Int, col: Int): BidMatrixQ =
+    def sliceEx (row: Int, col: Int): BidMatrixQ =
     {
-        throw new UnsupportedOperationException ("BidMatrixQ does not support sliceExclude")
-    } // sliceExclude
+        throw new UnsupportedOperationException ("BidMatrixQ does not support sliceEx")
+    } // sliceEx
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select rows from 'this' bidiagonal matrix according to the given index/basis.

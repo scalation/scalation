@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Fri Mar 28 14:14:24 EDT 2014
  *  @see     LICENSE (MIT style license file).
  */
@@ -34,7 +34,7 @@ object StreamMaker3 extends App
         println ("\n" +
                  "//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n" +
                  "/** @author  John Miller (code generated)\n" +
-                 " *  @version 1.4\n" +
+                 " *  @version 1.5\n" +
                  " *  @date    " + new Date () + "\n" +
                  " *  @see     LICENSE (MIT style license file).\n" +
                  " */\n" +

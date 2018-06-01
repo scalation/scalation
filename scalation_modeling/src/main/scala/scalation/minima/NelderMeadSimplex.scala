@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun May  5 13:13:42 EDT 2013
  *  @see     LICENSE (MIT style license file).
  *
@@ -14,8 +14,8 @@ package scalation.minima
 import scala.math.{abs, max, pow}
 import scala.util.control.Breaks.{breakable, break}
 
-import scalation.calculus.Differential.FunctionV2S
 import scalation.linalgebra.VectorD
+import scalation.math.FunctionV2S
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

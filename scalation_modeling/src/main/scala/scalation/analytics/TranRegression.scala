@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Mustafa Nural
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sat Jan 20 15:41:27 EST 2018
  *  @see     LICENSE (MIT style license file).
  */
@@ -37,8 +37,8 @@ import RegTechnique._
  *  @param transInv   the inverse transformation function to rescale predictions to original y scale (defaults to exp)
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class TranRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT,  transform: FunctionS2S = log,
-                     transInv: FunctionS2S = exp, technique: RegTechnique = QR)
+class TranRegression (x: MatriD, y: VectoD, transform: FunctionS2S = log,
+                      transInv: FunctionS2S = exp, technique: RegTechnique = QR)
       extends Regression (x, y.map (transform), technique)
 {
     if (x.dim1 <= x.dim2) throw new IllegalArgumentException ("not enough data rows in matrix to use regression")
@@ -49,12 +49,11 @@ class TranRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT,  transf
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics
-     *  @param yy   the response vector
      */
-    override def eval (yy: VectoD = y) =
+    override def eval ()
     {
         e = y - (x * b).map (transInv)                // residual/error vector
-        diagnose (y)
+        diagnose (e)
     } // eval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -67,9 +66,19 @@ class TranRegression [MatT <: MatriD, VecT <: VectoD] (x: MatT, y: VecT,  transf
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z for
      *  each row of matrix z.
-     *  @param z    the new matrix to predict
+     *  @param z  the new matrix to predict
      */
-    override def predict (z: MatT): VectoD = (z * b).map (transInv)
+    override def predict (z: MatriD): VectoD = (z * b).map (transInv)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform 'k'-fold cross-validation.
+     *  @param k      the number of folds
+     *  @param rando  whether to use randomized cross-validation
+     */
+    override def crossVal (k: Int = 10, rando: Boolean = true)
+    {
+        crossValidate ((x: MatriD, y: VectoD) => new TranRegression (x, y), k, rando)
+    } // crossVal
 
 } // TranRegression class
 
@@ -174,9 +183,8 @@ object TranRegressionTest2 extends App
     val trg = new TranRegression (x, y, sqrt _, sq _)
     trg.train ().eval ()
 
-    println (rg.fitLabels)
-    println (s"rg.fit = ${rg.fit}")
-    println (s"trg.fit = ${trg.fit}")
+    println (s"rg.fitMap = ${rg.fitMap}")
+    println (s"trg.fitMap = ${trg.fitMap}")
 
 } // TranRegressionTest2 object
 

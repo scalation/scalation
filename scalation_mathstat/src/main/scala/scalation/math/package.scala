@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Wed May 27 14:36:12 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *
@@ -16,6 +16,8 @@ import java.lang.Math.{abs, cos, log, max, sin, tan, ulp}
 
 import scala.language.implicitConversions
 
+import linalgebra.{MatriD, MatrixD, VectoD, VectorD}
+
 import math.ExtremeD.{MIN_NORMAL, EPSILON, TOL}    // smallest full precision, machine epsilon, tolerance
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -25,9 +27,15 @@ import math.ExtremeD.{MIN_NORMAL, EPSILON, TOL}    // smallest full precision, m
  */
 package object math
 {
-    /** The type definition for a function of a scalar (f: Double => Double) 
+    /** The type definition for a function of a scalar (f: Double => Double), etc. 
      */
-    type FunctionS2S = Double => Double
+    type FunctionS2S  = Double  => Double      // function of a scalar - Double 
+    type FunctionV2S  = VectorD => Double      // function of a vector - VectorD
+    type FunctionV_2S = VectoD  => Double      // function of a vector - VectoD  - base trait
+    type FunctionV2V  = VectorD => VectorD     // vector-valued function of a vector - VectorD
+    type FunctionV_2V = VectoD  => VectoD      // vector-valued function of a vector - VectoD  - base trait
+    type FunctionM2M  = MatrixD => MatrixD     // matrix-valued function of a matrix - MatrixD
+    type FunctionM_2M = MatriD  => MatriD      // matrix-valued function of a matrix - MatriD  - base trait
 
     /** The type definition for an array of scalar functions
      */
@@ -40,6 +48,18 @@ package object math
     /** The natural log of 10
      */
     val log_10 = log (10.0)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Vectorize a scalar function (S2S) to create a vector function (V_2V).
+     *  @param f  the scalar function to vectorize
+     */
+    def vectorize (f: FunctionS2S): FunctionV_2V = (x: VectoD) => x.map (f(_))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Matrixize a scalar function (S2S) to create a matrix function (M_2M).
+     *  @param f  the scalar function to matrixize
+     */
+    def matrixize (f: FunctionV_2V): FunctionM_2M = (x: MatriD) => x.map (f(_))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Implicit conversion from 'Int' to 'Int_Exp', which supports exponentiation

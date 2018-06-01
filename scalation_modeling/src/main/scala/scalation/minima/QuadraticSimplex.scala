@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Wed Aug 24 15:05:08 EDT 2011
  *  @see     LICENSE (MIT style license file).
  */
@@ -26,12 +26,12 @@ import scalation.util.Error
  *
  *  Creates an 'MM-by-NN' simplex tableau.  This implementation is restricted to
  *  linear constraints 'a x <= b' and 'q' being a positive semi-definite matrix.
- *  Pivoting must now also handle non-linear complementary slackness
+ *  Pivoting must now also handle non-linear complementary slackness.
  *  @see www.engineering.uiowa.edu/~dbricker/lp_stacks.html
  *
  *  @param a      the M-by-N constraint matrix
  *  @param b      the M-length constant/limit vector
- *  @param q      the M-by-N cost/revenue matrix (second order component)
+ *  @param q      the N-by-N cost/revenue matrix (second order component)
  *  @param c      the N-length cost/revenue vector (first order component)
  *  @param x_B    the initial basis (set of indices where x_i is in the basis)
  */
@@ -46,8 +46,10 @@ class QuadraticSimplex (a: MatrixD, b: VectorD, q: MatrixD, c: VectorD, var x_B:
     private val NN       = N + M + 2 * q.dim2 + 2    // # columns in tableau
     private val MAX_ITER = 200 * N                   // maximum number of iterations
 
-    if (b.dim != M) flaw ("constructor", "b.dim = " + b.dim + " != " + M)
-    if (c.dim != N) flaw ("constructor", "c.dim = " + c.dim + " != " + N)
+    if (b.dim != M)  flaw ("constructor", "b.dim  = " + b.dim  + " != " + M)
+    if (c.dim != N)  flaw ("constructor", "c.dim  = " + c.dim  + " != " + N)
+    if (q.dim1 != N) flaw ("constructor", "q.dim1 = " + q.dim1 + " != " + N)
+    if (q.dim2 != N) flaw ("constructor", "q.dim2 = " + q.dim2 + " != " + N)
 
     /** The 'MM-by-NN' simplex tableau '[ x, w, y, v, r | bc ]'
      *  The complementary variables are 'x_i v_i = 0 = w_i y_i'
@@ -152,7 +154,7 @@ class QuadraticSimplex (a: MatrixD, b: VectorD, q: MatrixD, c: VectorD, var x_B:
         for (i <- 0 until MM if i != k) t(i, l) = 0.0         // zero out column l
         for (j <- 0 until NN if j != l) t(k, j) /= t(k, l)    // scale row k
         t(k, l) = 1.0
-        x_B(k) = l                                  // update basis (l replaces k)
+        x_B(k) = l                                            // update basis (l replaces k)
         if (DEBUG) showTableau ()
     } // pivot
 
@@ -161,16 +163,16 @@ class QuadraticSimplex (a: MatrixD, b: VectorD, q: MatrixD, c: VectorD, var x_B:
      *  find a non-basic variable to replace a variable in the current basis
      *  so long as the objective improves.
      */
-    def solve (): Tuple2 [VectorD, Double] =
+    def solve (): (VectorD, Double) =
     {
-        var k = -1       // the leaving variable (row)
-        var l = -1       // the entering variable (column)
+        var k = -1                                   // the leaving variable (row)
+        var l = -1                                   // the entering variable (column)
         showTableau ()
 
         breakable { for (it <- 1 to MAX_ITER) {
             l = entering (); if (l == -1) break      // optimal solution found
             k = leaving (l); if (k == -1) break      // solution is unbounded
-            pivot (k, l)                       // pivot: k leaves and l enters
+            pivot (k, l)                             // pivot: k leaves and l enters
         }} // for
 
         showTableau ()
@@ -179,12 +181,12 @@ class QuadraticSimplex (a: MatrixD, b: VectorD, q: MatrixD, c: VectorD, var x_B:
     } // solve
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the tableau (t).
+    /** Return the tableau 't'.
      */
     def tableau: MatrixD = t
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the primal solution vector (x).
+    /** Return the primal solution vector 'x'.
      */
     def primal: VectorD =
     {
@@ -218,6 +220,7 @@ class QuadraticSimplex (a: MatrixD, b: VectorD, q: MatrixD, c: VectorD, var x_B:
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `QuadraticSimplexTest` object is used to test the `QuadraticSimplex` class.
+ *  > runMain scalation.minima.QuadraticSimplexTest
  */
 object QuadraticSimplexTest extends App
 {

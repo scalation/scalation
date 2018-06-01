@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author John Miller, Mustafa Nural
- *  @version 1.4
+ *  @version 1.5
  *  @date Mon Apr 24 21:28:06 EDT 2017
  *  @see LICENSE (MIT style license file).
 

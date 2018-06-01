@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Casey Bowman
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sat Apr 12 13:45:50 EDT 2014
  *  @see     LICENSE (MIT style license file).
  */

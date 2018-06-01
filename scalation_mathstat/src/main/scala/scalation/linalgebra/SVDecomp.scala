@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Khalid Jahangeer
- *  @version 1.4
+ *  @version 1.5
  *  @date    Wed May 28 16:06:12 EDT 2014
  *  @see     LICENSE (MIT style license file).
  */

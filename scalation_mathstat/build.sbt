@@ -6,7 +6,7 @@ lazy val commonSettings = Seq (
 
 name         := "scalation",
 organization := "scalation",
-version      := "1.4",
+version      := "1.5",
 scalaVersion := "2.12.4",
 fork         := true,
 

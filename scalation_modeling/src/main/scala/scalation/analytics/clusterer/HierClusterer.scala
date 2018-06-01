@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Karen Gilmer
- *  @version 1.4
+ *  @version 1.5
  *  @date    Wed Jan  9 15:38:04 EST 2013
  *  @see     LICENSE (MIT style license file).
  */

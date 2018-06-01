@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Mon Jan  5 14:00:12 EST 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -9,7 +9,7 @@
 package scalation.analytics
 
 import scalation.math.FunctionS2S
-import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectorI}
+import scalation.linalgebra.{MatriD, VectoD, VectoI}
 import scalation.linalgebra.MatrixD.++^
 import scalation.linalgebra.VectorD.one
 
@@ -28,7 +28,7 @@ import RegTechnique._
  *  `PolyRegression`   - polynomial regression,
  *  `TrigRegression`   - trigonometric regression
  *  `ResponseSurface`  - response surface regression,
- *  `ANOVA`            - GLM form of ANalysis Of VAriance, 
+ *  `ANOVA1`           - GLM form of ANalysis Of VAriance, 
  *  `ANCOVA`           - GLM form of ANalysis of COVAriance.
  */
 trait GLM
@@ -53,7 +53,7 @@ trait GLM
      *  @param x  the input/design m-by-n matrix
      *  @param y  the response m-vector
      */
-    def apply (x: MatriD, y: VectoD): Regression [MatriD, VectoD] =
+    def apply (x: MatriD, y: VectoD): Regression =
     {
         if (add_1)
             new Regression (one (x.dim1) +^: x, y, technique)
@@ -65,7 +65,7 @@ trait GLM
     /** Build a Multiple Linear Regression model using Ordinary Least Squares 'OLS'.
      *  @param xy  the combined input/design m-by-n matrix and response m-vector
      */
-    def apply (xy: MatriD): Regression [MatriD, VectoD] =
+    def apply (xy: MatriD): Regression =
     {
         if (add_1)
             new Regression (one (xy.dim1) +^: xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1), technique)
@@ -78,7 +78,7 @@ trait GLM
      *  @param x  the input/design m-by-n matrix
      *  @param y  the response m-vector
      */
-    def apply (x: MatriD, y: VectoD, w: VectoD): Regression_WLS [MatriD, VectoD] =
+    def apply (x: MatriD, y: VectoD, w: VectoD): Regression_WLS =
     {
         if (add_1)
             new Regression_WLS (one (x.dim1) +^: x, y, technique, w)
@@ -92,7 +92,7 @@ trait GLM
      *  @param y       the centered response vector
      *  @param lambda  the shrinkage parameter (0 => OLS) in the penalty term 'lambda * b dot b'
      */
-    def apply (x: MatriD, y: VectoD, lambda: Double): RidgeRegression [MatriD, VectoD] =
+    def apply (x: MatriD, y: VectoD, lambda: Double): RidgeRegression =
     {
         new RidgeRegression (x, y, lambda, technique)
     } // apply
@@ -102,7 +102,7 @@ trait GLM
      *  @param xY      the combined centered input/design m-by-n matrix and response vector
      *  @param lambda  the shrinkage parameter (0 => OLS) in the penalty term 'lambda * b dot b'
      */
-    def apply (xy: MatriD, lambda: Double): RidgeRegression [MatriD, VectoD] =
+    def apply (xy: MatriD, lambda: Double): RidgeRegression =
     {
         new RidgeRegression (xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1), lambda, technique)
     } // apply
@@ -114,7 +114,7 @@ trait GLM
      *  @param transform  the transformation function (e.g., log)
      *  @param transInv   the inverse transformation function (e.g., exp)
      */
-    def apply (x: MatriD, y: VectoD, transform: FunctionS2S, tranInv: FunctionS2S): TranRegression [MatriD, VectoD] =
+    def apply (x: MatriD, y: VectoD, transform: FunctionS2S, tranInv: FunctionS2S): TranRegression =
     {
         if (add_1)
             new TranRegression (one (x.dim1) +^: x, y, transform, tranInv, technique)
@@ -128,7 +128,7 @@ trait GLM
      *  @param transform  the transformation function (e.g., log)
      *  @param transInv   the inverse transformation function (e.g., exp)
      */
-    def apply (xy: MatriD, transform: FunctionS2S, tranInv: FunctionS2S): TranRegression [MatriD, VectoD] =
+    def apply (xy: MatriD, transform: FunctionS2S, tranInv: FunctionS2S): TranRegression =
     {
         if (add_1)
             new TranRegression (one (xy.dim1) +^: xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1),
@@ -187,7 +187,7 @@ trait GLM
      *  @param y      the response vector
      *  @param cubic  the order of the surface (false for quadratic, true for cubic)
      */
-    def apply (x_ : MatriD, y: VectoD, cubic: Boolean): ResponseSurface [MatriD, VectoD] =
+    def apply (x_ : MatriD, y: VectoD, cubic: Boolean): ResponseSurface =
     {
         new ResponseSurface (x_, y, cubic)
     } // apply
@@ -195,12 +195,12 @@ trait GLM
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build an ANalysis Of VAriance (ANOVA) model.
      *  @param t       the treatment/categorical variable vector
-     *  @param y       the response vector
      *  @param levels  the number of treatment levels (1, ... levels)
+     *  @param y       the response vector
      */
-    def apply (t: VectorI, y: VectoD, levels: Int): ANOVA =
+    def apply (t: VectoD, levels: Int,  y: VectoD): ANOVA1 =
     {
-        new ANOVA (t, y, levels, technique)
+        new ANOVA1 (t, y, levels, technique)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -210,7 +210,7 @@ trait GLM
      *  @param y       the response vector
      *  @param levels  the number of treatment levels (1, ... levels)
      */
-    def apply (x_ : MatriD, t: VectorI, y: VectoD, levels: Int): ANCOVA =
+    def apply (x_ : MatriD, y: VectoD, t: VectoI, levels: Int): ANCOVA =
     {
         new ANCOVA (x_, t, y, levels, technique)
     } // apply
@@ -224,6 +224,7 @@ trait GLM
  */
 object GLM extends GLM
 
+import scalation.linalgebra.{MatrixD, VectorD, VectorI}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `GLMTest` object tests the `GLM` object using the following regression

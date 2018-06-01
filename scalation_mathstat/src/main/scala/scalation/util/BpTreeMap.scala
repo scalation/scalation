@@ -1,12 +1,14 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  John Miller
- *  @version 1.4
- *  @date    Fri Jul  1 14:01:05 EDT 2016
+/** @author  John Miller, Yang Fan
+ *  @version 1.5
+ *  @date    Fri Apr 20 22:55:45 EDT 2018
  *  @see     LICENSE (MIT style license file).
  */
 
 package scalation.util
+
+import java.io.{FileWriter, PrintWriter}
 
 import scala.collection.mutable.{AbstractMap, Map, MapLike}
 import scala.reflect.ClassTag
@@ -23,9 +25,13 @@ import scala.reflect.ClassTag
 class BpTreeMap [K <% Ordered [K]: ClassTag, V: ClassTag] (half: Int = 2)
       extends AbstractMap [K, V] with Map [K, V] with MapLike [K, V, BpTreeMap [K, V]] with Serializable
 {
+    /** Provides access to a file for outputing large B+Trees
+     */
+    private var writer: PrintWriter = null
+
     /** The debug flag for tracking node splits
      */
-    private val DEBUG = true
+    private val DEBUG = false
 
     /** The maximum number of keys per node
      */
@@ -106,7 +112,8 @@ class BpTreeMap [K <% Ordered [K]: ClassTag, V: ClassTag] (half: Int = 2)
             def next: (K, V) =
             {
                 val kv = (nn.key(ii), nn.ref(ii).asInstanceOf [V])
-                if (ii < nn.nKeys - 1) ii += 1 else { ii = 0; nn = nn.ref(mx).asInstanceOf [Node [K]] }
+                if (ii < nn.nKeys - 1) ii += 1
+                else {ii = 0; nn = nn.ref(nn.nKeys).asInstanceOf [Node [K]]}
                 kv
             } // next
         } // Iterator
@@ -122,6 +129,19 @@ class BpTreeMap [K <% Ordered [K]: ClassTag, V: ClassTag] (half: Int = 2)
      */
     def printTree () { println ("BpTreeMap"); printT (root, 0); println ("-" * 50) }
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Print the keys in 'this' B+Tree map to file.
+     *  @param file  the file to be used for output
+     */
+    def printTreetoFile (file: String)
+    {
+        writer = new PrintWriter (new FileWriter (file, true))
+        writer.println ("BpTreeMap");
+        printTtoFile (root, 0);
+        writer.println ("-" * 50)
+        writer.close ()
+    } // printTreetoFile
+
     //  P R I V A T E   M E T H O D S  -----------------------------------------
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -136,6 +156,28 @@ class BpTreeMap [K <% Ordered [K]: ClassTag, V: ClassTag] (half: Int = 2)
         for (i <- 0 until n.nKeys) print (n.key(i) + " . ")
         println ("]")
         if (! n.isLeaf) for (j <- 0 to n.nKeys) printT (n.asInstanceOf [Node [K]].ref(j).asInstanceOf [Node [K]], level + 1)
+    } // printT
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Print 'this' B+Tree map using a preorder traversal and indenting each level.
+     *  @param n      the current node to print
+     *  @param level  the current level in the B+Tree
+     */
+    private def printTtoFile (n: Node [K], level: Int)
+    {
+        writer.println ("-" * 50)
+        writer.print ("\t" * level + "[ . ")
+        for (i <- 0 until n.nKeys) writer.print (n.key(i) + " . ")
+        writer.println ("]")
+
+//      for (i <- 0 to n.nKeys)  print ("i"+i +" "+ n.ref(i) +" ")
+//      println ("]")
+//      if (DEBUG) { println (n.ref(n.nKeys)); println ("]") }
+
+        if (! n.isLeaf) {
+           for (j <- 0 to n.nKeys) printTtoFile (n.asInstanceOf [Node [K]].ref(j).asInstanceOf [Node [K]], level + 1)
+        } // if
+        writer.flush ()
     } // printT
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -202,7 +244,7 @@ class BpTreeMap [K <% Ordered [K]: ClassTag, V: ClassTag] (half: Int = 2)
                 return kd_rt
             } // if
         } // if
-        n.wedge (k, v, n.find (k), true)                                // wedge into current node
+        n.wedge (k, v, n.find (k), true)                        // wedge into current node
         if (split) kd_rt else null
     } // add
 
@@ -221,10 +263,12 @@ class BpTreeMap [K <% Ordered [K]: ClassTag, V: ClassTag] (half: Int = 2)
         if (n.isFull) {
             split = true
             if (DEBUG) println ("before internal split: n = " + n)
-            kd_rt = n.split ()                                          // split n -> n & rt
+            kd_rt = n.split ()
+            // split n -> n & rt
+            val promotedvalue = n.key(n.nKeys-1)
             n.nKeys -= 1                                                // remove promoted largest left key
             if (DEBUG) println ("after internal split: n = " + n + "\nkd_rt = " + kd_rt)
-            if (k > n.key(n.nKeys - 1)) {
+            if (k > promotedvalue){
                 kd_rt._2.wedge (k, v, kd_rt._2.find (k), false)         // wedge into right sibling
                 return kd_rt
             } // if
@@ -239,7 +283,7 @@ class BpTreeMap [K <% Ordered [K]: ClassTag, V: ClassTag] (half: Int = 2)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BpTreeMapTest` object is used to test the `BpTreeMap` class by inserting
  *  increasing key values.
- *  > runMain scalation.util.BpTreeMapTest
+ *  > run-main scalation.util.BpTreeMapTest
  */
 object BpTreeMapTest extends App
 {
@@ -266,7 +310,7 @@ object BpTreeMapTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `BpTreeMapTest2` object is used to test the `BpTreeMap` class by inserting
  *  random key values.
- *  > runMain scalation.util.BpTreeMapTest2
+ *  > run-main scalation.util.BpTreeMapTest2
  */
 object BpTreeMapTest2 extends App
 {
@@ -278,7 +322,7 @@ object BpTreeMapTest2 extends App
 
     // for unique random integers
 
-//  import scalation.random.RandiU0         // comment out due to package dependency
+//  import scalation.random.RandiU0                     // comment out due to package dependency
 //  val stream = 2
 //  val rng    = RandiU0 (mx, stream)
 //  for (i <- 1 until totKeys) tree.put (rng.iigen (mx), i * i)

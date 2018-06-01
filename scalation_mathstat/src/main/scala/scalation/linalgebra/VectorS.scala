@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun Sep 16 14:09:25 EDT 2012
  *  @see     LICENSE (MIT style license file).
  */
@@ -33,8 +33,8 @@ class VectorS (val dim: Int,
 {
     if (v == null) {
         v = Array.ofDim [StrNum] (dim)
-    } else if (dim != v.length) {
-        flaw ("constructor", "vector dimension is wrong: dim " + dim + " != v.length " + v.length)
+    } else if (dim > v.length) {
+        flaw ("constructor", "vector dimension is larger than space: dim = " + dim + " > v.length = " + v.length)
     } // if
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -97,6 +97,17 @@ class VectorS (val dim: Int,
     /** Get 'this' vector's entire array.
      */
     def apply (): WrappedArray [StrNum] = v
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get 'this' vector's elements that are given in the index vector.
+     *  @param iv  the index vector
+     */
+    override def apply (iv: VectoI): VectorS =
+    {
+        val c = new VectorS (iv.dim)
+        for (i <- c.range) c.v(i) = v(iv(i))
+        c
+    } // apply
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set 'this' vector's element at the 'i'-th index position. 

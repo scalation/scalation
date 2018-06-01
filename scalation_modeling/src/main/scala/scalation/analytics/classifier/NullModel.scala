@@ -1,14 +1,14 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Fri Feb 16 16:14:34 EST 2018
  *  @see     LICENSE (MIT style license file).
  */
 
 package scalation.analytics.classifier
 
-import scalation.linalgebra.{VectoD, VectorD, VectoI, VectorI}
+import scalation.linalgebra.{MatriI, VectoD, VectorD, VectoI, VectorI}
 import scalation.util.banner
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -20,18 +20,14 @@ import scalation.util.banner
  *  @param k   the number of classes
  *  @param cn  the names for all classes
  */
-class NullModel (y: VectoI, k: Int, cn: Array [String])
-      extends Classifier
+class NullModel (y: VectoI, k: Int = 2, cn: Array [String] = Array ("no", "yes"))
+      extends ClassifierInt (null, y, null, k, cn)
 {
     private val DEBUG = true                                 // debug flag
-    private val m     = y.dim                                // number of instance
     private val nu_y  = new VectorD (k)                      // frequency counts for y-values
     private var pi_y: VectoD = null                          // probability estimates for y-values
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the number of data vectors/points in the entire dataset (training + testing),
-     */
-    def size: Int = m
+    if (cn.length != k) flaw ("constructor", "# class names != # classes")
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier by computing the probabilities for C, and the
@@ -60,12 +56,18 @@ class NullModel (y: VectoI, k: Int, cn: Array [String])
         (best, cn(best), pi_y(best))                         // return the best class and its name
     } // classify
 
+   //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Classify all of the row vectors in matrix 'xx'.
+     *  @param xx  the row vectors to classify
+     */
+    override def classify (xx: MatriI): VectoI = VectorI.fill (xx.dim1)(pi_y.argmax ())
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the quality of the training with a testiing dataset and return the
      *  fraction of correct classifications.
      *  @param itest  indices of the instances considered test data
      */
-    def test (itest: IndexedSeq [Int]): Double =
+    override def test (itest: IndexedSeq [Int]): Double =
     {
         var correct = 0
         val c = classify (VectorI (1))._1                    // decision won't change

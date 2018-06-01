@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Michael E. Cotterell
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun Jan 11 19:05:20 EST 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -12,12 +12,10 @@
 
 package scalation.analytics
 
-import scala.collection.immutable.ListMap
 import scala.math.{exp, log, sqrt}
 
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.minima.QuasiNewton
-import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ExpRegression` class supports exponential regression.  In this case,
@@ -28,25 +26,18 @@ import scalation.util.Error
  *  <p>
  *  @see www.stat.uni-muenchen.de/~leiten/Lehre/Material/GLM_0708/chapterGLM.pdf 
  *  @param x       the data/design matrix
- *  @param nonneg  whether to check that responses are nonnegative
  *  @param y       the response vector
+ *  @param nonneg  whether to check that responses are nonnegative
  */
-class ExpRegression (x: MatriD, nonneg: Boolean, y: VectoD)
-      extends Predictor with Error
+class ExpRegression (x: MatriD, y: VectoD, nonneg: Boolean = true)
+      extends PredictorMat (x, y)
 {
-    if (x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
     if (nonneg && ! y.isNonnegative) flaw ("constructor", "response vector y must be nonnegative")
 
     private val DEBUG  = false                                 // debug flag
-    private val k      = x.dim2 - 1                            // number of variables (k = n-1)
-    private val m      = x.dim1.toDouble                       // number of data points (rows)
-    private val df     = (m - k - 1).toInt                     // degrees of freedom
-    private val r_df   = (m-1.0) / df                          // ratio of degrees of freedom
-
-    private var rBarSq = -1.0                                  // adjusted R-squared
-    private var fStat  = -1.0                                  // F statistic (quality of fit)
-    private var aic    = -1.0                                  // Akaike Information Criterion (AIC)
-    private var bic    = -1.0                                  // Bayesian Information Criterion (BIC)
+    private var n_dev      = -1.0                              // null dev: -LL, for null model (intercept only)
+    private var r_dev      = -1.0                              // residual dev: -LL, for full model
+    private var pseudo_rSq = -1.0                              // McFaffen's pseudo R-squared
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** For a given parameter vector b, compute '-2 * Log-Likelihood' (-2LL).
@@ -88,6 +79,7 @@ class ExpRegression (x: MatriD, nonneg: Boolean, y: VectoD)
     def train (yy: VectoD = y): ExpRegression =
     {
         // FIX - currently works for yy = y
+        train_null ()
         val b0   = new VectorD (x.dim2)                        // use b_0 = 0 for starting guess for parameters
         val bfgs = new QuasiNewton (ll)                        // minimizer for -2LL
         b        = bfgs.solve (b0)                             // find optimal solution for parameters
@@ -98,68 +90,28 @@ class ExpRegression (x: MatriD, nonneg: Boolean, y: VectoD)
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  exponential regression equation.
+    /** For the null model, train the classifier by fitting the parameter vector
+     *  (b-vector) in the logistic regression equation using maximum likelihood.
+     *  Do this by minimizing -2l.
      */
-//    def train (): ExpRegression = train (y)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the error and useful diagnostics.
-     *  @param yy   the response vector
-     */
-    def eval (yy: VectoD = y)
+    def train_null ()
     {
-        e = yy - x * b                                         // compute residual/error vector e
-        diagnose (yy)                                          // compute diagnostics
-    } // eval
+         val b0   = new VectorD (x.dim2)        // use b0 = 0 for starting guess for parameters
+         val bfgs = new QuasiNewton (ll_null)   // minimizer for -2l
+         val b_n = bfgs.solve (b0)              // find optimal solution for parameters
+
+         n_dev   = ll_null (b_n)                // measure of fitness for null model
+    } // train_null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute diagostics for the regression model.
-     *  @param yy  the response vector
+    /** Perform 'k'-fold cross-validation.
+     *  @param k      the number of folds
+     *  @param rando  whether to use randomized cross-validation
      */
-    override protected def diagnose (yy: VectoD)
+    def crossVal (k: Int = 10, rando: Boolean = true)
     {
-        super.diagnose (yy)
-        rBarSq = 1.0 - (1.0-rSq) * r_df                        // R-bar-squared (adjusted R-squared)
-        fStat  = ((sst - sse) * df) / (sse * k)                // F statistic (msr / mse)
-        aic    = m * log (sse) - m * log (m) + 2.0 * (k+1)     // Akaike Information Criterion (AIC)
-        bic    = aic + (k+1) * (log (m) - 2.0)                 // Bayesian Information Criterion (BIC)
-    } // diagnose
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit.
-     */
-    override def fit: VectoD = super.fit.asInstanceOf [VectorD] ++ VectorD (rBarSq, fStat, aic, bic)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the labels for the fit.
-     */
-    override def fitLabels: Seq [String] = super.fitLabels ++ Seq ("rBarSq", "fStat", "aic", "bic")
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
-     *  e.g., (b_0, b_1, b_2) dot (1, z_1, z_2).
-     *  @param z  the new vector to predict
-     */
-    def predict (z: VectoD): Double = exp (b dot z)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build a map of diagnostics metrics for the overall quality of fit.
-     */
-    override def metrics: Map [String, Any] =
-    {
-        ListMap ("Degrees of Freedom"    -> (df),
-                 "Effective DF"          -> (m - b.count (_ != 0) - 1),
-                 "Residual stdErr"       -> "%.4f".format (sqrt (sse / (df))),
-                 "R-Squared"             -> "%.4f".format (rSq),
-                 "Adjusted R-Squared"    -> "%.4f".format (rBarSq),
-                 "F-Statistic"           -> "%.4f".format (fStat),
-                 "SSE"                   -> "%.4f".format (sse),
-                 "RMSE"                  -> "%.4f".format (rmse),
-                 "AIC"                   -> "%.4f".format (aic),
-                 "BIC"                   -> "%.4f".format (bic))
-    } // metrics
-
+        crossValidate ((x: MatriD, y: VectoD) => new ExpRegression (x, y), k, rando)
+    } // crossVal
 
 } // ExpRegression class
 
@@ -182,7 +134,7 @@ object ExpRegressionTest extends App
     println ("x = " + x)
     println ("y = " + y)
 
-    val erg = new ExpRegression (x, true, y)
+    val erg = new ExpRegression (x, y)
     erg.train ().eval ()
     println ("fit = " + erg.fit)
 
@@ -222,7 +174,7 @@ object ExpRegressionTest2 extends App
 
         for (i <- 0 until y.dim) y(i) = exp (x(i) dot b) * e.gen
 
-        val erg = new ExpRegression (x, true, y)
+        val erg = new ExpRegression (x, y)
         erg.train ().eval ()
 
         (n, k, b, erg.coefficient, erg.fit(0))

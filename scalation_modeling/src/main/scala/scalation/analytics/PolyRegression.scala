@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Wed Feb 20 17:39:57 EST 2013
  *  @see     LICENSE (MIT style license file).
  */
@@ -14,7 +14,7 @@ import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.math.double_exp
 import scalation.plot.Plot
 import scalation.stat.StatVector.corr
-import scalation.util.{banner, Error, time}
+import scalation.util.banner
 
 import RegTechnique._
 
@@ -35,26 +35,24 @@ import RegTechnique._
  *  @see www.ams.sunysb.edu/~zhu/ams57213/Team3.pptx
  *  @param t          the input vector: t_i expands to x_i = [1, t_i, t_i^2, ... t_i^k]
  *  @param y          the response vector
- *  @param k          the order of the polynomial (max degree)
+ *  @param ord        the order (k) of the polynomial (max degree)
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  *  @param raw        whether the polynomials are raw or orthogonal
  */
-class PolyRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = Cholesky,
+class PolyRegression (t: VectoD, y: VectoD, ord: Int, technique: RegTechnique = Cholesky,
                       raw: Boolean = true)
-      extends Predictor with Error
+      extends PredictorVec (t, y, ord)
 {
-    if (t.dim != y.dim) flaw ("constructor", "dimensions of t and y are incompatible")
-    if (t.dim <= k)     flaw ("constructor", "not enough data points for the given order (k)")
+    private val DEBUG = true                                 // debug flag
+    private var x     = expand (t)                           // data/design matrix built from t (raw)
 
-    private val DEBUG = true
-    private var x     = new MatrixD (t.dim, 1 + k)           // data/design matrix built from t
-    private var a: MatrixD = null                            // multipliers for orthogonal polynomials
-    for (i <- t.range) x(i) = expand (t(i))                  // raw polynomials
+    private var a: MatriD = null                             // multipliers for orthogonal polynomials
     if (! raw) {
         val za = orthogonalize (x)                           // orthogonal polynomials
         x = za._1; a = za._2
     } // if
-    private val rg    = new Regression (x, y, technique)     // regular multiple linear regression
+
+    rg = new Regression (x, y, technique)                    // regular multiple linear regression
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Expand the scalar 't' into a vector of powers of 't:  [1, t, t^2 ... t^k]'.
@@ -62,8 +60,8 @@ class PolyRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = Ch
      */
     def expand (t: Double): VectoD = 
     {
-        val v = new VectorD (1 + k)
-        for (j <- 0 to k) v(j) = t~^j
+        val v = new VectorD (1 + ord)
+        for (j <- 0 to ord) v(j) = t~^j
         v
     } // expand
 
@@ -73,7 +71,7 @@ class PolyRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = Ch
      *  This will eliminate the multi-collinearity problem.
      *  @param x  the matrix to orthogonalize
      */
-    def orthogonalize (x: MatrixD): (MatrixD, MatrixD) =
+    def orthogonalize (x: MatriD): (MatriD, MatriD) =
     {
         val z = new MatrixD (x.dim1, x.dim2)
         val a = new MatrixD (x.dim2, x.dim2)
@@ -107,49 +105,6 @@ class PolyRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = Ch
     } // orthoVector
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the predictor by fitting the parameter vector 'b' in the
-     *  multiple regression equation
-     *  <p>
-     *      yy  =  b dot x + e  =  [b_0, ... b_k] dot [1, t, t^2 ... t^k] + e
-     *  <p>
-     *  using the least squares method.
-     *  @param yy  the response vector
-     */
-    def train (yy: VectoD = y): Regression [MatrixD, VectoD] = rg.train (yy)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the predictor by fitting the parameter vector 'b' in the
-     *  regression equation using the least squares method on 'y'
-     */
-//    def train (): Regression [MatrixD, VectoD] = rg.train ()
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the error and useful diagnostics.
-     *  @param yy   the response vector
-     */
-    def eval (yy: VectoD = y) { rg.eval (yy) }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the vector of coefficients.
-     */
-    override def coefficient: VectoD = rg.coefficient
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the vector of residuals/errors.
-     */
-    override def residual: VectoD = rg.residual
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including 'rSquared'.
-     */
-    override def fit: VectoD = rg.fit
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the labels for the fit.
-     */
-    override def fitLabels: Seq [String] = rg.fitLabels
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of 'y = f(z)' by evaluating the formula 'y = b dot expand (z)',
      *  e.g., '(b_0, b_1, b_2) dot (1, z, z^2)'.
      *  @param z  the new scalar to predict
@@ -161,40 +116,20 @@ class PolyRegression (t: VectoD, y: VectoD, k: Int, technique: RegTechnique = Ch
     } // predict
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
-     *  e.g., (b_0, b_1, b_2) dot (1, z_1, z_2).
-     *  @param z  the new expanded/orhogonalized vector to predict
-     */
-    def predict (z: VectoD): Double = rg.predict (z)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform forward selection to add the most predictive variable to the existing
-     *  model, returning the variable to add, the new parameter vector and the new
-     *  quality of fit.  May be called repeatedly.
-     *  @param cols  the columns of matrix x included in the existing model
-     */
-    def forwardSel (cols: Set [Int]): (Int, VectoD, VectoD) = rg.forwardSel (cols)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform backward elimination to remove the least predictive variable from
-     *  the existing model, returning the variable to eliminate, the new parameter
-     *  vector and the new quality of fit.  May be called repeatedly.
-     *  @param cols  the columns of matrix x included in the existing model
-     */
-    def backwardElim (cols: Set [Int]): (Int, VectoD, VectoD) = rg.backwardElim (cols)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Variance Inflation Factor (VIF) for each variable to test
-     *  for multi-collinearity by regressing 'xj' against the rest of the variables.
-     *  A VIF over 10 indicates that over 90% of the variance of 'xj' can be predicted
-     *  from the other variables, so 'xj' is a candidate for removal from the model.
-     */
-    def vif: VectoD = rg.vif
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the correlation matrix for the columns in data matrix 'x'.
      */
-    def corrMatrix: MatriD = corr (x)
+    def corrMatrix: MatriD = corr (x.asInstanceOf [MatrixD])       // FIX
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform 'k'-fold cross-validation.
+     *  @param ord    the order of the expansion (e.g., max degree in PolyRegression)
+     *  @param k      the number of folds
+     *  @param rando  whether to use randomized cross-validation
+     */
+    def crossVal (ord: Int, k: Int = 10, rando: Boolean = true)
+    {
+        crossValidate ((t: VectoD, y: VectoD, ord) => new PolyRegression (t, y, ord), k, rando)
+    } // crossVal
 
 } // PolyRegression class
 
@@ -226,8 +161,7 @@ object PolyRegressionTest extends App
     prg.train ().eval ()
 
     println ("coefficient = " + prg.coefficient)
-    println ("            = " + prg.fitLabels)
-    println ("fit         = " + prg.fit)
+    println ("fitMap      = " + prg.fitMap)
 
     banner ("test for collinearity")
     println ("corr = " + prg.corrMatrix)
@@ -271,8 +205,7 @@ object PolyRegressionTest2 extends App
     prg.train ().eval ()
 
     println ("coefficient = " + prg.coefficient)
-    println ("            = " + prg.fitLabels)
-    println ("fit         = " + prg.fit)
+    println ("fitMap      = " + prg.fitMap)
 
     banner ("test for collinearity")
     println ("corr = " + prg.corrMatrix)

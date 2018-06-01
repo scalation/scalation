@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Tue Jul 21 13:35:37 EDT 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -30,6 +30,12 @@ package object graphalytics
     /** The standard file extension for graphs
      */
     val EXT = ".grp"
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert the arguments to an array of strings.
+     *  @param a  the arguments
+     */
+    def stringArray (a: Any*) : Array [String] = a.map (_.toString).toArray
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /*  Implicit conversion from 'Double' to 'VectorD' for cases when TLable

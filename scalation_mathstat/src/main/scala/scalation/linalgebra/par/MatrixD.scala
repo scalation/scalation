@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Yung-Long Li
- *  @version 1.4
+ *  @version 1.5
  *  @date    Jan 11 18:34:25 EST 2013
  *  @see     LICENSE (MIT style license file).
  */
@@ -266,7 +266,7 @@ class MatrixD (val d1: Int,
      *  @param row  the row to exclude
      *  @param col  the column to exclude
      */
-    def sliceExclude (row: Int, col: Int): MatrixD =
+    def sliceEx (row: Int, col: Int): MatrixD =
     {
         val c = new MatrixD (dim1 - oneIf (row < dim1), dim2 - oneIf (col < dim2))
         for (i <- range1 if i != row) for (j <- range2 if j != col) {
@@ -274,7 +274,7 @@ class MatrixD (val d1: Int,
                     = v(i)(j)
         } // for
         c
-    } // sliceExclude
+    } // sliceEx
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select rows from this matrix according to the given index/basis.
@@ -1431,7 +1431,7 @@ class MatrixD (val d1: Int,
         var sum = 0.0
         var b: MatrixD = null
         for (j <- range2) {
-            b = sliceExclude (0, j)   // the submatrix that excludes row 0 and column j
+            b = sliceEx (0, j)             // the submatrix that excludes row 0 and column j
             sum += (if (j % 2 == 0) v(0)(j) * (if (b.dim1 == 1) b.v(0)(0) else b.det)
                     else           -v(0)(j) * (if (b.dim1 == 1) b.v(0)(0) else b.det))
         } // for 

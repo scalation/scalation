@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun Sep 23 21:14:14 EDT 2012
  *  @see     LICENSE (MIT style license file).
  */
@@ -49,7 +49,7 @@ abstract class ClassifierReal (x: MatriD, y: VectoI, fn: Array [String], k: Int,
     protected val fset = Array.fill [Boolean](n)(true)
 
     if (y.dim != m)     flaw ("constructor", "y.dim must equal training-set size (m)")
-    if (fn.length != n) flaw ("constructor", "fn.length must equal feature-set size (n)")
+    if (fn != null && fn.length != n) flaw ("constructor", "fn.length must equal feature-set size (n)")
     if (k >= m)         flaw ("constructor", "k must be less than training-set size (m)")
     if (cn.length != k) flaw ("constructor", "cn.length must equal number of classes (k)")
 
@@ -71,6 +71,15 @@ abstract class ClassifierReal (x: MatriD, y: VectoI, fn: Array [String], k: Int,
      *  @param z  the vector to classify
      */
     def classify (z: VectoI): (Int, String, Double) = classify (z.toDouble)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Classify all of the row vectors in matrix 'xx'.
+     *  @param xx  the row vectors to classify
+     */
+    def classify (xx: MatriD): VectoI =
+    {
+        VectorI (for (i <- xx.range1) yield classify (xx(i))._1)
+    } // classify
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the quality of the training with a test-set and return the fraction

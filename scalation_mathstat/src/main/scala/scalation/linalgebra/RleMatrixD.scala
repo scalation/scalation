@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Vishnu Gowda Harish, Vinay Kumar Bingi, John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sat Oct 1 1:10:11 EDT 2016
  *  @see     LICENSE (MIT style license file).
  */
@@ -207,10 +207,10 @@ import RleMatrixD._
      *  @param row  the row to exclude
      *  @param col  the column to exclude
      */
-    def sliceExclude (row: Int, col: Int): RleMatrixD =
+    def sliceEx (row: Int, col: Int): RleMatrixD =
     {
         RleMatrixD (for (i <- range2 if i != col) yield RleVectorD (for (j <- range1 if j != row) yield v(i)(j))) 
-    } // sliceExclude
+    } // sliceEx
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select rows from 'this' matrix according to the given index/basis.
@@ -681,7 +681,7 @@ import RleMatrixD._
         var sum = 0.0
         var b: MatrixD = null
         for (j <- range2) {
-            b = (this.toDense).sliceExclude (0, j)   // the submatrix that excludes row 0 and column j
+            b = (this.toDense).sliceEx (0, j)    // the submatrix that excludes row 0 and column j
             sum += (if (j % 2 == 0) this(0, j) * (if (b.dim1 == 1) b(0, 0) else b.det)
                     else           -this(0, j) * (if (b.dim1 == 1) b(0, 0) else b.det))
         } // for 

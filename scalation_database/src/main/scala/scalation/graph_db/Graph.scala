@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Matthew Saltz
- *  @version 1.4
+ *  @version 1.5
  *  @date    Wed May 13 14:58:25 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *
@@ -93,11 +93,23 @@ class Graph [TLabel: ClassTag] (val ch:      Array [SET [Int]],
     {
         val labelMap = Map [TLabel, SET [Int]] ()
         for (i <- label.indices) {                      // for each vertex i
+            val lab = label(i)                          // label for vertex i
+            val st  = labelMap (lab)                    // get set of vertices with that label
+            if (st != null) st.add (i)                  // add to existing set
+            else labelMap.put (lab, SET(i))             // make a new set
+        } // for
+        labelMap
+    } // buildLabelMap
+/*
+    {                                                   // Replaced - inefficient
+        val labelMap = Map [TLabel, SET [Int]] ()
+        for (i <- label.indices) {                      // for each vertex i
             val lab  = label(i)                         // label for vertex i
             labelMap += lab -> (labelMap.getOrElse (lab, SET ()) + i)
         } // for
         labelMap
     } // buildLabelMap
+*/
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the maximum label value.
@@ -198,9 +210,18 @@ class Graph [TLabel: ClassTag] (val ch:      Array [SET [Int]],
     } // same
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the set of vertices in 'this' digraph with label l.
+    /** Return the set of vertices in 'this' digraph with label 'l'.
+     *  @param l  the label to match
      */
-    def getVerticesWithLabel (l: TLabel) = labelMap.getOrElse (l, SET [Int] ())
+    def getVerticesWithLabel (l: TLabel) =
+    {
+        val st = labelMap.get (l)
+        if (st != null) st                             // set of vertices with label l
+        else SET [Int] ()                              // empty set
+    } // getVerticesWithLabel
+/*
+        labelMap.getOrElse (l, SET [Int] ())
+*/
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Make this directed graph work like an undirected graph by making sure that
@@ -294,6 +315,26 @@ object Graph
         traverse (tree.root)
         g
     } // apply
+
+    val g44 = new Graph (Array (SET (5, 9, 8),             // 0
+                                SET (5),                   // 1
+                                SET (),                    // 2
+                                SET (8),                   // 3
+                                SET (),                    // 4
+                                SET (0, 2, 7, 8, 3),       // 5
+                                SET (0, 2, 7, 8, 4),       // 6
+                                SET (8, 2),                // 7
+                                SET (),                    // 8
+                                SET (6)),                  // 9
+                         Array ("0", "0", "3", "1", "1", "0", "0", "3", "1", "0"),
+                         true, "g")
+
+    val q44 = new Graph (Array (SET (1, 2, 3),             // 0
+                                SET (0, 2),                // 1
+                                SET (),                    // 2
+                                SET (2)),                  // 3
+                         Array ("0", "0", "1", "1"),
+                         true, "q")
 
 } // Graph object
 

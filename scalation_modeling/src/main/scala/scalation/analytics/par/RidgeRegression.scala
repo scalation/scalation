@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Mon Feb  2 16:43:07 EST 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -12,12 +12,12 @@ package scalation.analytics.par
 
 import math.pow
 
-import scalation.linalgebra.{Fac_QR_H, VectoD}
+import scalation.linalgebra.{Fac_QR_H, MatriD, VectoD}
 import scalation.linalgebra.par._
 import scalation.plot.Plot
 import scalation.util.{Error, time}
 
-import scalation.analytics.Predictor
+import scalation.analytics.PredictorMat
 import scalation.analytics.RegTechnique._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -47,14 +47,12 @@ import scalation.analytics.RegTechnique._
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
 class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: RegTechnique = Inverse)
-      extends Predictor with Error
+      extends PredictorMat (x, y)
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
     if (x.dim1 <= x.dim2) flaw ("constructor", "not enough data rows in matrix to use regression")
 
     private val DEBUG      = true                               // debug flag
-    private val k          = x.dim2 - 1                         // number of variables (k = n-1)
-    private val m          = x.dim1.toDouble                    // number of data points (rows)
     private val r_df       = (m-1.0) / (m-k-1.0)                // ratio of degrees of freedom
     private var rSquared   = -1.0                               // coefficient of determination (quality of fit)
     private var rBarSq     = -1.0                               // Adjusted R-squared
@@ -85,7 +83,7 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
      *      y  =  b dot x + e  =  [b_1, ... b_k] dot [x_1, ... x_k] + e
      *  using the least squares method.
      */
-    def train (): RidgeRegression =
+    override def train (): RidgeRegression =
     {
         b        = if (x_pinv == null) fac.solve (y)
                    else x_pinv * y                              // x parameter vector [b_1, ... b_k]
@@ -122,24 +120,18 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.
-     *  @param yy   the response vector
      */
-    def eval (yy: VectoD = y)
+    override def eval ()
     {
-        e = yy - x * b                                         // compute residual/error vector e
-        diagnose (yy)                                          // compute diagnostics
+        e = y - x * b                                           // compute residual/error vector e
+        diagnose (e)                                            // compute diagnostics
     } // eval
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit including 'rSquared'.
-     */
-    override def fit: VectoD = VectorD (rSquared, rBarSq, fStat)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula below.
      *  @param z  the new vector to predict
      */
-    def predict (z: VectoD): Double = b dot z
+    override def predict (z: VectoD): Double = b dot z
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable
@@ -148,13 +140,13 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
      */
     def backElim (): (Int, VectoD, VectoD) =
     {
-        var j_max   = -1                              // index of variable to eliminate
-        var b_max: VectoD = null                      // parameter values for best solution
-        var ft_max: VectoD = VectorD (3); ft_max.set (-1.0)   // optimize on quality of fit (ft(0) is rSquared)
+        var j_max   = -1                                              // index of variable to eliminate
+        var b_max: VectoD = null                                      // parameter values for best solution
+        var ft_max: VectoD = VectorD (3); ft_max.set (-1.0)           // optimize on quality of fit (ft(0) is rSquared)
 
         for (j <- 1 to k) {
-            val keep = m.toInt                        // i-value large enough to not exclude any rows in slice
-            val rg_j = new RidgeRegression (x.sliceExclude (keep, j), y)       // regress with x_j removed
+            val keep = m.toInt                                        // i-value large enough to not exclude any rows in slice
+            val rg_j = new RidgeRegression (x.sliceEx (keep, j), y)   // regress with x_j removed
             rg_j.train ().eval ()
             val b  = rg_j.coefficient
             val ft = rg_j.fit
@@ -171,16 +163,26 @@ class RidgeRegression (x: MatrixD, y: VectorD, lambda: Double = 0.1, technique: 
      */
     def vif: VectorD =
     {
-        val vifV = new VectorD (k)           // VIF vector
+        val vifV = new VectorD (k)                                      // VIF vector
         for (j <- 1 to k) {
-            val keep = m.toInt               // i-value large enough to not exclude any rows in slice
-            val x_j  = x.col(j)                                           // x_j is jth column in x
-            val rg_j = new RidgeRegression (x.sliceExclude (keep, j), x_j)     // regress with x_j removed
+            val keep = m.toInt                                          // i-value large enough to not exclude any rows in slice
+            val x_j  = x.col(j)                                         // x_j is jth column in x
+            val rg_j = new RidgeRegression (x.sliceEx (keep, j), x_j)   // regress with x_j removed
             rg_j.train ().eval ()
-            vifV(j-1) =  1.0 / (1.0 - rg_j.fit(0))                        // store vif for x_1 in vifV(0)
+            vifV(j-1) =  1.0 / (1.0 - rg_j.fit(0))                      // store vif for x_1 in vifV(0)
         } // for
         vifV
     } // vif
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform 'k'-fold cross-validation.
+     *  @param k      the number of folds
+     *  @param rando  whether to use randomized cross-validation
+     */
+    def crossVal (k: Int = 10, rando: Boolean = true)
+    {
+        crossValidate ((x: MatriD, y: VectoD) => new RidgeRegression (x.asInstanceOf [MatrixD], y.asInstanceOf [VectorD]), k, rando)
+    } // crossVal
 
 } // RidgeRegression class
 

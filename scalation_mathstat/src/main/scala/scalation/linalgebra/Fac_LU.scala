@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Mustafa Nural, John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Fri May 26 14:32:21 EDT 2017
  *  @see     LICENSE (MIT style license file).
  *
@@ -148,8 +148,8 @@ class Fac_LU [MatT <: MatriD] (a: MatT)
     {
         if (m != n) throw new IllegalArgumentException ("solve: requires a square matrix")
 
-        val bb = b.copy                              // make a copy to perserve b
-        permute (bb)                                 // permute according to piv
+//      val bb = b.copy; permute (bb)                // make a copy of b and permute by piv
+        val bb = b(piv)                              // permute b the same way as l 
         val y = new VectorD (l.dim2)                 // forward substitution
         for (k <- 0 until y.dim) {                   // solve for y in l*y = bb
             val l_k = l(k)

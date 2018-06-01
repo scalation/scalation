@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Matthew Saltz
- *  @version 1.4
+ *  @version 1.5
  *  @date    Wed May 13 14:58:25 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *
@@ -254,6 +254,29 @@ object Graph
     val g2p = new Graph (g2.ch, g2.label, true, g2.name)    // with parents
     val q2p = new Graph (q2.ch, q2.label, true, q2.name)    // with parents
 
+    // data graph g44 --------------------------------------------------------
+
+    val g44 = new Graph (Array (SET (5, 9, 8),              // 0
+                                SET (5),                    // 1
+                                SET (),                     // 2
+                                SET (8),                    // 3
+                                SET (),                     // 4
+                                SET (0, 2, 7, 8, 3),        // 5
+                                SET (0, 2, 7, 8, 4),        // 6
+                                SET (8, 2),                 // 7
+                                SET (),                     // 8
+                                SET (6)),                   // 9
+                                Array("0", "0", "3", "1", "1", "0", "0", "3", "1", "0"),
+                         true, "g44")
+
+    // query graph q44 --------------------------------------------------------
+
+    val q44 = new Graph (Array (SET (1,2,3),
+                                SET (0,2),
+                                SET (),
+                                SET (2)),
+                                Array ("0", "0", "1", "1"),
+                         true, "q44")
 } // Graph object
 
 

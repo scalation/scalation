@@ -1,14 +1,13 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Michael Cotterell
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun Jan 18 20:46:18 EST 2015
  *  @see     LICENSE (MIT style license file).
  */
 
 package scalation.analytics
 
-import scalation.analytics.classifier.LogisticRegression
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectoI, VectorI}
 import scalation.linalgebra.VectorD.one
 
@@ -18,26 +17,12 @@ import RegTechnique._
 /** A Generalized Linear Model 'GZLM' can be developed using the `GZLM` object.
  *  It provides factory methods for General Linear Models 'GLM' via inheritance
  *  and for proper Generalized Linear Models:
- *  `LogisticRegression` - logistic regression,
+ *  `LogisticRegression` - logistic regression, (@see `classifier` package)
  *  `PoissonRegression`  - Poisson regression,
  *  `ExpRegression`      - Exponential regression,
  */
 object GZLM extends GLM
 {
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build a Logistic Regression model.
-     *  @param x   the input/design m-by-n matrix
-     *  @param y   the categorical response vector, y_i in {0, 1}
-     *  @param cn  the names for both categories/classes
-     */
-    def apply (x: MatriD, y: VectoI, cn: Array [String]): LogisticRegression =
-    {
-        if (add_1)
-            new LogisticRegression (one (x.dim1) +^: x, y, cn)
-        else
-            new LogisticRegression (x, y, cn)
-    } // apply
-
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Poisson Regression model.
      *  @param x        the input/design m-by-n matrix
@@ -48,9 +33,9 @@ object GZLM extends GLM
     def apply (x: MatriD, y: VectoI, fn: Array [String], poisson: Boolean): PoissonRegression =
     {
         if (add_1)
-            new PoissonRegression (one (x.dim1) +^: x, y, fn)
+            PoissonRegression (one (x.dim1) +^: x, y, fn)
         else
-            new PoissonRegression (x, y, fn)
+            PoissonRegression (x, y, fn)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -62,9 +47,9 @@ object GZLM extends GLM
     def apply (x: MatriD, nonneg: Boolean, y: VectoD): ExpRegression =
     {
         if (add_1)
-            new ExpRegression (one (x.dim1) +^: x, nonneg, y)
+            new ExpRegression (one (x.dim1) +^: x, y, nonneg)
         else
-            new ExpRegression (x, nonneg, y)
+            new ExpRegression (x, y, nonneg)
     } // apply
 
 } // GZLM object

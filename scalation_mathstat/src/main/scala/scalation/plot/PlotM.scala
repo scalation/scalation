@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  John Miller
- *  @version 1.4
+/** @author  John Miller, Michael Cotterell
+ *  @version 1.5
  *  @date    Sun Nov 15 15:05:06 EDT 2009
  *  @see     LICENSE (MIT style license file). 
  */
@@ -14,7 +14,7 @@ import scalation.linalgebra.{MatriD, VectoD}
 import scalation.scala2d.{Panel, VizFrame}
 import scalation.scala2d.{Ellipse, Line}
 import scalation.scala2d.Colors._
-import scalation.scala2d.Shapes.{BasicStroke, Dimension, Graphics, Graphics2D}
+import scalation.scala2d.Shapes.{BasicStroke, Graphics, Graphics2D}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PlotM` class takes an 'x' vector and a 'y' matrix of data values and plots
@@ -22,28 +22,30 @@ import scalation.scala2d.Shapes.{BasicStroke, Dimension, Graphics, Graphics2D}
  *  @param x       the x vector of data values (horizontal)
  *  @param y       the y matrix of data values where y(i) is the i-th vector (vertical)
  *  @param _title  the title of the plot
+ *  @param label   the label/legend/key for each curve in the plot
+ *  @param lines   flag for generating a line plot
  */
 class PlotM (x: VectoD, y: MatriD, var label: Array [String] = null,
-            _title: String = "PlotM y_i vs. x for each i")
+            _title: String = "PlotM y_i vs. x for each i", lines: Boolean = false)
       extends VizFrame (_title, null)
 {
-    private val EPSILON  = 1E-9
-    private val frameW   = getW
-    private val frameH   = getH
-    private val offset   = 70
-    private val baseX    = offset
-    private val baseY    = frameH - offset
-    private val stepsX   = 10
-    private val stepsY   = 10
-    private val minX     = floor (x.min ())
-    private val maxX     = ceil (x.max () + EPSILON)
-    private val minY     = floor (y.min ())
-    private val maxY     = ceil (y.max () + EPSILON)
-    private val deltaX   = maxX - minX
-    private val deltaY   = maxY - minY
-    private val diameter = 4
-    private val dot      = Ellipse ()
-    private val axis     = Line ()
+    private val EPSILON   = 1E-9
+    private val frameW    = getW
+    private val frameH    = getH
+    private val offset    = 70
+    private val baseX     = offset
+    private val baseY     = frameH - offset
+    private val stepsX    = 10
+    private val stepsY    = 10
+    private val minX      = floor (x.min ())
+    private val maxX      = ceil (x.max () + EPSILON)
+    private val minY      = floor (y.min ())
+    private val maxY      = ceil (y.max () + EPSILON)
+    private val deltaX    = maxX - minX
+    private val deltaY    = maxY - minY
+    private val diameter  = 4
+    private val dot       = Ellipse ()
+    private val axis      = Line ()
 
     if (label == null) label = defaultLabels
 
@@ -119,6 +121,9 @@ class PlotM (x: VectoD, y: MatriD, var label: Array [String] = null,
                 g2d.setPaint (color)
                 if (i < label.length) g2d.drawString (label(i), offset * (i + 2), frameH - 20)
 
+                var px_pos = 0 // previous x
+                var py_pos = 0 // previous y
+
                 for (j <- 0 until x.dim) {
                     val xx = round ((x(j) - minX) * (frameW - 2 * offset).asInstanceOf [Double])
                     x_pos = (xx / deltaX).asInstanceOf [Int] + offset
@@ -126,6 +131,17 @@ class PlotM (x: VectoD, y: MatriD, var label: Array [String] = null,
                     y_pos = (yy / deltaY).asInstanceOf [Int] + offset
                     dot.setFrame (x_pos, y_pos, diameter, diameter)         // x, y, w, h
                     g2d.fill (dot)
+
+                    // connect with lines
+                    if (j != 0 && lines) {
+                        g2d.setStroke (new BasicStroke (1.0f))
+                        g2d.drawLine (px_pos+1, py_pos+1, x_pos+1, y_pos+1)
+                    } // if
+
+                    px_pos = x_pos // update previous x
+                    py_pos = y_pos // update previous y
+                    
+
                 } // for
             } // for
         } // paintComponent
@@ -148,7 +164,7 @@ class PlotM (x: VectoD, y: MatriD, var label: Array [String] = null,
     } // clip
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Convert 'this' object to a string.
+    /** Convert 'this' `PlotM` object to a string.
      */
     override def toString = "PlotM (y = " + y + " vs. x = " + x + ")"
 
@@ -180,6 +196,7 @@ object PlotM
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PlotMTest` object is used to test the `PlotM` class.
+ *  > runMain sclation.plot.PlotMTest
  */
 object PlotMTest extends App
 {
@@ -200,4 +217,30 @@ object PlotMTest extends App
     println ("plot = " + plot)
 
 } // PlotMTest object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `PlotMTest2` object is used to test the `PlotM` class.  This version also
+ *  plots lines connecting the points.
+ *  > runMain sclation.plot.PlotMTest2
+ */
+object PlotMTest2 extends App
+{
+    import scalation.linalgebra.{MatrixD, VectorD}
+
+    val x = new VectorD (200)
+    val y = new MatrixD (5, 200)
+
+    for (i <- 0 until 200) {
+        x(i)    = (i - 100) / 10.0
+        y(0, i) = 10.0 * x(i)
+        y(1, i) = pow (x(i), 2)
+        y(2, i) = .1 * pow (x(i), 3)
+        y(3, i) = .01 * pow (x(i), 4)
+        y(4, i) = .001 * pow (x(i), 5)
+    } // for
+    val plot = new PlotM (x, y, Array ("Linear", "Quadratic", "Cubic", "Quartic", "Quintic"), lines = true)
+    println ("plot = " + plot)
+
+} // PlotMTest2 object
 

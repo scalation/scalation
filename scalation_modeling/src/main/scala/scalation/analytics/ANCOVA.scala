@@ -1,14 +1,14 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun Jan  4 23:09:27 EST 2015
  *  @see     LICENSE (MIT style license file).
  */
 
 package scalation.analytics
 
-import scala.collection.mutable.Set
+import scala.collection.mutable.{Map, Set}
 
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectoI, VectorI}
 import scalation.util.{Error, time}
@@ -40,7 +40,7 @@ import RegTechnique._
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
 class ANCOVA (x_ : MatriD, t: VectoI, y: VectoD, levels: Int, technique: RegTechnique = QR)
-      extends Predictor  with Error
+      extends Predictor with Error
 {
     if (x_.dim1 != y.dim) flaw ("constructor", "dimensions of x_ and y are incompatible")
     if (t.dim   != y.dim) flaw ("constructor", "dimensions of t and y are incompatible")
@@ -79,19 +79,12 @@ class ANCOVA (x_ : MatriD, t: VectoI, y: VectoD, levels: Int, technique: RegTech
      *  using the least squares method.
      *  @param yy  the response vector
      */
-    def train (yy: VectoD = y): Regression [MatrixD, VectoD] = rg.train (yy)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  regression equation using the least squares method on 'y'.
-     */
-//    def train (): Regression [MatrixD, VectoD] = rg.train ()
+    def train (yy: VectoD = y): Regression = rg.train (yy)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.
-     *  @param yy   the response vector
      */
-    def eval (yy: VectoD = y) { rg.eval (yy) }
+    def eval () { rg.eval () }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector of coefficients.
@@ -106,12 +99,17 @@ class ANCOVA (x_ : MatriD, t: VectoI, y: VectoD, levels: Int, technique: RegTech
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit 'rSquared'.
      */
-    override def fit: VectoD = rg.fit
+    def fit: VectoD = rg.fit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the fit.
      */
-    override def fitLabels: Seq [String] = rg.fitLabels
+    def fitLabel: Seq [String] = rg.fitLabel
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build a map of quality of fit measures.
+     */
+    def fitMap: Map [String, String] = rg.fitMap
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
@@ -143,6 +141,12 @@ class ANCOVA (x_ : MatriD, t: VectoI, y: VectoD, levels: Int, technique: RegTech
      *  from the other variables, so 'xj' is a candidate for removal from the model.
      */
     def vif: VectoD = rg.vif
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform 'k'-fold cross-validation.
+     *  @param k  the number of folds
+     */
+    def crossVal (k: Int = 10) { rg.crossVal (k) }
 
 } // ANCOVA class
 
@@ -176,9 +180,8 @@ object ANCOVATest extends App
     val anc    = new ANCOVA (x, t, y, levels)
     anc.train ().eval ()
 
-    println (anc.fitLabels)
-    println ("fit         = " + anc.fit)
     println ("coefficient = " + anc.coefficient)
+    println ("fitMap      = " + anc.fitMap)
 
     val yp = anc.predict (z)
     println ("predict (" + z + ") = " + yp)

@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Thu Mar  7 14:20:25 EST 2013
  *  @see     LICENSE (MIT style license file)
  *  @see     gwu.geverstine.com/pdenum.pdf

@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun Dec 28 21:52:38 EST 2014
  *  @see     LICENSE (MIT style license file).
  */
@@ -18,7 +18,7 @@ import scalation.minima.QuasiNewton
 import scalation.plot.Plot
 import scalation.util.banner
 
-import ActivationFunc.sigmoid
+import ActivationFun.sigmoid
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `LogisticRegression` class supports (binomial) logistic regression.  In this
@@ -97,6 +97,7 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String] = null,
      */
     def train (itest: IndexedSeq [Int]): LogisticRegression =     // FIX - use these parameters
     {
+         train_null ()
          val b0   = new VectorD (x.dim2)        // use b_0 = 0 for starting guess for parameters
          val bfgs = new QuasiNewton (ll)        // minimizer for -2l
          b     = bfgs.solve (b0)                // find optimal solution for parameters
@@ -126,41 +127,37 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String] = null,
     def coefficient: VectoD = b
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the fit (parameter vector b, quality of fit). Assumes both
-     *  'train_null' and 'train' have already been called.
+    /** Return the quality of fit.  Assumes both 'train_null' and 'train' have
+     *  already been called.
+     *  @param y   the actual class labels
+     *  @param yp  the predicted class labels
+     *  @param k   the number of class labels
      */
-    def fit: VectoD = 
+    override def fit (y: VectoI, yp: VectoI, k: Int = 2): VectoD =
     {
         pseudo_rSq = 1.0 - r_dev / n_dev
-        VectorD (n_dev, r_dev, aic, pseudo_rSq)
+        super.fit (y, yp) ++ VectorD (n_dev, r_dev, aic, pseudo_rSq)
     } // fit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the fit.  Override when necessary.
      */
-    def fitLabels: Seq [String] = Seq ("n_dev", "r_dev", "aic", "pseudo_rSq")
+    override def fitLabel: Seq [String] = super.fitLabel ++ Seq ("n_dev", "r_dev", "aic", "pseudo_rSq")
 
-    val index_prSq = 3
+    val index_prSq = 7                                        // index of pseudo_rSq
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Classify the value of y = f(z) by evaluating the formula y = sigmoid (b dot z).
-     *  Return the best class, its name and FIX.
+    /** Classify the value of 'y = f(z)' by evaluating the formula 'y = sigmoid (b dot z)'.
+     *  Return the best class, its name and quality metric
      *  @param z  the new vector to classify
      */
     override def classify (z: VectoD): (Int, String, Double) =
     {
         val c = if (sigmoid (b dot z) > 0.5) 1 else 0
-        (c, cn(c), -1.0)                                    // FIX - need metric
+        (c, cn(c), pseudo_rSq)
     } // classify
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Classify the value of 'y = f(z)' by evaluating the formula 'y = sigmoid (b dot z)',
-     *  for an integer vector.
-     *  @param z  the new integer vector to classify
-     */
-    override def classify (z: VectoI): (Int, String, Double) = classify (z.toDouble)
-
-   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform forward selection to add the most predictive variable to the existing
      *  model, returning the variable to add, the new parameter vector and the new
      *  quality of fit.  May be called repeatedly.
@@ -181,14 +178,16 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String] = null,
         val ir    =  index_prSq                                    // fit(ir) is prSq
         var j_max = -1                                             // index of variable to eliminate
         var b_max: VectoD = null                                   // parameter values for best solution
-        var ft_max: VectoD = VectorD.fill (fitLabels.size)(-1.0)   // optimize on quality of fit
+        var ft_max: VectoD = VectorD.fill (fitLabel.size)(-1.0)    // optimize on quality of fit
         val keep = m                                               // i-value large enough to not exclude any rows in slice
   
         for (j <- 1 to k) {
-            val rg_j = new LogisticRegression (x.sliceExclude (keep, j), y)    // regress with x_j removed
+            val x_j  = x.sliceEx (keep, j)                         // data matrix with column j removed
+            val rg_j = new LogisticRegression (x_j, y)             // regress with x_j removed
             rg_j.train ()
             val bb = rg_j.coefficient
-            val ft = rg_j.fit
+            val yp = rg_j.classify (x_j)
+            val ft = rg_j.fit (y, yp)
             if (ft(ir) > ft_max(ir)) { j_max = j; b_max = bb; ft_max = ft }
         } // for
         (j_max, b_max, ft_max)
@@ -203,13 +202,13 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String] = null,
      */
     def vif: VectoD =
     {
-        val vifV = new VectorD (k)           // VIF vector
+        val vifV = new VectorD (k)                                 // VIF vector
         for (j <- 1 to k) {
-            val keep = m                     // i-value large enough to not exclude any rows in slice
-            val x_j  = x.col(j)                                                 // x_j is jth column in x
-            val rg_j = new Regression (x.sliceExclude (keep, j), x_j)           // regress with x_j removed
+            val keep = m                                           // i-value large enough to not exclude any rows in slice
+            val x_j  = x.col(j)                                    // x_j is jth column in x
+            val rg_j = new Regression (x.sliceEx (keep, j), x_j)   // regress with x_j removed
             rg_j.train ()
-            vifV(j-1) =  1.0 / (1.0 - rg_j.fit(rg_j.index_rSq))            // store vif for x_1 in vifV(0)
+            vifV(j-1) =  1.0 / (1.0 - rg_j.fit(rg_j.index_rSq))    // store vif for x_1 in vifV(0)
         } // for
         vifV
     } // vif
@@ -271,24 +270,27 @@ object LogisticRegressionTest extends App
     var z: VectoD = null
 
     println ("x = " + x)
-    println ("y = " + y)
 
     val fn = Array ("One", "Mpg")
 
-    val rg = new LogisticRegression (x, y, fn)
-    rg.train_null ()                                    // train based on null model
-    rg.train ()                                         // train based on full model
+    val lrg = new LogisticRegression (x, y, fn)
+//  lrg.train_null ()                                    // train based on null model
+    lrg.train ()                                         // train based on full model
 
     banner ("Logistic Regression Results")
-    println ("b = " + rg.coefficient)
-    println (rg.fitLabels)
-    println (rg.fit)
+    println ("b = " + lrg.coefficient)
 
-    z = VectorD (1.0, 15.0)                             // classify point z
-    println ("classify (" + z + ") = " + rg.classify (z))
+    val yp = lrg.classify (x)
+    println ("y  = " + y)
+    println ("yp = " + yp)
+    println (lrg.fitLabel)
+    println (lrg.fit (y, yp))
 
-    z = VectorD (1.0, 30.0)                             // classify point z
-    println ("classify (" + z + ") = " + rg.classify (z))
+    z = VectorD (1.0, 15.0)                              // classify point z
+    println ("classify (" + z + ") = " + lrg.classify (z))
+
+    z = VectorD (1.0, 30.0)                              // classify point z
+    println ("classify (" + z + ") = " + lrg.classify (z))
 
 } // LogisticRegressionTest object
 
@@ -350,20 +352,23 @@ object LogisticRegressionTest2 extends App
     val cn = Array ("no", "yes")
 
     println ("x = " + x)
-    println ("y = " + y)
 
-//  val rg = new LogisticRegression (x(0 until x.dim1, 0 until 2), y, fn, cn)
-    val rg = new LogisticRegression (x, y, fn, cn)
-    rg.train_null ()                                    // train based on null model
-    rg.train ()                                         // train based on full model
+//  val lrg = new LogisticRegression (x(0 until x.dim1, 0 until 2), y, fn, cn)
+    val lrg = new LogisticRegression (x, y, fn, cn)
+//  lrg.train_null ()                                    // train based on null model
+    lrg.train ()                                         // train based on full model
 
     banner ("Logistic Regression Results")
-    println ("b = " + rg.coefficient)
-    println (rg.fitLabels)
-    println (rg.fit)
+    println ("b = " + lrg.coefficient)
 
     val z  = VectorD (1.0, 100.0, 100.0, 100.0)         // classify point z
-    println ("classify (" + z + ") = " + rg.classify (z))
+    println ("classify (" + z + ") = " + lrg.classify (z))
+
+    val yp = lrg.classify (x)
+    println ("y  = " + y)
+    println ("yp = " + yp)
+    println (lrg.fitLabel)
+    println (lrg.fit (y, yp))
 
 //  new Plot (x.col(1), y, yyp)
 //  new Plot (x.col(2), y, yyp)

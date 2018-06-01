@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Tue Feb 27 15:16:23 EST 2018
  *  @see     LICENSE (MIT style license file).
  */
@@ -55,8 +55,8 @@ class SimpleLDA (x: VectoD, y: VectoI, fn: Array [String] = Array ("x1"), k: Int
         term2 = mu~^2 / (2.0 * sig2) - py.map (log (_))
 
         if (DEBUG) {
-            println (s"py \t = $py \n mu \t = $mu \n sig2 \t = $sig2")
-            println (s"term1 \t = $term1 \n term2 \t = $term2")
+            println (s" py \t = $py \n mu \t = $mu \n sig2 \t = $sig2")
+            println (s" term1 \t = $term1 \n term2 \t = $term2")
         } // if
         this
     } // train
@@ -97,18 +97,21 @@ object SimpleLDATest extends App
     val k  = 2                                                 // number of classes
     val fn = Array ("curvature")                               // feature name
     val cn = Array ("pass", "fail")                            // class names
-    val cl = new SimpleLDA (x, y, fn, k, cn)                   // create SimpleLDA classifier
-    cl.train ()
+    val lda = new SimpleLDA (x, y, fn, k, cn)                  // create SimpleLDA classifier
+    lda.train ()
 
     banner ("classify")
     val z  = VectorD (2.81)
-    println (s"classify ($z) = ${cl.classify (z)}")
+    println (s"classify ($z) = ${lda.classify (z)}")
 
     banner ("test")
-    val yp = new VectorI (x.dim)                               // predicted class vector
-    for (i <- x.range) yp(i) = cl.classify (VectorD (x(i)))._1
-    println (s" y = $y \n yp = $yp")
-    println (cl.actualVpredicted (y, yp))                      // compare y vs. yp
+    val xx = new MatrixD (x.dim, 1)
+    for (i <- x.range) xx(i) = VectorD (x(i))
+    val yp = lda.classify (xx)
+    println (lda.fitLabel)
+    println (lda.fit (y, yp))
+    val cm = new ConfusionMat (y, yp)
+    println (s"cm = ${cm.confusion}")
 
     val t = VectorD.range (0, x.dim)
     new Plot (t, y.toDouble, yp.toDouble, "y(black)/yp(red) vs. t")
@@ -136,14 +139,17 @@ object SimpleLDATest2 extends App
     val k   = 2                                                // number of classes
     val fnm = Array ("temperature")                            // feature name
     val cn  = Array ("well", "has-flu")                        // class names
-    val cl  = new SimpleLDA (x, y, fnm, k, cn)                 // create SimpleLDA classifier
-    cl.train ()
+    val lda  = new SimpleLDA (x, y, fnm, k, cn)                // create SimpleLDA classifier
+    lda.train ()
 
     banner ("classify")
-    val yp = new VectorI (x.dim)                               // predicted class vector
-    for (i <- x.range) yp(i) = cl.classify (VectorD (x(i)))._1
-    println (s" y = $y \n yp = $yp")
-    println (cl.actualVpredicted (y, yp))                      // compare y vs. yp
+    val xx = new MatrixD (x.dim, 1)
+    for (i <- x.range) xx(i) = VectorD (x(i))
+    val yp = lda.classify (xx)
+    println ("y  = " + y)
+    println ("yp = " + yp)
+    println (lda.fitLabel)
+    println (lda.fit (y, yp))
 
     val t = VectorD.range (0, x.dim)
     new Plot (t, y.toDouble, yp.toDouble, "y(black)/yp(red) vs. t")

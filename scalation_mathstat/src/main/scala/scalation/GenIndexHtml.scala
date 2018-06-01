@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Srikalyan Swayampakula, Michael E. Cotterell
- *  @version 1.4
+ *  @version 1.5
  *  @date    Wed Aug  27 14:16:12 EDT 2013
  *  @see     LICENSE (MIT style license file).
  */

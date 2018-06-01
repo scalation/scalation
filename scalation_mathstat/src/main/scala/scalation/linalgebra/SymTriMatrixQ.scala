@@ -2,7 +2,7 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Robert Davis, John Miller
  *  @builder scalation.linalgebra.bld.BldSymTriMatrix
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun Sep 16 14:09:25 EDT 2012
  *  @see     LICENSE (MIT style license file).
  */
@@ -322,10 +322,10 @@ class SymTriMatrixQ (val d1: Int)
      *  @param row  the row to exclude
      *  @param col  the column to exclude
      */
-    def sliceExclude (row: Int, col: Int): SymTriMatrixQ =
+    def sliceEx (row: Int, col: Int): SymTriMatrixQ =
     {
-        throw new UnsupportedOperationException ("SymTriMatrixQ does not support sliceExclude")
-    } // sliceExclude
+        throw new UnsupportedOperationException ("SymTriMatrixQ does not support sliceEx")
+    } // sliceEx
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select rows from 'this' tridiagonal matrix according to the given index/basis.

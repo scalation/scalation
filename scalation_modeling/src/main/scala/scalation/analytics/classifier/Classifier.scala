@@ -1,7 +1,7 @@
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun Sep 23 21:14:14 EDT 2012
  *  @see     LICENSE (MIT style license file).
  */
@@ -10,23 +10,25 @@ package scalation.analytics.classifier
 
 import scala.math.round
 
-import scalation.linalgebra.{VectoD, VectoI, VectorI}
+import scalation.linalgebra.{MatriI, MatrixI, VectoD, VectorD, VectoI, VectorI}
 import scalation.random.PermutedVecI
 import scalation.random.RNGStream.ranStream
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+import Round.roundVec
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Classifier` trait provides a common framework for several classifiers.
  *  A classifier is for bounded responses.  When the number of distinct responses
  *  cannot be bounded by some integer 'k', a predictor should be used.
  */
 trait Classifier
 {
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the number of data vectors/points in the entire dataset (training + testing),
      */
     def size: Int                                             // typically = m
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier by computing the probabilities from a training dataset of
      *  data vectors and their classifications.  The indices for the testing dataset
      *  are given and the training dataset consists of all the other instances.
@@ -35,7 +37,7 @@ trait Classifier
      */
     def train (itest: IndexedSeq [Int]): Classifier
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier by computing the probabilities from a training dataset of
      *  data vectors and their classifications.  Must be implemented in any extending class.
      *  Can be used when the dataset is randomized so that the training part of a dataset
@@ -45,40 +47,35 @@ trait Classifier
      */
     def train (testStart: Int, testEnd: Int): Classifier = train (testStart until testEnd)
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier by computing the probabilities from a training dataset of
      *  data vectors and their classifications.  Must be implemented in any extending class.
      *  Can be used when the whole dataset is used for training.
      */
     def train (): Classifier = train (0, 0)
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a new discrete data vector 'z', determine which class it fits into,
      *  returning the best class, its name and its relative probability.
      *  @param z  the integer vector to classify
      */
     def classify (z: VectoI): (Int, String, Double)
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a new continuous data vector 'z', determine which class it fits into,
      *  returning the best class, its name and its relative probability.
-     *  Override in classes that require precise real values for classification.
      *  @param z  the real vector to classify
      */
-    def classify (z: VectoD): (Int, String, Double) =
-    {
-        val zi = new VectorI (z.dim, z.map (round (_).toInt).toArray)
-        classify (zi)
-    } // classify
+    def classify (z: VectoD): (Int, String, Double)
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the quality of the training with a test dataset and return the fraction
      *  of correct classifications.
      *  @param itest  the indices of the instances considered test data
      */
     def test (itest: IndexedSeq [Int]): Double
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the quality of the training with a test dataset and return the fraction
      *  of correct classifications.  Can be used when the dataset is randomized
      *  so that the testing/training part of a dataset corresponds to simple slices
@@ -88,7 +85,7 @@ trait Classifier
      */
     def test (testStart: Int, testEnd: Int): Double = test (testStart until testEnd)
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the accuracy of the classified results by cross-validation, returning
      *  the accuracy.  The "test data" starts at 'testStart' and ends at 'testEnd',
      *  the rest of the data is "training data'.
@@ -111,7 +108,7 @@ trait Classifier
         sum / nx.toDouble                                        // return average accuracy
     } // crossValidate
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the accuracy of the classified results by cross-validation, returning
      *  the accuracy.  This version of cross-validation relies on "subtracting"
      *  frequencies from the previously stored global data to achieve efficiency.
@@ -136,27 +133,28 @@ trait Classifier
         sum / nx.toDouble                                        // return average accuracy
     } // crossValidateRand
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compare the actual class 'y' vector versus the predicted class 'yp' vector,
-     *  returning tp, tn, fn, fp.
-     *  @see www.dataschool.io/simple-guide-to-confusion-matrix-terminology
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the quality of fit including 'acc', 'prec', 'recall', 'kappa'.
+     *  Override to add more quality of fit measures.
+     *  @see medium.com/greyatom/performance-metrics-for-classification-problems-in-machine-learning-part-i-b085d432082b
+     *  @see `ConfusionMat`
      *  @param y   the actual class labels
      *  @param yp  the precicted class labels
+     *  @param k   the number of class labels
      */
-    def actualVpredicted (y: VectoI, yp: VectoI): Map [String, Double] =
+    def fit (y: VectoI, yp: VectoI, k: Int = 2): VectoD =
     {
-        var tp, tn, fn, fp = 0
-        for (i <- y.range) {
-            val sum = y(i) + yp(i)
-            if (sum == 2) tp += 1
-            else if (sum == 0) tn += 1
-            else if (y(i) == 1) fn += 1
-            else fp += 1
-        } // for
-        Map ("tp" -> tp, "tn" -> tn, "fn" -> fn, "fp" -> fp)
-    } // actualVpredicted
+        val cm  = new ConfusionMat (y, yp, k)                    // confusion matrix
+        val p_r = cm.prec_recl                                   // precision and recall
+        VectorD (cm.accuracy, p_r._3, p_r._4, cm.kappa)
+    } // fit
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the labels for the fit.  Override when necessary.
+     */
+    def fitLabel: Seq [String] = Seq ("acc", "prec", "recall", "kappa")
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset the frequency counters.
      */
     def reset ()

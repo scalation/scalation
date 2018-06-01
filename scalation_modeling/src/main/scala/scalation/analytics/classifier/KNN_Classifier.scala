@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun Sep 22 18:45:44 EDT 2013 
  *  @see     LICENSE (MIT style license file).
  */
@@ -21,22 +21,25 @@ import scalation.random.Bernoulli
  *  stored row-wise in the data matrix 'x'.  The corresponding classifications
  *  are given in the vector 'y', such that the classification for vector 'x(i)'
  *  is given by 'y(i)'.
- *  @param x    the vectors/points of classified data stored as rows of a matrix
- *  @param y    the classification of each vector in x
- *  @param fn   the names for all features/variables
- *  @param k    the number of classes
- *  @param cn   the names for all classes
+ *  @param x      the vectors/points of classified data stored as rows of a matrix
+ *  @param y      the classification of each vector in x
+ *  @param fn     the names for all features/variables
+ *  @param k      the number of classes
+ *  @param cn     the names for all classes
  *  @param kappa  the number of nearest neighbors to consider
  */
-class KNN_Classifier (x: MatriD, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
+class KNN_Classifier (x: MatriD, y: VectoI, fn: Array [String] = null,
+                      k: Int = 2, cn: Array [String] = Array ("no", "yes"),
                       kappa: Int = 3)
       extends ClassifierReal (x, y, fn, k, cn)
 {
-    private val DEBUG      = true                                // debug flag
+    private val DEBUG      = false                               // debug flag
     private val MAX_DOUBLE = Double.PositiveInfinity             // infinity
     private val topK       = Array.fill (kappa)(-1, MAX_DOUBLE)  // top-kappa nearest points (in reserve order)
     private val count      = new VectorI (k)                     // how many nearest neighbors in each class.
     private val coin       = Bernoulli ()                        // use a fair coin for breaking ties
+
+    if (cn.length != k) flaw ("constructor", "# class names != # classes")
 
     if (DEBUG) println (s" x = $x \n y = $y")
 
@@ -161,23 +164,61 @@ object KNN_ClassifierTest extends App
     println ("----------------------------------------------------")
     println ("xy = " + xy)
 
-    val cl = KNN_Classifier (xy, fn, 2, cn)
+    val knn = KNN_Classifier (xy, fn, 2, cn)
 
     val z1 = VectorD (10.0, 10.0)
     println ("----------------------------------------------------")
     println ("z1 = " + z1)
-    println ("class = " + cl.classify (z1))
+    println ("class = " + knn.classify (z1))
 
     val z2 = VectorD ( 3.0,  3.0)
     println ("----------------------------------------------------")
     println ("z2 = " + z2)
-    println ("class = " + cl.classify (z2))
+    println ("class = " + knn.classify (z2))
 
-    val y  =  xy.col (xy.dim2-1).toInt
-    val yp = VectorI (for (i <- xy.range1) yield cl.classify (xy(i).slice (0, xy.dim2-1))._1)
-    println (cl.actualVpredicted (y, yp))
+    val y  = xy.col (xy.dim2-1).toInt
+    val yp = knn.classify (xy.sliceCol (0, xy.dim2-1))
+    println ("y  = " + y)
+    println ("yp = " + yp)
+    println (knn.fitLabel)
+    println (knn.fit (y, yp))
 
     new Plot (xy.col(0), y.toDouble, yp.toDouble)
 
 } // KNN_ClassifierTest object
 
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `KNN_ClassifierTest2` object is used to test the `KNN_Classifier` class.
+ *  > runMain scalation.analytics.classifier.KNN_ClassifierTest2
+ */
+object KNN_ClassifierTest2 extends App
+{
+    //                            x1 x2  y
+    val xy = new MatrixD ((9, 3), 0, 0, 0,
+                                  0, 1, 0,
+                                  0, 2, 1,
+                                  1, 0, 0,
+                                  1, 1, 0,
+                                  1, 2, 1,
+                                  2, 0, 1,
+                                  2, 1, 1,
+                                  2, 2, 1)
+    val x = xy.sliceCol (0, 2)
+
+    val fn = Array ("x1", "x2")                   // feature/variable names
+    val cn = Array ("No", "Yes")                  // class names
+
+    println ("----------------------------------------------------")
+    println ("xy = " + xy)
+    println ("----------------------------------------------------")
+    println ("x = " + x)
+
+    val knn = KNN_Classifier (xy, fn, 2, cn)
+
+    // test samples -----------------------------------------------------------
+    for (i <- x.range1) {
+        println ("Use knn to classify (" + x(i) + ") = " + knn.classify (x(i)))
+    } // for
+
+} // KNN_ClassifierTest2 object

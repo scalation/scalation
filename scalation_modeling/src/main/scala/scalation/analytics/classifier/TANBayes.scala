@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Hao Peng, Zhe Jin
- *  @version 1.4
+ *  @version 1.5
  *  @date    Mon Jul 27 01:27:00 EDT 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -38,11 +38,14 @@ import BayesClassifier.me_default
  *  @param vc  the value count (number of distinct values) for each feature
  *  @param me  use m-estimates (me == 0 => regular MLE estimates)
  */
-class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
-                me: Double = me_default, protected var vc: Array [Int] = null)
+class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String] = null,
+                 k: Int = 2, cn: Array [String] = Array ("no", "yes"),
+                 me: Double = me_default, protected var vc: Array [Int] = null)
       extends BayesClassifier (x, y, fn, k, cn)
 {
     private val DEBUG  = false                            // debug flag
+
+    if (cn.length != k) flaw ("constructor", "# class names != # classes")
 
     protected var parent = new VectorI (n)                // vector holding the parent for each feature/variable
     protected val vcp    = Array.ofDim [Int] (n)          // value count for the parent
@@ -280,7 +283,8 @@ object TANBayes0
  *  @param me  use m-estimates (me == 0 => regular MLE estimates)
  *  @param vc  the value count (number of distinct values) for each feature
  */
-class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
+class TANBayes (x: MatriI, y: VectoI, fn: Array [String] = null,
+                k: Int = 2, cn: Array [String] = Array ("no", "yes"),
                 me: Double = me_default, vc_ : Array [Int] = null)
         extends TANBayes0 (x, y, fn, k, cn, me, vc_)
 {
@@ -457,6 +461,10 @@ object TANBayesTest2 extends App
 
     println ("tan0 cv accu = " + tan0.crossValidateRand())  // cross validate the classifier
     println ("tan  cv accu = " + tan.crossValidateRand())   // cross validate the classifier
+
+    val yp = tan.classify (x)
+    println (tan.fitLabel)
+    println (tan.fit (y, yp))
 
 } // TANBayesTest2 object
 

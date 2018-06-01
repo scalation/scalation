@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun Jan  4 23:09:27 EST 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -88,14 +88,13 @@ class ANCOVA (x_ : MatrixD, t: VectorI, y: VectorD, levels: Int, technique: RegT
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.
-     *  @param yy   the response vector
      */
-    def eval (yy: VectoD = y) { rg.eval (yy) }
+    def eval () { rg.eval () }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit including 'rSquared'.
      */
-    override def fit: VectoD = rg.fit
+    def fit: VectoD = rg.fit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,

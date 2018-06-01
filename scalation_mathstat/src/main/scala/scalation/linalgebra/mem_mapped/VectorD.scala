@@ -2,7 +2,7 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
  *  @builder scalation.linalgebra.mem_mapped.bld.BldVector
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun Sep 27 18:29:28 EDT 2015
  *  @see     LICENSE (MIT style license file).
  */

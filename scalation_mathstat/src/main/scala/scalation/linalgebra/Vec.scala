@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun Aug 23 15:42:06 EDT 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -24,6 +24,11 @@ trait Vec
     /** Return the size (number of elements) of the vector.
      */
     def size: Int
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Produce the range of all indices (0 to one less than dim).
+     */
+    def indices: Range
 
 } // Vec trait
 
@@ -101,20 +106,24 @@ object Vec
      */
     def ++ (x: Vec, y: Vec): Vec =
     {
-        x match {
-        case _: VectorC => x.asInstanceOf [VectorC] ++ y.asInstanceOf [VectorC]
-        case _: VectorD => x.asInstanceOf [VectorD] ++ y.asInstanceOf [VectorD]
-        case _: VectorI => x.asInstanceOf [VectorI] ++ y.asInstanceOf [VectorI]
-        case _: VectorL => x.asInstanceOf [VectorL] ++ y.asInstanceOf [VectorL]
-        case _: VectorQ => x.asInstanceOf [VectorQ] ++ y.asInstanceOf [VectorQ]
-        case _: VectorR => x.asInstanceOf [VectorR] ++ y.asInstanceOf [VectorR]
-        case _: VectorS => x.asInstanceOf [VectorS] ++ y.asInstanceOf [VectorS]
-        case _  =>  println ("++ vector type not supported"); null
-        } // match
+        if (x == null && y == null) null
+        else if (x == null) y
+        else if (y == null) x
+        else x match {
+            case _: VectorC => x.asInstanceOf [VectorC] ++ y.asInstanceOf [VectorC]
+            case _: VectorD => x.asInstanceOf [VectorD] ++ y.asInstanceOf [VectorD]
+            case _: VectorI => x.asInstanceOf [VectorI] ++ y.asInstanceOf [VectorI]
+            case _: VectorL => x.asInstanceOf [VectorL] ++ y.asInstanceOf [VectorL]
+            case _: VectorQ => x.asInstanceOf [VectorQ] ++ y.asInstanceOf [VectorQ]
+            case _: VectorR => x.asInstanceOf [VectorR] ++ y.asInstanceOf [VectorR]
+            case _: VectorS => x.asInstanceOf [VectorS] ++ y.asInstanceOf [VectorS]
+            case _  =>  println ("++ vector type not supported"); null
+            } // match
     } // ++
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Copy of vector 'x' with scalar 's' appended.
+     *  FIX - different in Yang Fan's code.
      *  @param x  the vector
      *  @param s  the scalar to append
      */
@@ -233,6 +242,24 @@ object Vec
         case _  =>  println ("toDouble: vector type not supported"); null
         } // match
     } // toDouble
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert compressed RleVector to dense Vector.
+     *  @param x  the vector to convert
+     */
+    def toDense (x: Vec) =
+    {
+        x match {
+        case _: VectorC | _: RleVectorC => x match { case _: RleVectorC => x.asInstanceOf [RleVectorC].toDense; case _ => x }
+        case _: VectorD | _: RleVectorD => x match { case _: RleVectorD => x.asInstanceOf [RleVectorD].toDense; case _ => x }
+        case _: VectorI | _: RleVectorI => x match { case _: RleVectorI => x.asInstanceOf [RleVectorI].toDense; case _ => x }
+        case _: VectorL | _: RleVectorL => x match { case _: RleVectorL => x.asInstanceOf [RleVectorL].toDense; case _ => x }
+        case _: VectorQ | _: RleVectorQ => x match { case _: RleVectorQ => x.asInstanceOf [RleVectorQ].toDense; case _ => x }
+        case _: VectorR | _: RleVectorR => x match { case _: RleVectorR => x.asInstanceOf [RleVectorR].toDense; case _ => x }
+        case _: VectorS | _: RleVectorS => x match { case _: RleVectorS => x.asInstanceOf [RleVectorS].toDense; case _ => x }
+        case _  =>  println ("toDense: vector type not supported"); null
+        } // match
+    } // toDense
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the minimum of vector 'x'.

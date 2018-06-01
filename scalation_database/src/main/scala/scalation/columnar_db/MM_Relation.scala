@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun Aug 23 15:42:06 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *
@@ -332,6 +332,26 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
     /** Return the size in terms of number of columns in the relation.
      */
     def cols: Int = col.length
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the columns in the relation.
+     */
+//  def columns: Vector [Vec] = col            // FIX - implement
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the names of columns in the relation.
+     */
+    def colNames: Seq [String] = colName
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the mapping from column names to column positions.
+     */
+    def colsMap: Map [String, Int] = colMap
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the domains for the columns in the relation.
+     */
+    def domains: String = domain
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the size in terms of number of rows in the relation.

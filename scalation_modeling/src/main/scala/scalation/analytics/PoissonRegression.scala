@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun Jan 11 19:05:20 EST 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -17,7 +17,6 @@ import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectoI, VectorI}
 import scalation.math.Combinatorics.fac
 import scalation.minima.QuasiNewton
 import scalation.plot.Plot
-import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PoissonRegression` class supports Poisson regression.  In this case, 
@@ -33,18 +32,18 @@ import scalation.util.Error
  *  @param y   the integer response vector, y_i in {0, 1, ... }
  *  @param fn  the names of the features/variable
  */
-class PoissonRegression (x: MatriD, y: VectoI, fn: Array [String] = null)
-      extends Predictor with Error
+class PoissonRegression (x: MatriD, y: VectoD, fn: Array [String] = null)
+      extends PredictorMat (x, y)
 {
-    if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
-
     private val DEBUG      = false                    // debug flag
+/*
     private val k          = x.dim2 - 1               // number of variables 
     private val n          = x.dim1.toDouble          // number of data points (rows)
     private val r_df       = (n-1.0) / (n-k-1.0)      // ratio of degrees of freedom
+*/
+    private var aic        = -1.0                     // Akaike’s Information Criterion
     private var n_dev      = -1.0                     // null dev: -LL, for null model (intercept only)
     private var r_dev      = -1.0                     // residual dev: -LL, for full model
-    private var aic        = -1.0                     // Akaike’s Information Criterion
     private var pseudo_rSq = -1.0                     // McFaffen's pseudo R-squared
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -87,6 +86,7 @@ class PoissonRegression (x: MatriD, y: VectoI, fn: Array [String] = null)
     def train (yy: VectoD = y.toDouble): PoissonRegression =
     {
          // FIX - yy currently not used
+         train_null ()
          val b0   = new VectorD (x.dim2)         // use b_0 = 0 for starting guess for parameters
          val bfgs = new QuasiNewton (ll)         // minimizer for -2LL
 
@@ -95,13 +95,6 @@ class PoissonRegression (x: MatriD, y: VectoI, fn: Array [String] = null)
          aic   = r_dev + 2.0 * x.dim2
          this
     } // train
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** For the full model, train the predictor by fitting the parameter vector
-     *  (b-vector) in the Poisson regression equation using maximum likelihood.
-     *  Do this by minimizing '-2LL'.
-     */
-//    def train (): PoissonRegression = train (y)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** For the null model, train the classifier by fitting the parameter vector
@@ -119,12 +112,12 @@ class PoissonRegression (x: MatriD, y: VectoI, fn: Array [String] = null)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.
-     *  @param yy   the response vector
+     *  FIX - not x * b
      */
-    def eval (yy: VectoD = y.toDouble)
+    override def eval ()
     {
-        e = yy - x * b                                         // compute residual/error vector e
-        diagnose (yy)                                          // compute diagnostics
+        e = y - x * b                                         // compute residual/error vector e
+        diagnose (e)                                          // compute diagnostics
     } // eval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -140,21 +133,13 @@ class PoissonRegression (x: MatriD, y: VectoI, fn: Array [String] = null)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the fit.
      */
-    override def fitLabels: Seq [String] = Seq ("n_dev", "r_dev", "aic", "pseudo_rSq")
+    override def fitLabel: Seq [String] = Seq ("n_dev", "r_dev", "aic", "pseudo_rSq")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Classify the value of 'y = f(z)' by evaluating the formula 'y = exp (b dot z)'.
      *  @param z  the new vector to predict
      */
-    def predict (z: VectoD): Double = (round (exp (b dot z))).toDouble
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Classify the value of 'y = f(z)' by evaluating the formula 'y = exp (b dot z)',
-     *  for an integer vector.
-     *  FIX or remove.
-     *  @param z  the new integer vector to predict
-     */
-//  def predict (z: VectorI): (Int, String) = predict (z.toDouble)
+    override def predict (z: VectoD): Double = (round (exp (b dot z))).toDouble
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable
@@ -171,7 +156,7 @@ class PoissonRegression (x: MatriD, y: VectoI, fn: Array [String] = null)
 //
 //      for (j <- 1 to k) {
 //          val keep = n.toInt               // i-value large enough to not exclude any rows in slice
-//          val rg_j = new PoissonRegression (x.sliceExclude (keep, j), y)       // regress with x_j removed
+//          val rg_j = new PoissonRegression (x.sliceEx (keep, j), y)       // regress with x_j removed
 //          rg_j.train ().eval ()
 //          val (b, rSq, fS, rBar) =  rg_j.fit
 //          if (rSq > rSq_max) { j_max = j; b_max = b; rSq_max = rSq; fS_max = fS}
@@ -191,15 +176,35 @@ class PoissonRegression (x: MatriD, y: VectoI, fn: Array [String] = null)
 //      val vifV = new VectorD (k)           // VIF vector
 //      for (j <- 1 to k) {
 //          val keep = n.toInt               // i-value large enough to not exclude any rows in slice
-//          val x_j  = x.col(j)                                               // x_j is jth column in x
-//          val rg_j = new PoissonRegression (x.sliceExclude (keep, j), x_j)    // regress with x_j removed
+//          val x_j  = x.col(j)                                             // x_j is jth column in x
+//          val rg_j = new PoissonRegression (x.sliceEx (keep, j), x_j)     // regress with x_j removed
 //          rg_j.train ().eval ()
-//          vifV(j-1) =  1.0 / (1.0 - rg_j.fit._2)                            // store vif for x_1 in vifV(0)
+//          vifV(j-1) =  1.0 / (1.0 - rg_j.fit._2)                          // store vif for x_1 in vifV(0)
 //      } // for
 //      vifV
 //  } // vif
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform 'k'-fold cross-validation.
+     *  @param k      the number of folds
+     *  @param rando  whether to use randomized cross-validation
+     */
+    def crossVal (k: Int = 10, rando: Boolean = true)
+    {
+        crossValidate ((x: MatriD, y: VectoD) => new PoissonRegression (x, y), k, rando)
+    } // crossVal
+
 } // PoissonRegression class
+
+
+object PoissonRegression
+{
+    def apply (x: MatriD, y: VectoI, fn: Array [String] = null): PoissonRegression =
+    {
+        new PoissonRegression (x, y.toDouble, fn)
+    } // apply
+
+} // PoissonRegression object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -252,7 +257,7 @@ object PoissonRegressionTest extends App
     println ("x = " + x)
     println ("y = " + y)
 
-    val rg = new PoissonRegression (x, y)
+    val rg = PoissonRegression (x, y)
     rg.train_null ()                                    // train based on null model
     rg.train ().eval ()                                 // train based on full model
     val b  = rg.coefficient                             // obtain coefficients
@@ -332,8 +337,8 @@ object PoissonRegressionTest2 extends App
     println ("x = " + x)
     println ("y = " + y)
 
-//  val rg = new PoissonRegression (x(0 until x.dim1, 0 until 2), y, fn)
-    val rg = new PoissonRegression (x, y, fn)
+//  val rg = PoissonRegression (x(0 until x.dim1, 0 until 2), y, fn)
+    val rg = PoissonRegression (x, y, fn)
     rg.train_null ()                                    // train based on null model
     rg.train ().eval ()                                 // train based on full model
 

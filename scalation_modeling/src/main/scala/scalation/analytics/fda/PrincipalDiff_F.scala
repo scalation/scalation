@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Wed Nov 16 16:33:38 EST 2016
  *  @see     LICENSE (MIT style license file).
  *
@@ -12,6 +12,7 @@ package scalation.analytics.fda
 
 import scala.math.{cos, Pi, sin}
 
+import scalation.calculus.DB_Spline
 import scalation.linalgebra.VectorD
 import scalation.plot.Plot
 import scalation.random.Normal
@@ -50,7 +51,8 @@ object PrincipalDiffTest extends App
 
     val y = t.map (x(_))
 
-    val moo = new Smoothing_F (t, y)
+    val bf  = new DB_Spline (t)
+    val moo = new Smoothing_F (t, y, bf)
     moo.train ()
     val xs = moo.predict (t)
 

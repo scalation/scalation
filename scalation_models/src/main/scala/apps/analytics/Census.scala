@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Vishnu Gowda Harish, John Miller, 
- *  @version 1.4
+ *  @version 1.5
  *  @date    Thu Dec 22 17:00:46 EST 2016
  *  @see     LICENSE (MIT style license file).
  */

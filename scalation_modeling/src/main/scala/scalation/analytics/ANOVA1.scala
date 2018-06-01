@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun Jan  4 23:09:27 EST 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -10,7 +10,7 @@ package scalation.analytics
 
 import scala.collection.mutable.Set
 
-import scalation.linalgebra.{MatrixD, VectoD, VectorD, VectoI, VectorI}
+import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.plot.Plot
 import scalation.util.{banner, Error}
 
@@ -33,20 +33,25 @@ import RegTechnique._
  *      x.t * x * b  =  x.t * y
  *      b  =  fac.solve (.)
  *  <p>
+ *  @see `ANCOVA` for models with multiple variables 
  *  @see psych.colorado.edu/~carey/Courses/PSYC5741/handouts/GLM%20Theory.pdf
  *  @param t          the binary/categorical treatment variable vector
+ *                        double with integer values
  *  @param y          the response vector
  *  @param levels     the number of treatment levels (1, ... levels)
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class ANOVA1 (t: VectoI, y: VectoD, levels: Int, technique: RegTechnique = QR)
-      extends Predictor with Error
+class ANOVA1 (t: VectoD, y: VectoD, levels: Int, technique: RegTechnique = QR)
+      extends PredictorVec (t, y, levels)
 {
     if (t.dim != y.dim) flaw ("constructor", "dimensions of t and y are incompatible")
 
     val x = new MatrixD (y.dim, levels)                           // design matrix
     assignDummyVars ()                                            // assign values for dummy variables
-    val rg = new Regression (x, y, technique)                     // regular multiple linear regression
+    rg = new Regression (x, y, technique)                         // regular multiple linear regression
+
+    // FIX - need to be implemented
+    def expand(t: Double): scalation.linalgebra.VectoD = ???
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Assign values for the dummy variables based on a treatment variable's level 'lev'.
@@ -64,11 +69,11 @@ class ANOVA1 (t: VectoI, y: VectoD, levels: Int, technique: RegTechnique = QR)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Assign values for the dummy variables based on the treatment vector 't'.
      */
-    def assignDummyVars (tt: VectoI = t)
+    def assignDummyVars (tt: VectoD = t)
     {
         for (i <- tt.range) {
             x(i, 0) = 1.0                                         // first column is always one
-            val lev = tt(i)                                       // treatment level for ith item
+            val lev = tt(i).toInt                                 // treatment level for ith item
             if (lev < 1 || lev > levels) flaw ("assignDummyVars", "treatment level is out of range")
             if (lev < levels) x(i, lev) = 1.0
         } // for
@@ -83,72 +88,25 @@ class ANOVA1 (t: VectoI, y: VectoD, levels: Int, technique: RegTechnique = QR)
      *  using the least squares method.
      *  @param yy  the response vector
      */
-    def train (yy: VectoD = y): Regression [MatrixD, VectoD] = rg.train (yy)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the predictor by fitting the parameter vector (b-vector) in the
-     *  regression equation using the least squares method on 'y'.
-     */
-//    def train (): Regression [MatrixD, VectoD] = rg.train ()
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the error and useful diagnostics.
-     *  @param yy   the response vector
-     */
-    def eval (yy: VectoD = y) { rg.eval (yy) }
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the vector of residuals/errors.
-     */
-    override def residual: VectoD = rg.residual
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the quality of fit.
-     */
-    override def fit: VectoD = rg.fit
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the labels for the fit.
-     */
-    override def fitLabels: Seq [String] = rg.fitLabels
+    override def train (yy: VectoD = y): Regression = rg.train (yy)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
      *  e.g., (b_0, b_1, b_2) dot (1, z_1, z_2).
      *  @param z  the new vector to predict
      */
-    def predict (z: Int): Double = rg.predict (assignDummyVar (z))
+    def predict (z: Double): Double = rg.predict (assignDummyVar (z.toInt))
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
-     *  e.g., (b_0, b_1, b_2) dot (1, z_1, z_2).
-     *  @param z  the new vector to predict
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform 'k'-fold cross-validation.
+     *  @param ord    the number of treatment levels
+     *  @param k      the number of folds
+     *  @param rando  whether to use randomized cross-validation
      */
-    def predict (z: VectoD): Double = rg.predict (z)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform forward selection to add the most predictive variable to the existing
-     *  model, returning the variable to add, the new parameter vector and the new
-     *  quality of fit.  May be called repeatedly.
-     *  @param cols  the columns of matrix x included in the existing model
-     */
-    def forwardSel (cols: Set [Int]): (Int, VectoD, VectoD) = rg.forwardSel (cols)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform backward elimination to remove the least predictive variable from
-     *  the existing model, returning the variable to eliminate, the new parameter
-     *  vector and the new  quality of fit.  May be called repeatedly.
-     *  @param cols  the columns of matrix x included in the existing model
-     */
-    def backwardElim (cols: Set [Int]): (Int, VectoD, VectoD) = rg.backwardElim (cols)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Variance Inflation Factor 'VIF' for each variable to test
-     *  for multi-collinearity by regressing 'xj' against the rest of the variables.
-     *  A VIF over 10 indicates that over 90% of the variance of 'xj' can be predicted
-     *  from the other variables, so 'xj' is a candidate for removal from the model.
-     */
-    def vif: VectoD = rg.vif
+    def crossVal (ord: Int, k: Int = 10, rando: Boolean = true)
+    {
+        crossValidate ((t: VectoD, y: VectoD, ord) => new ANOVA1 (t, y, ord), k, rando)
+    } // crossVal
 
 } // ANOVA1 class
 
@@ -163,7 +121,7 @@ class ANOVA1 (t: VectoI, y: VectoD, levels: Int, technique: RegTechnique = QR)
  */
 object ANOVA1Test extends App
 {
-    val t  = VectorI (1, 1, 1, 2, 2, 2, 3, 3, 3)                 // treatment level data
+    val t  = VectorD (1, 1, 1, 2, 2, 2, 3, 3, 3)                 // treatment level data
     val y  = VectorD (755.0, 865.0, 815.0,
                       442.0, 420.0, 401.0,
                       282.0, 250.0, 227.0)                       // response vector
@@ -176,8 +134,7 @@ object ANOVA1Test extends App
     val arg    = new ANOVA1 (t, y, levels)
     arg.train ().eval ()
     println ("coefficient = " + arg.coefficient)
-    println ("              " + arg.fitLabels)
-    println ("fit         = " + arg.fit)
+    println ("fitMap      = " + arg.fitMap)
 
     val yp1 = arg.predict (z)                                     // predict for one point
     println ("predict (" + z + ") = " + yp1)

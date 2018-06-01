@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Matthew Saltz, John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Thu Nov 10 14:14:46 EST 2016
  *  @see     LICENSE (MIT style license file).
  *

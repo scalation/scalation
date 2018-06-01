@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Aravind Kalimurthy
- *  @version 1.4
+ *  @version 1.5
  *  @date    Tue Aug  9 16:39:41 EDT 2016
  *  @see     LICENSE (MIT style license file).
  *
@@ -11,6 +11,8 @@
 package scalation.graph_db
 
 import scala.collection.mutable.{Set => SET}
+
+import scalation.graphalytics.stringArray
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ExampleGraphS` object contains example query and data digraphs in which
@@ -29,7 +31,7 @@ object ExampleGraphS
                                SET (0),                         // ch(2)
                                SET (4),                         // ch(3)
                                SET ()),                         // ch(4)
-                        StringArray ("abc", "xyz" , "abc","abc", "abc"),       // vertex labels
+                        stringArray ("abc", "xyz" , "abc","abc", "abc"),       // vertex labels
                         false, "g1")                            // inverse, name
 
     // query digraph q1 ------------------------------------------------------
@@ -37,7 +39,7 @@ object ExampleGraphS
     val q1 = new Graph (Array (SET (1, 2),                      // ch(0)
                                SET (),                          // ch(1)
                                SET (1)),                        // ch(2)
-                        StringArray ("xyz", "abc", "abc"),
+                        stringArray ("xyz", "abc", "abc"),
                         false, "q1")
 
     val g1p = new Graph (g1.ch, g1.label, true, g1.name)        // with parents
@@ -83,7 +85,7 @@ object ExampleGraphS
                                SET (),                        // ch(27)
                                SET (27, 29),                  // ch(28)
                                SET (22)),                     // ch(29)
-                        StringArray ("xyz", "abc", "pqr", "pqr", "pqr", "xyz", 
+                        stringArray ("xyz", "abc", "pqr", "pqr", "pqr", "xyz", 
                                      "abc", "xyz", "pqr", "efg", "pqr", "xyz", 
                                      "abc", "pqr", "abc", "xyz", "abc", "pqr", 
                                      "xyz", "xyz", "abc", "pqr", "abc", "xyz", 
@@ -97,7 +99,7 @@ object ExampleGraphS
                                SET (0, 2, 3),                 // ch(1)
                                SET (),                        // ch(2)
                                SET ()),                       // ch(3)
-                        StringArray ("xyz", "abc", "pqr", "pqr"),
+                        stringArray ("xyz", "abc", "pqr", "pqr"),
                         false, "q2")
 
     val g2p = new Graph (g2.ch, g2.label, true, g2.name)      // with parents
@@ -144,7 +146,7 @@ object ExampleGraphS
                                SET (),                        // ch(27)
                                SET (27, 29),                  // ch(28)
                                SET (22)),                     // ch(29)
-                        StringArray ("xyz", "abc", "pqr", "pqr", "pqr", "xyz", 
+                        stringArray ("xyz", "abc", "pqr", "pqr", "pqr", "xyz", 
                                      "abc", "xyz", "pqr", "efg", "pqr", "xyz", 
                                      "abc", "pqr", "abc", "xyz", "abc", "pqr", 
                                      "xyz", "xyz", "abc", "pqr", "abc", "xyz", 
@@ -157,7 +159,7 @@ object ExampleGraphS
                                SET (0, 2, 3),                 // ch(1)
                                SET (),                        // ch(2)
                                SET ()),                       // ch(3)
-                        StringArray ("xyz", "abc", "pqr", "pqr"),
+                        stringArray ("xyz", "abc", "pqr", "pqr"),
                         false, "q3")
 
     val g3p = new Graph (g3.ch, g3.label, true, g3.name)      // with parents
@@ -203,7 +205,7 @@ object ExampleGraphS
                                SET (),                        // ch(27)
                                SET (27, 29),                  // ch(28)
                                SET (22)),                     // ch(29)
-                        StringArray ("a", "b", "c", "c", "c", "a", 
+                        stringArray ("a", "b", "c", "c", "c", "a", 
                                      "b", "a", "c", "m", "c", "a", 
                                      "b", "c", "b", "a", "b", "c", 
                                      "a", "a", "b", "c", "b", "a", 
@@ -216,13 +218,11 @@ object ExampleGraphS
                                SET (0, 2, 3),                 // ch(1)
                                SET (),                        // ch(2)
                                SET ()),                       // ch(3)
-                        StringArray ("a", "b", "c", "c"),
+                        stringArray ("a", "b", "c", "c"),
                         false, "q4")
 
     val g4p = new Graph (g4.ch, g4.label, true, g4.name)      // with parents
     val q4p = new Graph (q4.ch, q4.label, true, q4.name)      // with parents
-
-   def StringArray (a: Any*) : Array[String] = a.map(_.toString).toArray
 
 } // ExampleGraphS object
 

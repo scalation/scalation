@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Tue Oct 11 16:12:54 EDT 2016
  *  @see     LICENSE (MIT style license file).
  *
@@ -14,6 +14,7 @@
 package scalation.analytics.fda
 
 import scalation.analytics.RidgeRegression
+import scalation.calculus.DB_Spline
 import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.plot.Plot
 
@@ -35,8 +36,10 @@ class Regression_F (y: VectorD, x: VectorD, t: VectorD, τ: VectorD, ord: Int = 
     private var b: VectoD = null                         // regression coefficients
     private var c: VectoD = null                         // smoothing coefficients
 
-    private val bs  = new B_Spline (t)                   // use B-Spline basis functions
-    private val moo = new Smoothing_F (x, t, τ, ord)
+//  private val bs  = new B_Spline (t)                   // use B-Spline basis functions
+//  private val moo = new Smoothing_F (x, t, τ, ord)
+    private val bs  = new DB_Spline (t)                  // use derivative B-Spline basis functions
+    private val moo = new Smoothing_F (x, t, bs)
     private val xx  = new MatrixD (x.dim, 2)             // 2-column data matrix [1, xs]
     xx.setCol (0, x.one ())                              // column of all ones
     xx.setCol (1, smooth (x))                            // column of smoothed x, i.e., xs

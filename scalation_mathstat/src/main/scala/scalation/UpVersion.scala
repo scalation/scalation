@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Wed Jul 31 20:51:48 EDT 2013
  *  @see     LICENSE (MIT style license file).  
  *
@@ -22,8 +22,8 @@ import scala.io._
 object UpVersion
 {
     private val DEBUG      = true                      // debug flag
-    private val pat1       = "@version 1.3"            // pattern to find (change as needed)
-    private val pat2       = "@version 1.4"            // replacement pattern (change as needed)
+    private val pat1       = "@version 1.4"            // pattern to find (change as needed)
+    private val pat2       = "@version 1.5"            // replacement pattern (change as needed)
     private val SKIP       = "old"                     // do not process files in this directory
     private val sep        = File.separator            // file separator ('/' for UNIX, '\' for Windows)
     private val SRC_DIR    = "."                       // source directory

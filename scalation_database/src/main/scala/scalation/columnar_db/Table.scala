@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sun Aug 23 15:42:06 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *
@@ -18,6 +18,7 @@
 
 package scalation.columnar_db
 
+import scala.collection.mutable.Map
 import scala.collection.immutable.StringOps
 
 import scalation.linalgebra._
@@ -98,7 +99,6 @@ object TableObj
 
 import TableObj._
 
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `Table` trait stores and operates on vectors.  The vectors form the
  *  columns of the columnar relational datastore.  Columns may have any of the
@@ -122,17 +122,37 @@ import TableObj._
 trait Table
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the size in terms of number of columns in the relation.
+    /** Return the size in terms of number of columns in the table.
      */
     def cols: Int
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the size in terms of number of rows in the relation.
+    /** Return the columns in the table.
+     */
+    def columns: Vector [Vec] = ???    // FIX - remove and implement in all classes
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the names of columns in the table.
+     */
+    def colNames: Seq [String]
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the mapping from column names to column positions.
+     */
+    def colsMap: Map [String, Int]
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the domains for the columns in the table.
+     */
+    def domains: String
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the size in terms of number of rows in the table.
      */
     def rows: Int
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the range of index values for the relation.
+    /** Return the range of index values for the table.
      */
     def indices: Range = 0 until rows
 
@@ -362,19 +382,28 @@ trait Table
      *  @param sos   the sequence of strings holding the values
      *  @param _typ  the string of corresponding types, e.g., 'SDI'
      */
+    @throws (classOf [Exception])
     def row (sos: Seq [String], _typ: String): Row =
     {
+        var result: Vector [Any] = null
         val typ = if (_typ == null) "S" * sos.length else _typ    // missing => assume StrNum
-        (for (j <- sos.indices) yield
-            typ(j) match {
-            case 'C' => Complex (sos(j))
-            case 'D' => new StringOps (sos(j)).toDouble
-            case 'I' => new StringOps (sos(j)).toInt
-            case 'L' => new StringOps (sos(j)).toLong
-            case 'Q' => Rational (sos(j))
-            case 'R' => Real (sos(j))
-            case _   => StrNum (sos(j))
+        try {
+            result = (for (j <- sos.indices) yield
+                typ(j) match {
+                case 'C' => if (sos(j).isEmpty) Complex (0)  else Complex (sos(j))
+                case 'D' => if (sos(j).isEmpty) 0.0          else new StringOps (sos(j)).toDouble
+                case 'I' => if (sos(j).isEmpty) 0            else new StringOps (sos(j)).toInt
+                case 'L' => if (sos(j).isEmpty) 0l           else new StringOps (sos(j)).toLong
+                case 'Q' => if (sos(j).isEmpty) Rational (0) else Rational (sos(j))
+                case 'R' => if (sos(j).isEmpty) Real (0)     else Real (sos(j))
+                case _   => StrNum (sos(j))
             }).toVector
+        } catch {
+            case ex: Exception =>
+                println ("row function throw exception, row is:\n" + sos + "\ntuple length is: " + sos.size)
+                throw ex
+        } // try
+        result
     } // row
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

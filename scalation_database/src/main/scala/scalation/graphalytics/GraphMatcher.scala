@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Matthew Saltz
- *  @version 1.4
+ *  @version 1.5
  *  @date    Thu Jul 25 11:28:31 EDT 2013
  *  @see     LICENSE (MIT style license file).
  */
@@ -51,7 +51,6 @@ abstract class GraphMatcher (g: Graph, q: Graph)
      *  @param phi  array of mappings from a query vertex u to { graph vertices v }
      */
     def prune (phi: Array [SET [Int]]): Array [SET [Int]]
-
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether two sets are disjoint, i.e., have an empty intersection.

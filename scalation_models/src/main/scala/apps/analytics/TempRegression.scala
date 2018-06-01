@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Fri Sep 13 17:52:31 EDT 2013
  *  @see     LICENSE (MIT style license file).
  */
@@ -52,7 +52,7 @@ object TempRegression extends App
     val y = VectorD (56.0, 48.0, 60.0, 46.0, 38.0, 46.0, 53.0, 46.0,
                      44.0, 41.0, 47.0, 36.0, 52.0, 60.0, 56.0, 62.0)
 
-    var rg: Regression [MatrixD, VectorD] = _
+    var rg: Regression = _
     val z = VectorD (1.0, 30.0, 1000.0, 100.0)
 
     println ("-------------------------------------------------")

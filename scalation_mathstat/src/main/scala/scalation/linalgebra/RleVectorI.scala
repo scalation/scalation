@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Vishnu Gowda Harish, John Miller
- *  @version 1.4
+ *  @version 1.5
  *  @date    Mon March 28 5:10:20 EDT 2016
  *  @see     LICENSE (MIT style license file).
  */
@@ -469,6 +469,19 @@ class RleVectorI (val dim: Int, protected var v: ReArray [TripletI] = null)
         val dd = (for (i <- crange if p (ar(i).value); j <- 0 until ar(i).count) yield ar(i).startPos + j) (breakOut)     
         dd.toArray
     } // filterPos
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Filter the elements of 'this' vector based on the predicate 'p', returning
+     *  the index positions. (for thetajoin, return first vector index combine second vector index)
+     *  @param v2  the vector to compare with
+     *  @param p   the predicate (Boolean function, between two elements) to apply
+     */
+    def filterPos2 (v2: VectoI, p: (Int, Int) => Boolean): IndexedSeq [(Int, Int)] =
+    {
+        var result = IndexedSeq [(Int, Int)] ()
+        for (i <- range; j <- v2.range if p(this(i), v2(j))) result = result :+ (i, j)
+        result
+    } // filterPos2
     
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Map the elements of 'this' vector by applying the mapping function 'f'.

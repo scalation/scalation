@@ -2,7 +2,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller (code generated)
- *  @version 1.4
+ *  @version 1.5
  *  @date    Fri Mar 28 14:14:24 EDT 2014
  *  @see     LICENSE (MIT style license file).
  */

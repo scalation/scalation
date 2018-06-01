@@ -2,7 +2,7 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Yung Long Li 
  *  @builder scalation.linalgebra.bld.BldSparseMatrix
- *  @version 1.4
+ *  @version 1.5
  *  @date    Sat Nov 10 19:05:18 EST 2012
  *  @see     LICENSE (MIT style license file).
  */
@@ -376,14 +376,14 @@ class SparseMatrixR (val d1: Int,
      *  @param row  the row to exclude
      *  @param col  the column to exclude
      */
-    def sliceExclude (row: Int, col: Int): SparseMatrixR =
+    def sliceEx (row: Int, col: Int): SparseMatrixR =
     {
         val c = new SparseMatrixR (dim1 - 1, dim2 - 1)
         for (i <- range1 if i != row) for (j <- range2 if j != col) {
             if (v(i) contains j) c.v(i - oneIf (i > row))(j - oneIf (j > col)) = this(i, j)
         } // for
         c
-    } // sliceExclude
+    } // sliceEx
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select rows from this matrix according to the given index/basis.
@@ -1540,7 +1540,7 @@ class SparseMatrixR (val d1: Int,
 
         var sum = _0
         for (j <- range2) {
-            val b = sliceExclude (0, j)   // the submatrix that excludes row 0 and column j
+            val b = sliceEx (0, j)            // the submatrix that excludes row 0 and column j
             sum += (if (j % 2 == 0) this(0, j) * (if (b.dim1 == 1) b(0, 0) else b.det)
                     else          - this(0, j) * (if (b.dim1 == 1) b(0, 0) else b.det))
         } // for

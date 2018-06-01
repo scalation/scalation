@@ -1,9 +1,11 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Matthew Saltz, John Miller, Ayushi Jain
- *  @version 1.4
+ *  @version 1.5
  *  @date    Thu Jul 25 11:28:31 EDT 2013
  *  @see     LICENSE (MIT style license file).
+ *
+ *  Dual Subgraph Isomorphism Using Immutable Sets
  */
 
 package scalation.graphalytics
@@ -21,11 +23,10 @@ import scalation.util.time
 class DualIso (g: Graph, q: Graph)
       extends GraphMatcher (g, q)
 {
-    private val duals        = new DualSim2 (g, q)     // object for Dual Simulation algorithm
-    private var t0           = 0.0                     // start time for timer
+    private var limit        = 1000000                      // limit on number of matches
+    private val duals        = new DualSim2 (g, q)          // object for Dual Simulation algorithm
     private var matches      = SET [Array [SET [Int]]] ()   // initialize matches to empty
-    private var noBijections = true                    // no results yet
-    private var limit        = 1000000                 // limit on number of matches
+    private var noBijections = true                         // no results yet
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Set an upper bound on the number matches to allow before quitting.
@@ -41,12 +42,12 @@ class DualIso (g: Graph, q: Graph)
      */
     override def bijections (): SET [Array [Int]] =
     {
-        matches = SET [Array [SET [Int]]] ()           // initialize matches to empty
-        val phi = duals.feasibleMates ()               // initial mappings from label match
-        refine (duals.prune (phi), 0)                  // recursively find all bijections
-        val psi = simplify (matches)                   // pull bijections out matches
-        noBijections = false                           // results now available
-        psi                                            // return the set of bijections
+        matches = SET [Array [SET [Int]]] ()                // initialize matches to empty
+        val phi = duals.feasibleMates ()                    // initial mappings from label match
+        refine (duals.prune (phi), 0)                       // recursively find all bijections
+        val psi = simplify (matches)                        // pull bijections out matches
+        noBijections = false                                // results now available
+        psi                                                 // return the set of bijections
     } // bijections
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -57,9 +58,9 @@ class DualIso (g: Graph, q: Graph)
      */
     override def mappings (): Array [SET [Int]] = 
     {
-        var psi: SET [Array [Int]] = null              // mappings from Dual Simulation
-        if (noBijections) psi = bijections ()          // if no results, create them
-        merge (psi)                                    // merge bijections to create mappings
+        var psi: SET [Array [Int]] = null                   // mappings from Dual Simulation
+        if (noBijections) psi = bijections ()               // if no results, create them
+        merge (psi)                                         // merge bijections to create mappings
     } // mappings
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -83,10 +84,10 @@ class DualIso (g: Graph, q: Graph)
             } // if
         } else if (! phi.isEmpty) {
             for (i <- phi (depth) if (! contains (phi, depth, i))) {
-                val phiCopy = phi.map (x => x)                           // make a copy of phi
-                phiCopy (depth) = SET [Int] (i)                          // isolate vertex i
-                if (matches.size >= limit) return                        // quit if at LIMIT
-                refine (duals.prune (phiCopy), depth + 1)                // solve recursively for the next depth
+                val phiCopy = phi.map (x => x)                        // make a copy of phi
+                phiCopy (depth) = SET [Int] (i)                       // isolate vertex i
+                if (matches.size >= limit) return                     // quit if at LIMIT
+                refine (duals.prune (phiCopy), depth + 1)             // solve recursively for the next depth
             } // for
         } // if
     } // refine
@@ -185,11 +186,11 @@ object DualIsoTest2 extends App
  */
 object DualIsoTest3 extends App
 {
-    val gSize     = 1000         // size of the data graph
-    val qSize     =   10         // size of the query graph
-    val nLabels   =  100         // number of distinct labels
-    val gAvDegree =    5         // average vertex out degree for data graph
-    val qAvDegree =    2         // average vertex out degree for query graph
+    val gSize     = 1000                                  // size of the data graph
+    val qSize     =   10                                  // size of the query graph
+    val nLabels   =  100                                  // number of distinct labels
+    val gAvDegree =    5                                  // average vertex out degree for data graph
+    val qAvDegree =    2                                  // average vertex out degree for query graph
 
     val g = GraphGen.genRandomGraph (gSize, nLabels, gAvDegree, false, "g")
     val q = GraphGen.genBFSQuery (qSize, qAvDegree, g, false, "q")
