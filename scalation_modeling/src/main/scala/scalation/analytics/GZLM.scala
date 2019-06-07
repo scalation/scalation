@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Michael Cotterell
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sun Jan 18 20:46:18 EST 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -25,31 +25,32 @@ object GZLM extends GLM
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Poisson Regression model.
-     *  @param x        the input/design m-by-n matrix
-     *  @param y        the integer response vector, y_i in {0, 1, ... }
-     *  @param fn       the names for all factors
+     *  @param x        the data/input m-by-n matrix
+     *  @param y        the integer response/output vector, y_i in {0, 1, ... }
+     *  @param fname    the feature/variable name
      *  @param poisson  whether it is `PoissonRegression`
      */
-    def apply (x: MatriD, y: VectoI, fn: Array [String], poisson: Boolean): PoissonRegression =
+    def apply (x: MatriD, y: VectoI, fname: Strings, poisson: Boolean): PoissonRegression =
     {
         if (add_1)
-            PoissonRegression (one (x.dim1) +^: x, y, fn)
+            PoissonRegression (one (x.dim1) +^: x, y, fname)
         else
-            PoissonRegression (x, y, fn)
+            PoissonRegression (x, y, fname)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build an Exponential Regression model.
-     *  @param x       the input/design m-by-n matrix
+     *  @param x       the data/input m-by-n matrix
+     *  @param y       the response/output vector
+     *  @param fname   the feature/variable name
      *  @param nonneg  whether to check that responses are nonnegative
-     *  @param y       the response vector
      */
-    def apply (x: MatriD, nonneg: Boolean, y: VectoD): ExpRegression =
+    def apply (x: MatriD, y: VectoD, fname: Strings, nonneg: Boolean): ExpRegression =
     {
         if (add_1)
-            new ExpRegression (one (x.dim1) +^: x, y, nonneg)
+            new ExpRegression (one (x.dim1) +^: x, y, fname, null, nonneg)
         else
-            new ExpRegression (x, y, nonneg)
+            new ExpRegression (x, y, fname, null, nonneg)
     } // apply
 
 } // GZLM object

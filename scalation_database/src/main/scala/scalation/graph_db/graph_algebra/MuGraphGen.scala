@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Matthew Saltz, John Miller, Aravind Kalimurthy, Supriya Ramireddy
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sat Apr 15 16:07:28 EDT 2017
  *  @see     LICENSE (MIT style license file).
  */

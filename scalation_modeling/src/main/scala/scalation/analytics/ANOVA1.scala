@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sun Jan  4 23:09:27 EST 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -12,6 +12,7 @@ import scala.collection.mutable.Set
 
 import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.plot.Plot
+import scalation.stat.Statistic
 import scalation.util.{banner, Error}
 
 import RegTechnique._
@@ -46,12 +47,15 @@ class ANOVA1 (t: VectoD, y: VectoD, levels: Int, technique: RegTechnique = QR)
 {
     if (t.dim != y.dim) flaw ("constructor", "dimensions of t and y are incompatible")
 
-    val x = new MatrixD (y.dim, levels)                           // design matrix
+    val x = new MatrixD (y.dim, levels)                           // data/input matrix
     assignDummyVars ()                                            // assign values for dummy variables
-    rg = new Regression (x, y, technique)                         // regular multiple linear regression
+    rg = new Regression (x, y, null, null, technique)             // regular multiple linear regression
 
-    // FIX - need to be implemented
-    def expand(t: Double): scalation.linalgebra.VectoD = ???
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /**
+     *  @param t
+     */
+    def expand (t: Double): VectoD = ???                          // FIX - needs to be implemented
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Assign values for the dummy variables based on a treatment variable's level 'lev'.
@@ -103,9 +107,9 @@ class ANOVA1 (t: VectoD, y: VectoD, levels: Int, technique: RegTechnique = QR)
      *  @param k      the number of folds
      *  @param rando  whether to use randomized cross-validation
      */
-    def crossVal (ord: Int, k: Int = 10, rando: Boolean = true)
+    def crossVal (ord: Int, k: Int = 10, rando: Boolean = true): Array [Statistic] =
     {
-        crossValidate ((t: VectoD, y: VectoD, ord) => new ANOVA1 (t, y, ord), k, rando)
+        crossValidate ((t: VectoD, y: VectoD, ord) => new ANOVA1 (t, y, ord, technique), k, rando)
     } // crossVal
 
 } // ANOVA1 class
@@ -133,8 +137,8 @@ object ANOVA1Test extends App
     val levels = 3
     val arg    = new ANOVA1 (t, y, levels)
     arg.train ().eval ()
-    println ("coefficient = " + arg.coefficient)
-    println ("fitMap      = " + arg.fitMap)
+    println ("parameter = " + arg.parameter)
+    println ("fitMap    = " + arg.fitMap)
 
     val yp1 = arg.predict (z)                                     // predict for one point
     println ("predict (" + z + ") = " + yp1)

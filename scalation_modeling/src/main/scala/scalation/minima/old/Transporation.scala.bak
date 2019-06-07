@@ -1,0 +1,96 @@
+
+package scalation.minima
+
+import math.min
+import collection.mutable.ListBuffer
+
+import scalation.linalgebra.{MatrixD, VectorD}
+
+class Transportation (c: MatrixD, s: VectorD, d: VectorD)
+{
+    private val m  = c.dim1      // number of supplies
+    private val n  = c.dim2      // number of demands
+    private val mm = m + 2
+    private val nn = n + 2
+    println (mm + " " + nn)
+
+// step 0
+
+    private val tab = new MatrixD (mm, nn)
+
+    tab(0 until m, 0 until n) = c
+    tab(m) = d
+    for (i <- 0 until m) tab (i, n) = s(i)
+//    tab(0 until m, n) = s
+
+    val u = new VectorD (m)
+    for (i <- 0 until m) u(i) = c(i).min ()
+    val v = new VectorD (n)
+    for (j <- 0 until n) v(j) = (c.col(j) - u).min ()
+    for (i <- 0 until m) tab (i, n+1) = u(i)
+    tab (m+1) = v
+
+    println ("tab = " + tab)
+
+    val x = new MatrixD (m, n)
+    val l = ListBuffer [Int, Int, Int] ()
+
+// step 1
+
+// substep 1
+
+    for (i <- 0 until m if x(i).sum < s(i)) l += (i, 1, 1)
+
+// substep 2
+
+    if (l.isEmpty) return
+    val item = l.remove (0)
+    if (item._3 == 1) {
+        for (j <- 0 until n if c(item._1, j) == 0.) l += (j, 1, 0)
+    } else {
+        for (i <- 0 until m if x(i, item._3) > 0.) l += (i, 0, 0)
+    } // if
+    
+
+    def changeFlow ()
+    {
+    } // chnageFlow
+
+} // Transportation class
+
+object TransportationTest extends App
+{
+     val c = new MatrixD ((3, 4), 2., 3., 11., 7., 
+                                  1., 0.,  6., 1.,
+                                  5., 8., 15., 9.)
+     val s = new VectorD (6., 1., 10.)
+     val d = new VectorD (7., 5., 3., 2.)
+
+     val trans = new Transportation (c, s, d)
+
+} // TransportationTest object
+
+/*
+    val cBar = new MatrixD (m, n)
+    for (i <- 0 until m; j <- 0 until n) cBar(i, j) = c(i, j) - u(i) - v(j)
+    println ("cBar = " + cBar)
+
+    val ss = s
+    val dd = d
+
+    val x = new MatrixD (m, n)
+    for (i <- 0 until m) {
+        for (j <- 0 until n) {
+             if (cBar(i, j) == 0.) { 
+                 x(i, j) = ss(i) min dd(j)
+                 ss(i) -= x(i, j)
+                 dd(j) -= x(i, j)
+             } // if
+        } // for
+    } // for
+    println ("x = " + x)       
+
+    var cost = 0.
+    for (i <- 0 until m; j <- 0 until n if x(i, j) != 0.) cost += c(i, j) * x(i, j)
+    println ("cost = " + cost)
+*/

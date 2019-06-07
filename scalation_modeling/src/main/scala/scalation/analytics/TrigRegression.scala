@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Mon Feb  2 18:18:15 EST 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -13,6 +13,7 @@ import scala.math.{cos, Pi, sin}
 
 import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.plot.Plot
+import scalation.stat.Statistic
 import scalation.util.{banner, Error, time}
 
 import RegTechnique._
@@ -42,10 +43,10 @@ class TrigRegression (t: VectoD, y: VectoD, ord: Int, technique: RegTechnique = 
       extends PredictorVec (t, y, ord)
 {
     private val w = (2.0 * Pi) / (t.max() - t.min())           // base displacement angle in radians
-    private val x = new MatrixD (t.dim, 1 + 2 * ord)           // design matrix built from t
+    private val x = new MatrixD (t.dim, 1 + 2 * ord)           // data matrix built from t
     for (i <- t.range) x(i) = expand (t(i))
 
-    rg = new Regression (x, y, technique)                      // regular multiple linear regression
+    rg = new Regression (x, y, null, null, technique)          // regular multiple linear regression
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Expand the scalar 't' into a vector of powers of  trig terms/columns:
@@ -77,9 +78,9 @@ class TrigRegression (t: VectoD, y: VectoD, ord: Int, technique: RegTechnique = 
      *  @param k      the number of folds
      *  @param rando  whether to use randomized cross-validation
      */
-    def crossVal (ord: Int, k: Int = 10, rando: Boolean = true)
+    def crossVal (ord: Int, k: Int = 10, rando: Boolean = true): Array [Statistic] =
     {
-        crossValidate ((t: VectoD, y: VectoD, ord) => new TrigRegression (t, y, ord), k, rando)
+        crossValidate ((t: VectoD, y: VectoD, ord) => new TrigRegression (t, y, ord, technique), k, rando)
     } // crossVal
 
 } // TrigRegression class
@@ -109,8 +110,8 @@ object TrigRegressionTest extends App
     val harmonics = 8
     val trg   = new TrigRegression (t, y, harmonics)
     trg.train ().eval ()
-    println ("coefficient = " + trg.coefficient)
-    println ("fitMap      = " + trg.fitMap)
+    println ("parameter = " + trg.parameter)
+    println ("fitMap    = " + trg.fitMap)
 
     val z   = 10.5                                  // predict y for one point
     val yp1 = trg.predict (z)
@@ -151,8 +152,8 @@ object TrigRegressionTest2 extends App
     val harmonics = 16
     val trg   = new TrigRegression (t, y, harmonics)
     trg.train ().eval ()
-    println ("coefficient = " + trg.coefficient)
-    println ("fitMap      = " + trg.fitMap)
+    println ("parameter = " + trg.parameter)
+    println ("fitMap    = " + trg.fitMap)
 
     val z   = 10.5                                  // predict y for one point
     val yp1 = trg.predict (z)

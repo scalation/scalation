@@ -1,0 +1,88 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.2
+ *  @date    Fri May 15 11:58:34 EDT 2015
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  Contains Scala wrapper classes for all the subclasses of 
+ *  `javafx.scene.transform.Transform`:  Rotate, Scale, Translate
+ *  Caveat: Affine and Shear are currently left out
+ */
+
+package scalation.scala3d
+
+import javafx.scene._
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Rotate` object provides factory methods for `javafx.scene.transform.Rotate`,
+ *  which creates a 3D rotation.
+ */
+object Rotate
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build a Rotate object.
+     *  @param angle  the angle of rotation measured in degrees
+     *  @param axis   the axis of rotation
+     *  @param pivot  the pivot point to rotate around
+     */
+    def apply (angle: Double, axis: Point3D, pivot: Point3D = Point3D.ZERO) =
+    {
+        new Rotate (angle, pivot.getX (), pivot.getY (), pivot.getZ (), axis)
+    } // apply
+      
+} // Rotate object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Scale` object provides factory methods for `javafx.scene.transform.Scale`,
+ *  which creates a 3D rescaling.  The optional 'pivot' point may be thought
+ *  of as follows: translates by -pivot, scale, translate by +pivot.
+ */
+object Scale
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build a Scale object.
+     *  @param p      the axis of rotation
+     *  @param pivot  the pivot point
+     */
+    def apply (p: Point3D, pivot: Point3D = Point3D.ZERO) =
+    {
+        new Scale (p.getX (), p. getY (), p.getZ (),
+                   pivot.getX (), pivot.getY (), pivot.getZ ())
+    } // apply
+
+} // Scale object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Translate` object provides factory methods `javafx.scene.transform.Translate`,
+ *  which creates a 3D translation.
+ *  @param x  the distance to translate in the x direction
+ *  @param y  the distance to translate in the y direction
+ *  @param z  the distance to translate in the z direction
+ */
+object Translate
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build a Tranlate object from three coordinates.
+     *  @param x  the x coordinate indicating the distance to translate in that direction
+     *  @param y  the y coordinate indicating the distance to translate in that direction
+     *  @param z  the z coordinate indicating the distance to translate in that direction
+     */
+    def apply (x: Double, y: Double, z: Double) =
+    {
+        new Translate (x, y, z)
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build a Tranlate object from a point.
+     *  @param p  the point/vector indicating the distance to translate in each direction
+     */
+    def apply (p: Point3D) =
+    {
+        new Translate (p.getX (), p.getY (), p.getZ ())
+    } // apply
+
+} // Translate object
+

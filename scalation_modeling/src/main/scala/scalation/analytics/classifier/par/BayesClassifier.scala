@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Hao Peng, Zhe Jin
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sat Aug  8 20:26:34 EDT 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -23,26 +23,23 @@ import scalation.math.log2
 /** The `BayesClassifier` object provides factory methods for building Bayesian
  *  classifiers.  The following types of classifiers are currently supported:
  *  `NaiveBayes`       - Naive Bayes classifier
- *  `SelNaiveBayes`    - Selective Naive Bayes classifier
  *  `TANBayes`         - Tree Augmented Naive Bayes classifier
- *  `SelTAN`           - Selective Tree Augmented Naive Bayes classifier
  *  `TwoBAN_OS`        - Ordering-based Bayesian Network with k = 2
  */
 abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
                                 private val PARALLELISM: Int = Runtime.getRuntime ().availableProcessors ())
         extends ClassifierInt (x, y, fn, k, cn) with BayesMetrics
 {
-    protected var smooth   = true                    // flag for using parameter smoothing
-    protected val N0       = 5.0                     // parameter needed for smoothing
     protected val tiny     = 1E-9                    // value needed for CMI calculations
+    protected var smooth   = true                    // flag for using parameter smoothing
     protected var additive = true                    // flag to use additive approach for training/cross-validation
 
-    protected val f_C = new VectorI (k)              // frequency counts for classes 0, ..., k-1
-    protected var p_C = new VectorD (k)              // probabilities for classes 0, ..., k-1
+    protected val nu_y = new VectorI (k)             // frequency of y for classes 0, ..., k-1
+    protected var p_y  = new VectorD (k)             // probability of y for classes 0, ..., k-1
 
-    protected var f_X:   HMatrix2 [Int] = null       // Frequency of X
-    protected var f_CX:  HMatrix3 [Int] = null       // Joint frequency of C and X
-    protected var f_CXZ: HMatrix5 [Int] = null       // Joint frequency of C, X, and Z, where X, Z are features/columns
+    protected var nu_X:   HMatrix2 [Int] = null      // frequency of X
+    protected var nu_Xy:  HMatrix3 [Int] = null      // joint frequency of X and y
+    protected var nu_XyZ: HMatrix5 [Int] = null      // joint frequency of X, y, and Z, where X, Z are features/columns
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Toggle the value of the 'smooth' property.
@@ -54,59 +51,59 @@ abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int
      */
     def calcCMI (idx: IndexedSeq [Int], vca: Array [Int]): MatrixD =
     {
-        val p_CXZ = new HMatrix5 [Double] (k, n, n, vca, vca)   // Joint probability of C, X, and Z, where X, Z are features/columns
-        val p_CX  = new HMatrix3 [Double] (k, n, vca)           // Joint probability of C and X
-        var p_C: VectorD = null
+        var p_y: VectorD = null
+        val p_Xy  = new HMatrix3 [Double] (k, n, vca)           // joint probability of X and y
+        val p_XyZ = new HMatrix5 [Double] (k, n, n, vca, vca)   // joint probability of C, X, and Z, where X, Z are features/columns
 
         reset ()
         val idxA = split (idx, PARALLELISM)
 
-        val f_Cw   = Array.ofDim [VectorI] (PARALLELISM)
-        val f_Xw   = Array.ofDim [HMatrix2 [Int]] (PARALLELISM)
-        val f_CXw  = Array.ofDim [HMatrix3 [Int]] (PARALLELISM)
-        val f_CXZw = Array.ofDim [HMatrix5 [Int]] (PARALLELISM)
+        val nu_yw   = Array.ofDim [VectorI] (PARALLELISM)
+        val nu_Xw   = Array.ofDim [HMatrix2 [Int]] (PARALLELISM)
+        val nu_Xyw  = Array.ofDim [HMatrix3 [Int]] (PARALLELISM)
+        val nu_XyZw = Array.ofDim [HMatrix5 [Int]] (PARALLELISM)
 
         for (w <- (0 until PARALLELISM).par) {
-            f_Cw (w)   = new VectorI (k)
-            f_Xw (w)   = new HMatrix2 [Int] (n, vca)
-            f_CXw (w)  = new HMatrix3 [Int] (k, n, vca)
-            f_CXZw (w) = new HMatrix5 [Int] (k, n, n, vca, vca)
+            nu_yw (w)   = new VectorI (k)
+            nu_Xw (w)   = new HMatrix2 [Int] (n, vca)
+            nu_Xyw (w)  = new HMatrix3 [Int] (k, n, vca)
+            nu_XyZw (w) = new HMatrix5 [Int] (k, n, n, vca, vca)
         } // for
 
         val paraRange = (0 until PARALLELISM).par
         paraRange.tasksupport = new ForkJoinTaskSupport (new ForkJoinPool (PARALLELISM))
 
-        for (w <- paraRange; i <- idxA(w)) updateFreq (i, f_Cw(w), f_Xw(w), f_CXw(w), f_CXZw(w))
+        for (w <- paraRange; i <- idxA(w)) updateFreq (i, nu_yw(w), nu_Xw(w), nu_Xyw(w), nu_XyZw(w))
 
         for (w <- 0 until PARALLELISM) {
-            f_C  += f_Cw (w)
-            f_X  += f_Xw (w)
-            f_CX += f_CXw (w)
-            f_CXZ += f_CXZw(w)
+            nu_y   += nu_yw (w)
+            nu_X   += nu_Xw (w)
+            nu_Xy  += nu_Xyw (w)
+            nu_XyZ += nu_XyZw(w)
         } // for
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /** Compute marginal and joint probabilities
+        /** Compute marginal and joint probabilities.
          */
         def probabilities ()
         {
             for (j <- (0 until n).par if fset(j)) {
                 for (xj <- (0 until vca(j)).par) {
-                    //p_X(j, xj) = (f_X(j, xj)) / md
+                    //p_X(j, xj) = (nu_X(j, xj)) / md
                     for (c <- (0 until k).par) {
-                        p_CX(c, j, xj) = (f_CX(c, j, xj) + tiny) / md
+                        p_Xy(c, j, xj) = (nu_Xy(c, j, xj) + tiny) / md
                         for (j2 <- (j + 1 until n).par if fset(j2); xj2 <- (0 until vca(j2)).par) {
-                            p_CXZ(c, j, j2, xj, xj2) = (f_CXZ(c, j, j2, xj, xj2) + tiny) / md
+                            p_XyZ(c, j, j2, xj, xj2) = (nu_XyZ(c, j, j2, xj, xj2) + tiny) / md
                         } // for
                     } // for
                 } // for
             } // for
         } // probabilities
 
-        p_C = f_C.toDouble / m
+        p_y = nu_y.toDouble / m
         probabilities ()
 
-        cmiJoint (p_C, p_CX, p_CXZ)
+        cmiJoint (p_y, p_Xy, p_XyZ)
     } // calcCMI
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -114,20 +111,20 @@ abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int
      *  of C and joint probabilities of CXZ and CX, where C is the class (parent), and
      *  X & Z are features.
      *  @see en.wikipedia.org/wiki/Conditional_mutual_information
-     *  @param p_C    the marginal probability of C
-     *  @param p_CX   the joint probability of C and X
-     *  @param p_CXZ  the joint probability of C, X, and Z
+     *  @param p_y    the marginal probability of y
+     *  @param p_Xy   the joint probability of X and y
+     *  @param p_XyZ  the joint probability of C, X, and Z
      */
-    def cmiJoint (p_C: VectorD, p_CX: HMatrix3 [Double], p_CXZ: HMatrix5 [Double]): MatrixD =
+    def cmiJoint (p_y: VectorD, p_Xy: HMatrix3 [Double], p_XyZ: HMatrix5 [Double]): MatrixD =
     {
-        val cmiMx = new MatrixD (p_CX.dim2, p_CX.dim2)
-        for (c <- (0 until k).par) {                                                        // check each class, where k = p_C.size
-            val pc = p_C(c)
-            for (j <- (0 until p_CX.dim2).par if fset(j); xj <- (0 until p_CX.dim_3(j)).par) {         // n = p_CX.dim2, vc(j) = p_CX.dim_3(j)
-            val pcx = p_CX(c, j, xj)
-                for (j2 <- (j+1 until p_CX.dim2).par if fset(j2); xj2 <- (0 until p_CX.dim_3(j2)).par) {
-                    val pcz  = p_CX(c, j2, xj2)
-                    val pcxz = p_CXZ (c, j, j2, xj, xj2)
+        val cmiMx = new MatrixD (p_Xy.dim2, p_Xy.dim2)
+        for (c <- (0 until k).par) {                                                        // check each class, where k = p_y.size
+            val pc = p_y(c)
+            for (j <- (0 until p_Xy.dim2).par if fset(j); xj <- (0 until p_Xy.dim_3(j)).par) {         // n = p_Xy.dim2, vc(j) = p_Xy.dim_3(j)
+            val pcx = p_Xy(c, j, xj)
+                for (j2 <- (j+1 until p_Xy.dim2).par if fset(j2); xj2 <- (0 until p_Xy.dim_3(j2)).par) {
+                    val pcz  = p_Xy(c, j2, xj2)
+                    val pcxz = p_XyZ (c, j, j2, xj, xj2)
                     cmiMx (j, j2) += pcxz * log2( (pc * pcxz) / (pcx * pcz) )
                 } // for
             } // for
@@ -173,7 +170,7 @@ abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int
      *  data matrix. Only to be used for CMI frequency calculations.
      *  @param i  the index for current data row
      */
-    protected def updateFreq (i: Int, f_C: VectoI, f_X: HMatrix2[Int], f_CX: HMatrix3[Int], f_CXZ: HMatrix5[Int]) {}
+    protected def updateFreq (i: Int, nu_y: VectoI, nu_X: HMatrix2[Int], nu_Xy: HMatrix3[Int], nu_XyZ: HMatrix5[Int]) {}
 
 } // BayesClassifier class
 
@@ -187,7 +184,7 @@ object BayesClassifier
     /** The default value for m-estimates (me == 0 => regular MLE estimates)
      *                                     me == 1 => no divide by 0, close to MLE estimates)
      */
-    val me_default = 1E-9
+    val me_default = 1E-6
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Naive Bayes classification model.
@@ -223,13 +220,13 @@ object BayesClassifier
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Tree Augmented Naive Bayes Classification model
-     *  @param x      the integer-valued data vectors stored as rows of a matrix
-     *  @param y      the class vector, where y(l) = class for row l of the matrix, x(l)
-     *  @param fn     the names for all features/variables
-     *  @param k      the number of classes
-     *  @param cn     the names for all classes
-     *  @param vc     the value count (number of distinct values) for each feature
-     *  @param me     use m-estimates (me == 0 => regular MLE estimates)
+     *  @param x   the integer-valued data vectors stored as rows of a matrix
+     *  @param y   the class vector, where y(l) = class for row l of the matrix, x(l)
+     *  @param fn  the names for all features/variables
+     *  @param k   the number of classes
+     *  @param cn  the names for all classes
+     *  @param vc  the value count (number of distinct values) for each feature
+     *  @param me  use m-estimates (me == 0 => regular MLE estimates)
      */
     def apply (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
                me: Double, vc: Array [Int], PARALLELISM: Int): TANBayes =
@@ -240,11 +237,11 @@ object BayesClassifier
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Tree Augmented Naive Bayes Classification model,
      *  passing 'x' and 'y' together in one matrix.
-     *  @param xy     the data vectors along with their classifications stored as rows of a matrix
-     *  @param fn     the names of the features
-     *  @param k      the number of classes
-     *  @param vc     the value count (number of distinct values) for each feature
-     *  @param me     use m-estimates (me == 0 => regular MLE estimates)
+     *  @param xy  the data vectors along with their classifications stored as rows of a matrix
+     *  @param fn  the names of the features
+     *  @param k   the number of classes
+     *  @param vc  the value count (number of distinct values) for each feature
+     *  @param me  use m-estimates (me == 0 => regular MLE estimates)
      */
     def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
                me: Double, vc: Array [Int], PARALLELISM: Int): TANBayes =
@@ -254,14 +251,14 @@ object BayesClassifier
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a Bayesian Network 2 classification model.
-     *  @param x     the integer-valued data vectors stored as rows of a matrix
-     *  @param y     the class vector, where y(l) = class for row l of the matrix, x(l)
-     *  @param fn    the names for all features/variables
-     *  @param k     the number of classes
-     *  @param cn    the names for all classes
-     *  @param vc    the value count (number of distinct values) for each feature
-     *  @param me    use m-estimates (me == 0 => regular MLE estimates)
-     *  @param thres the correlation threshold between 2 features for possible parent-child relationship
+     *  @param x      the integer-valued data vectors stored as rows of a matrix
+     *  @param y      the class vector, where y(l) = class for row l of the matrix, x(l)
+     *  @param fn     the names for all features/variables
+     *  @param k      the number of classes
+     *  @param cn     the names for all classes
+     *  @param vc     the value count (number of distinct values) for each feature
+     *  @param me     use m-estimates (me == 0 => regular MLE estimates)
+     *  @param thres  the correlation threshold between 2 features for possible parent-child relationship
      */
     def apply (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
                vc: Array [Int], thres: Double, me: Double, PARALLELISM: Int): TwoBAN_OS =
@@ -271,12 +268,12 @@ object BayesClassifier
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Bayesian Network 2 classification model, passing 'x' and 'y' together in one matrix.
-     *  @param xy    the data vectors along with their classifications stored as rows of a matrix
-     *  @param fn    the names of the features
-     *  @param k     the number of classes
-     *  @param vc    the value count (number of distinct values) for each feature
-     *  @param me    use m-estimates (me == 0 => regular MLE estimates)
-     *  @param thres the correlation threshold between 2 features for possible parent-child relationship
+     *  @param xy     the data vectors along with their classifications stored as rows of a matrix
+     *  @param fn     the names of the features
+     *  @param k      the number of classes
+     *  @param vc     the value count (number of distinct values) for each feature
+     *  @param me     use m-estimates (me == 0 => regular MLE estimates)
+     *  @param thres  the correlation threshold between 2 features for possible parent-child relationship
      */
     def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
                vc: Array [Int], thres: Double, me: Double, PARALLELISM: Int): TwoBAN_OS =

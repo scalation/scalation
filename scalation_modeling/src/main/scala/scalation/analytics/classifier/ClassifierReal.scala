@@ -1,16 +1,19 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sun Sep 23 21:14:14 EDT 2012
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
+import scala.collection.mutable.Set
 import scala.util.control.Breaks.{break, breakable}
 
 import scalation.linalgebra.{MatriD, MatrixD, VectorD, VectoI, VectorI}
+import scalation.random.RandomSet
 import scalation.stat.vectorD2StatVector
 import scalation.util.Error
 
@@ -23,8 +26,8 @@ import scalation.util.Error
  *  @param k   the number of classes
  *  @param cn  the names for all classes
  */
-abstract class ClassifierReal (x: MatriD, y: VectoI, fn: Array [String], k: Int,
-                               cn: Array [String])
+abstract class ClassifierReal (x: MatriD, y: VectoI, protected var fn: Strings,
+                               k: Int, protected var cn: Strings)
          extends Classifier with Error
 {
     /** the number of data vectors in training-set (# rows)
@@ -46,10 +49,14 @@ abstract class ClassifierReal (x: MatriD, y: VectoI, fn: Array [String], k: Int,
     /** the set of features to turn on or off. All features are on by default.
      *  Used for feature selection.
      */
-    protected val fset = Array.fill [Boolean](n)(true)
+    protected val fset = Array.fill (n)(true)
+
+    if (fn == null) fn = x.range2.map ("x" + _).toArray               // default variable names
+    if (cn == null) cn = if (k == 2) Array ("no", "yes")              // default class names
+                         else (0 until k).map ("c" + _).toArray
 
     if (y.dim != m)     flaw ("constructor", "y.dim must equal training-set size (m)")
-    if (fn != null && fn.length != n) flaw ("constructor", "fn.length must equal feature-set size (n)")
+    if (fn.length != n) flaw ("constructor", "fn.length must equal feature-set size (n)")
     if (k >= m)         flaw ("constructor", "k must be less than training-set size (m)")
     if (cn.length != k) flaw ("constructor", "cn.length must equal number of classes (k)")
 
@@ -76,7 +83,7 @@ abstract class ClassifierReal (x: MatriD, y: VectoI, fn: Array [String], k: Int,
     /** Classify all of the row vectors in matrix 'xx'.
      *  @param xx  the row vectors to classify
      */
-    def classify (xx: MatriD): VectoI =
+    def classify (xx: MatriD = x): VectoI =
     {
         VectorI (for (i <- xx.range1) yield classify (xx(i))._1)
     } // classify
@@ -86,7 +93,7 @@ abstract class ClassifierReal (x: MatriD, y: VectoI, fn: Array [String], k: Int,
      *  of correct classifications.
      *  @param itest  indices of the instances considered test data
      */
-    def test (itest: IndexedSeq [Int]): Double =
+    def test (itest: Ints): Double =
     {
         var correct = 0
         for (i <- itest if classify (x(i))._1 == y(i)) correct += 1
@@ -136,7 +143,7 @@ abstract class ClassifierReal (x: MatriD, y: VectoI, fn: Array [String], k: Int,
         cor
     } // calcCorrelation2
 
-   //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform feature selection on the classifier. Use backward elimination
      *  technique, that is, remove the least significant feature, in terms of cross-
      *  validation accuracy, in each round.
@@ -190,4 +197,37 @@ abstract class ClassifierReal (x: MatriD, y: VectoI, fn: Array [String], k: Int,
     } // featureSelection
 
 } // ClassifierReal abstract class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `ClassifierReal` object provides helper methods.
+ */
+object ClassifierReal
+{
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Pull out the designed response column from the combined matrix.
+     *  When 'col' is negative or the last column, slice out the last column.
+     *  @param xy   the combined data and response/classification matrix
+     *  @param col  the designated response column to be pulled out
+     */
+    def pullResponse (xy: MatriD, col: Int = -1): (MatriD, VectoI) =
+    {
+        if (col < 0 || col == xy.dim2-1) (xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1).toInt)
+        else                             (xy.sliceEx (xy.dim1, col), xy.col (col).toInt)
+    } // pullResponse
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Make the 'isCont' flag that indicates which columns are continuous.
+     *  Ex: makeIsCont (12, 7, 11) // 12 columns with 7 and 11 being continuous
+     *  @param size  the number of variables/features
+     *  @param cont  the column indices of the continuous variables/features
+     */
+    def makeIsCont (size: Int, cont: Int*): Array [Boolean] =
+    {
+        val flag = Array.fill (size)(false)
+        for (i <- cont) flag(i) = true
+        flag
+    } // makeIsCont
+
+} // ClassifierReal object
 

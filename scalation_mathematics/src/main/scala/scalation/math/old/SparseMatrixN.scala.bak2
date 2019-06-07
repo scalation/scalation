@@ -1,0 +1,737 @@
+
+/**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ * @author  John Miller
+ * @version 1.0
+ * @date    Sat May 22 15:24:17 EDT 2010
+ * @see     LICENSE (MIT style license file).
+ */
+
+package scalation.mathstat
+
+import java.util._
+
+import scala.collection.mutable._
+import scala.math.abs
+import scalation.util.Error
+
+/**::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ * Convenience definitions for commonly used types of matrices.
+ */
+object SparseMatrices
+{
+    type SparseMatrixI = SparseMatrixN [Int]
+    type SparseMatrixL = SparseMatrixN [Long]
+    type SparseMatrixF = SparseMatrixN [Float]
+    type SparseMatrixD = SparseMatrixN [Double]
+    type SparseMatrixC = SparseMatrixN [Complex]
+
+} // SparseMatrices object
+
+/**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ * The SparseMatrixN class stores and operates on Numeric Matrices of various
+ * sizes and types.  The element type may be any subtype of Numeric.  Rather
+ * than storing the matrix as a 2 dimensional array, it is stored as an array
+ * of list maps, which record all the non-zero values for each particular row,
+ * along with their j-index.
+ * @param dim1  the first/row dimension
+ * @param dim2  the second/column dimension
+ * @param _0    the value zero for type T
+ */
+case class SparseMatrixN [T <% Ordered [T]: ClassManifest] (d1: Int,
+                                                            d2: Int,
+                                                            _0: T)
+     extends Matrix [T] (d1, d2) with Error
+{
+    /** Store the matrix as an array of list maps (j-index, value)
+     */
+    private val v = Array.ofDim [ListMap [Int, T]] (dim1)
+
+    {
+        for (i <- range1) v(i) = new ListMap [Int, T] ()
+    } // primary constructor
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Construct a dim1 by dim1 square matrix.
+     * @param dim1  the row and column dimension
+     * @param _0    the value zero for type T
+     */
+    def this (dim1: Int, _0: T)
+    {
+        this (dim1, dim1, _0)                      // invoke primary constructor
+    } // constructor
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Construct a dim1 by dim2 matrix and assign each element the value x.
+     * @param dim1  the row dimension
+     * @param dim2  the column dimesion
+     * @param x     the scalar value to assign
+     * @param _0    the value zero for type T
+     */
+    def this (dim1: Int, dim2: Int, x: T, _0: T)
+    {
+        this (dim1, dim2, _0)                      // invoke primary constructor
+        if (x != _0) {
+            for (i <- range1; j <- range2.reverse) v(i)(j) = x
+        } // if
+    } // constructor
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Construct a dim1 by dim1 square matrix with x assigned on the diagonal
+     * and 0 assigned off the diagonal.  To obtain an identity matrix, let x = 1.
+     * @param dim1  the row and column dimension
+     * @param x     the scalar value to assign on the diagonal
+     * @param _0    the value zero for type T
+     */
+    def this (dim1: Int, x: T, _0: T)
+    {
+        this (dim1, dim1, _0)                      // invoke primary constructor
+        if (x != _0) {
+            for (i <- range1) v(i)(i) = x
+        } // if
+    } // constructor
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Construct a matrix and assign values from matrix u.
+     * @param u   the matrix of values to assign
+     * @param _0  the value zero for type T
+     */
+    def this (u: SparseMatrixN [T], _0: T)
+    {
+        this (u.dim1, u.dim2, _0)                  // invoke primary constructor
+        for (i <- range1; j <- range2) this(i, j) = u(i, j)
+    } // constructor
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Get this matrix's element at the i,j-th index position.
+     * @param i  the row index
+     * @param j  the column index
+     */
+    def apply (i: Int, j: Int): T =
+    {
+        var v_ij = _0
+        try {
+            v_ij = v(i)(j)
+        } catch {
+            case nsee: NoSuchElementException => 
+        } // try
+        v_ij
+    } // apply
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Get this matrix's vector at the i-th index position (i-th row).
+     * @param i  the row index
+     */
+    def apply (i: Int): VectorN [T] =
+    {
+        val a = Array.ofDim [T] (dim2)
+        for (j <- 0 until dim2) {
+            try {
+                a(j) = v(i)(j)
+            } catch {
+                case nsee: NoSuchElementException =>  a(j) = _0
+            } // try
+        } // for
+        new VectorN [T] (a)
+    } // apply
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Set this matrix's element at the i,j-th index position to the scalar x.
+     * Only store x if it is non-zero.
+     * @param i  the row index
+     * @param j  the column index
+     * @param x  the scalar value to assign
+     */
+    def update (i: Int, j: Int, x: T) 
+    {
+        if (x != _0) v(i)(j) = x else v(i) -= j
+    } // update
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Set this matrix's row at the i-th index position to the vector u.
+     * @param i  the row index
+     * @param u  the vector value to assign
+     */
+    def update (i: Int, u: VectorN [T])
+    {
+        for (j <- 0 until u.dim) {
+            val x = u(j)
+            if (x != _0) v(i)(j) = x else v(i) -= j
+        } // for
+    } // update
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Slice this matrix row-wise from to end.
+     * @param from  the start row of the slice
+     * @param end   the end row of the slice
+     */
+    def slice (from: Int, end: Int): SparseMatrixN [T] =
+    {
+        val c = SparseMatrixN [T] (end - from + 1, dim2, _0)
+        for (i <- 0 until c.dim1) c(i) = this(i + from)
+        c
+    } // slice
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Slice this matrix row-wise r_from to r_end and column-wise c_from to c_end.
+     * @param r_from  the start of the row slice
+     * @param r_end   the end of the row slice
+     * @param c_from  the start of the column slice
+     * @param c_end   the end of the column slice
+     */
+    def slice (r_from: Int, r_end: Int, c_from: Int, c_end: Int): SparseMatrixN [T] =
+    {
+        val c = SparseMatrixN [T] (r_end - r_from + 1, c_end - c_from + 1, _0)
+        for (i <- 0 until c.dim1; j <- 0 until c.dim2) c(i, j) = this(i + r_from, j + c_from)
+        c
+    } // slice
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Slice this matrix excluding the given row and column.
+     * @param row  the row to exclude
+     * @param col  the column to exclude
+     */
+    def sliceExclude (row: Int, col: Int): SparseMatrixN [T] =
+    {
+        val c = SparseMatrixN [T] (dim1 - 1, dim2 - 1, _0)
+        for (i <- range1 if i != row) for (j <- range2 if j != col) {
+            c.v(i - oneIf (i > row))(j - oneIf (j > col)) = this(i, j)
+        } // for
+        c
+    } // sliceExclude
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Transpose this matrix (rows => columns).
+     */
+    def t: SparseMatrixN [T] =
+    {
+        val b = SparseMatrixN [T] (dim2, dim1, _0)
+        for (i <- b.range1; j <- b.range2) b(i, j) = this(j, i)
+        b
+    } // t
+
+   /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Add this matrix and matrix b.
+     * @param b  the matrix to add (requires sameCrossDimensions)
+     */
+    def + (b: Matrix [T]) (implicit nu: Numeric [T]): SparseMatrixN [T] =
+    {
+        val c = SparseMatrixN [T] (dim1, dim2, _0)
+        for (i <- c.range1; j <- c.range2) c(i, j) = nu.plus (this(i, j), b(i, j))
+        c
+    } // +
+
+   /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Add inplace this matrix and matrix b.
+     * @param b  the matrix to add (requires sameCrossDimensions)
+     */
+    def += (b: Matrix [T]) (implicit nu: Numeric [T])
+    {
+        for (i <- range1; j <- range2) this(i, j) = nu.plus (this(i, j), b(i, j))
+    } // +=
+
+   /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Add this matrix and scalar s.
+     * @param s  the scalar to add
+     */
+    def + (s: T) (implicit nu: Numeric [T]): SparseMatrixN [T] =
+    {
+        val c = SparseMatrixN [T] (dim1, dim2, _0)
+        for (i <- c.range1; j <- c.range2) c(i, j) = nu.plus (this(i, j), s)
+        c
+    } // +
+
+   /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Add inplace this matrix and scalar s.
+     * @param s  the scalar to add
+     */
+    def += (s: T) (implicit nu: Numeric [T])
+    {
+        for (i <- range1; j <- range2) this(i, j) = nu.plus (this(i, j), s)
+    } // +=
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * From this matrix substract matrix b.
+     * @param b  the matrix to subtract (requires sameCrossDimensions)
+     */
+    def - (b: Matrix [T]) (implicit nu: Numeric [T]): SparseMatrixN [T] =
+    {
+        val c = SparseMatrixN [T] (dim1, dim2, _0)
+        for (i <- c.range1; j <- c.range2) c(i, j) = nu.minus (this(i, j), b(i, j))
+        c
+    } // -
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * From this matrix substract inplace matrix b.
+     * @param b  the matrix to subtract (requires sameCrossDimensions)
+     */
+    def -= (b: Matrix [T]) (implicit nu: Numeric [T])
+    {
+        for (i <- range1; j <- range2) this(i, j) = nu.minus (this(i, j), b(i, j))
+    } // -=
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * From this matrix subtract scalar s.
+     * @param s  the scalar to subtract
+     */
+    def - (s: T) (implicit nu: Numeric [T]): SparseMatrixN [T] =
+    {
+        val c = SparseMatrixN [T] (dim1, dim2, _0)
+        for (i <- c.range1; j <- c.range2) c(i, j) = nu.minus (this(i, j), s)
+        c
+    } // -
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * From this matrix subtract inplace scalar s.
+     * @param s  the scalar to subtract
+     */
+    def -= (s: T) (implicit nu: Numeric [T])
+    {
+        for (i <- range1; j <- range2) this(i, j) = nu.minus (this(i, j), s)
+    } // -=
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Multiply this matrix by matrix b.
+     * @param b  the matrix to multiply by (requires sameCrossDimensions)
+     */
+    def * (b: Matrix [T]) (implicit nu: Numeric [T]): SparseMatrixN [T] =
+    {
+        val c = SparseMatrixN [T] (dim1, b.dim2, _0)
+        for (i <- c.range1; j <- c.range2) c(i, j) = row(i) dot b.col(j)
+        c
+    } // *
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Multiply inplace this matrix by matrix b.
+     * @param b  the matrix to multiply by (requires sameCrossDimensions)
+     */
+    def *= (b: Matrix [T]) (implicit nu: Numeric [T])
+    {
+        for (i <- range1; j <- range2) this(i, j) = row(i) dot b.col(j)
+    } // *=
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Multiply this matrix by vector b.
+     * @param b  the vector to multiply by
+     */
+    def * (b: VectorN [T]) (implicit nu: Numeric [T]): VectorN [T] =
+    {
+        val c = VectorN [T] (dim1)
+        for (i <- range1) c(i) = row(i) dot b
+        c
+    } // *
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Multiply this matrix by scalar s.
+     * @param s  the scalar to multiply by
+     */
+    def * (s: T) (implicit nu: Numeric [T]): SparseMatrixN [T] =
+    {
+        val c = SparseMatrixN [T] (dim1, dim2, _0)
+        for (i <- c.range1; j <- c.range2) c(i, j) = nu.times (this(i, j), s)
+        c
+    } // *
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Multiply inplace this matrix by scalar s.
+     * @param s  the scalar to multiply by
+     */
+    def *= (s: T) (implicit nu: Numeric [T])
+    {
+        for (i <- range1; j <- range2) this(i, j) = nu.times (this(i, j), s)
+    } // *=
+
+   /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Multiply this matrix by vector b to produce another matrix (a_ij * b_j)
+     * @param b  the vector to multiply by
+     */
+    def ** (b: VectorN [T]) (implicit nu: Numeric [T]): SparseMatrixN [T] =
+    {
+        val c = SparseMatrixN [T] (dim1, dim2, _0)
+        for (i <- c.range1; j <- c.range2) c(i, j) = nu.times (this(i, j), b(j))
+        c
+    } // **
+
+   /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Multiply inplace this matrix by vector b to produce another matrix (a_ij * b_j)
+     * @param b  the vector to multiply by
+     */
+    def **= (b: VectorN [T]) (implicit nu: Numeric [T])
+    {
+        for (i <- range1; j <- range2) this(i, j) = nu.times (this(i, j), b(j))
+    } // **=
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Decompose this matrix into the product of lower and upper triangular
+     * matrices (l, u) using the LU Decomposition algorithm.  This version uses
+     * partial pivoting.
+     */
+    def lud (implicit nu: Fractional [T]): Tuple2 [SparseMatrixN [T], SparseMatrixN [T]] =
+    {
+        val _1 = nu.one
+        val l  = SparseMatrixN [T] (dim1, dim2, _0)  // lower triangular matrix
+        val u  = new SparseMatrixN [T] (this, _0)    // upper triangular matrix (a copy of this)
+
+        for (i <- u.range1) {
+            var pivot = u(i, i)
+            if (pivot == 0.) {
+                val k = partialPivoting (u, i)   // find the maxiumum element below pivot
+                swap (u, i, k, i)                // swap rows i and k from column k
+                pivot = u(i, i)                  // reset the pivot
+            } // if
+            l(i, i) = _1
+            for (j <- i + 1 until u.dim2) l(i, j) = _0
+            for (k <- i + 1 until u.dim1) {
+                val mul = nu.div (u(k, i), pivot)
+                l(k, i) = mul
+                for (j <- u.range2) u(k, j) = nu.minus (u(k, j), nu.times (mul, u(i, j)))
+            } // for
+        } // for
+        Tuple2 (l, u)
+    } // lud
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Decompose inplace this matrix into the product of lower and upper triangular
+     * matrices (l, u) using the LU Decomposition algorithm.  This version uses
+     * partial pivoting.
+     */
+    def lud_ip (implicit nu: Fractional [T]): Tuple2 [SparseMatrixN [T], SparseMatrixN [T]] =
+    {
+        val _1 = nu.one
+        val l  = SparseMatrixN [T] (dim1, dim2, _0)  // lower triangular matrix
+        val u  = this                                // upper triangular matrix (this)
+
+        for (i <- u.range1) {
+            var pivot = u(i, i)
+            if (pivot == 0.) {
+                val k = partialPivoting (u, i)   // find the maxiumum element below pivot
+                swap (u, i, k, i)                // swap rows i and k from column k
+                pivot = u(i, i)                  // reset the pivot
+            } // if
+            l(i, i) = _1
+            for (j <- i + 1 until u.dim2) l(i, j) = _0
+            for (k <- i + 1 until u.dim1) {
+                val mul = nu.div (u(k, i), pivot)
+                l(k, i) = mul
+                for (j <- u.range2) u(k, j) = nu.minus (u(k, j), nu.times (mul, u(i, j)))
+            } // for
+        } // for
+        Tuple2 (l, u)
+    } // lud_ip
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Use partial pivoting to find a maximal non-zero pivot and return its row
+     * index, i.e., find the maximum element (k, i) below the pivot (i, i).
+     * @param a  the matrix to perform partial pivoting on
+     * @param i  the row and column index for the current pivot
+     */
+    private def partialPivoting (a: SparseMatrixN [T], i: Int) (implicit nu: Fractional [T]): Int =
+    {
+        var max  = a(i, i)   // initially set to the pivot
+        var kMax = i         // initially the pivot row
+
+        for (k <- i + 1 until a.dim1 if nu.gt (nu.abs (a(k, i)), max)) {
+            max  = nu.abs (a(k, i))
+            kMax = k
+        } // for
+        if (kMax == i) flaw ("partialPivoting", "unable to find a non-zero pivot")
+        kMax
+    } // partialPivoting
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Swap the elements in rows i and k starting from column col.
+     * @param a    the matrix containing the rows to swap
+     * @param i    the higher row  (e.g., contains a zero pivot)
+     * @param k    the lower row (e.g., contains max element below pivot)
+     * @param col  the starting column for the swap
+     */
+    private def swap (a: SparseMatrixN [T], i: Int, k: Int, col: Int)
+    {
+        for (j <- col until a.dim2) {
+            val tmp = a(k, j); a(k, j) = a(i, j); a(i, j) = tmp
+        } // for
+    } // swap
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Solve for x in the equation l*u*x = b (see lud above).
+     * @param l  the lower triangular matrix
+     * @param u  the upper triangular matrix
+     * @param b  the constant vector
+     */
+    def solve (l: Matrix [T], u: Matrix [T], b: VectorN [T])
+        (implicit nu: Fractional [T]): VectorN [T] =
+    {
+        val y = VectorN [T] (l.dim2)
+        for (k <- 0 until y.dim) {                   // solve for y in l*y = b
+            var sum = _0
+            for (j <- 0 until k) sum = nu.plus (sum, nu.times (l(k, j), y(j)))
+            y(k) = nu.minus (b(k), sum)
+        } // for
+
+        val x = VectorN [T] (u.dim2)
+        for (k <- x.dim - 1 to 0 by -1) {            // solve for x in u*x = y
+            var sum = _0
+            for (j <- k + 1 until u.dim2) sum = nu.plus (sum, nu.times (u(k, j), x(j)))
+            x(k) = nu.div (nu.minus (y(k), sum), u(k, k))
+        } // for
+        x
+    } // solve
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Solve for x in the equation l*u*x = b (see lud above).
+     * @param lu  the lower and upper triangular matrices
+     * @param b   the constant vector
+     */
+    def solve (lu: Tuple2 [Matrix [T], Matrix [T]], b: VectorN [T])
+        (implicit nu: Fractional [T]): VectorN [T] =
+    {
+        solve (lu._1, lu._2, b)
+    } // solve
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Solve for x in the equation a*x = b where a is this matrix (see lud above).
+     * @param b  the constant vector.
+     */
+    def solve (b: VectorN [T])
+        (implicit nu: Fractional [T]): VectorN [T] =
+    {
+        solve (lud, b)
+    } // solve
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Combine this matrix with matrix b, placing them along the diagonal and
+     * filling in the bottom left and top right regions with zeroes; [this, b].
+     * @param b  the matrix to combine with this matrix
+     */
+    def diag (b: Matrix [T]) (implicit nu: Numeric [T]): SparseMatrixN [T] =
+    {
+        val m = dim1 + b.dim1
+        val n = dim2 + b.dim2
+        val c = SparseMatrixN [T] (m, n, _0)
+
+        for (i <- 0 until m; j <- 0 until n) {
+            c(i, j) = if (i <  dim1 && j <  dim2) this(i, j)
+                 else if (i >= dim1 && j >= dim2) b(i - dim1, j - dim2)
+                    else                          _0
+        } // for
+        c
+    } // diag
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Form a matrix [Ip, this, Iq] where Ir is a r by r identity matrix, by
+     * positioning the three matrices Ip, this and Iq along the diagonal.
+     * @param p  the size of identity matrix Ip
+     * @param q  the size of identity matrix Iq
+     */
+    def diag (p: Int, q: Int) (implicit nu: Numeric [T]): SparseMatrixN [T] =
+    {
+        if (! isSymmetric) flaw ("diag", "this matrix must be symmetric")
+        val _1 = nu.one
+        val n  = dim1 + p + q
+        val c  = SparseMatrixN [T] (n, n, _0)
+
+        for (i <- 0 until n; j <- 0 until n) {
+            c(i, j) = if (i < p || i > p + dim1) if (i == j) _1 else _0
+                    else                         this(i - p, j - p)
+        } // for
+        c
+    } // diag
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Inverse this matrix (requires a squareMatrix).  This version uses partial
+     * pivoting.
+     */
+    def inverse (implicit nu: Fractional [T]): SparseMatrixN [T] =
+    {
+        val _1 = nu.one
+        val b  = new SparseMatrixN [T] (this, _0)       // copy this matrix into b
+        val c  = new SparseMatrixN [T] (dim1, _1, _0)   // let c represent the augmentation
+
+        for (i <- b.range1) {
+            var pivot = b(i, i)
+            if (pivot == 0.) {
+                val k = partialPivoting (b, i)  // find the maxiumum element below pivot
+                swap (b, i, k, i)               // in b, swap rows i and k from column i
+                swap (c, i, k, 0)               // in c, swap rows i and k from column 0
+                pivot = b(i, i)                 // reset the pivot
+            } // if
+            for (j <- b.range2) {
+                b(i, j) = nu.div (b(i, j), pivot)
+                c(i, j) = nu.div (c(i, j), pivot)
+            } // for
+            for (k <- 0 until dim1 if k != i) {
+                val mul = b(k, i)
+                for (j <- b.range2) {
+                     b(k, j) = nu.minus (b(k, j), nu.times (mul, b(i, j)))
+                     c(k, j) = nu.minus (c(k, j), nu.times (mul, c(i, j)))
+                } // for
+            } // for
+        } // for
+        c
+    } // inverse
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Invert inplace this matrix (requires a squareMatrix).  This version uses
+     * partial pivoting.
+     */
+    def inverse_ip (implicit nu: Fractional [T]): SparseMatrixN [T] =
+    {
+        val _1 = nu.one
+        val b  = this                                   // use this matrix for b
+        val c  = new SparseMatrixN [T] (dim1, _1, _0)   // let c represent the augmentation
+
+        for (i <- b.range1) {
+            var pivot = b(i, i)
+            if (pivot == 0.) {
+                val k = partialPivoting (b, i)  // find the maxiumum element below pivot
+                swap (b, i, k, i)               // in b, swap rows i and k from column i
+                swap (c, i, k, 0)               // in c, swap rows i and k from column 0
+                pivot = b(i, i)                 // reset the pivot
+            } // if
+            for (j <- b.range2) {
+                b(i, j) = nu.div (b(i, j), pivot)
+                c(i, j) = nu.div (c(i, j), pivot)
+            } // for
+            for (k <- 0 until dim1 if k != i) {
+                val mul = b(k, i)
+                for (j <- b.range2) {
+                     b(k, j) = nu.minus (b(k, j), nu.times (mul, b(i, j)))
+                     c(k, j) = nu.minus (c(k, j), nu.times (mul, c(i, j)))
+                } // for
+            } // for
+        } // for
+        c
+    } // inverse_ip
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Use Guass-Jordan reduction on this matrix to make the left part embed an
+     * identity matrix.  A constraint on this m by n matrix is that n >= m.
+     */
+    def reduce (implicit nu: Fractional [T]): SparseMatrixN [T] =
+    {
+        if (dim2 < dim1) flaw ("reduce", "requires n (columns) >= m (rows)")
+        val b = new SparseMatrixN [T] (this, _0)    // copy this matrix into b
+
+        for (i <- b.range1) {
+            var pivot = b(i, i)
+            if (pivot == 0.) {
+                val k = partialPivoting (b, i)  // find the maxiumum element below pivot
+                swap (b, i, k, i)               // in b, swap rows i and k from column i
+                pivot = b(i, i)                 // reset the pivot
+            } // if
+            for (j <- b.range2) {
+                b(i, j) = nu.div (b(i, j), pivot)
+            } // for
+            for (k <- 0 until dim1 if k != i) {
+                val mul = b(k, i)
+                for (j <- b.range2) {
+                     b(k, j) = nu.minus (b(k, j), nu.times (mul, b(i, j)))
+                } // for
+            } // for
+        } // for
+        b
+    } // reduce
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Use Guass-Jordan reduction inplace on this matrix to make the left part
+     * embed an identity matrix.  A constraint on this m by n matrix is that n >= m.
+     */
+    def reduce_ip (implicit nu: Fractional [T])
+    {
+        if (dim2 < dim1) flaw ("reduce", "requires n (columns) >= m (rows)")
+        val b = this         // use this matrix for b
+
+        for (i <- b.range1) {
+            var pivot = b(i, i)
+            if (pivot == 0.) {
+                val k = partialPivoting (b, i)  // find the maxiumum element below pivot
+                swap (b, i, k, i)               // in b, swap rows i and k from column i
+                pivot = b(i, i)                 // reset the pivot
+            } // if
+            for (j <- b.range2) {
+                b(i, j) = nu.div (b(i, j), pivot)
+            } // for
+            for (k <- 0 until dim1 if k != i) {
+                val mul = b(k, i)
+                for (j <- b.range2) {
+                     b(k, j) = nu.minus (b(k, j), nu.times (mul, b(i, j)))
+                } // for
+            } // for
+        } // for
+    } // reduce_ip
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Compute the determinant of this matrix.
+     */
+    def det (implicit nu: Numeric [T]): T =
+    {
+        if ( ! isSquare) flaw ("det", "determinant only works on square matrices")
+        val _0  = nu.zero
+        var sum = _0
+        var b: SparseMatrixN [T] = null
+
+        for (j <- range2) {
+            b = sliceExclude (0, j)   // the submatrix that excludes row 0 and column j
+            if (j % 2 == 0) {
+                sum = nu.plus (sum, nu.times (this(0, j), (if (b.dim1 == 1) b(0, 0) else b.det)))
+            } else {
+                sum = nu.minus (sum, nu.times (this(0, j), (if (b.dim1 == 1) b(0, 0) else b.det)))
+            } // if
+        } // for
+        sum
+    } // det
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Check whether this matrix is rectangular (all rows have the same number
+     * of columns).
+     */
+    def isRectangular: Boolean = true
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Show the non-zero elements in this sparse matrix.
+     */
+    def show
+    {
+        print ("SparseMatrix (")
+        for (i <- range1) {
+            if (i > 0) print ("\t")
+            println ("\t" + v(i))
+        } // for
+        println (")")
+    } // show
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Show all elements in this sparse matrix.
+     */
+    def showAll
+    {
+        print ("SparseMatrix (")
+        for (i <- range1) {
+            if (i > 0) print ("\t")
+            print ("\t(")
+            for (j <- range2) print (" " + this(i, j))
+            println (" )")
+        } // for
+        println (")")
+    } // showAll
+
+} // SparseMatrixN class
+
+/**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ * This object is used to test the SparseMatrixN class.
+ */
+object SparseMatrixNTest extends Application
+{
+     val y = new SparseMatrixN [Double] (3, 3, 7., 0.)
+     val z = new SparseMatrixN [Double] (3, 8., 0.)
+     val a = y + z
+     val b = y - z
+     val c = y * z
+
+     println ("y     = "); y.show; y.showAll
+     println ("z     = "); z.show; z.showAll
+     println ("y + z = "); a.show; a.showAll
+     println ("y - z = "); b.show; b.showAll
+     println ("y * z = "); c.show; c.showAll
+
+} // SparseMatrixNTest object
+

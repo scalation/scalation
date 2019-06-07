@@ -1,0 +1,118 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller, Hao Peng
+  * @version 1.2
+  * @since   Mon Jul 27 01:27:00 EDT 2015
+  * @see     LICENSE (MIT style license file).
+  */
+
+
+package scalation.analytics
+
+import reflect.ClassTag
+
+import scalation.util.Error
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Table3` class is a simple implementation of a 3-dimensional table.
+ *  The first two dimensions must be fixed and known, while the third dimension
+ *  may be dynamically allocated by the user.
+ *  @param s0  size of the 1st dimension of the table
+ *  @param s1  size of the 2nd dimension of the table
+ */
+class Table3 [T: ClassTag] (s0: Int, s1: Int)
+      extends Error
+{
+    /** Multi-dimensional array storage for table
+     */
+    private val tab = Array.ofDim [Array [T]] (s0, s1)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Clear (make null) all contents in the 3rd and 4th dimensions of the table.
+     */
+    def clear () = { for (i <- 0 until s0; j <- 0 until s1) tab(i)(j) = null }
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Allocate one element of the 3rd dimension of the table.
+     *  @param i   1st dimension index of the table
+     *  @param j   2nd dimension index of the table
+     *  @param sz  size of the array to be allocated in row i and column j
+     */
+    def alloc (i: Int, j: Int, sz: Int) { tab(i)(j) = Array.ofDim [T] (sz) }
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Allocate all elements of the 3rd dimension of the table.
+     *  @param sz  sizes of all the arrays to be allocated in the 3rd dimension
+     */
+    def alloc (sz: Array [Int])
+    {
+        if (sz.length != s1) flaw ("alloc", "Dimensions mismatch")
+        for (i <- 0 until s0; j <- 0 until s1) tab(i)(j) = Array.ofDim [T] (sz(j))
+    } // alloc
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Retrieve a single element of the table.
+     *  @param i  1st dimension index of the table
+     *  @param j  2nd dimension index of the table
+     *  @param k  3rd dimension index of the table
+     */
+    def apply (i: Int, j: Int, k: Int): T = tab(i)(j)(k)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Update a single element of the table to the given value.
+     *  @param i  1st dimension index of the table
+     *  @param j  2nd dimension index of the table
+     *  @param k  3rd dimension index of the table
+     *  @param v  the value to be updated at the above position in the table
+     */
+    def update (i: Int, j: Int, k: Int, v: T) = tab(i)(j)(k) = v
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Print the table in a relatively nice manner.
+      */
+    override def toString: String = tab.deep.toString ()
+
+} // Table3 class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Table3Test` object is used to test the `Table3` class.
+ *  Basic alloc and update functions are tested using `Int`.
+ */
+object Table3Test extends App
+{
+    val tb = new Table3 [Int] (2, 3)
+    for (i <- 0 until 2; j <- 0 until 3) tb.alloc (i, j, 2)
+    for (i <- 0 until 2; j <- 0 until 3; k <- 0 until 2) tb(i, j, k) = i + j + k
+    println ("tb = " + tb)
+
+} // Table3Test object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Table3Test2` object is used to test the `Table3` class.
+  * Basic alloc and update functions are tested using `Double`.
+  */
+object Table3Test2 extends App
+{
+    val tb = new Table3 [Double] (2, 3)
+    for (i <- 0 until 2; j <- 0 until 3) tb.alloc (i, j, 2)
+    for (i <- 0 until 2; j <- 0 until 3; k <- 0 until 2) tb(i, j, k) = (i + j + k) * 0.5
+    println ("tb = " + tb)
+
+} // Table3Test2
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Table3Test3` object is used to test the `Table3` class.
+  * Advanced alloc and update functions are tested.
+  */
+object Table3Test3 extends App
+{
+    val tb = new Table3 [Double] (2, 3)
+    tb.alloc (Array (2, 2, 2))
+    for (i <- 0 until 2; j <- 0 until 3; k <- 0 until 2) tb(i, j, k) = (i + j + k) * 0.5
+    println ("tb = " + tb)
+
+} // Table3Test3
+

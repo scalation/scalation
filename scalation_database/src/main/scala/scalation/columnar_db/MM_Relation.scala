@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sun Aug 23 15:42:06 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *
@@ -23,6 +23,8 @@ import java.io.{FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutp
 
 import scala.collection.immutable.StringOps
 import scala.collection.mutable.{ArrayBuffer, Map}
+import scala.math.{min => MIN}
+import scala.reflect.ClassTag
 
 import scalation.linalgebra.MatrixKind._
 import scalation.linalgebra.mem_mapped._
@@ -50,7 +52,7 @@ object MM_Relation
     def apply (name: String, colName: Seq [String], row: Seq [Row], key: Int, domain: String): MM_Relation =
     {
         val equivCol = Vector.fill [Vec] (colName.length)(null)
-        val r2 = MM_Relation (name, colName, equivCol, key, domain)
+        val r2 = new MM_Relation (name, colName, equivCol, key, domain)
         for (tuple <- row) r2.add (tuple)
         r2
     } // apply
@@ -66,7 +68,7 @@ object MM_Relation
     def apply (name: String, colName: Seq [String], row: Seq [Row], key: Int): MM_Relation =
     {
         val equivCol = Vector.fill [Vec] (colName.length)(null)
-        val r2 = MM_Relation (name, colName, equivCol, key, null)
+        val r2 = new MM_Relation (name, colName, equivCol, key, null)
         for (tuple <- row) r2.add_2 (tuple)
         r2
     } // apply
@@ -100,7 +102,7 @@ object MM_Relation
         var cnt    = skip
         val lines  = getFromURL_File (fileName)
         val newCol = Vector.fill [Vec] (colName.length)(null)
-        val r3     = MM_Relation (name, colName, newCol, key, domain)
+        val r3     = new MM_Relation (name, colName, newCol, key, domain)
         for (ln <- lines) {
             if (cnt <= 0) r3.add (r3.row (ln.split (eSep), domain)) else cnt -= 1
         } // for
@@ -136,7 +138,7 @@ object MM_Relation
                 values.indices.foreach (i => { colBuffer(i) += values(i) })
             } // if
         } // for
-        MM_Relation (name, colName, colBuffer.indices.map (i => VectorS (colBuffer(i).toArray)).toVector, key, domain)
+        new MM_Relation (name, colName, colBuffer.indices.map (i => VectorS (colBuffer(i).toArray)).toVector, key, domain)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -155,7 +157,7 @@ object MM_Relation
         var eSep   = ","
         val lines  = getFromURL_File (fileName)
         val newCol = Vector.fill [Vec] (colName.length)(null)
-        val r3     = MM_Relation (name, colName, newCol, key, domain)
+        val r3     = new MM_Relation (name, colName, newCol, key, domain)
         for (ln <- lines) r3.add (r3.row (ln.split (eSep), domain))
         r3
     } // apply
@@ -182,7 +184,7 @@ object MM_Relation
                     domain: String = null): MM_Relation =
     {
         val newCol = for (j <- 0 until xy.dim2) yield xy.col (j).asInstanceOf [Vec]
-        MM_Relation (name, colName, newCol.toVector, key, domain)
+        new MM_Relation (name, colName, newCol.toVector, key, domain)
     } // fromMatriD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -199,7 +201,7 @@ object MM_Relation
                     domain: String = null): MM_Relation =
     {
         val newCol = for (j <- 0 until x.dim2) yield x.col (j).asInstanceOf [Vec]
-        MM_Relation (name, colName, newCol.toVector :+ y, key, domain)
+        new MM_Relation (name, colName, newCol.toVector :+ y, key, domain)
     } // fromMatriD_
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -214,7 +216,7 @@ object MM_Relation
                     domain: String = null): MM_Relation =
     {
         val newCol = for (j <- 0 until xy.dim2) yield xy.col (j).asInstanceOf [Vec]
-        MM_Relation (name, colName, newCol.toVector, key, domain)
+        new MM_Relation (name, colName, newCol.toVector, key, domain)
     } // fromMatriI
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -230,7 +232,7 @@ object MM_Relation
                      domain: String = null): MM_Relation =
     {
         val newCol = for (j <- 0 until x.dim2) yield x.col (j).asInstanceOf [Vec]
-        MM_Relation (name, colName, newCol.toVector :+ y, key, domain)
+        new MM_Relation (name, colName, newCol.toVector :+ y, key, domain)
     } // fromMatriII
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -307,6 +309,7 @@ import MM_Relation._
  *      Q - `Rational` - `VectorQ` - 128 bit ratio of two long integers
  *      R - `Real`     - `VectorR` - 128 bit quad precision floating point number
  *      S - `StrNum`   - `VectorS` - variable length numeric string
+ *      T - `TimeNum`  - `VectorT` - 96 bit time number
  *  <p>
  *------------------------------------------------------------------------------
  *  @param name     the name of the relation
@@ -314,9 +317,12 @@ import MM_Relation._
  *  @param col      the Scala Vector of columns making up the columnar relation
  *  @param key      the column number for the primary key (< 0 => no primary key)
  *  @param domain   an optional string indicating domains for columns (e.g., 'SD' = `StrNum`, `Double`) 
+ *  @param fKeys    an optional sequence of foreign keys - Seq (column name, ref table name, ref column position)
+ *  @param enter    whether to enter the newly created relation into the `Catalog`
  */
-case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Vec],
-                     key: Int = 0, domain: String = null)
+class MM_Relation (val name: String, val colName: Seq [String], var col: Vector [Vec],
+                   val key: Int = 0, val domain: String = null, var fKeys: Seq [(String, String, Int)] = null,
+                enter: Boolean = true)
      extends Table with Error
 {
     if (colName.length != col.length) flaw ("constructor", "incompatible sizes for 'colName' and 'col'")
@@ -334,9 +340,18 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
     def cols: Int = col.length
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the columns in the relation.
+    /** Return all of the columns in the relation.
      */
-//  def columns: Vector [Vec] = col            // FIX - implement
+//  def columns: Vector [Vec] = col
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the column in the relation with column name 'cName'.
+     *  @param cName  column name used to retrieve the column vector
+     */
+//  def column (cName: String): Vec = col(colMap (cName))
+
+    def column(cName: String): scalation.linalgebra.Vec = ???
+    def columns: Vector[scalation.linalgebra.Vec] = ???
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the names of columns in the relation.
@@ -359,32 +374,35 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
     def rows: Int = col(0).size
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Project onto the columns with the given column names.
-     *  @param cName  the names of the columns to project onto
+    /** Rename 'this' table, returning a shallow copy of 'this' table.
+     *  @param newName  the new name for the table.
      */
-    def pi (cName: String*): MM_Relation = pi (cName.map(colMap (_)), cName)
+    def rename (newName: String): MM_Relation =
+    {
+        new MM_Relation (newName, colName, col, key, domain, fKeys)
+    } // rename
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Project onto the columns with the given column names.
      *  @param cName  the names of the columns to project onto
      */
-    def π (cName: String*): MM_Relation = pi (cName.map(colMap (_)), cName)
+    def project (cName: String*): MM_Relation = project (cName.map(colMap (_)), cName)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Project onto the columns with the given column positions.
      *  @param cPos   the column positions to project onto
      *  @param cName  the optional new names for the columns to project onto
      */
-    def pi (cPos: Seq [Int], cName: Seq [String] = null): MM_Relation =
+    def project (cPos: Seq [Int], cName: Seq [String] = null): MM_Relation =
     {
         val newCName  = if (cName == null) cPos.map (colName(_)) else cName
         val newCol    = cPos.map (col(_)).toVector
         val newKey    = if (cPos contains key) key else -1
         val newDomain = projectD (domain, cPos)
-        MM_Relation (name + "_p_" + ucount (), newCName, newCol, newKey, newDomain)
-    } // pi
+        new MM_Relation (name + "_p_" + ucount (), newCName, newCol, newKey, newDomain)
+    } // project
 
-    private def getNew (cName: String) = { val cn = colMap (cName)
+    private def getMeta (cName: String) = { val cn = colMap (cName)
                                            (cn,
                                             Seq (cName),
                                             if (cn == key) key else -1,
@@ -398,51 +416,51 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
      */
     def pisigmaC (cName: String, p: Complex => Boolean): MM_Relation =
     {
-        val nu     = getNew (cName)
+        val nu     = getMeta (cName)
         val newCol = Vector (col (nu._1).asInstanceOf [VectorC].filter (p))
-        MM_Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
+        new MM_Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
     } // pisigmaC
 
     def pisigmaD (cName: String, p: Double => Boolean): MM_Relation =
     {
-        val nu     = getNew (cName)
+        val nu     = getMeta (cName)
         val newCol = Vector (col (nu._1).asInstanceOf [VectorD].filter (p))
-        MM_Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
+        new MM_Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
     } // pisigmaD
 
     def pisigmaI (cName: String, p: Int => Boolean): MM_Relation =
     {
-        val nu     = getNew (cName)
+        val nu     = getMeta (cName)
         val newCol = Vector (col (nu._1).asInstanceOf [VectorI].filter (p))
-        MM_Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
+        new MM_Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
     } // pisigmaI
 
     def pisigmaL (cName: String, p: Long => Boolean): MM_Relation =
     {
-        val nu     = getNew (cName)
+        val nu     = getMeta (cName)
         val newCol = Vector (col (nu._1).asInstanceOf [VectorL].filter (p))
-        MM_Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
+        new MM_Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
     } // pisigmaL
 
     def pisigmaQ (cName: String, p: Rational => Boolean): MM_Relation =
     {
-        val nu     = getNew (cName)
+        val nu     = getMeta (cName)
         val newCol = Vector (col (nu._1).asInstanceOf [VectorQ].filter (p))
-        MM_Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
+        new MM_Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
     } // pisigmaQ
 
     def pisigmaR (cName: String, p: Real => Boolean): MM_Relation =
     {
-        val nu     = getNew (cName)
+        val nu     = getMeta (cName)
         val newCol = Vector (col (nu._1).asInstanceOf [VectorR].filter (p))
-        MM_Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
+        new MM_Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
     } // pisigmaR
 
     def pisigmaS (cName: String, p: StrNum => Boolean): MM_Relation =
     {
-        val nu     = getNew (cName)
+        val nu     = getMeta (cName)
         val newCol = Vector (col (nu._1).asInstanceOf [VectorS].filter (p))
-        MM_Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
+        new MM_Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
     } // pisigmaS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -557,7 +575,7 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
     def selectAt (pos: Seq [Int]): MM_Relation =
     {
        val newCol = (for (j <- col.indices) yield Vec.select (col(j), pos)).toVector
-       MM_Relation (name + "_s_" + ucount (), colName, newCol, key, domain)
+       new MM_Relation (name + "_s_" + ucount (), colName, newCol, key, domain)
     } // selectAt
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -565,7 +583,6 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
      *  differing numbers of columns or differing domain strings.
      *  @param r2  the other relation
      */
-//  def incompatible (r2: MM_Relation): Boolean =
     def incompatible (_r2: Table): Boolean =
     {
          val r2 = _r2.asInstanceOf [MM_Relation]
@@ -584,57 +601,42 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
     /** Union 'this' relation and 'r2'.  Check that the two relations are compatible.
      *  @param r2  the other relation
      */
-//  def union (r2: MM_Relation): MM_Relation =
     def union (_r2: Table): MM_Relation =
     {
         val r2 = _r2.asInstanceOf [MM_Relation]
         if (incompatible (r2)) return null
         val newCol = (for (j <- col.indices) yield Vec.++ (col(j), r2.col(j)))
-        MM_Relation (name + "_u_" + ucount (), colName, newCol.toVector, -1, domain)
+        new MM_Relation (name + "_u_" + ucount (), colName, newCol.toVector, -1, domain)
     } // union
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Union 'this' relation and 'r2'.  Check that the two relations are compatible.
-     *  @param r2  the other relation
-     */
-    def ⋃ (r2: Table): MM_Relation = this union r2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Intersect 'this' relation and 'r2'.  Check that the two relations are compatible.
      *  @param r2  the other relation
      */
-//  def intersect (r2: MM_Relation): MM_Relation =
     def intersect (_r2: Table): MM_Relation =
     {
         val r2 = _r2.asInstanceOf [MM_Relation]
         if (incompatible (r2)) return null
         val newCol = Vector.fill [Vec] (colName.length)(null)
-        val r3 = MM_Relation (name + "_u_" + ucount (), colName, newCol.toVector, -1, domain)
+        val r3 = new MM_Relation (name + "_u_" + ucount (), colName, newCol.toVector, -1, domain)
         for (i <- 0 until rows if r2 contains row(i)) r3.add (row(i))
         r3
     } // intersect
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Intersect 'this' relation and 'r2'.  Check that the two relations are compatible.
-     *  @param r2  the other relation
-     */
-    def ⋂ (r2: Table): MM_Relation = this intersect r2
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Take the difference of 'this' relation and 'r2' ('this - r2').  Check that
      *  the two relations are compatible.
      *  @param r2  the other relation
      */
-//  def - (r2: MM_Relation): MM_Relation =
-    def - (_r2: Table): MM_Relation =
+    def minus (_r2: Table): MM_Relation =
     {
         val r2 = _r2.asInstanceOf [MM_Relation]
         if (incompatible (r2)) return null
         val newCol = Vector.fill [Vec] (colName.length)(null)
-        val r3 = MM_Relation (name + "_m_" + ucount (), colName, newCol, key, domain)
+        val r3 = new MM_Relation (name + "_m_" + ucount (), colName, newCol, key, domain)
         for (i <- 0 until rows if ! (r2 contains row(i))) r3.add (row(i))
         r3
-    } // -
+    } // minus
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Join 'this' relation and 'r2 by performing an "equi-join".  Rows from both
@@ -644,7 +646,6 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
      *  @param cName2  the join column names of relation r2 (e.g., the Primary Key)
      *  @param r2      the rhs relation in the join operation
      */
-//  def join (cName1: Seq [String], cName2: Seq [String], r2: MM_Relation): MM_Relation =
     def join (cName1: Seq [String], cName2: Seq [String], _r2: Table): MM_Relation =
     {
         val r2 = _r2.asInstanceOf [MM_Relation]
@@ -657,7 +658,7 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
         val newCol    = Vector.fill [Vec] (ncols) (null)
         val newKey    = key                                        // FIX
         val newDomain = domain + r2.domain
-        val r3 = MM_Relation (name + "_j_" + ucount (), newCName, newCol, newKey, newDomain)
+        val r3 = new MM_Relation (name + "_j_" + ucount (), newCName, newCol, newKey, newDomain)
 
         for (i <- 0 until rows) {
             val t = row(i)
@@ -670,25 +671,11 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
     } // join
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Join 'this' relation and 'r2 by performing an "equi-join".  Rows from both
-     *  relations are compared requiring 'cName1' values to equal 'cName2' values.
-     *  Disambiguate column names by appending "2" to the end of any duplicate column name.
-     *  @param cName1  the string of join column names of this relation (e.g., the Foreign Key)
-     *  @param cName2  the string of join column names of relation r2 (e.g., the Primary Key)
-     *  @param r2      the rhs relation in the join operation
-     */
-    def join (cName1: String, cName2: String, r2: Table): MM_Relation =
-    {
-        join (cName1.split (" "), cName2.split (" "), r2)
-    } // join
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Join 'this' relation and 'r2 by performing a "natural-join".  Rows from both
      *  relations are compared requiring 'cName' values to be equal.
      *  @param cName  the common join column names for both relation
      *  @param r2     the rhs relation in the join operation
      */
-//  def join (cName: Seq [String], r2: MM_Relation): MM_Relation =
     def join (cName: Seq [String], _r2: Table): MM_Relation =
     {
         val r2 = _r2.asInstanceOf [MM_Relation]
@@ -701,37 +688,36 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
         val newCol    = Vector.fill [Vec] (ncols) (null)
         val newKey    = key                                        // FIX
         val newDomain = domain + r2.domain
-        val r3 = MM_Relation (name + "_j_" + ucount (), newCName, newCol, newKey, newDomain)
+        val r3 = new MM_Relation (name + "_j_" + ucount (), newCName, newCol, newKey, newDomain)
 
         for (i <- 0 until rows) {
             val t = row(i)
             for (j <- 0 until r2.rows) {
                 val u = r2.row(j)
-                if (sameOn (t, u, cp1, cp2)) { val u3 = project (u, cp3); r3.add (t ++ u3) }
+                if (sameOn (t, u, cp1, cp2)) { val u3 = TableObj.project (u, cp3); r3.add (t ++ u3) }
             } // for
         } // for
         r3
     } // join
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Join 'this' relation and 'r2 by performing a "natural-join".  Rows from both
-     *  relations are compared requiring agreement on common attributes (column names).
-     *  @param r2  the rhs relation in the join operation
-     */
-//  def >< (r2: MM_Relation): MM_Relation =
-    def >< (_r2: Table): MM_Relation =
-    {
-        val r2 = _r2.asInstanceOf [MM_Relation]
-        val common = colName intersect r2.colName
-        join (common, r2)
-    } // ><
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Join 'this' relation and 'r2 by performing a "natural-join".  Rows from both
-     *  relations are compared requiring agreement on common attributes (column names).
-     *  @param r2  the rhs relation in the join operation
+    /* As seen from class MM_Relation, the missing signatures are as follows.
+     * For convenience, these are usable as stub implementations.
      */
-    def ⋈ (r2: Table): MM_Relation = this >< r2
+    def delete [T] (p: Predicate[T]*): MM_Relation = ???
+    def eproject (aggCol: AggColumn*)(cName: String*): Relation = ???
+    def groupBy (cName: String*): MM_Relation = ???
+    def join [T] (r2: Table, p0: Predicate2 [T], p: Predicate2 [T]*): MM_Relation = ???
+    def leftJoin (cName1: String, cName2 : String, r2: Table): MM_Relation = ???
+    def leftJoin (thres: Double = 0.001) (cName1: String, cName2: String, r2: Table): MM_Relation = ???
+    def orderBy (_cName: String*): MM_Relation = ???
+    def product (r2: Table): MM_Relation = ???
+    def reverseOrderBy (_cName: String*): MM_Relation = ???
+    def select [T: ClassTag] (cName: String, p: T => Boolean): MM_Relation = ???
+    def update [T] (cName: String, func: T => T, pred: T => Boolean): Unit = ???
+    def update [T] (cName: String, func: T => T, matchVal: T): Unit = ???
+    def update [T] (cName: String, newVal: T, matchVal: T): Unit = ???
+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether 'this' relation contains a row matching the given 'tuple'.
@@ -748,6 +734,31 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
      *  @param i  the 'i'th position
      */
     def row (i: Int): Row = col.map (Vec (_, i)).toVector
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compress the selected columns 'cName' in 'this' table.
+     *  @param cName  the names of the columns to be compressed
+     */
+    def compress (cName: String*)
+    {
+        for (c <- cName) {
+            val i = colMap (c)
+//          col(i).compress ()      // FIX - add compress to Vec
+        } // for
+    } // compress
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Uncompress the selected columns 'cName' in 'this' table.
+     *  @param cName  the names of the columns to be uncompressed
+     */
+    def uncompress (cName: String*)
+    {
+        for (c <- cName) {
+            val i = colMap (c)
+//          col(i).uncompress ()      // FIX - add uncompress to Vec
+        } // for
+    } // uncompress
+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'tuple to 'this' relation as a new row.
@@ -796,19 +807,26 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show 'this' relation row by row.
+     *  @param limit  the limit on the number of rows to display
      */
-    def show ()
+    def show (limit: Int = Int.MaxValue)
     {
-        val wid = 18                                             // column width
-        val rep = wid * colName.length                           // repetition = width * # columns
+        val wid   = 18                                             // column width
+        val rep   = wid * colName.length                           // repetition = width * # columns
+        val title = s"| MM_Relation name = $name, key-column = $key "
 
         println (s"|-${"-"*rep}-|")
-        println (s"  MM_Relation name = $name, key-column = $key")
+        println (title + " "*(rep-title.length) + "   |")
         println (s"|-${"-"*rep}-|")
         print ("| "); for (cn <- colName) print (s"%${wid}s".format (cn)); println (" |")
         println (s"|-${"-"*rep}-|")
-        for (i <- 0 until rows) {
-            print ("| "); for (cv <- row(i)) print (s"%${wid}s".format (cv)); println (" |")
+        for (i <- 0 until MIN (rows, limit)) {
+            print ("| ")
+            for (cv <- row(i)) {
+                if (cv.isInstanceOf [Double]) print (s"%${wid}g".format (cv))
+                else                          print (s"%${wid}s".format (cv))
+            } // for
+            println (" |")
         } // for
         println (s"|-${"-"*rep}-|")
     } // show
@@ -823,7 +841,7 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
      */
     def toMatriD (colPos: Seq [Int], kind: MatrixKind = DENSE): MatriD =
     {
-        val colVec = for (x <- pi (colPos).col) yield Vec.toDouble (x)
+        val colVec = for (x <- project (colPos).col) yield Vec.toDouble (x)
         kind match {
         case DENSE           => MatrixD (colVec)
 //      case SPARSE          => SparseMatrixD (colVec)
@@ -843,7 +861,7 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
      */
     def toMatriDD (colPos: Seq [Int], colPosV: Int, kind: MatrixKind = DENSE): Tuple2 [MatriD, VectorD] =
     {
-        val colVec = for (x <- pi (colPos).col) yield Vec.toDouble (x)
+        val colVec = for (x <- project (colPos).col) yield Vec.toDouble (x)
         kind match {
         case DENSE           => (MatrixD (colVec), Vec.toDouble (col(colPosV)))
 //      case SPARSE          => (SparseMatrixD (colVec), Vec.toDouble (col(colPosV)))
@@ -863,7 +881,7 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
      */
     def toMatriDI (colPos: Seq [Int], colPosV: Int, kind: MatrixKind = DENSE): Tuple2 [MatriD, VectorI] =
     {
-        val colVec = for (x <- pi (colPos).col) yield Vec.toDouble (x)
+        val colVec = for (x <- project (colPos).col) yield Vec.toDouble (x)
         kind match {
         case DENSE           => (MatrixD (colVec), Vec.toInt (col(colPosV)))
 //      case SPARSE          => (SparseMatrixD (colVec), Vec.toInt (col(colPosV)))
@@ -882,7 +900,7 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
      */
     def toMatriI (colPos: Seq [Int], kind: MatrixKind = DENSE): MatriI =
     {
-        val colVec = for (x <- pi (colPos).col) yield Vec.toInt (x)
+        val colVec = for (x <- project (colPos).col) yield Vec.toInt (x)
         kind match {
         case DENSE           => MatrixI (colVec)
 //      case SPARSE          => SparseMatrixI (colVec)
@@ -902,7 +920,7 @@ case class MM_Relation (name: String, colName: Seq [String], var col: Vector [Ve
      */
     def toMatriII (colPos: Seq [Int], colPosV: Int, kind: MatrixKind = DENSE): Tuple2 [MatriI, VectorI] =
     {
-        val colVec = for (x <- pi (colPos).col) yield Vec.toInt (x)
+        val colVec = for (x <- project (colPos).col) yield Vec.toInt (x)
         kind match {
         case DENSE           => (MatrixI (colVec), Vec.toInt (col(colPosV)))
 //      case SPARSE          => (SparseMatrixI (colVec), Vec.toInt (col(colPosV)))
@@ -989,12 +1007,12 @@ object MM_RelationEx
  */
 object MM_RelationTest extends App
 {
-    val weekdays = MM_Relation ("weekdays", Seq ("day", "time"),
+    val weekdays = new MM_Relation ("weekdays", Seq ("day", "time"),
                               Vector (VectorS ("Mon", "Tue", "Wed", "Thu", "Fri"),
                                       VectorD (5.00, 8.15, 6.30, 9.45, 7.00)),
                               0, "SD")
 
-    val weekend = MM_Relation ("weekends", Seq ("day", "time"),
+    val weekend = new MM_Relation ("weekends", Seq ("day", "time"),
                               Vector (VectorS ("Sat", "Sun"),
                                       VectorD (3.00, 4.30)),
                               0, "SD")
@@ -1033,7 +1051,7 @@ object MM_RelationTest extends App
     println ("--------------------------------------------")
     println ("week.join (\"day\", \"day\" weekend)      = " + week.join ("day", "day", weekend))
     println ("--------------------------------------------")
-    println ("week >< weekend                           = " + (week >< weekend))
+    println ("week join weekend                           = " + (week join weekend))
 
     week.writeCSV ("columnar_db" + ⁄ + "week.csv")
 
@@ -1048,12 +1066,12 @@ object MM_RelationTest extends App
  */
 object MM_RelationTest2 extends App
 {
-    val weekdays = MM_Relation ("weekdays", Seq ("day", "time"),
+    val weekdays = new MM_Relation ("weekdays", Seq ("day", "time"),
                               Vector (VectorS ("Mon", "Tue", "Wed", "Thu", "Fri"),
                                       VectorD (5.00, 8.15, 6.30, 9.45, 7.00)),
                               0, "SD")
 
-    val weekend = MM_Relation ("weekends", Seq ("day", "time"),
+    val weekend = new MM_Relation ("weekends", Seq ("day", "time"),
                               Vector (VectorS ("Sat", "Sun"),
                                       VectorD (3.00, 4.30)),
                               0, "SD")
@@ -1098,7 +1116,7 @@ object MM_RelationTest3 extends App
     import MM_RelationEx.productSales
 
 /*
-    val productSales = MM_Relation ("productSales",
+    val productSales = new MM_Relation ("productSales",
         Seq ("SalesInvoiceNumber", "SalesDateKey", "SalesTimeKey", "SalesTimeAltKey", "StoreID", "CustomerID",
              "ProductID", "SalesPersonID", "Quantity", "ProductActualCost", "SalesTotalCost", "Deviation"),
         Seq (Vector [Any] (1,  20130101, 44347, 121907, 1, 1, 1, 1, 2,  11.0,  13.0, 2.0), 
@@ -1129,12 +1147,12 @@ object MM_RelationTest3 extends App
              0, "IIIIIIIIIDDD")
 */
 
-    val costVprice = productSales.π ("ProductActualCost", "SalesTotalCost")
+    val costVprice = productSales.project ("ProductActualCost", "SalesTotalCost")
 
     productSales.show ()
 
     println ("productSales = " + productSales)
-    println ("productSales.π (\"ProductActualCost\", \"SalesTotalCost\") = " + costVprice)
+    println ("productSales.project (\"ProductActualCost\", \"SalesTotalCost\") = " + costVprice)
 
     println ("\nTest count")
     println ("------------------------")

@@ -1,0 +1,207 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller, Aravind Kalimurthy
+ *  @version 1.2
+ *  @date    Mon Aug 29 12:31:10 EDT 2016
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  @see docs.oracle.com/javase/8/docs/api/java/util/regex/Matcher.html
+ */
+
+package scalation
+package util
+
+import java.util.regex.MatchResult
+import java.util.regex.{Matcher => JavaMatcher}
+import dk.brics.automaton.{AutomatonMatcher => BricsMatcher}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `MMatcher` class allows the user to select among multiple regex pattern
+ *  matchers.  See imports above for those currently supported.
+ *  @param baseMatcher  the base pattern matcher to be used
+ */
+class MMatcher (val baseMatcher: MatchResult)
+      extends MatchResult
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the offset after the last character matched.
+     */
+    def end (): Int = baseMatcher.end ()
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the offset after the last character of the subsequence captured by the
+     *  given group during this match.
+     *  @param group  the index of a capturing group in this matcher's pattern
+     */
+    def end (group: Int): Int = baseMatcher.end (group)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find/match the next subsequence of the input sequence that matches the pattern.
+     */
+    def find (): Boolean =
+    {
+        baseMatcher match {
+        case _: JavaMatcher  => baseMatcher.asInstanceOf [JavaMatcher].find ()
+        case _: BricsMatcher => baseMatcher.asInstanceOf [BricsMatcher].find ()
+        case _               => println ("find: matcher not supported"); false
+        } // match
+    } // find
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Resets this matcher and then attempts to find the next subsequence of the input
+     *  sequence that matches the pattern, starting at the specified index.
+     *  @param start  the index to start searching for a match
+     */
+    def find (start: Int): Boolean =
+    {
+        baseMatcher match {
+        case _: JavaMatcher  => baseMatcher.asInstanceOf [JavaMatcher].find (start)
+        case _               => println ("find: matcher not supported"); false
+        } // match
+    } // find
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the input subsequence matched by the previous match.
+     */
+    def group (): String = baseMatcher.group ()
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the input subsequence captured by the given group during the previous match operation.
+     *  @param group
+     */
+    def group (group: Int): String = baseMatcher.group (group)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the number of capturing groups in this match result's pattern.
+     */
+    def groupCount (): Int = baseMatcher.groupCount ()
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Match the input sequence, starting at the beginning of the region, against the pattern.
+     */
+    def lookingAt (): Boolean =
+    {
+        baseMatcher match {
+        case _: JavaMatcher  => baseMatcher.asInstanceOf [JavaMatcher].lookingAt ()
+        case _               => println ("lookingAt: matcher not supported"); false
+        } // match
+    } // find
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Match the entire region against the pattern.
+     */
+    def matches (): Boolean =
+    {
+        baseMatcher match {
+        case _: JavaMatcher  => baseMatcher.asInstanceOf [JavaMatcher].matches ()
+        case _               => println ("matches: matcher not supported"); false
+        } // match
+    } // find
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the start index of the match.
+     */
+    def start (): Int = baseMatcher.start ()
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the start index of the subsequence captured by the given group during this match.
+     *  @param group
+     */
+    def start (group: Int): Int = baseMatcher.start (group)
+
+} // MMatcher class
+
+import java.util.regex.{Matcher, Pattern}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RegexPat` value class provides an implementation for wildcard string
+ *  matching that checks if the 'self' string matches against a given 'pattern'
+ *  string based on single (CHAR_WILD_ONE) and/or multiple (CHAR_WILD_MANY) wildcards.
+ *  @param self  the underlying object to be accessed via the 'self' accessor
+ */
+class RegexPat (patString: String)
+{    
+    private val pat = Pattern.compile (patString)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The equal-match operator determines whether the 'self' string matches the
+     *  given 'pattern' string.   Pattern may contain single- and/or multiple-replacing
+     *  wildcard characters.
+     *  @param input  the input against which the string to be matched
+     */
+    def =~ (input: String): Boolean = isMatch (input)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Test whether the 'self' string matches the given 'pattern' string.
+     *  Pattern may contain single- and/or multiple-replacing wildcard characters.
+     *  @param input  the input against which the string to be matched
+     */
+    def isMatch (input: String): Boolean = 
+    {
+        val mat = pat.matcher (input)
+        mat.find ()                          // match part of input
+//      mat.matches ()                       // match whole input
+    } // isMatch
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert this `RegexPat` object to its underlying string.
+     */
+    override def toString: String = patString
+
+} // RegexPat class
+    
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RegexPatTest` object is used to test the `RegexPat` class.
+ *  @see http://lh3lh3.users.sourceforge.net/reb.shtml
+ *  > run-main scalation.util.RegexPatTest
+ */
+object RegexPatTest extends App
+{
+    import scala.collection.mutable.ListBuffer
+    import scalation.linalgebra.MatrixD
+
+    val DEBUG = true
+    val ITER  = 10
+    val sourceFile = SRC_SCALA_DIR + ⁄ + "scalation" + ⁄ + "util" + ⁄ + "RegexPat.scala"
+
+    val pattern = Array (
+        "([a-zA-Z][a-zA-Z0-9]*)://([^ /]+)(/[^ ]*)",                         // URI (protocol://server/path) 
+        "([^ @]+)@([^ @]+)",                                                 // Email (name@server)
+        "([0-9][0-9]?)/([0-9][0-9]?)/([0-9][0-9]([0-9][0-9])?)",             // Date (month/day/year)
+        "([a-zA-Z][a-zA-Z0-9]*)://([^ /]+)(/[^ ]*)?|([^ @]+)@([^ @]+)")      // URI|Email
+
+    val lines = getFromURL_File (sourceFile).toArray                         // lines from file
+    val tim   = new MatrixD (pattern.length, 2)                              // matrix to hold timing results
+    val res   = ListBuffer [Boolean] ()                                      // match results for java.util.regex
+    val res2  = ListBuffer [Boolean] ()                                      // match results for competitor
+
+    for (j <- pattern.indices) {
+        banner ("T E S T: " + pattern(j))
+
+        banner ("Test: java.util.regex")
+        val pat = new RegexPat (pattern(j))
+        for (line <- lines) res += pat =~ line       // don't gauge first time through
+        tim(j, 0) = gauge {
+            for (i <- 0 until ITER) {
+                res.clear ()
+                for (line <- lines) res += pat =~ line
+            } // for
+        } // gauge
+        println ("res = " + res)
+
+        banner ("Test: competitor")
+        // ...
+        println ("res2 = " + res2)
+//      assert (res2 == res)
+    } // for
+
+    println ("tim = " + tim)
+    println ("avg tim = " + tim.mean)
+        
+} // RegexPatTest object
+
+// http://www.cs.uga.edu/~jam/scalation.html
+// jam@cs.uga.edu
+// 08/28/2016
+// http://www.cs.uga.edu/~jam/scalation.html

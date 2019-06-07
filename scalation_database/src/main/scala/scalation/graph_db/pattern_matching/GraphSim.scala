@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Usman Nisar, Aravind Kalimurthy, John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Tue Dec 20 15:10:55 EST 2016
  *  @see     LICENSE (MIT style license file).
  *

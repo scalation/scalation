@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sun Sep 11 22:43:04 EDT 2011
  *  @see     LICENSE (MIT style license file).
  */
@@ -12,8 +12,8 @@ import scala.collection.mutable.ArrayBuffer
 import scala.math.{abs, ceil, floor, max, round, sqrt}
 import scala.util.control.Breaks.{breakable, break}
 
+import scalation.linalgebra.FunctionV2S
 import scalation.linalgebra.VectorD
-import scalation.math.FunctionV2S
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** This `IntegerNLP`solves Integer Non-Linear Programming (INLP) and Mixed Integer

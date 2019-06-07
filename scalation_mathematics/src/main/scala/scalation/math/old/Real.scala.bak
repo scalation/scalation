@@ -1,0 +1,133 @@
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.2
+ *  @date    Sun Jun 14 15:22:33 EDT 2015
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.math
+
+// U N D E R   D E V E L O P M E N T 
+
+import annotation.strictfp
+
+import ExtremeD.MAX_VALUE
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Real` class provides higher precision floating point numbers using
+ *  the Double Double technique.
+ *  @see oai.cwi.nl/oai/asset/9159/9159A.pdf
+ *  @param x  the low portion
+ *  @param y  the high portion
+ */
+@strictfp
+case class Real (hi: Double, lo: Double = 0.0) // extends strictfp
+{
+    private val SPLIT = 134217729.0                  // 2^27+1, for IEEE double
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether 'this' number "is Not a Number".
+     */
+    def isNaN: Boolean = hi.isNaN
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the unary minus (-).
+     */
+    def unary_- (): Real = if (isNaN) this else Real (-hi, -lo)
+
+    def negate (x: Real): Real = -x
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add two real numbers.
+     *  @param y  add complex y to this
+     */
+    def + (y: Real): Real =
+    {
+        var t = 0.0                                                         // temp
+
+        var (zh, zl) = (hi + y.hi, lo + y.lo)                               // z = x + y
+        val (yh, yl) = (zh - hi, zl - lo)                                   // y' = z - x
+        val (xh, xl) = (zh - yh, zl - yl)                                   // x' = z - y'
+        val (dh, dl) = ((hi - xh) + (y.hi - yh), (lo - xl) + (y.lo - yl))   // d = (x - x') + (y - y')
+
+        t = dh + zl
+        val hh = zh + t; val hl = t + (zh - hh)
+
+        t = dl + hl
+        zh = hh + t; zl = t + (hh - zh)
+        Real (zh, zl)
+    } // +
+
+    def plus (x: Real, y: Real): Real = x + y
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Subtract two real numbers.
+     *  @param y  subtract y from this
+     */
+    def - (y: Real): Real = this + (-y)
+
+    def minus (x: Real, y: Real): Real = x - y
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply two complex numbers.
+     *  @param y  multiply this times y
+     */
+    def * (y: Real): Real =
+    {
+          var cx = SPLIT * hi
+          val hx = cx - (cx - hi)
+          val tx = hi - hx
+
+          var cy = SPLIT * y.hi
+          val hy = cy - (cy - y.hi)
+          val ty = y.hi - hy
+
+          cx = hi * y.hi
+          cy = ((((hx*hy - cx) + hx*ty) + tx*hy) + tx*ty) + (hi*y.lo + lo*y.hi)
+
+          val zh = cx + cy
+          val zl = cy + (cx - zh)
+          Real (zh, zl)
+    } // *
+
+    def times (x: Real, y: Real): Real = x * y
+
+/*
+    @strictfp
+    def + (y: Double): Real =
+    {
+        val z  = x + y
+        val w  = z - x; val z1 = y - w
+        val v  = z - w; val z2 = v - x
+        val zz = z1 - z2
+        Real (z, zz)
+    } // +
+*/
+
+    override def toString: String = s"($hi, $lo)"
+    
+} // Real class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RealTest` object is used to test the `Real` class.
+ *  > run-main scalation.math.RealTest
+ */
+object RealTest extends App
+{
+    val a = Real (10.0)
+    val b = Real (1.0 / 6.0)
+    val c = a + b
+    val d = a - b
+    val e = a * b
+
+    println (s"a = $a")
+    println (s"b = $b")
+    println (s"c = $c")
+    println (s"d = $d")
+    println (s"e = $e")
+    println (s"a = $a")
+
+} // RealTest object
+

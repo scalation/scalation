@@ -1,13 +1,15 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Mon Oct 10 16:42:21 EDT 2016
  *  @see     LICENSE (MIT style license file).
  *
  *  @see romisatriawahono.net/lecture/dm/paper/clustering/
  *       Garcia%20-%20K-means%20algorithms%20for%20functional%20data%20-%202015.pdf
  */
+
+// U N D E R   D E V E L O P M E N T
 
 package scalation.analytics.fda
 
@@ -23,21 +25,21 @@ import scalation.util.banner
  *  @param t  the time points
  *  @param τ  the time points for knots
  *  @param k  the number of clusters to make
- *  @param s  the random number stream (to vary the clusters made)
  */
-class KMeansClustering_F (x: MatrixD, t: VectorD, τ: VectorD, k: Int, s: Int = 0)
+class KMeansClustering_F (x: MatrixD, t: VectorD, τ: VectorD, k: Int)
       extends Clusterer
 {
     private val DEBUG = true                          // debug flag
     private val xs    = new MatrixD (x.dim1, x.dim2)  // smoothed version of data matrix
     private var cl: KMeansClusterer = null            // holder to clustering algorithm
 
-
    /** As seen from class KMeansClustering_F, the missing signatures are as follows.
     *  For convenience, these are usable as stub implementations.
     */
-    def centroids(): scalation.linalgebra.MatrixD = ???
-    def csize(): scalation.linalgebra.VectorI = ???
+    def centroids: scalation.linalgebra.MatrixD = ???
+    def csize: scalation.linalgebra.VectorI = ???
+    def classify(y: scalation.linalgebra.VectoD): Int = ???
+    def train(): scalation.analytics.clusterer.Clusterer = ???
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create 'k' clusters consisting of points/rows that are closest to each other.
@@ -46,8 +48,9 @@ class KMeansClustering_F (x: MatrixD, t: VectorD, τ: VectorD, k: Int, s: Int = 
     {
         smooth ()                                     // smooth the data
         if (DEBUG) println ("xs = " + xs)
-        cl = new KMeansClusterer (xs, k, s)           // use classical k-means
-        cl.cluster ()                                 // create the clsuters
+        cl = new KMeansClusterer (xs, k)              // use classical k-means
+        cl.train ()
+        cl.cluster                                    // create the clsuters
     } // cluster
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -103,7 +106,8 @@ object KMeansClustering_FTest extends App
 
     for (s <- 0 to 4) {                         // test with different random streams
         banner ("KMeansClustering_F for stream s = " + s)
-        val cl = new KMeansClustering_F (x, t, t, 3, s)                 
+        val cl = new KMeansClustering_F (x, t, t, 3)                 
+        cl.setStream (s)
         println ("--- final cluster = " + cl.cluster ().deep + "\n")
         println ("--- classify " + y + " = " + cl.classify (y) + "\n")
     } // for

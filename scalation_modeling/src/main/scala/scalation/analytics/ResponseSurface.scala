@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Mustafa Nural
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sat Jan 20 16:05:52 EST 2018
  *  @see     LICENSE (MIT style license file).
  */
@@ -12,6 +12,9 @@ import scala.collection.mutable.Set
 
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.linalgebra.VectorD.one
+import scalation.math.double_exp
+import scalation.plot.PlotM
+import scalation.stat.Statistic
 import scalation.util.banner
 
 import RegTechnique._
@@ -22,47 +25,30 @@ import RegTechnique._
  *  <p>
  *      y  =  b dot x + e  =  [b_0, ... b_k] dot [1, x_0, x_0^2, x_1, x_0*x_1, x_1^2] + e
  *  <p>
+ *  Adds an a constant term for intercept (must not include intercept, column of ones
+ *  in initial data matrix).
  *  @see scalation.metamodel.QuadraticFit
  *  @param x_         the input vectors/points
  *  @param y          the response vector
+ *  @param fname_     the feature/variable names
  *  @param cubic      the order of the surface (defaults to quadratic, else cubic)
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class ResponseSurface (x_ : MatriD, y: VectoD, cubic: Boolean = false, technique: RegTechnique = QR)
-      extends Regression (ResponseSurface.allForms (x_, cubic), y, technique)
+class ResponseSurface (x_ : MatriD, y: VectoD, fname_ : Strings = null, cubic: Boolean = false,
+                       technique: RegTechnique = QR)
+      extends Regression (ResponseSurface.allForms (x_, cubic), y, fname_, null, technique)
 {
-    private val n = x_.dim2                     // the dimensionality (2D, 3D, etc.) of points in matrix x_
-
-    if (x.dim1 <= x.dim2) throw new IllegalArgumentException ("not enough data rows in matrix to use regression")
-
-    if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given a point 'z', use the quadratic 'rsm' regression equation to predict a
-     *  value for the function at 'z'.
-     *  for 1D:  b_0 + b_1*z_0 + b_2*z_0^2
-     *  for 2D:  b_0 + b_1*z_0 + b_2*z_0^2 + b_3*z_1 + b_4*z_1*z_0 + b_5*z_1^2
-     *  @param z  the point/vector whose functional value is to be predicted
-     */
-    override def predict (z: VectoD): Double =
-    {
-        val q   = one(1) ++ z    // augmented vector: [ 1., x(0), ..., x(n-1) ]
-        var l   = 0
-        var sum = 0.0
-        if (cubic) for (i <- 0 to n; j <- i to n; k <- j to n) { sum += b(l) * q(i) * q(j) * q(k); l += 1 }
-        else       for (i <- 0 to n; j <- i to n)              { sum += b(l) * q(i) * q(j);        l += 1 }
-        sum
-    } // predict
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform 'k'-fold cross-validation.
+     *  @param xx     the data matrix to use (full data matrix or selected columns)
      *  @param k      the number of folds
      *  @param rando  whether to use randomized cross-validation
      */
-    override def crossVal (k: Int = 10, rando: Boolean = true)
+    override def crossVal (xx: MatriD = x, k: Int = 10, rando: Boolean = true): Array [Statistic] =
     {
-        crossValidate ((x: MatriD, y: VectoD) => new ResponseSurface (x, y), k, rando)
-    } // crossVa
+        crossValidate ((x: MatriD, y: VectoD) => new ResponseSurface (x, y, fname, cubic, technique),
+                                                 xx, k, rando)
+    } // crossVal
 
 } // ResponseSurface class
 
@@ -76,8 +62,8 @@ object ResponseSurface
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The number of quadratic, linear and constant forms/terms (3, 6, 10, 15, ...)
      *  of cubic, quadratic, linear and constant forms/terms (4, 10, 20, 35, ...)
-     *  @param n        number of predictors
-     *  @param cubic    the order of the surface (2 for quadratic, 3 for cubic)
+     *  @param n      the number of parameters/predictors
+     *  @param cubic  the order of the surface (2 for quadratic, 3 for cubic)
      */
     def numTerms (n: Int, cubic: Boolean = false) =
     {
@@ -149,37 +135,17 @@ object ResponseSurface
  */
 object ResponseSurfaceTest extends App
 {
-    //                            x1      x2
-    val x = new MatrixD ((20, 2), 47.0,   85.4,
-                                  49.0,   94.2,
-                                  49.0,   95.3,
-                                  50.0,   94.7,
-                                  51.0,   89.4,
-                                  48.0,   99.5,
-                                  49.0,   99.8,
-                                  47.0,   90.9,
-                                  49.0,   89.2,
-                                  48.0,   92.7,
-                                  47.0,   94.4,
-                                  49.0,   94.1,
-                                  50.0,   91.6,
-                                  45.0,   87.1,
-                                  52.0,  101.3,
-                                  46.0,   94.5,
-                                  46.0,   87.0,
-                                  46.0,   94.5,
-                                  48.0,   90.5,
-                                  56.0,   95.7)
-    //  response BP
-    val y = VectorD (105.0, 115.0, 116.0, 117.0, 112.0, 121.0, 121.0, 110.0, 110.0, 114.0,
-                     114.0, 115.0, 114.0, 106.0, 125.0, 114.0, 106.0, 113.0, 110.0, 122.0)
+    import ExampleBPressure.{x01 => x, y}
 
     val rsr = new ResponseSurface (x, y)
     rsr.train ().eval ()
     val nTerms = ResponseSurface.numTerms (2)
-    println ("nTerms      = " + nTerms)
-    println ("coefficient = " + rsr.coefficient)
-    println ("fitMap      = " + rsr.fitMap)
+    println (s"x = ${rsr.getX}")
+    println (s"y = $y")
+
+    println ("nTerms    = " + nTerms)
+    println (rsr.report)
+    println (rsr.summary)
 
     banner ("Forward Selection Test")
     val fcols = Set (0)
@@ -198,4 +164,172 @@ object ResponseSurfaceTest extends App
     } // for
 
 } // ResponseSurfaceTest object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `ResponseSurfaceTest2` object is used to test the `ResponseSurface` class.
+ *  > runMain scalation.analytics.ResponseSurfaceTest2
+ */
+object ResponseSurfaceTest2 extends App
+{
+    import scalation.random.Normal
+    import scalation.stat.StatVector.corr
+
+    val s      = 20
+    val grid   = 1 to s
+    val (m, n) = (s*s, 2)
+    val noise  = new Normal (0, 10 * s * s)
+    val x = new MatrixD (m, n)
+    val y = new VectorD (m)
+
+    var k = 0
+    for (i <- grid; j <- grid) {
+        x(k) = VectorD (i, j)
+        y(k) = x(k, 0)~^2 + 2 * x(k, 1) + x(k, 0) * x(k, 1) +  noise.gen
+        k += 1
+    } // for
+
+    banner ("Regression")
+    val ox = VectorD.one (y.dim) +^: x
+    val rg = new Regression (ox, y)
+    rg.train ().eval ()
+    println (rg.report)
+    println (rg.summary)
+
+    banner ("QuadRegression")
+    val qrg = new QuadRegression (x, y)
+    qrg.train ().eval ()
+    println (qrg.report)
+    println (qrg.summary)
+
+    banner ("ResponseSurface")
+    val rsr = new ResponseSurface (x, y)
+    rsr.train ().eval ()
+    println (rsr.report)
+    println (rsr.summary)
+
+    banner ("Multi-collinearity Check")
+    val rx = rsr.getX
+    println (corr (rx.asInstanceOf [MatrixD]))
+    println (s"vif = ${rsr.vif}")
+
+} // ResponseSurfaceTest2 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `ResponseSurfaceTest3` object tests the `ResponseSurface` class using the AutoMPG
+ *  dataset.  It illustrates using the `Relation` class for reading the data
+ *  from a .csv file "auto-mpg.csv".  Assumes no missing values.
+ *  It also combines feature selection with cross-validation and plots
+ *  R^2, R^2 Bar and R^2 cv vs. the instance index.
+ *  > runMain scalation.analytics.ResponseSurfaceTest3
+ */
+object ResponseSurfaceTest3 extends App
+{
+    import scalation.columnar_db.Relation
+
+    banner ("auto_mpg relation")
+    val auto_tab = Relation (BASE_DIR + "auto-mpg.csv", "auto_mpg", null, -1)
+    auto_tab.show ()
+
+    banner ("auto_mpg (x, y) dataset")
+    val (x, y) = auto_tab.toMatriDD (1 to 6, 0)
+    println (s"x = $x")
+    println (s"y = $y")
+
+    banner ("auto_mpg regression")
+    val qrg = new ResponseSurface (x, y)
+    qrg.train ().eval ()
+    val n  = x.dim2                                                // number of variables
+    val nt = ResponseSurface.numTerms (n)                          // number of terms
+    println (s"n = $n, nt = $nt")
+    println (qrg.report)
+    println (qrg.summary)
+
+    banner ("Forward Selection Test")
+    val qx  = qrg.getX                                             // get matrix with all columns
+    val rg  = new Regression (qx, y)                               // regression on all columns
+    val rSq = new MatrixD (qx.dim2-1, 3)                           // R^2, R^2 Bar,  R^2 cv
+
+    val fcols = Set (0)                                            // start with x_0 in model
+    for (l <- 1 until nt) {
+        val (x_j, b_j, fit_j) = rg.forwardSel (fcols)              // add most predictive variable
+        println (s"forward model: add x_j = $x_j with b = $b_j \n fit = $fit_j")
+        if (x_j == -1) {
+            println (s"the 'forwardSel' could not find a variable to add: x_j = $x_j")
+        } else {
+            fcols += x_j                                           // add variable x_j
+            val x_cols = qx.selectCols (fcols.toArray)             // qx projected onto cols_j columns
+            rSq(l-1)   = Fit.qofVector (fit_j, rg.crossVal (x_cols))   // use main model, 'rg'
+//          val rg_j   = new Regression (x_cols, y)                // regress with x_j added
+//          rSq(l-1)   = Fit.qofVector (fit_j, rg_j.crossVal ())   // use new model, rg_j
+        } // if
+    } // for
+
+    val k = fcols.size
+    for (l <- k until nt) rSq(l-1) = rSq(l-2)
+    println (s"rSq = $rSq")
+    val t = VectorD.range (1, k)                                   // instance index
+    new PlotM (t, rSq.t, lines = true)
+
+} // ResponseSurfaceTest3 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `ResponseSurfaceTest4` object tests the `ResponseSurface` class using the AutoMPG
+ *  dataset.  It illustrates using the `Relation` class for reading the data
+ *  from a .csv file "auto-mpg.csv".  Assumes no missing values.
+ *  It also combines feature selection with cross-validation and plots
+ *  R^2, R^2 Bar and R^2 cv vs. the instance index.  Runs the cubic case.
+ *  > runMain scalation.analytics.ResponseSurfaceTest4
+ */
+object ResponseSurfaceTest4 extends App
+{
+    import scalation.columnar_db.Relation
+
+    banner ("auto_mpg relation")
+    val auto_tab = Relation (BASE_DIR + "auto-mpg.csv", "auto_mpg", null, -1)
+    auto_tab.show ()
+
+    banner ("auto_mpg (x, y) dataset")
+    val (x, y) = auto_tab.toMatriDD (1 to 6, 0)
+    println (s"x = $x")
+    println (s"y = $y")
+
+    banner ("auto_mpg regression")
+    val qrg = new ResponseSurface (x, y, cubic = true)
+    qrg.train ().eval ()
+    val n  = x.dim2                                                // number of variables
+    val nt = ResponseSurface.numTerms (n, cubic = true)            // number of terms
+    println (s"n = $n, nt = $nt")
+    println (qrg.report)
+    println (qrg.summary)
+
+    banner ("Forward Selection Test")
+    val qx  = qrg.getX                                             // get matrix with all columns
+    val rg  = new Regression (qx, y)                               // regression on all columns
+    val rSq = new MatrixD (qx.dim2-1, 3)                           // R^2, R^2 Bar,  R^2 cv
+
+    val fcols = Set (0)                                            // start with x_0 in model
+    for (l <- 1 until nt) {
+        val (x_j, b_j, fit_j) = rg.forwardSel (fcols)              // add most predictive variable
+        println (s"forward model: add x_j = $x_j with b = $b_j \n fit = $fit_j")
+        if (x_j == -1) {
+            println (s"the 'forwardSel' could not find a variable to add: x_j = $x_j")
+        } else {
+            fcols += x_j                                           // add variable x_j
+            val x_cols = qx.selectCols (fcols.toArray)             // qx projected onto cols_j columns
+            rSq(l-1)   = Fit.qofVector (fit_j, rg.crossVal (x_cols))   // use main model, 'rg'
+//          val rg_j   = new Regression (x_cols, y)                // regress with x_j added
+//          rSq(l-1)   = Fit.qofVector (fit_j, rg_j.crossVal ())   // use new model, rg_j
+        } // if
+    } // for
+
+    val k = fcols.size
+    for (l <- k until nt) rSq(l-1) = rSq(l-2)
+    println (s"rSq = $rSq")
+    val t = VectorD.range (1, k)                                   // instance index
+    new PlotM (t, rSq.t, lines = true)
+
+} // ResponseSurfaceTest4 object
 

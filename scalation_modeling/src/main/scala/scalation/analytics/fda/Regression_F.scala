@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Tue Oct 11 16:12:54 EDT 2016
  *  @see     LICENSE (MIT style license file).
  *
@@ -11,9 +11,9 @@
  *  @see http://link.springer.com/book/10.1007%2Fb98888
  */
 
-package scalation.analytics.fda
+package scalation.analytics
+package fda
 
-import scalation.analytics.RidgeRegression
 import scalation.calculus.DB_Spline
 import scalation.linalgebra.{MatrixD, VectoD, VectorD}
 import scalation.plot.Plot
@@ -54,10 +54,10 @@ class Regression_F (y: VectorD, x: VectorD, t: VectorD, τ: VectorD, ord: Int = 
 /*
         b = (xx.t * xx).inverse * xx.t * y               // direct solution, may produce NaN
 */
-        val lambda = 0.01
-        val rrg = new RidgeRegression (xx, y, lambda)
+        val hp = RidgeRegression.hp.updateReturn ("lambda", 0.01)
+        val rrg = new RidgeRegression (xx, y, null, hp)
         rrg.train ()
-        b = rrg.coefficient
+        b = rrg.parameter
         b
     } // train
 

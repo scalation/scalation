@@ -1,46 +1,48 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Fri Feb 16 16:14:34 EST 2018
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
-import scalation.linalgebra.{MatriI, VectoD, VectorD, VectoI, VectorI}
+import scalation.linalgebra.{MatriD, MatriI, VectoD, VectorD, VectoI, VectorI}
 import scalation.util.banner
+
+import Probability.{frequency, toProbability}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NullModel` class implements an Integer-Based Null Model Classifier,
  *  which is a simple classifier for discrete input data.  The classifier is trained
  *  just using a classification vector 'y'.
  *  Each data instance is classified into one of 'k' classes numbered 0, ..., k-1.
- *  @param y   the class vector, where y(i) = class for instance i
- *  @param k   the number of classes
- *  @param cn  the names for all classes
+ *  @param y    the classification vector, where y(i) = class for instance i
+ *  @param k    the number of classes
+ *  @param cn_  the names for all classes
  */
-class NullModel (y: VectoI, k: Int = 2, cn: Array [String] = Array ("no", "yes"))
-      extends ClassifierInt (null, y, null, k, cn)
+class NullModel (y: VectoI, k: Int = 2, cn_ : Strings = null)
+      extends ClassifierInt (null, y, null, k, cn_)
 {
     private val DEBUG = true                                 // debug flag
-    private val nu_y  = new VectorD (k)                      // frequency counts for y-values
-    private var pi_y: VectoD = null                          // probability estimates for y-values
+    private var nu_y: VectoI = null                          // frequency counts for y-values
+    private var p_y:  VectoD = null                          // probability estimates for y-values
 
     if (cn.length != k) flaw ("constructor", "# class names != # classes")
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the classifier by computing the probabilities for C, and the
+    /** Train the classifier by computing the probabilities for y, and the
      *  conditional probabilities for X_j.
      *  @param itest  indices of the instances considered as testing data
      */
-    def train (itest: IndexedSeq [Int]): NullModel =
+    def train (itest: Ints): NullModel =
     {
-        val idx = 0 until m diff itest                       // training data set - opposite of tesing
-        reset ()                                             // reset counter
-        for (i <- idx) nu_y(y(i)) += 1                       // tally frequency counts
-        pi_y = nu_y / idx.size.toDouble                      // probability vector for class y
-        if (DEBUG) println (s" nu_y = $nu_y \n pi_y = $pi_y")
+        val idx = 0 until m diff itest                       // training dataset - opposite of tesing
+        nu_y = frequency (y, k, idx)                         // frequency vector for y
+        p_y  = toProbability (nu_y, idx.size)                // probability vector for y
+        if (DEBUG) println (s" nu_y = $nu_y \n p_y = $p_y")
         this
     } // train
 
@@ -52,22 +54,24 @@ class NullModel (y: VectoI, k: Int = 2, cn: Array [String] = Array ("no", "yes")
      */
     def classify (z: VectoI): (Int, String, Double) =
     {
-        val best = pi_y.argmax ()                            // class with the highest  probability
-        (best, cn(best), pi_y(best))                         // return the best class and its name
+        val best = p_y.argmax ()                            // class with the highest  probability
+        (best, cn(best), p_y(best))                         // return the best class and its name
     } // classify
 
-   //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Classify all of the row vectors in matrix 'xx'.
      *  @param xx  the row vectors to classify
      */
-    override def classify (xx: MatriI): VectoI = VectorI.fill (xx.dim1)(pi_y.argmax ())
+    override def classify (xx: MatriI): VectoI = VectorI.fill (xx.dim1)(p_y.argmax ())
+
+    def classify (xx: MatriD): VectoI = classify (xx.toInt)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the quality of the training with a testiing dataset and return the
      *  fraction of correct classifications.
      *  @param itest  indices of the instances considered test data
      */
-    override def test (itest: IndexedSeq [Int]): Double =
+    override def test (itest: Ints): Double =
     {
         var correct = 0
         val c = classify (VectorI (1))._1                    // decision won't change
@@ -78,7 +82,7 @@ class NullModel (y: VectoI, k: Int = 2, cn: Array [String] = Array ("no", "yes")
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset or re-initialize all the frequency counters.
      */
-    def reset () { nu_y.set (0) }
+    def reset () { /* NA */ }
 
 } // NullModel class
 

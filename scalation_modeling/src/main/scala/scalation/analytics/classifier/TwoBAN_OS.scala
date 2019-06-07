@@ -1,12 +1,13 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author John Miller, Hao Peng, Zhe Jin
- *  @version 1.5
+ *  @version 1.6
  *  @date Fri Oct 16 18:14:54 EDT 2015
  *  @see LICENSE (MIT style license file).
  */
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
 import scala.util.control.Breaks.{break, breakable}
 
@@ -17,6 +18,7 @@ import scalation.random.PermutedVecI
 import scalation.random.RNGStream.ranStream
 
 import BayesClassifier.me_default
+import ClassifierInt.pullResponse
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `TwoBAN_OS0` class implements an Integer-Based Bayesian Network Classifier,
@@ -28,22 +30,21 @@ import BayesClassifier.me_default
  *  each class in the training-set.  Relative posterior probabilities are computed
  *  by multiplying these by values computed using conditional probabilities.  The
  *  classifier supports limited dependency between features/variables.
- *
+ *------------------------------------------------------------------------------
  *  This classifier uses the standard cross-validation technique.
- *  ------------------------------------------------------------------------------
- *
+ *------------------------------------------------------------------------------
  *  @param x     the integer-valued data vectors stored as rows of a matrix
  *  @param y     the class vector, where y(l) = class for row l of the matrix, x(l)
- *  @param fn    the names for all features/variables
+ *  @param fn_   the names for all features/variables
  *  @param k     the number of classes
- *  @param cn    the names for all classes
+ *  @param cn_   the names for all classes
  *  @param vc    the value count (number of distinct values) for each feature
- *  @param me    use m-estimates (me == 0 => regular MLE estimates)
  *  @param thres the correlation threshold between 2 features for possible parent-child relationship
+ *  @param me    use m-estimates (me == 0 => regular MLE estimates)
  */
-class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
+class TwoBAN_OS0 (x: MatriI, y: VectoI, fn_ : Strings = null, k: Int = 2, cn_ : Strings = null,
                   protected var vc: Array [Int] = null, thres: Double = 0.0, me: Double = me_default)
-      extends BayesClassifier (x, y, fn, k, cn)
+      extends BayesClassifier (x, y, fn_, k, cn_)
 {
     private val DEBUG = false                                             // debug flag
 
@@ -56,16 +57,16 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
     protected var featureOrder = permutedVec.igen
     protected val tabu = new TabuFeatures ()                              // the tabu list used in feature swapping
 
-    protected val f_CXPP  = new HMatrix5 [Int] (k, n)                     // conditional frequency counts for variable/feature j: xj
-    protected val p_X_CPP = new HMatrix5 [Double] (k, n)                  // conditional probabilities for variable/feature j: xj
+    protected val nu_XyPP = new HMatrix5 [Int] (k, n)                     // conditional frequency counts for variable/feature j: xj
+    protected val p_XyPP  = new HMatrix5 [Double] (k, n)                  // conditional probabilities for variable/feature j: xj
 
     if (vc == null) {
         shiftToZero; vc = vc_fromData                                     // set to default for binary data (2)
     } // if
 
-    f_X   = new HMatrix2[Int] (n, vc)                                     // Frequency of X
-    f_CX  = new HMatrix3 [Int] (k, n, vc)                                 // Joint frequency of C and X
-    f_CXZ = new HMatrix5 [Int] (k, n, n, vc, vc)                          // Joint frequency of C, X, and Z, where X, Z are features/columns
+    nu_X   = new HMatrix2 [Int] (n, vc)                                   // frequency of X = [x_0, ... x_n-1]
+    nu_Xy  = new HMatrix3 [Int] (k, n, vc)                                // joint frequency of X and y
+    nu_XyZ = new HMatrix5 [Int] (k, n, n, vc, vc)                         // joint frequency of X, y and Z where X, Z are features/columns
 
     if (DEBUG) println ("value count vc = " + vc.deep)
 
@@ -74,14 +75,14 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
      *  conditional probabilities for X_j.
      *  @param itest  indices of the instances considered as testing data
      */
-    override def train (itest: IndexedSeq [Int]): TwoBAN_OS0 =
+    override def train (itest: Ints): TwoBAN_OS0 =
     {
         val idx = if (additive) 0 until m diff itest else itest
         val cmiMx = calcCMI (idx, vc)
         learnStructure (cmiMx)
         copyFreqCXPP (if (additive) idx else 0 until m diff itest)
         train2 ()
-        if (smooth) smoothParam (itest.size)
+        if (smooth) smoothP (md - itest.size)
         this
     } // train
 
@@ -91,14 +92,14 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
      */
     private def train2 ()
     {
-        p_C = nu_y.toDouble / md                               // prior probability for class yi
+        p_y = nu_y.toDouble / md                               // prior probability for class yi
         for (i <- 0 until k; j <- 0 until n if fset(j)) {                // for each class i
         val me_vc = me / vc(j).toDouble
             for (xj <- 0 until vc(j); xp <- 0 until vcp1(j); xp2 <- 0 until vcp2(j)) {
-                val d = if      (parent(j, 1) > -1) f_CXZ(i, parent(j, 0), parent(j, 1), xp, xp2) + me
-                        else if (parent(j, 0) > -1) f_CX(i, parent(j, 0), xp) + me
+                val d = if      (parent(j, 1) > -1) nu_XyZ(i, parent(j, 0), parent(j, 1), xp, xp2) + me
+                        else if (parent(j, 0) > -1) nu_Xy(i, parent(j, 0), xp) + me
                         else                        nu_y(i) + me
-                p_X_CPP(i, j, xj, xp, xp2) = (f_CXPP(i, j, xj, xp, xp2) + me_vc) / d.toDouble
+                p_XyPP(i, j, xj, xp, xp2) = (nu_XyPP(i, j, xj, xp, xp2) + me_vc) / d.toDouble
             } // for
         } // for
     } // train2
@@ -107,22 +108,22 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
     /** Clone/copy the values in global freq variables into local ones.
      *  @param itrain   indices of the training region
      */
-    private def copyFreqCXPP (itrain: IndexedSeq[Int])
+    private def copyFreqCXPP (itrain: Ints)
     {
-        f_CXPP.alloc (vc, vcp1, vcp2)
+        nu_XyPP.alloc (vc, vcp1, vcp2)
         // compute the joint frequencies of class, feature-X and its two parents
         for (i <- itrain) {
             val yi = y(i)
             for (j <- 0 until n if fset(j) if parent(j, 1) > -1) {
-                f_CXPP(yi, j, x(i, j), x(i, parent(j, 0)), x(i, parent(j, 1))) += 1
+                nu_XyPP(yi, j, x(i, j), x(i, parent(j, 0)), x(i, parent(j, 1))) += 1
             } // for
         } // for
 
         for (i <- 0 until k) {
             for (j <- x.range2 if fset(j); xj <- 0 until vc(j)) {
                 for (xp <- 0 until vcp1(j); xp2 <- 0 until vcp2(j) if (parent(j, 1) == -1)) {
-                    f_CXPP(i, j, xj, xp, xp2) = if (parent(j, 0) > -1) f_CXZ(i, j, parent(j, 0), xj, xp)
-                                                else                   f_CX(i, j, xj)
+                    nu_XyPP(i, j, xj, xp, xp2) = if (parent(j, 0) > -1) nu_XyZ(i, j, parent(j, 0), xj, xp)
+                                                 else                   nu_Xy(i, j, xj)
                 } // for
             } // for
         } // for
@@ -133,16 +134,16 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
      *  row of the data matrix.
      *  @param i  the index for current data row
      */
-    protected override def updateFreq (i: Int)
+    protected def updateFreq (i: Int)
     {
-        val yi   = y(i)                                       // get the class for ith row
-        nu_y(yi) += 1                                          // decrement frequency for class yi
+        val yi    = y(i)                                       // get the class for ith row
+        nu_y(yi) += 1                                          // increment frequency for class yi
         for (j <- x.range2 if fset(j)) {
-            f_X(j, x(i, j)) += 1
-            f_CX (yi, j, x(i, j)) += 1
+            nu_X(j, x(i, j)) += 1
+            nu_Xy(yi, j, x(i, j)) += 1
             for (j2 <- j+1 until n if fset(j2)) {
-                f_CXZ (yi, j, j2, x(i, j), x(i, j2)) += 1
-                f_CXZ (yi, j2, j, x(i, j2), x(i, j)) += 1
+                nu_XyZ(yi, j, j2, x(i, j), x(i, j2)) += 1
+                nu_XyZ(yi, j2, j, x(i, j2), x(i, j)) += 1
             } // for
         } // for
     } // updateFreq
@@ -248,7 +249,7 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
         featureOrder = optimalFeatureOrder
         computeParent (cmiMx)
         computeVcp ()
-        p_X_CPP.alloc (vc, vcp1, vcp2)
+        p_XyPP.alloc (vc, vcp1, vcp2)
 
     } // learnStructure
 
@@ -342,34 +343,26 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
     /** Perform smoothing operations on the learned parameters by using Dirichlet priors
      *  to compute the posterior probabilities of the parameters given the training dataset.
      *  @see citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.178.8884&rep=rep1&type=pdf
-     *  @param testSize  size of the test size
+     *  @param trainSize  the size of the training dataset
      */
-    private def smoothParam (testSize: Int = 0)
+    private def smoothP (trainSize: Double)
     {
+        val N0       = 5.0                     // parameter needed for smoothing
         for (i <- 0 until k) {
-            p_C(i) *= m / (m + N0)
-            p_C(i) += N0 * k / (m + N0)
             for (j <- 0 until n if fset(j)) {
-                val pj = parent(j, 0)
-                val pj2 = parent(j, 1)
+                val (pj, pj2)  = (parent(j, 0), parent(j, 1))
                 for (xj <- 0 until vc(j); xp <- 0 until vcp1(j); xp2 <- 0 until vcp2(j)) {
+                    val nu_px = if (pj2 > -1)     nu_XyZ(i, pj, pj2, xp, xp2)
+                                else if (pj > -1) nu_Xy(i, pj, xp)
+                                else              nu_y(i)
+                    val theta0 = nu_X(j, xj) / trainSize
 
-                    val f_px = if (pj2 > -1) f_CXZ(i, pj, pj2, xp, xp2)
-                               else if (pj > -1) f_CX(i, pj, xp)
-                               else nu_y(i)
-
-                    //NOTE: two alternative priors, may work better for some datasets
-//                    val theta0 = if (pj > -1) f_CXZ(i, j, pj, xj, xp) / (md - testSize)
-//                                 else f_CX(i, j, xj)
-//                    val theta0 = f_CX(i, j, xj) / (md - testSize)
-                    val theta0 = f_X(j, xj) / (md - testSize)
-
-                    p_X_CPP(i, j, xj, xp, xp2) *= (f_px / (f_px + N0))
-                    p_X_CPP(i, j, xj, xp, xp2) += (N0 / (f_px + N0) * theta0)
+                    p_XyPP(i, j, xj, xp, xp2) *= nu_px / (nu_px + N0)
+                    p_XyPP(i, j, xj, xp, xp2) += N0 / (nu_px + N0) * theta0
                 } // for
             } // for
         } // for
-    } // smoothParam
+    } // smoothP
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'z', classify it returning the class number
@@ -379,11 +372,11 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
      */
     def classify (z: VectoI): (Int, String, Double) =
     {
-        val prob = new VectorD (p_C)
+        val prob = new VectorD (p_y)
         for (i <- 0 until k; j <- 0 until n if fset(j)) {
-            prob(i) *=  (if      (parent(j, 1) > -1) p_X_CPP (i, j, z(j), z(parent(j, 0)), z(parent(j, 1)))
-                         else if (parent(j, 0) > -1) p_X_CPP(i, j, z(j), z(parent(j, 0)), 0)
-                         else                        p_X_CPP(i, j, z(j), 0, 0))
+            prob(i) *=  (if      (parent(j, 1) > -1) p_XyPP(i, j, z(j), z(parent(j, 0)), z(parent(j, 1)))
+                         else if (parent(j, 0) > -1) p_XyPP(i, j, z(j), z(parent(j, 0)), 0)
+                         else                        p_XyPP(i, j, z(j), 0, 0))
         } // for
         if (DEBUG) println("prob = " + prob)
         val best = prob.argmax()                // class with the highest relative posterior probability
@@ -396,9 +389,9 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
     def reset ()
     {
         nu_y.set (0)
-        f_X.set(0)
-        f_CX.set(0)
-        f_CXZ.set(0)
+        nu_X.set(0)
+        nu_Xy.set(0)
+        nu_XyZ.set(0)
     } // reset
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -421,18 +414,18 @@ object TwoBAN_OS0
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a `TwoBAN_OS0 object, passing 'x' and 'y' together in one table.
-     *  @param xy    the data vectors along with their classifications stored as rows of a matrix
-     *  @param fn    the names of the features
-     *  @param k     the number of classes
-     *  @param vc    the value count (number of distinct values) for each feature
-     *  @param me    use m-estimates (me == 0 => regular MLE estimates)
-     *  @param thres the correlation threshold between 2 features for possible parent-child relationship
+     *  @param xy     the data vectors along with their classifications stored as rows of a matrix
+     *  @param fn     the names of the features
+     *  @param k      the number of classes
+     *  @param vc     the value count (number of distinct values) for each feature
+     *  @param thres  the correlation threshold between 2 features for possible parent-child relationship
+     *  @param me     use m-estimates (me == 0 => regular MLE estimates)
      */
-    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
-              vc: Array [Int] = null, thres: Double = 0.3, me: Double = me_default, smooth: Boolean = true) =
+    def apply (xy: MatriI, fn: Strings, k: Int, cn: Strings,
+              vc: Array [Int] = null, thres: Double = 0.3, me: Double = me_default) =
     {
-        new TwoBAN_OS0 (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn,
-                           vc, thres, me)
+        val (x, y) = pullResponse (xy)
+        new TwoBAN_OS0 (x, y, fn, k, cn, vc, thres, me)
     } // apply
 
 } // TwoBAN_OS0 object
@@ -443,24 +436,24 @@ object TwoBAN_OS0
  *  ------------------------------------------------------------------------------
  *  @param x      the integer-valued data vectors stored as rows of a matrix
  *  @param y      the class vector, where y(l) = class for row l of the matrix, x(l)
- *  @param fn     the names for all features/variables
+ *  @param fn_    the names for all features/variables
  *  @param k      the number of classes
- *  @param cn     the names for all classes
- *  @param vc     the value count (number of distinct values) for each feature
- *  @param me     use m-estimates (me == 0 => regular MLE estimates)
+ *  @param cn_    the names for all classes
+ *  @param vc_    the value count (number of distinct values) for each feature
  *  @param thres  the correlation threshold between 2 features for possible parent-child relationship
+ *  @param me     use m-estimates (me == 0 => regular MLE estimates)
  */
-class TwoBAN_OS (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
+class TwoBAN_OS (x: MatriI, y: VectoI, fn_ : Strings = null, k: Int = 2, cn_ : Strings = null,
                  vc_ : Array [Int] = null, thres: Double = 0.0, me: Float = me_default)
-        extends TwoBAN_OS0 (x, y, fn, k, cn, vc_, thres, me)
+        extends TwoBAN_OS0 (x, y, fn_, k, cn_, vc_, thres, me)
 {
     private val DEBUG = false                                         // debug flag
 
-    private val g_f_CXZ = new HMatrix5 [Int] (k, n, n, vc, vc)        // global joint frequency of C, X, and Z, where X, Z are features/columns
-    private val g_f_CX  = new HMatrix3 [Int] (k, n, vc)               // global joint frequency of C and X
-    private val g_nu_y   = new VectorI (k)                             // global frequency of C
-    private val g_f_X   = new HMatrix2[Int] (n, vc)                   // global frequency of X
-
+    private val g_nu_y   = new VectorI (k)                            // global frequency of y
+    private val g_nu_X   = new HMatrix2 [Int] (n, vc)                 // global frequency of X = [x_0, ... x_n-1]
+    private val g_nu_Xy  = new HMatrix3 [Int] (k, n, vc)              // global joint frequency of X and y
+    private val g_nu_XyZ = new HMatrix5 [Int] (k, n, n, vc, vc)       // global joint frequency of X, y and Z
+                                                                      //  where X, Z are features/columns
     additive = false
 
     if (DEBUG) println ("value count vc = " + vc.deep)
@@ -477,14 +470,14 @@ class TwoBAN_OS (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
             val yi = y(i)
             g_nu_y(yi) += 1
             for (j <- 0 until n if fset(j)) {
-                g_f_X(j, x(i, j)) += 1
-                g_f_CX(yi, j, x(i, j)) += 1
-                for (j2 <- j+1 until n if fset(j2)) g_f_CXZ(yi, j, j2, x(i, j), x(i, j2)) += 1
+                g_nu_X(j, x(i, j)) += 1
+                g_nu_Xy(yi, j, x(i, j)) += 1
+                for (j2 <- j+1 until n if fset(j2)) g_nu_XyZ(yi, j, j2, x(i, j), x(i, j2)) += 1
             } // for
         } // for
 
         for (c <- 0 until k; j <- 0 until n if fset(j); j2 <- j+1 until n if fset(j2); xj <- 0 until vc(j); xj2 <- 0 until vc(j2)) {
-            g_f_CXZ(c, j2, j, xj2, xj) = g_f_CXZ(c, j, j2, xj, xj2)
+            g_nu_XyZ(c, j2, j, xj2, xj) = g_nu_XyZ(c, j, j2, xj, xj2)
         } // for
     } // frequenciesAll
 
@@ -495,14 +488,14 @@ class TwoBAN_OS (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
      */
     protected override def updateFreq (i: Int)
     {
-        val yi   = y(i)                                       // get the class for ith row
+        val yi    = y(i)                                       // get the class for ith row
         nu_y(yi) -= 1                                          // decrement frequency for class yi
         for (j <- x.range2 if fset(j)) {
-            f_X(j, x(i, j)) -= 1
-            f_CX (yi, j, x(i, j)) -= 1
+            nu_X(j, x(i, j)) -= 1
+            nu_Xy(yi, j, x(i, j)) -= 1
             for (j2 <- j+1 until n if fset(j2)) {
-                f_CXZ (yi, j, j2, x(i, j), x(i, j2)) -= 1
-                f_CXZ (yi, j2, j, x(i, j2), x(i, j)) -= 1
+                nu_XyZ(yi, j, j2, x(i, j), x(i, j2)) -= 1
+                nu_XyZ(yi, j2, j, x(i, j2), x(i, j)) -= 1
             } // for
         } // for
     } // updateFreq
@@ -515,11 +508,11 @@ class TwoBAN_OS (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
         for (i <- 0 until k) {
             nu_y(i) = g_nu_y(i)
             for (j <- x.range2 if fset(j); xj <- 0 until vc(j)) {
-                if (i == 0) f_X(j, xj) = g_f_X(j, xj)
-                f_CX(i, j, xj) = g_f_CX(i, j, xj)
+                if (i == 0) nu_X(j, xj) = g_nu_X(j, xj)
+                nu_Xy(i, j, xj) = g_nu_Xy(i, j, xj)
                 for (j2 <- j+1 until n if fset(j2); xj2 <- 0 until vc(j2)) {
-                    f_CXZ(i, j, j2, xj, xj2) = g_f_CXZ(i, j, j2, xj, xj2)
-                    f_CXZ(i, j2, j, xj2, xj) = f_CXZ(i, j, j2, xj, xj2)
+                    nu_XyZ(i, j, j2, xj, xj2) = g_nu_XyZ(i, j, j2, xj, xj2)
+                    nu_XyZ(i, j2, j, xj2, xj) = nu_XyZ(i, j, j2, xj, xj2)
                 } // for
             } // for
         } // for
@@ -542,11 +535,11 @@ object TwoBAN_OS
      *  @param me     use m-estimates (me == 0 => regular MLE estimates)
      *  @param thres  the correlation threshold between 2 features for possible parent-child relationship
      */
-    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String], vc: Array [Int] = null,
+    def apply (xy: MatriI, fn: Strings, k: Int, cn: Strings, vc: Array [Int] = null,
                thres: Double = 0.3, me: Float = me_default) =
     {
-        new TwoBAN_OS (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn,
-            vc, thres, me)
+        val (x, y) = pullResponse (xy)
+        new TwoBAN_OS (x, y, fn, k, cn, vc, thres, me)
     } // apply
 
 } // TwoBAN_OS object

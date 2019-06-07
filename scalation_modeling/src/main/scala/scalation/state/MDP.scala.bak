@@ -1,0 +1,113 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.5
+ *  @date    Wed May  9 13:14:48 EDT 2018
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  Model-Free Markov Decision Processes
+ *  @see https://pdfs.semanticscholar.org/968b/ab782e52faf0f7957ca0f38b9e9078454afe.pdf
+ */
+
+package scalation.state
+
+import scala.collection.mutable.Map
+
+import scalation.linalgebra.{MatriD, VectoD}
+import scalation.linalgebra.gen.HMatrix3
+import scalation.random.Randi0
+import scalation.graphalytics.{Tree, TreeNode}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `MDP` class provides Partially-Observable Markov Decision Processes.
+ *  @param n  the number of states S = {0, 1, ... n-1}
+ *  @param p  the number of actions A = {0, 1, ... p-1}
+ *  @param m  the number of observation O = {0, 1, ... m-1}
+ *  @param t  the transitional conditional probability t(s, a, q) = P(q | s, a),
+ *            where s, q in S, a in A
+ *  @param z  the observational conditional probability z(s, z, o) = P(o | s, a),
+ *            where o in O, s in S, a in A
+ *  @param r  the reward matrix r(s, a)
+ *  @param g  the discount factor in (0, 1)
+ */
+class MDP (n: Int, p: Int, m: Int, t: HMatrix3 [Double], z: HMatrix3 [Double],
+             r: MatriD, g: Double)
+{
+    private val bgen = Randi0 (n-1)                         // random variate generator
+    private val b0   = bgen.gen                             // initial belief state probability value
+    private var bid  = -1                                   // belief id
+    private val bmap = Map [Int, Double] ()                 // map from bid to belief state vector
+    private val root = makeNode (b0)                        // make and map the root node
+    private val xt   = new Tree (root, 0.0)                 // make x-tree with the given root
+    private val pi   = Map [Double, Int] ()                 // policy maps belief state into action
+
+    private val s_r  = 0 until n
+    private val a_r  = 0 until p
+    private val o_r  = 0 until m
+
+    def optimize (): Set [Double] =
+    {
+        var b  = b0                                         // the current belief state vector
+        val al = Set [Double] ()                            // initial set of alpha-vectors
+        var cont = true
+        while (cont) {
+            sample (al)
+            backup (al, b)
+            prune (al)
+            if (terminate) cont = false                     // check termination condition
+        } // while
+        al
+    } // optimize
+
+    def makeNode (b: Double): TreeNode =
+    {
+        bid  += 1
+        bmap += bid -> b
+        new TreeNode (bid, 0)
+    } // makeNode
+
+    def terminate: Boolean =
+    {
+        true
+    } // terminate
+
+    def sample (al: Set [Double])
+    {
+        val (b, a, o) = pick                                // pick a belief, action and observation
+        val bb = tau (b, a , o)                             // create a new belief state bb
+        val node = makeNode (bb)
+        xt.add (node)                                       // make bb a child of b in the x-tree
+    } // sample
+
+    def pick: (Int, Int, Int) =
+    {
+        (0, 0, 0)                        // FIX
+    } // pick
+
+    def tau (b: Int, a: Int, o: Int): Double =
+    {
+        -1.0                             // FIX
+    } // tau
+
+    def backup (al: Set [Double], b: Double)
+    {
+        for (a <- a_r; o <- o_r) {
+            al(a, o) = VectorD (for (alp <- al) yield alp * tau (b, a, o)).argmax
+        } // for
+        for (a <- a_r; s <- s_r) {
+        } // for
+        alb = VectorD (for (a <- a_r) yield al(a) * b).argmax
+        al += alp
+    } // backup
+
+    def prune (al: Set [Double])
+    {
+    } // prune
+
+} // MDP class
+
+
+object MDPTest extends App
+{
+} // MDPTest object
+

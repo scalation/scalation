@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Sameer Gaherwar and John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sun May 18 11:23:45 EDT 2014
  *  @see     LICENSE (MIT style license file).
  *

@@ -1,0 +1,161 @@
+/*
+ * Author: Sami Salkosuo, sami.salkosuo@fi.ibm.com
+ *
+ * (c) Copyright IBM Corp. 2007
+ * @see https://www.ibm.com/developerworks/library/j-coordconvert/index.html
+ */
+
+package scalation.spatial
+
+import scala.util.control.Breaks.{breakable, break}
+import scala.math._
+
+object LatLong2UTM
+{
+    val negLetters = Array('A', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M')
+    val negDegrees = Array(-90, -84, -72, -64, -56, -48, -40, -32, -24, -16, -8)
+    val posLetters = Array('N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Z')
+    val posDegrees = Array(0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 84)
+    // Lat Lon to UTM variables
+
+    // equatorial radius
+    var equatorialRadius = 6378137
+
+    // polar radius
+    var polarRadius = 6356752.314
+
+    // scale factor
+    var k0 = 0.9996
+
+    // eccentricity
+    var e: Double = Math.sqrt(1 - pow(polarRadius / equatorialRadius, 2))
+    var e1sq: Double = e * e / (1 - e * e)
+
+    // r curv 2
+    var nu = 6389236.914
+
+    // Calculate Meridional Arc Length
+    // Meridional Arc
+    var S = 5103266.421
+    var A0 = 6367449.146
+    var B0 = 16038.42955
+    var C0 = 16.83261333
+    var D0 = 0.021984404
+    var E0 = 0.000312705
+
+    // Calculation Constants
+    // Delta Long
+    var p: Double = -0.483084
+
+    var sin1 = 4.84814E-06
+
+    // Coefficients for UTM Coordinates
+    var K1 = 5101225.115
+
+    var K2 = 3750.291596
+
+    var K3 = 1.397608151
+
+    var K4 = 214839.3105
+
+    var K5: Double = -2.995382942
+
+    def validate(latitude: Double, longitude: Double): Unit = {
+        if (latitude < -90.0 || latitude > 90.0 || longitude < -180.0 || longitude >= 180.0)
+            throw new IllegalArgumentException("Legal ranges: latitude [-90,90], longitude [-180,180).")
+    }
+
+    def getLongZone(longitude: Double): String = {
+        var longZone = 0.0
+        if (longitude < 0.0) longZone = ((180.0 + longitude) / 6) + 1
+        else longZone = (longitude / 6) + 31
+        var value = String.valueOf(longZone.toInt)
+        if (value.length == 1) value = "0" + value
+        value
+    }
+
+    def getNorthing(latitude: Double): Double = {
+        var northing = K1 + K2 * p * p + K3 * pow(p, 4)
+        if (latitude < 0.0) northing = 10000000 + northing
+        northing
+    }
+
+    def getEasting: Double = 500000 + (K4 * p + K5 * pow(p, 3))
+
+    def latLong2UTM (lat: Double, lng: Double): String =
+    {
+        validate (lat, lng)
+        setVariables (lat, lng)
+
+
+        def getLatZone (latitude: Double): String =
+        {
+            var latIndex = -2
+            val lat = latitude.toInt
+            if (lat >= 0) {
+                val len = posLetters.length
+                breakable { for (i <- 0 until len) {
+                    if (lat == posDegrees(i)) { latIndex = i; break }
+                    if (lat > posDegrees(i)) { //continue
+                    } else { latIndex = i - 1; break }
+                }} // breakable for
+            } else {
+                val len = negLetters.length
+                breakable { for (i <- 0 until len) {
+                    if (lat == negDegrees(i)) { latIndex = i; break }
+                    if (lat < negDegrees(i)) { latIndex = i - 1; break }
+                    else {}// continue
+                }} // breakable for
+            } // if
+            if (latIndex == -1) latIndex = 0
+            if (lat >= 0) {
+                if (latIndex == -2) latIndex = posLetters.length - 1
+                return String.valueOf(posLetters(latIndex))
+            } else {
+                if (latIndex == -2) latIndex = negLetters.length - 1
+                return String.valueOf(negLetters(latIndex))
+            } // if
+        } // getLatZone
+
+        val longZone = getLongZone(lng)
+        val latZone = getLatZone(lat)
+        val _easting = getEasting
+        val _northing = getNorthing(lat)
+
+        longZone + " " + latZone + " " + _easting.toInt + " " + _northing.toInt
+    } // latLong2UTM
+
+    def setVariables(latitude: Double, longitude: Double): Unit = {
+        val latRad = toRadians(latitude)
+        nu = equatorialRadius / pow(1 - pow(e * sin(latRad), 2), 1 / 2.0)
+        var var1 = 0.0
+        if (longitude < 0.0) var1 = ((180 + longitude) / 6.0).toInt + 1
+        else var1 = (longitude / 6).toInt + 31
+        val var2 = (6 * var1) - 183
+        val var3 = longitude - var2
+        p = var3 * 3600 / 10000
+        S = A0 * latitude - B0 * sin(2 * latitude) + C0 * sin(4 * latitude) - D0 * sin(6 * latitude) + E0 * sin(8 * latitude)
+        K1 = S * k0
+        K2 = nu * sin(latitude) * cos(latitude) * pow(sin1, 2) * k0 * 100000000 / 2
+        K3 = ((pow(sin1, 4) * nu * sin(latitude) * Math.pow(cos(latitude), 3)) / 24) * (5 - pow(tan(latitude), 2) + 9 * e1sq * pow(cos(latitude), 2) + 4 * pow(e1sq, 2) * pow(cos(latitude), 4)) * k0 * 10000000000000000L
+        K4 = nu * cos(latitude) * sin1 * k0 * 10000
+        K5 = pow(sin1 * cos(latitude), 3) * (nu / 6) * (1 - pow(tan(latitude), 2) + e1sq * pow(cos(latitude), 2)) * k0 * 1000000000000L
+    }
+} // LatLong2UTM object
+
+import LatLong2UTM.latLong2UTM
+import Coordinates._
+
+// > runMain scalation.spatial.LatLong2UTMTest
+
+object LatLong2UTMTest extends App
+{
+    for (i <- ll.indices) {
+        val (lat, long) = (ll(i)._1, ll(i)._2)
+        val utm = latLong2UTM (lat, long)
+        println (s"latLong2UTM (${ll(i)}) \t = $utm")
+//        assert (utm == uTM(i))
+    } // for
+
+} // LatLong2UTMTest object
+

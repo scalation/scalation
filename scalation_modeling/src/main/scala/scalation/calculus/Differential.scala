@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Mon Jan 28 17:18:16 EST 2013
  *  @see     LICENSE (MIT style license file).
  *
@@ -12,6 +12,7 @@ package scalation.calculus
 
 import scala.math.sqrt
 
+import scalation.linalgebra.FunctionV2S
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.math._
 

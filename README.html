@@ -29,12 +29,12 @@ ScalaTion also supports optimization and analytics as they nowadays go hand-in-h
 Some of the algorithms come in both sequential and parallel versions.
 
 <p>
-The <b>ScalaTion 1.5</b> version defines multiple .par subpackages that contain parallel versions of sequential algorithms.
+The <b>ScalaTion 1.6</b> version defines multiple .par subpackages that contain parallel versions of sequential algorithms.
 Future directions include completing the 'scala3d' and 'physics' packages.
 
 <p>
-As of version 1.5, ScalaTion consists of 4 subprojects:
-scalation_mathstat, scalation_database, scalation_modeling and scalation_models
+As of version 1.6, ScalaTion consists of five subprojects:
+scalation_mathematics, scalation_statistics, scalation_database, scalation_modeling and scalation_models
 
 <p>
 Please read the <a href = LICENSE.html> LICENSE </a> file (an MIT style license).
@@ -43,55 +43,92 @@ Please read the <a href = LICENSE.html> LICENSE </a> file (an MIT style license)
 <h3> Installation Instructions </h3>
 
 Requires:
-<a href = "http://www.scala-lang.org/downloads">Scala 2.12.x</a> and
+<a href = "http://www.scala-lang.org/downloads">Scala 2.12.8+</a> and
 <a href = "http://www.oracle.com/technetwork/java/javase/downloads">Java 8</a>
 <br>
 Recommended:
 <a href = "http://www.scala-sbt.org/">sbt</a> &nbsp;
-(see <a href = "http://www.scala-sbt.org/0.13/docs/Setup.html">Setup.html</a>)
+(see <a href = "http://www.scala-sbt.org/1.x/docs/Setup.html">Setup.html</a>)
+<br>
+Getting started: <a href = "https://www.scala-sbt.org/1.x/docs/Hello.html">sbt Hello, World</a>
 
 <h4>1. Download one of the following two files</h4>
 
-<a href = "../scalation_1.5.tar.gz"> scalation_1.5.tar.gz </a> <br> <b>OR</b> <br>
-<a href = "../scalation_1.5.zip"> scalation_1.5.zip </a>
+<a href = "../scalation_1.6.tar.gz"> scalation_1.6.tar.gz </a> <br> <b>OR</b> <br>
+<a href = "../scalation_1.6.zip"> scalation_1.6.zip </a>
 
 <p>
 <h4>2. Untar or unzip the file</h4>
 
 <pre><code>
-$ tar xvfz scalation_1.5.tar.gz <br> <b>OR</b> <br>
-$ unzip scalation_1.5.zip
+$ tar xvfz scalation_1.6.tar.gz <br> <b>OR</b> <br>
+$ unzip scalation_1.6.zip
 </code></pre>
 
-<h4>3. To compile code or run apps, enter sbt and type compile, runMain or exit </h4>
+
+<h4>3. To build all the modules, change into the ScalaTion base directory and run the build_all.sh shell script</h4>
 
 <pre><code>
-$ cd scalation_1.5 <br>
-$ cd scalation_models <br>
+$ cd scalation_1.6 <br>
+$ ./build_all.sh <br>
+</code></pre>
+
+<h4>4. To compile code or run apps, change into one of the module directories, enter sbt and type compile, runMain or exit </h4>
+
+<pre><code>
+$ cd scalation_modeling <br>
 $ sbt <br>
 > compile <br>
-> runMain apps.process.Bank <br>
+> runMain scalation.analytics.SimpleRegressionTest <br>
 > runMain scalation.analytics.RegressionTest <br>
+> runMain scalation.analytics.PredictorMatTest <br>
 > exit
 </code></pre>
 
 <p>
-ScalaTion 1.5 is set up to use the Simple Build Tool <a href = "http://www.scala-sbt.org">sbt</a>.
+The compile command is optional, since runMain will automatically compile if need be.
 
 <p>
-ScalaTion 1.5 uses the following build specification files
-<a href = "scalation_mathstat/build.sbt">build.sbt</a>,
-<a href = "scalation_modeling/build.sbt">build.sbt</a> and
-<a href = "scalation_mmodels/build.sbt">build.sbt</a>.
+ScalaTion is set up to use the Simple Build Tool <a href = "http://www.scala-sbt.org">sbt</a>.
+ScalaTion 1.6 uses the following five build specification files (one for each module):
+
+<ol>
+<li>
+scalation_mathematics: <a href = "scalation_mathematics/build.sbt">build.sbt</a>,
+<li>
+scalation_statistics: <a href = "scalation_statistics/build.sbt">build.sbt</a>,
+<li>
+scalation_database: <a href = "scalation_database/build.sbt">build.sbt</a>,
+<li>
+scalation_modeling: <a href = "scalation_modeling/build.sbt">build.sbt</a> and
+<li>
+scalation_models: <a href = "scalation_models/build.sbt">build.sbt</a>.
+</ol>
+
 Source packages are in the <b>src/main/scala</b> directory,
 class files are in the <b>target/scala-2.12/classes</b> directory, and
 documentation files are in the <b>target/scala-2.12/api</b> directory.
+Unmanaged jar files are stored in a common library <b>../lib</b> directory, <a href = "lib">lib</a>.
 Data file input, output or analytics are stored in subdirectories of <b>data</b>,
 while database files are stored in <b>store</b>.
 
+<h4>5.  To develop projects that use ScalaTion that are outside ScalaTion do the following </h4>
+
+<pre><code>
+$ cd your_project_dir <br>
+$ sbt new sbt/scala-seed.g8 <br>
+$ cd hello <br>
+$ mkdir lib <br>
+copy jar files from <a href = "lib">lib</a> <br>
+$ cd src/main/scala/example <br>
+$ vim Hello.scala <br>
+</code></pre>
+
+The second time you do this, you will want to use a more appropriate name than hello.
+
 <p><hr><p>
 
-To develop using an IDE:
+To develop using an Integrated Development Environment (IDE) [Eclipse or IntelliJ]:
 <ol>
 <li>
 Download <a href = "http://typesafe.com/stack/downloads/scala-ide">Scala IDE for Eclipse</a>
@@ -182,55 +219,62 @@ Online <a href = "../home/theses/jain_thesis/bigdata_2014/BigDataCong2014_DualIs
 <tr>
 <tr>
 <tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/index.html"><b>MATH AND STAT</b></a>
-<td> <b> The scalation_mathstat module provides foundational packages for mathematics and statistics needed for modeling.
+<td> <a href = "scalation_mathematics/target/scala-2.12/api/index.html"><b>MATHEMATICS</b></a>
+<td> <b> The scalation_mathematics module provides foundational packages for mathematics needed for modeling.
 <tr>
 <tr>
 <tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/index.html"> scalation.linalgebra </a>
+<td> <a href = "scalation_mathematics/target/scala-2.12/api/scalation/linalgebra/index.html"> scalation.linalgebra </a>
 <td> The `linalgebra` package contains classes, traits and objects for linear algebra, including vectors and matrices for real and complex numbers. 
 <tr>
-<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/bld/index.html"> scalation.linalgebra.bld </a>
+<td> - <a href = "scalation_mathematics/target/scala-2.12/api/scalation/linalgebra/bld/index.html"> scalation.linalgebra.bld </a>
 <td> The `bld` package contains traits and objects for generating source code for vector classes, matrix traits and matrix classes. 
 <tr>
-<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/gen/index.html"> scalation.linalgebra.gen </a>
+<td> - <a href = "scalation_mathematics/target/scala-2.12/api/scalation/linalgebra/gen/index.html"> scalation.linalgebra.gen </a>
 <td> The `gen` package contains generic classes, traits and objects for linear algebra, including vectors and matrices for types implementing `Numeric`. Tend to run more slowly than the specialized versions in `linalgebra`. 
 <tr>
-<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/mem_mapped/index.html"> scalation.linalgebra.mem_mapped </a>
+<td> - <a href = "scalation_mathematics/target/scala-2.12/api/scalation/linalgebra/mem_mapped/index.html"> scalation.linalgebra.mem_mapped </a>
 <td> The `mem_mapped` package contains classes, traits and objects for out-of-core linear algebra, including vectors and matrices for real and complex numbers. 
 <tr>
-<td> - - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/mem_mapped/bld/index.html"> scalation.linalgebra.mem_mapped.bld </a>
+<td> - - <a href = "scalation_mathematics/target/scala-2.12/api/scalation/linalgebra/mem_mapped/bld/index.html"> scalation.linalgebra.mem_mapped.bld </a>
 <td> The `bld` package contains traits and objects for generating source code for out-of-core vector classes, matrix traits and matrix classes. 
 <tr>
-<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/linalgebra/par/index.html"> scalation.linalgebra.par </a>
+<td> - <a href = "scalation_mathematics/target/scala-2.12/api/scalation/linalgebra/par/index.html"> scalation.linalgebra.par </a>
 <td> The `par` package contains classes, traits and objects for parallel linear algebra, including vectors and matrices for real and complex numbers. 
 <tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/math/index.html"> scalation.math </a>
+<td> <a href = "scalation_mathematics/target/scala-2.12/api/scalation/math/index.html"> scalation.math </a>
 <td> The `math` package contains classes, traits and objects for common mathematical operations.  Its package object defines exponentiation, logarithmic, trigonometric, etc. operators and functions. 
 <tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/par/index.html"> scalation.par </a>
-<td> The `par` package contains classes, traits and objects for parallel processing techniques such as Map-Reduce. 
-<tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/plot/index.html"> scalation.plot </a>
-<td> The `plot` package contains classes, traits and objects for simple plotting of x-y data. 
-<tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/random/index.html"> scalation.random </a>
-<td> The `random` package contains classes, traits and objects for the generation of random numbers. 
-<tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/scala2d/index.html"> scalation.scala2d </a>
-<td> The `scala2d` package contains classes, traits and objects for for simple 2D graphics in scala, based upon `java.swing`, `java.awt` and `java_awt_geom`. 
-<tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/stat/index.html"> scalation.stat </a>
-<td> The `stat` package contains classes, traits and objects for  basic statistical functions and analyses.  The package object itself defines an implicit conversion from `scalation.linalgebra.VectorD` to `StatVector`. 
-<tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/tenalgebra/index.html"> scalation.tenalgebra </a>
-<td> The `tenalgebra` package contains classes, traits and objects for tensor algebra. 
-<tr>
-<td> <a href = "scalation_mathstat/target/scala-2.12/api/scalation/util/index.html"> scalation.util </a>
+<td> <a href = "scalation_mathematics/target/scala-2.12/api/scalation/util/index.html"> scalation.util </a>
 <td> The `util` package contains classes, traits and objects for basic utility functions. 
 <tr>
-<td> - <a href = "scalation_mathstat/target/scala-2.12/api/scalation/util/bld/index.html"> scalation.util.bld </a>
+<td> - <a href = "scalation_mathematics/target/scala-2.12/api/scalation/util/bld/index.html"> scalation.util.bld </a>
 <td> The `bld` package contains traits and objects for generating source code for memory mapped arrays. 
+<tr>
+<tr>
+<tr>
+<td> <a href = "scalation_statistics/target/scala-2.12/api/index.html"><b>STATISTICS</b></a>
+<td> <b> The scalation_statistics module provides foundational packages for statistics needed for modeling.
+<tr>
+<tr>
+<tr>
+<td> <a href = "scalation_statistics/target/scala-2.12/api/scalation/par/index.html"> scalation.par </a>
+<td> The `par` package contains classes, traits and objects for parallel processing techniques such as Map-Reduce. 
+<tr>
+<td> <a href = "scalation_statistics/target/scala-2.12/api/scalation/plot/index.html"> scalation.plot </a>
+<td> The `plot` package contains classes, traits and objects for simple plotting of x-y data. 
+<tr>
+<td> <a href = "scalation_statistics/target/scala-2.12/api/scalation/random/index.html"> scalation.random </a>
+<td> The `random` package contains classes, traits and objects for the generation of random numbers. 
+<tr>
+<td> <a href = "scalation_mathematics/target/scala-2.12/api/scalation/scala2d/index.html"> scalation.scala2d </a>
+<td> The `scala2d` package contains classes, traits and objects for for simple 2D graphics in scala, based upon `java.swing`, `java.awt` and `java_awt_geom`. 
+<tr>
+<td> <a href = "scalation_statistics/target/scala-2.12/api/scalation/stat/index.html"> scalation.stat </a>
+<td> The `stat` package contains classes, traits and objects for  basic statistical functions and analyses.  The package object itself defines an implicit conversion from `scalation.linalgebra.VectorD` to `StatVector`. 
+<tr>
+<td> <a href = "scalation_statistics/target/scala-2.12/api/scalation/tenalgebra/index.html"> scalation.tenalgebra </a>
+<td> The `tenalgebra` package contains classes, traits and objects for tensor algebra. 
 <tr>
 <tr>
 <tr>
@@ -257,6 +301,15 @@ suitable for interfacing with graph databases.
 <tr>
 <td> - - <a href = "scalation_database/target/scala-2.12/api/scalation/graph_db/pattern_matching/test/index.html"> scalation.graph_db.pattern_matching.test </a>
 <td> The `test` package contains classes for testing graph pattern matching algorithms. 
+<tr>
+<td> <a href = "scalation_database/target/scala-2.12/api/scalation/image/index.html"> scalation.image </a>
+<td> The `image` package contains classes, traits and objects for image processing and computer vision.
+<tr>
+<td> <a href = "scalation_database/target/scala-2.12/api/scalation/scala3d/index.html"> scalation.scala3d </a>
+<td> The `scala3d` package contains classes, traits and objects for simple 3D graphics in scala, based upon javafx.  Its package object contains type aliases for 'javafx.geometry.Point3D' and all subclasses of 'javafx.scene.shape.Shape3D'. 
+<tr>
+<td> <a href = "scalation_database/target/scala-2.12/api/scalation/spatial/index.html"> scalation.spatial </a>
+<td> The `spatial` package contains classes, traits and objects for spatial coordinates.
 <tr>
 <tr>
 <tr>
@@ -325,9 +378,6 @@ suitable for interfacing with graph databases.
 <td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/process/index.html"> scalation.process </a>
 <td> The `process` package contains classes, traits and objects for process-oriented simulation models (for example, process-interaction). 
 <tr>
-<td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/scala3d/index.html"> scalation.scala3d </a>
-<td> The `scala3d` package contains classes, traits and objects for for simple 3D graphics in scala, based upon javafx.  Its package object contains type aliases for 'javafx.geometry.Point3D' and all subclasses of 'javafx.scene.shape.Shape3D'. 
-<tr>
 <td> <a href = "scalation_modeling/target/scala-2.12/api/scalation/state/index.html"> scalation.state </a>
 <td> The `state` package contains classes, traits and objects for state-oriented simulation models (for example, Markov Chains). 
 <tr>
@@ -393,55 +443,62 @@ suitable for interfacing with graph databases.
 <tr>
 <tr>
 <tr>
-<td> <a href = "scalation_mathstat/src/main/scala/scalation"><b>MATH AND STAT</b></a>
-<td> <b>The scalation_mathstat module provides foundational packages for mathematics and statistics needed for modeling.</b>
+<td> <a href = "scalation_mathematics/src/main/scala/scalation"><b>MATHEMATICS</b></a>
+<td> <b>The scalation_mathematics module provides foundational packages for mathematics needed for modeling.</b>
 <tr>
 <tr>
 <tr>
-<td> <a href = "scalation_mathstat/src/main/scala/scalation/linalgebra/"> scalation.linalgebra </a>
+<td> <a href = "scalation_mathematics/src/main/scala/scalation/linalgebra/"> scalation.linalgebra </a>
 <td> The `linalgebra` package contains classes, traits and objects for linear algebra, including vectors and matrices for real and complex numbers. 
 <tr>
-<td> - <a href = "scalation_mathstat/src/main/scala/scalation/linalgebra/bld/"> scalation.linalgebra.bld </a>
+<td> - <a href = "scalation_mathematics/src/main/scala/scalation/linalgebra/bld/"> scalation.linalgebra.bld </a>
 <td> The `bld` package contains traits and objects for generating source code for vector classes, matrix traits and matrix classes. 
 <tr>
-<td> - <a href = "scalation_mathstat/src/main/scala/scalation/linalgebra/gen/"> scalation.linalgebra.gen </a>
+<td> - <a href = "scalation_mathematics/src/main/scala/scalation/linalgebra/gen/"> scalation.linalgebra.gen </a>
 <td> The `gen` package contains generic classes, traits and objects for linear algebra, including vectors and matrices for types implementing `Numeric`. Tend to run more slowly than the specialized versions in `linalgebra`. 
 <tr>
-<td> - <a href = "scalation_mathstat/src/main/scala/scalation/linalgebra/mem_mapped/"> scalation.linalgebra.mem_mapped </a>
+<td> - <a href = "scalation_mathematics/src/main/scala/scalation/linalgebra/mem_mapped/"> scalation.linalgebra.mem_mapped </a>
 <td> The `mem_mapped` package contains classes, traits and objects for out-of-core linear algebra, including vectors and matrices for real and complex numbers. 
 <tr>
-<td> - - <a href = "scalation_mathstat/src/main/scala/scalation/linalgebra/mem_mapped/bld/"> scalation.linalgebra.mem_mapped.bld </a>
+<td> - - <a href = "scalation_mathematics/src/main/scala/scalation/linalgebra/mem_mapped/bld/"> scalation.linalgebra.mem_mapped.bld </a>
 <td> The `bld` package contains traits and objects for generating source code for out-of-core vector classes, matrix traits and matrix classes. 
 <tr>
-<td> - <a href = "scalation_mathstat/src/main/scala/scalation/linalgebra/par/"> scalation.linalgebra.par </a>
+<td> - <a href = "scalation_mathematics/src/main/scala/scalation/linalgebra/par/"> scalation.linalgebra.par </a>
 <td> The `par` package contains classes, traits and objects for parallel linear algebra, including vectors and matrices for real and complex numbers. 
 <tr>
-<td> <a href = "scalation_mathstat/src/main/scala/scalation/math/"> scalation.math </a>
+<td> <a href = "scalation_mathematics/src/main/scala/scalation/math/"> scalation.math </a>
 <td> The `math` package contains classes, traits and objects for common mathematical operations.  Its package object defines exponentiation, logarithmic, trigonometric, etc. operators and functions. 
 <tr>
-<td> <a href = "scalation_mathstat/src/main/scala/scalation/par/"> scalation.par </a>
-<td> The `par` package contains classes, traits and objects for parallel processing techniques such as Map-Reduce. 
-<tr>
-<td> <a href = "scalation_mathstat/src/main/scala/scalation/plot/"> scalation.plot </a>
-<td> The `plot` package contains classes, traits and objects for simple plotting of x-y data. 
-<tr>
-<td> <a href = "scalation_mathstat/src/main/scala/scalation/random/"> scalation.random </a>
-<td> The `random` package contains classes, traits and objects for the generation of random numbers. 
-<tr>
-<td> <a href = "scalation_mathstat/src/main/scala/scalation/scala2d/"> scalation.scala2d </a>
-<td> The `scala2d` package contains classes, traits and objects for for simple 2D graphics in scala, based upon `java.swing`, `java.awt` and `java_awt_geom`. 
-<tr>
-<td> <a href = "scalation_mathstat/src/main/scala/scalation/stat/"> scalation.stat </a>
-<td> The `stat` package contains classes, traits and objects for  basic statistical functions and analyses.  The package object itself defines an implicit conversion from `scalation.linalgebra.VectorD` to `StatVector`. 
-<tr>
-<td> <a href = "scalation_mathstat/src/main/scala/scalation/tenalgebra/"> scalation.tenalgebra </a>
-<td> The `tenalgebra` package contains classes, traits and objects for tensor algebra. 
-<tr>
-<td> <a href = "scalation_mathstat/src/main/scala/scalation/util/"> scalation.util </a>
+<td> <a href = "scalation_mathematics/src/main/scala/scalation/util/"> scalation.util </a>
 <td> The `util` package contains classes, traits and objects for basic utility functions. 
 <tr>
-<td> - <a href = "scalation_mathstat/src/main/scala/scalation/util/bld/"> scalation.util.bld </a>
+<td> - <a href = "scalation_mathematics/src/main/scala/scalation/util/bld/"> scalation.util.bld </a>
 <td> The `bld` package contains traits and objects for generating source code for memory mapped arrays. 
+<tr>
+<tr>
+<tr>
+<td> <a href = "scalation_statistics/src/main/scala/scalation"><b>STATISTICS</b></a>
+<td> <b>The scalation_statistics module provides foundational packages for statistics needed for modeling.</b>
+<tr>
+<tr>
+<tr>
+<td> <a href = "scalation_statistics/src/main/scala/scalation/par/"> scalation.par </a>
+<td> The `par` package contains classes, traits and objects for parallel processing techniques such as Map-Reduce. 
+<tr>
+<td> <a href = "scalation_statistics/src/main/scala/scalation/plot/"> scalation.plot </a>
+<td> The `plot` package contains classes, traits and objects for simple plotting of x-y data. 
+<tr>
+<td> <a href = "scalation_statistics/src/main/scala/scalation/random/"> scalation.random </a>
+<td> The `random` package contains classes, traits and objects for the generation of random numbers. 
+<tr>
+<td> <a href = "scalation_mathematics/src/main/scala/scalation/scala2d/"> scalation.scala2d </a>
+<td> The `scala2d` package contains classes, traits and objects for for simple 2D graphics in scala, based upon `java.swing`, `java.awt` and `java_awt_geom`. 
+<tr>
+<td> <a href = "scalation_statistics/src/main/scala/scalation/stat/"> scalation.stat </a>
+<td> The `stat` package contains classes, traits and objects for  basic statistical functions and analyses.  The package object itself defines an implicit conversion from `scalation.linalgebra.VectorD` to `StatVector`. 
+<tr>
+<td> <a href = "scalation_statistics/src/main/scala/scalation/tenalgebra/"> scalation.tenalgebra </a>
+<td> The `tenalgebra` package contains classes, traits and objects for tensor algebra. 
 <tr>
 <tr>
 <tr>
@@ -467,6 +524,15 @@ suitable for interfacing with graph databases.
 <tr>
 <td> - - <a href = "scalation_database/src/main/scala/scalation/graph_db/pattern_matching/test/"> scalation.graph_db.pattern_matching.test </a>
 <td> The `test` package contains classes for testing graph pattern matching algorithms. 
+<tr>
+<td> <a href = "scalation_database/src/main/scala/scalation/image/"> scalation.image </a>
+<td> The `image` package contains classes, traits and objects for image processing and computer vision.
+<tr>
+<td> <a href = "scalation_database/src/main/scala/scalation/scala3d/"> scalation.scala3d </a>
+<td> The `scala3d` package contains classes, traits and objects for simple 3D graphics in scala, based upon javafx.  Its package object contains type aliases for 'javafx.geometry.Point3D' and all subclasses of 'javafx.scene.shape.Shape3D'. 
+<tr>
+<td> <a href = "scalation_database/src/main/scala/scalation/spatial/"> scalation.spatial </a>
+<td> The `spatial` package contains classes, traits and objects for spatial coordinates.
 <tr>
 <tr>
 <tr>
@@ -535,9 +601,6 @@ suitable for interfacing with graph databases.
 <td> <a href = "scalation_modeling/src/main/scala/scalation/process/"> scalation.process </a>
 <td> The `process` package contains classes, traits and objects for process-oriented simulation models (for example, process-interaction). 
 <tr>
-<td> <a href = "scalation_modeling/src/main/scala/scalation/scala3d/"> scalation.scala3d </a>
-<td> The `scala3d` package contains classes, traits and objects for for simple 3D graphics in scala, based upon javafx.  Its package object contains type aliases for 'javafx.geometry.Point3D' and all subclasses of 'javafx.scene.shape.Shape3D'. 
-<tr>
 <td> <a href = "scalation_modeling/src/main/scala/scalation/state/"> scalation.state </a>
 <td> The `state` package contains classes, traits and objects for state-oriented simulation models (for example, Markov Chains). 
 <tr>
@@ -589,15 +652,15 @@ suitable for interfacing with graph databases.
 <tr>
 <tr>
 <tr>
-<td> <a href = "scalation_mathstat/src/test/scala/testing"><b>MATH AND STAT UNIT TESTS</b></a>
-<td> <b>Unit Tests for the scalation_mathstat module</b>
+<td> <a href = "scalation_mathematics/src/test/scala/testing"><b>MATH AND STAT UNIT TESTS</b></a>
+<td> <b>Unit Tests for the scalation_mathematics module</b>
 <tr>
 <tr>
 <tr>
-<td> <a href = "scalation_mathstat/src/test/scala/testing/linalgebra/"> testing.linalgebra </a>
+<td> <a href = "scalation_mathematics/src/test/scala/testing/linalgebra/"> testing.linalgebra </a>
 <td> Unit tests for the `linalgebra` package. 
 <tr>
-<td> <a href = "scalation_mathstat/src/test/scala/testing/stat/"> testing.stat </a>
+<td> <a href = "scalation_statistics/src/test/scala/testing/stat/"> testing.stat </a>
 <td> Unit tests for the `stat` package. 
 </table>
 </blockquote>
@@ -608,8 +671,8 @@ suitable for interfacing with graph databases.
 <p>
 
 <pre><code>
-$ cd scalation_1.5 <br>
-$ cd scalation_mathstat <br>
+$ cd scalation_1.6 <br>
+$ cd scalation_mathematics <br>
 $ sbt <br>
 > compile <br>
 > package <br>
@@ -621,8 +684,8 @@ $ sbt <br>
 > exit
 </code></pre>
 
-Similarly for scalation_modeling and scalation_models.
-Currently the .jar files need to be copied (copy_jars.sh) into the lib directory of dependent subprojects.
+Similarly for scalation_statistics, scalation_database, scalation_modeling and scalation_models.
+Script files: release.sh, build_all.sh, build_modeling.sh
 
 <p>
 </body>

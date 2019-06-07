@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Michael Cotterell, Hao Peng
- *  @version 1.5
+ *  @version 1.6
  *  @date    Tue May 2 21:45:58 EDT 2017
  *  @see     LICENSE (MIT style license file).
  *
@@ -89,7 +89,7 @@ object FourierTest extends App
     import scala.language.postfixOps
 
     // census data (1790--1990)
-    val t = VectorD (1790.0 to 1991 by 10)
+    val t = VectorD.range (1790, 1991) * 10.0
     println (t)
     val y = VectorD (  3.9000,
                        5.3000,
@@ -139,7 +139,9 @@ object FourierTest extends App
     println (s"   e = $e")
     println (s" sse = $sse")
 
-    new FPlot (t(0) to t(t.dim-1) by 1, Seq(x), lines = true)
+//  new FPlot (t(0) to t(t.dim-1) by 1, Seq(x), lines = true)
+    import scala.collection.immutable.NumericRange
+//  new FPlot (NumericRange.inclusive (t(0), t(t.dim-1), 1.0), Seq(x), lines = true)   // FIX
 
 //  val yp = new DFourier (w)
 //  new Plot (t, y, yp, s"y vs yp", lines = true)

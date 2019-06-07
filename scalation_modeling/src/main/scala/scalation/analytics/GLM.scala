@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Mon Jan  5 14:00:12 EST 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -13,6 +13,7 @@ import scalation.linalgebra.{MatriD, VectoD, VectoI}
 import scalation.linalgebra.MatrixD.++^
 import scalation.linalgebra.VectorD.one
 
+import PredictorMat.pullResponse
 import RegTechnique._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -29,19 +30,19 @@ import RegTechnique._
  *  `TrigRegression`   - trigonometric regression
  *  `ResponseSurface`  - response surface regression,
  *  `ANOVA1`           - GLM form of ANalysis Of VAriance, 
- *  `ANCOVA`           - GLM form of ANalysis of COVAriance.
+ *  `ANCOVA1`          - GLM form of ANalysis of COVAriance.
  */
 trait GLM
 {
-    protected var add_1     = true       // by default, prepend a column of all ones to the design matrix
+    protected var add_1     = true       // by default, prepend a column of all ones to the data matrix
     protected var technique = QR         // by default, use QR Factorization for
                                          // the regression technique used to solve for b in x.t*x*b = x.t*y
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Simple Linear Regression model, automatically prepending the
      *  column of ones (form matrix from two column vectors [ 1 x ]).
-     *  @param x  the input/design m-by-1 vector
-     *  @param y  the response m-vector
+     *  @param x  the data/input m-by-1 vector
+     *  @param y  the response/output m-vector
      */
     def apply (x: VectoD, y: VectoD): SimpleRegression =
     {
@@ -50,66 +51,70 @@ trait GLM
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Multiple Linear Regression model using Ordinary Least Squares 'OLS'.
-     *  @param x  the input/design m-by-n matrix
-     *  @param y  the response m-vector
+     *  @param x  the data/input m-by-n matrix
+     *  @param y  the response/output m-vector
      */
     def apply (x: MatriD, y: VectoD): Regression =
     {
         if (add_1)
-            new Regression (one (x.dim1) +^: x, y, technique)
+            new Regression (one (x.dim1) +^: x, y, null, null, technique)
         else
-            new Regression (x, y, technique)
+            new Regression (x, y, null, null, technique)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Multiple Linear Regression model using Ordinary Least Squares 'OLS'.
-     *  @param xy  the combined input/design m-by-n matrix and response m-vector
+     *  @param xy  the combined data/input m-by-n matrix and response m-vector
      */
     def apply (xy: MatriD): Regression =
     {
+        val (x, y) = pullResponse (xy)
         if (add_1)
-            new Regression (one (xy.dim1) +^: xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1), technique)
+            new Regression (one (xy.dim1) +^: x, y, null, null, technique)
         else
-            new Regression (xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1), technique)
+            new Regression (x, y, null, null, technique)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Multiple Linear Regression model using Weighted Least Squares 'WLS'.
-     *  @param x  the input/design m-by-n matrix
+     *  @param x  the data/input m-by-n matrix
      *  @param y  the response m-vector
      */
     def apply (x: MatriD, y: VectoD, w: VectoD): Regression_WLS =
     {
         if (add_1)
-            new Regression_WLS (one (x.dim1) +^: x, y, technique, w)
+            new Regression_WLS (one (x.dim1) +^: x, y, null, technique, w)
         else
-            new Regression_WLS (x, y, technique, w)
+            new Regression_WLS (x, y, null, technique, w)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Multiple Linear Robust Regression model.
-     *  @param x       the centered input/design m-by-n matrix NOT augmented with a first column of ones
+     *  @param x       the centered data/input m-by-n matrix NOT augmented with a first column of ones
      *  @param y       the centered response vector
-     *  @param lambda  the shrinkage parameter (0 => OLS) in the penalty term 'lambda * b dot b'
+     *  @param lambda  the shrinkage hyper-parameter (0 => OLS) in the penalty term 'lambda * b dot b'
      */
     def apply (x: MatriD, y: VectoD, lambda: Double): RidgeRegression =
     {
-        new RidgeRegression (x, y, lambda, technique)
+        val hp = RidgeRegression.hp.updateReturn ("lambda", lambda)
+        new RidgeRegression (x, y, null, hp, technique)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Multiple Linear Robust Regression model.
-     *  @param xY      the combined centered input/design m-by-n matrix and response vector
+     *  @param xY      the combined centered data/input m-by-n matrix and response vector
      *  @param lambda  the shrinkage parameter (0 => OLS) in the penalty term 'lambda * b dot b'
      */
     def apply (xy: MatriD, lambda: Double): RidgeRegression =
     {
-        new RidgeRegression (xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1), lambda, technique)
+        val (x, y) = pullResponse (xy)
+        val hp = RidgeRegression.hp.updateReturn ("lambda", lambda)
+        new RidgeRegression (x, y, null, hp, technique)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Transformed Multiple Linear Regression model.
-     *  @param x          the input/design m-by-n matrix
+     *  @param x          the data/input m-by-n matrix
      *  @param y          the response m-vector
      *  @param transform  the transformation function (e.g., log)
      *  @param transInv   the inverse transformation function (e.g., exp)
@@ -117,24 +122,24 @@ trait GLM
     def apply (x: MatriD, y: VectoD, transform: FunctionS2S, tranInv: FunctionS2S): TranRegression =
     {
         if (add_1)
-            new TranRegression (one (x.dim1) +^: x, y, transform, tranInv, technique)
+            new TranRegression (one (x.dim1) +^: x, y, null, transform, tranInv, technique)
         else
-            new TranRegression (x, y, transform, tranInv, technique)
+            new TranRegression (x, y, null, transform, tranInv, technique)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Transformed Multiple Linear Regression model.
-     *  @param xy         the combined input/design m-by-n matrix and response m-vector
+     *  @param xy         the combined data/input m-by-n matrix and response m-vector
      *  @param transform  the transformation function (e.g., log)
      *  @param transInv   the inverse transformation function (e.g., exp)
      */
     def apply (xy: MatriD, transform: FunctionS2S, tranInv: FunctionS2S): TranRegression =
     {
+        val (x, y) = pullResponse (xy)
         if (add_1)
-            new TranRegression (one (xy.dim1) +^: xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1),
-                                transform, tranInv, technique)
+            new TranRegression (one (xy.dim1) +^: x, y, null, transform, tranInv, technique)
         else
-            new TranRegression (xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1), transform, tranInv, technique)
+            new TranRegression (x, y, null, transform, tranInv, technique)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -189,7 +194,7 @@ trait GLM
      */
     def apply (x_ : MatriD, y: VectoD, cubic: Boolean): ResponseSurface =
     {
-        new ResponseSurface (x_, y, cubic)
+        new ResponseSurface (x_, y, null, cubic)
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -204,15 +209,14 @@ trait GLM
     } // apply
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Build an ANalysis of COVAriance (ANCOVA) model.
-     *  @param x_      the data/design matrix of continuous variables
+    /** Build an ANalysis of COVAriance (ANCOVA1) model.
+     *  @param x_      the data/input matrix of continuous variables
      *  @param t       the treatment/categorical variable vector
      *  @param y       the response vector
-     *  @param levels  the number of treatment levels (1, ... levels)
      */
-    def apply (x_ : MatriD, y: VectoD, t: VectoI, levels: Int): ANCOVA =
+    def apply (x_ : MatriD, y: VectoD, t: VectoI): ANCOVA1 =
     {
-        new ANCOVA (x_, t, y, levels, technique)
+        new ANCOVA1 (x_, t, y, null, technique)
     } // apply
 
 } // GLM trait

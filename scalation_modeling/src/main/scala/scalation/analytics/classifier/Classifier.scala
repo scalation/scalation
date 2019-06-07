@@ -1,17 +1,19 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sun Sep 23 21:14:14 EDT 2012
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
 import scala.math.round
+import scala.collection.mutable.{LinkedHashMap, Map, Set}
 
 import scalation.linalgebra.{MatriI, MatrixI, VectoD, VectorD, VectoI, VectorI}
-import scalation.random.PermutedVecI
+import scalation.random.{PermutedVecI, RandomSet}
 import scalation.random.RNGStream.ranStream
 
 import Round.roundVec
@@ -35,7 +37,7 @@ trait Classifier
      *  Must be implemented in any extending class.
      *  @param itest  the indices of the instances considered as testing data
      */
-    def train (itest: IndexedSeq [Int]): Classifier
+    def train (itest: Ints): Classifier
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the classifier by computing the probabilities from a training dataset of
@@ -73,7 +75,7 @@ trait Classifier
      *  of correct classifications.
      *  @param itest  the indices of the instances considered test data
      */
-    def test (itest: IndexedSeq [Int]): Double
+    def test (itest: Ints): Double
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Test the quality of the training with a test dataset and return the fraction
@@ -139,7 +141,7 @@ trait Classifier
      *  @see medium.com/greyatom/performance-metrics-for-classification-problems-in-machine-learning-part-i-b085d432082b
      *  @see `ConfusionMat`
      *  @param y   the actual class labels
-     *  @param yp  the precicted class labels
+     *  @param yp  the predicted class labels
      *  @param k   the number of class labels
      */
     def fit (y: VectoI, yp: VectoI, k: Int = 2): VectoD =
@@ -155,9 +157,79 @@ trait Classifier
     def fitLabel: Seq [String] = Seq ("acc", "prec", "recall", "kappa")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Format a double value.
+     *  @param z  the double value to format
+     */
+    private def f_ (z: Double): String = "%.5f".format (z)
+
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build a map of quality of fit measures (use of `LinedHashMap` makes it ordered).
+     *  Override to add more quality of fit measures.
+     *  @param y   the actual class labels
+     *  @param yp  the predicted class labels
+     *  @param k   the number of class labels
+     */
+    def fitMap (y: VectoI, yp: VectoI, k: Int = 2): Map [String, String] =
+    {
+        val lm = LinkedHashMap [String, String] ()               // empty list map
+        val fl = fitLabel                                        // fit labels
+        val fv = fit (y, yp, k)                                  // fit values
+        for (i <- fl.indices) lm += fl(i) -> f_(fv(i))
+        lm
+    } // fitMap
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset the frequency counters.
      */
     def reset ()
 
 } // Classifier trait
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Classifier` object provides methods for paritioning the downsampling the
+ *  the dataset.
+ */
+object Classifier
+{
+    private val DEBUG = true                            // debug flag
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Partition the dataset into groups, e.g., to set up for downsampling, by
+     *  returning each group's indices and frequency counts.  Instances with the
+     *  same classification 'y(i)' will be found in the 'i'th group.
+     *  @param y  the classification/response vector
+     */
+    def partition (y: VectoI): (Array [Set [Int]], VectoI) =
+    {
+        val k = y.max () + 1                            // number of class labels
+        val group = Array.fill (k)(Set [Int] ())        // create k empty groups
+        for (i <- y.range) group(y(i)) += i             // add index i into group y(i)
+        val freq = VectorI (group.map (_.size))         // get the frequency for each group
+        (group, freq)
+    } // partition
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Downsample to reduce imbalance of classes, by returning the group indices
+     *  and the probability for each group.
+     *  @param y   the classification/response vector
+     *  @param ns  the number of instances in downsample
+     */
+    def downsample (y: VectoI, ns: Int): Array [Int] =
+    {
+        val dsample = Set [Int] ()                      // create an empty downsample
+        val (group, freq) = partition (y)               // partition into groups
+        val gmax = freq.min () - 1                      // use smallest group for samples per group
+        if (DEBUG) println (s"downsample: collect samples in range 0 to $gmax per group")
+        val rsg   = RandomSet (gmax, gmax)              // create a random set generator
+        for (ig <- group.indices) {
+            val idx    = rsg.igen                       // randomly select indices in group
+            val groupi = group(ig).toArray              // make corresponding array
+            for (j <- idx) dsample += groupi(j)         // add selected ones to dsample
+        } // for
+        if (DEBUG) println (s"downsample: dsample = $dsample")
+        dsample.toArray                                 // indices for y in downsample
+    } // downsample
+
+} // Classifier object
 

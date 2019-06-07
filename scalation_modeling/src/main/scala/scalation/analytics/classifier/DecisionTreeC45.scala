@@ -1,6 +1,7 @@
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  Jerry Shi, John Miller, Dong Yu Yu
- *  @version 1.3
+/** @author  Jerry Shi, John Miller, Dong Yu Yu, Susan George
+ *  @version 1.6
  *  @date    Wed Jan  9 15:07:13 EST 2013
  *  @see     LICENSE (MIT style license file).
  *  @see     http://en.wikipedia.org/wiki/C4.5_algorithm
@@ -8,13 +9,13 @@
 
 package scalation.analytics.classifier
 
-import scala.collection.mutable.{MutableList, Queue}
-import scala.math.{ceil, floor}
-import scala.util.control.Breaks.{break, breakable}
+import scala.collection.mutable.{ArrayBuffer}
 import scala.util.Sorting
+
 import scalation.linalgebra.{VectoD, VectorD, VectoI, VectorI, MatriD, MatrixD}
-import scalation.util.Error
-import scalation.analytics.Probability.entropy
+import scalation.util.banner
+
+import Probability.{count, entropy, findSplit, frequency}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DecisionTreeC45` class implements a Decision Tree classifier using the
@@ -23,390 +24,272 @@ import scalation.analytics.Probability.entropy
  *  one of 'k' classes numbered '0, ..., k-1'.  Each column in the matrix represents
  *  a feature (e.g., Humidity).  The 'vc' array gives the number of distinct values
  *  per feature (e.g., 2 for Humidity).
+ *-----------------------------------------------------------------------------
+ *  At node for feature 'x_f', create children for possible discrete values of 'x_f'
+ *  (For continuous, pick a threshold to split into lower and higher values).  Upon
+ *  splitting, some matrices need to be created for which 'x_f' column is removed and
+ *  each child only contains rows for its given value of 'x_f'.
+ *-----------------------------------------------------------------------------
  *  @param x       the data vectors stored as rows of a matrix
  *  @param y       the class array, where y_i = class for row i of the matrix x
- *  @param fn      the names for all features/variables
  *  @param isCont  `Boolean` value to indicate whether according feature is continuous
+ *  @param fn_     the names for all features/variables
  *  @param k       the number of classes
- *  @param cn      the names for all classes
+ *  @param cn_     the names for all classes
  *  @param vc      the value count array indicating number of distinct values per feature
+ *  @param height  the maximum height of tree (max edge count root to leaf)
  */
-class DecisionTreeC45 (val x: MatriD, val y: VectoI, fn: Array [String], isCont: Array [Boolean],
-                       k: Int, cn: Array [String], private var vc: Array [Int] = null)
-      extends ClassifierReal (x, y, fn, k, cn)
+class DecisionTreeC45 (val x: MatriD, val y: VectoI, isCont: Array [Boolean], fn_ : Strings = null,
+                       k: Int = 2, cn_ : Strings = null, private var vc: Array [Int] = null,
+                       height: Int = Int.MaxValue)
+      extends ClassifierReal (x, y, fn_, k, cn_) with DecisionTree
 {
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Class that contains information for a tree node.
-     *  @param f         feature of the node, if it is leaf, contains the feature of its parent
-     *  @param value     branch value
-     *  @param theshold  threshold for continuous feature
-     *  @param leaf      `Boolean` value indicate whether is leaf node
-     *  @param decision  decision if it is leaf node
-     */
-    class Node (val f: Int, var value: Double, val threshold: Double = -1,
-                val leaf: Boolean = false, val decision: Int = -1)
-    {
-        var next = new MutableList [DecisionTreeC45#Node] ()
-        
-        override def toString (): String =
-        {
-            if (leaf) {
-                val s="Node (LeafOf: " + fn(f) + "\t" + "BranchValue: "  + value + "\tclass: " + decision + ")"
-                println(s)
-                s
-            } else if (isCont (f)) {
-                if (value == -1) "Node (feature: " + fn(f) + "\t BranchValue: ROOT" + "\tThreshold: " + threshold + ")"
-                else             "Node (feature: " + fn(f) + "\t BranchValue: " + value + "\tThreshold: " + threshold + ")"
-            } else {
-                if (value == -1) "Node (feature: " + fn(f) + "\t BranchValue: ROOT" + ")"
-                else             "Node (feature: " + fn(f) + "\t BranchValue: " + value + ")"
-            } // if
-        } // toString
-
-    } // Node class
-
-    private val DEBUG  = false                       // debug flag
-    private val y_prob = new VectorD (k)             // probability that class c occurs
-
-    if (vc == null) vc = vc_default                  // set value count (vs) to default for binary data (2)
-    for (i <- 0 until m) y_prob(y(i)) += 1
-    y_prob /= md
-    private val entropy_0 = entropy (y_prob)         // the initial entropy
-    private var root: DecisionTreeC45#Node = null    // decision tree, store according to layers of tree
-    private var threshold = new Array [Double] (n)   // threshold for continuous features (below <=, above >)
+    private val DEBUG     = true                                             // debug flag
+    private val entropy_0 = entropy (frequency (y, k))                       // the initial entropy
+    private val threshold = Array.ofDim [Double] (n)                         // threshold for continuous features (below <=, above >)
     
-    for (i <- 0 until n if isCont(i)) vc(i) = 2      // for continuous features set vc to 2 (below, above)
-      
-    if (DEBUG) println ("Constructing a C45 Decision Tree: initial entropy = " + entropy_0)
+    if (vc == null) vc = vc_default                                          // set value count (vs) to default for binary data (2)
+    for (i <- 0 until n if isCont(i)) vc(i) = 2                              // for continuous features set vc to 2 (below, above)
+
+    banner ("DecisionTreeC45: initial entropy entropy_0 = " + entropy_0)
     
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given a feature column (e.g., 2 (Humidity)) and a value (e.g., 1 (High))
-     *  use the frequency of occurrence the value for each classification
-     *  (e.g., 0 (no), 1 (yes)) to estimate k probabilities.  Also, determine
-     *  the fraction of training cases where the feature has this value
-     *  (e.g., fraction where Humidity is High = 7/14).
-     *  @param fCol   a feature column to consider (e.g., Humidity)
-     *  @param value  one of the possible values for this feature (e.g., 1 (High))
-     *  @param cont   indicates whether is calculating continuous feature
-     *  @param thres  threshold for continuous feature
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the decision tree.
+     *  @param itest  the indices for the test data
      */
-    def frequency (fCol: VectoD, value: Double, cont: Boolean = false, thres: Double = 0):
-                   Tuple2 [Double, VectorD] =
+    def train (itest: IndexedSeq [Int]) =                                    // FIX the logic - use itest
     {
-        val prob  = new VectorD (k)        // probability vector for a given feature and value
-        var count = 0.0
-        if (cont) {                        // feature with continuous values
-            if (value == 0) {
-                for (i <- 0 until m if fCol(i) <= thres) {    // below threshold
-                    count      += 1.0
-                    prob(y(i)) += 1
-                } // for
-             } else {
-                for (i <- 0 until m if fCol(i) > thres) {      // above threshold
-                    count      += 1.0
-                    prob(y(i)) += 1
-                } // for
-            } // if
-        } else {                           // feature with discrete values
-            for (i <- 0 until m if fCol(i) == value) {
-                count      += 1.0
-                prob(y(i)) += 1
-            } // for
-        } // if
-        (count / md, prob /= count)        // return the fraction and the probability vector 
-    } // frequency
+        root = buildTree (x, y, List [(Int, Int)] ())
+        println ("Entropy of tree = " + Node2.calcEntropy (leaves))
+        println ("No of leaves (original) = " + leaves.size)
+        this
+    } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the information gain due to using the values of a feature/attribute
      *  to distinguish the training cases (e.g., how well does Humidity with its
      *  values Normal and High indicate whether one will play tennis).
-     *  @param f  the feature to consider (e.g., 2 (Humidity))
+     *  @param f   the feature to consider (e.g., 2 (Humidity))
+     *  @param x_  the trimmed data matrix
+     *  @param y_  the trimmed classification vector
      */
-    def gain (f: Int): Double =
+    private def gain (f: Int, x_ : MatriD, y_ : VectoI): (Double, VectoI) =
     {
-        val fCol = x.col(f)            // extract column f from data matrix x
-        val vals = vc(f)               // the number of distinct values for feature f
-        var sum  = 0.0
-        for (i <- 0 until vals) {
-            val (coun_fi, prob_fi) = frequency (fCol, i, isCont(f), threshold(f))
-            val entr_fi = entropy (prob_fi)           // entropy for feature f value i
-            sum += coun_fi * entr_fi
+        val nu  = new VectorI (k)                                            // frequency counts
+        var sum = 0.0
+        for (v <- 0 until vc(f)) {
+            val (frac_v, nu_v) = frequency (x_.col(f), y_, k, v, null, isCont(f), threshold(f))
+            sum += frac_v * entropy (nu_v)                                   // weighted entropy
+            nu  += nu_v
         } // for
-        val igain = entropy_0 - sum                   // the drop in entropy
-        igain                                         // return the information gain
+        val igain = entropy_0 - sum                                          // the drop in entropy = information gain
+        if (DEBUG) println (s"gain: entropy = $sum, overall gain from feature $f = $igain")
+        (igain, nu)                                                          // return the gain and frequency counts
     } // gain
-
+ 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given a continuous feature, adjust its threshold to improve gain.
-     *  @param f  the feature index to consider
+    /** Find the best feature 'f' / column 'xj' to expand the decision tree,
+     *  returning that feature, its gain and its frequency vector.
+     *  Note: the dataset is restricted to 'rindex' rows and 'cindex' columns.
+     *  @param x_  the trimmed data matrix
+     *  @param y_  the trimmed classification vector
      */
-    def calThreshold (f: Int)
+    private def findBest (x_ : MatriD, y_ : VectoI): (Int, Double, VectoI) =
     {
-        var thres    =  0.0                          // start with a threshold of 0
-        var tmpThres =  0.0                          // try other thresholds
-        var maxGain  = -1.0                          // maximum gain
-        var tmpGain  =  0.0                          // gain with current threshold
-        var fCol     = x.col(f)                      // feature column
-        var values   = new MutableList [Double] ()   // values for feature
-        for (i <- 0 until m if ! values.contains (fCol(i))) values += fCol(i)
-        values = values.sorted
-
-        if (DEBUG) {
-            println("\n ************ Threshold calculation for feature = " + f)
-            println("possible value for feature = " + f + "  are: " + values)
-        } // if
-
-        for (i <- 0 until values.length - 1) {
-            tmpThres     = (values(i) + values(i+1)) / 2.0
-            threshold(f) = tmpThres                  // tmp change for gain calculation
-            tmpGain      = gain (f)                  // compute gain with new threshold
-            if (DEBUG) println ("for threshold " + tmpThres + " the gain is " + tmpGain)
-            if (tmpGain > maxGain) {
-                thres   = tmpThres                   // found a better threshold
-                maxGain = tmpGain                    // save better gain
-            } // if
+        var best = (-1, 0.0, null.asInstanceOf [VectoI])                     // best (feature, (gain, frequency))
+        for (f <- 0 until n) {
+            if (DEBUG) println (s"--> findBest: check feature f = $f")
+            val xj = x_.col(f)                                               // column j (feature f)
+            if (isCont(f)) threshold(f) = findSplit (xj, y_, k = k)          // isCont => calculate split threshold
+            val (gn, nu) = gain (f, x_, y_)                                  // compute gain for feature f
+            if (DEBUG) println (s"findBest: compare ($f, $gn, $nu) to $best")
+            if (gn > best._2) best = (f, gn, nu) 
         } // for
-
-        threshold(f) = thres                         // save best threshold for this feature
-        if (DEBUG) println ("for feature "+ f + " threshold = " + thres)
-    } // calThreshold
+        if (best._2 <= 0.0) println ("findBest: no positive gain found")
+        best
+    } // findBest
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return new x matrix and y array for next step of constructing decision tree.
-     *  @param f      the feature index
-     *  @param value  one of the features values
-     */
-    def nextXY (f: Int, value: Double): Tuple2 [MatrixD, VectorI] =      
-    {
-        var count = 0
-        if (isCont(f)) {                       // feature with continuous values
-            if (value == 0) {
-                for (i <- 0 until m if x(i, f) <= threshold(f)) count += 1
-            } else {
-                for (i <- 0 until m if x(i, f) > threshold(f)) count += 1
-            } // if
-        } else {                               // feature with discrete values
-            for (i <- 0 until m if x(i, f) == value) count += 1
-        } // if
+    /** Recursively build the decision tree given a subset of data.
+     *  @param dset   the dataset to build the subtree
+     *  @param path   an existing path in the tree ((feature, value), ...)
+     *  @param depth  the depth of the subtree being built
+     */  
+    private def buildTree (x_ : MatriD, y_ : VectoI, path: List [(Int, Int)], depth: Int = 0): Node2 =
+    { 
+        val (f, gn, nu) = findBest (x_, y_)
+        println ("-" * 80)
+        println (s"buildTree: best feature = $f, gain = $gn, path = $path")
 
-        val nx = new MatrixD (count, n)        // new x matrix
-        val ny = new VectorI (count)           // new y array
+        if (f < 0) return null                                               // no useful feature was found
 
-        var x_index = 0
-        if (isCont(f)) {                       // feature with continuous values
-            if (value == 0) {
-                for (i <- 0 until m if x(i, f) <= threshold(f)) {
-                    ny(x_index) = y(i)
-                    nx(x_index) = x(i)
-                    x_index += 1
+        val node = FeatureNode (f, path, nu)
+        node.threshold = threshold(f)
+          
+        for (b <- 0 until vc(f)) {                                           // build subtree or leaf for each branch value
+            if (DEBUG) println (s"- buildTree: explore branch $b of ${vc(f)} for feature x$f at depth $depth")
+            val (xx, yy) = trimRows (f, b, x_, y_)                           // time matrix x_ and vector y_
+
+            if (depth >= height) {                                           // at height limit
+                for (v <- 0 until vc(f)) {
+                    val (frac_v, nu_v) = frequency (xx.col(f), yy, k, v, null, isCont(f), threshold(f))
+                    leaves += Node2.addLeaf (nu_v.argmax (), nu_v, node, v)  // add leaf node
                 } // for
-            } else {
-                for (i <- 0 until m if x(i, f) > threshold(f)) {
-                    ny(x_index) = y(i)
-                    nx(x_index) = x(i)
-                    x_index += 1
-                } // for
-            } // if
-        } else {                               // feature with discrete values
-            for (i <- 0 until m if x(i, f) == value) {
-                ny(x_index) = y(i)
-                nx(x_index) = x(i)
-                x_index += 1
-            } // for
-        } // if
-        (nx, ny)
-    } // nextXY
-    
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Train the classifier, i.e., determine which feature provides the most
-     *  information gain and select it as the root of the decision tree.
-     *  @param interval train the tree using the features index within 
-     *  
-     */
-    def train (interval: IndexedSeq [Int]): DecisionTreeC45 =    // FIX - use these parameters
-    {
-        if (DEBUG) {
-            println ("train: inputs:")
-            println ("\t x      = " + x)
-            println ("\t y      = " + y)
-            println ("\t vc     = " + vc.deep)
-            println ("\t isCont = " + isCont.deep)
-        } // if
-
-        for (f <- 0 until n if isCont(f)) calThreshold (f)    // set threshold for cont. features
-        var opt = (0, gain (0))                               // compute gain for feature 0
-        
-        if (DEBUG) println ("train: for feature " + opt._1 + " the gain is " + opt._2)
-        
-        for (f <- interval) {
-            val fgain = gain (f)                              // compute gain for feature f
-            if (DEBUG) println ("train: for feature " + f + " the gain is " + fgain)
-            if (fgain > opt._2) opt = (f, fgain)              // save feature giving best gain
-        } // for
-        
-        if (DEBUG) println ("train: \noptimal feature is " + opt._1 + " with a gain of " + opt._2)
-        
-        buildTree (opt)
-        this
-    } // train
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given the next most distinguishing feature/attribute, extend the
-     *  decision tree.
-     *  @param opt  the optimal feature and its gain
-     */
-    def buildTree (opt: Tuple2 [Int, Double])
-    {
-        root = if (isCont(opt._1)) new Node (opt._1, -1, threshold(opt._1)) else new Node (opt._1, -1)
-
-        for (i <- 0 until vc(opt._1)) {
-            var next = nextXY(opt._1, i)
-            if (next._2.size != 0) {  //if additionial spit doesn't cause empty nodes
-                var nodeContainSameClass = true
-                for (j <- 0 until next._2.dim - 1 if next._2(j) != next._2(j + 1)) nodeContainSameClass = false
-                if (nodeContainSameClass) {
-                    var t = next._1
-                    root.next += new Node (opt._1, root.next.length, -1, true, next._2(0))
-                    if (DEBUG) {
-                        println (" --> Leaf = " + root.next)
-                        println ("\t x      = " + next._1)
-                        println ("\t y      = " + next._2)
-                        println ("\t vc     = " + vc.deep)
-                        println ("\t isCont = " + isCont.deep)
-                    } // if
-                } else {
-                    var nodeContainSameFeatures = true    // used to examine if features are identical, then no need to build trees
-                    for (i <- 0 until next._1.dim1-1) if (next._1(i) != next._1(i+1)) nodeContainSameFeatures = false
-                    if (! nodeContainSameFeatures) {
-                        val subtree = new DecisionTreeC45 (next._1, next._2, fn, isCont, k, cn, vc)
-                        subtree.train ()
-                        subtree.root.value = root.next.length
-                        root.next += subtree.root
+                println (s"buildTree: early termination: depth = $depth, height = $height")
+                return node
+            } else {       
+                if (yy.dim != 0) {                                           // if additional split doesn't cause empty nodes
+                    if (yy.countinct == 1) {                                 // if target contains a single value                  
+                        leaves += Node2.addLeaf (yy(0), frequency (yy, k), node, b)      // add leaf node            
+                    } else if (multivalued (xx)) {                           // if multivalued, build
+                        node.branch += b -> buildTree (xx, yy, (f, b) :: path, depth+1)  // add feature node
                     } // if
                 } // if
             } // if
+
         } // for
+        node                                                                 // return root of tree
     } // buildTree
-    
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Print out the decision tree using Breadth First Search (BFS).
-     */
-    def printTree ()
-    {
-        println("\n*********************")
-        println("  DecisionTree:\n")
-        var queue = new Queue [DecisionTreeC45#Node] ()
-        queue += root
 
-        do {
-            var nd = queue.dequeue
-            for (i <- 0 until nd.next.length) queue += nd.next(i)
-            if (isCont (nd.f) && ! nd.leaf) {
-                println (nd + " --> (" + nd.next.length + " )")
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Trim the data matrix 'xx' and classification vector 'yy', selecting rows based
+     *  on threshold values for continuous features or discrete values, otherwise.
+     *  Return a new 'x_' data matrix and a new 'y_' classification vector for next
+     *  step of constructing decision tree based upon values of the given feature 'f'.
+     *  @param f      the feature/column index
+     *  @param value  one of the feature values or 0 (<=) / 1 (> threshold) for a continuous feature
+     *  @param xx     the data matrix containing feature/column f
+     *  @param yy     the corresponding response/classification vector
+     */
+    private def trimRows (f: Int, value: Int, xx: MatriD, yy: VectoI): (MatriD, VectoI) =
+    {
+        val x_f = xx.col(f)                                                  // column f of matrix xx
+        val cnt = count (x_f, value, null, isCont(f), threshold(f))
+        val x_  = new MatrixD (cnt, xx.dim2)                                 // new x matrix
+        val y_  = new VectorI (cnt)                                          // new y vector
+
+        var ii = 0
+        if (isCont(f)) {                                                     // feature with continuous values
+            if (value == 0) {
+                for (i <- x_f.range if x_f(i) <= threshold(f)) { y_(ii) = yy(i); x_(ii) = xx(i); ii += 1 }
             } else {
-                println (nd + " --> (" + nd.next.length + " )")
+                for (i <- x_f.range if x_f(i) >  threshold(f)) { y_(ii) = yy(i); x_(ii) = xx(i); ii += 1 }
             } // if
-        } while (! queue.isEmpty)
-    } // printTree
+        } else {                                                             // feature with discrete values
+            for (i <- x_f.range if x_f(i) == value) { y_(ii) = yy(i); x_(ii) = xx(i); ii += 1 }
+        } // if
+        (x_, y_)
+    } // trimRows
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a data vector z, classify it returning the class number (0, ..., k-1)
      *  by following a decision path from the root to a leaf.
-     *  Return the best class, its name and its FIX.
-     *  @param z  the data vector to classify (purely discrete features)
-     *
-    def classify (z: VectoD): (Int, String, Double) =
-    {
-        if(DEBUG) println ("classify: purely discrete features\n")
-
-        for (i <- 0 until n if z(i) >= vc(i)) {
-            println("classify: the " + i + "th value is too large")
-            break
-        } // for
-
-        var nd   = root         // current node
-        var step = 0
-        while ( ! nd.leaf) {
-            println ("classify: step-" + step + ": " + nd)
-            nd = nd.next(z(nd.f).toInt)
-            step += 1
-        } // while
-
-        println ("classify step-" + step + ": " + nd + "\n")
-        val best = nd.decision
-        (best, cn(best), -1.0)               // FIX - need ranking metric
-    } // classify
-     */
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given a data vector z, classify it returning the class number (0, ..., k-1)
-     *  by following a decision path from the root to a leaf.
-     *  Return the best class, it ane and FIX.
+     *  Return the best class, its name and FIX.
      *  @param z  the data vector to classify (some continuous features)
      */
     override def classify (z: VectoD): (Int, String, Double) =
     {
-        if(DEBUG) println ("classify: some continuous features\n")
-
-        var nd   = root         // current node
-        var step = 0
-        while ( ! nd.leaf) {
-            if (DEBUG) println ("classify: step-" + step + ": " + nd)
-            if (isCont (nd.f)) {
-                nd = if (z(nd.f) <= nd.threshold) nd.next(0) else nd.next(1)
-            } else {
-                nd = nd.next(z(nd.f).toInt)
-            } // if
-            step += 1
-        } // while
-
-        if (DEBUG) println ("classify: step-" + step + ": " + nd + "\n")
-        val best = nd.decision
-        (best, cn(best), -1.0)          // FIX - need metric
+        var node = root                                                      // current node
+        for (j <- 0 to n) {
+            node match {
+            case FeatureNode (f, path, count, branch) =>
+                try {
+                    val fn = node.asInstanceOf [FeatureNode]
+                    node = if (isCont (f)) if (z(f) <= fn.threshold) fn.branch(0) else fn.branch(1)
+                           else branch (z(f).toInt) 
+                } catch { case nse: NoSuchElementException =>
+                    val best = node.asInstanceOf [FeatureNode].nu.argmax ()
+                    return (best, cn(best), -1.0)
+                } // try
+            case LeafNode (y, count) => 
+                val best = y
+                return (best, cn(best), -1.0)
+            case _ =>
+                println (s"classify: 'node match' failed for node = $node")
+                return (-1, "?", -1.0)
+            } // match
+        } // for
+        println ("classify: failed at leaf node")
+        (-1, "?", -1.0)
     } // classify
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Reset or re-initialize the frequency tables and the probability tables.
-     */
-    def reset ()
-    {
-        // FIX: to be implemented
-    } // reset
 
 } // DecisionTreeC45 class
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** `DecisionTreeC45` is the companion object for the `DecisionTreeC45` class.
+/** `DecisionTreeC45` is the companion object provides factory methods.
  */
 object DecisionTreeC45
 {
+    import ClassifierReal.pullResponse
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a `DecisionTreeID3` object, passing 'x' and 'y' together in one table.
-     *  @param xy  the data vectors along with their classifications stored as rows of a matrix
+    /** Create a decision tree for the given combined matrix where the last column
+     *  is the response/classification vector.
+     *  @param xy      the data vectors along with their classifications stored as rows of a matrix
+     *  @param isCont  `Boolean` value to indicate whether according feature is continuous
+     *  @param fn      the names for all features/variables
+     *  @param k       the number of classes
+     *  @param cn      the names for all classes
+     *  @param vc      the value count array indicating number of distinct values per feature
+     *  @param height  the maximum height of tree (max edge count root to leaf)
+     */
+    def apply (xy: MatriD, isCont: Array [Boolean], fn: Strings = null,
+               k: Int = 2, cn: Strings = null, vc: Array [Int] = null, height: Int = Int.MaxValue) =
+    {
+        val (x, y) = pullResponse (xy)
+        new DecisionTreeC45 (x, y, isCont, fn, k, cn, vc, height)
+    } // apply
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Test the decision tree on the given dataset passed in as a combined matrix.
+     *  @param xy      the data vectors along with their classifications stored as rows of a matrix
      *  @param fn      the names for all features/variables
      *  @param isCont  `Boolean` value to indicate whether according feature is continuous
      *  @param k       the number of classes
      *  @param cn      the names for all classes
      *  @param vc      the value count array indicating number of distinct values per feature
+     *  @param height  the maximum height of tree (max edge count root to leaf)
      */
-    def apply (xy: MatriD, fn: Array [String], isCont: Array [Boolean], k: Int, cn: Array [String],
-               vc: Array [Int] = null) =
+    def test (xy: MatriD, fn: Strings, isCont: Array [Boolean], k: Int = 2, cn: Strings = null,
+              vc: Array [Int] = null, height: Int = Int.MaxValue): DecisionTreeC45 =
     {
-        new DecisionTreeC45 (xy(0 until xy.dim1, 0 until xy.dim2-1), xy.col(xy.dim2-1).toInt, fn, isCont, k, cn, vc)
-    } // apply
+        banner ("create, train and print a C4.5 decision tree")
+        println (s"dataset xy: ${xy.dim1}-by-${xy.dim2} matrix")
+        val (x, y) = pullResponse (xy)
+        val ymin   = y.min ()
+        println (s"unadjusted ymin = $ymin")
+        if (ymin != 0) y -= ymin
+        val tree = new DecisionTreeC45 (x, y, isCont, fn, k, cn, vc, height)
+        tree.train ()
+        tree.printTree (vc)
+
+        banner ("classify all intances and show confusion matrix")
+        val yp = tree.classify (x)
+//      for (i <- y.range) println (s"i: $i, \t y  = ${y(i)}, \t yp = ${yp(i)}")
+        val ymax = y.max ()
+        println (s"ymax = $ymax")
+        println ("fitMap = " + tree.fitMap (y, yp, ymax+1))
+        val cm = new ConfusionMat (y, yp, ymax+1)
+        println ("cm = " + cm.confusion)
+        println ("accuracy    = " + cm.accuracy)
+        println ("prec-recall = " + cm.prec_recl)
+        tree
+    } // test
 
 } // DecisionTreeC45 object
 
+import DecisionTreeC45.test
+import ClassifierReal.makeIsCont
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `DecisionTreeC45Test` object is used to test the `DecisionTreeC45` class.
  *  Ex: Classify (No/Yes) whether a person will play tennis based on the measured
  *  features.
- *  @see http://www.cise.ufl.edu/~ddd/cap6635/Fall-97/Short-papers/2.htm
- *  > runMain scalation.analytics.classifier.DecisionTreeC45_Test
+ *  @see www.cise.ufl.edu/~ddd/cap6635/Fall-97/Short-papers/2.htm
+ *  > runMain scalation.analytics.classifier.DecisionTreeC45Test
  */
-object DecisionTreeC45_Test extends App
+object DecisionTreeC45Test extends App
 {
     // training-set -----------------------------------------------------------
     // Outlook:     Rain (0), Overcast (1), Sunny (2)
@@ -414,82 +297,120 @@ object DecisionTreeC45_Test extends App
     // Humidity:    Normal (0), High (1)
     // Wind:        Weak (0), Strong (1)
     // features:    Outlook Temp Humidity Wind
-    
-    val x  = new MatrixD ((14, 4),   2,     2,     1,     0,      // day  1 - data matrix
-                                     2,     2,     1,     1,      // day  2
-                                     1,     2,     1,     0,      // day  3
-                                     0,     1,     1,     0,      // day  4
-                                     0,     0,     0,     0,      // day  5
-                                     0,     0,     0,     1,      // day  6
-                                     1,     0,     0,     1,      // day  7
-                                     2,     1,     1,     0,      // day  8
-                                     2,     0,     0,     0,      // day  9
-                                     0,     1,     0,     0,      // day 10
-                                     2,     1,     0,     1,      // day 11
-                                     1,     1,     1,     1,      // day 12
-                                     1,     2,     0,     0,      // day 13
-                                     0,     1,     1,     1)      // day 14
-    // day:           1  2  3  4  5  6  7  8  9 10 11 12 13 14
-    val y  = VectorI (0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0)   // classification vector: 0(No), 1(Yes))
-    val vc = Array (3, 3, 2, 2)                                   // distinct values for each feature
-    val fn = Array ("Outlook", "Temp", "Humidity", "Wind")        // feature names
-    val flag = Array (false, false, false, false)                 // is continuous
-    val cn = Array("No","Yes")
-//  val x = new MatrixI ((14, 4),  0,     85,     85,    0,    
-//                                 0,     80,     90,    1,    
-//                                 1,     83,     78,    0,    
-//                                 2,     70,     96,    0,    
-//                                 2,     68,     80,    0,    
-//                                 2,     65,     70,    1,    
-//                                 1,     64,     65,    1,    
-//                                 0,     72,     95,    0,    
-//                                 0,     69,     70,    0,    
-//                                 2,     75,     80,    0,    
-//                                 0,     75,     70,    1,    
-//                                 1,     72,     90,    1,
-//                                 1,     81,     75,    0,    
-//                                 2,     71,     80,    1)    
-//                                 
-//  val y  = VectorI (0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0)     // classification vector: 0(No), 1(Yes))
-//  val vc = Array (3, 3, 2, 2)                                     // distinct values for each feature
-//  val flag = Array (false, true, true, false)
+    // classification vector: 0(no), 1(yes))
 
-    // train the classifier ---------------------------------------------------
-    val cl = new DecisionTreeC45 (x, y, fn, flag, 2, vc = vc, cn = cn)      // create the classifier
-    cl.train ()
-    cl.printTree ()
-    val t = VectorD(1,2,1,0)
-    println("result" + cl.classify(t))
-//  test sample ------------------------------------------------------------
-//  val z = VectorD (2, 100, 77.5, 0)                               // new data vector to classify
-//  println ("--- classify " + z + " = " + cl.classify (z) + "\n")
-//  val z2 = VectorD (2, 100, 77.6, 1)                              // new data vector to classify
-//  println ("--- classify " + z2 + " = " + cl.classify (z2) + "\n")
+    import ExampleTennis.fn
+
+    val xy = ExampleTennis.xy.toDouble 
     
+    banner ("C4.5 Decision Tree for 'playtennis' dataset")
+
+    val vc    = Array (3, 3, 2, 2)                                // distinct values for each feature
+    val isCon = makeIsCont (xy.dim2-1)                            // continuous column flag
+    val tree  = test (xy, fn, isCon, 2, null, vc)                 // create and test decision tree
+
+    banner ("Classify New Data")
+    val z = VectorI (2, 2, 1, 1)                                  // new data vector to classify
+    println (s"classify ($z) = ${tree.classify (z)}")
+
+    banner ("Prune the Tree")
+    val threshold = 0.98                                          // pruning threshold
+//  tree.prune (threshold)                                        // prune the decision tre
+
 } // DecisionTreeC45Test object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `DecisionTreeC45_Test2` object is used to test the `DecisionTreeC45` class
- *  using the well-known winequality dataset.
- *  > runMain scalation.analytics.classifier.DecisionTreeC45_Test2
+/** The `DecisionTreeC45Test2` object is used to test the `DecisionTreeC45` class.
+ *  Ex: Classify (No/Yes) whether a person will play tennis based on the measured
+ *  features.  This one used the version with continuous features.
+ *  @see https://sefiks.com/2018/05/13/a-step-by-step-c4-5-decision-tree-example/
+ *  > runMain scalation.analytics.classifier.DecisionTreeC45Test2
  */
-object DecisionTreeC45_Test2 extends App {
+object DecisionTreeC45Test2 extends App
+{
+    // training-set -----------------------------------------------------------
+    // Outlook:     Rain (0), Overcast (1), Sunny (2)
+    // Temperature: continuous
+    // Humidity:    continuous
+    // Wind:        Weak (0), Strong (1)
+    // features:    Outlook Temp Humidity Wind
+    // classification vector: 0(no), 1(yes))
 
-    val file        = BASE_DIR + "winequality-white.csv"
-    val numberClass = 7
+    import ExampleTennisCont.{fn, xy}
 
-    val data   = MatrixD (file)
-    val target = data.col (data.dim2-1).-=(3)                        // regularize the target value
-    val sample = data.selectCols (Range(0, data.dim2 - 1).toArray)
-    var fn     = new Array[String] (data.dim2-1)
-    val cn     = new Array[String] (numberClass)
-    for (i <- 0 until data.dim2-1) fn(i) = s"feature$i"
-    for (i <- 0 until numberClass) cn(i) = s"class$i"
-    val isC  = Array.fill (sample.dim2)(true)
-    val tree = new DecisionTreeC45 (sample, target.toInt, fn, isCont = isC, k = numberClass, cn = cn)
-    tree.train ()
-    tree.printTree ()
+    banner ("C4.5 Decision Tree for 'playtennis' continuous version dataset")
 
-} // DecisionTreeC45_Test2 object
+    val vc    = Array (3, 3, 2, 2)                                // distinct values for each feature
+    val isCon = Array (false, true, true, false)                  // continuous column flag
+    val tree  = test (xy, fn, isCon, vc = vc)                     // create and test decision tree
+
+    banner ("Classify New Data")
+    val z = VectorD (2, 80, 80, 1)                                // new data vector to classify
+    println (s"classify ($z) = ${tree.classify (z)}")
+
+} // DecisionTreeC45Test2 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `DecisionTreeC45Test3` object is used to test the `DecisionTreeC45` class.
+ *  Ex: Classify whether a there is breast cancer.
+ *  > runMain scalation.analytics.classifier.DecisionTreeC45Test3
+ */
+object DecisionTreeC45Test3 extends App
+{
+    banner ("C4.5 Decision Tree for 'breast cancer' dataset")
+    val fname  = BASE_DIR + "breast_cancer.csv"
+    val xy     = MatrixD (fname)
+    val fn     = Array ("Clump Thickness", "Uniformity of Cell Size", "Uniformity of Cell Shape", "Marginal Adhesion",
+                       "Single Epithelial Cell Size", "Bare Nuclei", "Bland Chromatin", "Normal Nucleoli", "Mitoses")
+    val isCon  = makeIsCont (xy.dim2-1)                            // continuous column flag
+    val cn     = Array ("benign", "malignant")
+    val k      = cn.size
+    val vc     = (for (j <- 0 until xy.dim2-1) yield xy.col(j).max ().toInt + 1).toArray
+    val height = 5
+    val tree   = test (xy, fn, isCon, k, cn, vc, height)          // create and test decision tree
+
+    banner ("Prune the Tree")
+    val threshold = 0.4                                           // pruning threshold
+//  tree.prune (threshold)                                        // prune the decision tree
+
+} // DecisionTreeC45Test3 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `DecisionTreeC45Test4` object is used to test the `DecisionTreeC45` class
+ *  using the well-known wine quality dataset.
+ *  > runMain scalation.analytics.classifier.DecisionTreeC45Test4
+ */
+object DecisionTreeC45Test4 extends App
+{
+    banner ("C4.5 Decision Tree for 'winequality-white' dataset")
+    val fname = BASE_DIR + "winequality-white.csv"                // data file
+    val xy    = MatrixD (fname)                                   // combined data matrix
+    val fn    = Array ("FixedAcidity", "VolatileAcidity",  "CitricAcid", "ResidualSugar", "Chlorides",
+                       "FreeSulfurDioxide", "TotalSulfurDioxide", "Density", "pH", "Sulphates", "Alcohol") 
+    val isCon = Array.fill (fn.length)(true)                      // continuous column flag
+    val cn    = Array ("q3", "q4", "q5", "q6", "q7", "q8", "q9")
+    val k     = cn.size
+    val vc    = (for (j <- 0 until xy.dim2-1) yield xy.col(j).max ().toInt + 1).toArray
+    val height = 10                                                // try several values for max tree depth
+    val tree   = test (xy, fn, isCon, k, cn, vc, height)           // create and test decision tree
+
+    banner ("Prune the Tree")
+    val threshold = 0.98                                          // pruning threshold
+//  tree.prune (threshold)                                        // prune the decision tree
+
+} // DecisionTreeC45Test4 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `DecisionTreeC45Test5` object is used to test the 'makeIsCont' function.
+ *  > runMain scalation.analytics.classifier.DecisionTreeC45Test5
+ */
+object DecisionTreeC45Test5 extends App
+{
+    println ("isCont = " + makeIsCont (16, 7, 11).deep)
+
+} // DecisionTreeC45Test5 object
 

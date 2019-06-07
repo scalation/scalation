@@ -1,0 +1,136 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Santosh Uttam Bobade, John Miller
+ *  @version 1.5
+ *  @date    Wed Aug  8 14:33:21 EDT 2018
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  Adapted from Conversion.java
+ *  Author: Sami Salkosuo, sami.salkosuo@fi.ibm.com
+ *
+ *  (c) Copyright IBM Corp. 2007
+ *  @see www.ibm.com/developerworks/library/j-coordconvert/index.html
+ */
+
+package scalation.spatial
+
+import scala.math._
+
+import scalation.math.roundTo
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `UTM2LatLong` object is used to convert UTM coordinates to Latitude-Longitude.
+ */
+object UTM2LatLong
+{
+    private val southernZones = "ACDEFGHJKLM"
+    private val a    = 6378137
+    private val e    = 0.081819191
+    private val e1sq = 0.006739497
+    private val k0   = 0.9996
+
+    private var phi1  = 0.0
+    private var fact1 = 0.0
+    private var fact2 = 0.0
+    private var fact3 = 0.0
+    private var fact4 = 0.0
+    private var _a3   = 0.0
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether the 'latZone' is in the southern hemisphere.
+     *  @param latZone  the latitude zone
+     */
+    def isSouthern (latZone: String): Boolean = southernZones contains latZone
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert UTM coordinates to Latitude-Longitude.
+     *  @param uTM  the UTM coordinates as a string
+     */
+    def uTM2LatLong (uTM: String): (Double, Double) =
+    {
+        val utm = uTM.split (" ")
+        uTM2LatLong (utm(0).toInt, utm(1), utm(2).toDouble, utm(3).toDouble)
+    } // uTM2LatLong
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert UTM coordinates to Latitude-Longitude.
+     *  @param longZone  the longitude zone
+     *  @param _latZone  the latitude zone
+     *  @param easting   the meters East of reference
+     *  @param northing  the meters North of reference
+     */
+    def uTM2LatLong (longZone: Int, latZone: String, easting: Double, northing: Double): (Double, Double) =
+    {
+        val southern = isSouthern (latZone)
+        setVariables (easting, if (southern) 10000000 - northing else northing)
+        val zoneCM    = if (longZone > 0) 6 * longZone - 183.0 else 3.0
+        val latitude  = 180 * (phi1 - fact1 * (fact2 + fact3 + fact4)) / Pi
+        val longitude = zoneCM - _a3
+        (if (southern) -latitude else latitude, longitude)
+    } // uTM2LatLong
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set values for variables based on give 'latitude' and 'longitude'
+     *  @param easting   the meters East of reference
+     *  @param northing  the meters North of reference
+     */
+    private def setVariables (easting: Double, northing: Double)
+    {
+        val arc = northing / k0
+        val mu = arc / (a * (1 - pow (e, 2) / 4.0 - 3 * pow (e, 4) / 64.0 - 5 * pow (e, 6) / 256.0))
+        val ei = (1 - pow (1 - e * e, 1 / 2.0)) / (1 + pow (1 - e * e, 1 / 2.0))
+        val ca = 3 * ei / 2 - 27 * pow (ei, 3) / 32.0
+        val cb = 21 * pow (ei, 2) / 16 - 55 * pow (ei, 4) / 32
+        val cc = 151 * pow (ei, 3) / 96
+        val cd = 1097 * pow (ei, 4) / 512
+        phi1 = mu + ca * sin (2 * mu) + cb * sin (4 * mu) + cc * sin (6 * mu) + cd * sin (8 * mu)
+        val n0 = a / pow (1 - pow ( (e * sin (phi1)), 2), 1 / 2.0)
+        val r0 = a * (1 - e * e) / pow (1 - pow ((e * sin (phi1)), 2), 3 / 2.0)
+        fact1 = n0 * tan (phi1) / r0
+        val _a1 = 500000 - easting
+        val dd0 = _a1 / (n0 * k0)
+        fact2 = dd0 * dd0 / 2
+        val t0 = pow (tan (phi1), 2)
+        val Q0 = e1sq * pow (cos (phi1), 2)
+        fact3 = (5 + 3 * t0 + 10 * Q0 - 4 * Q0 * Q0 - 9 * e1sq) * pow (dd0, 4) / 24
+        fact4 = (61 + 90 * t0 + 298 * Q0 + 45 * t0 * t0 - 252 * e1sq - 3 * Q0 * Q0) * pow (dd0, 6) / 720
+        val lof1 = _a1 / (n0 * k0)
+        val lof2 = (1 + 2 * t0 + Q0) * pow (dd0, 3) / 6.0
+        val lof3 = (5 - 2 * Q0 + 28 * t0 - 3 * pow (Q0, 2) + 8 * e1sq + 24 * pow (t0, 2)) * pow (dd0, 5) / 120
+        val _a2 = (lof1 - lof2 + lof3) / cos (phi1)
+        _a3 = _a2 * 180 / Pi
+    } // setVariables
+
+} // UTM2LatLong object
+
+
+object Coordinates
+{
+    val uTM = Array ("30 N 808084 1438",    "30 N 808084 14385",   "34 G 683473 4942631", "25 L 404859 8588690",
+                     "02 C 506346 1057742", "60 Z 500000 9997964", "01 A 500000 2035",    "31 Z 500000 9997964",
+                     "08 Q 453580 2594272", "57 X 450793 8586116", "22 A 502639 75072")
+
+    val ll  = Array ((  0.0130,   -0.2324), ( 0.1300,  -0.2324), (-45.6456,   23.3545), (-12.7650, -33.8765),
+                     (-80.5434, -170.6540), (90.0000, 177.0000), (-90.0000, -177.0000), ( 90.0000,   3.0000),
+                     ( 23.4578, -135.4545), (77.3450, 156.9876), (-89.3454,  -48.9306))
+
+} // Coordinates object
+
+import UTM2LatLong.uTM2LatLong
+import Coordinates._
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `UTM2LatLongTest` object is used to convert UTM coordinates to Latitude-Longitude.
+ *  > runMain scalation.spatial.UTM2LatLongTest
+ */
+object UTM2LatLongTest extends App
+{
+    for (i <- uTM.indices) {
+        val (lat, long) = uTM2LatLong (uTM(i))
+        val (rlat, rlong) = (roundTo (lat), roundTo (long))
+        println (s"uTM2LatLong (${uTM(i)})   \t = ($rlat, $rlong)")
+        assert (rlat == ll(i)._1 && rlong == ll(i)._2)
+    } // for
+
+} // UTM2LatLongTest object
+

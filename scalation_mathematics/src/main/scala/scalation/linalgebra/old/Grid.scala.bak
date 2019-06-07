@@ -1,0 +1,29 @@
+
+package scalation.linalgebra
+
+import math.{floor, pow}
+
+object Grid extends App
+{
+    val k  =  5                                 // use odd number, e.g., 5, 7, 9
+    val m  =  k / 2                             // middle index
+    val n  =  3                                 // number of dimensions
+    val xc = VectorD (10.0, 20.0, 10.0)         // center to orgin
+    val xs = VectorD (1.0, 2.0, 1.0)            // scaling to [-m, m]
+    val x  = new VectorD (n)
+    val y  = new VectorD (k)
+    for (j <- 0 until k) y(j) = j - m
+
+    for (i <- 0 until pow (k, n).toInt) {
+       var ii = i
+       for (j <- 0 until n) {
+           x(j) = y(ii % k)
+           ii /= k
+       } // for
+       println ("x = " + x)                      // centered, scaled point
+       val xx = x * xs + xc
+       println ("xx = " + xx)                    // unscaled, uncentered point
+   } // for
+
+} // Grid
+

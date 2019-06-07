@@ -1,19 +1,20 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Wed Feb 20 17:39:57 EST 2013
  *  @see     LICENSE (MIT style license file).
  */
 
 package scalation.analytics
 
+import scala.collection.mutable.Set
 import scala.math.log
 
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
-import scalation.math.double_exp
 import scalation.minima.QuasiNewton
 import scalation.plot.Plot
+import scalation.stat.Statistic
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -27,18 +28,19 @@ import scalation.util.Error
  *  Use Least-Squares (minimizing the residuals) to fit the parameter vector
  *  'b' by using Non-linear Programming to minimize Sum of Squares Error 'SSE'.
  *  @see www.bsos.umd.edu/socy/alan/stats/socy602_handouts/kut86916_ch13.pdf
- *  @param x       the input/design matrix augmented with a first column of ones
- *  @param y       the response vector
+ *  @param x       the data/input matrix augmented with a first column of ones
+ *  @param y       the response/output vector
  *  @param f       the non-linear function f(x, b) to fit
  *  @param b_init  the initial guess for the parameter vector b
+ *  @param fname_  the feature/variable names
  */
 class NonLinRegression (x: MatriD, y: VectoD, f: (VectoD, VectoD) => Double,
-                        b_init: VectorD)                                         // FIX - should be trait - currently fails
-      extends PredictorMat (x, y)
+                        b_init: VectorD, fname_ : Strings = null)            // FIX - should be trait - currently fails
+      extends PredictorMat (x, y, fname_)
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
 
-    private val DEBUG  = false                                 // debug flag
+    private val DEBUG  = false                                    // debug flag
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Function to compute the Sum of Squares Error 'SSE' for given values for
@@ -73,29 +75,32 @@ class NonLinRegression (x: MatriD, y: VectoD, f: (VectoD, VectoD) => Double,
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the error and useful diagnostics.
-     */
-    override def eval ()
-    {
-        e = y - x * b                                         // compute residual/error vector e
-        diagnose (e)                                          // compute diagnostics
-    } // eval
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Predict the value of y = f(z) by evaluating the formula y = f(z, b),
-     *  i.e.0, (b0, b1) dot (1.0, z1).
+    /** Predict the value of 'y = f(z)' by evaluating the formula 'y = f(z, b)',
+     *  i.e., '(b0, b1) dot (1.0, z1)'.
      *  @param z  the new vector to predict
      */
     override def predict (z: VectoD): Double = f(z, b)
 
+    def forwardSel (cols: Set [Int], adjusted: Boolean): (Int, VectoD, VectoD) =
+    {
+        throw new UnsupportedOperationException ("NonLinRegression does not have feature selection")
+    } // forwardSel
+
+    def backwardElim (cols: Set [Int], adjusted: Boolean, first: Int): (Int, VectoD, VectoD) =
+    {
+        throw new UnsupportedOperationException ("NonLinRegression does not have feature selection")
+    } // backwardElim
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform 'k'-fold cross-validation.
+     *  @param xx     the data matrix to use (full data matrix or selected columns)
      *  @param k      the number of folds
      *  @param rando  whether to use randomized cross-validation
      */
-    def crossVal (k: Int = 10, rando: Boolean = true)
+    def crossVal (xx: MatriD = x, k: Int = 10, rando: Boolean = true): Array [Statistic] =
     {
-        crossValidate ((x: MatriD, y: VectoD) => new Perceptron (x, y), k, rando)
+        crossValidate ((x: MatriD, y: VectoD) => new NonLinRegression (x, y, f, b_init, fname),
+                                                 xx, k, rando)
     } // crossVal
 
 } // NonLinRegression class

@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Hao Peng
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sat Sep  8 13:53:16 EDT 2012
  *  @see     LICENSE (MIT style license file).
  *
@@ -55,8 +55,8 @@ class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [
         shiftToZero; vc = vc_fromData                        // set value counts from data
     } // if
 
-    f_CX  = new HMatrix3 [Int] (k, n, vc)                    // frequency counts for class yi & feature xj
-    protected val p_X_C = new HMatrix3 [Double] (k, n, vc)   // conditional probabilities for feature xj given class yi
+    nu_Xy  = new HMatrix3 [Int] (k, n, vc)                   // frequency counts for class yi & feature xj
+    protected val p_Xy = new HMatrix3 [Double] (k, n, vc)    // conditional probabilities for feature xj given class yi
 
     if (DEBUG) println ("distinct value count vc = " + vc.deep)
 
@@ -81,17 +81,17 @@ class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [
      */
     private def train2 ()
     {
-        p_C = f_C.toDouble / md                               // prior probability for class yi
+        p_y = nu_y.toDouble / md                               // prior probability for class yi
         for (i <- (0 until k).par; j <- (0 until n).par if fset(j)) {    // for each class yi & feature xj
             val me_vc = me / vc(j).toDouble
             for (xj <- (0 until vc(j)).par) {                 // for each value for feature j: xj
-                p_X_C(i, j, xj) = (f_CX(i, j, xj) + me_vc) / (f_C(i) + me)
+                p_Xy(i, j, xj) = (nu_Xy(i, j, xj) + me_vc) / (nu_y(i) + me)
             } // for
         } // for
 
         if (DEBUG) {
-            println ("p_C   = " + p_C)                        // P(C = yi)
-            println ("p_X_C = " + p_X_C)                      // P(X_j = x | C = yi)
+            println ("p_y  = " + p_y)                        // P(y = c)
+            println ("p_Xy = " + p_Xy)                       // P(X_j = x | y = c)
         } // if
     } // train2
 
@@ -105,27 +105,27 @@ class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [
         reset ()
         val idxA = split (indices, PARALLELISM)
 
-        val f_Cw = Array.ofDim [VectorI] (PARALLELISM)
-        val f_CXw = Array.ofDim [HMatrix3[Int]] (PARALLELISM)
+        val nu_yw  = Array.ofDim [VectorI] (PARALLELISM)
+        val nu_Xyw = Array.ofDim [HMatrix3[Int]] (PARALLELISM)
 
         for(w <- (0 until PARALLELISM).par) {
-            f_Cw(w) = new VectorI (k)
-            f_CXw(w) = new HMatrix3 [Int] (k, n, vc)
+            nu_yw(w) = new VectorI (k)
+            nu_Xyw(w) = new HMatrix3 [Int] (k, n, vc)
         } // for
 
         val paraRange = (0 until PARALLELISM).par
         paraRange.tasksupport = new ForkJoinTaskSupport (new ForkJoinPool (PARALLELISM))
 
-        for (w <- paraRange; i <- idxA(w)) updateFreq (i, f_Cw(w), f_CXw(w))
+        for (w <- paraRange; i <- idxA(w)) updateFreq (i, nu_yw(w), nu_Xyw(w))
 
         for (w <- 0 until PARALLELISM){
-            f_C += f_Cw (w)
-            f_CX += f_CXw (w)
+            nu_y  += nu_yw(w)
+            nu_Xy += nu_Xyw(w)
         } // for
 
         if (DEBUG) {
-            println ("l_f_C = " + f_C)                  // #(C = i)
-            println ("l_f_CX = " + f_CX)                // #(X_j = x & C = i)
+            println ("nu_y = " + nu_y)                    // #(y = c)
+            println ("nu_Xy = " + nu_Xy)                  // #(X_j = x & y = c)
         } // if
     } // frequencies
 
@@ -133,15 +133,15 @@ class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Increment frequency counters used in CMI calculations based on the 'i'th
      *  row of the data matrix.
-     *  @param i        the index for current data row
-     *  @param f_C      frequency table of class C
-     *  @param f_CX     joint frequency table of C and X
+     *  @param i      the index for current data row
+     *  @param nu_y   frequency table of class y = c
+     *  @param nu_Xy  joint frequency table of X and
      */
-    protected def updateFreq (i: Int, f_C: VectoI, f_CX: HMatrix3[Int])
+    protected def updateFreq (i: Int, nu_y: VectoI, nu_Xy: HMatrix3 [Int])
     {
-        val yi   = y(i)                                       // get the class for ith row
-        f_C(yi) += 1                                          // decrement frequency for class yi
-        for (j <- x.range2 if fset(j)) f_CX (yi, j, x(i, j)) += 1
+        val yi    = y(i)                                       // get the class for ith row
+        nu_y(yi) += 1                                          // decrement frequency for class yi
+        for (j <- x.range2 if fset(j)) nu_Xy(yi, j, x(i, j)) += 1
     } // updateFreq
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -154,8 +154,8 @@ class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [
     def classify (z: VectoI): (Int, String, Double) =
     {
         if (DEBUG) banner ("classify (z)")
-        val prob = new VectorD (p_C)
-        for (i <- 0 until k; j <- 0 until n if fset(j)) prob(i) *= p_X_C(i, j, z(j))   // P(X_j = z_j | C = i)
+        val prob = new VectorD (p_y)
+        for (i <- 0 until k; j <- 0 until n if fset(j)) prob(i) *= p_Xy(i, j, z(j))   // P(X_j = z_j | C = i)
         if (DEBUG) println ("prob = " + prob)
         val best = prob.argmax ()                    // class with the highest relative posterior probability
         (best, cn(best), prob(best))                 // return the best class and its name
@@ -166,8 +166,8 @@ class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [
      */
     def reset ()
     {
-        f_C.set (0)
-        f_CX.set (0)
+        nu_y.set (0)
+        nu_Xy.set (0)
     } // reset
 
 } // NaiveBayes0 class
@@ -217,8 +217,8 @@ class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
 {
     private val DEBUG = false                              // debug flag
 
-    private val g_f_C  = new VectorI (k)                   // global frequency counts (using entire dataset) for class yi
-    private var g_f_CX = new HMatrix3 [Int] (k, n, vc)     // global frequency counts (using entire dataset) for class yi & feature xj
+    private val g_nu_y  = new VectorI (k)                   // global frequency counts (using entire dataset) for class yi
+    private var g_nu_Xy = new HMatrix3 [Int] (k, n, vc)     // global frequency counts (using entire dataset) for class yi & feature xj
 
     additive = false
 
@@ -232,12 +232,12 @@ class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
     def frequenciesAll ()
     {
         val size = m / PARALLELISM + 1
-        val g_f_Cw = Array.ofDim [VectorI] (PARALLELISM)
-        val g_f_CXw = Array.ofDim [HMatrix3[Int]] (PARALLELISM)
+        val g_nu_yw  = Array.ofDim [VectorI] (PARALLELISM)
+        val g_nu_Xyw = Array.ofDim [HMatrix3[Int]] (PARALLELISM)
 
         for(w <- (0 until PARALLELISM).par) {
-            g_f_Cw(w) = new VectorI (k)
-            g_f_CXw(w) = new HMatrix3 [Int] (k, n, vc)
+            g_nu_yw(w)  = new VectorI (k)
+            g_nu_Xyw(w) = new HMatrix3 [Int] (k, n, vc)
         } // for
 
         val paraRange = (0 until PARALLELISM).par
@@ -245,20 +245,20 @@ class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
 
         for (w <- paraRange; i <- w * size until min((w+1)*size, m)) {
             val yi = y(i)
-            g_f_Cw(w)(yi) += 1
+            g_nu_yw(w)(yi) += 1
             for (j <- 0 until n if fset(j)) {
-                g_f_CXw(w)(yi, j, x(i, j)) += 1
+                g_nu_Xyw(w)(yi, j, x(i, j)) += 1
             } // for
         } // for
 
         for (w <- 0 until PARALLELISM){
-            g_f_C += g_f_Cw (w)
-            g_f_CX += g_f_CXw (w)
+            g_nu_y  += g_nu_yw(w)
+            g_nu_Xy += g_nu_Xyw(w)
         } // for
 
         if (DEBUG) {
-            println ("g_f_C  = " + g_f_C)                         // #(C = yi)
-            println ("g_f_CX = " + g_f_CX)                        // #(C = yi & X_j = x)
+            println ("g_nu_y  = " + g_nu_y)                         // #(C = yi)
+            println ("g_nu_Xy = " + g_nu_Xy)                        // #(C = yi & X_j = x)
         } // if
 
     } // frequenciesAll
@@ -267,11 +267,11 @@ class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
     /** Decrement frequency counters based on the 'i'th row of the data matrix.
      *  @param i  the index for current data row
      */
-    protected override def updateFreq (i: Int, f_C: VectoI, f_CX: HMatrix3[Int])
+    protected override def updateFreq (i: Int, nu_y: VectoI, nu_Xy: HMatrix3 [Int])
     {
         val yi   = y(i)                                       // get the class for ith row
-        f_C(yi) -= 1                                          // decrement frequency for class yi
-        for (j <- x.range2 if fset(j)) f_CX (yi, j, x(i, j)) -= 1
+        nu_y(yi) -= 1                                          // decrement frequency for class yi
+        for (j <- x.range2 if fset(j)) nu_Xy(yi, j, x(i, j)) -= 1
     } // updateFreq
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -280,8 +280,8 @@ class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
     override def reset ()
     {
         for (i <- (0 until k).par) {
-            f_C(i) = g_f_C(i)
-            for (j <- x.range2.par if fset(j); xj <- (0 until vc(j)).par) f_CX(i, j, xj) = g_f_CX(i, j, xj)
+            nu_y(i) = g_nu_y(i)
+            for (j <- x.range2.par if fset(j); xj <- (0 until vc(j)).par) nu_Xy(i, j, xj) = g_nu_Xy(i, j, xj)
         } // for
     } // reset
 

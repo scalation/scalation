@@ -1,0 +1,132 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller, Hao Peng
+  * @version 1.2
+  * @since   Mon Jul 27 01:27:00 EDT 2015
+  * @see     LICENSE (MIT style license file).
+  */
+
+package scalation.analytics
+
+import reflect.ClassTag
+
+import scalation.linalgebra.VectorI
+import scalation.util.Error
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Table4` class is a simple implementation of a 4-dimensional table.
+ *  The first two dimensions must be fixed and known, while the third and fourth
+ *  dimension may be dynamically allocated by the user.
+ *  @param s0  size of the 1st dimension of the table
+ *  @param s1  size of the 2nd dimension of the table
+ */
+class Table4 [T: ClassTag] (s0: Int, s1: Int)
+      extends Error
+{
+    /** Multi-dimensional array storage for table
+     */
+    private val tab = Array.ofDim [Array [Array [T]]] (s0, s1)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Clear (make null) all contents in the 3rd and 4th dimensions of the table.
+     */
+    def clear () = { for (i <- 0 until s0; j <- 0 until s1) tab(i)(j) = null }
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Allocate a 2D array into the 3rd and 4th dimension of the table at the
+     *  given index.
+     *  @param i  1st dimension index of the table
+     *  @param j  2nd dimension index of the table
+     *  @param v  size of the 3rd dimension
+     *  @param p  size of the 4th dimension
+     */
+    def alloc (i: Int, j: Int, v: Int, p: Int) { tab(i)(j) = Array.ofDim [T] (v, p) }
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Allocate the 3rd and 4th dimensions of the table based on the given
+     *  value count and parent vector. Mainly used in 'AugNaiveBayes' class.
+     *  @param vc   value count
+     *  @param par  parent vector
+     */
+    def alloc (vc: Array [Int], par: VectorI)
+    {
+        if (vc.length != s1) flaw ("alloc", "Dimensions mismatch")
+
+        for (i <- 0 until s0; j <- 0 until s1) {
+            tab(i)(j) = if (par(j) > -1) Array.ofDim [T] (vc(j), vc(par(j)))  // has parent
+                        else             Array.ofDim [T] (vc(j), 1)           // no parent
+        } // for
+    } // alloc
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Allocate the 3rd and 4th dimensions of the table based on the given
+     *  value count, parent vector, and feature set. Mainly used in
+     *  'AugSelNaiveBayes' class.
+     *  @param vc    value count
+     *  @param par   parent vector
+     *  @param fset  feature set
+     */
+    def alloc (vc: Array [Int], par: VectorI, fset: Array [Boolean])
+    {
+        if (vc.length != s1) flaw ("alloc", "Dimensions mismatch")
+
+        for (i <- 0 until s0; j <- 0 until s1 if fset(j)) {
+            tab(i)(j) = if (par(j) > -1) Array.ofDim [T] (vc(j), vc(par(j)))  // has parent
+                        else             Array.ofDim [T] (vc(j), 1)           // no parent
+        } // for
+    } // alloc
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Retrieve a single element of the table.
+     *  @param i  1st dimension index of the table
+     *  @param j  2nd dimension index of the table
+     *  @param k  3rd dimension index of the table
+     *  @param l  4th dimension index of the table
+     */
+    def apply (i: Int, j: Int, k: Int, l: Int): T = tab(i)(j)(k)(l)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Update a single element of the table to the given value.
+      * @param i  1st dimension index of the table
+      * @param j  2nd dimension index of the table
+      * @param k  3rd dimension index of the table
+      * @param l  4th dimension index of the table
+      * @param v  the value to be updated at the above position in the table
+      */
+    def update (i: Int, j: Int, k: Int, l: Int, v: T) = tab(i)(j)(k)(l) = v
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Print the table in a relatively nice manner.
+      */
+    override def toString: String = tab.deep.toString ()
+
+} // Table4 class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Table4Test` object is used to test the `Table4` class.
+ *  Basic alloc and update functions are tested
+ */
+object Table4Test extends App
+{
+    val tb = new Table4 [Int] (2, 3)
+    for (i <- 0 until 2; j <- 0 until 3) tb.alloc (i, j, 2, 2)
+    for (i <- 0 until 2; j <- 0 until 3; k <- 0 until 2; l <- 0 until 2) tb(i, j, k, l) = i + j + k + l
+    println ("tb = " + tb)
+
+} // Table4Test object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Table4Test2` object is used to test the `Table4` class.
+ *  Basic alloc and update functions are tested
+ */
+object Table4Test2 extends App
+{
+    val tb = new Table4 [Double] (2, 3)
+    for (i <- 0 until 2; j <- 0 until 3) tb.alloc (i, j, 2, 2)
+    for (i <- 0 until 2; j <- 0 until 3; k <- 0 until 2; l <- 0 until 2) tb(i, j, k, l) = (i + j + k + l) * 0.5
+    println ("tb = " + tb)
+
+} // Table4Test2 object
+

@@ -33,9 +33,9 @@ import BayesClassifier.me_default
  *  each class in the training-set.  Relative posterior probabilities are computed
  *  by multiplying these by values computed using conditional probabilities.  The
  *  classifier supports limited dependency between features/variables.
- *
+ *------------------------------------------------------------------------------
  *  This classifier uses the standard cross-validation technique.
- *  ------------------------------------------------------------------------------
+ *------------------------------------------------------------------------------
  *  @param x            the integer-valued data vectors stored as rows of a matrix
  *  @param y            the class vector, where y(l) = class for row l of the matrix, x(l)
  *  @param fn           the names for all features/variables
@@ -60,16 +60,16 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
     protected val permutedVec  = PermutedVecI (VectorI.range(0, n), ranStream)
     protected var featureOrder = permutedVec.igen
 
-    protected var f_CXPP  = new HMatrix5 [Int] (k, n)                     // conditional frequency counts for variable/feature j: xj
-    protected val p_X_CPP = new HMatrix5 [Double] (k, n)                  // conditional probabilities for variable/feature j: xj
+    protected var nu_XyPP = new HMatrix5 [Int] (k, n)                     // conditional frequency counts for variable/feature j: xj
+    protected val p_XyPP = new HMatrix5 [Double] (k, n)                  // conditional probabilities for variable/feature j: xj
 
     if (vc == null) {
         shiftToZero; vc = vc_fromData                                     // set to default for binary data (2)
     } // if
 
-    f_X   = new HMatrix2 [Int] (n, vc)                                    // Frequency of X
-    f_CX  = new HMatrix3 [Int] (k, n, vc)                                 // Joint frequency of C and X
-    f_CXZ = new HMatrix5 [Int] (k, n, n, vc, vc)                          // Joint frequency of C, X, and Z, where X, Z are features/columns
+    nu_X   = new HMatrix2 [Int] (n, vc)                                   // frequency of X
+    nu_Xy  = new HMatrix3 [Int] (k, n, vc)                                // joint frequency of X and y
+    nu_XyZ = new HMatrix5 [Int] (k, n, n, vc, vc)                         // joint frequency of X, y and Z, where X, Z are features/columns
 
     protected val scoreArray = new VectorD (maxRandomRestarts)
     protected val featOrderArray = Array.ofDim [VectoI] (maxRandomRestarts)
@@ -89,7 +89,7 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
         learnStructure (cmiMx)
         copyFreqCXPP (if (additive) idx else 0 until m diff itest)
         train2 ()
-        if (smooth) smoothParam (itest.size)
+        if (smooth) smoothP (md - itest.size)
         this
     } // train
 
@@ -99,14 +99,14 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
      */
     private def train2 ()
     {
-        p_C = f_C.toDouble / md                               // prior probability for class yi
+        p_y = nu_y.toDouble / md                               // prior probability for class yi
         for (i <- (0 until k).par; j <- (0 until n).par if fset(j)) {    // for each class i
         val me_vc = me / vc(j).toDouble
             for (xj <- (0 until vc(j)).par; xp <- (0 until vcp1(j)).par; xp2 <- (0 until vcp2(j)).par) {
-                val d = if      (parent(j, 1) > -1) f_CXZ(i, parent(j, 0), parent(j, 1), xp, xp2) + me
-                        else if (parent(j, 0) > -1) f_CX(i, parent(j, 0), xp) + me
-                        else                        f_C(i) + me
-                p_X_CPP(i, j, xj, xp, xp2) = (f_CXPP(i, j, xj, xp, xp2) + me_vc) / d.toDouble
+                val d = if      (parent(j, 1) > -1) nu_XyZ(i, parent(j, 0), parent(j, 1), xp, xp2) + me
+                        else if (parent(j, 0) > -1) nu_Xy(i, parent(j, 0), xp) + me
+                        else                        nu_y(i) + me
+                p_XyPP(i, j, xj, xp, xp2) = (nu_XyPP(i, j, xj, xp, xp2) + me_vc) / d.toDouble
             } // for
         } // for
     } // train2
@@ -121,12 +121,12 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
     {
         val itrainA = split(itrain, PARALLELISM)
 
-        f_CXPP.alloc (vc, vcp1, vcp2)       // compute the joint frequencies of class, feature-X and its two parents
+        nu_XyPP.alloc (vc, vcp1, vcp2)       // compute the joint frequencies of class, feature-X and its two parents
 
-        val f_CXPPw = Array.ofDim [HMatrix5 [Int]](PARALLELISM)
+        val nu_XyPPw = Array.ofDim [HMatrix5 [Int]](PARALLELISM)
         for (w <- (0 until PARALLELISM).par) {
-            f_CXPPw(w) = new HMatrix5 [Int] (k, n)
-            f_CXPPw(w).alloc(vc, vcp1, vcp2)
+            nu_XyPPw(w) = new HMatrix5 [Int] (k, n)
+            nu_XyPPw(w).alloc(vc, vcp1, vcp2)
         } // for
 
         val paraRange = (0 until PARALLELISM).par
@@ -135,19 +135,19 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
         for (w <- paraRange; i <- itrainA(w)) {
             val yi = y(i)
             for (j <- 0 until n if fset(j) && parent(j, 1) > -1) {
-                f_CXPPw(w)(yi, j, x(i, j), x(i, parent(j, 0)), x(i, parent(j, 1))) += 1
+                nu_XyPPw(w)(yi, j, x(i, j), x(i, parent(j, 0)), x(i, parent(j, 1))) += 1
             } // for
         } // for
 
         for (w <- 0 until PARALLELISM) {
-            f_CXPP += f_CXPPw (w)
+            nu_XyPP += nu_XyPPw (w)
         } // for
 
         for (i <- (0 until k).par) {
             for (j <- x.range2.par if fset(j); xj <- (0 until vc(j)).par) {
                 for (xp <- (0 until vcp1(j)).par; xp2 <- (0 until vcp2(j)).par if (parent(j, 1) == -1)) {
-                    f_CXPP(i, j, xj, xp, xp2) = if (parent(j, 0) > -1) f_CXZ(i, j, parent(j, 0), xj, xp)
-                    else f_CX(i, j, xj)
+                    nu_XyPP(i, j, xj, xp, xp2) = if (parent(j, 0) > -1) nu_XyZ(i, j, parent(j, 0), xj, xp)
+                    else nu_Xy(i, j, xj)
                 } // for
             } // for
         } // for
@@ -156,22 +156,22 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Increment frequency counters used in CMI calculations based on the 'i'th
      *  row of the data matrix.
-     *  @param i        the index for current data row
-     *  @param f_C      frequency table of class C
-     *  @param f_X      frequency table of feature X
-     *  @param f_CX     joint frequency table of C and X
-     *  @param f_CXZ    joint frequency table of C, X, and Z, where X and Z are features/columns
+     *  @param i       the index for current data row
+     *  @param nu_y    frequency table of class y
+     *  @param nu_X    frequency table of feature X
+     *  @param nu_Xy   joint frequency table of X and y
+     *  @param nu_XyZ  joint frequency table of X, y and Z, where X and Z are features/columns
      */
-    protected override def updateFreq (i: Int, f_C: VectoI, f_X: HMatrix2 [Int], f_CX: HMatrix3 [Int], f_CXZ: HMatrix5 [Int])
+    protected override def updateFreq (i: Int, nu_y: VectoI, nu_X: HMatrix2 [Int], nu_Xy: HMatrix3 [Int], nu_XyZ: HMatrix5 [Int])
     {
         val yi   = y(i)                                       // get the class for ith row
-        f_C(yi) += 1                                          // decrement frequency for class yi
+        nu_y(yi) += 1                                         // decrement frequency for class yi
         for (j <- x.range2 if fset(j)) {
-            f_X(j, x(i, j)) += 1
-            f_CX (yi, j, x(i, j)) += 1
+            nu_X(j, x(i, j)) += 1
+            nu_Xy(yi, j, x(i, j)) += 1
             for (j2 <- j+1 until n if fset(j2)) {
-                f_CXZ (yi, j, j2, x(i, j), x(i, j2)) += 1
-                f_CXZ (yi, j2, j, x(i, j2), x(i, j)) += 1
+                nu_XyZ(yi, j, j2, x(i, j), x(i, j2)) += 1
+                nu_XyZ(yi, j2, j, x(i, j2), x(i, j)) += 1
             } // for
         } // for
     } // updateFreq
@@ -255,7 +255,7 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
         featureOrder = featOrderArray(scoreArray.argmax())
         parent = computeParent(featureOrder, cmiMx)
         computeVcp()
-        p_X_CPP.alloc (vc, vcp1, vcp2)
+        p_XyPP.alloc (vc, vcp1, vcp2)
 
     } // learnStructure
 
@@ -354,34 +354,27 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
     /** Perform smoothing operations on the learned parameters by using Dirichlet priors
      *  to compute the posterior probabilities of the parameters given the training dataset.
      *  @see citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.178.8884&rep=rep1&type=pdf
-     *  @param testSize  size of the test size
+     *  @param trainSize  size of the training dataset
      */
-    private def smoothParam (testSize: Int = 0)
+    private def smoothP (trainSize: Double)
     {
+        val N0 = 3
         for (i <- (0 until k).par) {
-            p_C(i) *= m / (m + N0)
-            p_C(i) += N0 * k / (m + N0)
             for (j <- (0 until n).par if fset(j)) {
                 val pj = parent(j, 0)
                 val pj2 = parent(j, 1)
                 for (xj <- (0 until vc(j)).par; xp <- (0 until vcp1(j)).par; xp2 <- (0 until vcp2(j)).par) {
+                    val nu_px = if (pj2 > -1) nu_XyZ(i, pj, pj2, xp, xp2)
+                                else if (pj > -1) nu_Xy(i, pj, xp)
+                                else nu_y(i)
+                    val theta0 = nu_X(j, xj) / trainSize
 
-                    val f_px = if (pj2 > -1) f_CXZ(i, pj, pj2, xp, xp2)
-                    else if (pj > -1) f_CX(i, pj, xp)
-                    else f_C(i)
-
-                    //NOTE: two alternative priors, may work better for some datasets
-//                    val theta0 = if (pj > -1) f_CXZ(i, j, pj, xj, xp) / (md - testSize)
-//                                 else f_CX(i, j, xj)
-//                    val theta0 = f_CX(i, j, xj) / (md - testSize)
-                    val theta0 = f_X(j, xj) / (md - testSize)
-
-                    p_X_CPP(i, j, xj, xp, xp2) *= (f_px / (f_px + N0))
-                    p_X_CPP(i, j, xj, xp, xp2) += (N0 / (f_px + N0) * theta0)
+                    p_XyPP(i, j, xj, xp, xp2) *= nu_px / (nu_px + N0)
+                    p_XyPP(i, j, xj, xp, xp2) += N0 / (nu_px + N0) * theta0
                 } // for
             } // for
         } // for
-    } // smoothParam
+    } // smoothP
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'z', classify it returning the class number
@@ -392,11 +385,11 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
      */
     def classify (z: VectoI): (Int, String, Double) =
     {
-        val prob = new VectorD (p_C)
+        val prob = new VectorD (p_y)
         for (i <- 0 until k; j <- 0 until n if fset(j)) {
-            prob(i) *=  (if      (parent(j, 1) > -1) p_X_CPP (i, j, z(j), z(parent(j, 0)), z(parent(j, 1)))
-                         else if (parent(j, 0) > -1) p_X_CPP(i, j, z(j), z(parent(j, 0)), 0)
-                         else                        p_X_CPP(i, j, z(j), 0, 0))
+            prob(i) *= (if      (parent(j, 1) > -1) p_XyPP (i, j, z(j), z(parent(j, 0)), z(parent(j, 1)))
+                        else if (parent(j, 0) > -1) p_XyPP(i, j, z(j), z(parent(j, 0)), 0)
+                        else                        p_XyPP(i, j, z(j), 0, 0))
         } // for
         if (DEBUG) println("prob = " + prob)
         val best = prob.argmax()                // class with the highest relative posterior probability
@@ -408,10 +401,10 @@ class TwoBAN_OS0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [S
      */
     def reset ()
     {
-        f_C.set (0)
-        f_X.set (0)
-        f_CX.set (0)
-        f_CXZ.set (0)
+        nu_y.set (0)
+        nu_X.set (0)
+        nu_Xy.set (0)
+        nu_XyZ.set (0)
     } // reset
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -483,10 +476,10 @@ class TwoBAN_OS (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
 {
     private val DEBUG = false                                         // debug flag
 
-    private var g_f_CXZ = new HMatrix5 [Int] (k, n, n, vc, vc)        // global joint frequency of C, X, and Z, where X, Z are features/columns
-    private var g_f_CX  = new HMatrix3 [Int] (k, n, vc)               // global joint frequency of C and X
-    private val g_f_C   = new VectorI (k)                             // global frequency of C
-    private var g_f_X   = new HMatrix2[Int] (n, vc)                   // global frequency of X
+    private val g_nu_y   = new VectorI (k)                             // global frequency of y
+    private var g_nu_X   = new HMatrix2[Int] (n, vc)                   // global frequency of X
+    private var g_nu_Xy  = new HMatrix3 [Int] (k, n, vc)               // global joint frequency of X and y
+    private var g_nu_XyZ = new HMatrix5 [Int] (k, n, n, vc, vc)        // global joint frequency of C, X, and Z, where X, Z are features/columns
 
     additive = false
 
@@ -501,16 +494,16 @@ class TwoBAN_OS (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
     def frequenciesAll ()
     {
         val size   = m / PARALLELISM + 1
-        val g_f_Cw   = Array.ofDim [VectorI] (PARALLELISM)
-        val g_f_Xw   = Array.ofDim [HMatrix2 [Int]] (PARALLELISM)
-        val g_f_CXw  = Array.ofDim [HMatrix3 [Int]](PARALLELISM)
-        val g_f_CXZw = Array.ofDim [HMatrix5 [Int]](PARALLELISM)
+        val g_nu_yw   = Array.ofDim [VectorI] (PARALLELISM)
+        val g_nu_Xw   = Array.ofDim [HMatrix2 [Int]] (PARALLELISM)
+        val g_nu_Xyw  = Array.ofDim [HMatrix3 [Int]] (PARALLELISM)
+        val g_nu_XyZw = Array.ofDim [HMatrix5 [Int]] (PARALLELISM)
 
         for (w <- 0 until PARALLELISM) {
-            g_f_Cw (w)   = new VectorI (k)
-            g_f_Xw (w)   = new HMatrix2 [Int] (n, vc)
-            g_f_CXw (w)  = new HMatrix3 [Int] (k, n, vc)
-            g_f_CXZw (w) = new HMatrix5 [Int] (k, n, n, vc, vc)
+            g_nu_yw (w)   = new VectorI (k)
+            g_nu_Xw (w)   = new HMatrix2 [Int] (n, vc)
+            g_nu_Xyw (w)  = new HMatrix3 [Int] (k, n, vc)
+            g_nu_XyZw (w) = new HMatrix5 [Int] (k, n, n, vc, vc)
         } // for
 
         val paraRange = (0 until PARALLELISM).par
@@ -518,46 +511,46 @@ class TwoBAN_OS (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
 
         for (w <- paraRange; i <- w * size until min ((w + 1) * size, m)) {
             val yi = y(i)
-            g_f_Cw(w)(yi) += 1
+            g_nu_yw(w)(yi) += 1
             for (j <- 0 until n if fset(j)) {
-                g_f_Xw(w)(j, x(i, j)) += 1
-                g_f_CXw(w)(yi, j, x(i, j)) += 1
-                for (j2 <- j+1 until n if fset(j2)) g_f_CXZw(w)(yi, j, j2, x(i, j), x(i, j2)) += 1
+                g_nu_Xw(w)(j, x(i, j)) += 1
+                g_nu_Xyw(w)(yi, j, x(i, j)) += 1
+                for (j2 <- j+1 until n if fset(j2)) g_nu_XyZw(w)(yi, j, j2, x(i, j), x(i, j2)) += 1
             } // for
         } // for
 
         for (w <- 0 until PARALLELISM) {
-            g_f_C  += g_f_Cw (w)
-            g_f_X  += g_f_Xw (w)
-            g_f_CX += g_f_CXw (w)
-            g_f_CXZ += g_f_CXZw(w)
+            g_nu_y   += g_nu_yw(w)
+            g_nu_X   += g_nu_Xw(w)
+            g_nu_Xy  += g_nu_Xyw(w)
+            g_nu_XyZ += g_nu_XyZw(w)
         } // for
 
         for (c <- (0 until k).par; j <- (0 until n).par if fset(j); j2 <- (j+1 until n).par if fset(j2);
              xj <- (0 until vc(j)).par; xj2 <- (0 until vc(j2)).par) {
-            g_f_CXZ(c, j2, j, xj2, xj) = g_f_CXZ(c, j, j2, xj, xj2)
+            g_nu_XyZ(c, j2, j, xj2, xj) = g_nu_XyZ(c, j, j2, xj, xj2)
         } // for
     } // frequenciesAll
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Decrement frequency counters used in CMI calculations based on the 'i'th
      *  row of the data matrix.
-     *  @param i        the index for current data row
-     *  @param f_C      frequency table of class C
-     *  @param f_X      frequency table of feature X
-     *  @param f_CX     joint frequency table of C and X
-     *  @param f_CXZ    joint frequency table of C, X, and Z, where X and Z are features/columns
+     *  @param i       the index for current data row
+     *  @param nu_y    frequency table of class y
+     *  @param nu_X    frequency table of feature X
+     *  @param nu_Xy   joint frequency table of X and y
+     *  @param nu_XyZ  joint frequency table of X, y and Z, where X and Z are features/columns
      */
-    protected override def updateFreq (i: Int, f_C: VectoI, f_X: HMatrix2[Int], f_CX: HMatrix3[Int], f_CXZ: HMatrix5[Int])
+    protected override def updateFreq (i: Int, nu_y: VectoI, nu_X: HMatrix2[Int], nu_Xy: HMatrix3[Int], nu_XyZ: HMatrix5[Int])
     {
-        val yi   = y(i)                                       // get the class for ith row
-        f_C(yi) -= 1                                          // decrement frequency for class yi
+        val yi    = y(i)                                       // get the class for ith row
+        nu_y(yi) -= 1                                          // decrement frequency for class yi
         for (j <- x.range2 if fset(j)) {
-            f_X(j, x(i, j)) -= 1
-            f_CX (yi, j, x(i, j)) -= 1
+            nu_X(j, x(i, j)) -= 1
+            nu_Xy(yi, j, x(i, j)) -= 1
             for (j2 <- j+1 until n if fset(j2)) {
-                f_CXZ (yi, j, j2, x(i, j), x(i, j2)) -= 1
-                f_CXZ (yi, j2, j, x(i, j2), x(i, j)) -= 1
+                nu_XyZ(yi, j, j2, x(i, j), x(i, j2)) -= 1
+                nu_XyZ(yi, j2, j, x(i, j2), x(i, j)) -= 1
             } // for
         } // for
     } // updateFreq
@@ -568,13 +561,13 @@ class TwoBAN_OS (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
     override def reset ()
     {
         for (i <- (0 until k).par) {
-            f_C(i) = g_f_C(i)
+            nu_y(i) = g_nu_y(i)
             for (j <- x.range2.par if fset(j); xj <- (0 until vc(j)).par) {
-                if (i == 0) f_X(j, xj) = g_f_X(j, xj)
-                f_CX(i, j, xj) = g_f_CX(i, j, xj)
+                if (i == 0) nu_X(j, xj) = g_nu_X(j, xj)
+                nu_Xy(i, j, xj) = g_nu_Xy(i, j, xj)
                 for (j2 <- (j+1 until n).par if fset(j2); xj2 <- (0 until vc(j2)).par) {
-                    f_CXZ(i, j, j2, xj, xj2) = g_f_CXZ(i, j, j2, xj, xj2)
-                    f_CXZ(i, j2, j, xj2, xj) = f_CXZ(i, j, j2, xj, xj2)
+                    nu_XyZ(i, j, j2, xj, xj2) = g_nu_XyZ(i, j, j2, xj, xj2)
+                    nu_XyZ(i, j2, j, xj2, xj) = nu_XyZ(i, j, j2, xj, xj2)
                 } // for
             } // for
         } // for

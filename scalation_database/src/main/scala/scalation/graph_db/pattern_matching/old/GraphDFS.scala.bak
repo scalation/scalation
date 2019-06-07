@@ -1,0 +1,126 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.2
+ *  @date    Sun Jul  5 15:15:49 EDT 2015
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.graphalytics
+
+import LabelType.TLabel
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphDFS` performs Depth First Search on a Directed Graph.
+ *  @param g  the directed graph to search
+ */
+class GraphDFS (g: Graph)
+{ 
+    private   val DEBUG = true                              // debug flag
+    protected val go    = Array.ofDim [Boolean] (g.size)    // go flags
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the size of the graph (number of vertices).
+     */
+    def size = g.size
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the 'go' flags to true.  When a vertex is visited, its 'go' will be
+     *  set to false.  Must call this method forst.
+     */
+    def setGo { for (i <- 0 until g.size) go(i) = true }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Search for the label 'lab' in this graph, returning the first vertex id
+     *  with a matching labels, or -1 if not found.
+     *  @param lab  the label to search for
+     */
+    def find (lab: TLabel): Int =
+    {
+        for (i <- 0 until g.size if go(i)) {
+            val res = visit (i, lab)                        // visit vertices in DFS order
+            if (res >= 0) return res                        // return if found
+        } // for
+        -1                                                  // not found
+    } // find
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether vertex 'k' is reachable from 'i', i.e., there is a
+     *  a directed path from vertex 'i' to 'k'.
+     *  @param i  the starting vertex
+     *  @param k  the ending vertex
+     */
+    def reach (i: Int, k: Int): Boolean =
+    {
+        go(i) = false                                       // mark vertex visited
+        if (i == k) return true                             // vertex k reached?
+        for (j <- g.adj(i) if go(j)) {
+            if (reach (j, k)) return true   
+        } // for
+        false                                               // not reaeched
+    } // reach
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Visit the next vertex and check its label, returning the first vertex id
+     *  with a matching labels, or -1 if not found.
+     *  @param lab  the label to search for
+     */
+    private def visit (i: Int, lab: TLabel): Int =
+    {
+        go(i) = false                                       // mark as visited
+        if (DEBUG) println (s"label($i) = ${g.label (i)}")
+        if (g.label(i) == lab) return i                     // found label?
+        for (j <- g.adj(i) if go(j)) {
+            val res = visit (j, lab)                        // visit i's child j
+            if (res >= 0) return res                        // return if found
+        } // for
+        -1                                                  // not found
+    } // visit
+
+} // GraphDFS class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphDFSTest` is used to test the `GraphDFS` class.
+ *  > run-main scalation.graphalytics.GraphDFSTest
+ */
+object GraphDFSTest extends App
+{
+    def make = Graph (Array (Set (4, 5),                        // 0           // adj
+                             Set (5),                           // 1
+                             Set (6, 7),                        // 2
+                             Set (7, 8),                        // 3
+                             Set (0, 5, 9),                     // 4
+                             Set (0, 1, 4, 6, 10),              // 5
+                             Set (2, 5, 7, 10, 11),             // 6
+                             Set (2, 3, 6, 8),                  // 7
+                             Set (3, 7, 12),                    // 8
+                             Set (4),                           // 9
+                             Set (5, 6),                        // 10
+                             Set (6),                           // 11
+                             Set [Int] ()),                     // 12
+//                           Set (8)),                          // 12
+                      Array (1, 2, 3, 4 , 5, 6, 13, 12, 11, 10, 9, 8, 7))      // labels
+
+    private val g = make
+    g.print ("g")
+
+    test (new GraphDFS (g))
+
+    def test (gs: GraphDFS)
+    {
+        println ("Test find method")
+        for (l <- 0 to 14) {
+            gs.setGo
+            println (s"find ($l)  = ${gs.find (l)}")                           // find vertices with given label
+        } // for
+
+        println ("Test reach method")
+        for (i <- 0 until gs.size; j <- 0 until gs.size) {
+            gs.setGo
+            println (s"reach ($i, $j) = ${gs.reach (i, j)}")                   // reach (i, j)
+        } // for
+    } // test
+
+} // GraphDFSTest object
+

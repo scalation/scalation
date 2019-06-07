@@ -1,0 +1,167 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.1
+ *  @date    Sat Sep  8 13:53:16 EDT 2012
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.analytics
+
+import math.{ceil, floor}
+
+import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.linalgebra_gen.Vectors.VectorI
+import scalation.math.DoubleWithExp._
+import scalation.random.Normal
+import scalation.stat.StatVector
+import scalation.util.Error
+
+class DAG (val par: Array [Set [Int]])
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This class implements a Bayesian Network Classifier.  The classifier is
+ *  trained using a data matrix x and a classification vector y.  Each data vector
+ *  in the matrix is classified into one of k classes numbered 0, ..., k-1.
+ *  Prior probabilities are calculated based on the population of each class in
+ *  the training-set.  Relative posterior probabilities are computed by multiplying
+ *  these by values computed using conditional density functions based on the Normal
+ *  (Gaussian) distribution.  The classifier is naive, because it assumes feature
+ *  independence and therefore simply multiplies the conditional densities.
+ *  @param x  the data vectors stored as rows of a matrix
+ *  @param y  the class vector, where y_i = class for row i of the matrix x
+ *  @param k  the number of classes
+ */
+class BayesNetwork (dag: DAG, table: Array [Map [Int, Double]], k: Int)
+//      extends Classifier with Error
+{
+    private val DEBUG = true                 // debug flag
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the Joint Probability (JP) of 'x'.
+     *  @param x  the vector of variables
+     */
+    def jp (x: Array [Int]): Double =
+    {
+        var prod = 1.0
+        for (i <- x.indices) {
+            val pr = dag.par (i)                         // parents of node i
+            val key = Array.ofDim [Int] (pr.size + 1)
+            var k = 0
+            for (j <- pr) { key(k) = x(j); k += 1 }
+            key(pr.size) = x(i)
+            prod *= cp (i, key)
+        } // for
+        prod
+    } // jp
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the Conditional Probability (CP) of 'x_i' given its parents values.
+     *  @param i    the ith variable (whose conditional probability is sought)
+     *  @param key  the values of x_i's parents and x_i
+     */
+    def cp (i: Int, key: Array [Int]): Double =
+    {
+        println ("pc: find key " + key.deep + " in table " + i)
+        if (DEBUG) println (table(i))
+        table(i)(key.deep.hashCode)
+    } // cp
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the classifier, i.e., calculate statistics and create conditional
+     *  density (cd) functions.  Assumes that conditional densities follow the
+     *  Normal (Gaussian) distribution.
+    def train ()
+    {
+        // FIX - to be implemented
+    } // train
+     */
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a continuous data vector z, classify it returning the class number
+     *  (0, ..., k-1) with the highest relative posterior probability.
+     *  @param z  the data vector to classify
+     */
+    def classify (z: Array [Int]): Int =
+    {
+        val prob = new VectorD (k)
+        val x    = Array.ofDim [Int] (z.length + 1)
+        for (i <- z.indices) x(i) = z(i)
+        for (c <- 0 until k) {              // iterate over classes
+            x(z.length) = c
+            prob(c)     = jp (x)
+        } // for
+        println ("prob = " + prob)
+        prob.argmax ()           // class with the highest relative posterior probability
+    } // classify
+
+} // BayesNetwork class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The 'BayesNetworkTest' object is used to test the 'BayesNetwork' class.
+ *  Ex: Classify whether a person has a Back Ache.
+ *  @see www.eng.tau.ac.il/~bengal/BN.pdf
+ */
+object BayesNetworkTest extends App
+{
+    // Compute P(C, S, W, B, A) = P(C) P(S) P(W|C) P(B|S,C) P(A|B)
+
+    val dag = new DAG (Array (Set (),           // parents for C(0) = {}
+                              Set (),           // parents for S(1) = {}
+                              Set (0),          // patents for W(2) = {C}
+                              Set (0, 1),       // patents for B(3) = {C, S}
+                              Set (3)))         // patents for A(4) = {W}
+
+    // Chair                 C
+    val cTable = Map (Array (0).deep.hashCode -> 0.20,
+                      Array (1).deep.hashCode -> 0.80)
+
+    // Sport                 S
+    val sTable = Map (Array (0).deep.hashCode -> 0.98,
+                      Array (1).deep.hashCode -> 0.02)
+
+    // Worker                C  W
+    val wTable = Map (Array (0, 0).deep.hashCode -> 0.99,
+                      Array (0, 1).deep.hashCode -> 0.01,
+                      Array (1, 0).deep.hashCode -> 0.10,
+                      Array (1, 1).deep.hashCode -> 0.90)
+
+    // Back                  C  S  B
+    val bTable = Map (Array (0, 0, 0).deep.hashCode -> 0.99,
+                      Array (0, 0, 1).deep.hashCode -> 0.01,
+                      Array (0, 1, 0).deep.hashCode -> 0.10,
+                      Array (0, 1, 1).deep.hashCode -> 0.90,
+                      Array (1, 0, 0).deep.hashCode -> 0.80,
+                      Array (1, 0, 1).deep.hashCode -> 0.20,
+                      Array (1, 1, 0).deep.hashCode -> 0.01,
+                      Array (1, 1, 1).deep.hashCode -> 0.90)
+
+    // Ache                  B  A
+    val aTable = Map (Array (0, 0).deep.hashCode -> 0.90,
+                      Array (0, 1).deep.hashCode -> 0.10,
+                      Array (1, 0).deep.hashCode -> 0.30,
+                      Array (1, 1).deep.hashCode -> 0.70)
+
+    val table = Array (cTable, sTable, wTable, bTable, aTable)
+                      
+
+    println ("---------------------------------------------------------------")
+
+    val bn = new BayesNetwork (dag, table, 2)
+
+    // train the classifier ---------------------------------------------------
+    // cl.train ()  // FIX - to be implemented
+
+    // test sample ------------------------------------------------------------
+    // C, S, W, B, A
+    val x1 =  Array (1, 1, 0, 0, 1)                        // compute JP for vector x1
+    val x2 =  Array (1, 1, 0, 0, 0)                        // compute JP for vector x2
+    val z  =  Array (1, 1, 0, 0)                           // data vector z to classify
+    println ("--- JP " + x1.deep + " = " + bn.jp (x1) + "\n")
+    println ("--- JP " + x2.deep + " = " + bn.jp (x2) + "\n")
+    println ("--- classify " + z.deep + " = " + bn.classify (z) + "\n")
+
+} // BayesNetworkTest object
+

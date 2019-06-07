@@ -1,12 +1,13 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Hao Peng, Zhe Jin
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sat Aug  8 20:26:34 EDT 2015
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
 import scala.collection.mutable.ListBuffer
 import scalation.columnar_db.Relation
@@ -33,33 +34,33 @@ class DAG (val parent: Array [Array [Int]])
 } // DAG class
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `BayesClassifier` object provides factory methods for building Bayesian
+/** The `BayesClassifier` abstract class provides factory methods for building Bayesian
  *  classifiers.  The following types of classifiers are currently supported:
  *  `NaiveBayes`       - Naive Bayes classifier
  *  `OneBAN`           - Augmented Naive Bayes (1-BAN) classifier
  *  `TANBayes`         - Tree Augmented Naive Bayes classifier
  *  `TwoBAN_OS`        - Ordering-based Bayesian Network (2-BAN with Order Swapping)
  *-----------------------------------------------------------------------------
- *  @param x   the integer-valued data vectors stored as rows of a matrix
- *  @param y   the class vector, where y(l) = class for row l of the matrix x, x(l)
- *  @param fn  the names for all features/variables
- *  @param k   the number of classes
- *  @param cn  the names for all classes
+ *  @param x    the integer-valued data vectors stored as rows of a matrix
+ *  @param y    the class vector, where y(l) = class for row l of the matrix x, x(l)
+ *  @param fn_  the names for all features/variables
+ *  @param k    the number of classes
+ *  @param cn_  the names for all classes
  */
-abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String])
-         extends ClassifierInt (x, y, fn, k, cn) with BayesMetrics
+abstract class BayesClassifier (x: MatriI, y: VectoI, fn_ : Strings = null, k: Int = 2, cn_ : Strings = null)
+         extends ClassifierInt (x, y, fn_, k, cn_) with BayesMetrics
 {
-    protected var smooth   = true                    // flag for using parameter smoothing
-    protected val N0       = 5.0                     // parameter needed for smoothing
     protected val tiny     = 1E-9                    // value needed for CMI calculations
+    protected var smooth   = true                    // flag for using parameter smoothing
     protected var additive = true                    // flag to use additive approach for training/cross-validation
 
-    protected val nu_y = new VectorI (k)             // frequency counts for classes 0, ..., k-1
-    protected var p_C  = new VectorD (k)             // probabilities for classes 0, ..., k-1
+    protected val nu_y = new VectorI (k)             // frequency of y for classes 0, ..., k-1
+    protected var p_y  = new VectorD (k)             // probability of y for classes 0, ..., k-1
 
-    protected var f_X:   HMatrix2 [Int] = null       // Frequency of X
-    protected var f_CX:  HMatrix3 [Int] = null       // Joint frequency of C and X
-    protected var f_CXZ: HMatrix5 [Int] = null       // Joint frequency of C, X, and Z, where X, Z are features/columns
+    protected var nu_X:   HMatrix2 [Int] = null      // frequency of X = [x_0, ... x_n-1]
+    protected var nu_Xy:  HMatrix3 [Int] = null      // joint frequency of X and y
+    protected var nu_XyZ: HMatrix5 [Int] = null      // joint frequency of X, y and Z
+                                                     // where X, Z are features/columns
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Toggle the value of the 'smooth' property.
@@ -67,16 +68,16 @@ abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int
     def toggleSmooth () { smooth = ! smooth}
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the conditional mutual information matrix
-     *  @param idx   indicies of either training or testing region
-     *  @param vca   array of value counts
+    /** Compute the conditional mutual information matrix.
+     *  @param idx  indicies of either training or testing region
+     *  @param vca  array of value counts
      */
-    def calcCMI (idx: IndexedSeq [Int], vca: Array [Int]): MatrixD =
+    def calcCMI (idx: Ints, vca: Array [Int]): MatrixD =
     {
-        val p_CXZ = new HMatrix5 [Double] (k, n, n, vca, vca)          // Joint probability of C, X, and Z, where X, Z are features/columns
-        val p_CX  = new HMatrix3 [Double] (k, n, vca)                  // Joint probability of C and X
-        var p_C: VectoD = null
-
+        var p_y: VectoD = null                                      // probability of y
+        val p_Xy  = new HMatrix3 [Double] (k, n, vca)               // joint probability of X and y
+        val p_XyZ = new HMatrix5 [Double] (k, n, n, vca, vca)       // joint probability of X, y and Z
+                                                                    // where X, Z are features/columns
         reset ()
         for (i <- idx) updateFreq (i)
 
@@ -89,41 +90,41 @@ abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int
                 //val me_vc = me / vc(j).toDouble
                 for (xj <- 0 until vca(j)) {
                     for (c <- 0 until k) {
-                        p_CX(c, j, xj) = (f_CX(c, j, xj) + tiny) / md
+                        p_Xy(c, j, xj) = (nu_Xy(c, j, xj) + tiny) / md
                         for (j2 <- j + 1 until n if fset(j2); xj2 <- 0 until vca(j2)) {
-                            p_CXZ(c, j, j2, xj, xj2) = (f_CXZ(c, j, j2, xj, xj2) + tiny) / md
+                            p_XyZ(c, j, j2, xj, xj2) = (nu_XyZ(c, j, j2, xj, xj2) + tiny) / md
                         } // for
                     } // for
                 } // for
             } // for
         } // probabilities
 
-        p_C = nu_y.toDouble / m
+        p_y = nu_y.toDouble / m
         probabilities ()
 
-        cmiJoint (p_C, p_CX, p_CXZ)
+        cmiJoint (p_y, p_Xy, p_XyZ)
     } // calcCMI
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute conditional mutual information matrix given the marginal probability
-     *  of C and joint probabilities of CXZ and CX, where C is the class (parent), and
-     *  X & Z are features.
+    /** Compute conditional mutual information matrix given the probability
+     *  of 'y' and joint probabilities of 'Xy' and 'XyZ', where 'y' is the class,
+     *  and 'X' & 'Z' are features.
      *  @see en.wikipedia.org/wiki/Conditional_mutual_information
-     *  @param p_C   the marginal probability of C
-     *  @param p_CX  the joint probability of C and X
-     *  @param p_CXZ the joint probability of C, X, and Z
+     *  @param p_y    the probability of y
+     *  @param p_Xy   the joint probability of X and y
+     *  @param p_XyZ  the joint probability of X, y and Z
      */
-    def cmiJoint (p_C: VectoD, p_CX: HMatrix3 [Double], p_CXZ: HMatrix5 [Double]): MatrixD =
+    def cmiJoint (p_y: VectoD, p_Xy: HMatrix3 [Double], p_XyZ: HMatrix5 [Double]): MatrixD =
     {
-        val cmiMx = new MatrixD (p_CX.dim2, p_CX.dim2)
-        for (c <- 0 until k) {                               // check each class, where k = p_C.size
-            val pc = p_C(c)
-            for (j <- 0 until p_CX.dim2 if fset(j); xj <- 0 until p_CX.dim_3(j)) {
-                // n = p_CX.dim2, vc(j) = p_CX.dim_3(j)
-                val pcx = p_CX(c, j, xj)
-                for (j2 <- j + 1 until p_CX.dim2 if fset(j2); xj2 <- 0 until p_CX.dim_3(j2)) {
-                    val pcz  = p_CX(c, j2, xj2)
-                    val pcxz = p_CXZ(c, j, j2, xj, xj2)
+        val cmiMx = new MatrixD (p_Xy.dim2, p_Xy.dim2)
+        for (c <- 0 until k) {                               // check each class, where k = p_y.size
+            val pc = p_y(c)
+            for (j <- 0 until p_Xy.dim2 if fset(j); xj <- 0 until p_Xy.dim_3(j)) {
+                // n = p_Xy.dim2, vc(j) = p_Xy.dim_3(j)
+                val pcx = p_Xy(c, j, xj)
+                for (j2 <- j + 1 until p_Xy.dim2 if fset(j2); xj2 <- 0 until p_Xy.dim_3(j2)) {
+                    val pcz  = p_Xy(c, j2, xj2)
+                    val pcxz = p_XyZ(c, j, j2, xj, xj2)
                     cmiMx(j, j2) += pcxz * log2((pc * pcxz) / (pcx * pcz))
                 } // for
             } // for
@@ -141,7 +142,12 @@ abstract class BayesClassifier (x: MatriI, y: VectoI, fn: Array [String], k: Int
      *  data matrix.
      *  @param i  the index for current data row
      */
-    protected def updateFreq (i: Int) {}
+    protected def updateFreq (i: Int)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Print the class probabilities.
+     */
+    def printClassProb () { println (s"ClassProb = $p_y") }
 
 } // BayesClassifier class
 
@@ -164,7 +170,7 @@ object BayesClassifier
      *                                     me == small => no divide by 0, close to MLE estimates)
      */
 //  val me_default = 1.0f
-    val me_default = 1E-9f
+    val me_default = 1E-3f
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a Naive Bayes classification model.
@@ -176,7 +182,7 @@ object BayesClassifier
      *  @param vc  the value count (number of distinct values) for each feature
      *  @param me  use m-estimates (me == 0 => regular MLE estimates)
      */
-    def apply (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
+    def apply (x: MatriI, y: VectoI, fn: Strings, k: Int, cn: Strings,
                vc: Array [Int], me: Float): NaiveBayes =
     {
         new NaiveBayes (x, y, fn, k, cn, vc, me)
@@ -192,7 +198,7 @@ object BayesClassifier
      *  @param vc  the value count (number of distinct values) for each feature
      *  @param me  use m-estimates (me == 0 => regular MLE estimates)
      */
-    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
+    def apply (xy: MatriI, fn: Strings, k: Int, cn: Strings,
                vc: Array [Int], me: Float): NaiveBayes =
     {
         NaiveBayes (xy, fn, k, cn, vc, me)
@@ -209,7 +215,7 @@ object BayesClassifier
      *  @param me     use m-estimates (me == 0 => regular MLE estimates)
      *  @param thres  the correlation threshold between 2 features for possible parent-child relationship
      */
-    def apply (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
+    def apply (x: MatriI, y: VectoI, fn: Strings, k: Int, cn: Strings,
                vc: Array [Int], me: Float, thres: Double): OneBAN =
     {
         new OneBAN (x, y, fn, k, cn, vc, me, thres)
@@ -226,7 +232,7 @@ object BayesClassifier
      *  @param me      use m-estimates (me == 0 => regular MLE estimates)
      *  @param thres   the correlation threshold between 2 features for possible parent-child relationship
      */
-    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
+    def apply (xy: MatriI, fn: Strings, k: Int, cn: Strings,
                vc: Array [Int], me: Float, thres: Double): OneBAN =
     {
         OneBAN (xy, fn, k, cn, vc, me, thres)
@@ -242,7 +248,7 @@ object BayesClassifier
      *  @param me      use m-estimates (me == 0 => regular MLE estimates)
      *  @param vc      the value count (number of distinct values) for each feature
      */
-    def apply (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
+    def apply (x: MatriI, y: VectoI, fn: Strings, k: Int, cn: Strings,
                me: Float, vc: Array [Int]): TANBayes =
     {
         new TANBayes (x, y, fn, k, cn, me, vc)
@@ -259,7 +265,7 @@ object BayesClassifier
      *  @param vc      the value count (number of distinct values) for each feature
      */
 
-    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String], me: Float, vc: Array [Int]): TANBayes =
+    def apply (xy: MatriI, fn: Strings, k: Int, cn: Strings, me: Float, vc: Array [Int]): TANBayes =
     {
         TANBayes (xy, fn, k, cn, me, vc)
     } // apply
@@ -275,7 +281,7 @@ object BayesClassifier
      *  @param thres  the correlation threshold between 2 features for possible parent-child relationship
      *  @param me     use m-estimates (me == 0 => regular MLE estimates)
      */
-    def apply (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
+    def apply (x: MatriI, y: VectoI, fn: Strings, k: Int, cn: Strings,
                vc: Array [Int], thres: Double, me: Float): TwoBAN_OS =
     {
         new TwoBAN_OS (x, y, fn, k, cn, vc, thres, me)
@@ -292,7 +298,7 @@ object BayesClassifier
      *  @param thres  the correlation threshold between 2 features for possible parent-child relationship
      *  @param me     use m-estimates (me == 0 => regular MLE estimates)
      */
-    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
+    def apply (xy: MatriI, fn: Strings, k: Int, cn: Strings,
               vc: Array [Int], thres: Double, me: Float): TwoBAN_OS =
     {
         TwoBAN_OS (xy, fn, k, cn, vc, thres, me)

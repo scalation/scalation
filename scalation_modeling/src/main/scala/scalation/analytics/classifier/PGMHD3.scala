@@ -1,12 +1,13 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Khalifeh Al-Jadda, John A. Miller, Hao Peng
- *  @version 1.5
+ *  @version 1.6
  *  @date    Mon Aug 15 13:13:15 EDT 2016
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
 import scala.math._
 
@@ -29,18 +30,18 @@ import BayesClassifier.me_default
  *  -----------------------------------------------------------------------------
  *  [ x ] -> [ x z ]  where x features are level 2 and z features are level 3.
  *  -----------------------------------------------------------------------------
- *  @param x   the integer-valued data vectors stored as rows of a matrix
- *  @param nx  the number of x features/columns
- *  @param y   the class vector, where y(l) = class for row l of the matrix x, x(l)
- *  @param fn  the names for all features/variables
- *  @param k   the number of classes
- *  @param cn  the names for all classes
- *  @param vc  the value count (number of distinct values) for each feature
- *  @param me  use m-estimates (me == 0 => regular MLE estimates)
+ *  @param x    the integer-valued data vectors stored as rows of a matrix
+ *  @param nx   the number of x features/columns
+ *  @param y    the class vector, where y(l) = class for row l of the matrix x, x(l)
+ *  @param fn_  the names for all features/variables
+ *  @param k    the number of classes
+ *  @param cn_  the names for all classes
+ *  @param vc   the value count (number of distinct values) for each feature
+ *  @param me   use m-estimates (me == 0 => regular MLE estimates)
  */
-class PGMHD3 (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
+class PGMHD3 (x: MatriI, nx: Int, y: VectoI, fn_ : Strings = null, k: Int = 2, cn_ : Strings = null,
                   private var vc: Array [Int] = null, me: Float = me_default)
-      extends BayesClassifier (x, y, fn, k, cn)
+      extends BayesClassifier (x, y, fn_, k, cn_)
 {
     private val DEBUG  = true                              // debug flag
     private val nz     = x.dim2 - nx                       // number of z features/columns
@@ -115,7 +116,7 @@ class PGMHD3 (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: Arr
      *  conditional probabilities for X_j.
      *  @param itest  the indices of test data
      */
-    def train (itest: IndexedSeq [Int]): PGMHD3 =
+    def train (itest: Ints): PGMHD3 =
     {
         frequencies (0 until m diff itest)                       // compute frequencies skipping test region
 
@@ -133,7 +134,8 @@ class PGMHD3 (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: Arr
             } // for
             for (j <- 0 until nz) {                            // for each feature j
                 val me_vc = me / vc_z(j).toDouble
-                for (zj <- 0 until vc_z(j); zp <- 0 until vc_x(parent(j))) {  // for each value of feature j: zj and each value of zj's parent: zp
+                // for each value of feature j: zj and each value of zj's parent: zp
+                for (zj <- 0 until vc_z(j); zp <- 0 until vc_x(parent(j))) {
                     probZ(i, j, zj, zp) = (popZ(i, j, zj, zp) + me_vc) / (pci + me)
                 } // for
             } // for
@@ -153,7 +155,7 @@ class PGMHD3 (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: Arr
      *  training data.
      *  @param itrain indices of the instances considered train data
      */
-    private def frequencies (itrain: IndexedSeq [Int])
+    private def frequencies (itrain: Ints)
     {
         if (DEBUG) banner ("frequencies (itrain)")
         for (l <- itrain) {                                    // l = lth row of data matrix x
@@ -172,6 +174,13 @@ class PGMHD3 (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: Arr
             println ("popZ = " + popZ)                         // #(Z_j = z & C = i)
         } // if
     } // frequencies
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Increment/Decrement frequency counters based on the 'i'th row of the
+     *  data matrix.
+     *  @param i  the index for current data row
+     */
+    protected def updateFreq (i: Int) = ???
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'z', classify it returning the class number
@@ -220,6 +229,8 @@ class PGMHD3 (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: Arr
  */
 object PGMHD3
 {
+    import ClassifierInt.pullResponse
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a `PGMHD3` object, passing 'x' and 'y' together in one matrix.
      *  @param xy  the data vectors along with their classifications stored as rows of a matrix
@@ -229,11 +240,11 @@ object PGMHD3
      *  @param vc  the value count (number of distinct values) for each feature
      *  @param me  use m-estimates (me == 0 => regular MLE estimates)
      */
-    def apply (xy: MatriI, nx: Int, fn: Array [String], k: Int, cn: Array [String],
+    def apply (xy: MatriI, nx: Int, fn: Strings, k: Int, cn: Strings,
                vc: Array [Int] = null, me: Float = me_default) =
     {
-        new PGMHD3 (xy(0 until xy.dim1, 0 until xy.dim2 - 1), nx, xy.col(xy.dim2 - 1), fn, k, cn,
-            vc, me)
+        val (x, y) = pullResponse (xy)
+        new PGMHD3 (x, nx, y, fn, k, cn, vc, me)
     } // apply
 
 } // PGMHD3 object

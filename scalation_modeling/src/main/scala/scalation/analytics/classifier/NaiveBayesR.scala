@@ -1,12 +1,13 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sat Sep  8 13:53:16 EDT 2012
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
 import scala.math.{ceil, floor}
 
@@ -28,15 +29,14 @@ import scalation.util.banner
  *  it assumes feature independence and therefore simply multiplies the conditional
  *  densities.
  *-----------------------------------------------------------------------------
- *  @param x   the real-valued data vectors stored as rows of a matrix
- *  @param y   the class vector, where y_i = class for row i of the matrix x, x(i)
- *  @param fn  the names for all features/variables
- *  @param k   the number of classes
- *  @param cn  the names for all classes
+ *  @param x    the real-valued data vectors stored as rows of a matrix
+ *  @param y    the class vector, where y_i = class for row i of the matrix x, x(i)
+ *  @param fn_  the names for all features/variables
+ *  @param k    the number of classes
+ *  @param cn_  the names for all classes
  */
-class NaiveBayesR (x: MatriD, y: VectoI, fn: Array [String], k: Int = 2,
-                   cn: Array [String] = Array ("no", "yes"))
-      extends ClassifierReal (x, y, fn, k, cn)
+class NaiveBayesR (x: MatriD, y: VectoI, fn_ : Strings = null, k: Int = 2, cn_ : Strings = null)
+      extends ClassifierReal (x, y, fn_, k, cn_)
 {
     private val DEBUG   = false                   // debug flag
     private val EPSILON = 1E-9                    // number close to zero
@@ -112,13 +112,13 @@ class NaiveBayesR (x: MatriD, y: VectoI, fn: Array [String], k: Int = 2,
      *  @param testStart  starting index of test region (inclusive) used in cross-validation
      *  @param testEnd    ending index of test region (exclusive) used in cross-validation
      */
-    def train (itest: IndexedSeq [Int]): NaiveBayesR =   // FIX - use parameters 
+    def train (itest: Ints): NaiveBayesR =           // FIX - use parameters 
     {
         calcStats ()
         for (c <- 0 until k; j <- 0 until n) {
             cd(c)(j) = (z_j => Normal (mean(c, j), varc(c, j)).pf (z_j))
         } // for
-        prob = nu_y / md              // probability = class frequency / training-set size
+        prob = nu_y / md                             // probability = class frequency / training-set size
         this
     } // train
 
@@ -154,15 +154,19 @@ class NaiveBayesR (x: MatriD, y: VectoI, fn: Array [String], k: Int = 2,
  */
 object NaiveBayesR
 {
+    import ClassifierReal.pullResponse
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a `NaiveBayesR` object, passing 'x' and 'y' together in one matrix.
      *  @param xy  the data vectors along with their classifications stored as rows of a matrix
      *  @param fn  the names of the features
      *  @param k   the number of classes
+     *  @param cn  the names of the classes
      */
-    def apply (xy: MatriD, fn: Array [String], k: Int = 2, cn: Array [String] = Array ("no", "yes")): NaiveBayesR =
+    def apply (xy: MatriD, fn: Strings = null, k: Int = 2, cn: Strings = null): NaiveBayesR =
     {
-        new NaiveBayesR (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1).toInt, fn, k, cn)
+        val (x, y) = pullResponse (xy)
+        new NaiveBayesR (x, y, fn, k, cn)
     } // apply
 
 } // NaiveBayesR object
@@ -201,8 +205,7 @@ object NaiveBayesRTest extends App
     val x  = xy.sliceCol (0, 2)
     val y  = xy.col (2).toInt
     val yp = nbr.classify (xy.sliceCol (0, xy.dim2-1))
-    println (nbr.fitLabel)
-    println (nbr.fit (y, yp))
+    println (nbr.fitMap (y, yp))
 
     val t = VectorD.range (0, x.dim1)
     new Plot (t, y.toDouble, yp.toDouble, "y(black)/yp(red) vs. t")

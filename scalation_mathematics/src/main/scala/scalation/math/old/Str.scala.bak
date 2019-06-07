@@ -1,0 +1,23 @@
+
+package scalation.math
+
+import collection.immutable._
+
+case class Str (s: String) extends StringLike [Str]
+{
+    def seq: IndexedSeq[Char] = ???
+    protected[this] def newBuilder: scala.collection.mutable.Builder[Char,scalation.math.Str] = ???
+} // Str class
+
+// > run-main scalation.math.StrTest
+
+object StrTest extends App
+{
+    val s1 = Str ("test1")
+//  val s2: Str = Str ("test2")
+    val s2: Str = "test2"
+    println ("s1 = " + s1)
+    println ("s2 = " + s2)
+
+} // StrTest object
+

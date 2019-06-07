@@ -1,14 +1,15 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Wed Aug 28 15:02:36 EDT 2013
  *  @see     LICENSE (MIT style license file).
  */
 
 // U N D E R   D E V E L O P M E N T
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
 import scalation.linalgebra.{MatriI, MatrixI, VectorD, VectoI, VectorI}
 
@@ -30,7 +31,7 @@ import scalation.linalgebra.{MatriI, MatrixI, VectorD, VectoI, VectorI}
  *  @param dag    the directed acyclic graph specifying conditional dependencies
  *  @param table  the array of tables recording conditional probabilities
  */
-class BayesNetwork (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
+class BayesNetwork (x: MatriI, y: VectoI, fn: Strings, k: Int, cn: Strings,
                     dag: DAG = null, table: Array [Map [Int, Double]] = null)
       extends BayesClassifier (x, y, fn, k, cn)
 {
@@ -72,11 +73,18 @@ class BayesNetwork (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array 
      *  @param testStart  starting index of test region (inclusive) used in cross-validation.
      *  @param testEnd    ending index of test region (exclusive) used in cross-validation.
      */
-    def train (itest: IndexedSeq [Int]): BayesNetwork =      // FIX - use these parameters
+    def train (itest: Ints): BayesNetwork =      // FIX - use these parameters
     {
         // FIX - to be implemented
         this
     } // train
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Increment/Decrement frequency counters based on the 'i'th row of the
+     *  data matrix.
+     *  @param i  the index for current data row
+     */
+    protected def updateFreq (i: Int) = ???
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given an integer-valued data vector 'z', classify it returning the class
@@ -101,7 +109,7 @@ class BayesNetwork (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array 
      *  The vector 'z' id first converted to an integer valued vector by rounding.
      *  @param z  the data vector to classify
      */
-//  def classify (z: VectoD): Tuple2 [Int, String] =
+//  def classify (z: VectoD): (Int, String) =
 //  {
 //      val z_int = new VectorI (z.dim)
 //      for (i <- 0 until z.dim) z_int(i) = round (z(i)).toInt

@@ -1,51 +1,53 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Dong Yu Yu, John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Fri Jan  5 16:54:27 EST 2018
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
 import scala.util.Random
 
-import scalation.linalgebra.{MatrixD, VectoD, VectorD, VectoI, VectorI}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectoI, VectorI}
 import scalation.random.RandomVecI
+import scalation.util.banner
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RandomForest` class uses randomness for building descision trees in classification.
  *  It randomly selects sub-samples with 'size = bR * sample-size' from the sample
  *  (with replacement) and uses the 'fS' number of sub-features to build the trees,
  *  and to classify by voting from all of the trees.
- *  @param x   the data matrix (instances by features)
- *  @param y   the response class labels of the instances
- *  @param nF  the number of trees
- *  @param bR  bagging ratio (the portion of samples used in building trees)
- *  @param fS  the number of features used in building trees
- *  @param k   the number of classes
- *  @param s   seed for randomness
- *  @param fn  feature names (array of string)
- *  @param cn  class names (array of string)
+ *  @param x       the data matrix (instances by features)
+ *  @param y       the response class labels of the instances
+ *  @param nTrees  the number of trees
+ *  @param fS      the number of features used in building trees
+ *  @param bR      bagging ratio (the portion of samples used in building trees)
+ *  @param k       the number of classes
+ *  @param s       seed for randomness
+ *  @param fn_     feature names (array of string)
+ *  @param cn_     class names (array of string)
  */
-class RandomForest (x: MatrixD, y: VectoI, nF: Int, bR: Double, fS: Int, k: Int, s: Int,
-                    val fn: Array [String], val cn: Array [String])
-      extends ClassifierReal (x, y, fn, k , cn)
+class RandomForest (x: MatriD, y: VectoI, nTrees: Int, fS: Int,
+                    bR: Double = 0.7, k: Int = 2, s: Int = 0, fn_ : Strings = null, cn_ : Strings = null)
+      extends ClassifierReal (x, y, fn_, k , cn_)
 {
     private val DEBUG  = false
     private val xy     = x.:^+(y.toDouble)
     private val random = new Random (s)
-    private val forest = Array.ofDim [DecisionTreeC45] (nF)
+    private val forest = Array.ofDim [DecisionTreeC45] (nTrees)
 
-    if (nF <= 0) flaw ("constructor", "RF number of tree restrcited to be positive integer ")
-    if (bR < 0 || bR > 1) flaw ("constructor", "RF bagging ratio restricted to 0 thru 1")
+    if (nTrees <= 0) flaw ("constructor", "RF number of tree restrcited to be positive integer ")
     if (fS < 0 || fS > x.dim2) flaw ("constructor", "RF feature size restricted to 0 thru number of features")
+    if (bR < 0 || bR > 1) flaw ("constructor", "RF bagging ratio restricted to 0 thru 1")
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a 'subSample' (size = baggingRatio * orginal sample size) from the samples,
      *  returning the 'subSample'.
      */
-    def createSubsample (): MatrixD =
+    def createSubsample (): MatriD =
     {
         val stream     = random.nextInt ().abs.%(1000)
         val sampleSize = (xy.dim1 * bR).toInt
@@ -61,7 +63,7 @@ class RandomForest (x: MatrixD, y: VectoI, nF: Int, bR: Double, fS: Int, k: Int,
      *  and the selected features 'index'.
      *  @param subSample  the sub-sample to select from
      */
-    def selectSubFeatures (subSample: MatrixD): (MatrixD, VectoI) =
+    def selectSubFeatures (subSample: MatriD): (MatriD, VectoI) =
     {
         val rvv         = RandomVecI (min = 0, max = subSample.dim2-1, dim = fS, unique = true)
         val index       = rvv.igen
@@ -75,20 +77,20 @@ class RandomForest (x: MatrixD, y: VectoI, nF: Int, bR: Double, fS: Int, k: Int,
      *  @param testStart  the beginning of test region (inclusive).
      *  @param testEnd    the end of test region (exclusive).
      */
-    def train (itest: IndexedSeq [Int]): RandomForest =             // FIX - implementation ignore argument
+    def train (itest: Ints): RandomForest =                    // FIX - implementation ignore argument
     {
         println ("=== Start Training ===")
         val isC = Array.fill (x.dim2)(true)
         val vc  = Array.fill (x.dim2)(2)
-        for (i <- 0 until nF) {
+        for (i <- 0 until nTrees) {
             val temp    = createSubsample ()
             val feature = temp.selectCols (Range (0, temp.dim2-1).toArray)
             val selectTarget = temp.col (temp.dim2-1).toInt
-            forest(i) = new DecisionTreeC45 (feature, selectTarget, fn, isCont = isC, k = k, cn = cn, vc = vc)
+            forest(i) = new DecisionTreeC45 (feature, selectTarget, isC, fn, k, cn, vc)
             forest(i).train (selectSubFeatures (x)._2())
             if (DEBUG) {
                 println (s"===Tree$i===")
-                println (forest(i).printTree ())
+                println (forest(i).printTree (vc))
             }//if
         } // for
         this
@@ -103,7 +105,7 @@ class RandomForest (x: MatrixD, y: VectoI, nF: Int, bR: Double, fS: Int, k: Int,
     {
         if (DEBUG) println (s"predict for $z:")
         var result = new VectorI (k)
-        for (i <- 0 until nF) {
+        for (i <- 0 until nTrees) {
             result(forest(i).classify (z)._1) += 1
             if (DEBUG) println (s"for tree$i, predict class = ${cn(forest(i).classify (z)._1)}")
         } // for
@@ -137,17 +139,24 @@ object RandomForestTest extends App
                                     6.5, 0.31, 0.14,  7.50, 0.044, 34, 133.0, 0.9955, 3.22, 0.50,  9.5, 
                                     6.2, 0.66, 0.48,  1.20, 0.029, 29,  75.0, 0.9892, 3.33, 0.39, 12.8)
 
-    val y = VectorI (5, 5, 5, 7, 5, 7, 6, 8, 6, 5, 8)
-    y -= 3
-    val numClasses = 7
+    val y = VectorI (5, 5, 5, 7, 5, 7, 6, 8, 6, 5, 8)             // response/class labels
+    y -= 3                                                        // shift the class labels by 3
+
+    banner ("RandomForestTest1:  partial winequality-white dataset")
+    val nFeatures = 7
+    val nClasses  = 7
+    val nTrees    = 3
     val fn = Array ("fixed acidity", "volatile acidity", "citric acid", "residual sugar", "chlorides",
                     "free sulfur dioxide", "total sulfur dioxide", "density", "pH", "sulphates", "alcohol")    // feature names
 
-    val cn = Array("Level3", "Level4", "Level5", "Level6", "Level7", "Level8", "Level9")                       // class names
+    val cn = Array ("Level3", "Level4", "Level5", "Level6", "Level7", "Level8", "Level9")                      // class names
 
-    val rF = new RandomForest (x, y, nF = 5, bR = 0.7, fS = 7, k = numClasses, s = 223, fn = fn, cn = cn)
+    val rF = new RandomForest (x, y, nTrees = nTrees, fS = nFeatures, k = nClasses, fn_ = fn, cn_ = cn)
     rF.train ()
     println (s"Accuracy = ${rF.test (0, x.dim1)}")
+    val yp = rF.classify ()
+    val cm = new ConfusionMat (y, yp, nClasses)
+    println (s"C_Matrix = ${cm.confusion}")
 
 } // RandomForestTest object
 
@@ -159,19 +168,24 @@ object RandomForestTest extends App
  */
 object RandomForestTest2 extends App
 {
-    val file        = BASE_DIR + "winequality-white.csv"
-    val numbClasses = 7
+    val fname  = BASE_DIR + "winequality-white.csv"
+    val xy     = MatrixD (fname)
+    val (x, y) = ClassifierReal.pullResponse (xy)
+    y -= 3                                                        // shift the class labels by 3
 
-    println ("RandomForestTest2: Loading WineQuality Dataset")
-    val data   = MatrixD (file)
-    val target = data.col (data.dim2-1).-=(3)            // regularize the class labels
+    banner ("RandomForestTest2:  winequality-white dataset")
+    val nFeatures = 7
+    val nClasses  = 7
+    val nTrees    = 3
 
-    val fn = (for (i <- 0 until data.dim2-1) yield s"feature$i").toArray
-    val cn = (for (i <- 0 until numbClasses) yield s"class$i").toArray
-    val rF = new RandomForest (data.selectCols (Range (0,data.dim2-1).toArray), target.toInt,
-                               nF = 3, bR = 0.7, fS = 7, k = numbClasses, s = 223, fn = fn, cn = cn)
+    val rF = new RandomForest (x, y, nTrees = nTrees, fS = nFeatures, k = nClasses)
     rF.train ()
-    println (s"Accuracy = ${rF.test (0, data.dim1)}")
+    println (s"Accuracy = ${rF.test (0, y.dim)}")
+/*
+    val yp = rF.classify ()
+    val cm = new ConfusionMat (y, yp, nClasses)
+    println (s"C_Matrix = ${cm.confusion}")
+*/
 
 } // RandomForestTest2 object
 
@@ -183,22 +197,23 @@ object RandomForestTest2 extends App
  */
 object RandomForestTest3 extends App
 {
-    val file        = BASE_DIR + "winequality-white.csv"
-    val numbClasses = 7
-    val maxTrees    = 3
+    val fname  = BASE_DIR + "winequality-white.csv"
+    val xy     = MatrixD (fname)
+    val (x, y) = ClassifierReal.pullResponse (xy)
+    y -= 3                                                        // shift the class labels by 3
 
-    println ("RandomForestTest3: Loading WineQuality Dataset")
-    val data   = MatrixD (file)
-    val target = data.col (data.dim2-1).-=(3)            // regularize the class labels
-
-    val fn = (for (i <- 0 until data.dim2-1) yield s"feature$i").toArray
-    val cn = (for (i <- 0 until numbClasses) yield s"class$i").toArray
+    banner ("RandomForestTest3:  winequality-white dataset")
+    val nFeatures = 7
+    val nClasses  = 7
+    val maxTrees  = 3
 
     for (numTrees <- 1 to maxTrees) {
-        val rF = new RandomForest (data.selectCols (Range (0, data.dim2 - 1).toArray), target.toInt,
-                                   nF = numTrees, bR = 0.7, fS = 7, k = numbClasses, s = 223, fn = fn, cn = cn)
+        val rF = new RandomForest (x, y, nTrees = numTrees, fS = nFeatures, k = nClasses)
         rF.train ()
-        println (s"Number of Tree = $numTrees, Accuracy = ${rF.test (0,data.dim1)}")
+        println (s"Number of Tree = $numTrees, Accuracy = ${rF.test (0, y.dim)}")
+        val yp = rF.classify ()
+        val cm = new ConfusionMat (y, yp, nClasses)
+        println (s"Number of Tree = $numTrees, C_Matrix = ${cm.confusion}")
     } // for
 
 } // RandomForestTest3 object
@@ -211,31 +226,29 @@ object RandomForestTest3 extends App
  */
 object RandomForestTest4 extends App
 {
-    /*Loading the Dataset*/
-    val file        = BASE_DIR + "winequality-white.csv"
-    val numbClasses = 7
-
-    println ("RandomForestTest4: Loading WineQuality Dataset")
-    val data   = MatrixD (file)
-    val target = data.col (data.dim2-1).-=(3)              //regulized the class labels
-    data.setCol (data.dim2-1, target)
+    val fname  = BASE_DIR + "winequality-white.csv"
+    val xy     = MatrixD (fname)
+    val (x, y) = ClassifierReal.pullResponse (xy)
+    y -= 3                                                        // shift the class labels by 3
  
+    banner ("RandomForestTest4: winequality-white dataset")
+    val nClasses = 7
 
-    /*Divide samples into training and testing dataset */
-    val trainSize  = (data.dim1 * 0.8).toInt
-    val rvv        = RandomVecI ( min=0, max=data.dim1-1, dim =trainSize, unique=true,stream=223 )
-    val subSample  = new MatrixD (trainSize, data.dim2)
-    val elseSample = new MatrixD (data.dim1-trainSize, data.dim2)
+    // Divide samples into training and testing dataset
+    val trainSize  = (y.dim * 0.8).toInt
+    val rvv        = RandomVecI (min = 0, max = y.dim-1, dim = trainSize, unique = true, stream = 223)
+    val subSample  = new MatrixD (trainSize, xy.dim2)
+    val elseSample = new MatrixD (xy.dim1-trainSize, xy.dim2)
     val index      = rvv.igen
     var trainCount = 0
     var elseCount  = 0
 
-    for ( i <- data.range1) {
+    for ( i <- y.range) {
         if (index contains i) {
-            subSample.set (trainCount, data(i))
+            subSample.set (trainCount, xy(i))
             trainCount += 1
         } else {
-            elseSample.set (elseCount, data(i))
+            elseSample.set (elseCount, xy(i))
             elseCount  += 1 
         } // if
     } // for
@@ -244,11 +257,9 @@ object RandomForestTest4 extends App
     val elseTarget   = elseSample.col (elseSample.dim2-1)
 
     /* Starting training Forest */
-    val ran= 3
-    val fn = (for (i <- 0 until data.dim2-1) yield s"feature$i").toArray
-    val cn = (for (i <- 0 until numbClasses) yield s"class$i").toArray
-    val rF = new RandomForest (subSample.selectCols(Range(0, data.dim2 - 1).toArray), subSample.col(subSample.dim2 - 1).toInt, 
-                              nF = 5, bR = 0.64, fS = 7, k = numbClasses, s = ran, fn = fn, cn = cn)
+    val ran = 3
+    val rF  = new RandomForest (subSample.selectCols(Range(0, xy.dim2 - 1).toArray), subSample.col(subSample.dim2 - 1).toInt, 
+                              nTrees = 5, fS = 7, bR = 0.64, k = nClasses, s = ran)
     rF.train ()
 
     /* Print the accuracy for unseen data */
@@ -259,6 +270,36 @@ object RandomForestTest4 extends App
     } 
     val accuracy = accurateCount / elseFeature.dim1
     println (s"Testing Accuracy = $accuracy")
+    val yp = rF.classify ()
+    val cm = new ConfusionMat (y, yp, nClasses)
+    println (s"C_Matrix = ${cm.confusion}")
 
 } // RandomForestTest4 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RandomForestTest5` object is used to test the `RandomForest` class.
+ *  It tests the Random Forest classifier by specific numbers of trees.
+ *  > runMain scalation.analytics.classifier.RandomForestTest5
+ */
+object RandomForestTest5 extends App
+{
+    val fname  = BASE_DIR + "breast_cancer.csv"
+    val xy     = MatrixD (fname)
+    val (x, y) = ClassifierReal.pullResponse (xy)
+
+    banner ("RandomForestTest5: breast_cancer dataset")
+    val nFeatures = x.dim2 - 1
+    val maxTrees  = 4
+
+    for (numTrees <- 1 to maxTrees) {
+        val rF = new RandomForest (x, y, nTrees = numTrees, fS = nFeatures)
+        rF.train ()
+        println (s"Number of Tree = $numTrees, Accuracy = ${rF.test (0, y.dim)}")
+        val yp = rF.classify ()
+        val cm = new ConfusionMat (y, yp)
+        println (s"Number of Tree = $numTrees, C_Matrix = ${cm.confusion}")
+    } // for
+
+} // RandomForestTest5 object
 

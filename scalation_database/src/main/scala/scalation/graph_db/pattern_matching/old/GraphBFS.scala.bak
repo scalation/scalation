@@ -1,0 +1,92 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller, Matthew Saltz
+ *  @version 1.2
+ *  @date    Mon Nov 11 19:03:45 EST 2013
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.graphalytics
+
+import collection.mutable.Queue
+
+import LabelType.TLabel
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphBFS` performs Breadth First Search on a Directed Graph.
+ *  @param g  the directed graph to search
+ */
+class GraphBFS (g: Graph)
+      extends GraphDFS (g)
+{
+    private val DEBUG = true                                // debug flag
+    private val qu    = new Queue [Int] ()                  // vertex queue
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Search for the label 'lab' in this graph, returning the first vertex id
+     *  with a matching label, or -1 if not found.
+     *  @param lab  the label to search for
+     */
+    override def find (lab: TLabel): Int =
+    {
+        for (i <- 0 until g.size if go(i)) {
+            qu.enqueue (i)                                  // put unvisited vertex in queue
+            val res = visit (lab)                           // visit vertices in BFS order
+            if (res >= 0) { qu.clear; return res }          // return vertex where found
+        } // for
+        qu.clear; -1                                        // not found
+    } // find
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether vertex 'k' is reachable from 'i', i.e., there is a
+     *  a directed path from vertex 'i' to 'k'.
+     *  @param i  the starting vertex
+     *  @param k  the ending vertex
+     */
+    override def reach (i: Int, k: Int): Boolean =
+    {
+        qu.enqueue (i)
+        while (! qu.isEmpty) {
+            val j = qu.dequeue ()                           // take next vertex from queue
+            go(j) = false                                   // mark as visited
+            if (j == k) { qu.clear; return true }           // found k?
+            for (c <- g.adj(j) if go(c)) qu.enqueue (c)     // put unvisited children in queue
+        } // while
+        qu.clear; false                                     // not found
+    } // reach
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Visit the next vertex and check its label, returning the first vertex id
+     *  with a matching label, or -1 if not found.
+     *  @param lab  the label to search for
+     */
+    private def visit (lab: TLabel): Int =
+    {
+        var j = 0
+        while (! qu.isEmpty) {
+            do j = qu.dequeue () while (! go(j))                    // take next go vertex from queue
+            if (DEBUG) println (s"visit: label($j) = ${g.label(j)}")
+            if (g.label(j) == lab) return j                         // found label?
+            go(j) = false                                           // mark as visited
+            for (c <- g.adj(j) if go(c)) qu.enqueue (c)             // put unvisited children in queue
+        } // while
+        -1                                                          // not found
+    } // visit
+
+} // GraphBFS class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphBFSTest` is used to test the `GraphBFS` class.
+ *  > run-main scalation.graphalytics.GraphBFSTest
+ */
+object GraphBFSTest extends App
+{
+    import GraphDFSTest.{make, test}
+
+    private val g = make
+    g.print ("g")
+    test (new GraphBFS (g))
+
+} // GraphBFSTest object
+

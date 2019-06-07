@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Hao Peng
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sun Nov 12 12:27:00 EST 2017
  *  @see     LICENSE (MIT style license file).
  *
@@ -61,9 +61,10 @@ object DFourierTest extends App
 {
     val m = 1
     val dfour = new DFourier ()
-    val t = VectorD(0.0 to 5 by 0.01)
+//  val t = VectorD (0.0 to 5 by 0.01)
+    val t = VectorD.range (0, 501) * 0.01
 
-    def x (n: Int, tt: Double) = (0 until 2*m+1).map(j => dfour.dnbf(n)(m)(j)(tt)).sum
+    def x (n: Int, tt: Double) = (0 until 2*m+1).map (j => dfour.dnbf(n)(m)(j)(tt)).sum
 
     val y   = for (tt <- t) yield x(0, tt)
     val dy  = for (tt <- t) yield x(1, tt)

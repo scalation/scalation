@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Fri Sep 13 17:52:31 EDT 2013
  *  @see     LICENSE (MIT style license file).
  */
@@ -57,7 +57,7 @@ object TempRegression extends App
 
     println ("-------------------------------------------------")
     println ("Fit the parameter vector b using QR Factorization")
-    time { rg = new Regression (x, y) }                        // use QR Factorization
+    time { rg = new Regression (x, y) }                         // use QR Factorization
     time { rg.train () }
     println ("full model: fit = " + rg.fit)
     println ("predict (" + z + ") = " + rg.predict (z))
@@ -65,7 +65,7 @@ object TempRegression extends App
 
     println ("-------------------------------------------------")
     println ("Fit the parameter vector b using Cholesky Factorization")
-    time { rg = new Regression (x, y, Cholesky) }             // use Cholesky Factorization
+    time { rg = new Regression (x, y, technique = Cholesky) }   // use Cholesky Factorization
     time { rg.train () }
     println ("full model: fit = " + rg.fit)
     println ("predict (" + z + ") = " + rg.predict (z))
@@ -73,7 +73,7 @@ object TempRegression extends App
 
     println ("-------------------------------------------------")
     println ("Fit the parameter vector b using Matrix Inversion")
-    time { rg = new Regression (x, y, Inverse) }               // use Matrix Inversion
+    time { rg = new Regression (x, y, technique = Inverse) }    // use Matrix Inversion
     time { rg.train () }
     println ("full model: fit = " + rg.fit)
     println ("predict (" + z + ") = " + rg.predict (z))

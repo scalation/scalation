@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Hao Peng
- *  @version 1.5
+ *  @version 1.6
  *  @date    Fri Oct 7 12:27:00 EDT 2017
  *  @see     LICENSE (MIT style license file).
  *------------------------------------------------------------------------------
@@ -22,10 +22,10 @@ import scala.math.{abs, max, min, pow}
 import scala.util.control.Breaks.{break, breakable}
 
 import scalation.calculus.Differential.∇
-import scalation.linalgebra._
+import scalation.linalgebra.FunctionV2S
+import scalation.linalgebra.{Fac_LU, MatriD, MatrixD, VectoI, VectorI, VectoD, VectorD}
 import scalation.linalgebra.MatrixD.eye
 import scalation.math.ExtremeD.{MAX_VALUE, NEGATIVE_INFINITY, POSITIVE_INFINITY}
-import scalation.math.FunctionV2S
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `L_BFGS_B` the class implements the Limited memory Broyden–Fletcher–

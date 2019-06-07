@@ -1,0 +1,120 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.0
+ *  @date    Sun Nov 15 15:05:06 EDT 2009
+ *  @see     LICENSE (MIT style license file).
+ *  @see     http://en.wikipedia.org/wiki/Autoregressive_integrated_moving_average
+ *  @see     http://www.emu.edu.tr/mbalcilar/teaching2007/econ604/lecture_notes.htm
+ */
+
+// U N D E R   D E V E L O P M E N T
+
+package scalation.analytics
+
+import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.plot.Plot
+import scalation.random.Random
+import scalation.util.Error
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This class provide basic time series analysis capabilities for
+ *  Auto-Regressive (AR), Integrated (I) and Moving Average (MA) models.
+ *  In an ARIMA(p, d, q) model, p, d and q refer to the order of the
+ *  Auto-Regressive, Integrated and Moving Average components of the model. 
+ *  ARIMA models are often used for forecasting.
+ *  @param y  the input vector
+ *  @param t  the time vector
+ */
+class ARIMA (y: VectorD, t: VectorD)
+      extends Predictor with Error
+{
+    private val n = y.dim        // size of the input vector
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return a vector that is the Moving Average (MA) of the given vector.
+     *  @param k  the number of points to average
+     */
+    def ma (k: Int): VectorD =
+    {
+        val kk = k.toDouble
+        val z = new VectorD (n - k)
+        for (i <- 0 until n - k) z(i) = y(i until i + k).sum / kk
+        z
+    } // ma
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return a vector that is the Auto-Regressive (AR) predictions of the last k
+     *  points.
+     *  @param rho  the vector of auto-correlations
+     */
+    def ar (rho: VectorD): VectorD =
+    {
+        val k = rho.dim               // use lag-1 to lag-k
+        val z = new VectorD (n - k)
+        for (i <- k until n) {
+            var sum = 0.
+            for (j <- 0 until k) sum += rho(j) * y(i - j)
+            z(i - k) = sum
+        } // for
+        z
+    } // ar
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Fit an ARIMA model to historical times series data.
+     */
+    def train ()
+    {
+        // FIX: to be implemented
+    } // train
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the fit (??)
+     */
+    //def fit: // returning ??
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** For all the time points in vector t, predict the value of y = f(t) by ...
+     *  @param z  the time-vector indicating time points to forecast
+     */
+    def predict (t: VectorD): Double = 
+    {
+        0.      // FIX: to be implemented
+    } // predict
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given several time vectors, forecast the y-values.
+     *  @param z  the matrix containing row time-vectors to use for prediction
+     */
+    def predict (z: MatrixD): VectorD =
+    {
+        throw new UnsupportedOperationException ()
+    } // predict
+
+} // ARIMA class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This object is used to test the ARIMA class.
+ */
+object ARIMATest extends App
+{
+    val n = 100
+    val y = new VectorD (n)
+    val t = new VectorD (n)
+    val r = Random ()
+    for (i <- 0 until n) {
+        t(i) = i.toDouble
+        y(i) = t(i) + 10. * r.gen
+    } // for
+
+    val ts = new ARIMA (y, t)
+
+    val z = ts.ma (5)
+    new Plot (t, y, z, "Plot of y, z vs. t")
+
+    val v = ts.ar (new VectorD (.9, .7))
+    new Plot (t, y, v, "Plot of y, v vs. t")
+
+} // ARIMATest object
+

@@ -1,0 +1,87 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Kevin Warrick, John Miller, Susan George
+ *  @version 1.5
+ *  @date    Tue Oct 16 17:03:00 EDT 2018
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.analytics.classifier
+
+import scala.collection.mutable.HashMap
+
+import scalation.linalgebra.VectoI
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Node` class is used to hold inormation about a node in the decision tree.
+ *  @param nu  the frequency count
+ */
+abstract class Node (nu: VectoI)
+         extends Cloneable
+{
+    /** The sum of frequency counts
+     */
+    val nu_sum = nu.sum
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Copy a node and all of its child nodes.
+     *  @param vc  the value count
+     */
+    def copy (vc: Array [Int]): Node =
+    {
+        this match {
+        case FeatureNode (f, branches, path, nu) => 
+            deepCopy (FeatureNode (f, branches.clone (), path, nu), vc)
+        case LeafNode (y, nu) =>
+            LeafNode (y, nu)
+        } // match
+    } // copy
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** This method deep copies a node all the way down by creating new instances of feature node.
+     *  This is required while pruning.
+     *  @param curNode  the current node
+     *  @param vc       the value count
+     */
+    def deepCopy (curNode: Node, vc: Array [Int]): Node =
+    {
+        val fn = curNode.asInstanceOf [FeatureNode]
+        for (i <- 0 until vc(fn.f)) {
+            if (fn.branches.get(i) != None) {
+                val node = fn.branches(i)
+                if (node.isInstanceOf [FeatureNode]) {
+                    val tempFn    = node.asInstanceOf [FeatureNode]
+                    val tempNewFn = new FeatureNode (tempFn.f, tempFn.branches.clone(), tempFn.path, tempFn.nu)
+                    fn.branches  += i -> tempNewFn
+                } // if
+            } // if
+        } // for
+        fn
+    } // deepCopy
+
+} // Node class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `FeatureNode` class is for internal nodes.
+ *  @param f         the feature/variable number used for splitting
+ *  @param branches  maps the branch value, e.g., f2 has values 0, 1, 3, for a node 
+ *  @param path      the path from the current node to the root {(parent node feature, branch)}
+ *  @param nu        the frequency count
+ */
+case class FeatureNode (f: Int, branches: HashMap [Int, Node], path: List [(Int, Int)], nu: VectoI)
+     extends Node (nu) with Cloneable
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `LeafNode` class is for leaf nodes.
+ *  @param y       the respone/decision value
+ *  @param nu      the frequency count (count for each possible decision value for y)
+ */
+case class LeafNode (y: Int, nu: VectoI)
+     extends Node (nu) with Cloneable
+{
+    var parent: FeatureNode = null
+
+} // LeafNode class
+

@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sun Sep 16 22:35:14 EDT 2012
  *  @see     LICENSE (MIT style license file).
  *  @see http://en.wikipedia.org/wiki/Gillespie_algorithm

@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Michael Cotterell, John Miller, Hao Peng, Dong-Yu Yu
- *  @version 1.5
+ *  @version 1.6
  *  @date    Fri Mar 24 20:24:40 2017
  *  @see     LICENSE (MIT style license file).
  *
@@ -307,7 +307,7 @@ object SmoothingB_FTest extends App
     val L    = y.max () - y.min ()                                   // period length
     val w    = 2.0 * Pi / L                                          // fundamental frequency estimate
 
-    val centers = VectorD (0.0 until 100.0/17 by 0.5)
+//  val centers = VectorD (0.0 until 100.0/17 by 0.5)
 
     for (ord <- mMin to mMax) {
         val moo = new SmoothingB_F (z, t, ord, lambda = lambda, method = method)     // smoother (use GCV)

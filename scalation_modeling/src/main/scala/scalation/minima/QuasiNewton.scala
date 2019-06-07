@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Hao Peng
- *  @version 1.5
+ *  @version 1.6
  *  @date    Fri Sep 30 13:37:32 EDT 2011
  *  @see     LICENSE (MIT style license file).
  *------------------------------------------------------------------------------
@@ -19,9 +19,9 @@ package scalation.minima
 import scala.math.{abs, max, pow}
 
 import scalation.calculus.Differential.∇
+import scalation.linalgebra.FunctionV2S
 import scalation.linalgebra.{MatrixD, VectorD}
 import scalation.linalgebra.MatrixD.{eye, outer}
-import scalation.math.FunctionV2S
 import scalation.util.Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

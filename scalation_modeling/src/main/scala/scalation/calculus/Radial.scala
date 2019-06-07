@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Hao Peng
- *  @version 1.5
+ *  @version 1.6
  *  @date    Wed Nov 15 12:27:00 EST 2017
  *  @see     LICENSE (MIT style license file).
  *
@@ -163,7 +163,8 @@ object RadialTest extends App
     import BasisFunction.plot
 
     val t = VectorD.range (-300, 300)/100
-    val c = VectorD (-2.8 to 2.8 by 0.4)
+//  val c = VectorD (-2.8 to 2.8 by 0.4)
+    val c = VectorD.range (-7, 8) * 0.4
     val m = c.size
 
     val rbf = new Radial (c, GAUSSIAN)

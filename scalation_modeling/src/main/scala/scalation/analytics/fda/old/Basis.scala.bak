@@ -1,0 +1,49 @@
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.2
+ *  @date    Fri Sep  2 14:48:42 EDT 2016
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  @see open.uct.ac.za/bitstream/item/16664/thesis_sci_2015_essomba_rene_franck.pdf?sequence=1
+ */
+
+package scalation.analytics.fda
+
+import scalation.linalgebra._
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Basis` class
+ */
+class Basis (x: VectorD, k: Int)
+{
+    private val phi = new MatrixD (x.dim, k)
+    private val c   = new VectorD (k)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /**
+     */
+    def train ()
+    {
+        // values for phi_ij
+        // values for c_j
+    } // train
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /**
+     */
+    def approx: VectorD =
+    {
+        phi * c
+    } // approx
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /**
+     */
+    def predict (t: Double): Double =
+    {
+        0.0
+    } // predict
+
+} // Basis class
+

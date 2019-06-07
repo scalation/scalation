@@ -1,0 +1,296 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.6
+ *  @date    Fri Dec 21 14:38:32 EST 2018
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.analytics
+
+import scala.collection.mutable.Set
+
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
+import scalation.plot.Plot
+import scalation.stat.Statistic
+import scalation.random.Bernoulli
+import scalation.util.banner
+
+// FIX - apparent bug
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `KNN_Predictor` class is used to predict a response value for new vector 'z'.
+ *  It works by finding its 'kappa' nearest neighbors.  These neighbors essentially
+ *  vote according to their prediction.  The consensus is the average individual
+ *  predictions for 'z'.  Using a distance metric, the 'kappa' vectors nearest
+ *  to 'z' are found in the training data, which are stored row-wise in data
+ *  matrix 'x'.  The corresponding response values are given in the vector 'y',
+ *  such that the response value for vector 'x(i)' is given by 'y(i)'.
+ *  @param x       the vectors/points of predictor data stored as rows of a matrix
+ *  @param y       the response value for each vector in x
+ *  @param fname_  the names for all features/variables
+ *  @param hparam  the number of nearest neighbors to consider
+ */
+class KNN_Predictor (x: MatriD, y: VectoD,
+                     fname_ : Strings = null, hparam: HyperParameter = KNN_Predictor.hp)
+      extends PredictorMat (x, y, fname_, hparam)
+{
+    private val DEBUG      = true                                 // debug flag
+    private val MAX_DOUBLE = Double.PositiveInfinity              // infinity
+    private val kappa      = hparam ("kappa").toInt               // the number of nearest neighbors to consider
+    private val topK       = Array.fill (kappa)(-1, MAX_DOUBLE)   // top-kappa nearest points (in reserve order)
+    private val coin       = Bernoulli ()                         // use a fair coin for breaking ties
+
+//  if (DEBUG) println (s" x = $x \n y = $y")
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute a distance metric between vectors/points 'x' and 'z'.
+     *  The squared Euclidean norm used for efficiency, but may use other norms.
+     *  @param x  the first vector/point
+     *  @param z  the second vector/point
+     */
+    def distance (x: VectoD, z: VectoD): Double = (x - z).normSq
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the 'kappa' nearest neighbors (top-'kappa') to vector 'z' and store in
+     *  the 'topK' array.  Break ties by flipping a fair coin.
+     *  @param z  the vector used for prediction
+     */
+    private def kNearest (z: VectoD)
+    {
+        var dk = MAX_DOUBLE
+        for (i <- x.range1) {
+            val di = distance (z, x(i))                           // compute distance to z
+            if (di < dk) dk = replaceTop (i, di)                  // if closer, adjust top-kappa
+            else if (di == dk && coin.igen == 1) replaceTop (i, di)    // for breaking ties, may comment out
+        } // for
+        if (DEBUG) println (s"z = $z: topK = ${topK.deep}")
+    } // kNearest
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Training involves resetting the data structures before each prediction.
+     *  It uses lazy training, so most of it is done during prediction.
+     *  @param yy  the response values
+     */
+    def train (yy: VectoD = y): KNN_Predictor = this
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the error and useful diagnostics.  Requires override to adjust
+     *  degrees of freedom (df1, df2).
+     *  @param xx  the data matrix used in prediction
+     *  @param yy  the actual response vector
+     */
+    override def eval (xx: MatriD = x, yy: VectoD = y): KNN_Predictor =
+    {
+        val yp = predict (xx)                                            // y predicted for xx (test/full)
+        e = yy - yp                                                      // compute residual/error vector e
+        val df1 = kappa                                                  // degrees of freedom model = kappa
+        val df2 = yy.dim - df1                                           // degrees of freedom error
+        resetDF ((df1, df2))
+        diagnose (e, yy)                                                 // compute diagnostics
+        this
+    } // eval
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a new point/vector 'z', predict its response value based on the
+     *  actual response values of its 'kappa' nearest neighbors.
+     *  @param z  the vector to predict
+     */
+    override def predict (z: VectoD): Double =
+    {
+        kNearest (z)                                             // set top-kappa to kappa nearest
+        var sum = 0.0
+        for (i <- 0 until kappa) sum = y(topK(i)._1)             // sum the individual predictions
+        val yp = sum / kappa                                     // divide to get average
+        reset ()                                                 // reset topK
+        yp                                                       // return the predicted value
+    } // predict
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Remove the most distant neighbor and add new neighbor 'i'.  Maintain the
+     *  'topK' nearest neighbors in sorted order farthest to nearest.
+     *  @param i   new neighbor to be added
+     *  @param di  distance of the new neighbor
+     */
+    private def replaceTop (i: Int, di: Double): Double =
+    {
+        var j = 0
+        while (j < kappa-1 && di < topK(j)._2) { topK(j) = topK(j+1); j += 1 }
+        topK(j) = (i, di)
+        topK(0)._2                          // the distance of the new farthest neighbor
+    } // replaceTop
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reset or re-initialize 'topK' and counters.
+     */
+    def reset ()
+    {
+        for (i <- 0 until kappa) topK(i)  = (-1, MAX_DOUBLE)     // initialize top-kappa
+    } // reset
+
+    def forwardSel (cols: Set [Int], adjusted: Boolean): (Int, VectoD, VectoD) =
+    {
+        throw new UnsupportedOperationException ("KNN_Predictor does not have feature selection")
+    } // forwardSel
+
+    def backwardElim (cols: Set [Int], adjusted: Boolean, first: Int): (Int, VectoD, VectoD) =
+    {
+        throw new UnsupportedOperationException ("KNN_Predictor does not have feature selection")
+    } // backwardElim
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform 'k'-fold cross-validation.
+     *  @param xx     the data matrix to use (full data matrix or selected columns)
+     *  @param k      the number of folds
+     *  @param rando  whether to use randomized cross-validation.
+     */
+    def crossVal (xx: MatriD = x, k: Int = 10, rando: Boolean = true): Array [Statistic] =
+    {
+        crossValidate ((x: MatriD, y: VectoD) => new KNN_Predictor (x, y, fname, hparam),
+                                                 xx, k, rando)
+    } // crossVal
+
+} // KNN_Predictor class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `KNN_Predictor` companion object provides a factory functions.
+ */
+object KNN_Predictor
+{
+    val hp = new HyperParameter; hp += ("kappa", 3, 3)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a `KNN_Predictor` object from a combined 'xy' data-response matrix.
+     *  @param xy      the combined data-response matrix
+     *  @param fname   the names for all features/variables
+     *  @param hparam  the number of nearest neighbors to consider
+     */
+    def apply (xy: MatriD, fname: Strings = null, hparam: HyperParameter = hp): KNN_Predictor =
+    {
+        val (x, y) = PredictorMat.pullResponse (xy)
+        new KNN_Predictor (x, y, fname, hparam)
+    } // apply
+
+} // KNN_Predictor object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `KNN_PredictorTest` object is used to test the `KNN_Predictor` class.
+ *  > runMain scalation.analytics.KNN_PredictorTest
+ */
+object KNN_PredictorTest extends App
+{
+    //                            x0 x1  y
+    val xy = new MatrixD ((10, 3), 1, 5, 1,       // joint data matrix
+                                   2, 4, 1,
+                                   3, 4, 1,
+                                   4, 4, 1,
+                                   5, 3, 0,
+                                   6, 3, 1,
+                                   7, 2, 0,
+                                   8, 2, 0,
+                                   9, 1, 0,
+                                  10, 1, 0)
+
+
+    println ("----------------------------------------------------")
+    println ("xy = " + xy)
+
+//  val fn = Array ("x0", "x1")                   // feature/variable names
+//  val knn = KNN_Predictor (xy, fn)
+    val knn = KNN_Predictor (xy)
+
+    val z1 = VectorD (10.0, 10.0)
+    println ("----------------------------------------------------")
+    println ("z1 = " + z1)
+    println ("yp = " + knn.predict (z1))
+
+    val z2 = VectorD ( 3.0,  3.0)
+    println ("----------------------------------------------------")
+    println ("z2 = " + z2)
+    println ("yp = " + knn.predict (z2))
+
+    val (x, y) = PredictorMat.pullResponse (xy)
+    knn.eval (x, y)                               // no train, due to lazy/late training
+    banner ("Compare y vs. yp")
+    val yp = knn.predict (x)
+    println ("y  = " + y)
+    println ("yp = " + yp)
+    println (knn.report)
+
+    new Plot (xy.col(0), y, yp, lines = true)
+
+} // KNN_PredictorTest object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `KNN_PredictorTest2` object is used to test the `KNN_Predictor` class.
+ *  > runMain scalation.analytics.KNN_PredictorTest2
+ */
+object KNN_PredictorTest2 extends App
+{
+    //                            x1 x2  y
+    val xy = new MatrixD ((9, 3), 0, 0, 0,
+                                  0, 1, 0,
+                                  0, 2, 1,
+                                  1, 0, 0,
+                                  1, 1, 0,
+                                  1, 2, 1,
+                                  2, 0, 1,
+                                  2, 1, 1,
+                                  2, 2, 1)
+
+    val (x, y) = PredictorMat.pullResponse (xy)
+
+    val fn = Array ("x1", "x2")                   // feature/variable names
+
+    println ("----------------------------------------------------")
+    println ("xy = " + xy)
+    println ("----------------------------------------------------")
+
+    val knn = KNN_Predictor (xy, fn)
+
+    knn.eval (x, y)                               // no train, due to lazy/late training
+    banner ("Compare y vs. yp")
+    val yp = knn.predict (x)
+    println ("y  = " + y)
+    println ("yp = " + yp)
+    println (knn.report)
+
+    // test samples -----------------------------------------------------------
+    for (i <- y.range) {
+        println (s"KNN ($i): predict (${x(i)}) = ${knn.predict (x(i))} =? ${y(i)}")
+    } // for
+
+} // KNN_PredictorTest2 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `KNN_PredictorTest3` object is used to test the `KNN_predictor` class.
+ *  > runMain scalation.analytics.KNN_PredictorTest3
+ */
+object KNN_PredictorTest3 extends App
+{
+    import ExampleAutoMPG._
+    import scalation.plot.Plot
+
+    println ("----------------------------------------------------")
+    println ("xy = " + xy)
+
+    val cap = 20
+    val sse = new VectorD (cap)
+    val kr  = VectorD.range (0, cap)
+
+    for (k <- 2 until cap) {
+        KNN_Predictor.hp("kappa") = k
+        val cp = KNN_Predictor (xy)
+        cp.train ().eval ()
+        println (cp.report)
+        sse(k) = cp.fit(cp.index_rSq)
+    } // for
+
+    new Plot (kr, sse)
+
+} // KNN_PredictorTest3 object
+

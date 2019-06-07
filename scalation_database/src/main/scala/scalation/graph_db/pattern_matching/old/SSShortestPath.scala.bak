@@ -1,0 +1,100 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.1
+ *  @date    Sat Aug 10 14:26:34 EDT 2013
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.graphalytics
+
+import collection.mutable.PriorityQueue
+
+import scalation.linalgebra.{Matrix, MatrixD, SparseMatrixD, VectorD}
+import scalation.linalgebra_gen.Vectors.VectorI
+import scalation.linalgebra.SparseMatrixD.RowMap
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SSShortestPath` class is used to solve shortest path problems for graphs
+ *  stored in matrices.  It solves the Single-Source Shortest Path (SSSP) problem
+ *  for directed graphs.  The edge cost/distance (must be non-negative) can be
+ *  stored in either a dense or sparse matrix.  Dijkstra's Algorithm is used.
+ *  @see http://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
+ *  @param c  the cost/distance matrix
+ *  @param s  the single-source vertex
+ */
+class SSShortestPath (c: Matrix, s: Int)
+{
+    type Item = Tuple2 [Int, Double]                    // vertex id and its distance from vertex s
+
+    private val DEBUG = true                            // debug flag
+    private val INF   = Double.PositiveInfinity         // infinity (indicates no path so far)
+    private val n     = c.dim1                          // the number of vertices
+    private val rang  = 0 until n                       // index range
+    private val q = PriorityQueue.empty [Item]          // priority queue ordered by distance
+            (new Ordering [Item] { def compare (it1: Item, it2: Item) = it1._2 compare it2._2 })
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine the shortest path from vertex 's' to each vertex 'j' returning
+     *  the vector 'd' giving the distance from 's' to all other vertices and
+     *  the vector 'p' of predecessor vertices.  The path from 's' to each vertex
+     *  can be deduced from the 'p' vector.
+     */
+    def spath (): Tuple2 [VectorD, VectorI] =
+    {
+        val d = c(s)                                    // the distance from vertex s to each vertex j
+        for (j <- rang if c(s, j) == 0) d(j) = INF      // set distance to infinity if no direct edge from s
+        d(s)  = 0.0                                     // zero distance from s to s
+        val p = new VectorI (n)                         // create predecessor vertor
+        for (j <- rang) {
+            p(j) = if (d(j) != INF) s else -1           // initialize predecessor vertices
+            q += ( (j, d(j)) )                          // add each vertex j incl. its distance to q
+        } // for
+
+        var go = true                                   // set the go flag to true
+        while (go && q.nonEmpty) {                      // iteratively, try to find a shortcut
+
+            val (l, d_l) = q.dequeue ()                 // vertex l in q with least distance d_l from s
+            if (d_l == INF) go = false                  // no shortcuts left, so quit
+            else {
+                for (j <- rang if c(l, j) > 0.0) {      // check vertex l's neighbors
+                    val alt = d_l + c(l, j)             // compute alternate distance from s to j
+                    if (alt < d(j)) {
+                        p(j) = l;  d(j) = alt; q += ( (j, d(j)) )
+                    } // if
+                } // for
+                if (DEBUG) println ("distance from " + s + ": d = " + d)
+            } // if
+
+        } // while
+        (d, p)                      // return the distance and predecessor vectors
+    } // spath
+
+} // SSShortestPath class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SSShortestPathTest` object is used to test the `SSShortestPath` class.
+ */
+object SSShortestPathTest extends App
+{
+    // dense matrix representation for the graph, where d_ij = distance from i to j
+
+    val c = new MatrixD ((3, 3),   0.0,   2.0, 100.0,
+                                 100.0,   0.0,   3.0,
+                                   4.0, 100.0,   0.0)
+    println (c)
+    val sp = new SSShortestPath (c, 0)
+    println ("(d, p) = " + sp.spath ())          // shortest distance from s to all vertices)
+
+    // sparse matrix representation for the graph, where d_ij = distance from i to j
+
+    val b = new SparseMatrixD (3, 3, Array (new RowMap ((1, 2.0),   (2, 100.0)),
+                                            new RowMap ((0, 100.0), (2, 3.0)),
+                                            new RowMap ((0, 4.0),   (1, 100.0)) ))
+    println (b)
+    val sp2 = new SSShortestPath (b, 0)
+    println ("(d, p) = " + sp2.spath ())        // shortest distance from s to all vertices
+
+} // SSShortestPathTest object
+

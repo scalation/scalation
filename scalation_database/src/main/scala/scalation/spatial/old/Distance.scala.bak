@@ -1,0 +1,39 @@
+
+package scalation.spatial
+
+object Distance
+{
+    /** This method calculates distance between 2 lat-long co-ordinates, in miles.
+     * @param lat1  the latitude of first location
+     * @param lon1  the longitude of first location
+     * @param lat2  the latitude of second location
+     * @param lon2  the longitude of second location
+     * @see          https://dzone.com/articles/scala-calculating-distance-between-two-locations
+     */
+    def distance (lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double =
+    {
+        import scala.math._
+        val latDistance = Math.toRadians (lat1 - lat2)
+        val lngDistance = Math.toRadians (lon1 - lon2)
+        val sinLat = sin (latDistance / 2)
+        val sinLng = sin (lngDistance / 2)
+        val a = sinLat * sinLat + (cos (toRadians (lat1)) *
+          cos (toRadians (lat2)) * sinLng * sinLng)
+        val c = 2 * atan2 (sqrt (a), sqrt (1 - a))
+        6371 * c * 0.6213              //6371 = AVERAGE_RADIUS_OF_EARTH_KM, * by 0.6213 for Miles
+    } // distance
+
+} // Distance object
+
+// > runMain scalation.spatial.DistanceTester
+
+object DistanceTester extends App
+{
+    val (lat1, lon1) = (33.9519, 83.3576)          // Athens, GA
+    val (lat2, lon2) = (33.7490, 84.3880)          // Atlanta, GA
+    import Distance.distance
+    val d = distance(lat1, lon1, lat2, lon2)
+    println(s"Distance = $d miles.")
+
+} // DistanceTester object
+

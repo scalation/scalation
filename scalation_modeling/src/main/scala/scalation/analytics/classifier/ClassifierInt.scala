@@ -1,12 +1,13 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sun Sep 23 21:14:14 EDT 2012
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
 import scala.util.control.Breaks.{break, breakable}
 
@@ -25,8 +26,8 @@ import Round.roundVec
  *  @param k   the number of classes
  *  @param cn  the names for all classes
  */
-abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int,
-                              cn: Array [String])
+abstract class ClassifierInt (x: MatriI, y: VectoI, protected var fn: Strings = null,
+                              k: Int, protected var cn: Strings = null)
          extends Classifier with Error
 {
     /** the number of data vectors in training/test-set (# rows)
@@ -48,7 +49,11 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int,
     /** the set of features to turn on or off. All features are on by default.
      *  Used for feature selection.
      */
-    protected val fset = Array.fill [Boolean](n)(true)
+    protected val fset = Array.fill (n)(true)
+
+    if (fn == null && x != null) fn = x.range2.map ("x" + _).toArray    // default variable names
+    if (cn == null) cn = if (k == 2) Array ("no", "yes")                // default class names
+                         else (0 until k).map ("c" + _).toArray
 
     if (x != null && x.dim1 != m)     flaw ("constructor", "y.dim must equal training-set size (m)")
     if (fn != null && fn.length != n) flaw ("constructor", "fn.length must equal feature-set size (n)")
@@ -105,7 +110,7 @@ abstract class ClassifierInt (x: MatriI, y: VectoI, fn: Array [String], k: Int,
      *  of correct classifications.
      *  @param itest  indices of the instances considered test data
      */
-    def test (itest: IndexedSeq [Int]): Double =
+    def test (itest: Ints): Double =
     {
         var correct = 0
         for (i <- itest if classify (x(i))._1 == y(i)) correct += 1
@@ -244,6 +249,18 @@ object ClassifierInt
         } // if
         xy
     } // apply
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Pull out the designed response column from the combined matrix.
+     *  When 'col' is negative or the last column, slice out the last column.
+     *  @param xy   the combined data and response/classification matrix
+     *  @param col  the designated response column to be pulled out
+     */
+    def pullResponse (xy: MatriI, col: Int = -1): (MatriI, VectoI) =
+    {
+        if (col < 0 || col == xy.dim2-1) (xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1))
+        else                             (xy.sliceEx (xy.dim1, col), xy.col (col))
+    } // pullResponse
 
 } // ClassifierInt object
 

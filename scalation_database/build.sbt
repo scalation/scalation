@@ -1,14 +1,17 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // build.sbt - specifications for Simple Build Tool
+// https://www.scala-sbt.org/1.x/docs
+// https://www.scala-sbt.org/1.x/docs/Forking.html
 
 lazy val commonSettings = Seq (
 
 name         := "scalation",
 organization := "scalation",
-version      := "1.5",
-scalaVersion := "2.12.4",
+version      := "1.6",
+scalaVersion := "2.12.8",
 fork         := true,
+//connectInput := true,
 
 concurrentRestrictions := Seq(Tags.limitAll(1)),
 
@@ -23,6 +26,7 @@ scalacOptions += "-opt:l:inline",               // enable cross-method optimizat
 scalacOptions += "-opt-inline-from:**",         // allow inlining for all classes
 scalacOptions += "-opt-warnings",
 scalacOptions += "-Xlint:-adapted-args",        // run lint - disable "adapted-args" (auto tupling used)
+
 // scalacOptions += "-feature",
 // scalacOptions += "-unchecked",
 
@@ -38,6 +42,7 @@ lazy val root = (project in file("."))
   .settings (
     commonSettings,
     name := "scalation_database",
+    unmanagedBase := baseDirectory.value / "../lib",
 
 ////////////////////////////////////////////////////////////////////////////////
 // Scala Modules

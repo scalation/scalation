@@ -1,16 +1,18 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sun Sep 22 18:45:44 EDT 2013 
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectoI, VectorI}
 import scalation.plot.Plot
-import scalation.random.Bernoulli
+//import scalation.random.Bernoulli
+import scalation.util.{banner, Sorting}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KNN_Classifier` class is used to classify a new vector 'z' into one of
@@ -23,21 +25,21 @@ import scalation.random.Bernoulli
  *  is given by 'y(i)'.
  *  @param x      the vectors/points of classified data stored as rows of a matrix
  *  @param y      the classification of each vector in x
- *  @param fn     the names for all features/variables
+ *  @param fn_    the names for all features/variables
  *  @param k      the number of classes
- *  @param cn     the names for all classes
+ *  @param cn_    the names for all classes
  *  @param kappa  the number of nearest neighbors to consider
  */
-class KNN_Classifier (x: MatriD, y: VectoI, fn: Array [String] = null,
-                      k: Int = 2, cn: Array [String] = Array ("no", "yes"),
+class KNN_Classifier (x: MatriD, y: VectoI, fn_ : Strings = null, k: Int = 2, cn_ : Strings = null,
                       kappa: Int = 3)
-      extends ClassifierReal (x, y, fn, k, cn)
+      extends ClassifierReal (x, y, fn_, k, cn_)
 {
     private val DEBUG      = false                               // debug flag
     private val MAX_DOUBLE = Double.PositiveInfinity             // infinity
     private val topK       = Array.fill (kappa)(-1, MAX_DOUBLE)  // top-kappa nearest points (in reserve order)
     private val count      = new VectorI (k)                     // how many nearest neighbors in each class.
-    private val coin       = Bernoulli ()                        // use a fair coin for breaking ties
+    private val d          = Array.ofDim [Double] (x.dim1)       // array to hold distances
+//  private val coin       = Bernoulli ()                        // use a fair coin for breaking ties
 
     if (cn.length != k) flaw ("constructor", "# class names != # classes")
 
@@ -56,7 +58,16 @@ class KNN_Classifier (x: MatriD, y: VectoI, fn: Array [String] = null,
      *  the 'topK' array.  Break ties by flipping a fair coin.
      *  @param z  the vector to be classified
      */
-    def kNearest (z: VectoD)
+    private def kNearest (z: VectoD)
+    {
+        for (i <- x.range1) d(i) = distance (z, x(i))            // distance to all points
+        val srt = new Sorting (d)                                // create sort object
+        val top = srt.iselsort (kappa)                           // use partial indirect selsort
+        for (j <- 0 until kappa) topK(j) = (top(j), d(top(j)))   // assign index and diatance
+        if (DEBUG) println (s"z = $z: topK = ${topK.deep}")
+    } // kNearest
+/*
+    private def kNearest (z: VectoD)
     {
         var dk = MAX_DOUBLE
         for (i <- x.range1) {
@@ -66,13 +77,14 @@ class KNN_Classifier (x: MatriD, y: VectoI, fn: Array [String] = null,
         } // for
         if (DEBUG) println (s"z = $z: topK = ${topK.deep}")
     } // kNearest
+*/
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Training involves resetting the data structures before each classification.
      *  It uses lazy training, so most of it is done during classification.
      *  @param itest  the indices of the test data
      */
-    def train (itest: IndexedSeq [Int]): KNN_Classifier =        // FIX - use this parameters
+    def train (itest: Ints): KNN_Classifier =                    // FIX - use this parameters
     {
         this
     } // train
@@ -97,7 +109,7 @@ class KNN_Classifier (x: MatriD, y: VectoI, fn: Array [String] = null,
      *  'topK' nearest neighbors in sorted order farthest to nearest.
      *  @param i   new neighbor to be added
      *  @param di  distance of the new neighbor
-     */
+     *
     private def replaceTop (i: Int, di: Double): Double =
     {
         var j = 0
@@ -105,6 +117,7 @@ class KNN_Classifier (x: MatriD, y: VectoI, fn: Array [String] = null,
         topK(j) = (i, di)
         topK(0)._2                          // the distance of the new farthest neighbor
     } // replaceTop
+     */
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset or re-initialize 'topK' and counters.
@@ -132,7 +145,7 @@ object KNN_Classifier
      *  @param cn   the names for all classes
      *  @param kappa  the number of nearest neighbors to consider
      */
-    def apply (xy: MatriD, fn: Array [String], k: Int, cn: Array [String], kappa: Int = 3): KNN_Classifier =
+    def apply (xy: MatriD, fn: Strings, k: Int, cn: Strings, kappa: Int = 3): KNN_Classifier =
     {
         new KNN_Classifier (xy.sliceCol (0, xy.dim2-1), xy.col (xy.dim2-1).toInt, fn, k, cn, kappa)
     } // apply
@@ -180,8 +193,7 @@ object KNN_ClassifierTest extends App
     val yp = knn.classify (xy.sliceCol (0, xy.dim2-1))
     println ("y  = " + y)
     println ("yp = " + yp)
-    println (knn.fitLabel)
-    println (knn.fit (y, yp))
+    println (knn.fitMap (y, yp))
 
     new Plot (xy.col(0), y.toDouble, yp.toDouble)
 
@@ -205,6 +217,7 @@ object KNN_ClassifierTest2 extends App
                                   2, 1, 1,
                                   2, 2, 1)
     val x = xy.sliceCol (0, 2)
+    val y = xy.col (2)
 
     val fn = Array ("x1", "x2")                   // feature/variable names
     val cn = Array ("No", "Yes")                  // class names
@@ -217,8 +230,67 @@ object KNN_ClassifierTest2 extends App
     val knn = KNN_Classifier (xy, fn, 2, cn)
 
     // test samples -----------------------------------------------------------
-    for (i <- x.range1) {
-        println ("Use knn to classify (" + x(i) + ") = " + knn.classify (x(i)))
+    for (i <- y.range) {
+        println (s"KNN ($i): classify (${x(i)}) = ${knn.classify (x(i))} =? ${y(i)}")
     } // for
 
 } // KNN_ClassifierTest2 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `KNN_ClassifierTest3` object is used to test the `KNN_Classifier` class.
+ *  It uses the Iris dataset where the classification/response 'y' is unbalanced.
+ *  > runMain scalation.analytics.classifier.KNN_ClassifierTest3
+ */
+object KNN_ClassifierTest3 extends App
+{
+    import ExampleIris.{x, yb}
+
+    println ("----------------------------------------------------")
+    println ("x = " + x)
+    println ("----------------------------------------------------")
+    println ("yb = " + yb)
+
+    val knn = new KNN_Classifier (x, yb)
+
+    // test samples -----------------------------------------------------------
+    for (i <- yb.range) {
+        println (s"KNN ($i): classify (${x(i)}) = ${knn.classify (x(i))} =? ${yb(i)}")
+    } // for
+
+} // KNN_ClassifierTest3 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `KNN_ClassifierTest4` object is used to test the `KNN_Classifier` class.
+ *  It uses the Iris dataset where the classification/response 'y' is unbalanced
+ *  and downsampling is used to balance the classification.
+ *  > runMain scalation.analytics.classifier.KNN_ClassifierTest4
+ */
+object KNN_ClassifierTest4 extends App
+{
+    import ExampleIris.{x, yb}
+
+    banner ("original x")
+    println ("x = " + x)
+    banner ("original imbalanced yb")
+    println ("yb = " + yb)
+
+    val idx = Classifier.downsample (yb, 100)                 // use these indices
+    val x_  = x.selectRows (idx)                              // new x-matrix
+    val y_  = yb.select (idx)                                 // new y-vector
+
+    banner ("donwsampled x_")
+    println ("x_ = " + x_)
+    banner ("downsampled y_")
+    println ("y_ = " + y_)
+
+    val knn = new KNN_Classifier (x_, y_)
+
+    // test samples -----------------------------------------------------------
+    for (i <- y_.range) {
+        println (s"KNN ($i): classify (${x_(i)}) = ${knn.classify (x_(i))} =? ${y_(i)}")
+    } // for
+
+} // KNN_ClassifierTest4 object
+

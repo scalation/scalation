@@ -1,0 +1,32 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.2
+ *  @date    Sat May 16 13:51:17 EDT 2015
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `scala3d` package contains classes, traits and objects for for simple 3D
+ *  graphics in scala, based upon javafx.  The package object contains several
+ *  type aliases.
+ */
+package object scala3d
+{
+
+    type Scene           = javafx.scene.Scene
+    type Stage           = javafx.stage.Stage
+    type GraphicsContext = javafx.scene.canvas.GraphicsContext
+    type Canvas          = javafx.scene.canvas.Canvas
+
+    type Shape3D         = javafx.scene.shape.Shape3D
+    type Point3D         = javafx.geometry.Point3D
+
+    type Rotate          = javafx.scene.transform.Rotate
+    type Scale           = javafx.scene.transform.Scale
+    type Translate       = javafx.scene.transform.Translate
+
+} // scala3d package object
+

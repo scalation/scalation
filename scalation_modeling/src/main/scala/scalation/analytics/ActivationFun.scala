@@ -1,7 +1,7 @@
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sun Dec 28 12:00:07 EST 2014
  *  @see     LICENSE (MIT style license file).
  */
@@ -10,11 +10,25 @@ package scalation.analytics
 
 import scala.math.{exp, log, max, tanh}
 
+import scalation.linalgebra.{FunctionM_2M, FunctionV_2V, matrixize, vectorize}
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
-import scalation.math._
+import scalation.math.FunctionS2S
 import scalation.plot.Plot
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `AFF` class holds an Activation Function Family (AFF).
+ *  @param f       the activation function itself
+ *  @param fV      the vector version of the activation function
+ *  @param fM      the matrix version of the activation function
+ *  @param dV      the vector version of the activation function derivative
+ *  @param dM      the matrix version of the activation function derivative
+ *  @param bounds  the (lower, upper) bounds on the range of the activation function
+ */
+case class AFF (f: FunctionS2S, fV: FunctionV_2V, fM: FunctionM_2M,
+                dV: FunctionV_2V, dM: FunctionM_2M,
+                bounds: PairD = null)
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ActivationFun` object contains common Activation functions and provides
  *  both scalar and vector versions.
  *  @see en.wikipedia.org/wiki/Activation_function
@@ -23,17 +37,17 @@ import scalation.plot.Plot
  *              funM   matrix version of activation function (e.g., sigmoidM)
  *              funDV  vector version of dervivative (e.g., sigmoidDV)
  *              funDM  matrix version of dervivative (e.g., sigmoidDM)
- *------------------------------------------------------------------------------
- * Supports: id, reLU, tanh, sigmoid, gaussain, softmax
+ *----------------------------------------------------------------------------------
+ * Supports: id, reLU, lreLU, eLU, tanh, sigmoid, gaussian, softmax
  * Related functions: logistic, logit
  */
 object ActivationFun
 {
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    // id: identity functions
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// id: Identity functions
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the value of the identity 'id' function at scalar 't'.
+    /** Compute the value of the Identity 'id' function at scalar 't'.
      *  @param t  the id function argument
      */
     def id (t: Double): Double = t
@@ -50,12 +64,14 @@ object ActivationFun
 
     val idDM: FunctionM_2M = matrixize (idDV _)                    // matrix version
 
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    // reLU: Rectified linear unit functions
+    val f_id = AFF (id, idV, idM, idDV, idDM)                      // id family
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// reLU: Rectified Linear Unit functions
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the value of the identity 'reLU' function at scalar 't'.
-     *  @param t  the id function argument
+    /** Compute the value of the Rectified Linear Unit 'reLU' function at scalar 't'.
+     *  @param t  the reLU function argument
      */
     def reLU (t: Double): Double = max (0.0, t)
 
@@ -63,16 +79,88 @@ object ActivationFun
     val reLUM: FunctionM_2M = matrixize (reLUV)                    // matrix version
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the derivative vector for 'id' function at vector 'yp' where
-     *  'yp' is pre-computed by 'yp = idV (tt)'.
+    /** Compute the derivative vector for 'reLU' function at vector 'yp' where
+     *  'yp' is pre-computed by 'yp = reLUV (tt)'.
      *  @param yp  the derivative function vector argument
      */
     def reLUDV (yp: VectoD): VectoD = yp.map (y => if (y >= 0.0 ) 1.0 else 0.0)
 
     val reLUDM: FunctionM_2M = matrixize (reLUDV _)                // matrix version
 
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    // tanh: hyperbolic tangent functions
+    val f_reLU = AFF (reLU, reLUV, reLUM, reLUDV, reLUDM)          // reLU family
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// lreLU: Leaky Rectified Linear Unit functions
+
+    private var a = 0.01             // the lreLU alpha parameter (0, 1] indicating how leaky the function is
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the lreLU 'a' (alpha) parameter for the Leaky Rectified Linear Unit functions.
+     *  @param a  the rleLU alpha parameter (0, 1] indicating how leaky the function is
+     */
+    def setA (a_ : Double)
+    {
+         if (a > 1.0) println ("setA: the lreLU 'a' (alpha) parameter cannot be greater than 1")
+         else a = a_ 
+    } // setA
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the value of the Leaky Rectified Linear Unit 'lreLU' function at scalar 't'.
+     *  @param t  the lreLU function argument
+     */
+    def lreLU (t: Double): Double = max (a * t, t)
+
+    val lreLUV: FunctionV_2V = vectorize (lreLU _)                 // vector version
+    val lreLUM: FunctionM_2M = matrixize (lreLUV)                  // matrix version
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the derivative vector for 'lreLU' function at vector 'yp' where
+     *  'yp' is pre-computed by 'yp = lreLUV (tt)'.
+     *  @param yp  the derivative function vector argument
+     */
+    def lreLUDV (yp: VectoD): VectoD = yp.map (y => if (y >= 0.0 ) 1.0 else a)
+
+    val lreLUDM: FunctionM_2M = matrixize (lreLUDV _)              // matrix version
+
+    val f_lreLU = AFF (lreLU, lreLUV, lreLUM, lreLUDV, lreLUDM)    // lreLU family
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// eLU: Exponential Linear Unit functions
+// @see arxiv.org/pdf/1511.07289.pdf
+
+    private var a2 = 1.0             // the eLU alpha parameter (0, infinity) indicating how leaky the function is
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the eLU 'a2' (alpha) parameter for the Exponential Linear Unit functions.
+     *  @param a_  the eLU alpha parameter (0, infinity) indicating how leaky the function is
+     */
+    def setA2 (a_ : Double)
+    {
+         a2 = a_ 
+    } // setA2
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the value of the Exponential Linear Unit 'eLU' function at scalar 't'.
+     *  @param t  the eLU function argument
+     */
+    def eLU (t: Double): Double = if (t > 0.0 ) t else a2 * (exp (t) - 1)
+
+    val eLUV: FunctionV_2V = vectorize (eLU _)                     // vector version
+    val eLUM: FunctionM_2M = matrixize (eLUV)                      // matrix version
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the derivative vector for 'eLU' function at vector 'yp' where
+     *  'yp' is pre-computed by 'yp = eLUV (tt)'.
+     *  @param yp  the derivative function vector argument
+     */
+    def eLUDV (yp: VectoD): VectoD = yp.map (y => if (y > 0.0 ) 1.0 else y + a2)
+
+    val eLUDM: FunctionM_2M = matrixize (eLUDV _)                  // matrix version
+ 
+    val f_eLU = AFF (eLU, eLUV, eLUM, eLUDV, eLUDM)                // eLU family
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// tanh: Hyperbolic Tangent functions
   
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /*  Compute the value of the 'tanh' function at scalar 't'.
@@ -97,11 +185,13 @@ object ActivationFun
 
     val tanhDM: FunctionM_2M = matrixize (tanhDV _)                // matrix version
 
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    // sigmoid: sigmoid functions
+    val f_tanh = AFF (tanh, tanhV, tanhM, tanhDV, tanhDM, (-1, 1))    // tanh family
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// sigmoid: Sigmoid functions
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the value of the 'sigmoid' function at 't'.  This is a special case of
+    /** Compute the value of the Sigmoid function at 't'.  This is a special case of
      *  the logistic function, where 'a = 0' and 'b = 1'.  It is also referred to as
      *  the standard logistic function.  It is also the inverse of the logit function.
      *  @param t  the sigmoid function argument
@@ -120,50 +210,14 @@ object ActivationFun
 
     val sigmoidDM: FunctionM_2M = matrixize (sigmoidDV _)          // matrix version
 
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    // logistic: logistic functions
+    val f_sigmoid = AFF (sigmoid, sigmoidV, sigmoidM, sigmoidDV, sigmoidDM, (0, 1))   // sigmoid family
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// gaussian: Gaussian functions
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the value of the 'logistic' function at scalar 't'.
-     *  With the default settings, it is identical to 'sigmoid'.
-     *  Note, it is not typically used as an activation function
-     *  @see www.cs.xu.edu/math/math120/01f/logistic.pdf
-     *  @param t  the logistic function argument
-     *  @param a  the shift parameter (1 => mid at 0, <1 => mid shift left, >= mid shift right
-     *  @param b  the spread parameter (1 => sigmoid rate, <1 => slower than, >1 => faster than)
-     *            althtough typically positive, a negative b will cause the function to decrease
-     *  @param c  the scale parameter (range is 0 to c)
-     */
-    def logistic (t: Double, a: Double = 1.0, b: Double = 1.0, c: Double = 1.0): Double =
-    {
-        c / (1.0 + a * exp (-b*t))
-    } // logistic
-
-    def logisticV (tt: VectoD, a: Double = 1.0, b: Double = 1.0, c: Double = 1.0): VectoD = 
-    {
-        tt.map (t => c / (1.0 + a * exp (-b*t)))
-    } // logisticV
-
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    // logit: logit functions
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the log of the odds of an event occurring (e.g., success, 1).
-     *  The inverse of the 'logit' function is the standard logistic function
-     *  (sigmoid function).
-     *  Note, it is not typically used as an activation function
-     *  @param p  the probability, a number between 0 and 1.
-     */
-    def logit (p: Double): Double = log (p / (1.0 - p))
-
-    val logitV: FunctionV_2V = vectorize (logit _)                 // vector version
-
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    // gaussian: gaussian functions
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the value of the 'gaussian' function at scalar 't'.
-     *  @param t  the gaussian function argument
+    /** Compute the value of the Gaussian function at scalar 't'.
+     *  @param t  the Gaussian function argument
      */
     def gaussian (t: Double): Double = exp (-t * t)
 
@@ -171,7 +225,7 @@ object ActivationFun
     val gaussianM: FunctionM_2M = matrixize (gaussianV)            // matrix version
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the derivative vector for 'gaussian' function at vector 'yp' where
+    /** Compute the derivative vector for Gaussian function at vector 'yp' where
      *  'yp' is pre-computed by 'yp = gaussianV (tt)'.
      *  @param yp  the derivative function vector argument
      *  @param tt  the domain value for the function
@@ -189,11 +243,13 @@ object ActivationFun
         MatrixD (for (i <- yp.range1) yield tt(i) * yp(i) * -2.0)
     } // gaussianDM
 
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    // softmax: softmax functions
+//  val f_gaussain = AFF (guassian, gaussianV, gaussianM, auassianDV, gaussianDM)     // gaussian family
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// softmax: Softmax functions
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the vector of values of the 'softmax' function applied to vector 'tt'.
+    /** Compute the vector of values of the Softmax function applied to vector 'tt'.
      *  @see https://en.wikipedia.org/wiki/Softmax_function
      *  Note, scalar function version is not needed.
      *  @param tt  the softmax function vector argument
@@ -208,7 +264,7 @@ object ActivationFun
     val softmaxM: FunctionM_2M = matrixize (softmaxV _)            // matrix version
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the derivative vector for 'softmax' function at vector 'yp' where
+    /** Compute the derivative vector for Softmax function at vector 'yp' where
      *  'yp' is pre-computed by 'yp = softmaxV (tt)'.
      *  @param yp  the derivative function vector argument
      */
@@ -216,14 +272,54 @@ object ActivationFun
     {
         val z = new MatrixD (yp.dim, yp.dim)
         for (i <- yp.range; j <- yp.range) z(i, j) = if (i == j) yp(i) * (1.0 - yp(j))
-                                                     else        -yp(i) * yp(j)
+                                                     else       -yp(i) * yp(j)
         z
      } // softmaxDM
+
+//   val f_softmax = AFF (softmax, sofmaxV, softmaxM, softmaxDV, softmaxDM)     // softmax family
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// logistic: Logistic functions - related function
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the value of the Logistic function at scalar 't'.
+     *  With the default settings, it is identical to 'sigmoid'.
+     *  Note, it is not typically used as an activation function
+     *  @see www.cs.xu.edu/math/math120/01f/logistic.pdf
+     *  @param t  the logistic function argument
+     *  @param a  the shift parameter (1 => mid at 0, <1 => mid shift left, >= mid shift right
+     *  @param b  the spread parameter (1 => sigmoid rate, <1 => slower than, >1 => faster than)
+     *            althtough typically positive, a negative b will cause the function to decrease
+     *  @param c  the scale parameter (range is 0 to c)
+     */
+    def logistic (t: Double, a: Double = 1.0, b: Double = 1.0, c: Double = 1.0): Double =
+    {
+        c / (1.0 + a * exp (-b*t))
+    } // logistic
+
+    def logisticV (tt: VectoD, a: Double = 1.0, b: Double = 1.0, c: Double = 1.0): VectoD =
+    {
+        tt.map (t => c / (1.0 + a * exp (-b*t)))
+    } // logisticV
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// logit: Logit functions - related function
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the log of the odds (Logit) of an event occurring (e.g., success, 1).
+     *  The inverse of the 'logit' function is the standard logistic function
+     *  (sigmoid function).
+     *  Note, it is not typically used as an activation function
+     *  @param p  the probability, a number between 0 and 1.
+     */
+    def logit (p: Double): Double = log (p / (1.0 - p))
+
+    val logitV: FunctionV_2V = vectorize (logit _)                 // vector version
 
 } // ActivationFun object
 
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ActivationFunTest` is used to test the `ActivationFun` object.
  *  > runMain scalation.analytics.ActivationFunTest
  */
@@ -237,6 +333,8 @@ object ActivationFunTest extends App
     // Test the vector version of activation functions
     val ident  = idV (t);       new Plot (t, ident,  null, "t vs. ident") 
     val reluf  = reLUV (t);     new Plot (t, reluf,  null, "t vs. reluf") 
+    val lreluf = lreLUV (t);    new Plot (t, lreluf, null, "t vs. lreluf") 
+    val eluf   = eLUV (t);      new Plot (t, eluf,   null, "t vs. eluf") 
     val tanhh  = tanhV (t);     new Plot (t, tanhh,  null, "t vs. tanhh") 
     val sigmo  = sigmoidV (t);  new Plot (t, sigmo,  null, "t vs. sigmo")
     val gauss  = gaussianV (t); new Plot (t, gauss,  null, "t vs. gauss")
@@ -248,7 +346,9 @@ object ActivationFunTest extends App
 
     // Test the vector version of activation function derivatives
     val identD = idDV (ident);          new Plot (t, identD, null, "t vs. identD") 
-    val relufD = reLUDV (ident);        new Plot (t, relufD, null, "t vs. relufD") 
+    val relufD = reLUDV (reluf);        new Plot (t, relufD, null, "t vs. relufD") 
+    val lrlufD = lreLUDV (lreluf);      new Plot (t, lrlufD, null, "t vs. lrlufD") 
+    val elufD  = eLUDV (eluf);          new Plot (t, elufD, null,  "t vs. elufD") 
     val tanhhD = tanhDV (tanhh);        new Plot (t, tanhhD, null, "t vs. tanhhD") 
     val sigmoD = sigmoidDV (sigmo);     new Plot (t, sigmoD, null, "t vs. sigmoD")
     val gaussD = gaussianDV (gauss, t); new Plot (t, gaussD, null, "t vs. gaussD")
@@ -257,7 +357,7 @@ object ActivationFunTest extends App
 } // ActivationFunTest
 
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ActivationFunTest2` is used to test the `ActivationFun` object.
  *  @see en.wikipedia.org/wiki/Softmax_function
  *  > runMain scalation.analytics.ActivationFunTest2

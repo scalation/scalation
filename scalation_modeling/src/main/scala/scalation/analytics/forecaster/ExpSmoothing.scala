@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Hao Peng
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sun May 28 13:26:35 EDT 2017
  *  @see     LICENSE (MIT style license file).
  *
@@ -38,6 +38,7 @@ import scalation.util.banner
 class ExpSmoothing (y_ : VectoD, ll: Int = 1, multiplicative : Boolean = false, validateSteps : Int = 1)
       extends Forecaster
 {
+    protected var e: VectoD = null                  // residual/error vector [e_0, e_1, ... e_m-1
     private val DEBUG      = false                           // debug flag
     private var rSquared   = -1.0                            // coefficient of determination (quality of fit)
     private var fStat      = -1.0                            // F statistic (quality of fit)
@@ -200,7 +201,7 @@ class ExpSmoothing (y_ : VectoD, ll: Int = 1, multiplicative : Boolean = false, 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector of fitted values on the training data.
      */
-    def fittedValues (): VectoD = yp
+    def predict (): VectoD = yp
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit including 'rSquared'.  Not providing 'rBarSq'.
@@ -256,14 +257,14 @@ object ExpSmoothingTest extends App
     banner ("Customized Exponential Smoothing")
     ts.smooth ()                                                  // use customized parameters
     ts.eval ()
-    val s = ts.fittedValues ()
+    val s = ts.predict ()
     println (s"fit = ${ts.fit}")
     println (s"predict (s) = ${ts.forecast (h)}")
     new Plot (t, y, s, "Plot of y, s vs. t")
 
     banner ("Optimized Exponential Smoothing")
     ts.train ().eval ()                                           // use optimal α
-    val s2 = ts.fittedValues ()
+    val s2 = ts.predict ()
     println (s"fit = ${ts.fit}")
     println (s"predict (s2) = ${ts.forecast (h)}")
     new Plot (t, y, s2, "Plot of y, s2 vs. t")

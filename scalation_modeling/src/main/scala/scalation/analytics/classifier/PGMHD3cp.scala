@@ -1,12 +1,13 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Khalifeh Al-Jadda, John A. Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Mon Aug 15 13:13:15 EDT 2016
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
 import scala.math.abs
 
@@ -29,18 +30,18 @@ import BayesClassifier.me_default
  *  -----------------------------------------------------------------------------
  *  [ x ] -> [ x z ]  where x features are level 2 and z features are level 3.
  *  -----------------------------------------------------------------------------
- *  @param x   the integer-valued data vectors stored as rows of a matrix
- *  @param nx  the number of x features/columns
- *  @param y   the class vector, where y(l) = class for row l of the matrix x, x(l)
- *  @param fn  the names for all features/variables
- *  @param k   the number of classes
- *  @param cn  the names for all classes
- *  @param vc  the value count (number of distinct values) for each feature
- *  @param me  use m-estimates (me == 0 => regular MLE estimates)
+ *  @param x    the integer-valued data vectors stored as rows of a matrix
+ *  @param nx   the number of x features/columns
+ *  @param y    the class vector, where y(l) = class for row l of the matrix x, x(l)
+ *  @param fn_  the names for all features/variables
+ *  @param k    the number of classes
+ *  @param cn_  the names for all classes
+ *  @param vc   the value count (number of distinct values) for each feature
+ *  @param me   use m-estimates (me == 0 => regular MLE estimates)
  */
-class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
+class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn_ : Strings = null, k: Int, cn_ : Strings = null,
                 private var vc: Array [Int] = null, me: Float = me_default)
-      extends BayesClassifier (x, y, fn, k, cn)
+      extends BayesClassifier (x, y, fn_, k, cn_)
 {
     private val DEBUG  = true                              // debug flag
     private val nz     = x.dim2 - nx                       // number of z features/columns
@@ -51,11 +52,11 @@ class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: A
     private val vc_p   = Array.ofDim [Int] (nz)            // value count for the parent
 
 
-//  private val f_X   = new HMatrix2 [Int] (nx)            // frequency counts for X-feature jx
-                f_CX  = new HMatrix3 [Int] (k, nx)         // frequency counts for C-class i & X-feature jx
-//  private val f_XZ  = new HMatrix4 [Int] (nx, nz)        // frequency counts for X-feature jx & Z-feature jz
-//  private val f_CXZ = new HMatrix4 [Int] (k, nz)         // frequency counts for C-class i & X-feature jx & Z-feature jz
-    private val f_CXZ_ = new HMatrix4 [Int] (k, nz)        // frequency counts for C-class i & X-feature jx & Z-feature jz
+//  private val nu_X    = new HMatrix2 [Int] (nx)           // frequency counts for X-feature jx
+                nu_Xy   = new HMatrix3 [Int] (k, nx)        // frequency counts for y-class c & X-feature jx
+//  private val nu_XZ   = new HMatrix4 [Int] (nx, nz)       // frequency counts for X-feature jx & Z-feature jz
+//  private val nu_XZy  = new HMatrix4 [Int] (k, nz)        // frequency counts for y-class c & X-feature jx & Z-feature jz
+    private val nu_XZ_y = new HMatrix4 [Int] (k, nz)        // frequency counts for y-class c & X-feature jx & Z-feature jz
 
     if (vc == null) {
         shiftToZero; vc = vc_fromData                      // set value counts from the data
@@ -66,10 +67,10 @@ class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: A
     computeParent ()
     computeVcp ()
 
-//  f_X.alloc (vc_x)
-    f_CX.alloc (vc_x)
-//  f_XZ.alloc (vc_x, vc_z)
-    f_CXZ_.alloc (vc_z, vc_p)
+//  nu_X.alloc (vc_x)
+    nu_Xy.alloc (vc_x)
+//  nu_XZ.alloc (vc_x, vc_z)
+    nu_XZ_y.alloc (vc_z, vc_p)
 
     if (DEBUG) {
         println ("distinct value count vc_x = " + vc_x.deep)
@@ -111,7 +112,7 @@ class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: A
      *  conditional probabilities for X_j.
      *  @param itest  the indeices of the test data
      */
-    def train (itest: IndexedSeq [Int]): PGMHD3cp =
+    def train (itest: Ints): PGMHD3cp =
     {
         frequencies (0 until m diff itest)                    // compute frequencies skipping test region
 
@@ -125,7 +126,7 @@ class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: A
      *  training data.
      *  @param itrain  indices of the instances considered train data
      */
-    private def frequencies (itrain: IndexedSeq [Int])
+    private def frequencies (itrain: Ints)
     {
         if (DEBUG) banner ("frequencies (itrain)")
 
@@ -135,27 +136,34 @@ class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: A
             for (j <- 0 until n) {
                 if (j < nx) {
                     val x_j = x(l, j)                          // get value for j-th X-feature
-//                  f_X(j, x_j)     += 1                       // f_X
-                    f_CX(i, j, x_j) += 1                       // f_CX
+//                  nu_X(j, x_j)     += 1                      // nu_X
+                    nu_Xy(i, j, x_j) += 1                      // nu_Xy
                 } else {
                     val jj = j - nx                            // index from start of Z region
                     val z_j = x(l, j)                          // get value for j-th Z-feature
                     val jp = parent (jj)                       // X_jp is parent of Z_j
                     val x_jp = x(l, jp)                        // get value for jp-th X-feature
-//                  f_XZ(jp, jj, x_jp, z_j) += 1               // f_XZ
-                    f_CXZ_(i, jj, z_j, x_jp) += 1              // f_CXZ
+//                  nu_XZ(jp, jj, x_jp, z_j) += 1              // nu_XZ
+                    nu_XZ_y(i, jj, z_j, x_jp) += 1             // nu_XZy
                 } // if
             } // for
 
         } // for
 
         if (DEBUG) {
-//          println ("f_X   = " + f_X)                         // #(X_j = x)
-            println ("f_CX  = " + f_CX)                        // #(C = i & X_j = x)
-//          println ("f_XZ  = " + f_XZ)                        // #(X_jp = x & Z_j = z)
-            println ("f_CXZ = " + f_CXZ)                       // #(C = i & X_jp = x & Z_j = z)
+//          println ("nu_X   = " + nu_X)                         // #(X_j = x)
+            println ("nu_Xy  = " + nu_Xy)                        // #(y = c & X_j = x)
+//          println ("nu_XZ  = " + nu_XZ)                        // #(X_jp = x & Z_j = z)
+            println ("nu_XyZ = " + nu_XyZ)                       // #(X_jp = x & y = c & Z_j = z)
         } // if
     } // frequencies
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Increment/Decrement frequency counters based on the 'i'th row of the
+     *  data matrix.
+     *  @param i  the index for current data row
+     */
+    protected def updateFreq (i: Int) = ???
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'u', classify it returning the class number
@@ -171,8 +179,8 @@ class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: A
         for (i <- 0 until k) {
             prob(i) = 1.0                       // proportional to probabilty
             for (j <- 0 until n) {
-                if (j < nx) prob(i) *= f_CX(i, j, u(j))
-                else        prob(i) *= f_CXZ_(i, j-nx, u(j), u(parent(j-nx)))
+                if (j < nx) prob(i) *= nu_Xy(i, j, u(j))
+                else        prob(i) *= nu_XZ_y(i, j-nx, u(j), u(parent(j-nx)))
             } // for
         } // for
         if (DEBUG) println ("prob = " + prob)
@@ -185,10 +193,10 @@ class PGMHD3cp (x: MatriI, nx: Int, y: VectoI, fn: Array [String], k: Int, cn: A
      */
     def reset ()
     {
-//      f_X.set (0)
-        f_CX.set (0)
-//      f_XZ.set (0)
-        f_CXZ.set (0)
+//      nu_X.set (0)
+        nu_Xy.set (0)
+//      nu_XZ.set (0)
+        nu_XyZ.set (0)
     } // reset
 
 } // PGMHD3cp class
@@ -208,7 +216,7 @@ object PGMHD3cp
      *  @param vc  the value count (number of distinct values) for each feature
      *  @param me  use m-estimates (me == 0 => regular MLE estimates)
      */
-    def apply (xy: MatriI, nx: Int, fn: Array [String], k: Int, cn: Array [String],
+    def apply (xy: MatriI, nx: Int, fn: Strings, k: Int, cn: Strings,
                vc: Array [Int] = null, me: Float = me_default) =
     {
         new PGMHD3cp (xy(0 until xy.dim1, 0 until xy.dim2 - 1), nx, xy.col(xy.dim2 - 1), fn, k, cn, vc, me)

@@ -1,0 +1,18 @@
+
+FIX
+Remover warnings - control of threadpool for .par should be available in scala 2.12 RC1
+
+[warn] /home/scalation/scalation_1.2/src/main/scala/scalation/analytics/classifier/par/BayesNetwork2.scala:349: type ForkJoinPool in package forkjoin is deprecated: Use java.util.concurrent.ForkJoinPool directly, instead of this alias.
+[warn]         temprange.tasksupport = new ForkJoinTaskSupport (new scala.concurrent.forkjoin.ForkJoinPool (4))
+[warn]                                                                                        ^
+[warn] /home/scalation/scalation_1.2/src/main/scala/scalation/analytics/classifier/par/NaiveBayes.scala:90: type ForkJoinPool in package forkjoin is deprecated: Use java.util.concurrent.ForkJoinPool directly, instead of this alias.
+[warn]         temprange.tasksupport = new ForkJoinTaskSupport (new scala.concurrent.forkjoin.ForkJoinPool (endworkers))
+[warn]                                                                                        ^
+[warn] /home/scalation/scalation_1.2/src/main/scala/scalation/analytics/classifier/par/SelNaiveBayes.scala:133: type ForkJoinPool in package forkjoin is deprecated: Use java.util.concurrent.ForkJoinPool directly, instead of this alias.
+[warn]         temprange.tasksupport = new ForkJoinTaskSupport (new scala.concurrent.forkjoin.ForkJoinPool (8))
+[warn]                                                                                        ^
+[warn] /home/scalation/scalation_1.2/src/main/scala/scalation/analytics/classifier/par/TANBayes.scala:115: type ForkJoinPool in package forkjoin is deprecated: Use java.util.concurrent.ForkJoinPool directly, instead of this alias.
+[warn]             temprange.tasksupport = new ForkJoinTaskSupport (new scala.concurrent.forkjoin.ForkJoinPool (endworkers))
+[warn]                                                                                            ^
+[warn] four warnings found
+

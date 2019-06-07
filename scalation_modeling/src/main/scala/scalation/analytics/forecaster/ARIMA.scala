@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Hao Peng, John Miller, Michael Cotterell
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sat Jun 13 01:27:00 EST 2017
  *  @see     LICENSE (MIT style license file).
  *
@@ -37,13 +37,14 @@ import scalation.stat.vectorD2StatVector
  *  If 'd' > 0, then the time series must be differenced first before applying
  *  the above model.
  *------------------------------------------------------------------------------
- *  @param y  the input vector (time series data)
  *  @param t  the time vector
+ *  @param y  the input vector (time series data)
  *  @param d  the order of Integration (number of differences)
  */
-class ARIMA (y: VectoD, t: VectoD, d: Int = 0)
+class ARIMA (t: VectoD, y: VectoD, d: Int = 0)
       extends Forecaster
 {
+    protected var e: VectoD = null                  // residual/error vector [e_0, e_1, ... e_m-1]
     private val DEBUG = false                           // debug flag
             val mu    = y.mean                          // the sample mean
     private val xx    = new VectorD (y - mu)            // work with mean zero time series
@@ -366,7 +367,7 @@ class ARIMA (y: VectoD, t: VectoD, d: Int = 0)
 
         var reg = new Regression (ax, ay)
         reg.train ()
-        var φθ = reg.coefficient
+        var φθ = reg.parameter
         if (DEBUG) println (s"initial φθ = $φθ")
 
         var minSSE  = Double.MaxValue                       // use SSE as criterion to determine when to stop iterating
@@ -395,7 +396,7 @@ class ARIMA (y: VectoD, t: VectoD, d: Int = 0)
 
             reg = new Regression (ax, ay)
             reg.train ()
-            φθ = reg.coefficient
+            φθ = reg.parameter
             if (DEBUG) println (s"updated bφθ = $φθ")
         }} // breakable for
         φθ
@@ -493,9 +494,9 @@ class ARIMA (y: VectoD, t: VectoD, d: Int = 0)
     } // forecast
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the vector of fitted values on the training data
+    /** Return the vector of predicted values on the training data
      */
-    def fittedValues (): VectoD = transformBack (predictAll) += mu
+    def predict (): VectoD = transformBack (predictAll) += mu
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Plot a function, e.g.,  Auto-Correlation Function 'ACF', Partial Auto-Correlation
@@ -527,6 +528,21 @@ class ARIMA (y: VectoD, t: VectoD, d: Int = 0)
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `ARIMA` companion object provides factory methods for the `ARIMA` class.
+ */
+object ARIMA
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create an `ARIMA` object from a matrix.
+     *  @param ty  the matrix holding the time vector 't' and time series data 'y'
+     *  @param d   the order of Integration (number of differences)
+     */
+    def apply (ty: MatriD, d: Int = 0): ARIMA = new ARIMA (ty.col(0), ty.col(1), d)
+
+} // ARIMA object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ARIMATest` object is used to test the `ARIMA` class.
  *  > runMain scalation.analytics.ARIMATest
  */
@@ -537,7 +553,7 @@ object ARIMATest extends App
     val t = VectorD.range (0, n)
     val y = VectorD (for (i <- 0 until n) yield t(i) + 10.0 * ran.gen)
 
-    val ts = new ARIMA (y, t)            // time series data: y vs. t
+    val ts = new ARIMA (t, y)            // time series data: t and y
 
     ts.plotFunc (ts.acf, "ACF")
 
@@ -578,7 +594,7 @@ object ARIMATest2 extends App
     val d = 1                            // apply 1st order differencing
     val steps = 2                        // number of steps for the forecasts
 
-    val ts = new ARIMA (y, t, d)         // time series data: y vs. t
+    val ts = new ARIMA (t, y, d)         // time series data: t and y
 
     // Build AR(1), MA(1) and ARMA(1, 1) models for the (differenced) time series data
 
@@ -628,7 +644,7 @@ object ARIMATest3 extends App
     val d = 2                          // apply 2nd order differencing
     val steps = 2                      // number of steps for the forecasts
 
-    val ts = new ARIMA (y, t, d)       // time series data: y vs. t
+    val ts = new ARIMA (t, y, d)       // time series data: t and y
 
     // Build AR(2), MA(1) and ARMA(2, 1) models for the (differenced) time series data
 
@@ -671,7 +687,7 @@ object ARIMATest4 extends App
     val d = 1                            // apply 1st order differencing
     val steps = 1                        // number of steps for the forecasts
 
-    val ts = new ARIMA (y, t, d)         // time series data: y vs. t
+    val ts = new ARIMA (t, y, d)         // time series data: t and y
 
     println (s"y = $y")
 

@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Aravind Kalimurthy, John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Tue oct 27 05:41:17 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *

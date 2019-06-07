@@ -1,0 +1,167 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Matthew Saltz
+ *  @version 1.0
+ *  @date    Thu Jul 25 11:28:31 EDT 2013
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.graphalytics
+
+import scala.io._
+import java.io._
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** A class representing Graphs.
+// FIX: finish documentation
+ */
+case class Graph2 (adj: Array [Set [Int]],
+                 labels: Array [Int],
+                 labelMap: Map [Int, Set [Int]])
+{
+  def size = adj.size
+  def nEdges = adj.foldLeft(0) { (n, i) => n + i.size }
+  def nLabels = labelMap.keys.max
+
+  def nSelfLoops: Int = {
+    adj.indices.foldLeft(0) { (sum, i) =>
+      if (adj(i) contains i) sum + 1
+      else sum
+    }
+  }
+
+  def isConnected: Boolean = {
+    var connectedNodes = Set[Int]()
+    adj.foldLeft(0) { (i, set) =>
+      if (!set.isEmpty) connectedNodes += i
+      connectedNodes ++= set
+      i+1
+    }
+    if (connectedNodes.size == this.size) true
+    else false
+  }
+
+  def getVerticesWithLabel(l: Int) = labelMap.getOrElse(l, Set[Int]())
+
+  def print {
+    println("adj: ")
+    adj.foreach { println(_) }
+    println("labels: ")
+    labels.foldLeft(0) {(i, l) => { println(i + ": "+ l); i + 1; }}
+    println("labelMap: ")
+    labelMap.foreach{ case(k, v) => println(k + ": " + v) }
+ }
+
+  def writeToFile(filename: String) {
+    val out = new PrintWriter(filename)
+    for (i <- adj.indices) {
+      out.println(i + " " + labels(i) + " " + adj(i).foldLeft("")(
+        (str, n) => n + " " + str
+      ))
+    }
+    out.close
+  }
+
+  def iGraph2WriteToFiles(prefix: String): (String, String) = {
+    val labelFile = prefix + "igl.txt"
+    val edgeFile = prefix + "ige.txt"
+    val lOut = new PrintWriter(labelFile)
+    val eOut = new PrintWriter(edgeFile)
+    labels.foreach(lOut.println(_))
+    lOut.close
+    for (i <- adj.indices) {
+      adj(i).foreach(x => println(i + " " + x))
+    }
+    eOut.close
+    (labelFile, edgeFile)
+  }
+
+  def writeToFileNeo4J(nodeFile: String, edgeFile: String) {
+    val nodeOut = new PrintWriter(nodeFile)
+    nodeOut.println("id\tlabel")
+    labels.foldLeft(1) {(i, l) => nodeOut.println(i+"\t"+l); i+1; }
+    nodeOut.close
+    val edgeOut = new PrintWriter(edgeFile)
+    edgeOut.println("start\tend\ttype")
+    adj.foldLeft(1) { (i, n) =>
+      n.foreach { c => edgeOut.println(i + "\t" + (c+1) + "\tEDGE") }
+      i + 1
+    }
+    edgeOut.close
+  }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+object Graph2 {
+  /**
+    * Read a graph from a file
+    */
+  def apply(labelFile: String, edgeFile: String): Graph2 = {
+    val adj = Source.fromFile(edgeFile).getLines.map(
+      line =>
+        if(!(line.trim equals ""))
+          line.split(" ").map( x => x.trim.toInt ).toSet
+        else Set[Int]()
+    ).toArray
+    val labels = readLabels(labelFile)
+    val labelMap = buildLabelMapFromLabels(labels)
+    new Graph2(adj, labels, labelMap)
+  }
+
+  def readFromPajekFile(labelFile: String, edgeFile: String): Graph2 = {
+    val labels = readLabels(labelFile)
+    val labelMap = buildLabelMapFromLabels(labels)
+    val adj = Array.ofDim[Set[Int]](labels.size).map(x=>Set[Int]())
+    Source.fromFile(edgeFile).getLines.foreach{ l =>
+      val splitL = l.split(" ").map(_.trim)
+      val adjs = splitL.slice(1, splitL.length).map(_.trim.toInt).toSet
+      if (adjs.max > 3774768) println(adjs.max)
+      adj(splitL(0).toInt-1) ++= adjs
+    }
+    new Graph2(adj, labels, labelMap)
+  }
+
+  def apply(file: String): Graph2 = {
+    val adj = Source.fromFile(file).getLines.map(
+      line =>
+        if(!(line.trim equals "")) {
+          val l = line.split(" ")
+          l.slice(2, l.length).map( _.trim.toInt ).toSet
+        }
+        else Set[Int]()
+    ).toArray
+    val labels =
+      Source.fromFile(file).getLines.map(_.trim.split(" ").apply(1).trim.toInt).toArray
+    val labelMap = buildLabelMapFromLabels(labels)
+    new Graph2(adj, labels, labelMap)
+  }
+
+  def buildLabelMapFromLabels(labels: Array[Int]):
+                              Map[Int, Set[Int]] = {
+    var labelMap = Map[Int, Set[Int]]()
+    labels.foldLeft(0) ( (i, label) => {
+      labelMap = labelMap + (label -> (labelMap.getOrElse(label, Set[Int]()) + i))
+      i + 1
+    })
+    labelMap
+  }
+
+  def readLabels(lFile: String) =
+    Source.fromFile(lFile).getLines.map(_.trim.toInt).toArray
+
+}
+
+/*
+object Graph2WriterTest extends App {
+  val g = GraphGenerator.generateRandomGraph2(10, 5, 2)
+  g.print
+  g.writeToFile("g_test.txt")
+}
+
+object Neo4JWriterTest extends App {
+  val g = GraphGenerator.generateRandomGraph2(100000, 10, 10)
+  //g.print
+  g.writeToFileNeo4J("batch-import/tnode.csv", "batch-import/trel.csv")
+}
+*/
+

@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Matthew Saltz
- *  @version 1.5
+ *  @version 1.6
  *  @date    Wed May 13 14:58:25 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *
@@ -91,10 +91,11 @@ class Graph [TLabel: ClassTag] (val ch:      Array [SET [Int]],
      */
     def buildLabelMap (label: Array [TLabel]): Map [TLabel, SET [Int]] =
     {
+        if (DEBUG) println (s"label = ${label.deep}")
         val labelMap = Map [TLabel, SET [Int]] ()
         for (i <- label.indices) {                      // for each vertex i
             val lab = label(i)                          // label for vertex i
-            val st  = labelMap (lab)                    // get set of vertices with that label
+            val st  = labelMap.getOrElse (lab, null)    // get set of vertices with that label
             if (st != null) st.add (i)                  // add to existing set
             else labelMap.put (lab, SET(i))             // make a new set
         } // for

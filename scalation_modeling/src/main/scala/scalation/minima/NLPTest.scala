@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sun Oct  2 22:43:44 EDT 2011
  *  @see     LICENSE (MIT style license file).
  */
@@ -10,8 +10,8 @@ package scalation.minima
 
 import scala.math.pow
 
+import scalation.linalgebra.FunctionV2S
 import scalation.linalgebra.VectorD
-import scalation.math.FunctionV2S
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NLPTest1` object used to test several Non-Linear Programming (NLP) algorithms

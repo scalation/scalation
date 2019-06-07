@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Tue May 29 14:45:32 EDT 2012
  *  @see     LICENSE (MIT style license file).
  *  @see     www.cs.ucsb.edu/~xyan/classes/CS595D-2009winter/MCL_Presentation2.pdf
@@ -13,7 +13,7 @@ package scalation.analytics.clusterer
 import scala.collection.mutable.ListMap
 import scala.util.control.Breaks.{breakable, break}
 
-import scalation.linalgebra.{MatrixD, VectorD, VectorI}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectoI, VectorI}
 //import scalation.linalgebra.SparseMatrixD
 import scalation.math.double_exp
 import scalation.util.Error
@@ -41,16 +41,45 @@ class MarkovClusterer (t: MatrixD, k: Int = 2, r: Double = 2.0)
     private val MAX_ITER = 200             // maximum number of iterations
     private val EPSILON  = 1E-7            // number close to zero
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the centroids.  Should only be called after 'cluster ()'.
-     */
-    def centroids (): MatrixD = throw new UnsupportedOperationException ("not applicable")
+    private val clustr = Array.ofDim [Int] (t.dim2)     // vector of cluster assignments
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the sizes of the centroids.  Should only be called after
-     *  'cluster ()'.
+    /** Cluster the nodes in the graph by interpreting the processed matrix t.
+     *  Nodes not clustered will be in group 0; otherwise, they will be grouped
+     *  with their strongest positive attractor.
      */
-    def csize (): VectorI = throw new UnsupportedOperationException ("not applicable")
+    def train (): MarkovClusterer =
+    {
+        val force = new VectorD (t.dim2)           // force of attractor, initially 0
+        var group = 1                              // first real group is 1
+        for (i <- 0 until t.dim1) {
+            var found = false
+            for (j <- 0 until t.dim2) {
+                if (t(i, j) > force(j)) {          // if attractor has greater force
+                    clustr(j) = group              // assign node j to this group
+                    force(j) = t(i, j)             // make t(i, j) the new force
+                    found = true                   // a group was found for this row
+                } // if
+            } // for
+            if (found) group += 1                  // increment the group number
+        } // for
+        this
+    } // train
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the cluster assignment vector.  Should only be called after `train`.
+     */
+    def cluster: Array [Int] = clustr
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the centroids.  Should only be called after 'train'.
+     */
+    def centroids: MatriD = throw new UnsupportedOperationException ("not applicable")
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the sizes of the centroids.  Should only be called after 'train'.
+     */
+    def csize: VectoI = throw new UnsupportedOperationException ("not applicable")
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add self-loops by setting the main diagonal to the weight parameter.
@@ -117,7 +146,7 @@ class MarkovClusterer (t: MatrixD, k: Int = 2, r: Double = 2.0)
     /** Return the processed matrix t.  The matrix is processed by repeated
      *  steps of expansion and inflation until convergence is detected.
      */
-    def processMatrix (): MatrixD = 
+    def processMatrix (): MatriD = 
     {
         breakable { for (l <- 1 to MAX_ITER) {
             expand ()                         // expansion step
@@ -128,34 +157,10 @@ class MarkovClusterer (t: MatrixD, k: Int = 2, r: Double = 2.0)
     } // processMatrix
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Cluster the nodes in the graph by interpreting the processed matrix t.
-     *  Nodes not clustered will be in group 0; otherwise, they will be grouped
-     *  with their strongest positive attractor.
-     */
-    def cluster (): Array [Int] =
-    {
-        val clust = Array.ofDim [Int] (t.dim2)     // vector of cluster assignments
-        val force = new VectorD (t.dim2)           // force of attractor, initially 0
-        var group = 1                              // first real group is 1
-        for (i <- 0 until t.dim1) {
-            var found = false
-            for (j <- 0 until t.dim2) {
-                if (t(i, j) > force(j)) {          // if attractor has greater force
-                    clust(j) = group               // assign node j to this group
-                    force(j) = t(i, j)             // make t(i, j) the new force
-                    found = true                   // a group was found for this row
-                } // if
-            } // for
-            if (found) group += 1                  // increment the group number
-        } // for
-        clust                      // return the vector of cluster assignments
-    } // cluster
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** This clustering method is not applicable to graph clustering.
      *  @param y  unused parameter
      */
-    def classify (y: VectorD): Int =
+    def classify (y: VectoD): Int =
     {
         throw new UnsupportedOperationException ()
     } // classify
@@ -194,7 +199,8 @@ object MarkovClustererTest extends App
     mg.addSelfLoops ()
     mg.normalize ()
     println ("result  = " + mg.processMatrix ())
-    println ("cluster = " + mg.cluster ())
+    mg.train ()
+    println ("cluster = " + mg.cluster)
 
     // Test the MCL Algorithm on a Markov transition matrix.
 
@@ -216,7 +222,8 @@ object MarkovClustererTest extends App
     println ("t = " + t)
     val mt = new MarkovClusterer (t)
     println ("result  = " + mt.processMatrix ())
-    println ("cluster = " + mt.cluster ())
+    mt.train ()
+    println ("cluster = " + mt.cluster)
 
     // Test the MCL Algorithm on a graph represented as a sparse adjacency matrix.
 
@@ -261,7 +268,8 @@ object MarkovClustererTest2 extends App
     my.addSelfLoops ()
     my.normalize ()
     my.processMatrix ()
-    val cluster = my.cluster ()
+    my.train ()
+    val cluster = my.cluster
     println ("Elapsed time = " + (System.nanoTime - t0) + " ns")
     println ("-----------------------------------------------------------")
     println ("cluster = " + cluster)

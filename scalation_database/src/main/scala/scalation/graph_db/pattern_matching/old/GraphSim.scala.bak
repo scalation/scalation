@@ -1,0 +1,66 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Usman Nisar, John Miller
+ *  @version 1.0
+ *  @date    Mon May  6 10:50:37 EDT 2013
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.graphalytics
+
+import collection.mutable.{Set, HashMap}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This object implements the HHK algorithm for Graph Simulation.
+ */
+object GraphSim extends App
+{
+    type AdjSet = Set [Int]                    // type for adjacency set
+
+    if (args.length != 4) {
+        println ("usage: scala -cp classes scalation.graphalytics.GraphSim <DataGraph> <QueryGraph> <TimesToRun> <DisplayResults(0/1)>")
+        sys.exit
+    } // if
+
+    val g = new Graph (args(0))                 // data graph
+    val q = new Graph (args(1))                 // query graph
+
+    for (i <- 0 until args(2).toInt) {
+        var t0 = System.nanoTime ()
+        hhk (g, q)
+        println ("Time taken for the " + (i+1) + " run: " + (System.nanoTime () - t0))
+    } // for
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform graph simulation by forming a sim set for each vertex u in the query graph.
+     *  A vertex w in the data graph will be in u's sim set, if (1) their labels match and
+     *  (2) each child of u matches a child of w.
+     *  @param g  the data graph
+     *  @param q  the query graph
+     */
+    def hhk (g: Graph, q: Graph)
+    {
+        val sim = HashMap [Int, AdjSet] ()                                // map holding all sim sets
+    
+        for (u <- q.vertices) {                                           // check labels
+            var u_sim = Set [Int] ()                                      // sim set for vertex u
+            for (w <- g.vertices if g.label(w) == q.label(u)) u_sim += w  // label match => add w to u's sim set
+            sim += u -> u_sim                                             // add into sim map
+        } // for
+    
+        var change = true
+        while (change) {                                                  // check children
+            change = false
+            for (u <- q.vertices; w <- sim(u)) {                          // for each query vertex u and its sim w
+                for (v <- q.post(u) if (g.post(w) & sim(v)).isEmpty) {    // check their child sets
+                    sim(u) -= w                                           // any child not matched, remove w from u's sim set
+                    change  = true
+                } // for
+            } // for
+        } // while
+
+        if (args(3).toInt == 1) for (u <- q.vertices) println (u + " -> " + sim(u))
+    } //hhk
+
+} // GraphSim object
+

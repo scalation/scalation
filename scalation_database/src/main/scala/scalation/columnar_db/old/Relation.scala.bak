@@ -1,0 +1,589 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.2
+ *  @date    Sun Aug 23 15:42:06 EDT 2015
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  An implementation supporting columnar relational databases faciltating easy
+ *  and rapid analytics.  The columns in a relation are vectors from the
+ *  `scalation.linalgebra` package.  Vectors and matrices may be readily extracted
+ *  from a relation and feed into any of the numerous analytics techniques provided
+ *  in `scalation.analytics`.  The implemenation provides most of the columnar
+ *  relational algebra operators given in the following paper:
+ *  @see db.csail.mit.edu/projects/cstore/vldb.pdf
+ */
+
+package scalation.relalgebra
+
+import java.io._
+
+import collection.mutable.Map
+import io.Source.fromFile
+import reflect.ClassTag
+
+import scalation.linalgebra._
+import scalation.linalgebra.MatrixKind._
+import scalation.linalgebra.PredicateType._
+import scalation.math.{Complex, Rational, Real, StrNum}
+import scalation.util.SEP
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Relation` companion object provides additional functions for the `Relation`
+ *  class.
+ */
+object Relation
+{
+    /** Relative path for database storage directory
+     */
+    private val DB_DIR = "store" + SEP
+
+    /** Relative path for input/output data directory
+     */
+    private val DATA_DIR = "data" + SEP
+
+    /** Filename extension for serialized relations
+     *  FIX: investigate using more efficient serialization, e.g.,
+     *  @see github.com/EsotericSoftware/kryo
+     */
+    private val SER = ".ser"
+
+    /** Filename extension for CSV data files
+     */
+    private val CSV = ".csv"
+
+    /** Filename extension for JSON data files
+     */
+    private val JSON = ".json"
+
+    /** The token/element separation character (',' for CSV)
+     */
+    private val SP = ','
+
+    /** Counter for making unique relation names
+     */
+    private var _count = 0
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the next count.
+     */
+    def count (): Int = { _count += 1; _count }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Read the relation with the given 'name' into memory using serialization.
+     *  @param name  the name of the relation to load
+     */
+    def apply (name: String): Relation =
+    {
+        val ois = new ObjectInputStream (new FileInputStream (DB_DIR + name + SER))
+        val obj = ois.readObject ()
+        ois.close ()
+        obj.asInstanceOf [Relation]
+    } // apply
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Read the relation with the given 'name' into memory loading its columns
+     *  with data from the CSV file named 'fname'.
+     *  @param fname    the filename of the data file
+     *  @param typ      the types for each column
+     *  @param name     the name of the relation
+     *  @param colName  the names of columns
+     *  @param key      the column number for the primary key (< 0 => no primary key)
+     */
+    def apply (fname: String, typ: String,
+               name: String, colName: Array [String], key: Int): Relation =
+    {
+        val sp     = ','                                    // element separator
+        val lines  = fromFile (fname).getLines
+        val newCol = Array.ofDim [Vec] (colName.length)
+        val r3 = Relation (name, colName, newCol, key)
+        for (ln <- lines) r3.add (r3.row (ln.split (sp), typ), typ)
+        r3
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Read the relation with the given 'name' into memory from a JSON file.
+     *  @param fname  the filename of the JSON file
+     *  @param name   the name of the relation to load
+     */
+    def apply (fname: String, name: String): Relation =
+    {
+        null                                                     // FIX - needs to be implemented
+    } // apply
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a relation from the 'xy' matrix of doubles.
+     *  @param xy       the matrix containing the data
+     *  @param name     the name of the relation
+     *  @param colName  the names of columns
+     *  @param key      the column number for the primary key (< 0 => no primary key)
+     */
+    def fromMatriD (xy: MatriD, name: String, colName: Array [String], key: Int): Relation =
+    {
+        val newCol = (for (j <- 0 until xy.dim2) yield xy.col (j).asInstanceOf [Vec]).toArray
+        Relation (name, colName, newCol, key)
+    } // fromMatriD
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a relation from the 'x' matrix of doubles and 'y' vector of doubles
+     *  or integers.
+     *  @param x        the matrix containing the data
+     *  @param y        the vector containing the data
+     *  @param name     the name of the relation
+     *  @param colName  the names of columns
+     *  @param key      the column number for the primary key (< 0 => no primary key)
+     */
+    def fromMatriD_ (x: MatriD, y: Vec, name: String, colName: Array [String], key: Int): Relation =
+    {
+        val newCol = (for (j <- 0 until x.dim2) yield x.col (j).asInstanceOf [Vec]).toArray
+        Relation (name, colName, newCol :+ y, key)
+    } // fromMatriD_
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a relation from the 'xy' matrix of integers.
+     *  @param xy       the matrix containing the data
+     *  @param name     the name of the relation
+     *  @param colName  the names of columns
+     *  @param key      the column number for the primary key (< 0 => no primary key)
+     */
+    def fromMatriI (xy: MatriI, name: String, colName: Array [String], key: Int): Relation =
+    {
+        val newCol = (for (j <- 0 until xy.dim2) yield xy.col (j).asInstanceOf [Vec]).toArray
+        Relation (name, colName, newCol, key)
+    } // fromMatriI
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a relation from the 'xy' matrix of integers and 'y' vector of integers.
+     *  @param x        the matrix containing the data
+     *  @param y        the vector containing the data
+     *  @param name     the name of the relation
+     *  @param colName  the names of columns
+     *  @param key      the column number for the primary key (< 0 => no primary key)
+     */
+    def fromMatriII (x: MatriI, y: VectorI, name: String, colName: Array [String], key: Int): Relation =
+    {
+        val newCol = (for (j <- 0 until x.dim2) yield x.col (j).asInstanceOf [Vec]).toArray
+        Relation (name, colName, newCol :+ y, key)
+    } // fromMatriII
+
+} // Relation object
+
+import Relation._
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Relation` class stores and operates on vectors.  The vectors form the
+ *  columns of the columnar relational datastore.
+ *------------------------------------------------------------------------------
+ *  @param name     the name of the relation
+ *  @param colName  the names of columns
+ *  @param col      the sequence of columns making up the columnar relation
+ *  @param key      the column number for the primary key (< 0 => no primary key)
+ */
+case class Relation (name: String, colName: Array [String], col: Array [Vec], key: Int = 0)
+{
+    if (colName.length != col.length) println ("Relation.constructor: incompatible sizes")
+
+    /** The colMap maps column names to column positions
+     */
+    private val colMap = Map [String, Int] ()
+    for (j <- colName.indices) colMap += colName(j) -> j
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the size in terms of number of columns in the relation.
+     */
+    def cols: Int = col.length
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the size in terms of number of rows in the relation.
+     */
+    def rows: Int = col(0).size
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Project onto the columns with the given column names.
+     *  @param cName  the names of the columns to project onto
+     */
+    def project (cName: String*): Relation = project (matchCol (cName), cName.toArray)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Project onto the columns with the given column positions.
+     *  @param cPos   the column positions to project onto
+     *  @param cName  the optional new names for the columns to project onto
+     */
+    def project (cPos: Array [Int], cName: Array [String] = null): Relation =
+    {
+       val cn = if (cName == null) extractName (cPos) else cName
+       Relation (name + "_p_" + count (), cn, extractCol (cPos), -1)
+    } // project
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Select elements from column 'cName' in 'this' relation that satisfy the
+     *  predicate.
+     *  Caveat:  the method is restricted to a single column.
+     *  @param cName  the name of the column used for selection
+     *  @param pred   the predicate (Boolean function) to be satisfied
+     */
+    def select [T <: Numeric [T]] (con: Condition [T]): Relation =
+    {
+        val res = Vec.filter (col (colMap (con._1)), con._2)
+        Relation (name + "_s_" + count (), Array (con._1), Array (res))
+    } // select
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Select elements from columns in 'cName' in 'this' relation that satisfy
+     *  the  predicate.
+     *  @param con  the condition to be satisfied
+     */
+    def select [T <: Numeric [T]] (cons: Condition [T]*): Relation =
+    {
+        selectAt (selectPos (cons: _*))
+    } // select
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Select the positions of elements from columns in 'cName' in 'this' relation
+     *  that satisfy the  predicate.
+     *  FIX: trim the columns as you go
+     *  @param cons  the conditions to be satisfied
+     */
+    def selectPos [T <: Numeric [T]] (cons: Condition [T]*): Array [Int] =
+    {
+        var res = Vec.filterPos (col (colMap (cons(0)._1)), cons(0)._2)
+        for (j <- cons.indices) res = res intersect Vec.filterPos (col (colMap (cons(j)._1)), cons(j)._2)
+        res
+    } // selectPos
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Select across all columns at the specified column position.
+     */
+    def selectAt (pos: Array [Int]): Relation =
+    {
+       val newCol = (for (j <- col.indices) yield Vec.select (col(j), pos)).toArray
+       Relation (name + "_s_" + count (), colName, newCol, key)
+    } // selectAt
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Union 'this' relation and 'r2'.  Check that the two relations are compatible.
+     *  @param r2  the other relation
+     */
+    def union (r2: Relation): Relation =
+    {
+       if (cols != r2.cols) return null
+       val newCol = (for (j <- col.indices) yield Vec.++ (col(j), r2.col(j))).toArray
+       Relation (name + "_u_" + count (), colName, newCol, -1)
+    } // union
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Take the difference of 'this' relation and 'r2' ('this - r2'.  Check that
+     *  the two relations are compatible.
+     *  FIX: fails
+     *  @param r2  the other relation
+     */
+    def minus (r2: Relation, typ: String): Relation =
+    {
+       if (cols != r2.cols) return null
+       val newCol = Array.ofDim [Vec] (cols)
+       val r3 = Relation (name + "_m_" + count (), colName, newCol, -1)
+       for (i <- 0 until rows if ! (r2 contains row(i))) r3.add (row(i), typ)
+       r3
+    } // minus
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Join 'this' relation and 'r2 by performing an "equi-join".  Rows from both
+     *  relations are compared requiring 'cName1' values to equal 'cName2' values.
+     *  Disambiguate column names by append "2" to the end of any duplicate column name.
+     *  @param cName1  the string holding join column names of this relation (Foreign key)
+     *  @param cName2  the string holding join column names of relation r2 (Primary key)
+     *  @param r2      the rhs table in the join operation
+     */
+    def join (cName1: String, cName2: String, r2: Relation): Relation =
+    {
+        val cn1    = cName1.split (" ")                          // split into individual column names
+        val cn2    = cName2.split (" ")                          // split into individual column names
+        val newCol = Array.ofDim [Vec] (0)                       // FIX - needs to be implemented
+        Relation (name + "_j_" + count (), disambiguate (cn1, cn2), newCol, key)
+    } // join
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Combine two arrays of column names, disambiguating any repeated names by
+     *  appenfing "2".
+     *  @param  cn1   the first array of names
+     *  @param  cn2   the second array of names
+     */
+    def disambiguate (cn1: Array [String], cn2: Array [String]): Array [String] =
+    {
+        val n1 = cn1.length
+        (for (j <- 0 until n1 + cn2.length) yield
+            if (j < n1) cn1(j)
+            else { val nm2 = cn2(j - n1); if (colName contains nm2) nm2 + "2" else nm2 }
+        ).toArray
+    } // disambiguate
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether 'this' relation contains a row matching the given 'tuple'.
+     *  @param tuple  an aggregation of columns values (potential row)
+     */
+    def contains [T <: Numeric [T]] (tuple: Array [T]): Boolean =
+    {
+        for (i <- 0 until rows if row(i) == tuple) return true 
+        false
+    } // contains
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a row by pulling values from all columns at position 'i'.
+     *  @param i  the ith position
+     */
+    def row [T: ClassTag : Numeric] (i: Int): Array [T] =
+    {
+        (for (j <- 0 until cols) yield Vec (col(j), i).asInstanceOf [T]).toArray
+    } // row
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a row by pulling values from an array of strings and converting
+     *  elements to their appropriate types.
+     *  @param sa   the array of strings holding the values
+     *  @param typ  the string of corresponding types, e.g., "SDI"
+     */
+    def row (sa: Array [String], typ: String): Array [Any] =
+    {
+        (for (j <- sa.indices) yield
+            typ(j) match {
+            case 'C' => Complex (sa(j))
+            case 'D' => sa(j).toDouble
+            case 'I' => sa(j).toInt
+            case 'L' => sa(j).toLong
+            case 'Q' => Rational (sa(j))
+            case 'R' => Real (sa(j))
+            case _   => StrNum (sa(j))
+            }).toArray
+    } // row
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add 'tuple to 'this' relation as a new row.
+     *  @param tuple  an aggregation of columns values (new row)
+     *  @param typ    the string of corresponding types, e.g., "SDI"
+     */
+    def add [T <: Numeric [T]] (tuple: Array [T], typ: String)
+//  def add (tuple: Array [Any], typ: String)
+    {
+        for (j <- tuple.indices) col(j) = Vec.:+ (col(j), tuple(j))
+/*
+            typ(j) match {
+            case 'C' => Complex (tuple(j))
+            case 'D' => tuple(j).toDouble
+            case 'I' => tuple(j).toInt
+            case 'L' => tuple(j).toLong
+            case 'Q' => Rational (tuple(j))
+            case 'R' => Real (tuple(j))
+            case _   => StrNum (tuple(j))
+            })
+*/
+    } // add 
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert the relation into a string.
+     */
+    override def toString: String =
+    {
+        var sb = new StringBuilder ("Relation(" + name + ", " + key + ",\n" + colName.deep + ",\n")
+        for (i <- col.indices) sb.append (col(i) + "\n")
+        sb.replace (sb.length-1, sb.length, ")").mkString
+    } // toString
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Match column names to determine the corresponding column position.
+     *  @param cName  the array of column names to be matched
+     */
+    private def matchCol (cName: Seq [String]): Array [Int] =
+    {
+        (for (cn <- cName) yield colMap (cn)).toArray
+    } // matchCol
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Extract the columns at the given column position specified in 'cPos'.
+     *  @param cPos  the array of column position 
+     */
+    private def extractCol (cPos: Array [Int]): Array [Vec] =
+    {
+        (for (c <- cPos) yield col(c)).toArray
+    } // extractCol
+  
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Extract the column names at the given column position specified in 'cPos'.
+     *  @param cPos  the array of column position 
+     */
+    private def extractName (cPos: Array [Int]): Array [String] =
+    {
+        (for (c <- cPos) yield colName(c)).toArray
+    } // extractName
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' relation into a matrix of doubles, e.g., 
+     *  <p>
+     *       in the regession equation: 'xb = y' create matrix 'xy'
+     *  <p>
+     *  @param colPos  the array of column positions to use for the matrix
+     */
+    def toMatriD (colPos: Array [Int], kind: MatrixKind = DENSE): MatriD =
+    {
+        kind match {
+        case DENSE           => MatrixD (project (colPos).col.asInstanceOf [Array [VectorD]])
+        case SPARSE          => SparseMatrixD (project (colPos).col.asInstanceOf [Array [VectorD]])
+        case SYM_TRIDIAGONAL => SymTriMatrixD (project (colPos).col.asInstanceOf [Array [VectorD]])
+        case BIDIAGONAL      => BidMatrixD (project (colPos).col.asInstanceOf [Array [VectorD]])
+        } // match
+    } // toMatriD
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' relation into a matrix of doubles and a vector of doubles.
+     *  <p>
+     *       in the regession equation: 'xb = y' create matrix 'x' and vector 'y'
+     *  <p>
+     *  @param colPos   the array of column positions to use for the matrix
+     *  @param colPosV  the column position to use for the vector
+     */
+    def toMatriDD (colPos: Array [Int], colPosV: Int, kind: MatrixKind = DENSE): Tuple2 [MatriD, VectorD] =
+    {
+        kind match {
+        case DENSE           => (MatrixD (project (colPos).col.asInstanceOf [Array [VectorD]]),
+                                 col(colPosV).asInstanceOf [VectorD])
+        case SPARSE          => (SparseMatrixD (project (colPos).col.asInstanceOf [Array [VectorD]]),
+                                 col(colPosV).asInstanceOf [VectorD])
+        case SYM_TRIDIAGONAL => (SymTriMatrixD (project (colPos).col.asInstanceOf [Array [VectorD]]),
+                                 col(colPosV).asInstanceOf [VectorD])
+        case BIDIAGONAL      => (BidMatrixD (project (colPos).col.asInstanceOf [Array [VectorD]]),
+                                 col(colPosV).asInstanceOf [VectorD])
+        } // match
+    } // toMatriDD
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' relation into a matrix of doubles and a vector of integers.
+     *  <p>
+     *       in the regession equation: 'xb = y' create matrix 'x' and vector 'y'
+     *  <p>
+     *  @param colPos   the array of column positions to use for the matrix
+     *  @param colPosV  the column position to use for the vector
+     */
+    def toMatriDI (colPos: Array [Int], colPosV: Int, kind: MatrixKind = DENSE): Tuple2 [MatriD, VectorI] =
+    {
+        kind match {
+        case DENSE           => (MatrixD (project (colPos).col.asInstanceOf [Array [VectorD]]),
+                                 col(colPosV).asInstanceOf [VectorI])
+        case SPARSE          => (SparseMatrixD (project (colPos).col.asInstanceOf [Array [VectorD]]),
+                                 col(colPosV).asInstanceOf [VectorI])
+        case SYM_TRIDIAGONAL => (SymTriMatrixD (project (colPos).col.asInstanceOf [Array [VectorD]]),
+                                 col(colPosV).asInstanceOf [VectorI])
+        case BIDIAGONAL      => (BidMatrixD (project (colPos).col.asInstanceOf [Array [VectorD]]),
+                                 col(colPosV).asInstanceOf [VectorI])
+        } // match
+    } // toMatriDI
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' relation into a matrix of integers.
+     *  <p>
+     *       in the regession equation: 'xb = y' create matrix 'xy'
+     *  <p>
+     *  @param colPos  the array of column positions to use for the matrix
+     */
+    def toMatriI (colPos: Array [Int], kind: MatrixKind = DENSE): MatriI =
+    {
+        kind match {
+        case DENSE           => MatrixI (project (colPos).col.asInstanceOf [Array [VectorI]])
+        case SPARSE          => SparseMatrixI (project (colPos).col.asInstanceOf [Array [VectorI]])
+        case SYM_TRIDIAGONAL => SymTriMatrixI (project (colPos).col.asInstanceOf [Array [VectorI]])
+        case BIDIAGONAL      => BidMatrixI (project (colPos).col.asInstanceOf [Array [VectorI]])
+        } // match
+    } // toMatriI
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' relation into a matrix of integers and a vector of integers.
+     *  <p>
+     *       in the regession equation: 'xb = y' create matrix 'x' and vector 'y'
+     *  <p>
+     *  @param colPos   the array of column positions to use for the matrix
+     *  @param colPosV  the column position to use for the vector
+     */
+    def toMatriII (colPos: Array [Int], colPosV: Int, kind: MatrixKind = DENSE): Tuple2 [MatriI, VectorI] =
+    {
+        kind match {
+        case DENSE           => (MatrixI (project (colPos).col.asInstanceOf [Array [VectorI]]),
+                                 col(colPosV).asInstanceOf [VectorI])
+        case SPARSE          => (SparseMatrixI (project (colPos).col.asInstanceOf [Array [VectorI]]),
+                                 col(colPosV).asInstanceOf [VectorI])
+        case SYM_TRIDIAGONAL => (SymTriMatrixI (project (colPos).col.asInstanceOf [Array [VectorI]]),
+                                 col(colPosV).asInstanceOf [VectorI])
+        case BIDIAGONAL      => (BidMatrixI (project (colPos).col.asInstanceOf [Array [VectorI]]),
+                                 col(colPosV).asInstanceOf [VectorI])
+        } // match
+    } // toMatriII
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Save 'this' relation in a file using serialization.
+     */
+    def save ()
+    {
+        val oos = new ObjectOutputStream (new FileOutputStream (DB_DIR + name + SER))
+        oos.writeObject (this)
+        oos.close ()
+    } // save
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Write 'this' relation in a CSV file.
+     *  @param fname  the filename of the data file
+     */
+    def writeCSV (fname: String)
+    {
+        // FIX - to be implemented
+    } // writeCSV
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Write 'this' relation in a JSON file.
+     *  @param fname  the filename of the data file
+     */
+    def writeJSON (fname: String)
+    {
+        // FIX - to be implemented
+    } // writeJSON
+  
+} // Relation class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RelationTest` object tests the operations provided by `Relation`.
+ *  > run-main scalation.relalgebra.RelationTest
+ */
+object RelationTest extends App
+{
+    val weekdays = Relation ("weekdays", Array ("day", "time"),
+                              Array (VectorS ("Mon", "Tue", "Wed", "Thu", "Fri"),
+                                     VectorD (5.00, 8.15, 6.30, 9.45, 7.00)))
+
+    val weekends = Relation ("weekends", Array ("day", "time"),
+                              Array (VectorS ("Sat", "Sun"),
+                                     VectorD (3.00, 4.30)))
+
+    println ("--------------------------------------------")
+    println (s"weekdays                                  = " + weekdays)
+    println ("---------------------------------------------")
+    println (s"weekends                                  = " + weekends)
+    println ("--------------------------------------------")
+    println (s"weekdays.project (''day'')                = " + weekdays.project ("day"))
+    println ("--------------------------------------------")
+    println (s"weekdays.select (''day'', _ == ''Mon'')   = " + weekdays.select ("day", (x: StrNum) => x == StrNum ("Mon")))
+    println ("--------------------------------------------")
+    println (s"weekdays.select (''day'', _ > ''Mon'')    = " + weekdays.select ("day", (x: StrNum) => x > StrNum ("Mon")))
+    println ("--------------------------------------------")
+    println (s"weekdays.selectPos (''day'', _ > ''Mon'') = " + weekdays.selectPos (("day", (x: StrNum) => x > StrNum ("Mon"))).deep)
+    println ("--------------------------------------------")
+    println (s"weekdays.selectPos (''day'', ''time'')    = " + weekdays.selectPos (("day",  (x: StrNum) => x == StrNum ("Mon")),
+                                                                                   ("time", (y: Double) => y == 5.00)).deep)
+
+    val week = weekdays.union (weekends)
+    println ("--------------------------------------------")
+    println (s"weekdays.union (weekends)                 = " + week)
+    println ("--------------------------------------------")
+    println (s"week.minus (weekends, ''SD'')             = " + week.minus (weekends, "SD"))
+    println ("--------------------------------------------")
+    println (s"week.join (''day'', ''day'' weekends)     = " + week.join ("day", "day", weekends))
+
+} // RelationTest object
+

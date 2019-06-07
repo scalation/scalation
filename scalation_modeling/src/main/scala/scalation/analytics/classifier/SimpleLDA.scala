@@ -1,12 +1,13 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Tue Feb 27 15:16:23 EST 2018
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
 import scala.math.log
 
@@ -18,15 +19,15 @@ import scalation.util.banner
 /** The `SimpleLDA` class implements a Linear Discriminant Analysis 'LDA' classifier.
  *  It places a value into a group according to its maximal discriminant function.
  *  @see en.wikipedia.org/wiki/Linear_discriminant_analysis
- *  @param x   the real-valued training/test data values stored in a vector
- *  @param y   the training/test classification vector, where y_i = class for x_i
- *  @param fn  the name of the feature/variable
- *  @param k   the number of possible values for y (0, 1, ... k-1)
- *  @param cn  the names for all classes
+ *  @param x    the real-valued training/test data values stored in a vector
+ *  @param y    the training/test classification vector, where y_i = class for x_i
+ *  @param fn_  the name of the feature/variable
+ *  @param k    the number of possible values for y (0, 1, ... k-1)
+ *  @param cn_  the names for all classes
  */
-class SimpleLDA (x: VectoD, y: VectoI, fn: Array [String] = Array ("x1"), k: Int = 2,
-                 cn: Array [String] = Array ("no", "yes"))
-      extends ClassifierReal (MatrixD (Seq (x)), y, fn, k, cn)
+class SimpleLDA (x: VectoD, y: VectoI, fn_ : Strings = Array ("x1"), k: Int = 2,
+                 cn_ : Strings = null)
+      extends ClassifierReal (MatrixD (Seq (x)), y, fn_, k, cn_)
 {
     private val DEBUG = true                                      // debug flag
     private val xc    = for (c <- 0 until k) yield                // groups for x
@@ -44,7 +45,7 @@ class SimpleLDA (x: VectoD, y: VectoI, fn: Array [String] = Array ("x1"), k: Int
      *  These are computed in the 'classify' method.
      *  @param itest  the indices of the test data - FIX - not used yet
      */
-    def train (itest: IndexedSeq [Int]): SimpleLDA =
+    def train (itest: Ints): SimpleLDA =
     {
         py = VectorD (xc.map (_.dim / md))                        // probability y = c
         mu = VectorD (xc.map (_.mean))                            // group means
@@ -108,8 +109,7 @@ object SimpleLDATest extends App
     val xx = new MatrixD (x.dim, 1)
     for (i <- x.range) xx(i) = VectorD (x(i))
     val yp = lda.classify (xx)
-    println (lda.fitLabel)
-    println (lda.fit (y, yp))
+    println (lda.fitMap (y, yp))
     val cm = new ConfusionMat (y, yp)
     println (s"cm = ${cm.confusion}")
 
@@ -148,8 +148,7 @@ object SimpleLDATest2 extends App
     val yp = lda.classify (xx)
     println ("y  = " + y)
     println ("yp = " + yp)
-    println (lda.fitLabel)
-    println (lda.fit (y, yp))
+    println (lda.fitMap (y, yp))
 
     val t = VectorD.range (0, x.dim)
     new Plot (t, y.toDouble, yp.toDouble, "y(black)/yp(red) vs. t")

@@ -1,11 +1,12 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Fri Mar 16 15:13:38 EDT 2018
  *  @see     LICENSE (MIT style license file).
  *
  *  @see archive.ics.uci.edu/ml/datasets/Concrete+Slump+Test
+ *  @see pdfs.semanticscholar.org/2aba/047471e3e1eef6fa0319b4a63d3dfceafb0b.pdf
  */
 
 package scalation.analytics
@@ -15,7 +16,9 @@ import scalation.math.double_exp
 import scalation.plot.Plot
 import scalation.util.banner
 
-import ActivationFun.{sigmoidDM, sigmoidV, tanhV, tanhDM}
+import ActivationFun._
+import MatrixTransform._
+import Optimizer.hp
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ExampleConcrete` class stores a medium-sized example dataset from the UCI Machine
@@ -25,14 +28,14 @@ import ActivationFun.{sigmoidDM, sigmoidV, tanhV, tanhDM}
  */
 object ExampleConcrete
 {
-    // Input Variables (7):
+    // Input Variables (7) (component kg in one M^3 concrete):
     // 1. Cement
-    // 2. Slag
-    // 3. Fly ash
+    // 2. Blast Furnace Slag
+    // 3. Fly Ash
     // 4. Water
-    // 5. SP
-    // 6. Coarse Aggr.
-    // 7. Fine Aggr.
+    // 5. Super Plasticizer (SP)
+    // 6. Coarse Aggregate
+    // 7. Fine Aggrregate
     // Output Variables (3):
     // 1. SLUMP (cm)
     // 2. FLOW (cm)
@@ -144,13 +147,14 @@ object ExampleConcrete
         102,	297.1,	40.9,	239.9,	194,	7.5,	908.9,	651.8,	27.5,	67,	49.17,
         103,	348.7,	0.1,	223.1,	208.5,	9.6,	786.2,	758.1,	29,	78,	48.77)
 
-    val min_x = VectorD (for (j <- xy.range2) yield xy.col(j).min ())
-    val max_x = VectorD (for (j <- xy.range2) yield xy.col(j).max ())
+    val (min_x, max_x) = (min (xy), max (xy))
 
-    val xy_s  = MatrixTransform.scale (xy, min_x, max_x)                  // column-wise scaled to [0.0, 1.0]
-    val xy_s2 = MatrixTransform.scale (xy, min_x, max_x, -1.0, 1.0)       // column-wise scaled to [-1.0, 1.0]
-    xy_s.setCol (0, VectorD.one (xy.dim1))                                // turn index column into a column of all ones
-    xy_s2.setCol (0, VectorD.one (xy.dim1))                               // turn index column into a column of all ones
+    val xy_s  = scale (xy, (min_x, max_x), (0, 1))            // column-wise scaled to [0.0, 1.0]
+    val xy_s2 = scale (xy, (min_x, max_x), (-1, 1))           // column-wise scaled to [-1.0, 1.0]
+    setCol2One (xy_s)                                         // turn index column into a column of all ones
+    setCol2One (xy_s2)                                        // turn index column into a column of all ones
+
+    val t = VectorD.range (0, xy.dim1)                         // index vector
 
 } // ExampleConcrete object
 
@@ -165,10 +169,9 @@ object ExampleConcreteTest extends App
 {
     banner ("Regression")
 
-    val x = xy_s.sliceCol (0, 8)                          // input matrix - include column 0 for intercept
-//  val x = xy_s.sliceCol (1, 8)                          // input matrix - exclude column 0 for no intercept
-    val y = xy_s.sliceCol (8, 11)                         // output matrix
-    val t = VectorD.range (0, y.dim1)                     // index vector
+    val x = xy_s.sliceCol (0, 8)                              // input matrix - include column 0 for intercept
+//  val x = xy_s.sliceCol (1, 8)                              // input matrix - exclude column 0 for no intercept
+    val y = xy_s.sliceCol (8, 11)                             // output matrix
 
     println (s"input  x: ${x.dim1}, ${x.dim2}")
     println (s"output y: ${y.dim1}, ${y.dim2}")
@@ -177,11 +180,11 @@ object ExampleConcreteTest extends App
     var sse_all = 0.0
 
     for (j <- y.range2) {
-        banner (s"train for $j th column")
-        val yj = y.col(j)                                 // use jth column of matrix y
-        val rgj = new Regression (x, yj)                  // create a Regression model
+        val yj = y.col(j)                                     // use jth column of matrix y
+        val rgj = new Regression (x, yj)                      // create a Regression model
         rgj.train ().eval ()
-        println ("b = " + rgj.coefficient)
+        banner (s"train for $j th column")
+        println ("b = " + rgj.parameter)
         val e = rgj.residual
         println ("e = " + e)
         println ("sse = " + (e dot e))
@@ -189,10 +192,10 @@ object ExampleConcreteTest extends App
         banner (s"quality of fit for $j th column")
         val res = rgj.fit
         println (s"res = $res")
-        println ("fitMap = " + rgj.fitMap)
+        println (rgj.report)
 
         banner ("predicted output")
-        val yp = rgj.predict (x)                          // predicted output values
+        val yp = rgj.predict (x)                              // predicted output values
 //      println ("diff: y - yp = " + (y - yp))
         new Plot (t, yj, yp, s"y vs yp for $j th column")
         sst_all += res(1) 
@@ -215,10 +218,9 @@ object ExampleConcreteTest2 extends App
 {
     banner ("Perceptron")
 
-//  val x = xy_s.sliceCol (0, 8)                          // input matrix - include column 0 for intercept
-    val x = xy_s.sliceCol (1, 8)                          // input matrix - exclude column 0 for no intercept
-    val y = xy_s.sliceCol (8, 11)                         // output matrix
-    val t = VectorD.range (0, y.dim1)                     // index vector
+//  val x = xy_s.sliceCol (0, 8)                              // input matrix - include column 0 for intercept
+    val x = xy_s.sliceCol (1, 8)                              // input matrix - exclude column 0 for no intercept
+    val y = xy_s.sliceCol (8, 11)                             // output matrix
 
     println (s"input  x: ${x.dim1}, ${x.dim2}")
     println (s"output y: ${y.dim1}, ${y.dim2}")
@@ -227,12 +229,11 @@ object ExampleConcreteTest2 extends App
     var sse_all = 0.0
 
     for (j <- y.range2) {
-        banner (s"train for $j th column")
         val yj = y.col(j)
         val pt = new Perceptron (x, yj)
-        pt.reset (0.2)                                    // try several values for the learning rate eta
-        pt.train ().eval ()
-        println ("b = " + pt.coefficient)
+        pt.reset (eta_ = 0.2)                                 // try several values for the learning rate eta
+        pt.train ().eval ()                                   // try train vs. train0
+        banner (s"Perceptron: train for $j th column")
         val e = pt.residual
         println ("e = " + e)
         val sse = e dot e
@@ -242,10 +243,10 @@ object ExampleConcreteTest2 extends App
         sst_all += sst
 
         banner (s"quality of fit for $j th column")
-        println ("fitMap = " + pt.fitMap)
+        println (pt.report)
 
         banner ("predicted output")
-        val yp = pt.predict (x)                           // predicted output values
+        val yp = pt.predict (x)                               // predicted output values
 //      println ("diff: y - yp = " + (y - yp))
         new Plot (t, yj, yp, s"y vs yp for $j th column")
     } // for
@@ -259,74 +260,77 @@ object ExampleConcreteTest2 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ExampleConcreteTest3` object is used to test the `ExampleConcrete` object.
- *  It compares several modeling techniques.  This one runs `NeuralNet_2L` with 'sigmoid'.
+ *  It compares several modeling techniques.  This one runs `Perceptron`.
  *  > runMain scalation.analytics.ExampleConcreteTest3
  */
 object ExampleConcreteTest3 extends App
 {
-    banner ("NeuralNet_2L with sigmoid")
+    banner ("Perceptron with train2")
 
-    val x = xy_s.sliceCol (0, 8)                              // input matrix - include column 0 for intercept
-//  val x = xy_s.sliceCol (1, 8)                              // input matrix - exclude column 0 for no intercept
+//  val x = xy_s.sliceCol (0, 8)                              // input matrix - include column 0 for intercept
+    val x = xy_s.sliceCol (1, 8)                              // input matrix - exclude column 0 for no intercept
     val y = xy_s.sliceCol (8, 11)                             // output matrix
-    val t = VectorD.range (0, y.dim1)                         // index vector
 
     println (s"input  x: ${x.dim1}, ${x.dim2}")
     println (s"output y: ${y.dim1}, ${y.dim2}")
 
-    val nn = new NeuralNet_2L (x, y)                          // use default - sigmoid
+    var sst_all = 0.0
+    var sse_all = 0.0
 
-    for (eta <- 0.005 to 0.05 by 0.005) {
-        nn.reset (eta)                                        // try several values for the learning rate eta
-        banner (s"train NeuralNet_2L with sigmoid: eta = $eta")
-        nn.train ().eval ()
-        println ("bb = " + nn.weights.deep)
+    for (j <- y.range2) {
+        val yj = y.col(j)
+        val pt = new Perceptron (x, yj)
+        pt.train2 ().eval ()                                   // interval search on eta
+        banner (s"Perceptron: train2 for $j th column")
+        val e = pt.residual
+        println ("e = " + e)
+        val sse = e dot e
+        val sst = (yj dot yj) - yj.sum~^2 / yj.dim
+        println ("sse = " + sse)
+        sse_all += sse
+        sst_all += sst
 
-        banner ("quality of fit")
-        nn.fitMap ()
-/*
+        banner (s"quality of fit for $j th column")
+        println (pt.report)
+
         banner ("predicted output")
-        val yp = nn.predict (x)                               // predicted output values
+        val yp = pt.predict (x)                               // predicted output values
 //      println ("diff: y - yp = " + (y - yp))
-        for (j <- y.range2) {
-            new Plot (t, y.col(j), yp.col(j), s"y vs yp for $j th column")
-        } // for
-*/
+        new Plot (t, yj, yp, s"y vs yp for $j th column")
     } // for
+
+    println ("sst_all = " + sst_all)
+    println ("sse_all = " + sse_all)
+    println ("rSq_all = " + (sst_all - sse_all) / sst_all)
 
 } // ExampleConcreteTest3 object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ExampleConcreteTest4` object is used to test the `ExampleConcrete` object.
- *  It compares several modeling techniques.  This one runs `NeuralNet_2L` with 'tanh'.
+ *  It compares several modeling techniques.  This one runs `NeuralNet_2L` with 'sigmoid'.
  *  > runMain scalation.analytics.ExampleConcreteTest4
  */
 object ExampleConcreteTest4 extends App
 {
-    import scala.math.tanh
-    import ActivationFun.tanhDV
+    banner ("NeuralNet_2L with sigmoid")
 
-    banner ("NeuralNet_2L with tanh")
-
-//  val x = xy_s2.sliceCol (0, 8)                             // input matrix - include column 0 for intercept
-    val x = xy_s2.sliceCol (1, 8)                             // input matrix - exclude column 0 for no intercept
-    val y = xy_s2.sliceCol (8, 11)                            // output matrix
-    val t = VectorD.range (0, y.dim1)                         // index vector
+    val x = xy_s.sliceCol (0, 8)                              // input matrix - include column 0 for intercept
+//  val x = xy_s.sliceCol (1, 8)                              // input matrix - exclude column 0 for no intercept
+    val y = xy_s.sliceCol (8, 11)                             // output matrix
 
     println (s"input  x: ${x.dim1}, ${x.dim2}")
     println (s"output y: ${y.dim1}, ${y.dim2}")
 
-    val nn = new NeuralNet_2L (x, y, f1 = tanh _, f1D = tanhDV _)   // use tanh
+    val nn = new NeuralNet_2L (x, y)                          // use default - sigmoid
 
-    for (eta <- 0.005 to 0.05 by 0.005) {
+    for (i <- 1 to 10) {
+        val eta = i * 0.005
         nn.reset (eta)                                        // try several values for the learning rate eta
-        banner (s"train NeuralNet_2L with tanh: eta = $eta")
-        nn.train ().eval ()
-//      println ("bb = " + nn.weights.deep)
+        nn.train ().eval (x, y)
+        banner (s"NeuralNet_2L: train with sigmoid: eta = $eta")
+        println (nn.report)
 
-        banner ("quality of fit")
-        nn.fitMap ()
 /*
         banner ("predicted output")
         val yp = nn.predict (x)                               // predicted output values
@@ -342,36 +346,57 @@ object ExampleConcreteTest4 extends App
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `ExampleConcreteTest5` object is used to test the `ExampleConcrete` object.
- *  It compares several modeling techniques.  This one runs `NeuralNet_2L` with 'id'.
+ *  It compares several modeling techniques.  This one runs `NeuralNet_2L` with 'sigmoid'.
  *  > runMain scalation.analytics.ExampleConcreteTest5
  */
 object ExampleConcreteTest5 extends App
 {
-    import ActivationFun.{id, idDV}
+    banner ("NeuralNet_2L with sigmoid")
 
-    banner ("NeuralNet_2L with id")
-
-//  val x = xy_s2.sliceCol (0, 8)                            // input matrix - include column 0 for intercept
-    val x = xy_s2.sliceCol (1, 8)                            // input matrix - exclude column 0 for no intercept
-    val y = xy_s2.sliceCol (8, 11)                           // output matrix
-    val t = VectorD.range (0, y.dim1)                        // index vector
+    val x = xy_s.sliceCol (0, 8)                              // input matrix - include column 0 for intercept
+//  val x = xy_s.sliceCol (1, 8)                              // input matrix - exclude column 0 for no intercept
+    val y = xy_s.sliceCol (8, 11)                             // output matrix
 
     println (s"input  x: ${x.dim1}, ${x.dim2}")
     println (s"output y: ${y.dim1}, ${y.dim2}")
 
-    val nn = new NeuralNet_2L (x, y, f1 = id _, f1D = idDV _)   // use id
+    val nn = new NeuralNet_2L (x, y)                          // use default - sigmoid
 
-    for (eta <- 0.005 to 0.05 by 0.005) {
-        nn.reset (eta)                                       // try several values for the learning rate eta
-        banner (s"train NeuralNet_2L with id: eta = $eta")
-        nn.train ().eval ()
-//      println ("bb = " + nn.weights.deep)
+    nn.train2 ().eval (x, y)
+    banner (s"NeuralNet_2L: train2 with sigmoid")
+    println (nn.report)
 
-        banner ("quality of fit")
-        nn.fitMap ()
+} // ExampleConcreteTest5 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `ExampleConcreteTest6` object is used to test the `ExampleConcrete` object.
+ *  It compares several modeling techniques.  This one runs `NeuralNet_2L` with 'tanh'.
+ *  > runMain scalation.analytics.ExampleConcreteTest6
+ */
+object ExampleConcreteTest6 extends App
+{
+    banner ("NeuralNet_2L with tanh")
+
+//  val x = xy_s2.sliceCol (0, 8)                             // input matrix - include column 0 for intercept
+    val x = xy_s2.sliceCol (1, 8)                             // input matrix - exclude column 0 for no intercept
+    val y = xy_s2.sliceCol (8, 11)                            // output matrix
+
+    println (s"input  x: ${x.dim1}, ${x.dim2}")
+    println (s"output y: ${y.dim1}, ${y.dim2}")
+
+    val nn = new NeuralNet_2L (x, y, f1 = f_tanh)             // use tanh
+
+    for (i <- 1 to 10) {
+        val eta = i * 0.005
+        nn.reset (eta)                                        // try several values for the learning rate eta
+        nn.train ().eval (x, y)
+        banner (s"NeuralNet_2L: train with tanh: eta = $eta")
+        println (nn.report)
+
 /*
         banner ("predicted output")
-        val yp = nn.predict (x)                              // predicted output values
+        val yp = nn.predict (x)                               // predicted output values
 //      println ("diff: y - yp = " + (y - yp))
         for (j <- y.range2) {
             new Plot (t, y.col(j), yp.col(j), s"y vs yp for $j th column")
@@ -379,37 +404,73 @@ object ExampleConcreteTest5 extends App
 */
     } // for
 
-} // ExampleConcreteTest5 object
+} // ExampleConcreteTest6 object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `ExampleConcreteTest6` object is used to test the `ExampleConcrete` object.
- *  It compares several modeling techniques.  This one runs `NeuralNet_3L` with 'sigmiod'.
- *  > runMain scalation.analytics.ExampleConcreteTest6
+/** The `ExampleConcreteTest7` object is used to test the `ExampleConcrete` object.
+ *  It compares several modeling techniques.  This one runs `NeuralNet_2L` with 'id'.
+ *  > runMain scalation.analytics.ExampleConcreteTest7
  */
-object ExampleConcreteTest6 extends App
+object ExampleConcreteTest7 extends App
 {
-    banner ("NeuralNet_3L with sigmoid")
- 
-    val x = xy_s.sliceCol (0, 8)                              // input matrix - include column 0 for intercept
-//  val x = xy_s.sliceCol (1, 8)                              // input matrix - exclude column 0 for no intercept
-    val y = xy_s.sliceCol (8, 11)                             // output matrix
-    val t = VectorD.range (0, y.dim1)                         // index vector
+    banner ("NeuralNet_2L with id")
+
+//  val x = xy_s2.sliceCol (0, 8)                             // input matrix - include column 0 for intercept
+    val x = xy_s2.sliceCol (1, 8)                             // input matrix - exclude column 0 for no intercept
+    val y = xy_s2.sliceCol (8, 11)                            // output matrix
 
     println (s"input  x: ${x.dim1}, ${x.dim2}")
     println (s"output y: ${y.dim1}, ${y.dim2}")
 
-    val batchSize = 5
-    val nn = new NeuralNet_3L (x, y, bsize = batchSize)      // use default - sigmoid
+    val nn = new NeuralNet_2L (x, y, f1 = f_id)               // use id
 
-    for (eta <- 0.1 to 2.0 by 0.1) {
-        nn.reset (eta)                                       // try several values for the learning rate eta
-        banner (s"train NeuralNet_3L: eta = $eta")
-        nn.train ().eval ()
-//      println ("(aa, bb) = " + nn.weights.deep)
+    for (i <- 1 to 10) {
+        val eta = i * 0.005
+        nn.reset (eta)                                        // try several values for the learning rate eta
+        nn.train ().eval (x, y)
+        banner (s"NeuralNet_2L: train with id: eta = $eta")
+        println (nn.report)
 
-        banner ("quality of fit")
-        nn.fitMap ()
+/*
+        banner ("predicted output")
+        val yp = nn.predict (x)                               // predicted output values
+//      println ("diff: y - yp = " + (y - yp))
+        for (j <- y.range2) {
+            new Plot (t, y.col(j), yp.col(j), s"y vs yp for $j th column")
+        } // for
+*/
+    } // for
+
+} // ExampleConcreteTest7 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `ExampleConcreteTest8` object is used to test the `ExampleConcrete` object.
+ *  It compares several modeling techniques.  This one runs `NeuralNet_3L` with 'sigmoid'.
+ *  > runMain scalation.analytics.ExampleConcreteTest8
+ */
+object ExampleConcreteTest8 extends App
+{
+    banner ("NeuralNet_3L with sigmoid")
+ 
+//  val x = xy_s.sliceCol (0, 8)                              // input matrix - include column 0 for intercept
+    val x = xy_s.sliceCol (1, 8)                              // input matrix - exclude column 0 for no intercept
+    val y = xy_s.sliceCol (8, 11)                             // output matrix
+
+    println (s"input  x: ${x.dim1}, ${x.dim2}")
+    println (s"output y: ${y.dim1}, ${y.dim2}")
+
+    val batchSize = 10                                        // try different batch sizes
+    val hp2 = hp.updateReturn ("bSize", batchSize)
+    val nn  = new NeuralNet_3L (x, y, hparam = hp2)           // use default - sigmoid
+
+    for (i <- 1 to 20) {
+        val eta = i * 0.05
+        nn.reset (eta)                                        // try several values for the learning rate eta
+        nn.train ().eval (x, y)
+        banner (s"NeuralNet_3L train: eta = $eta")
+        println (nn.report)
 /*
         banner ("predicted output")
         val yp = nn.predict (x)                               // predicted output values
@@ -425,53 +486,56 @@ object ExampleConcreteTest6 extends App
 */
     } // for
 
-} // ExampleConcreteTest6 object
+} // ExampleConcreteTest8 object
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `ExampleConcreteTest7` object is used to test the `ExampleConcrete` object.
- *  It compares several modeling techniques.  This one runs `NeuralNet_XL` with 4 layers.
- *  > runMain scalation.analytics.ExampleConcreteTest7
+/** The `ExampleConcreteTest9` object is used to test the `ExampleConcrete` object.
+ *  It compares several modeling techniques.  This one runs `NeuralNet_3L` with 'sigmiod'.
+ *  > runMain scalation.analytics.ExampleConcreteTest9
  */
-object ExampleConcreteTest7 extends App
+object ExampleConcreteTest9 extends App
 {
-    banner ("NeuralNet_XL with 4 layers")
+    banner ("NeuralNet_3L with sigmoid")
 
-    val x = xy_s.sliceCol (0, 8)                             // input matrix
-    val y = xy_s.sliceCol (8, 11)                            // output matrix
-    val t = VectorD.range (0, y.dim1)                        // index vector
+//  val x = xy_s.sliceCol (0, 8)                              // input matrix - include column 0 for intercept
+    val x = xy_s.sliceCol (1, 8)                              // input matrix - exclude column 0 for no intercept
+    val y = xy_s.sliceCol (8, 11)                             // output matrix
 
     println (s"input  x: ${x.dim1}, ${x.dim2}")
     println (s"output y: ${y.dim1}, ${y.dim2}")
 
-    val batchSize = 5
-    val nn = new NeuralNet_XL (x, y, Array (x.dim2, x.dim2), bsize = batchSize,
-                               actfV  = Array (sigmoidV, tanhV, sigmoidV),
-                               actfDM = Array (sigmoidDM, tanhDM, sigmoidDM))
+    val nn = new NeuralNet_3L (x, y)                          // use default - sigmoid
+    nn.train2 ().eval (x, y)
+    banner (s"NeuralNet_3L: train2")
+    println (nn.report)
 
-    for (eta <- 0.1 to 0.6 by 0.1) {
-        nn.reset (eta)                                       // try several values for the learning rate eta
-        banner (s"train NeuralNet_XL: eta = $eta")
-        nn.train ().eval ()
-//      println ("weights = " + nn.weights)
+} // ExampleConcreteTest9 object
 
-        banner ("quality of fit")
-        nn.fitMap ()
 
-/*
-        banner ("predicted output")
-        val yp = nn.predict (x)                              // predicted output values
-//      println ("diff: y - yp = " + (y - yp))
-        for (j <- y.range2) {
-            val y_j = y.col(j)
-            val yp_j = yp.col(j)
-//          println (s"y.col(j).mean = ${y_j.mean}")
-//          println (s"yp.col(j)     = ${yp_j}")
-            println (s"sse col(j)    = ${(y_j - yp_j).normSq}")
-//          new Plot (t, y.col(j), yp.col(j), s"y vs yp for $j th column")
-        } // for
-*/
-    } // for
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `ExampleConcreteTest10` object is used to test the `ExampleConcrete` object.
+ *  It compares several modeling techniques.  This one runs `NeuralNet_XL` with 4 layers.
+ *  > runMain scalation.analytics.ExampleConcreteTes10t
+ */
+object ExampleConcreteTest10 extends App
+{
+    banner ("NeuralNet_XL with 4 layers")
 
-} // ExampleConcreteTest7 object
+//  val x = xy_s.sliceCol (0, 8)                              // input matrix - include column 0 for intercept
+    val x = xy_s.sliceCol (1, 8)                              // input matrix - exclude column 0 for no intercept
+    val y = xy_s.sliceCol (8, 11)                             // output matrix
+
+    println (s"input  x: ${x.dim1}, ${x.dim2}")
+    println (s"output y: ${y.dim1}, ${y.dim2}")
+
+    val hp2 = hp.updateReturn (("eta", 2.0), ("bSize", 5.0))
+    val nn  = new NeuralNet_XL (x, y, Array (x.dim2, x.dim2), hparam = hp2,
+                                f = Array (f_sigmoid, f_tanh, f_sigmoid))
+
+    nn.train2 ().eval (x, y)
+    banner (s"NeuralNet_XL: train")
+    println (nn.report)
+
+} // ExampleConcreteTest10 object
 

@@ -1,0 +1,223 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Mustafa Nural, John Miller
+ *  @version 1.3
+ *  @date    Fri May 26 14:32:21 EDT 2017
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.linalgebra
+
+import scala.collection.mutable.Set
+import scala.math.{abs, min}
+
+import scalation.linalgebra.gen.Matrix
+import scalation.util.{banner, Error}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Fac_LU` class provides methods to factor an 'm-by-n' matrix into its
+ *  lower and upper triangular products:
+ *  <p>
+ *      A  = LU   when partial pivoting is not needed
+ *      PA = LU   where P is the permutation matrix
+ *      A  = QLU  where Q = P.inverse
+ *  <p>
+ *  where 'a' is the given matrix and 'l' and 'u' are lower and upper triangular
+ *  matrices, respectively.  The permutation matrix is represented by the 'piv'
+ *  vector.  Once factored, can be used to solve a system of linear equations.
+ *  <p>
+ *      Solve for x in Ax = b: Ax = QLUx = b => LUx = Pb using steps (1) and (2)
+        (1) Solve Ly = Pb  using forward substitution for y
+        (2) Solve Ux = y   using backward substitution for x
+ *  <p>
+ *  @param a  the given m-by-n rectangular matrix
+ */
+class Fac_LU [MatT <: MatriD] (a: MatT)
+      extends Factorization with Error
+{
+    private val lu = a.copy().asInstanceOf [MatrixD]       // copy of matrix a to be factored
+    private val (m, n) = (lu.dim1, lu.dim2)                // (# rows, # columns) in matrix lu
+
+    if (m < n) flaw ("constructor", "requires m >= n")
+
+    private var pivsign = 1                                // initial value for pivot sign (used in det method)
+    private val piv     = VectorI.range (0, m)             // the initial values for pivots
+
+    private var l: MatriD = null                           // the lower triangular matrix
+    private var u: MatriD = null                           // the upper triangular matrix
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Factor matrix 'a' into the product of 'L' and 'U'
+     */
+    def factor () =
+    {
+        for (j <- lu.range2) {                             // for each column j
+            val lUcolj = lu.col(j)()                       // array (copied from lu) holding column j
+  
+            for (i <- lu.range1) {                         // for each row i
+                val lUrowi = lu()(i)                       // array (in lu) holding row i
+                val kmax   = min (i, j)
+                var sum    = 0.0                           // compute dot product truncated at kmax
+                for (k <- 0 until kmax) sum += lUrowi(k) * lUcolj(k)
+                lUcolj(i) -= sum
+                lUrowi(j)  = lUcolj(i)
+            } // for
+  
+            var p = j                                      // find pivot
+            for (i <- j+1 until m; if abs (lUcolj(i)) > abs (lUcolj(p))) p = i
+  
+            if (p != j) {
+                lu.swap (p, j)                             // swap rows j and p
+                piv.swap (p, j)                            // also swap in pivot vector
+                pivsign = -pivsign
+            } // if
+  
+            if (lu(j, j) != 0.0) {                         // compute multipliers for l
+                for (i <- j+1 until m) lu(i, j) /= lu(j, j)
+            } // if
+        } // for
+
+        l = lu.lowerT; l.setDiag (1.0)                     // form lower (l) matrix
+        u = lu.upperT                                      // form upper (u) matrix
+    } // factor
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the L and U matrices
+     */
+    def factors: (MatriD, MatriD) = (l, u)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Permute matrix 'c', equivalent to 'QC', i.e., multiplying by the inverse
+     *  of the permutation matrix 'P'.
+     *  @param c  the matrix to permute
+     */
+    def permute (c: MatriD)
+    {
+        val swapped = Set [Int] ()
+        for (j <- 0 until n) if (j != piv(j) && ! (swapped contains j)) {
+            val pj = piv(j)
+            println (s"swap: rows $j and $pj")
+            swapped += pj
+            c.swap (j, pj)
+        } // for
+    } // permute
+  
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Permute vector 'd', equivalent to 'Pb', i.e., multiplying by the permutation
+     *  matrix 'P'.
+     *  @param d  the vector to permute
+     */
+    def permute (d: VectoD): VectoD =
+    {
+        val swapped = Set [Int] ()
+        for (j <- 0 until n) if (j != piv(j) && ! (swapped contains j)) {
+            val pj = piv(j)
+            println (s"swap: rows $j and $pj")
+            swapped += pj
+            d.swap (j, pj)
+        } // for
+        d
+    } // permute
+  
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve for 'x' in the equation 'l*u*x = b'.
+     *  Return the solution vector 'x'.
+     *  @param b  the constant vector
+     */
+    def solve (b: VectoD): VectoD =
+    {
+        permute (b)
+        val y = new VectorD (l.dim2)                 // forward substitution
+        for (k <- 0 until y.dim) {                   // solve for y in l*y = b
+            val l_k = l(k)
+            var sum = 0.0
+            for (j <- 0 until k) sum += l_k(j) * y(j)
+            y(k) = b(k) - sum
+        } // for
+        u.bsolve (y)
+    } // solve
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve for 'x' using back substitution in the equation 'u*x = y' where
+     *  matrix 'u' is upper triangular.
+     *  @param y  the constant vector
+     */
+    def bsolve (y: VectoD): VectorD =
+    {
+        val x = new VectorD (u.dim2)                 // vector to solve for
+        for (k <- x.dim - 1 to 0 by -1) {            // solve for x in u*x = y
+            val u_k = u(k)
+            var sum = 0.0
+            for (j <- k + 1 until u.dim2) sum += u_k(j) * x(j)
+            x(k) = (y(k) - sum) / u(k, k)
+        } // for
+        x
+    } // bsolve
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the determinant of the 'lu' matrix.  The value of the determinant
+     *  indicates, among other things, whether there is a unique solution to a
+     *  system of linear equations (a nonzero determinant).
+     */
+    def det: Double =
+    {
+        if (m != n) throw new IllegalArgumentException ("det: matrix must be square");
+
+        var dt = pivsign.toDouble
+        for (j <- lu.range2) dt *= lu(j, j)
+        dt
+    } // det
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the rank (number of independent columns) of matrix 'lu'.
+     *  If 'rank < n', then 'lu' is singular
+     *  @see Fac_QR_RR.scala
+     */
+    def rank: Int = n - lu.getDiag.countZero
+
+    ZZ
+
+} // Fac_LU class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Fac_LUTest` object is used to test the `Fac_LU` class.
+ *  > run-main scalation.linalgebra.Fac_LUTest
+ */
+object Fac_LUTest extends App
+{
+    val a = new MatrixD ((4, 4), 4.0,  0.4,   0.8, -0.2,
+                                 0.4,  0.04, -0.12, 0.28,
+                                 0.8, -0.12,  9.2,  1.4,
+                                -0.2,  0.28,  1.4,  4.35)
+
+    val b = VectorD (-0.2, -0.32, 13.52, 14.17)
+
+    println (s"a = $a")
+    println (s"b = $b")
+
+    banner ("Factor A into L and U using LU Factorization")
+
+    val lu = new Fac_LU (a)
+    lu.factor ()
+    val (l, u) = lu.factors
+    println (s"(l, u) = ($l, $u)")
+
+    banner ("Solve for x in Ax = b using LUx = Pb")
+
+    val x = lu.solve (b) 
+    println (s"x = $x")
+    lu.permute (b)                          // resolve effects of permutation
+    println (s"a*x - b = ${a * x - b}")
+    assert (a*x == b)                       // ensure Ax = Pb
+
+    banner ("Verfify that A = QLU")
+
+    val plu = l * u
+    lu.permute (plu)                        // resolve effects of permutation
+    println(s"p*l*u = $plu")
+    println (s"a - p*l*u = ${a - plu}")
+    assert (a == plu)                       // ensure A = PLU
+
+} // Fac_LUTest object
+

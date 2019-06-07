@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Michael Cotterell, Hao Peng
- *  @version 1.3
+ *  @version 1.6
  *  @date    Tue Oct 11 16:12:54 EDT 2016
  *  @see     LICENSE (MIT style license file).
  *
@@ -11,6 +11,8 @@
 
 package scalation.analytics
 package fda
+
+import scala.collection.mutable.Map
 
 import scalation.linalgebra._
 import scalation.calculus.{DB_Spline, DBasisFunction, functionS2S2Hilbert}
@@ -37,14 +39,15 @@ class Regression_F2S (x: MatriD, y: VectoD, t: VectoD, bf: DBasisFunction, techn
                       lambda: Double = 1E-4)
     extends Predictor
 {
-    private val DEBUG = false                           // debug flag
-    private val ord   = bf.getOrder                     // order of the basis function
-    val (t0, tn)      = (t(0), t(t.dim-1))              // region of integration
+    private val DEBUG = false                             // debug flag
+    private var b: VectoD = null                          // parameter vector [b0]
+    private val ord   = bf.getOrder                       // order of the basis function
+    val (t0, tn)      = (t(0), t(t.dim-1))                // region of integration
 
     private var rg: RidgeRegression = null
 
-    e        = new VectorD (y.dim)
-    val xmoo = for (i <- y.range) yield {               // smooth the data
+    val e    = new VectorD (y.dim)
+    val xmoo = for (i <- y.range) yield {                 // smooth the data
         val moo = new Smoothing_F (x(i), t, bf)
         moo.train()
         moo
@@ -61,13 +64,15 @@ class Regression_F2S (x: MatriD, y: VectoD, t: VectoD, bf: DBasisFunction, techn
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the model using the smoothed data to find the regression coefficients 'b'.
-     *  @param yy   response vector
+     *  @param yy  the response vector
      */
-    def train (yy: VectoD): Regression_F2S =
+    def train (yy: VectoD = y): Regression_F2S =
     {
 //      val eye = MatrixD.eye(z.dim2)
 //      b = (z.t * z + eye * lambda).inverse * z.t * yy               // direct solution, may produce NaN
-        rg = new RidgeRegression (z, yy, lambda, technique = technique)
+
+        val hp = RidgeRegression.hp.updateReturn ("lambda", lambda)
+        rg = new RidgeRegression (z, yy, null, hp, technique)
         rg.train (yy)
         this
     } // train
@@ -79,8 +84,44 @@ class Regression_F2S (x: MatriD, y: VectoD, t: VectoD, bf: DBasisFunction, techn
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics for the entire dataset.
+     *  @param xx  the test data/input matrix
+     *  @param yy  the test response/output vector
      */
-    override def eval () = rg.eval()                                                     // compute diagnostics
+    override def eval (xx: MatriD = x, yy: VectoD = y) = rg.eval (xx, yy)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the hyper-parameters.
+     */
+    def hparameter: HyperParameter = null  // hparam = FIX
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the vector of parameter/coefficient values.
+     */
+    def parameter: VectoD = b
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return a basic report on the trained model.
+     *  @see 'summary' method for more details
+     */
+    def report: String =
+    {
+        s"""
+REPORT
+    hparameter hp  = $hparameter
+    parameter  b   = $parameter
+    fitMap     qof = $fitMap
+        """
+    } // report
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the vector of residuals/errors.
+     */
+    def residual: VectoD = e
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the quality of fit map.
+     */
+    def fitMap: Map [String, String] = rg.fitMap
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the y-value at time point 'tt'.
@@ -108,8 +149,9 @@ class Regression_F2S (x: MatriD, y: VectoD, t: VectoD, bf: DBasisFunction, techn
         val zs     = z (itrain)
         val ys     = y (itrain)
 
-        rg     = new RidgeRegression (zs, ys, lambda, technique = technique)
-        rg.train()
+        val hp = RidgeRegression.hp.updateReturn ("lambda", lambda)
+        rg = new RidgeRegression (zs, ys, null, hp, technique)
+        rg.train ()
     } // train
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

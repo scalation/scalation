@@ -1,0 +1,366 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Dong Yu Yu, John Miller
+ *  @version 1.5
+ *  @date    Wed Nov  7 17:08:17 EST 2018
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.analytics
+
+import java.lang.Error
+
+import scala.collection.mutable.{ArrayBuffer, Queue, Set}
+
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectoI, VectorD, VectorI}
+import scalation.random.PermutedVecI
+import scalation.stat.Statistic
+import scalation.util.banner
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Class that contains information for a tree node.
+ *  @param f        the feature of the node, if it is leaf, contains the feature of its parent
+ *  @param branch   the branch value (0 => left, 1 => right)
+ *  @param yp       leaf node's prediction for y
+ *  @param thresh   the threshold for continuous feature
+ *  @param depth    the current depth of the node
+ *  @param pthresh  the threshold for parent node
+ *  @param pfea     the feature of parent node
+ *  @param leaf     `Boolean` value indicate whether is a leaf node
+ */
+case class Node (f: Int, branch: Int, yp: Double, thresh: Double,
+                 depth: Int, pthresh: Double, pfea: Int, leaf: Boolean = false)
+{
+    val child = new ArrayBuffer [Node] ()                      // children of node
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert node to a string.
+     */
+    override def toString: String =
+    {
+        if (child.length == 0)
+             s"Leaf (pfeature = x$pfea, branch = $branch, feature = x$f, yp = $yp)"
+        else if (depth == 0)
+             s"Root (feature = x$f, threshold = $thresh)"
+        else
+             s"Node (pfeature = x$pfea, branch = $branch, feature = x$f, threshold = $thresh)"
+    } // toString
+
+} // Node class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RegressionTree` class implements a RegressionTree selecting splitting features
+ *  using minimal variance in children nodes. To avoid exponential choices in the selection,
+ *  supporting ordinal features currently. Use companion object is recommended for generate
+ *  Regression Tree.
+ *  @param x            the data vectors stored as rows of a matrix
+ *  @param y            the dependent value
+ *  @param fn           the names for all features/variables
+ *  @param maxDepth     the depth limit for tree
+ *  @param curDepth     current depth
+ *  @param branchValue  parameter used to record the branchValue for the tree node
+ *  @param thres        parameter used to record the threshold for the tree's parent node
+ *  @param feature      parameter used to record the feature for the tree's parent node
+ */
+class RegressionTree (x: MatriD, y: VectoD, private var fn: Array [String], maxDepth: Int,
+                      curDepth: Int, branchValue: Int, thres: Double, feature: Int)
+    extends PredictorMat (x, y)
+{
+    private val DEBUG     = false                              // debug flag
+    private val n         = x.dim2                             // number of columns in matrix
+    private val stream    = 0                                  // the random number stream
+    private val threshold = new Array [Double] (n)             // store best splitting threshold for each feature
+    private val permGen   = PermutedVecI (VectorI.range (0, m), stream)
+
+    private var root: Node = null                              // root node   
+
+    if (fn == null) fn = x.range2.map ("x" + _).toArray        // default variable names
+
+    if (DEBUG) println ("Constructing a Regression Tree:")
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The 'crossVal' abstract method must be coded in implementing classes to
+     *  call the above 'crossValidate' method.
+     *  @param k      the number of crosses and cross-validations (defaults to 10x).
+     *  @param rando  flag for using randomized cross-validation
+     */
+    def crossVal (k: Int, rando: Boolean): Unit =
+    {
+        val stats   = Array.fill (fitLabel.length) (new Statistic ())
+        val indices = if (rando) permGen.igen.split (k)
+                      else VectorI (0 until m).split (k)
+
+        for (idx <- indices) {
+            val idxa = idx.toArray
+            val x_te = x(idx)                                       // test data matrix
+            val y_te = y(idx)                                       // test response vector
+            val x_tr = x.selectRowsEx (idxa)                        // training data matrix
+            val y_tr = y.selectEx (idxa)                            // training response vector
+
+            if (DEBUG) {
+                println ("x_te = " + x_te)
+                println ("y_te = " + y_te)
+                println ("x_tr = " + x_tr)
+                println ("y_tr = " + y_tr)
+            } // if
+
+            val model = RegressionTree (x_tr, y_tr, fn, maxDepth)   // construct next model using training dataset
+            model.train ()                                          // train the model
+            model.eval (x_te, y_te)                                 // evaluate model on test dataset
+            val qm = model.fit                                      // get quality of fit measures
+            for (q <- qm.indices) stats(q).tally (qm(q))            // tally these measures
+        } // for
+
+        if (DEBUG) println ("stats = " + stats.deep)
+    } // crossVal
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Calculate the total variance in child node when split using feature 'f' in 'thresh'.
+     *  @param f       the feature indicator
+     *  @param thresh  the threshold in f
+     */
+    def variance (f: Int, thresh: Double): Double =
+    {
+        val (left, right) = split (f, thresh)
+        val varia = y.select (left).pvariance + y.select (right).pvariance
+        if (varia.isNaN) Double.MaxValue else varia
+    } // variance
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Split gives index of left and right child when spliting in 'thresh'.
+     *  @param f       the feature indicator
+     *  @param thresh  threshold
+     */
+    def split (f: Int, thresh: Double): (Array [Int], Array [Int]) =
+    {
+        val (sLeft, sRight) = (Set [Int] (), Set [Int] ())
+        for (i <- x.range1) if (x(i, f) <= thresh) sLeft += i else sRight += i
+        (sLeft.toArray, sRight.toArray)
+    } // split
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a feature to give the best threshold, optionally, a subsample can be used
+     *  to choose the splitting threshold with a range.
+     *  @param f          the feature index to consider
+     *  @param subSample  the index of subsample
+     */
+    def calThreshold (f: Int, subSample: VectoI = null)
+    {
+        var thres  = x.col(f).mean                         // FIX - how is this used?
+        var minVar = Double.MaxValue
+        var values: VectoD = x.col(f).distinct
+        if (subSample != null && x.dim1 >= subSample.dim)
+            values = x.col(f).select (subSample.toArray).distinct
+        values.sort ()
+
+        if (DEBUG) println (s"threshold: possible value for feature = $f are: $values")
+
+        for (i <- 0 until values.dim - 1) {
+            val tmpThres = (values(i) + values(i + 1)) / 2.0
+            val tmpVar = variance (f, tmpThres)
+            if (DEBUG) println (s"for threshold $tmpThres the value is $tmpVar")
+            if (tmpVar <= minVar) {
+                thres  = tmpThres                           // found a better threshold
+                minVar = tmpVar                             // save lower variance
+            } // if
+        } // for
+
+        threshold(f) = thres                                // save best threshold for this feature
+        if (DEBUG) println (s"for feature $f threshold = $thres")
+    } // calThreshold
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return new 'x' matrix and 'y' vector for next step of constructing decision tree.
+     *  @param f     the feature index
+     *  @param side  indicator for which side of child is chosen (i.e., 0 for left child)
+     */
+    def nextXY (f: Int, side: Int): (MatriD, VectoD) =
+    {
+        val (left, right) = split (f, threshold(f))
+        if (side == 0) (x.selectRows (left),  y.select (left))
+        else           (x.selectRows (right), y.select (right))
+    } // nextXY
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the regression tree by selecting threshold for all the features
+     *  in 'yy' (can be used as all the samples or subsamples).
+     *  @param yy  only the values in yy will be used in selecting threshold
+     */
+    def train (yy: VectoD): RegressionTree =
+    {
+        train (VectorI.range (0, yy.dim))
+        this
+    } // train
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the regression tree by selecting threshold for all the features
+     *  in interval (subsamples).
+     *  @param interval  only the values in interval will be used in selecting threshold
+     */
+    def train (interval: VectoI)
+    {
+        for (f <- 0 until n) calThreshold (f, interval)        // set threshold for features
+        var opt = (0, variance (0, threshold(0)))              // compute variance for feature 0
+
+        if (DEBUG) println (s"train: for feature ${opt._1} the variance is ${opt._2}")
+
+        for (f <- 0 until n) {
+            val fVar = variance (f, threshold(f))
+            if (DEBUG) println (s"train: for feature $f the variance is $fVar")
+            if (fVar <= opt._2) opt = (f, fVar)                // save feature giving minimal variance
+        } // for
+
+        if (DEBUG) println (s"train: optimal feature is ${opt._1} with variance of ${opt._2}")
+        buildTree (opt)
+    } // train
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given the next most distinguishing feature/attribute, extend the decision tree.
+     *  @param opt  the optimal feature and the variance
+     */
+    def buildTree (opt: (Int, Double))
+    {
+        root = if (curDepth == 0) Node (opt._1, -1, y.mean,  threshold(opt._1), curDepth, -1.0, -1)
+               else               Node (opt._1, branchValue, y.mean, threshold(opt._1), curDepth, thres, feature)
+        for (i <- 0 until 2) {
+            val next = nextXY (opt._1, i)
+            if (next._2.size != 0) {
+                if (curDepth >= maxDepth - 1) {
+                    val ypredict = next._2.mean
+                    root.child  += Node (opt._1, root.child.length, ypredict, threshold(opt._1), curDepth + 1,
+                                        threshold(opt._1), opt._1, true)
+                    if (DEBUG) {
+                        println (" --> Leaf = " + root.child)
+                        println ("\t x      = " + next._1)
+                        println ("\t y      = " + next._2)
+                    } // if
+                } else {
+                    if (next._2.size > 1) {
+                        val subtree = new RegressionTree (next._1, next._2, fn, maxDepth, curDepth + 1, i, threshold(opt._1), opt._1)
+                        subtree.train ()
+                        root.child += subtree.root
+                    } else {
+                        val ypredict = next._2.mean
+                        root.child  += Node (opt._1, root.child.length, ypredict, threshold(opt._1), curDepth + 1,
+                                             threshold(opt._1), opt._1, true)
+                    } // if
+                } // if
+            } // if
+        } // for
+    } // buildTree
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Print out the decision tree using Breadth First Search (BFS).
+     */
+    def printTree ()
+    {
+        println ("  RegressionTree:\n")
+        val queue = new Queue [Node] ()
+
+        for (i <- 0 until root.child.length) queue += root.child(i)
+        println (root)
+        var level = 0
+
+        while (! queue.isEmpty) {
+            val size = queue.size
+            level += 1
+            var str = "  " * level
+
+            for (i <- 0 until size) {
+                val nd = queue.dequeue ()
+                println (str + "->" + nd)
+                for (p <- 0 until nd.child.length) {
+                    queue += nd.child(p)
+                } // for
+            } // for
+            println ()
+        } // while
+    } // printTree
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a data vector z, predict the value by following the tree to the leaf.
+     *  @param z  the data vector to predict
+     */
+    override def predict (z: VectoD): Double =
+    {
+        var nd = root                                      // current node
+        while (nd.child.length >= 2) {
+            nd = if (z(nd.f) <= nd.thresh) nd.child(0) else nd.child(1)
+        } // while
+        nd.yp
+    } // predict
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a data matrix z, predict the value by following the tree to the leaf.
+     *  @param z  the data matrix to predict
+     */
+    override def predict (z: MatriD): VectorD =
+    {
+        VectorD (for (i <- z.range1) yield predict(z(i)))
+    } //predict
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Evaluate by diagnose the error.
+     *  @param xx  the data matrix used in prediction
+     *  @param yy  the actual dependent value
+     */
+    override def eval (xx: MatriD, yy: VectoD) =
+    {
+        e = yy - predict (xx)
+        diagnose (e)
+    } // eval
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reset or re-initialize the frequency tables and the probability tables.
+     */
+    def reset ()
+    {
+        // FIX: to be implemented
+    } // reset
+
+} // RegressionTree class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RegressionTree` companion object provides a factory method.
+ */
+object RegressionTree
+{
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a `RegressionTree` object.
+      * @param x         the data matrix
+      * @param y         the dependent value
+      * @param fn        the names for all features/variables
+      * @param maxDepth  the depth limit for the tree
+      */
+    def apply (x: MatriD, y: VectoD, fn: Array [String] = null, maxDepth: Int): RegressionTree =
+    {
+        new RegressionTree (x, y, fn, maxDepth, 0, -1, -1.0, -1)
+    } // apply
+
+} // RegressionTree object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RegressionTreeTest` object is used to test the `RegressionTree` class.
+  *  It tests a simple case that does not require a file to be read.
+  *  @see 
+  *  > runMain scalation.analytics.RegressionTreeTest
+  */
+object RegressionTreeTest extends App
+{
+    val x = new MatrixD ((10, 1), 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    val y = VectorD (5.56, 5.70, 5.91, 6.40, 6.80, 7.05, 8.90, 8.70, 9.00, 9.05)
+
+    for (i <- 1 to 8) {
+        banner (s"Regression with maxDepth = $i")
+        val rt = RegressionTree (x, y, null, maxDepth = i)
+        rt.train ()
+        rt.eval (x, y)
+        rt.printTree ()
+        println (rt.fitMap)
+    } // for
+
+} // RegressionTreeTest
+

@@ -1,0 +1,483 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller, Hao Peng
+ *  @version 1.6
+ *  @date    Sun Jan 27 15:34:08 EST 2019
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.analytics
+
+import scala.math.sqrt
+
+import scalation.linalgebra.{MatriD, MatrixD, VectorI, VectoD}
+import scalation.math.double_exp
+import scalation.random.PermutedVecI
+import scalation.random.RNGStream.ranStream
+
+import ActivationFun._
+import Initializer._
+import StoppingRule._
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Optimizer` object provides functions to optimize the parameters/weights
+ *  of Neural Networks with various numbers of layers.
+ *  This optimizer used Stochastic Gradient Descent.
+ */
+object Optimizer
+{
+    val hp = new HyperParameter
+    hp += ("eta", 0.1, 0.1)                                              // learning/convergence rate
+    hp += ("bSize", 20, 20)                                              // mini-batch size
+    hp += ("maxEpochs", 1000, 1000)                                      // maximum number of epochs/iterations
+    hp += ("lambda", 0.0, 0.0)                                           // regularization hyper-parameter
+
+    private val DEBUG          = false                                   // debug flag
+    private val ADJUST_PERIOD  = 100                                     // number of epochs before adjusting learning rate
+    private val ADJUST_FACTOR  = 1.1                                     // learning rate adjustment factor (1+)
+    private val NSTEPS         = 16                                      // steps for eta
+    private val UP_LIMIT       = 4                                       // stopping rule
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given training data 'x' and 'y' for a 2-layer, single output neural network, fit
+     *  the parameter/weight vector 'b'.  Iterate over several epochs, where each epoch divides
+     *  the training set into 'nbat' batches.  Each batch is used to update the weights.
+     *  @param x          the m-by-nx input matrix (training data consisting of m input vectors)
+     *  @param y          the m output vector (training data consisting of m output vectors)
+     *  @param b          the nx parameter/weight vector for layer 1->2 (input to output)
+     *  @param etaI       the learning/convergence rate interval
+     *  @param bSize      the batch size
+     *  @param maxEpochs  the maximum number of training epochs/iterations
+     *  @param f1         the activation function family for layers 1->2 (input to output)
+     */
+    def optimizeI (x: MatriD, y: VectoD,
+                   b: VectoD,
+                   etaI: PairD,
+                   bSize: Int     = hp.default ("bSize").toInt,
+                   maxEpochs: Int = hp.default ("maxEpochs").toInt,
+                   f1: AFF = f_sigmoid): (Double, Int) =
+    {
+        println (s"optimizeI: etaI = $etaI")
+        var best = (Double.MaxValue, -1)
+        var b_best: VectoD = null
+
+        for (i <- 0 to NSTEPS) {
+            val step = (etaI._2 - etaI._1) / NSTEPS                      // compute step size
+            val eta  = etaI._1 + i * step                                // current learning rate
+            b.set (weightVec (b.dim)())                                  // randomly assign parameters (weights)
+
+            val result = optimize (x, y, b, eta, bSize, maxEpochs, f1)
+            println (s"optimizeI: eta = $eta, result = $result")
+            if (result._1 < best._1) {
+                best = result
+                b_best = b.copy                                          // save best parameters (weights)
+            } // if
+        } // for
+
+        b.set (b_best ())                                                // use best parameters (weights)
+        best
+    } // optimizeI
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given training data 'x' and 'y' for a 2-layer, single output neural network, fit
+     *  the parameter/weight vector 'b'.  Iterate over several epochs, where each epoch divides
+     *  the training set into 'nbat' batches.  Each batch is used to update the weights.
+     *  @param x          the m-by-nx input matrix (training data consisting of m input vectors)
+     *  @param y          the m output vector (training data consisting of m output vectors)
+     *  @param b          the nx parameter/weight vector for layer 1->2 (input to output)
+     *  @param eta_       the initial learning/convergence rate
+     *  @param bSize      the batch size
+     *  @param maxEpochs  the maximum number of training epochs/iterations
+     *  @param f1         the activation function family for layers 1->2 (input to output)
+     */
+    def optimize (x: MatriD, y: VectoD,
+                  b: VectoD,
+                  eta_ : Double  = hp.default ("eta"),
+                  bSize: Int     = hp.default ("bSize").toInt,
+                  maxEpochs: Int = hp.default ("maxEpochs").toInt,
+                  f1: AFF = f_sigmoid): (Double, Int) =
+    {
+        val idx     = VectorI.range (0, x.dim1)                          // instance index range
+        val permGen = PermutedVecI (idx, ranStream)                      // permutation vector generator
+        val nBat    = x.dim1 / bSize                                     // the number of batches
+        val stop    = new StoppingRule ()                                // rule for stopping early
+        var eta     = eta_                                               // set initial learning rate
+        println (s"optimize: bSize = $bSize, nBat = $nBat, eta = $eta")
+
+        for (epoch <- 1 to maxEpochs) {                                  // iterate over each epoch
+            val batches = permGen.igen.split (nBat)                      // permute indices & split into nBat batches
+
+            for (ib <- batches) b -= updateWeight (x(ib), y(ib))         // iteratively update weight vector b
+
+            val sse = sseF (y, f1.fV (x * b))                            // recompute sum of squared errors
+            if (DEBUG) println (s"optimize: weights for $epoch th epoch: sse = $sse")
+            val (b_best, sse_best) = stop.stopWhen (b, sse)
+            if (b_best != null) {
+                b.set (b_best())
+                return (sse_best, epoch - UP_LIMIT)
+            } // if
+            if (epoch % ADJUST_PERIOD == 0) eta *= ADJUST_FACTOR         // adjust the learning rate
+        } // for
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        /*  Compute the parameter/weight vector 'b' update based on the current batch.
+         *  A step in the direction opposite to the gradient.
+         *  @param x  the input matrix for the current batch
+         *  @param y  the output vector for the current batch
+         */
+        def updateWeight (x: MatriD, y: VectoD): VectoD =
+        {
+            val yp = f1.fV (x * b)                                       // Yp = f (X b)
+            val e  = yp - y                                              // -e where e is the error vector
+            val dy = f1.dV (yp) * e                                      // delta y
+
+            val eta_o_sz = eta / x.dim1                                  // eta over the current batch size
+            x.t * dy * eta_o_sz                                          // return change in input-output weights
+        } // updateWeight
+
+        if (DEBUG) println (s"optimize: weights b = $b")
+        (sseF (y, f1.fV (x * b)), maxEpochs)                             // return sse and number of epochs
+    } // optimize
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given training data 'x' and 'y' for a 2-layer, single output neural network, fit
+     *  the parameter/weight vector 'b'.  Iterate over several epochs, where each epoch divides
+     *  the training set into 'nbat' batches.  Each batch is used to update the weights.
+     *  @param x          the m-by-nx input matrix (training data consisting of m input vectors)
+     *  @param y          the m output vector (training data consisting of m output vectors)
+     *  @param b          the parameter with nx-by-ny weight matrix for layer 1->2 (input to output)
+     *  @param etaI       the learning/convergence rate interval
+     *  @param bSize      the batch size
+     *  @param maxEpochs  the maximum number of training epochs/iterations
+     *  @param f1         the activation function family for layers 1->2 (input to output)
+     */
+    def optimize2I (x: MatriD, y: MatriD,
+                    b: NetParam,
+                    etaI: PairD,
+                    bSize: Int     = hp.default ("bSize").toInt,
+                    maxEpochs: Int = hp.default ("maxEpochs").toInt,
+                    f1: AFF = f_sigmoid): (Double, Int) =
+    {
+        println (s"optimize2I: etaI = $etaI")
+        var best = (Double.MaxValue, -1)
+        var b_best: NetParam = null
+
+        for (i <- 0 to NSTEPS) {
+            val step = (etaI._2 - etaI._1) / NSTEPS                      // compute step size
+            val eta  = etaI._1 + i * step                                // current learning rate
+            b.set (weightMat (b.w.dim1, b.w.dim2))                       // randomly assign weights to b.w
+
+            val result = optimize2 (x, y, b, eta, bSize, maxEpochs, f1)
+            println (s"optimize2I: eta = $eta, result = $result")
+            if (result._1 < best._1) {
+                best = result
+                b_best = b.copy                                          // save best weights
+            } // if
+        } // for
+
+        b.set (b_best)                                                   // use best weights
+        best
+    } // optimize2I
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given training data 'x' and 'y' for a 2-layer neural network, fit the parameter 'b'.
+     *  Iterate over several epochs, where each epoch divides the training set into 'nbat' batches.
+     *  Each batch is used to update the parameter's weights.
+     *  @param x          the m-by-nx input matrix (training data consisting of m input vectors)
+     *  @param y          the m-by-ny output matrix (training data consisting of m output vectors)
+     *  @param b          the parameters with an nx-by-ny weight matrix for layer 1->2 (input to output)
+     *  @param eta_       the initial learning/convergence rate
+     *  @param bSize      the batch size
+     *  @param maxEpochs  the maximum number of training epochs/iterations
+     *  @param f1         the activation function family for layers 1->2 (input to output)
+     */
+    def optimize2 (x: MatriD, y: MatriD,
+                   b: NetParam,
+                   eta_ : Double  = hp.default ("eta"),
+                   bSize: Int     = hp.default ("bSize").toInt,
+                   maxEpochs: Int = hp.default ("maxEpochs").toInt,
+                   f1: AFF = f_sigmoid): (Double, Int) =
+    {
+        val idx     = VectorI.range (0, x.dim1)                          // instance index range
+        val permGen = PermutedVecI (idx, ranStream)                      // permutation vector generator
+        val nBat    = x.dim1 / bSize                                     // the number of batches
+        var eta     = eta_                                               // set initial learning rate
+        val stop    = new StoppingRule ()                                // rule for stopping early
+        println (s"optimize2: bSize = $bSize, nBat = $nBat")
+
+        for (epoch <- 1 to maxEpochs) {                                  // iterate over each epoch
+            val batches = permGen.igen.split (nBat)                      // permute indices & split into nBat batches
+
+            for (ib <- batches) b -= updateWeight (x(ib), y(ib))         // iteratively update parameters b
+
+            val sse = sseF (y, f1.fM (b * x))                            // recompute sum of squared errors
+            if (DEBUG) println (s"optimize2: parameters for $epoch th epoch: sse = $sse")
+            val (b_best, sse_best) = stop.stopWhen (Array (b), sse)
+            if (b_best != null) {
+                b.set (b_best (0))
+                return (sse_best, epoch - UP_LIMIT)
+            } // if
+
+            if (epoch % ADJUST_PERIOD == 0) eta *= ADJUST_FACTOR         // adjust the learning rate
+        } // for
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        /*  Update the parameter/weight matrix 'b' based on the current batch.
+         *  Take a step in the direction opposite to the gradient.
+         *  @param x  the input matrix for the current batch
+         *  @param y  the output matrix for the current batch
+         */
+        def updateWeight (x: MatriD, y: MatriD): MatriD =
+        {
+            val yp = f1.fM (b * x)                                       // Yp = f (X B)
+            val ee = yp - y                                              // -E where E is the error matrix
+            val dy = f1.dM (yp) ** ee                                    // delta y
+
+            val eta_o_sz = eta / x.dim1                                  // eta over the current batch size
+            x.t * dy * eta_o_sz                                          // return change in input-output weights
+        } // updateWeight
+
+        if (DEBUG) println (s"optimize2: weights b = $b")
+        (sseF (y, f1.fM (b * x)), maxEpochs)                             // return number of epochs
+    } // optimize2
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given training data 'x' and 'y' for a 3-layer network, fit the parameters 'a' & 'b'.
+     *  Iterate over several epochs, where each epoch divides  the training set into 'nbat' batches.
+     *  Each batch is used to update the weights.
+     *  @param x          the m-by-nx input matrix (training data consisting of m input vectors)
+     *  @param y          the m output vector (training data consisting of m output vectors)
+     *  @param a          the paramters with nx-by-nz weight matrix & nz bias vector for layer 1->2 (input to hidden)
+     *  @param b          the paramters with nz-by-ny weight matrix & ny bias vector for layer 1->2 (input to output)
+     *  @param etaI       the learning/convergence rate interval
+     *  @param bSiz       the batch size
+     *  @param maxEpochs  the maximum number of training epochs/iterations
+     *  @param f1         the activation function family for layers 1->2 (input to output)
+     */
+    def optimize3I (x: MatriD, y: MatriD,
+                    a: NetParam, b: NetParam,
+                    etaI: PairD,
+                    bSize: Int     = hp.default ("bSize").toInt,
+                    maxEpochs: Int = hp.default ("maxEpochs").toInt,
+                    f1: AFF = f_sigmoid, f2: AFF = f_sigmoid): (Double, Int) =
+    {
+        println (s"optimize3I: etaI = $etaI")
+        var best = (Double.MaxValue, -1)
+        var a_best, b_best: NetParam = null
+
+        for (i <- 0 to NSTEPS) {
+            val step = (etaI._2 - etaI._1) / NSTEPS                      // compute step size
+            val eta  = etaI._1 + i * step                                // current learning rate
+            a.set (weightMat (a.w.dim1, a.w.dim2),                       // randomly assign weights to a.w
+                   weightVec (a.b.dim))                                  // randomly assign biases to a.b
+            b.set (weightMat (b.w.dim1, b.w.dim2),                       // randomly assign weights to b.w
+                   weightVec (b.b.dim))                                  // randomly assign biases to b.b
+
+            val result = optimize3 (x, y, a, b, eta, bSize, maxEpochs, f1, f2)
+            println (s"optimize3I: eta = $eta, result = $result")
+            if (result._1 < best._1) {
+                best = result
+                a_best = a.copy; b_best = b.copy                         // save best parameters (weights & biases)
+            } // if
+        } // for
+
+        a.set (a_best); b.set (b_best)                                   // use best parameters (weights & biases)
+        best
+    } // optimize3I
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given training data 'x' and 'y' for a 3-layer network, fit the parameters 'a' & 'b'.
+     *  Iterate over several epochs, where each epoch divides the training set into 'nbat' batches.
+     *  Each batch is used to update the weights.
+     *  @param x          the m-by-nx input matrix (training data consisting of m input vectors)
+     *  @param y          the m-by-ny output matrix (training data consisting of m output vectors)
+     *  @param a          the paramters with nx-by-nz weight matrix & nz bias vector for layer 1->2 (input to hidden)
+     *  @param b          the paramters with nz-by-ny weight matrix & ny bias vector for layer 1->2 (input to output)
+     *  @param eta_       the initial learning/convergence rate
+     *  @param bSize      the batch size
+     *  @param maxEpochs  the maximum number of training epochs/iterations
+     *  @param f1         the activation function family for layers 1->2 (input to hidden)
+     *  @param f2         the activation function family for layers 2->3 (hidden to output)
+     */
+    def optimize3 (x: MatriD, y: MatriD,
+                   a: NetParam, b: NetParam,
+                   eta_ : Double  = hp.default ("eta"),
+                   bSize: Int     = hp.default ("bSize").toInt,
+                   maxEpochs: Int = hp.default ("maxEpochs").toInt,
+                   f1: AFF = f_sigmoid, f2: AFF = f_sigmoid): (Double, Int) =
+    {
+        val idx     = VectorI.range (0, x.dim1)                          // instance index range
+        val permGen = PermutedVecI (idx, ranStream)                      // permutation vector generator
+        val nBat    = x.dim1 / bSize                                     // the number of batches
+        val stop    = new StoppingRule ()                                // rule for stopping early
+        var eta     = eta_                                               // counter for number of times moving up
+        println (s"optimize3: bSize = $bSize, nBat = $nBat")
+
+        for (epoch <- 1 to maxEpochs) {                                  // iterate over each epoch
+            val batches = permGen.igen.split (nBat)                      // permute indices & split into nBat batches
+
+            for (ib <- batches) {
+                val ab = updateWeight (x(ib), y(ib))                     // iteratively update parameters a & b
+                a -= ab._1; b -= ab._2
+            } // for
+
+            val sse = sseF (y, b * f2.fM (f1.fM (a * x)))
+            if (DEBUG) println (s"optimize3: parameters for $epoch th epoch: sse = $sse")
+            val (b_best, sse_best) = stop.stopWhen (Array (a, b), sse)
+            if (b_best != null) {
+                a.set (b_best(0))
+                b.set (b_best(1))
+                return (sse_best, epoch - UP_LIMIT)
+            } // if
+
+            if (epoch % ADJUST_PERIOD == 0) eta *= ADJUST_FACTOR         // adjust the learning rate
+        } // for
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        /*  Compute the parameter 'a' & 'b' updates based on the current batch.
+         *  A step in the direction opposite to the gradient.
+         *  @param x  the input matrix for the current batch
+         *  @param y  the output matrix for the current batch
+         */
+        def updateWeight (x: MatriD, y: MatriD): (NetParam, NetParam) =
+        {
+            var z  = f1.fM (a * x)                                       // Z  = f (X A) (and opt. set hidden bias)
+            var yp = f2.fM (b * z)                                       // Yp = f (Z B)
+            var ee = yp - y                                              // -E where E is the error matrix
+            val dy = f2.dM (yp) ** ee                                    // delta y
+            val dz = f1.dM (z) ** (dy * b.w.t)                           // delta z
+    
+            val eta_o_sz = eta / x.dim1                                  // eta over the current batch size
+            (NetParam (x.t * dz * eta_o_sz, dz.mean * eta),              // change to 'a' paramters (weights and biases)
+             NetParam (z.t * dy * eta_o_sz, dy.mean * eta))              // change to 'b' paramters (weights and biases)
+        } // updateWeight
+
+        if (DEBUG) println (s"optimize3: parameters a = $a \n b = $b")
+        (sseF (y, b * f2.fM (f1.fM (a * x))), maxEpochs)                 // return sse and number of epochs
+    } // optimize3
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given training data 'x' and 'y', fit the parameter array 'b'.  Iterate over several
+     *  epochs, where each epoch divides the training set into 'nbat' batches.  Each batch
+     *  is used to update the weights.
+     *  @param x          the m-by-nx input matrix (training data consisting of m input vectors)
+     *  @param y          the m-by-ny output matrix (training data consisting of m output vectors)
+     *  @param b          the array of parameters (weights & biases) between every two adjacent layers
+     *  @param etaI       the lower and upper bounds of learning/convergence rate
+     *  @param bSize      the batch size
+     *  @param maxEpochs  the maximum number of training epochs/iterations
+     *  @param actf       the array of activation function family for every two adjacent layers
+     */
+    def optimizeXI (x: MatriD, y: MatriD,
+                    b: NetParams,
+                    etaI: PairD,
+                    bSize: Int     = hp.default ("bSize").toInt,
+                    maxEpochs: Int = hp.default ("maxEpochs").toInt,
+                    lambda: Double = 0.0,
+                    actf: Array [AFF] = Array (f_sigmoid, f_sigmoid)): (Double, Int) =
+    {
+        println (s"optimizeXI: etaI = $etaI")
+        var best = (Double.MaxValue, -1)
+        var b_best: NetParams = null
+
+        for (i <- 0 to NSTEPS) {
+            val step = (etaI._2 - etaI._1) / NSTEPS                      // compute step size
+            val eta  = etaI._1 + i * step                                // current learning rate
+            for (b_l <- b) b_l.set (weightMat (b_l.w.dim1, b_l.w.dim2),  // randomly assign weights to b_l.w
+                                    weightVec (b_l.b.dim))               // randomly assign biases to b_l.b
+
+            val result = optimizeX (x, y, b, eta, bSize, maxEpochs, lambda, actf)
+            println (s"optimizeXI: eta = $eta, result = $result")
+            if (result._1 < best._1) {
+                best = result
+                b_best = for (l <- b.indices) yield b(l).copy            // save best parameters
+            } // if
+        } // for
+
+        for (l <- b.indices) b(l).set (b_best(l))                        // use best parameters
+        best
+    } // optimizeXI
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given training data 'x' and 'y', fit the array of parameter 'b'.  Iterate over several
+     *  epochs, where each epoch divides the training set into 'nbat' batches.  Each batch is
+     *  used to update the weights.
+     *  @param x          the m-by-nx input matrix (training data consisting of m input vectors)
+     *  @param y          the m-by-ny output matrix (training data consisting of m output vectors)
+     *  @param b          the array of parameters (weights & biases) between every two adjacent layers
+     *  @param eta_       the initial learning/convergence rate
+     *  @param bSize      the batch size
+     *  @param maxEpochs  the maximum number of training epochs/iterations
+     *  @param actf       the array of activation function family for every two adjacent layers
+     */
+    def optimizeX (x: MatriD, y: MatriD,
+                   b: NetParams,
+                   eta_ : Double  = hp.default ("eta"),
+                   bSize: Int     = hp.default ("bSize").toInt,
+                   maxEpochs: Int = hp.default ("maxEpochs").toInt,
+                   lambda: Double = 0.0,
+                   actf: Array [AFF] = Array (f_sigmoid, f_sigmoid)): (Double, Int) =
+    {
+        val idx     = VectorI.range (0, x.dim1)                          // instance index range
+        val permGen = PermutedVecI (idx, ranStream)                      // permutation vector generator
+        val nBat    = x.dim1 / bSize                                     // the number of batches
+        val stop    = new StoppingRule ()                                // rule for stopping early
+        var eta     = eta_                                               // counter for number of times moving up
+        var sse     = 0.0                                                // stores accumulated sse over batches for epoch
+        println (s"optimizeX: bSize = $bSize, nBat = $nBat")
+
+        for (epoch <- 1 to maxEpochs) {                                  // iterate over each epoch
+            sse         = 0.0
+            val batches = permGen.igen.split (nBat)                      // permute indices &split into nBat batches
+
+            for (ib <- batches) {
+                sse += updateWeight (x(ib), y(ib))                       // update parameters b
+            } // for
+
+            if (DEBUG) println (s"optimizeX: parameters for $epoch th epoch: sse = $sse")
+            val (b_best, sse_best) = stop.stopWhen (b, sse)
+            if (b_best != null) {
+                for (l <- b.indices) b(l).set (b_best(l))
+                return (sse_best, epoch - UP_LIMIT)
+            } // if
+
+            if (epoch % ADJUST_PERIOD == 0) eta *= ADJUST_FACTOR         // adjust the learning rate
+        } // for
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        /*  Compute the parameter 'b' updates based on the current batch.  A step in the
+         *  direction opposite to the gradient.
+         *  @param x  the input matrix for the current batch
+         *  @param y  the output matrix for the current batch
+         */
+        def updateWeight (x: MatriD, y: MatriD): Double =
+        {
+            val nl1 = actf.size
+            val nl  = nl1 + 1
+            val as  = Array.ofDim [MatriD](nl)                           // array to store activations, layer by layer
+            as(0)   = x                                                  // initial activation, which is the input matrix
+            for (l <- 0 until nl1) as(l+1) = actf(l).fM(b(l) * as(l))    // feedforward and store all activations
+
+            val yp = as.last                                             // predicted value of y
+            val ee = yp - y                                              // -E where E is the error matrix
+            val δs    = Array.ofDim [MatriD](nl1)                        // array to store all δ's
+            δs(nl1-1) = actf.last.dM(yp) ** ee                           // δ for the last layer
+            for (l <- 2 until nl)
+                δs(nl1-l) = actf(nl1-l).dM(as(nl-l)) ** (δs(nl-l) * b(nl-l).w.t)  // δ's for all previous hidden layers
+
+            val eta_o_sz = eta / x.dim1                                  // learning rate divided by size of mini-batch
+            for (i <- 0 until nl1) {
+//              b(i).w *= 1.0 - eta * (lambda / x.dim1)                  // regularization factor, weight decay
+                b(i) -= (as(i).t * δs(i) * eta_o_sz,                     // update weights
+                         δs(i).mean * eta)                               // update biases
+            } // for
+
+            ee.normF ~^ 2                                                // return the sse of this batch
+        } // updateWeight
+
+        if (DEBUG) println (s"optimizeX: parameters b = $b")
+        (sse, maxEpochs)                                                 // return sse and number of epochs
+    } // optimizeX
+
+} // Optimizer object
+

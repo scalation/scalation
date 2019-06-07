@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Wed Feb 20 17:39:57 EST 2013
  *  @see     LICENSE (MIT style license file).
  */
@@ -10,14 +10,14 @@ package scalation.analytics
 
 import scala.collection.mutable.{Map, Set}
 
-import scalation.linalgebra._
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorI}
 import scalation.stat.Statistic
 import scalation.random.PermutedVecI
-import scalation.util.Error
+import scalation.util.{banner, Error}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `PredictorVec` class supports term expanded regression.
- *  Fit the parameter vector 'b' in the regression equation.
+/** The `PredictorVec` class supports term expanded regression (work is delegated
+ *  to the `Regression` class).  Fit the parameter vector 'b' in the regression equation.
  *  Use Least-Squares (minimizing the residuals) to solve for the parameter vector 'b'
  *  using the Normal Equations:
  *  <p>
@@ -38,7 +38,6 @@ abstract class PredictorVec (t: VectoD, y: VectoD, ord: Int)
     private   val stream  = 0                                            // random number stream to use
     private   val permGen = PermutedVecI (VectorI.range (0, t.dim), stream)  // permutation generator
     protected var rg: Regression = null                                  // delegated regression model
-
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Expand the scalar 't' into a vector of terms/columns.
@@ -65,26 +64,47 @@ abstract class PredictorVec (t: VectoD, y: VectoD, ord: Int)
     def train (yy: VectoD = y): Regression = rg.train (yy)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the error and useful diagnostics for the entire dataset.
+    /** Compute the error and useful diagnostics for the test dataset.
+     *  @param tt  the test data vector (unexpanded)
+     *  @param yy  the test response vector
      */
-    def eval () { rg.eval () }
+    def eval (tt: VectoD, yy: VectoD): Regression = rg.eval (expand (tt), yy)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics for the test dataset.
      *  @param xx  the test data matrix
      *  @param yy  the test response vector
      */
-    def eval (tt: VectoD, yy: VectoD) { rg.eval (expand (tt), yy) }
+    def eval (xx: MatriD, yy: VectoD = y): Regression = rg.eval (xx, yy)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the hyper-parameters.
+     */
+    def hparameter: HyperParameter = rg.hparameter
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the vector of coefficients.
+    /** Return the vector of parameters/coefficients.
      */
-    override def coefficient: VectoD = rg.coefficient
+    def parameter: VectoD = rg.parameter
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return a basic report on the trained model.
+     *  @see 'summary' method for more details
+     */
+    def report: String =
+    {
+        s"""
+REPORT
+    hparameter hp  = $hparameter
+    parameter  b   = $parameter
+    fitMap     qof = $fitMap
+        """
+    } // report
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector of residuals/errors.
      */
-    override def residual: VectoD = rg.residual
+    def residual: VectoD = rg.residual
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit measures including 'rSq'.
@@ -119,17 +139,26 @@ abstract class PredictorVec (t: VectoD, y: VectoD, ord: Int)
     /** Perform forward selection to add the most predictive variable to the existing
      *  model, returning the variable to add, the new parameter vector and the new
      *  quality of fit.  May be called repeatedly.
-     *  @param cols  the columns of matrix x included in the existing model
+     *  @param cols      the columns of matrix x included in the existing model
+     *  @param adjusted  whether to use rSqBar or rSq as the criterion
      */
-    def forwardSel (cols: Set [Int]): (Int, VectoD, VectoD) = rg.forwardSel (cols)
+    def forwardSel (cols: Set [Int], adjusted: Boolean): (Int, VectoD, VectoD) =
+    {
+        rg.forwardSel (cols, adjusted)
+    } // forwardSel
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable from
      *  the existing model, returning the variable to eliminate, the new parameter
      *  vector and the new quality of fit.  May be called repeatedly.
-     *  @param cols  the columns of matrix x included in the existing model
+     *  @param cols      the columns of matrix x included in the existing model
+     *  @param adjusted  whether to use rSqBar or rSq as the criterion
+     *  @param first     the first column to consider for elimination
      */
-    def backwardElim (cols: Set [Int]): (Int, VectoD, VectoD) = rg.backwardElim (cols)
+    def backwardElim (cols: Set [Int], adjusted: Boolean, first: Int): (Int, VectoD, VectoD) =
+    {
+        rg.backwardElim (cols, adjusted, first)
+    } // backwardElim
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor (VIF) for each variable to test
@@ -142,26 +171,23 @@ abstract class PredictorVec (t: VectoD, y: VectoD, ord: Int)
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /*  Use 'k'-fold cross-validation to compute test quality of fit measures by
      *  dividing the dataset into a test dataset and a training dataset.
-     *  The test dataset is defined by 'tRange' and the rest of the data is training dataset".
-     *  @param x      the data matrix
-     *  @param y      the response vector
+     *  Each test dataset is defined by 'idx' and the rest of the data is the training dataset.
      *  @param algor  the prediction algorithm being applied (e.g., `PolyRegression`)
      *  @param k      the number of crosses and cross-validations (defaults to 10x).
      *  @param rando  whether to use randomized cross-validation
      */
-    def crossValidate (algor: (VectoD, VectoD, Int) => PredictorVec, k: Int = 10,
-                       rando: Boolean = true): Array [Statistic] =
+    protected def crossValidate (algor: (VectoD, VectoD, Int) => PredictorVec, k: Int = 10,
+                                 rando: Boolean = true): Array [Statistic] =
     {
         val stats   = Array.fill (fitLabel.length) (new Statistic ())
         val indices = if (rando) permGen.igen.split (k)
                       else       VectorI (0 until t.dim).split (k)
 
         for (idx <- indices) {
-            val idxa = idx.toArray
             val t_te = t(idx)                                            // test data matrix
             val y_te = y(idx)                                            // test response vector
-            val t_tr = t.selectEx (idxa)                                 // training data matrix
-            val y_tr = y.selectEx (idxa)                                 // training response vector
+            val t_tr = t.selectEx (idx)                                  // training data matrix
+            val y_tr = y.selectEx (idx)                                  // training response vector
 
             if (DEBUG) {
                 println ("t_te = " + t_te)
@@ -177,20 +203,23 @@ abstract class PredictorVec (t: VectoD, y: VectoD, ord: Int)
             for (i <- qm.indices) stats(i).tally (qm(i))                 // tally these measures
         } // for 
         
-        println ("stats = " + stats.deep)
+        if (DEBUG){
+            banner ("crossValidate: Statistical Table for QoF")
+            println (Statistic.labels)
+            for (i <- stats.indices) println (stats(i))
+        } // if
         stats
     } // crossValidate
 
-
-   //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The 'crossVal' abstract method must be coded in implementing classes to
      *  call the above 'crossValidate' method.  The 'algor' parameter may be
      *  specified as a lambda function to create the prediction algorithm.
-     *  @param k      the number of crosses and cross-validations (defaults to 10x).
      *  @param ord    the given order
+     *  @param k      the number of crosses and cross-validations (defaults to 10x).
      *  @param rando  whether to use randomized cross-validation
      */
-    def crossVal (k: Int = 10, ord: Int = 10, rando: Boolean = true)
+    def crossVal (ord: Int, k: Int = 10, rando: Boolean = true): Array [Statistic]
 
 } // PredictorVec abstract class
 

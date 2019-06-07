@@ -1,0 +1,53 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.2
+ *  @date    May 15 11:58:34 EDT 2015
+ *  @see     LICENSE (MIT style license file).
+ *
+ * @see https://docs.oracle.com/javafx/8/3d_graphics/camera.htm
+ *
+ * x-axis - points right
+ * y-axis - points down
+ * z-axis - points back
+ */
+
+package scalation.scala3d
+
+import javafx.scene.{PerspectiveCamera, Node}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Camera3D` class is used to create a camera to be added to a scene
+ *  (3D with perspective).
+ *  @param back  the distance to move the camera back in -z direction
+ */
+case class Camera3D (back: Double = 100.0)
+      extends PerspectiveCamera (true)
+{
+    val translateZ = Point3D (0.0, 0.0, -back)
+    //getTransforms ().add (Translate (translateZ))
+    getTransforms ().add (Translate (0.0, 0.0, -back))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /*  Flip the camera up-side down, if you prefer the y-axis to point up.
+     *  @see Example 3-4 in above URL.
+     *  @param root  the root node of the scene graph
+     *  FIX: need implementation of Xform from MoleculeSampleApp
+     *  @see https://docs.oracle.com/javafx/8/3d_graphics/Xform.java.html
+     *
+    def flip (root: Node)
+    {
+        val cameraXform = new Xform ()
+        root.getChildren ().add (cameraXform)
+        cameraXform.getChildren ().add (camera)
+        val rz = Rotate (180.0, Rotate.Z_AXIS)
+        camera.getTransforms().add (rz)
+    } // flip
+     */
+
+} // Camera3D class
+
+
+
+
+

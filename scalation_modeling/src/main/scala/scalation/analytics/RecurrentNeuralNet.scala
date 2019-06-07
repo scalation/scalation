@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Dong-Yu Yu, John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sat May  5 15:59:23 EDT 2018
  *  @see     LICENSE (MIT style license file).
  */

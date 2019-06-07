@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Wed Aug 24 19:53:22 EDT 2011
  *  @see     LICENSE (MIT style license file).
  */
@@ -11,8 +11,9 @@ package scalation.minima
 import scala.math.{abs, ceil, max, min, pow}
 
 import scalation.calculus.Differential.{gradient, gradientD}
+import scalation.linalgebra.FunctionV2S
 import scalation.linalgebra.{MatrixD, VectorD}
-import scalation.math.{double_exp, FunctionV2S}
+import scalation.math.double_exp
 import scalation.util.Error
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

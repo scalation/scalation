@@ -1,15 +1,19 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Mon Sep 24 19:00:23 EDT 2012
  *  @see     LICENSE (MIT style license file).
  */
 
 package scalation.analytics
 
+import scala.collection.mutable.Set
+
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.plot.Plot
+import scalation.stat.Statistic
+import scalation.util.{banner, Error}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `SimpleRegression` class supports simple linear regression.  In this case,
@@ -19,13 +23,14 @@ import scalation.plot.Plot
  *      y  =  b dot x + e  =  [b0, b1] dot [1, x1] + e  =  b0 + b1 * x1 + e
  *  <p>
  *  where 'e' represents the residuals (the part not explained by the model).
- *  @param x  the input/design matrix augmented with a first column of ones
- *  @param y  the response vector
+ *  @param x       the data/input matrix augmented with a first column of ones
+ *  @param y       the response/output vector
+ *  @param fname_  the feature/variable names
  */
-class SimpleRegression (x: MatriD, y: VectoD)
-      extends PredictorMat (x, y)
+class SimpleRegression (x: MatriD, y: VectoD, fname_ : Strings = null)
+      extends PredictorMat (x, y, fname_)
 {
-    if (x.dim2 != 2)     flaw ("constructor", "design matrix must have 2 columns")
+    if (x.dim2 != 2) flaw ("constructor", "data matrix must have 2 columns: " + x.dim2)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Train the predictor by fitting the parameter vector (b-vector) in the
@@ -52,15 +57,27 @@ class SimpleRegression (x: MatriD, y: VectoD)
 
         this
     } // train
+    
+    def forwardSel (cols: Set [Int], adjusted: Boolean): (Int, VectoD, VectoD) =
+    {
+        throw new UnsupportedOperationException ("SimpleRegression does not have feature selection")
+    } // forwardSel
+
+    def backwardElim (cols: Set [Int], adjusted: Boolean, first: Int): (Int, VectoD, VectoD) =
+    {
+        throw new UnsupportedOperationException ("SimpleRegression does not have feature selection")
+    } // backwardElim
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform 'k'-fold cross-validation.
+     *  @param xx     the data matrix to use (full data matrix or selected columns)
      *  @param k      the number of folds
      *  @param rando  whether to use randomized cross-validation
      */
-    def crossVal (k: Int = 10, rando: Boolean = true)
+    def crossVal (xx: MatriD = x, k: Int = 10, rando: Boolean = true): Array [Statistic] =
     {
-        crossValidate ((x: MatriD, y: VectoD) => new SimpleRegression (x, y), k, rando)
+        crossValidate ((x: MatriD, y: VectoD) => new SimpleRegression (x, y, fname),
+                                                 xx, k, rando)
     } // crossVal
 
 } // SimpleRegression class
@@ -70,13 +87,29 @@ class SimpleRegression (x: MatriD, y: VectoD)
 /** The `SimpleRegression` companion object provides a simple factory method
  *  for building simple regression linear regression models.
  */
-object SimpleRegression
+object SimpleRegression extends Error
 {
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a Simple Linear Regression model from a combined data matrix.
+     *  When 'xy.dim2 == 2', a column of all ones will be prepended to the matrix
+     *  corresponding to the intercept (form matrix from two column vectors [1 x]).
+     *  Take the first two columns for the predictor and the last column for the response.
+     *  @see `SimplerRegression` for a model without an intercept parameter
+     *  @param xy  the combined data matrix
+     */
+    def apply (xy: MatriD): SimpleRegression =
+    {
+        val n = xy.dim2 
+        if (n < 2) { flaw ("apply", "the length of the 'xy' matrix must be at least 2"); null }
+        else if (n == 2) new SimpleRegression (MatrixD.form_cw (1.0, xy.col(0)), xy.col(n-1))
+        else new SimpleRegression (xy.sliceCol (0, 2), xy.col(n-1))
+    } // apply
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a Simple Linear Regression model, automatically prepending the
      *  column of ones (form matrix from two column vectors [1 x]).
-     *  @param x  the input/design m-by-1 vector
-     *  @param y  the response m-vector
+     *  @param x  the data/input m-by-1 vector
+     *  @param y  the response/output m-vector
      */
     def apply (x: VectoD, y: VectoD): SimpleRegression =
     {
@@ -98,16 +131,18 @@ object SimpleRegressionTest extends App
     // 4 data points:
     val x = VectorD (1, 2, 3, 4)
     val y = VectorD (1, 3, 3, 4)
-//  val y = VectorD (1, 3, 2, 4)
 
     println ("x = " + x)
-    println ("y = " + y)
 
-    val rg = SimpleRegression (x, y)
+    val rg = SimpleRegression (x, y)                // automatically prepends a column of ones
     rg.train ().eval ()
 
-    println ("coefficient = " + rg.coefficient)
-    println ("fitMap      = " + rg.fitMap)
+    banner ("Test1: Simple Regression Model: y = b_0 + b_1 x + e")
+    println ("parameter = " + rg.parameter)         // parameter vector b
+    println ("fitMap    = " + rg.fitMap)            // quality of fit
+    println ("y         = " + y)                    // actual response vector
+    println ("yp        = " + rg.predict ())        // predicted response vector
+    println ("error     = " + rg.residual)          // error/residual vector = y - yp 
 
 } // SimpleRegressionTest object
 
@@ -131,22 +166,22 @@ object SimpleRegressionTest2 extends App
     val y = VectorD (2.0, 3.0, 5.0, 4.0, 6.0)       // y vector
 
     println ("x = " + x)
-    println ("y = " + y)
 
     val rg = new SimpleRegression (x, y)
     rg.train ().eval ()
 
-    println ("coefficient = " + rg.coefficient)
-    println ("fitMap      = " + rg.fitMap)
+    banner ("Test2: Simple Regression Model: y = b_0 + b_1 x + e")
+    println ("parameter = " + rg.parameter)         // parameter vector b
+    println ("fitMap    = " + rg.fitMap)            // quality of fit
+    println ("y         = " + y)                    // actual response vector
+    val yp = rg.predict ()
+    println ("yp        = " + yp)                   // predicted response vector
+    println ("error     = " + rg.residual)          // error/residual vector = y - yp 
 
-    val z  = VectorD (1.0, 5.0)               // predict y for one point
-    val yp = rg.predict (z)
-    println ("predict (" + z + ") = " + yp)
+    val z = VectorD (1.0, 5.0)                      // predict y for new point z
+    println (s"predict ($z) = ${rg.predict (z)}")
 
-    val yyp = VectorD (for (i <- x.range1) yield rg.predict (x(i)))    // predict y for several points
-    println ("predict (" + x + ") = " + yyp)
-
-    new Plot (x.col(1), y, yyp)
+    new Plot (x.col(1), y, yp, "plot y and yp vs. x")
 
 } // SimpleRegressionTest2 object
 
@@ -168,24 +203,63 @@ object SimpleRegressionTest3 extends App
                       590.0, 640.0, 450.0, 520.0, 690.0, 690.0, 770.0, 700.0, 730.0, 640.0)
 
     println ("x1 = " + x1)
-    println ("y  = " + y)
 
-    val x  = MatrixD.form_cw (1.0, x1)       // form matrix x from vector x1
+    val x = MatrixD.form_cw (1.0, x1)               // form matrix x from vector x1
 
     val rg = new SimpleRegression (x, y)
     rg.train ().eval ()
 
-    println ("coefficient = " + rg.coefficient)
-    println ("fitMap      = " + rg.fitMap)
+    banner ("Test3: Simple Regression Model: y = b_0 + b_1 x + e")
+    println ("parameter = " + rg.parameter)         // parameter vector b
+    println ("fitMap    = " + rg.fitMap)            // quality of fit
+    println ("y         = " + y)                    // actual response vector
+    val yp = rg.predict ()
+    println ("yp        = " + yp)                   // predicted response vector
+    println ("error     = " + rg.residual)          // error/residual vector = y - yp 
 
-    val z  = VectorD (1.0, 15.0)             // predict y for one point
-    val yp = rg.predict (z)
-    println ("predict (" + z + ") = " + yp)
+    val z  = VectorD (1.0, 15.0)                    // predict y for new point z
+    println (s"predict ($z) = ${rg.predict (z)}")
 
-    val yyp = VectorD (for (i <- x.range1) yield rg.predict (x(i)))    // predict y for several points
-    println ("predict (" + x + ") = " + yyp)
-    
-    new Plot (x1, y, yyp)
+    new Plot (x1, y, yp, "plot y and yp vs. x1")
 
 } // SimpleRegressionTest3 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SimpleRegressionTest4` object is used to test the `SimpleRegression` class
+ *  <p>
+ *      y = b dot x = b0 + b1 * x1
+ *  <p>
+ *  This version uses gradient descent to search for the optimal solution for b.
+ *  > runMain scalation.analytics.SimpleRegressionTest4
+ */
+object SimpleRegressionTest4 extends App
+{
+    // 4 data points:
+    val x  = new MatrixD ((4, 2), 1, 1,
+                                  1, 2,
+                                  1, 3,
+                                  1, 4)
+    val x1 = x.col(1)
+    val y  = VectorD (1, 3, 3, 4)
+    val _1 = VectorD.one (x1.dim)
+
+    println ("x = " + x)
+
+    val ITER = 10                                   // number of iterations
+    val eta  = 0.02                                 // try different values for the learning rate
+    val rg   = new SimpleRegression (x, y)          // create a simple regression model, don't train
+    var b    = new VectorD (x.dim2)                 // starting point [0, 0] for parameter vector b
+
+    banner (s"Test4: Simple Regression Model: gradient descent: eta = $eta")
+    for (it <- 1 to ITER) {
+        val yp = x * b
+        val e  = y - yp
+        val g  = VectorD (_1 dot e, x1 dot e)
+        b     += g * eta
+        val sse = e dot e
+        println (s"for iteration $it, b = $b, sse = $sse")
+    } // for
+
+} // SimpleRegressionTest4 object
 

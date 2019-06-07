@@ -1,0 +1,182 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Matthew Saltz, John Miller
+ *  @version 1.2
+ *  @date    Fri Jul 10 12:39:33 EDT 2015
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.graphalytics
+
+import java.io._
+
+import collection.immutable.{Set => SET}
+import scala.io._
+
+import LabelType.TLabel
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphIO` class is used to read/write graphs from/to a file.
+ *  @param g  the graph to read or write
+ */
+class GraphIO (g: Graph)
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Write the graph to ONE file in the following format:
+     *  <vertexId> <labelId> <adjVertex1> <adjVertex2> ...
+     *  @param gFile  the file in which to write the graph's label and edge information
+     */
+    def write2File (gFile: String)
+    {
+        val out = new PrintWriter (gFile)
+        for (i <- g.ch.indices) {
+            out.println (i + " " + g.label(i) + " " + g.ch(i).foldLeft ("")((str, n) => n + " " + str))
+        } // for
+        out.close
+    } // writeToFile
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Write the graph to TWO igraph compatible files.
+     *  @see igraph.sourceforge.net
+     */
+    def write2IgraphFiles (prefix: String): (String, String) =
+    {
+        val lFile = prefix + "igl.txt"
+        val eFile  = prefix + "ige.txt"
+        val lOut   = new PrintWriter (lFile)
+        g.label.foreach (lOut.println (_))
+        lOut.close
+        val eOut   = new PrintWriter (eFile)
+        for (i <- g.ch.indices) g.ch(i).foreach (x => eOut.println (i + " " + x))
+        eOut.close
+        (lFile, eFile)
+    } // write2IgraphFiles
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Write the graph to TWO Neo4J compatible files: lFile and eFile so that
+     *  they may be fed into Neo4j with one of its utilities.
+     *  FIX:  need to handle multiple edge types.
+     *  @param lFile  the file containing the graph labels (line: vertex-id TAB label)
+     *  @param eFile  the file the edges (line: start-id TAB end-id TAB type)
+     */
+    def write2Neo4JFiles (lFile: String, eFile: String)
+    {
+        val vertexLine = new PrintWriter (lFile)       // write the vertex ids and their labels
+        vertexLine.println ("id\tlabel")
+        g.label.foldLeft (1) { (i, l) => vertexLine.println (i + "\t" + l); i + 1 }
+        vertexLine.close
+        val edgeLine = new PrintWriter (eFile)        // write the edges and their types.
+        edgeLine.println ("start\tend\ttype")
+        g.ch.foldLeft (1) { (i, v) =>
+            v.foreach { c => edgeLine.println (i + "\t" + (c+1) + "\tEDGE") }
+            i + 1
+        } // foldLeft
+        edgeLine.close
+    } // write2Neo4JFiles
+
+} // GraphIO class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphIO` object is the companion object to the `GraphIO` class and is used
+ *  for reading graphs from files or graph databases.
+ */
+object GraphIO
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Read a graph from ONE file based on the format used by 'write2File':
+     *  <vertexId> <label> <adjVertex> <adjVertex2> ...
+     *  @param gFile     the file containing the graph's label and edge information
+     *  @param inverse   whether to store inverse adjacency sets (parents)
+     */
+    def apply (gFile: String, inverse: Boolean): Graph =
+    {
+        val lines = Source.fromFile (gFile).getLines         // get the lines from gFile
+        val label = lines.map (_.trim.split (" ")(1).trim.toInt).toArray
+        val ch    = lines.map (line =>
+            if (line.trim != "") line.split (" ").slice (2, line.length).map(_.trim.toInt).toSet
+            else SET [Int] ()
+        ).toArray
+        new Graph (ch, label, inverse)
+    } // apply
+
+/*
+    def apply (gFile: String, inverse: Boolean, sep: Char = ' '): Graph =
+    {
+        val lines = Source.fromFile (gFile).getLines         // get the lines from gFile
+        val n     = lines.size
+        val label = Array.ofDim [TLabel] (n)
+        val ch    = Array.ofDim [SET [Int]] (n)
+        var i     = 0
+        for (l <- lines) {
+            val arr = l.split (sep)
+            label(i) = arr(1).trim.toInt
+            ch(i)    = SET [Int] ()
+            ch(i)  ++= arr.slice (2, l.length).map(_.trim.toInt)
+            i       += 1
+        } // for
+        new Graph (ch, label, inverse)
+    } // apply
+*/
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Read a graph from TWO files:
+     *  'lFile' is a file with one label per line, where each line represents
+     *    the vertex with id <lineNumber>.
+     *  'eFile' is a file with each line representing the vertex with id
+     *    <lineNumber>, and each line contains a space-separated list of vertices
+     *    to which the current vertex is adjacent.
+     *  @param lFile  the file containing the graph labels
+     *  @param eFile  the file the edges (to create adjacency sets)
+     *  @param inverse   whether to store inverse adjacency sets (parents)
+     */
+    def read2Files (lFile: String, eFile: String, inverse: Boolean = false): Graph =
+    {
+        val lLines = Source.fromFile (lFile).getLines        // get the lines from lFile
+        val label  = lLines.map (_.trim.toInt).toArray       // make the label array
+        val eLines = Source.fromFile (eFile).getLines        // get the lines from eFile
+        val ch     = eLines.map ( line =>                    // make the adj array
+            if (line.trim != "") line.split (" ").map (x => x.trim.toInt).toSet
+            else SET [Int] ()
+        ).toArray
+        new Graph (ch, label)
+    } // read2Files
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Read a graph from TWO specially formatted Pajek files.
+     *  @param lFile     the file containing the graph labels
+     *  @param eFile     the file the edges (to create adjacency sets)
+     *  @param inverse   whether to store inverse adjacency sets (parents)
+     */
+    def read2PajekFile (lFile: String, eFile: String, inverse: Boolean = false): Graph =
+    {
+        val lLines = Source.fromFile (lFile).getLines        // get the lines from lFile
+        val label  = lLines.map (_.trim.toInt).toArray
+        val ch     = Array.ofDim [SET [Int]] (label.size)
+        for (i <- ch.indices) ch(i) = SET [Int] ()
+        val eLines = Source.fromFile (eFile).getLines        // get the lines from eFile
+        for (line <- eLines) {
+            val splitL = line.split (" ").map (_.trim)
+            val adjs   = splitL.slice (1, splitL.length).map(_.trim.toInt).toSet
+            ch(splitL(0).toInt-1) ++= adjs
+        } // for
+        new Graph (ch, label)
+    } // read2PajekFile
+
+} // GraphIO object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `GraphIOTest` object is used to test the `GraphIO` class and object.
+ */
+object GraphIOTest extends App
+{
+    val gFile = "graph_test.txt"
+    val g     = GraphGen.genRandomGraph (10, 5, 2)
+    g.print ()
+    println ("start writing graph to " + gFile)
+    (new GraphIO (g)).write2File (gFile)
+    println ("end writing graph to " + gFile)
+
+} // GraphIOTest object
+

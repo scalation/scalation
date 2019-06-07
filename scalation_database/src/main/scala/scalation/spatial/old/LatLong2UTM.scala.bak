@@ -1,0 +1,251 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Santosh Uttam Bobade, John Miller
+ *  @version 1.5
+ *  @date    Wed Aug  8 14:33:21 EDT 2018
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  Adapted from CoordinateConversion.java
+ *  Author: Sami Salkosuo, sami.salkosuo@fi.ibm.com
+ *
+ *  (c) Copyright IBM Corp. 2007
+ *  @see www.ibm.com/developerworks/library/j-coordconvert/index.html
+ */
+
+package scalation.spatial
+
+import scala.math._
+
+import scala.util.control.Breaks.{breakable, break}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Earth` object stores Earth properties.
+ */
+object Earth
+{
+    val radiusEquator = 6378137.0                        // equatorial radius (in meters)
+    val radiusPole    = 6356752.314                      // polar radius (in meters)
+//    val rRadii        = radiusPole / radiusEquator       // ratio of radii
+    val rRadii        = .9966       // ratio of radii
+    val e             = sqrt (1.0 - rRadii * rRadii)     // eccentricity
+    val ee            = e * e                            // eccentricity squared
+    val e1sq          = ee / (1.0 - ee)                  // ratio
+} // Earth object
+
+import Earth._
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `LatLong2UTM` object provides conversions between coordinates.
+ */
+object LatLong2UTM
+{
+    private val negLetters = Array ('A', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M')
+    private val posLetters = Array ('N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Z')
+    private val negDegrees = Array (-90, -84, -72, -64, -56, -48, -40, -32, -24, -16, -8)
+    private val posDegrees = Array (  0,   8,  16,  24,  32,  40,  48,  56,  64,  72, 84)
+    // Lat Long to UTM variables
+
+    // Calculate Meridional Arc Length
+    private val a0 = 6367449.146
+    private val b0 = 16038.42955
+    private val c0 = 16.83261333
+    private val d0 = 0.021984404
+    private val e0 = 0.000312705
+
+    // Calculation Constants
+    val sin1    = 4.84814E-06
+    val sin1_sq = sin1 * sin1
+
+/*
+    var p    = -0.483084                                                  // Delta Long
+    var k1   = 5101225.115                                                // Coefficients for UTM Coordinates
+    var k2   = 3750.291596
+    var k3   = 1.397608151
+    var k4   = 214839.3105
+    var k5   = -2.995382942
+*/
+    var p, k1, k2, k3, k4, k5 = 0.0
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Validate the 'latitude' and 'longitude' to make sure they are within the valid range.
+     *  @param latitude   the degrees North latitude
+     *  @param longitude  the degrees West longitude
+     */
+    def validate (latitude: Double, longitude: Double)
+    {
+        if (latitude < -90.0 || latitude > 90.0 || longitude < -180.0 || longitude >= 180.0)
+            throw new IllegalArgumentException ("Legal ranges: latitude [-90, 90], longitude [-180, 180).")
+    } // validate
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'latitude' and 'longitude' into UTM coordinates.
+     *  @param latitude   the degrees North latitude
+     *  @param longitude  the degrees West longitude
+     *  @param check      the check flag - validate if true
+     */
+    def latLong2UTM (latitude: Double, longitude: Double, check: Boolean = true) =
+    {
+        if (check) validate (latitude, longitude)
+        setVariables (latitude, longitude)
+        getLongZone (longitude) + " " + getLatZone (latitude) + " " + getEasting + " " + getNorthing (latitude)
+    } // latLong2UTM
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get the longitude zone.
+     *  @param longitude  the degrees West longitude
+     */
+    private def getLongZone (longitude: Double): String =
+    {
+        val longZone = if (longitude < 0.0) (180.0 + longitude) / 6 + 1 else longitude / 6 + 31
+        val value    = longZone.toInt.toString
+        if (value.length == 1) "0" + value else value
+    } // getLongZone
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get the latitude zone.
+     *  @param latitude  the degrees West longitude
+     */
+    private def getLatZone (latitude: Double): String =
+    {
+        var latIndex = -2
+        val lat = latitude.toInt
+
+        if (lat >= 0) {
+            val len = posLetters.length
+            breakable { for (i <- 0 until len) {
+                if (lat == posDegrees (i)) { latIndex = i; break }
+                if (lat  < posDegrees (i)) { latIndex = i - 1; break }
+            }} // breakable for
+        } else {
+            val len = negLetters.length
+            breakable { for (i <- 0 until len) {
+                if (lat == negDegrees (i)) { latIndex = i; break }
+                if (lat  < negDegrees (i)) { latIndex = i - 1; break }
+            }} // breakable for
+        } // if
+
+        if (latIndex == -1) latIndex = 0
+        if (lat >= 0) {
+            if (latIndex == -2) latIndex = posLetters.length - 1
+            posLetters (latIndex).toString
+        } else {
+            if (latIndex == -2) latIndex = negLetters.length - 1
+            negLetters (latIndex).toString
+        } // if
+    } // getLatZone
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get the meters North of zone reference (truncated to meters).
+     *  @param latitude  the degrees West longitude
+     */
+    private def getNorthing (latitude: Double): Int =
+    {
+        val northing = k1 + k2 * p * p + k3 * pow (p, 4)
+        (if (latitude < 0.0) 10000000 + northing else northing).toInt
+    } // getNorthing
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get the meters East of zone reference (truncated to meters).
+     */
+    private def getEasting: Int = (500000 + (k4 * p + k5 * pow (p, 3))).toInt
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set values for variable based on give 'latitude' and 'longitude'.
+     *  @param latitude   the degrees North latitude
+     *  @param longitude  the degrees West longitude
+     *
+    private def setVariables (latitude: Double, longitude: Double)
+    {
+        val latRad = toRadians (latitude)
+        val nu     = radiusEquator / sqrt (1 - pow (e * sin (latRad), 2))
+        val var1   = if (longitude < 0.0) ((180.0 + longitude) / 6.0).toInt + 1.0 else (longitude / 6.0).toInt + 31.0
+        val var2   = 6.0 * var1 - 183.0
+        val var3   = longitude - var2
+        val s      = a0 * latRad - b0 * sin (2 * latRad) + c0 * sin (4 * latRad) - d0 * sin (6 * latRad) + e0 * sin (8 * latRad)
+        p          = var3 * 0.36
+        k1         = s * rRadii
+        k2         = nu * sin (latRad) * cos (latRad) * sin1_sq * rRadii * 50000000
+        k3         = (nu * sin1_sq * sin1_sq * sin (latRad) * pow (cos (latRad), 3) / 24) *
+                     (5 - pow (tan (latRad), 2) + 9 * e1sq * pow (cos (latRad), 2) + 4 * pow (e1sq, 2) * pow (cos (latRad), 4)) *
+                     rRadii * 10000000000000000L
+        k4         = nu * cos (latRad) * sin1 * rRadii * 10000
+        k5         = (nu / 6) * pow (sin1 * cos (latRad), 3) * (1 - pow (tan (latRad), 2) + e1sq * pow (cos (latRad), 2)) *
+                     rRadii * 1000000000000L
+    } // setVariables
+     */
+
+        def setVariables (latitude: Double, longitude: Double)
+        {
+            val latRad = toRadians(latitude)
+            val nu = radiusEquator / pow(1 - pow(e * sin(latRad), 2), 1 / 2.0)
+            var var1 = 0.0
+            if (longitude < 0.0) var1 = ((180 + longitude) / 6.0).toInt + 1
+            else var1 = (longitude / 6).toInt + 31
+            val var2 = (6 * var1) - 183
+            val var3 = longitude - var2
+            p = var3 * 3600 / 10000
+            val s = a0 * latitude - b0 * sin(2 * latitude) + c0 * sin(4 * latitude) - d0 * sin(6 * latitude) + e0 * sin(8 * latitude)
+            k1 = s * rRadii
+            k2 = nu * sin(latitude) * cos(latitude) * pow(sin1, 2) * rRadii * 100000000 / 2
+            k3 = ((pow(sin1, 4) * nu * sin(latitude) * Math.pow(cos(latitude), 3)) / 24) * (5 - pow(tan(latitude), 2) + 9 * e1sq * pow(cos(latitude), 2) + 4 * pow(e1sq, 2) * pow(cos(latitude), 4)) * rRadii * 10000000000000000L
+            k4 = nu * cos(latitude) * sin1 * rRadii * 10000
+            k5 = pow(sin1 * cos(latitude), 3) * (nu / 6) * (1 - pow(tan(latitude), 2) + e1sq * pow(cos(latitude), 2)) * rRadii * 1000000000000L
+        } // setVariables
+
+
+} // LatLong2UTM object
+
+import LatLong2UTM.latLong2UTM
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `LatLong2UTMTest` object is used to test the `LatLong2UTM` class.
+ *  > runMain scalation.spatial.LatLong2UTMTest
+ */
+object LatLong2UTMTest extends App
+{
+    val s1  = latLong2UTM (  0.0000,    0.0000)
+    println ("latLong2UTM (  0.0000,    0.0000) = " + s1)
+//    assert (s1 == "31 N 166021 0")
+
+    val s2  = latLong2UTM (  0.1300,   -0.2324)
+    println ("latLong2UTM (  0.1300,   -0.2324) = " + s2)
+//    assert (s2 == "30 N 808084 14385")
+
+    val s3  = latLong2UTM (-45.6456,   23.3545)
+    println ("latLong2UTM (-45.6456,   23.3545) = " + s3)
+//    assert (s3 == "34 G 683473 4942631")
+
+    val s4  = latLong2UTM (-12.7650,  -33.8765)
+    println ("latLong2UTM (-12.7650,  -33.8765) = " + s4)
+//    assert (s4 == "25 L 404859 8588690")
+
+    val s5  = latLong2UTM (-80.5434, -170.6540)
+    println ("latLong2UTM (-80.5434, -170.6540) = " + s5)
+//    assert (s5 == "02 C 506346 1057742")
+
+    val s6  = latLong2UTM ( 90.0000,  177.0000)
+    println ("latLong2UTM ( 90.0000,  177.0000) = " + s6)
+//    assert (s6 == "60 Z 500000 9997964")
+
+    val s7  = latLong2UTM (-90.0000, -177.0000)
+    println ("latLong2UTM (-90.0000, -177.0000) = " + s7)
+//    assert (s7 == "01 A 500000 2035")
+
+    val s8  = latLong2UTM ( 90.0000,    3.0000)
+    println ("latLong2UTM ( 90.0000,    3.0000) = " + s8)
+//   assert (s8 == "31 Z 500000 9997964")
+
+    val s9  = latLong2UTM ( 23.4578, -135.4545)
+    println ("latLong2UTM ( 23.4578, -135.4545) = " + s9)
+//    assert (s9 == "08 Q 453580 2594272")
+
+    val s10 = latLong2UTM ( 77.3450,  156.9876)
+    println ("latLong2UTM ( 77.3450,  156.9876) = " + s10)
+//    assert (s10 == "57 X 450793 8586116")
+
+    val s11 = latLong2UTM (-89.3454,  -48.9306)
+    println ("latLong2UTM (-89.3454,  -48.9306) = " + s11)
+//    assert (s11 == "22 A 502639 75072")
+    
+} // LatLong2UTMTest
+

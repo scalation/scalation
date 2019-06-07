@@ -1,0 +1,30 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.1
+ *  @date    Sun Oct  9 14:56:22 EDT 2011
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.process
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Signifiable` trait defines standard messages/signals sent between actors
+ *  implementing process interaction simulations.
+ */
+trait Signifiable
+{
+    /** Signal for resuming an actor
+     */
+    protected val RESUME_ACTOR = "RA"
+
+    /** Signal for resuming the director
+     */
+    protected val RESUME_DIRECTOR = "RD"
+
+    /** Signal indicating results returned
+     */
+    protected val RETURN_RESULTS = "RR"
+
+} // Signifiable trait
+

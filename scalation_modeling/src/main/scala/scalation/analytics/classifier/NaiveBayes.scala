@@ -1,14 +1,15 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Hao Peng
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sat Sep  8 13:53:16 EDT 2012
  *  @see     LICENSE (MIT style license file).
  *
  *  @see eric.univ-lyon2.fr/~ricco/tanagra/fichiers/en_Tanagra_Naive_Bayes_Classifier_Explained.pdf
  */
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
 import scala.math.log
 
@@ -18,6 +19,7 @@ import scalation.linalgebra.gen.HMatrix3
 import scalation.util.banner
 
 import BayesClassifier.me_default
+import ClassifierInt.pullResponse
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `NaiveBayes0` class implements an Integer-Based Naive Bayes Classifier,
@@ -29,22 +31,20 @@ import BayesClassifier.me_default
  *  by multiplying these by values computed using conditional probabilities.  The
  *  classifier is naive, because it assumes feature independence and therefore
  *  simply multiplies the conditional probabilities.
- *
+ *  -----------------------------------------------------------------------------
  *  This classifier uses the standard cross-validation technique.
  *  -----------------------------------------------------------------------------
- *
- *  @param x   the integer-valued data vectors stored as rows of a matrix
- *  @param y   the class vector, where y(l) = class for row l of the matrix x, x(l)
- *  @param fn  the names for all features/variables
- *  @param k   the number of classes
- *  @param cn  the names for all classes
- *  @param vc  the value count (number of distinct values) for each feature
- *  @param me  use m-estimates (me == 0 => regular MLE estimates)
+ *  @param x    the integer-valued data vectors stored as rows of a matrix
+ *  @param y    the class vector, where y(l) = class for row l of the matrix x, x(l)
+ *  @param fn_  the names of the features/variables
+ *  @param k    the number of classes
+ *  @param cn_  the names of the classes
+ *  @param vc   the value count (number of distinct values) for each feature
+ *  @param me   use m-estimates (me == 0 => regular MLE estimates)
  */
-class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String] = null,
-                   k: Int = 2, cn: Array [String] = Array ("no", "yes"),
+class NaiveBayes0 (x: MatriI, y: VectoI, fn_ : Strings = null, k: Int = 2, cn_ : Strings = null,
                    protected var vc: Array [Int] = null, me: Double = me_default)
-      extends BayesClassifier (x, y, fn, k, cn)
+      extends BayesClassifier (x, y, fn_, k, cn_)
 {
     private val DEBUG = false                                // debug flag
 
@@ -54,8 +54,8 @@ class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String] = null,
         shiftToZero; vc = vc_fromData                        // set value counts from data
     } // if
 
-    f_CX = new HMatrix3 [Int] (k, n, vc)                     // frequency counts for class yi & feature xj
-    protected val p_X_C = new HMatrix3 [Double] (k, n, vc)   // conditional probabilities for feature xj given class yi
+    nu_Xy = new HMatrix3 [Int] (k, n, vc)                    // frequency counts for class yi & feature xj
+    protected val p_Xy = new HMatrix3 [Double] (k, n, vc)    // conditional probabilities for feature xj given class yi
 
     if (DEBUG) println ("distinct value count vc = " + vc.deep)
 
@@ -64,7 +64,7 @@ class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String] = null,
      *  conditional probabilities for x_j.
      *  @param itest  indices of the instances considered as testing data
      */
-    def train (itest: IndexedSeq [Int]): NaiveBayes0 =
+    def train (itest: Ints): NaiveBayes0 =
     {
         val idx = if (additive) 0 until m diff itest else itest
         frequencies (idx)
@@ -78,33 +78,32 @@ class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String] = null,
      */
     private def train2 ()
     {
-        p_C = nu_y.toDouble / md                               // probability for class yi
+        p_y = nu_y.toDouble / md                               // probability for class yi
         for (i <- 0 until k; j <- 0 until n if fset(j)) {      // for each class yi & feature xj
             val me_vc = me / vc(j).toDouble
             for (xj <- 0 until vc(j)) {                        // for each value for feature j: xj
-                p_X_C(i, j, xj) = (f_CX(i, j, xj) + me_vc) / (nu_y(i) + me)
+                p_Xy(i, j, xj) = (nu_Xy(i, j, xj) + me_vc) / (nu_y(i) + me)
             } // for
         } // for
 
         if (DEBUG) {
-            println ("p_C   = " + p_C)                         // P(y = l)
-            println ("p_X_C = " + p_X_C)                       // P(x_j = h | y = l)
+            println ("p_y  = " + p_y)                         // P(y = l)
+            println ("p_Xy = " + p_Xy)                        // P(x_j = h | y = l)
         } // if
     } // train2
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Count the frequencies for 'y' having class 'i' and 'x' for cases 0, 1, ...
-     *  This is the quick/decremental version.
      *  @param idx  indices of the instances considered training data
      */
-    protected def frequencies (idx: IndexedSeq [Int])
+    protected def frequencies (idx: Ints)
     {
         reset ()
         for (i <- idx) updateFreq (i)
 
         if (DEBUG) {
-            println ("nu_y = " + nu_y)                         // #(y = l)
-            println ("f_CX = " + f_CX)                         // #(x_j = h & y = l)
+            println ("nu_y  = " + nu_y)                        // #(y = l)
+            println ("nu_Xy = " + nu_Xy)                       // #(x_j = h & y = l)
         } // if
     } // frequencies
 
@@ -112,11 +111,11 @@ class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String] = null,
     /** Increment frequency counters based on the 'i'th row of the data matrix.
      *  @param i  the index for current data row
      */
-    protected override def updateFreq (i: Int)
+    protected def updateFreq (i: Int)
     {
         val yi    = y(i)                                       // get the class for ith row
         nu_y(yi) += 1                                          // increment frequency for class yi
-        for (j <- x.range2 if fset(j)) f_CX (yi, j, x(i, j)) += 1
+        for (j <- x.range2 if fset(j)) nu_Xy(yi, j, x(i, j)) += 1
     } // updateFreq
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -128,8 +127,8 @@ class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String] = null,
     def classify (z: VectoI): (Int, String, Double) =
     {
         if (DEBUG) banner ("classify (z)")
-        val prob = new VectorD (p_C)
-        for (i <- 0 until k; j <- 0 until n if fset(j)) prob(i) *= p_X_C(i, j, z(j))   // P(X_j = z_j | C = i)
+        val prob = new VectorD (p_y)
+        for (i <- 0 until k; j <- 0 until n if fset(j)) prob(i) *= p_Xy(i, j, z(j))   // P(X_j = z_j | y = i)
         if (DEBUG) println ("prob = " + prob)
         val best = prob.argmax ()                    // class with the highest relative posterior probability
         (best, cn(best), prob(best))                 // return the best class and its name
@@ -145,8 +144,8 @@ class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String] = null,
     def lclassify (z: VectoI): (Int, String, Double) =
     {
         if (DEBUG) banner ("lclassify (z)")
-        val prob = vlog (new VectorD (p_C))
-        for (i <- 0 until k; j <- 0 until n if fset(j)) prob(i) += log (p_X_C(i, j, z(j)))   // P(X_j = z_j | C = i)
+        val prob = vlog (new VectorD (p_y))
+        for (i <- 0 until k; j <- 0 until n if fset(j)) prob(i) += log (p_Xy(i, j, z(j)))   // P(X_j = z_j | y = i)
         if (DEBUG) println ("prob = " + prob)
         val best = prob.argmax ()                    // class with the highest relative posterior probability
         (best, cn(best), prob(best))                 // return the best class and its name
@@ -165,8 +164,18 @@ class NaiveBayes0 (x: MatriI, y: VectoI, fn: Array [String] = null,
     def reset ()
     {
         nu_y.set (0)
-        f_CX.set (0)
+        nu_Xy.set (0)
     } // reset
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Print the conditional probability tables by iterating over the features/variables
+     */
+    def printConditionalProb ()
+    {
+        for (j <- 0 until p_Xy.dim2) {
+            println (s"ConditionalProb for x$j = ${p_Xy(j)}")
+        } // for
+    } // printConditionalProb
 
 } // NaiveBayes0 class
 
@@ -184,10 +193,11 @@ object NaiveBayes0
      *  @param vc  the value count (number of distinct values) for each feature
      *  @param me  use m-estimates (me == 0 => regular MLE estimates)
      */
-    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
+    def apply (xy: MatriI, fn: Strings, k: Int, cn: Strings,
                vc: Array [Int] = null, me: Double = me_default) =
     {
-        new NaiveBayes0 (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn, vc, me)
+        val (x, y) = pullResponse (xy)
+        new NaiveBayes0 (x, y, fn, k, cn, vc, me)
     } // apply
 
 } // NaiveBayes0 object
@@ -195,25 +205,24 @@ object NaiveBayes0
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The same classifier but uses an optimized cross-validation technique.
- *  -----------------------------------------------------------------------------
- *  @param x   the integer-valued data vectors stored as rows of a matrix
- *  @param y   the class vector, where y(l) = class for row l of the matrix x, x(l)
- *  @param fn  the names for all features/variables
- *  @param k   the number of classes
- *  @param cn  the names for all classes
- *  @param vc  the value count (number of distinct values) for each feature
- *  @param me  use m-estimates (me == 0 => regular MLE estimates)
+ *-----------------------------------------------------------------------------
+ *  @param x    the integer-valued data vectors stored as rows of a matrix
+ *  @param y    the class vector, where y(l) = class for row l of the matrix x, x(l)
+ *  @param fn_  the names of the features/variables
+ *  @param k    the number of classes
+ *  @param cn_  the names of the classes
+ *  @param vc_  the value count (number of distinct values) for each feature
+ *  @param me   use m-estimates (me == 0 => regular MLE estimates)
  */
-class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String] = null,
-                  k: Int = 2, cn: Array [String] = Array ("no", "yes"),
+class NaiveBayes (x: MatriI, y: VectoI, fn_ : Strings = null, k: Int = 2, cn_ : Strings = null,
                   vc_ : Array [Int] = null, me: Float = me_default)
-        extends NaiveBayes0 (x, y, fn, k, cn, vc_, me)
+      extends NaiveBayes0 (x, y, fn_, k, cn_, vc_, me)
 {
     private val DEBUG = true                               // debug flag
 
     println ("vc = " + vc.deep)
     private val g_nu_y  = new VectorI (k)                  // global frequency counts (using entire dataset) for class yi
-    private val g_f_CX = new HMatrix3 [Int] (k, n, vc)     // global frequency counts (using entire dataset) for class yi & feature xj
+    private val g_nu_Xy = new HMatrix3 [Int] (k, n, vc)    // global frequency counts (using entire dataset) for class yi & feature xj
 
     additive = false
 
@@ -229,7 +238,7 @@ class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String] = null,
         for (i <- 0 until m) {
             val yi = y(i)
             g_nu_y(yi) += 1
-            for (j <- 0 until n if fset(j)) g_f_CX (yi, j, x(i, j)) += 1
+            for (j <- 0 until n if fset(j)) g_nu_Xy (yi, j, x(i, j)) += 1
         } // for
     } // frequenciesAll
 
@@ -241,7 +250,7 @@ class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String] = null,
     {
         val yi   = y(i)                                        // get the class for ith row
         nu_y(yi) -= 1                                          // decrement frequency for class yi
-        for (j <- x.range2 if fset(j)) f_CX (yi, j, x(i, j)) -= 1
+        for (j <- x.range2 if fset(j)) nu_Xy (yi, j, x(i, j)) -= 1
     } // updateFreq
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -251,7 +260,7 @@ class NaiveBayes (x: MatriI, y: VectoI, fn: Array [String] = null,
     {
         for (i <- 0 until k) {
             nu_y(i) = g_nu_y(i)
-            for (j <- x.range2 if fset(j); xj <- 0 until vc(j)) f_CX(i, j, xj) = g_f_CX(i, j, xj)
+            for (j <- x.range2 if fset(j); xj <- 0 until vc(j)) nu_Xy(i, j, xj) = g_nu_Xy(i, j, xj)
         } // for
     } // reset
 
@@ -271,10 +280,11 @@ object NaiveBayes
      *  @param vc  the value count (number of distinct values) for each feature
      *  @param me  use m-estimates (me == 0 => regular MLE estimates)
      */
-    def apply (xy: MatriI, fn: Array [String], k: Int, cn: Array [String],
+    def apply (xy: MatriI, fn: Strings, k: Int, cn: Strings,
                vc: Array [Int] = null, me: Float = me_default) =
     {
-        new NaiveBayes (xy(0 until xy.dim1, 0 until xy.dim2 - 1), xy.col(xy.dim2 - 1), fn, k, cn, vc, me)
+        val (x, y) = pullResponse (xy)
+        new NaiveBayes (x, y, fn, k, cn, vc, me)
     } // apply
 
 } // NaiveBayes object
@@ -289,20 +299,37 @@ object NaiveBayesTest extends App
     import ExampleTennis._
 
     banner ("Tennis Example")
-    println ("xy = " + xy)
-    println ("---------------------------------------------------------------")
+    println ("xy = " + xy)                                              // combined data matrix [ x | y ]
+    println ("- * 60")
 
     val nb0 = NaiveBayes0 (xy, fn, k, cn, null, 0)                      // create a classifier
     val nb  = NaiveBayes  (xy, fn, k, cn, null, 0)                      // create a classifier
     nb0.train ()                                                        // train the classifier
     nb.train ()                                                         // train the classifier
+    nb.printClassProb ()                                                // print the class probabilities
+    nb.printConditionalProb ()                                          // print the conditional probability tables
 
     val z = VectorI (2, 2, 1, 1)                                        // new data vector to classify
-    println ("Use nb0 to classify (" + z + ") = " + nb0.classify (z))
-    println ("Use nb  to classify (" + z + ") = " + nb.classify (z))
+    banner (s"Classify $z")
+    println (s"Use nb0 to classify ($z) = ${nb0.classify (z)}")
+    println (s"Use nb  to classify ($z) = ${nb.classify (z)}")
 
+    banner ("All Test")
+    val x  = xy.sliceCol (0, xy.dim2 - 1)                               // data matrix
+    val y  = xy.col (xy.dim2 - 1)                                       // response/class label vector
+    val yp = new VectorI (xy.dim1)                                      // predicted class label vector
+    for (i <- x.range1) {
+        yp(i) = nb.classify (x(i))._1
+        println (s"Use nb to classify (${x(i)}) = ${yp(i)}")
+    } // for
+    val cm  = new ConfusionMat (y, yp, k)                               // confusion matrix
+    println ("Confusion Matrix = " + cm.confusion)
+    println ("accuracy         = " + cm.accuracy)
+    println ("prec-recall      = " + cm.prec_recl)
+
+    banner ("Cross-validation")
     println ("nb0 cv accu = " + nb0.crossValidateRand (10, true))
-    println ("nb  cv accu = " + nb.crossValidateRand (10, true))
+    println ("nb  cv accu = " + nb.crossValidateRand (10, true))        // 10-fold cross-validation
 
 } // NaiveBayesTest object
 
@@ -353,8 +380,7 @@ object NaiveBayesTest2 extends App
     println ("Use nb  to classify (" + z2 + ") = " + nb.classify (z2))
 
     val yp = nb.classify (x)
-    println (nb.fitLabel)
-    println (nb.fit (y, yp))
+    println (nb.fitMap (y, yp))
 
 } // NaiveBayesTest2 object
 
@@ -539,4 +565,40 @@ object NaiveBayesTest6 extends App
     println ("nb  cv accu = " + nb.crossValidateRand ())  // cross validate the classifier
 
 } // NaiveBayesTest6 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `NaiveBayesTest7` object is used to test the 'NaiveBayes' class.
+ *  > runMain scalation.analytics.classifier.NaiveBayesTest7
+ */
+object NaiveBayesTest7 extends App
+{
+    val xy = new MatrixI ((9, 3), 0, 0, 1,              // 9-by-3 matrix
+                                  0, 1, 0,
+                                  0, 2, 0,
+                                  1, 0, 1,
+                                  1, 1, 0,
+                                  1, 2, 0,
+                                  2, 0, 1,
+                                  2, 1, 0,
+                                  2, 2, 1)
+
+    println ("xy = " + xy)
+
+    val x = xy.sliceCol (0, xy.dim2 - 1)                                // data matrix
+    val y = xy.col (xy.dim2 - 1)                                        // actual class label vector
+    val nb = new NaiveBayes (x, y)
+    nb.train ()
+
+    banner ("All Test")
+
+    val yp = nb.classify (x)                                            // predicted class label vector
+    for (i <- y.range) println (s"y_i = ${y(i)} \t yp_i = ${yp(i)}")
+
+    val cm  = new ConfusionMat (y, yp)                                  // confusion matrix
+    println ("Confusion Matrix = " + cm.confusion)
+    println ("accuracy         = " + cm.accuracy)
+    println ("prec-recall      = " + cm.prec_recl)
+
+} // NaiveBayesTest7 object
 

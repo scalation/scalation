@@ -1,0 +1,164 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller, Aravind Kalimurthy
+ *  @version 1.2
+ *  @date    Mon Aug 29 12:31:10 EDT 2016
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  @see docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html
+ */
+
+package scalation
+package util
+
+import java.util.regex.MatchResult
+import java.util.regex.{Matcher => JavaMatcher}
+import dk.brics.automaton.{AutomatonMatcher => BricsMatcher}
+import java.util.regex.{Pattern => JavaPattern}
+import dk.brics.automaton.{AutomatonMatcher => BricsPattern}
+import dk.brics.automaton._
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `MPattern` class allows the user to select amoung multiple regex pattern
+ *  classes used to preprocess/compile a string into a pattern to be used by a
+ *  regex pattern matcher.
+ *  @param 
+ */
+class MPattern (val basePattern: Any)
+{    
+    println ("basePattern = " + basePattern)
+    if (! (basePattern.isInstanceOf [JavaPattern] || basePattern.isInstanceOf [BricsPattern])
+        println ("constructor: basePatter type = " + basePattern.getClass () + " not supported")
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a matcher that will match the given input against this pattern.
+     *  @param input  the string to be matched
+     */
+    def matcher (input: String): MPattern =
+    {
+        new MPattern (basePattern match {
+        case _: JavaPattern  => basePattern.asInstanceOf [JavaPattern].matcher (input)
+        case _: BricsPattern => basePattern.asInstanceOf [BricsPattern].newMatcher (input)
+        case _               => { println ("matcher: regex pattern not supported"); null.asInstanceOf [MatchResult] }
+        }) // match
+    } // matcher
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The equal-match operator determines whether the 'self' string matches the
+     *  given 'pattern' string.   Pattern may contain single- and/or multiple-replacing
+     *  wildcard characters.
+     *  @param input  the input against which the string to be matched
+     */
+    def =~ (input: String): Boolean = //matcher (input).find ()
+    {
+        val matchr = matcher (input).basePattern
+        matchr match {
+        case _: JavaMatcher  => matchr.asInstanceOf [JavaMatcher].find ()
+        case _: BricsMatcher => matchr.asInstanceOf [BricsMatcher].find ()
+        case _               => { println ("matchr type = " + matchr.getClass ()); println ("=~: regex pattern not supported"); false }
+        } // match
+    } // =~
+
+//    private val pat = Pattern.compile (patString)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Test whether the 'self' string matches the given 'pattern' string.
+     *  Pattern may contain single- and/or multiple-replacing wildcard characters.
+     *  @param input  the input against which the string to be matched
+    def isMatch (input: String): Boolean = 
+    {
+        val mat = pat.matcher (input)
+        mat.find ()                          // match part of input
+//      mat.matches ()                       // match whole input
+    } // isMatch
+     */
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert this `MPattern` object to its underlying string.
+    override def toString: String = patString
+     */
+
+} // MPattern class
+
+
+object MPattern
+{
+    private var basePattern = "JavaPattern"
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reset the 'basePattern'.
+     *  @param _basePattern  the new 'basePattern'
+     */
+    def reset (_basePattern: String) { basePattern = _basePattern }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compile the given regular expression into a pattern/machine to recognize.
+     *  @param regex  the regular expression to be compiled
+     */
+    def compile (regex: String): MPattern =
+    {
+        basePattern match {
+        case "JavaPattern"  => new MPattern (JavaPattern.compile (regex))
+        case "BricsPattern" => new MPattern (new BricsPattern (new RegExp (regex).toAutomaton))
+        case _              => { println ("compile: regex pattern not supported"); null }
+        } // match
+    } // compile
+
+} // MPattern object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `MPatternTest` object is used to test the `MPattern` class.
+ *  @see http://lh3lh3.users.sourceforge.net/reb.shtml
+ *  > run-main scalation.util.MPatternTest
+ */
+object MPatternTest extends App
+{
+    import scala.collection.mutable.ListBuffer
+    import scalation.linalgebra.MatrixD
+
+    val DEBUG = true
+    val ITER  = 1
+    val sourceFile = SRC_SCALA_DIR + ⁄ + "scalation" + ⁄ + "util" + ⁄ + "MPattern.scala"
+
+    val pattern = Array (
+        "([a-zA-Z][a-zA-Z0-9]*)://([^ /]+)(/[^ ]*)",                         // URI (protocol://server/path) 
+        "([^ @]+)@([^ @]+)",                                                 // Email (name@server)
+        "([0-9][0-9]?)/([0-9][0-9]?)/([0-9][0-9]([0-9][0-9])?)",             // Date (month/day/year)
+        "([a-zA-Z][a-zA-Z0-9]*)://([^ /]+)(/[^ ]*)?|([^ @]+)@([^ @]+)")      // URI|Email
+
+    val lines = getFromURL_File (sourceFile).toArray                         // lines from file
+    val tim   = new MatrixD (pattern.length, 2)                              // matrix to hold timing results
+    val res   = ListBuffer [Boolean] ()                                      // match results for java.util.regex
+    val res2  = ListBuffer [Boolean] ()                                      // match results for competitor
+
+    for (j <- pattern.indices) {
+        banner ("T E S T: " + pattern(j))
+
+        banner ("Test: java.util.regex")
+        MPattern.reset ("BricsPattern")
+        val pat = MPattern.compile (pattern(j))
+        for (line <- lines) pat =~ line       // don't gauge first time through
+        tim(j, 0) = gauge {
+            for (i <- 0 until ITER) {
+                res.clear ()
+                for (line <- lines) res += pat =~ line
+            } // for
+        } // gauge
+        println ("res = " + res)
+
+        banner ("Test: competitor")
+        // ...
+        println ("res2 = " + res2)
+//      assert (res2 == res)
+    } // for
+
+    println ("tim = " + tim)
+    println ("avg tim = " + tim.mean)
+        
+} // MPatternTest object
+
+// http://www.cs.uga.edu/~jam/scalation.html
+// jam@cs.uga.edu
+// 08/28/2016
+// http://www.cs.uga.edu/~jam/scalation.html

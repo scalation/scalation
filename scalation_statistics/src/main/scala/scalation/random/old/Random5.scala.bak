@@ -1,0 +1,157 @@
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.1
+ *  @date    Sat Mar 22 14:39:30 EDT 2014
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  MRG (Multiple Recursive Generator)
+ */
+
+package scalation.random
+
+import scalation.util.Timer.time
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Random3` class generates random real numbers in the range (0, 1).
+ *  It uses the '' generator developed by Deng and Lin, described in
+ *  "Random Number Generation for the New Century".
+ *   is a Multiple Recursive Generator (MRG) shown to have good
+ *  performance and statistical properties for simulations.
+ *  <br>
+ *      MRG: x_i = (a_1 x_i-1 + a_2 x_i-2) % m
+ *  <br>
+ *  where a_1 = -1 and a_2 = 39613
+ *  @see http://www.personal.psu.edu/users/j/x/jxz203/lin/Lin_pub/2000_AmStat.pdf
+ *  @param stream  the random number stream index
+ */
+case class Random3 (stream: Int = 0)
+{
+    private val ba = Array (26403l, 27149l, 29812l, 30229l, 31332l,
+                            33236l, 33986l, 34601l, 36098l, 36181l,
+                            36673l, 36848l, 37097l, 37877l, 39613l,
+                            40851l, 40961l, 42174l, 42457l, 43199l,
+                            43693l, 44314l, 44530l, 45670l, 46338l)
+
+    private val m    = 2147483647l            // modulus (2^31 - 1)
+    private val a_2  = ba(stream)             // multiplier a_2          // FIX - better streams
+    private val norm = 1.0 / m.toDouble       // normalization to (0, 1)
+
+    private var x_1  = 3l                     // x_i-1
+    private var x_2  = 7l                     // x_i-2
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the theorectical mean for the random number generator's gen method.
+     */
+    def mean: Double = 0.5
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the next random number as a Double in the interval (0, 1).
+     */
+    def gen: Double =
+    {
+        var tmp = a_2 * x_2 - x_1
+        if (tmp < 0) tmp += m
+        tmp %= m
+        x_2 = x_1
+        x_1 = tmp
+        x_1 * norm
+    } // gen
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the next stream value as a Long integer.
+     */
+    def lgen: Long =
+    {
+        var tmp = a_2 * x_2 - x_1
+        if (tmp < 0) tmp += m
+        tmp %= m
+        x_2 = x_1
+        x_1 = tmp
+        x_1
+    } // lgen
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find and print out 100 (nStreams) seed values as a val declaration that
+     *  can be copied into a class to initialize the seeds (as done above).
+     *
+    def findSeeds - FIX
+    {
+        val streamLen = ((m - 1l) / nStreams).toLong
+        println ("    private val seeds: Array [Long] = Array (")
+        var seed = seed0
+        for (i <- 0 until nStreams) {
+            if (i % 5 != 4) {
+                print ("\t" + seed + "l,")
+                if (seed < 100000l) print ("\t")
+            } else if (i != nStreams - 1) {
+                println ("\t" + seed + "l,")
+            } else {
+                println ("\t" + seed + "l)")
+            } // if
+            var j = 0l
+            while (j < streamLen) { seed = lgen; j += 1 }
+//          for (j <- 0 until streamLen) seed = lgen         // limited to Int
+        } // for
+    } // find seeds
+     */
+
+} // Random3 class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RandomTest` object is used to test the `Random` class.
+ */
+object Random3Test extends App
+{
+    val rng = Random3 ()
+    var sum = 0.0
+    time {  for (i <- 0 until 10000000) sum += rng.gen }
+    println ("sum = " + sum)
+} // Random3Test	
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The Random Number Generator `RNG3` object provides multiple pre-built
+ *  random number streams.
+ */
+object RNG3
+{
+    /** Array of random number streams
+     */
+    val rand = Array [Random3] (
+         Random3 (0),  Random3 (1),  Random3 (2),  Random3 (3),  Random3 (4),
+         Random3 (5),  Random3 (6),  Random3 (7),  Random3 (8),  Random3 (9),
+         Random3 (10), Random3 (11), Random3 (12), Random3 (13), Random3 (14),
+         Random3 (15), Random3 (16), Random3 (17), Random3 (18), Random3 (19),
+         Random3 (20), Random3 (21), Random3 (22), Random3 (23), Random3 (24),
+         Random3 (25), Random3 (26), Random3 (27), Random3 (28), Random3 (29),
+         Random3 (30), Random3 (31), Random3 (32), Random3 (33), Random3 (34),
+         Random3 (35), Random3 (36), Random3 (37), Random3 (38), Random3 (39),
+         Random3 (40), Random3 (41), Random3 (42), Random3 (43), Random3 (44),
+         Random3 (45), Random3 (46), Random3 (47), Random3 (48), Random3 (49),
+         Random3 (50), Random3 (51), Random3 (52), Random3 (53), Random3 (54),
+         Random3 (55), Random3 (56), Random3 (57), Random3 (58), Random3 (59),
+         Random3 (60), Random3 (61), Random3 (62), Random3 (63), Random3 (64),
+         Random3 (65), Random3 (66), Random3 (67), Random3 (68), Random3 (69),
+         Random3 (70), Random3 (71), Random3 (72), Random3 (73), Random3 (74),
+         Random3 (75), Random3 (76), Random3 (77), Random3 (78), Random3 (79),
+         Random3 (80), Random3 (81), Random3 (82), Random3 (83), Random3 (84),
+         Random3 (85), Random3 (86), Random3 (87), Random3 (88), Random3 (89),
+         Random3 (90), Random3 (91), Random3 (92), Random3 (93), Random3 (94),
+         Random3 (95), Random3 (96), Random3 (97), Random3 (98), Random3 (99))
+
+} // RNG3 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `SeedFinder3` object find seeds for all the random number streams.
+ *
+object SeedFinder3 extends App
+{
+    val rng = Random3 ()
+    rng.findSeeds
+
+} // SeedFinder3 object
+ */
+

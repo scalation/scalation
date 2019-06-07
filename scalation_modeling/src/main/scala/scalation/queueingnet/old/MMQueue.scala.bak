@@ -1,0 +1,138 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.1
+ *  @date    Tue Nov 29 15:46:51 EST 2011
+ *  @see     LICENSE (MIT style license file).
+ *  @see     www.ece.virginia.edu/~mv/edu/715/lectures/QNet.pdf
+ *  @see     hspm.sph.sc.edu/courses/716-8%20Queuing%20Theory%20Cookbook.pdf
+ */
+
+package scalation.queueingnet
+
+import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.linalgebra.MatrixD.eye
+import scalation.math.Combinatorics.fac
+import scalation.math.DoubleWithExp._
+import scalation.math.IntWithExp._
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `MMQueue` class is used to solve single node Markovian Queueing problems.
+ *  The node represents a service station consisting of one queue and k servers.
+ *  It is currently limited to M/M/1, M/M/k and M/M/1/1 queues.
+ *  @param lambda  the external arrival rate
+ *  @param mu      the service rate
+ *  @param k       the number of servers
+ *  @param c       the capacity of the queue (non-positive => unlimited)
+ */
+class MMQueue (lambda: Double, mu: Double, private val k: Int = 1, private val c: Int = -1)
+{
+     /** The utilization factor
+      */
+     private val rho = lambda / (mu * k)
+
+     /** The effective arrival rate
+      */
+     private val lambda_e = if (c > 0) lambda / (1.0 + rho) else lambda
+
+     /** The effective utilization factor
+      */
+     private var rho_e = lambda_e / (mu * k)
+
+     /** The probability an entity is lost/dropped   FIX - generalize
+      */
+     private val p_lost = if (c == 1 ) rho / (1.0 + rho) else 0.0
+
+     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     /** Check intermediate results.
+      */
+     def check
+     {
+         println ("check queueing parameters:")
+         println ("lambda   = " + lambda)                   // arrival rate
+         println ("lambda_e = " + lambda_e)                 // arrival rate
+         println ("mu       = " + mu)                       // service rate
+         println ("k        = " + k)                        // number of servers
+         println ("rho      = " + rho)                      // utilization factor
+         println ("rho_e    = " + rho_e)                    // utilization factor
+         println ("p_lost   = " + p_lost)                   // probability entity is lost
+     } // check
+
+     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     /** Calculate the probability of the queue being empty, based on its utilization
+      *  factor and number of servers.
+      *  @param ro  the utilization factor
+      *  @param kk  the number of servers
+      */
+     def pi_0 (ro: Double, kk: Int): Double =
+     {
+         val rok = ro * kk
+         val sum = (for (i <- 0 until kk) yield rok~^i / fac (i)).sum
+         1.0 / (sum + rok~^kk / (fac (kk) * (1.0 - ro)))
+     } // pi_0
+
+     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     /** Calculate the expected number in the queue.
+      */
+     def nQueue: Double = if (c > 0) nQueue_1_1 else if (k > 1) nQueue_k else nQueue_1
+
+     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     /** Calculate the expected number in the M/M/1 queue.
+      */
+     def nQueue_1: Double = rho~^2 / (1.0 - rho)
+
+     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     /** Calculate the expected number in the M/M/k queue.
+      */
+     def nQueue_k: Double = pi_0 (rho, k) * k~^k * rho~^(k+1) / (fac (k) * (1.0 - rho)~^2)
+
+     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     /** Calculate the expected number in the M/M/1/1 queue (zero for this case).
+      */
+     def nQueue_1_1: Double = 0.0
+
+     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     /** Report the results.
+      */
+     def report
+     {
+         val lQ = nQueue            // expected number waiting in the queue
+         val lS = rho_e * k         // expected number in service
+         val lT = lQ + lS           // expected number in system
+
+         println ("\nResults for queue:")
+         println ("lQ = %g".format (lQ) + "\twQ = %g".format (lQ / lambda_e))
+         println ("lS = %g".format (lS) + "\twS = %g".format (lS / lambda_e))
+         println ("lT = %g".format (lT) + "\twT = %g".format (lT / lambda_e))
+     } // report
+
+} // MMQueue
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `MMQueueTest` object is used to test the `MMQueue` class.
+ */
+object MMQueueTest extends App
+{
+    val lambda     = 6.0                             // customer arrival rate (per hour)
+    val mu         = 7.5                             // customer service rate (per hour)
+
+    println("\nM/M/1 Queue Results:")
+    val mm1 = new MMQueue (lambda, mu)           // M/M/1 Queue
+    mm1.check
+    mm1.report
+
+    val k = 2                                        // number of servers 
+
+    println("\nM/M/k Queue Results:")
+    val mmk = new MMQueue (lambda, mu, k)        // M/M/k Queue
+    mmk.check
+    mmk.report
+
+    println("\nM/M/1/1 Queue Results:")
+    val mm1_1 = new MMQueue (lambda, mu, 1, 1)   // M/M/1/1 Queue
+    mm1_1.check
+    mm1_1.report
+
+} // MMQueueTest object
+

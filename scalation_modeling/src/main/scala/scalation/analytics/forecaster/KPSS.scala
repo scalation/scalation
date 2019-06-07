@@ -1,6 +1,6 @@
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Hao Peng
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sun Nov 19 12:27:00 EST 2017
  *  @see     LICENSE (MIT style license file).
  *

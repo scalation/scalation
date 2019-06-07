@@ -1,9 +1,12 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sat Nov 16 14:32:49 EST 2013
  *  @see     LICENSE (MIT style license file).
+
+ *  @see www.cs.sjsu.edu/faculty/stamp/RUA/HMM.pdf
+ *  @see people.cs.umass.edu/~mccallum/courses/inlp2004a/lect10-hmm2.pdf
  */
 
 package scalation.state
@@ -28,7 +31,6 @@ import scalation.random.ProbabilityVec
  *  <p>
  *      model (pi, a, b)
  *  <p>
- *  @see www.cs.sjsu.edu/faculty/stamp/RUA/HMM.pdf
  *  @param ob  the observation vector
  *  @param m   the number of observation symbols
  *  @param n   the number of (hidden) states in the model
@@ -251,7 +253,7 @@ class HiddenMarkov (ob: VectoI, m: Int, n: Int, private var pi: VectoD = null,
 /** The `HiddenMarkovTest` object is used to test the `HiddenMarkov` class.
  *  Given model '(pi, a, b)', determine the probability of the observations 'ob'.
  *  @see www.cs.sjsu.edu/~stamp/RUA/HMM.pdf (exercise 1).
- *  > runMain scalation.analytics.classifieu.HiddenMarkovTest
+ *  > runMain scalation.state.HiddenMarkovTest
  */
 object HiddenMarkovTest extends App
 {
@@ -278,7 +280,7 @@ object HiddenMarkovTest extends App
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `HiddenMarkovTest2` object is used to test the `HiddenMarkov` class.
  *  Train the model (pi, a, b) based on the observed data.
- *  > runMain scalation.analytics.classifier.HiddenMarkovTest2
+ *  > runMain scalation.state.HiddenMarkovTest2
  */
 object HiddenMarkovTest2 extends App
 {

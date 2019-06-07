@@ -1,0 +1,163 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Michael E. Cotterell, John Miller
+ *  @version 1.1
+ *  @date    Fri Aug 15 14:51:36 EDT 2014
+ *  @see     LICENSE (MIT style license file).
+ *
+ * Implementation options: Scala Actors, Akka Actors, Scala Continuations or Java Threads
+ * This one uses Scala Continuations
+ *
+ * @see http://www.cs.uga.edu/~jam/scalation_1.0/src/main/scala/scalation/coroutine/Coroutine.scala
+ */
+
+package scalation.process
+
+import scala.util.continuations._
+
+import scalation.util.Error
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `CoroutineC` class supports quasi-concurrent programming.  A coroutine
+ *  runs/acts until it yields control to some other coroutine.  When resumed,
+ *  a coroutines continues execution where it left off.
+ */
+abstract class CoroutineC extends Error
+{
+    private val DEBUG   = true           // debug flag
+    private var started = false          // whether this coroutine has started
+    private var running = false          // whether this coroutine is running
+
+    /** If this coroutine has been suspended, then session contains the remainder 
+     *  of the current coroutine execution.  That is, when a coroutine is
+     *  suspended, the remainder of the coroutine's 'act' function is turned
+     *  into a closure by the continuations plugin and then stored here so that
+     *  the coroutine can be resumed.
+     */
+    private var session: Unit => Unit = null
+
+    if (DEBUG) println ("wait to be started")
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** When the coroutine is started, this function is executed before the `act` function.
+     */
+    def preAct (): Unit @suspendable = ()
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** When the coroutine is finished executing its `act` function, this 
+     *  function is executed.
+     */
+    def postAct (): Unit @suspendable = ()
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** When an an instance of a class that mixes in `Couroutine`, starting the 
+     *  coroutine causes the `run` function to be called. The general contract
+     *  among all coroutines is that only the `run` function one coroutine can 
+     *  be executing at any given time.
+     */ 
+    def act (): Unit @suspendable
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Start this coroutine, i.e., invoke its 'act' method.
+     */
+    final override def start ()
+    {
+        if (! started) {
+            reset {
+                started = true
+                running = true
+                preAct ()
+                act () 
+                postAct ()
+                session = null
+            } // reset
+        } else {
+            flaw ("start", "can't start a coroutine that's already started")
+        } // if
+    } // start
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** If the coroutine is suspended, it is resumed and continues its execution.
+     *  If the coroutine is in some other state, the behavior of this function
+     *  is to be treated as undefined.
+     */
+    final def resume ()
+    {
+        if (started && ! running) {
+            session ()                    // execute the remaining session
+        } else {
+            flaw ("resume", "attempt to resume a coroutine from the wrong state")
+        } // if
+    } // resume
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Yield control to the 'other' coroutine.
+     *  @param other  the other coroutine to yield control to
+     *  @param quit   whether to wait via a receive or quit via exit
+     */
+    final def yyield (other: CoroutineC, quit: Boolean = false): Unit @suspendable =
+    {
+        if (other != null) {
+            if (other.started && ! running) {
+                if (DEBUG) println ("resume the other coroutine")
+                other.resume ()
+            } else if (! other.started) {
+                if (DEBUG) println ("start the other coroutine")
+                other.start ()
+            } else {
+                flaw ("yyield", "attempt to yield to a coroutine that's already running")
+            } // if
+        } // if
+
+        if (quit) {    // terminate coroutine
+            exit ()
+        } else {       // suspend coroutine's execution and save remaining execution in session
+            shift {
+                remaining: (Unit => Unit) => { session = remaining }
+            } // shift
+        } // if
+    } // yyield
+
+} // CoroutineC
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `CoroutineCTest` object is used to test the `Coroutine` class.
+ *  Should print:
+ *    Cor1: phase 1
+ *    Cor2: phase 1
+ *    Cor1: phase 2
+ *    Cor2: phase 2
+ */
+object CoroutineCTest extends App
+{
+    class Cor1 extends CoroutineC
+    {
+        def act ()
+        {
+            println ("Cor1: phase 1")
+            yyield (cor2)
+            println ("Cor1: phase 2")
+            yyield (cor2, true)
+        } // act
+    } // Cor1
+
+    class Cor2 extends CoroutineC
+    {
+        def act ()
+        {
+            println ("Cor2: phase 1")
+            yyield (cor1)
+            println ("Cor2: phase 2")
+            yyield (null, true)
+        } // act
+    } // Cor2
+
+    val cor1 = new Cor1 ()
+    val cor2 = new Cor2 ()
+
+    println ("start coroutines")
+    cor1.start ()                    // just start the first one
+
+} // CoroutineCTest
+

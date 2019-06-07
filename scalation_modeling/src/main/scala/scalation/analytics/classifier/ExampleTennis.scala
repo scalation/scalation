@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Fri Feb 16 16:14:34 EST 2018
  *  @see     LICENSE (MIT style license file).
  */
@@ -71,44 +71,50 @@ object ExampleTennisTest extends App
     val nm = new NullModel (y)
     nm.train ()
     yp = nm.classify (x)
-    println (nm.fitLabel)
-    println (nm.fit (y, yp))
+    println ("fitMap = " + nm.fitMap (y, yp))
     println ((new ConfusionMat (y, yp, 2)).confusion)
 
     banner ("NaiveBayes")
     val nb = new NaiveBayes (x, y)
     nb.train ()
     yp = nb.classify (x)
-    println (nb.fitLabel)
-    println (nb.fit (y, yp))
+    println ("fitMap = " + nb.fitMap (y, yp))
+    println ((new ConfusionMat (y, yp, 2)).confusion)
 
     banner ("TANBayes")
     val tan = new TANBayes (x, y)
     tan.train ()
     yp = tan.classify (x)
-    println (tan.fitLabel)
-    println (tan.fit (y, yp))
+    println ("fitMap = " + tan.fitMap (y, yp))
+    println ((new ConfusionMat (y, yp, 2)).confusion)
 
     banner ("LogisticRegression")
     val lrg = new LogisticRegression (xd, y)
     lrg.train ()
     yp = lrg.classify (xd)
-    println (lrg.fitLabel)
-    println (lrg.fit (y, yp))
+    println ("fitMap = " + lrg.fitMap (y, yp))
+    println ((new ConfusionMat (y, yp, 2)).confusion)
 
     banner ("LDA")
     val lda = new LDA (xd, y)
     lda.train ()
     yp = lda.classify (xd)
-    println (lda.fitLabel)
-    println (lda.fit (y, yp))
+    println ("fitMap = " + lda.fitMap (y, yp))
+    println ((new ConfusionMat (y, yp, 2)).confusion)
 
     banner ("KNN_Classifier")
     val knn = new KNN_Classifier (xd, y)
     knn.train ()
     yp = knn.classify (xd)
-    println (knn.fitLabel)
-    println (knn.fit (y, yp))
+    println ("fitMap = " + knn.fitMap (y, yp))
+    println ((new ConfusionMat (y, yp, 2)).confusion)
+
+    banner ("DecisionTreeID3")
+    val dti = new DecisionTreeID3 (x, y)
+    dti.train ()
+    yp = dti.classify (x)
+    println ("fitMap = " + dti.fitMap (y, yp))
+    println ((new ConfusionMat (y, yp, 2)).confusion)
 
 } // ExampleTennisTest object
 

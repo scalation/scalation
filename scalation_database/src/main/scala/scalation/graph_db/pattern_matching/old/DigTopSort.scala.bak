@@ -1,0 +1,82 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Hao Peng, John Miller
+ *  @version 1.2
+ *  @date    Thu Nov 19 18:43:58 EST 2015
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.graphalytics
+
+import scala.collection.mutable.Stack
+import scala.collection.mutable.{Set => SET}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `DigTopSort` class provides a means for performing topological sorts
+ *  on graphs.
+ *  @param g  the graph whose vertices are to be sorted
+ */
+case class DigTopSort (g: Digraph)
+{
+    /** Vertices pushed onto stack in topological order
+     */
+    private val stack = Stack [Int] ()
+
+    /** Set go to false after visiting the vertex
+     */
+    private val go = Array.fill (g.size)(true)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Topological sort that returns an edge compatible ordering of the vertices.
+     *  Translated from Java code and implements Tarjan's algorithm.
+     *  @see www.zrzahid.com/topological-sort/
+     *  @param g  the directed graph
+     */
+    def topSort: Array [Int] =
+    {
+        for (v <- 0 until g.size if go(v)) dfs(v)
+
+        /** Recursively visit vertices, pushing vertices onto a stack at the end
+         *  @param u  the current vertex
+         */
+        def dfs (u: Int)
+        {
+            go(u) = false
+            for (v <- g.ch(u) if go(v)) dfs(v)
+            stack push u
+        } // dfs
+
+        stack.toArray
+    } // topSort
+
+} // DigTopSort class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `DigTopSortTest` object tests the `DigTopSort` class using a label-free precedence
+ *  graph.  Digraphs are created by passing in an array of adjacency sets (one for
+ *  each vertex).
+ *  > run-main scalation.graphalytics.DigTopSortTest
+ */
+object DigTopSortTest extends App
+{
+    /** Test graph 1
+     */
+    val pg1 = new Digraph (Array (SET (1, 2),        // edges from 0:  0 -> 1, 0 -> 2
+                                  SET (2),           // edges from 1:  1 -> 2
+                                  SET [Int] ()))     // edges from 2:  no such edges
+    println ("Precedence Digraph pg1: --------------------------------------------")
+    pg1.print ()
+    println ("pg1 order = " + DigTopSort (pg1).topSort.deep)
+    
+    /** Test graph 2
+     */
+    val pg2 = new Digraph (Array (SET (1, 2),        // edges from 0:  0 -> 1, 0 -> 2
+                                  SET (2),           // edges from 1:  1 -> 2
+                                  SET (0)))          // edges form 2:  2 -> 0
+    println ("Precedence Diraph pg2: --------------------------------------------")
+    pg2.print ()
+    println ("pg2 order = " + DigTopSort (pg2).topSort.deep)
+    
+} // DigTopSortTest object
+

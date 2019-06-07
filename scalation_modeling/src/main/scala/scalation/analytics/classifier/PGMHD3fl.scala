@@ -1,12 +1,13 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Khalifeh Al-Jadda, John A. Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Mon Aug 15 13:13:15 EDT 2016
  *  @see     LICENSE (MIT style license file).
  */
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
 import scala.math.abs
 
@@ -30,15 +31,16 @@ import BayesClassifier.me_default
  *  '1' indicates occurrence, while '0' indicates no evidence of occurreence.
  *  Frequency counts and classification scores are computed from a training-set.
  *  -----------------------------------------------------------------------------
- *  @param x   the integer-valued level-1 data vectors stored as rows of a matrix
- *  @param z   the integer-valued level-2 data vectors stored as rows of a matrix
- *  @param y   the class matrix, where y(i) = classes for row 'i' of the matrix
- *  @param fn  the names for all X/Z-features/variables
- *  @param cn  the names for all C-class variables
- *  @param me  use m-estimates (me == 0 => regular MLE estimates)
+ *  @param x    the integer-valued level-1 data vectors stored as rows of a matrix
+ *  @param z    the integer-valued level-2 data vectors stored as rows of a matrix
+ *  @param y    the class matrix, where y(i) = classes for row 'i' of the matrix
+ *  @param fn_  the names for all X/Z-features/variables
+ *  @param cn_  the names for all C-class variables
+ *  @param me   use m-estimates (me == 0 => regular MLE estimates)
  */
-class PGMHD3fl (x: MatriI, z: MatriI, y: MatriI, fn: Array [String], cn: Array [String], me: Float = me_default)
-      extends BayesClassifier (x, y.col(0), fn, 2, cn)
+class PGMHD3fl (x: MatriI, z: MatriI, y: MatriI, fn_ : Strings = null, cn_ : Strings = null,
+                me: Float = me_default)
+      extends BayesClassifier (x, y.col(0), fn_, 2, cn_)
 {
     private val DEBUG  = true                              // debug flag
     private val nx     = x.dim2                            // number of X-features/columns (level 1)
@@ -134,7 +136,7 @@ class PGMHD3fl (x: MatriI, z: MatriI, y: MatriI, fn: Array [String], cn: Array [
     /** Train the classifier by computing frequencies, inflows and scores.
      *  @param itest  the indices of the test data
      */
-    def train (itest: IndexedSeq [Int]): PGMHD3fl =
+    def train (itest: Ints): PGMHD3fl =
     {
         frequencies (0 until m diff itest)                    // compute frequencies skipping test region
 
@@ -148,7 +150,7 @@ class PGMHD3fl (x: MatriI, z: MatriI, y: MatriI, fn: Array [String], cn: Array [
      *  training data.
      *  @param itrain indices of the instances considered train data
      */
-    private def frequencies (itrain: IndexedSeq [Int])
+    private def frequencies (itrain: Ints)
     {
         if (DEBUG) banner ("frequencies (itrain)")
         for (i <- itrain) increment (i)
@@ -168,6 +170,13 @@ class PGMHD3fl (x: MatriI, z: MatriI, y: MatriI, fn: Array [String], cn: Array [
             println ("x_cl  = " + x_cl)                        // classification score for X's
         } // if
     } // frequencies
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Increment/Decrement frequency counters based on the 'i'th row of the
+     *  data matrix.
+     *  @param i  the index for current data row
+     */
+    protected def updateFreq (i: Int) = ???
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'u', classify it returning the class(es)
@@ -226,7 +235,7 @@ object PGMHD3fl
      *  @param cn   the names of C-class variable outcomes
      *  @param me   use m-estimates (me == 0 => regular MLE estimates)
      */
-    def apply (xzy: MatriI, nx: Int, nxz: Int, fn: Array [String], cn: Array [String],
+    def apply (xzy: MatriI, nx: Int, nxz: Int, fn: Strings, cn: Strings,
                me: Float = me_default): PGMHD3fl =
     {
         val x = xzy.sliceCol (0, nx)

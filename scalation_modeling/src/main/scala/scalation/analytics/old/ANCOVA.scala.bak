@@ -1,0 +1,200 @@
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.5
+ *  @date    Sun Jan  4 23:09:27 EST 2015
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.analytics
+
+import scala.collection.mutable.{Map, Set}
+
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectoI, VectorI}
+import scalation.util.{Error, time}
+
+import RegTechnique._
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `ANCOVA` class supports ANalysis of COVAriance 'ANCOVA'.  It allows
+ *  the addition of a categorical treatment variable 't' into a multiple linear
+ *  regression.  This is done by introducing dummy variables 'dj' to distinguish
+ *  the treatment level.  The problem is again to fit the parameter vector 'b'
+ *  in the augmented regression equation
+ *  <p>
+ *      y  =  b dot x + e  =  b0  +  b_1   * x_1  +  b_2   * x_2  +  ... b_k * x_k
+                                  +  b_k+1 * d_1  +  b_k+2 * d_2  +  ... b_k+l * d_l + e
+ *  <p>
+ *  where 'e' represents the residuals (the part not explained by the model).
+ *  Use Least-Squares (minimizing the residuals) to solve for the parameter vector 'b'
+ *  using the Normal Equations:
+ *  <p>
+ *      x.t * x * b  =  x.t * y
+ *      b  =  fac.solve (.)
+ *  <p>
+ *  @see see.stanford.edu/materials/lsoeldsee263/05-ls.pdf
+ *  @param x_         the data/design matrix of continuous variables
+ *  @param t          the treatment/categorical variable vector
+ *  @param y          the response vector
+ *  @param fname_     the feature/variable names
+ *  @param levels     the number of treatment levels (0, ... levels -1)
+ *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
+ */
+class ANCOVA (x_ : MatriD, t: VectoI, y: VectoD, fname_ : Strings = null, levels: Int,
+              technique: RegTechnique = QR)
+//      extends Predictor with Error
+      extends Regression (x_ ++^ ANCOVA.dummyVars (t), y, fname_, null, technique)
+{
+/*
+    private val DEBUG = true                                 // debug flag
+
+    if (x_.dim1 != y.dim) flaw ("constructor", "dimensions of x_ and y are incompatible")
+    if (t.dim   != y.dim) flaw ("constructor", "dimensions of t and y are incompatible")
+
+    val x = x_ ++^ ANCOVA.dummyVars (t)
+    if (DEBUG) println ("x = " + x)
+    val rg = new Regression (x, y, null, null, technique)  // regular multiple linear regression
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Retrain the predictor by fitting the parameter vector (b-vector) in the
+     *  multiple regression equation
+     *  <p>
+     *      yy  =  b dot x + e  =  [b_0, ... b_k+l] dot [1, x_1, ..., d_1, ...] + e
+     *  <p>
+     *  using the least squares method.
+     *  @param yy  the response vector
+     */
+    def train (yy: VectoD = y): Regression = rg.train (yy)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the error and useful diagnostics.
+     */
+    def eval () { rg.eval () }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the vector of coefficients.
+     */
+    override def coefficient: VectoD = rg.coefficient
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the vector of residuals/errors.
+     */
+    override def residual: VectoD = rg.residual
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the quality of fit 'rSquared'.
+     */
+    def fit: VectoD = rg.fit
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the labels for the fit.
+     */
+    def fitLabel: Seq [String] = rg.fitLabel
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build a map of quality of fit measures.
+     */
+    def fitMap: Map [String, String] = rg.fitMap
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Predict the value of y = f(z) by evaluating the formula y = b dot z,
+     *  e.g., (b0, b1, b2) dot (1, z1, z2).
+     *  @param z  the new vector to predict
+     */
+    def predict (z: VectoD): Double = rg.predict (z)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform forward selection to add the most predictive variable to the existing
+     *  model, returning the variable to add, the new parameter vector and the new
+     *  quality of fit.  May be called repeatedly.
+     *  @param cols  the columns of matrix x included in the existing model
+     */
+    def forwardSel (cols: Set [Int]): (Int, VectoD, VectoD) = rg.forwardSel (cols)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform backward elimination to remove the least predictive variable from
+     *  the existing model, returning the variable to eliminate, the new parameter
+     *  vector and the new quality of fit.  May be called repeatedly.
+     *  @param cols  the columns of matrix x included in the existing model
+     */
+    def backwardElim (cols: Set [Int]): (Int, VectoD, VectoD) = rg.backwardElim (cols)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the Variance Inflation Factor (VIF) for each variable to test
+     *  for multi-collinearity by regressing 'xj' against the rest of the variables.
+     *  A VIF over 10 indicates that over 90% of the variance of 'xj' can be predicted
+     *  from the other variables, so 'xj' is a candidate for removal from the model.
+     */
+    def vif: VectoD = rg.vif
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform 'k'-fold cross-validation.
+     *  @param k  the number of folds
+     */
+    def crossVal (k: Int = 10) { rg.crossVal (k) }
+
+*/
+} // ANCOVA class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `ANCOVA` companion object provides helper functions.
+ */
+object ANCOVA extends Error
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Assign values for the dummy variables based on the treatment vector 't'.
+     *  @param t  the treatment level vector
+     */
+    def dummyVars (t: VectoI): MatriD =
+    {
+        val tmax = t.max ()
+        val xd = new MatrixD (t.dim, tmax)
+        for (i <- t.range) {
+            val ti = t(i)                                      // treatment level for ith item
+            if (ti < 0) flaw ("dummyVars", s"treatment level $ti may not be negative")
+            if (ti < tmax) xd(i, ti) = 1.0
+        } // for
+        xd
+    } // dummyVars
+
+} // ANCOVA object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `ANCOVATest` object tests the `ANCOVA` class using the following
+ *  regression equation.
+ *  <p>
+ *      y  =  b dot x  =  b_0 + b_1*x_1 + b_2*x_2 + b_3*d_1 + b_4*d_2
+ *  <p>
+ *  > runMain scalation.analytics.ANCOVATest
+ */
+object ANCOVATest extends App
+{
+    // 5 data points: constant term, x_1 coordinate, x_2 coordinate
+    val x = new MatrixD ((6, 3), 1.0, 36.0,  66.0,                 // 6-by-3 matrix
+                                 1.0, 37.0,  68.0,
+                                 1.0, 47.0,  64.0,
+                                 1.0, 32.0,  53.0,
+                                 1.0, 42.0,  83.0,
+                                 1.0,  1.0, 101.0)
+    val t = VectorI (0, 0, 1, 1, 2, 2)                             // treatments levels
+    val y = VectorD (745.0, 895.0, 442.0, 440.0, 643.0, 1598.0)    // response vector
+    val z = VectorD (1.0, 20.0, 80.0, 1.0, 0.0)
+
+    println ("x = " + x)
+    println ("t = " + t)
+    println ("y = " + y)
+
+    val levels = 3
+    val anc    = new ANCOVA (x, t, y, null, levels)
+    anc.train ().eval ()
+
+    println ("parameter = " + anc.coefficient)
+    println ("fitMap    = " + anc.fitMap)
+
+    val yp = anc.predict (z)
+    println ("predict (" + z + ") = " + yp)
+
+} // ANCOVATest object
+

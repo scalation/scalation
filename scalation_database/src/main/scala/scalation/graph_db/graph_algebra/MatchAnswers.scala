@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Supriya Ramireddy, John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Wed Nov  9 14:58:54 EST 2016
  *  @see     LICENSE (MIT style license file).
  */

@@ -1,0 +1,151 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.1
+ *  @date    Sun Sep 29 18:56:17 EDT 2013
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.minima
+
+import scalation.linalgebra.VectorD
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/**
+ *  @param x  the training point maxtrix
+ *  @param y  the desired output vector
+ */
+class SeqMinOpt (x: MatrixD, y: VectorI)
+//      extends Minimizer with Error
+{
+    private val EPSILON = 1E-4
+    private val TOL     = 1E-3
+    private val m       = x.dim1
+    private val n       = x.dim2
+
+    private val al = new VectorD (m)     // alpha (Langrange multipliers)
+    private val fc = new VectorD (m)     // function cache
+
+        var b_up = -1
+        var i_up =  0    // FIX
+        var b_lo =  1
+        var i_lo =  0    // FIX
+
+        fc(i_lo) = 1
+        fc(i_up) = -1
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Optimize by replacing old values of Lagrange multiplier al1, al2 with
+     *  new values a1 and a2.
+     */
+    def takeStep (i1: Int, i2: Int): Boolean =
+    {
+        if (i1 == i1) return false
+
+        val al1 = lagrange (i1)
+        val y1  = y(i1)
+        val f1  = fc(i1)
+
+        val s = y1 * y2
+
+        (l, h) = computeLH ()
+
+        if (l == h) return false
+
+        val k11 = kernel (x(i1), x(i1))
+        val k12 = kernel (x(i1), x(i2))
+        val k22 = kernel (x(i2), x(i2))
+        val eta = 2.0 * k12 - (k11 + k22)
+        var a1  = 0.0
+        var a2  = 0.0
+
+        if (eta < 0.0) {
+            a2 = al2 + y2 * (f2 - f1) / eta
+            if (a2 < l) a2 = l else if (a2 > h) a2 = h
+        } else {
+            lObj = func (l)
+            hObj = func (h)
+            a2 = if (lObj > hObj + EPSILON) l else if (lObj < hObj - EPSILON) h else al2
+        } // if
+
+        if (abs (a2 - al2) < EPSILON * (a2 + al2 + EPSILON) return false
+
+        a1 = al1 - s * (a2 - al2)
+    
+        // update weight vector
+        for (i <- i_0) fc(i) = func (x(i))
+        al(i1) = a1; al(i2) = a2
+        // update i_0, i_1, i_2, i_3, i_4
+        fc(i1) = f1 + y1 * (a1  -al1) * k11 + y2 (a2 - al2) * k12
+        fc(i2) = f2 + y1 * (a1 - al1) * k12 + y2 (a2 - al2) * k22
+
+        reset (i1, f1)
+        return true
+    } // takeStep
+
+    def reset (i, f)
+    {
+        var b_up = -1    // FIX
+        var i_up =  0    // FIX
+        var b_lo =  1    // FIX
+        var i_lo =  0    // FIX
+    } // reset
+
+    def checkExample (i2: Int): Boolean =
+    {
+        val y2  = y(i2)
+        val al2 = langrange (i2)
+        val f2  = if (i_0 contains i2) fc(i2) else { fc(i2) = func (x(i2)); fc(i2) }
+        reset (i2, f2)
+        if ((i_1 contains i2 || i_2 contains i2) && f2 < b_up) {
+           b_up = f2; i_up = i2
+        } else ((i_3 contains i2 || i_3 contains i2) && f2 < b_lo) {
+           b_lo = f2; i_lo = i2
+        } // if
+
+        if (isOptimal ()) return false
+
+        if (i_0 contains i2) {
+            i_lo = if (b_lo - f2 > f2 - b_up) i_lo else i_up
+        } // if
+        takeStep (i1, i2)
+    } // checkExample
+
+    def isOptimal (): Boolean =
+    {
+        false      // FIX
+    } // isOptimal
+    
+    def solve ()
+    {
+        var nChanged = 0
+        var checkAll = true
+
+        while (nChanges > 0 || checkAll) {
+            nChanged = 0
+            if (checkAll) {
+                for (i <- 0 until m) nChanged += checkExample (i)
+            } else {
+                var success = true
+                while (b_up <= b_lo - 2 * TOL && success) {
+                    var i2  = i_lo
+                    var y2  = y(i2)
+                    var al2 = langrange (i2)
+                    var f2  = fc(i2)
+                    success = takeStep (i_up, i_lo)
+                    nChanged += success
+                } // while
+                nChanged = 0
+                if (checkAll) chackAll = false
+                else if (nChanged == 0 ) checkAll = true
+            } // if
+        } // while
+    } // solve
+
+} // SeqMinOpt class
+
+
+object SeqMinOptTest extends App
+{
+} // SeqMinOptTest object
+

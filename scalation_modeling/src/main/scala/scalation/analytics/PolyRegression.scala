@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Wed Feb 20 17:39:57 EST 2013
  *  @see     LICENSE (MIT style license file).
  */
@@ -13,6 +13,7 @@ import scala.collection.mutable.Set
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
 import scalation.math.double_exp
 import scalation.plot.Plot
+import scalation.stat.Statistic
 import scalation.stat.StatVector.corr
 import scalation.util.banner
 
@@ -44,7 +45,7 @@ class PolyRegression (t: VectoD, y: VectoD, ord: Int, technique: RegTechnique = 
       extends PredictorVec (t, y, ord)
 {
     private val DEBUG = true                                 // debug flag
-    private var x     = expand (t)                           // data/design matrix built from t (raw)
+    private var x     = expand (t)                           // data/input matrix built from t (raw)
 
     private var a: MatriD = null                             // multipliers for orthogonal polynomials
     if (! raw) {
@@ -52,7 +53,7 @@ class PolyRegression (t: VectoD, y: VectoD, ord: Int, technique: RegTechnique = 
         x = za._1; a = za._2
     } // if
 
-    rg = new Regression (x, y, technique)                    // regular multiple linear regression
+    rg = new Regression (x, y, null, null, technique)        // regular multiple linear regression
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Expand the scalar 't' into a vector of powers of 't:  [1, t, t^2 ... t^k]'.
@@ -66,7 +67,7 @@ class PolyRegression (t: VectoD, y: VectoD, ord: Int, technique: RegTechnique = 
     } // expand
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Orthogonalize the data/design matrix 'x' using Gram-Schmidt Orthogonalization,
+    /** Orthogonalize the data/input matrix 'x' using Gram-Schmidt Orthogonalization,
      *  returning the a new orthogonal matrix 'z' and the orthogonalization multipliers 'a'.
      *  This will eliminate the multi-collinearity problem.
      *  @param x  the matrix to orthogonalize
@@ -88,7 +89,7 @@ class PolyRegression (t: VectoD, y: VectoD, ord: Int, technique: RegTechnique = 
     } // orthogonalize
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Follow the same transformations used to orthogonalize the data/design matrix 'x',
+    /** Follow the same transformations used to orthogonalize the data/input matrix 'x',
      *  on vector 'v', so its elements are correctly mapped.
      *  @param v  the vector to be transformed based the orthogonalize procedure
      */
@@ -126,9 +127,9 @@ class PolyRegression (t: VectoD, y: VectoD, ord: Int, technique: RegTechnique = 
      *  @param k      the number of folds
      *  @param rando  whether to use randomized cross-validation
      */
-    def crossVal (ord: Int, k: Int = 10, rando: Boolean = true)
+    def crossVal (ord: Int, k: Int = 10, rando: Boolean = true): Array [Statistic] =
     {
-        crossValidate ((t: VectoD, y: VectoD, ord) => new PolyRegression (t, y, ord), k, rando)
+        crossValidate ((t: VectoD, y: VectoD, ord) => new PolyRegression (t, y, ord, technique), k, rando)
     } // crossVal
 
 } // PolyRegression class
@@ -160,8 +161,8 @@ object PolyRegressionTest extends App
     val prg       = new PolyRegression (t, y, order, technique)
     prg.train ().eval ()
 
-    println ("coefficient = " + prg.coefficient)
-    println ("fitMap      = " + prg.fitMap)
+    println ("parameter = " + prg.parameter)
+    println ("fitMap    = " + prg.fitMap)
 
     banner ("test for collinearity")
     println ("corr = " + prg.corrMatrix)
@@ -204,8 +205,8 @@ object PolyRegressionTest2 extends App
     val prg       = new PolyRegression (t, y, order, technique, false)
     prg.train ().eval ()
 
-    println ("coefficient = " + prg.coefficient)
-    println ("fitMap      = " + prg.fitMap)
+    println ("parameter = " + prg.parameter)
+    println ("fitMap    = " + prg.fitMap)
 
     banner ("test for collinearity")
     println ("corr = " + prg.corrMatrix)

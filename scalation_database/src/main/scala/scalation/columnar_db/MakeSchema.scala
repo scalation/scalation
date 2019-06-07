@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Hao Peng
- *  @version 1.5
+ *  @version 1.6
  *  @date    Tue Oct 6 12:27:00 EDT 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -10,7 +10,7 @@ package scalation.columnar_db
 
 import scala.util.control.Breaks.{break, breakable}
 
-import scalation.linalgebra.Converter.mapToInt
+import scalation.linalgebra.Converter.map2Int
 import scalation.linalgebra.{MatrixD, MatrixI, Vec, VectorS, mem_mapped}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -97,7 +97,7 @@ object MakeSchema
         case 0 => (c.toInt, "I")
         case 1 => (c.toLong, "L")
         case 2 => (c.toDouble, "D")
-        case _ => if (mapString) (mapToInt(c)._1, "I") else (c, "S")
+        case _ => if (mapString) (map2Int(c)._1, "I") else (c, "S")
         } // match
     } // analyzeType
 
@@ -111,7 +111,7 @@ object MakeSchema
     def mm_analyzeType (c: mem_mapped.VectorS, samplePercent: Int = 100, mapString: Boolean = false):
                         Tuple2[mem_mapped.Vec, String] =
      {
-        import scalation.linalgebra.mem_mapped.Converter.mapToInt
+        import scalation.linalgebra.mem_mapped.Converter.map2Int
 
         val np    = c.dim * (samplePercent / 100.0)
         var state = 0
@@ -131,7 +131,7 @@ object MakeSchema
              case 0 => (c.toInt, "I")
              case 1 => (c.toLong, "L")
              case 2 => (c.toDouble, "D")
-             case _ => if (mapString) (mapToInt(c)._1, "I") else (c, "S")
+             case _ => if (mapString) (map2Int(c)._1, "I") else (c, "S")
          } // match
     } // mm_analyzeType
 
@@ -176,7 +176,7 @@ object MakeSchemaTest extends App
  
     println ("initial domain = " + productSales.domain)
     val productSales_s = MakeSchema (productSales)
-    productSales_s.show
+    productSales_s.show ()
     println ("final domain = " + productSales_s.domain)
 
 } // MakeSchemaTest object
@@ -189,12 +189,12 @@ object MakeSchemaTest extends App
 object MakeSchemaTest2 extends App
 {
     val url = "https://raw.githubusercontent.com/scalation/analytics/develop/examples/auto_mpg.csv"
-    val auto_mpg = Relation (url, "auto_mpg", -1, null, ",")
+    val auto_mpg = Relation (url, "auto_mpg", -1, null, ",", null)
 
     println ("initial domain = " + auto_mpg.domain)
 
     val auto_mpg_s = MakeSchema (auto_mpg)
-    auto_mpg_s.show
+    auto_mpg_s.show ()
     println ("final domain = " + auto_mpg_s.domain)
 
     val xy = auto_mpg_s.toMatriDD (1 until 8, 0)

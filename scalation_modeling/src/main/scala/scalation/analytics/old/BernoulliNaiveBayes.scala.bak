@@ -1,0 +1,172 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.1
+ *  @date    Sat Sep  8 13:53:16 EDT 2012
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.analytics
+
+import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.linalgebra_gen.Matrices.MatrixI
+import scalation.linalgebra_gen.VectorN
+import scalation.linalgebra_gen.Vectors.VectorI
+import scalation.util.Error
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `BernoulliNaiveBayes` class implements a Bernoulli Naive Bayes Classifier,
+ *  which is a commonly used such classifier for discrete input data (Multinomial
+ *  being the other).  The  classifier is trained using a data matrix 'x' and a
+ *  classification vector 'y'.  Each data vector in the matrix is classified into
+ *  one of 'k' classes numbered 0, ..., k-1.  Prior probabilities are calculated
+ *  based on the population of each class in the training-set.  Relative posterior
+ *  probabilities are computed by multiplying these by values computed using
+ *  conditional probabilities based on the Bernoulli distribution.  The classifier
+ *  is naive, because it assumes feature independence and therefore simply multiplies
+ *  the conditional probabilities.
+ *  @param x   the binary data vectors stored as rows of a matrix
+ *  @param y   the class vector, where y_i = class for row i of the matrix x
+ *  @param k   the number of classes
+ *  @param me  use m-estimates (m == 0 => regular estimates)
+ */
+class BernoulliNaiveBayes (x: MatrixI, y: VectorI, k: Int = 2, me: Int = 3)
+      extends Classifier with Error
+{
+    if (k >= x.dim1) flaw ("constructor", "k must be less than the training-set size")
+
+    private val DEBUG   = true                    // debug flag
+    private val m       = x.dim1                  // the number of data vectors in training-set
+    private val n       = x.dim2                  // the number of features
+    private val md      = m.toDouble              // training-set size as a Double
+    private val nd      = n.toDouble              // feature-set size as a Double
+
+    private val popC    = new VectorI (k)         // frequency counts for classes 0, ..., k-1
+    private val popX_0  = new MatrixI (k, n)      // frequency counts for feature absence
+    private val popX_1  = new MatrixI (k, n)      // frequency counts for feature presence
+
+    private val probC   = new VectorD (k)         // probabilities for classes 0, ..., k-1
+    private val probX_0 = new MatrixD (k, n)      // conditional probabilities for feature absence
+    private val probX_1 = new MatrixD (k, n)      // conditional probabilities for feature presence
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Check the correlation of the feature vectors (fea).  If the correlations
+     *  are too high, the independence assumption may be dubious.
+     *
+    def checkCorrelation
+    {
+        val fea = for (j <- 0 until n) yield new StatVector (x.col(j))
+        val cor = new MatrixD (n, n)
+        for (j1 <- 0 until n; j2 <- 0 until j1) cor(j1, j2) = fea(j1) corr fea(j2)
+        println ("correlation matrix = " + cor)
+    } // checkCorrelation
+     */
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Count the frequencies for 'y' having class 'i' and 'x' for cases 0 and 1.
+     */
+    def frequencies ()
+    {
+        for (l <- 0 until m) {
+            val i = y(l)
+            popC(i) += 1
+            for (j <- 0 until n) {
+                if (x(l, j) == 0) popX_0(i, j) += 1 else popX_1(i, j) +=1
+            } // for
+        } // for
+    } // frequencies
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the classifier by computing the probabilities for C,  and the
+     *  conditional probabilities for X_0 and X_1.
+     */
+    def train ()
+    {
+        frequencies ()
+        for (i <- 0 until k) {                      // for each class i
+            val pci  = popC(i).toDouble
+            probC(i) = pci / md
+            for (j <- 0 until n) {                  // for each feature j
+                probX_0(i, j) = (popX_0 (i, j) + me/2.0) / (pci + me)
+                probX_1(i, j) = (popX_1 (i, j) + me/2.0) / (pci + me)
+            } // for
+        } // for
+
+        if (DEBUG) {
+            println ("probC   = " + probC)          // P(C = i)
+            println ("probX_0 = " + probX_0)        // P(X_j = 0 | C = i)
+            println ("probX_1 = " + probX_1)        // P(X_j = 1 | C = i)
+        } // if
+    } // train
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a discrete data vector 'z', classify it returning the class number
+     *  (0, ..., k-1) with the highest relative posterior probability.
+     *  @param z  the data vector to classify
+     */
+    override def classify (z: VectorI): Int =
+    {
+        val prob = new VectorD (k)
+        for (i <- 0 until k) {
+            prob(i) = probC(i)
+            for (j <- 0 until n) prob(i) *= (if (z(j) == 0) probX_0(i, j) else probX_1(i, j))
+        } // for
+        println ("prob = " + prob)
+        prob.argmax ()           // class with the highest relative posterior probability
+    } // classify
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a continous data vector 'z', first convert it to binary and then
+     *  classify it returning the class number (0, ..., k-1) with the highest
+     *  relative posterior probability.
+     *  @param z  the data vector to classify
+     */
+    def classify (z: VectorD): Int =
+    {
+        val zz = new VectorI (k)
+        for (j <- 0 until n) zz(j) = if (zz(j) < .5) 0 else 1
+        classify (zz)
+    } // classify
+
+} // BernoulliNaiveBayes class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `BernoulliNaiveBayesTest` object is used to test the 'BernoulliNaiveBayes' class.
+ ** Ex: Classify whether a car is more likely to be stolen (1) or not (1).
+ *  http://www.inf.u-szeged.hu/~ormandi/ai2/06-naiveBayes-example.pdf
+ */
+object BernoulliNaiveBayesTest extends App
+{
+    // x0: color:   Red (1), Yellow (0)
+    // x1: type:    SUV (1), Sports (0)
+    // x2: origin:  Domestic (1), Imported (0)
+    // features:                 x0  x1  x2
+    val x = new MatrixI ((10, 3), 1,  0,  1,           // data matrix
+                                  1,  0,  1,
+                                  1,  0,  1,
+                                  0,  0,  1,
+                                  0,  0,  0,
+                                  0,  1,  0,
+                                  0,  1,  0,
+                                  0,  1,  1,
+                                  1,  1,  0,
+                                  1,  0,  0)
+    val y = VectorN (1, 0, 1, 0, 1, 0, 1, 0, 0, 1)     // classification vector: 0(no), 1(yes))
+    println ("x = " + x)
+    println ("y = " + y)
+    println ("---------------------------------------------------------------")
+
+    val bnb = new BernoulliNaiveBayes (x, y)           // create the classifier            
+
+    // train the classifier ---------------------------------------------------
+    bnb.train ()
+
+    // test sample ------------------------------------------------------------
+    val z1 = VectorN (1, 0, 1)                         // new data vector to classify
+    val z2 = VectorN (1, 1, 1)                         // new data vector to classify
+    println ("classify (" + z1 + ") = " + bnb.classify (z1) + "\n")
+    println ("classify (" + z2 + ") = " + bnb.classify (z2) + "\n")
+
+} // BernoulliNaiveBayesTest object
+

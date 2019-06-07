@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Mon Nov 14 15:21:25 EST 2011
  *  @see     LICENSE (MIT style license file).
  */
@@ -11,8 +11,9 @@ package scalation.analytics
 import scala.collection.mutable.Set
 import scala.math.pow
 
+import scalation.linalgebra.FunctionV2S
 import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD}
-import scalation.math.{double_exp, FunctionV2S}
+import scalation.math.double_exp
 import scalation.minima.QuasiNewton
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -61,7 +62,7 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a center point x, form a square grid around it.  This can be used
-     *  to create a design matrix for use in multiple regression.  
+     *  to create a data/input matrix for use in multiple regression.  
      *  @param x  the center point/vector of the grid
      *  @param i  the current dimension (facilitates recursion)
      *  @param d  the distance to move on each step
@@ -93,17 +94,17 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
     } // printGrid
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given a grid of design points, create a design matrix 'xx' and response
+    /** Given a grid of design points, create a data/input matrix 'xx' and response
      *  vector 'yy' returning them as a tuple.
      */
     def response (): (MatriD, VectoD) =
     {
-        val xx = new MatrixD (grid.size, nt)  // design matrix
-        val yy = new VectorD (grid.size)      // response vector
+        val xx = new MatrixD (grid.size, nt)        // data/input matrix
+        val yy = new VectorD (grid.size)            // response/output vector
         for (k <- 0 until grid.size) {
             val x = grid (k)
-            xx(k) = qForms (x)                // vector values for all quadratic forms
-            yy(k) = f(x)                      // functional value at x
+            xx(k) = qForms (x)                      // vector values for all quadratic forms
+            yy(k) = f(x)                            // functional value at x
         } // for
         (xx, yy)
     } // response
@@ -141,16 +142,16 @@ class QuadraticFit (f: FunctionV2S, n: Int = 3, k: Int = 5)
     } // qFormsEval
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given a design matrix and response vector, use multiple regression to fit
-     *  the surface, i.e., determine the coefficients of the regression equation.
-     *  @param xx  the data/design matrix
-     *  @param yy  the response vector
+    /** Given a data/input matrix and response/output vector, use multiple regression
+     *  to fit the surface, i.e., determine the coefficients of the regression equation.
+     *  @param xx  the data/input matrix
+     *  @param yy  the response/output vector
      */
     def fit (xx: MatriD, yy: VectoD)
     {
         reg = new Regression (xx, yy)
         reg.train ().eval ()
-        b = reg.coefficient                     // coefficients in regression equation
+        b = reg.parameter                       // coefficients in regression equation
         println ("b = " + b)
         println ("fit = " + reg.fit)            // coefficient of determination, etc.
     } // fit
@@ -186,9 +187,9 @@ object QuadraticFitTest extends App
     qf.formGrid (xc, xs)                             // form a grid around point xc
     qf.printGrid ()
 
-    // create the data/design matrix
+    // create the data/input matrix
     val (xx, yy) = qf.response ()                    // compute the response surface for the grid
-    println ("design matrix + response vector")
+    println ("data matrix + response vector")
     println (xx :+ yy)        
 
     // fit a multi-dimensional quadratic function
@@ -227,9 +228,9 @@ object QuadraticFitTest2 extends App
     qf.formGrid (xc, xs)                             // form a grid around point xc
     qf.printGrid ()
 
-    // create the data/design matrix
+    // create the data/input matrix
     val (xx, yy) = qf.response ()                    // compute the response surface for the grid
-    println ("design matrix + response vector")
+    println ("data matrix + response vector")
     println (xx :+ yy)        
 
     // fit a multi-dimensional quadratic function
@@ -265,9 +266,9 @@ object QuadraticFitTest3 extends App
     qf.formGrid (xc, xs)                             // form a grid around point xc
     qf.printGrid ()
 
-    // create the data/design matrix
+    // create the data/input matrix
     val (xx, yy) = qf.response ()                    // compute the response surface for the grid
-    println ("design matrix + response vector")
+    println ("data matrix + response vector")
     println (xx :+ yy)
 
     // fit a multi-dimensional quadratic function

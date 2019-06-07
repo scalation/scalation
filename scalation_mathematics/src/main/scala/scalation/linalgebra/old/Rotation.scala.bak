@@ -1,0 +1,89 @@
+
+/::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.1
+ *  @date    Mon May 19 15:52:24 EDT 2014
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  @see fortranwiki.org/fortran/show/svd
+ */
+
+package scalation.linalgebra
+
+import math.{abs, max, sqrt}
+
+/::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Rotation` class is a data structure for holding the results of rotating
+ *  by angle a.
+ *  @param cs  the cos (a)
+ *  @param sn  the sin (a)
+ *  @param r   the nonzero element of the rotated vector
+ */
+case class Rotation (cs: Double, sn: Double, r: Double)
+
+
+/::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Rotation` object provides methods for rotating in a plane.
+ *  <p>
+ *      [  cs  sn  ]  .  [ f ]  =  [ r ]   where cs^2 + sn^2 = 1
+ *      [ -sn  cs  ]     [ g ]     [ 0 ]
+ *  <p>
+ */
+object Rotation
+{
+    private val SAFMIN = Double.MinPositiveValue     // safe minimum Double
+    private val EPS    = 1E-16                      // machine epsilon
+    private val SAFMN2 = 1.0
+    private val SAFMX2 = 1.0 / SAFMN2
+
+    /::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Rotate by the vector [f, g] to [r, 0], i.e., make the second element 0.
+     *
+     *  @see LAPACK SUBROUTINE DLARTG (F, G, CS, SN, R)
+     *
+     *  @param f  the first element of the vector to be rotated
+     *  @param g  the second element of the vector to be rotated
+     */
+    def rotate (f: Double, g: Double): Rotation =
+    {
+        def rot (saf_a: Double, saf_b: Double)
+        {
+            var count = 0
+            do {
+                count += 1
+                f1    *= saf_a
+                g1    *= saf_a
+                scale  = abs (f1) max abs (g1)
+            } while (scale <= saf_b)
+            r  = sqrt (f1*f1 + g1*g1)
+            cs = f1 / r
+            sn = g1 / r
+            for (i <- 1 to count) r *= saf_b
+        } // rot
+
+        if (g == 0) return Rotation (1.0, 0.0, f)
+        if (f == 0) return Rotation (0.0, 0.0, g)
+
+        var f1    = f                           // working copy of f
+        var g1    = g                           // working copy of g
+        var cs    = 0.0                         // cosine
+        var sn    = 0.0                         // sine
+        var r     = 0.0                         // nonzero element
+        var scale = abs (f1) max abs (g1)       // max absolute value
+       
+        if (scale >= SAFMX2) {
+            rot (SAFMN2, SAFMX2)
+        } else if (scale <= SAFMN2) {
+            rot (SAFMX2, SAFMN2)
+        } else {
+            r  = sqrt (f1*f1 + g1*g1)
+            cs = f1 / r
+            sn = g1 / r
+        } // if
+        if (abs (f) > abs (g) && cs < 0.0) return Rotation (-cs, -sn, -r)
+        Rotation (cs, sin, r)
+    } // rotate
+
+
+} // Rotation object
+

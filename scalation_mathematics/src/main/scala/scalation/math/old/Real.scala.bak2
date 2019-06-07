@@ -1,0 +1,531 @@
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.2
+ *  @date    Sun Jun 14 15:22:33 EDT 2015
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.math
+
+// U N D E R   D E V E L O P M E N T 
+
+import annotation.strictfp
+
+import language.implicitConversions
+import math.{abs => ABS, floor}
+import util.control.Breaks.{break, breakable}
+
+import ExtremeD.MAX_VALUE
+
+import Real._
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Real` class provides higher precision floating point numbers using the
+ *  Double Double technique.
+ *-----------------------------------------------------------------------------
+ *  Code adapted from DoubleDouble.java:
+ *  @see http://tsusiatsoftware.net/dd/main.html
+ *  @see oai.cwi.nl/oai/asset/9159/9159A.pdf
+ *-----------------------------------------------------------------------------
+ *  @param hi  the high portion of the real number
+ *  @param lo  the low portion of the real number
+ */
+@strictfp
+case class Real (hi: Double, lo: Double = 0.0) // extends strictfp
+     extends Fractional [Real] with Ordered [Real]
+{
+    private val DEBUG = true                         // debug flag
+    private val SPLIT = 134217729.0                  // 2^27+1, for IEEE double
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether 'this' number "is Infinity".
+     */
+    def isInfinity: Boolean = hi.isNegInfinity || hi.isPosInfinity
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether 'this' number "is Not a Number".
+     */
+    def isNaN: Boolean = hi.isNaN
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether 'this' number "is Negative Infinity".
+     */
+    def isNegInfinity: Boolean = hi.isNegInfinity
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether 'this' number "is Positive Infinity".
+     */
+    def isPosInfinity: Boolean = hi.isPosInfinity
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the unary minus (-).
+     */
+    def unary_- (): Real = if (isNaN) this else Real (-hi, -lo)
+
+    def negate (x: Real): Real = -x
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add two real numbers.
+     *  @param y  add real y to this
+     */
+    def + (y: Real): Real =
+    {
+        var t = 0.0                                                         // temp
+
+        var (zh, zl) = (hi + y.hi, lo + y.lo)                               // z = x + y
+        val (yh, yl) = (zh - hi, zl - lo)                                   // y' = z - x
+        val (xh, xl) = (zh - yh, zl - yl)                                   // x' = z - y'
+        val (dh, dl) = ((hi - xh) + (y.hi - yh), (lo - xl) + (y.lo - yl))   // d = (x - x') + (y - y')
+
+        t = dh + zl
+        val hh = zh + t; val hl = t + (zh - hh)
+
+        t = dl + hl
+        zh = hh + t; zl = t + (hh - zh)
+        Real (zh, zl)
+    } // +
+
+    def plus (x: Real, y: Real): Real = x + y
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Subtract two real numbers.
+     *  @param y  subtract y from this
+     */
+    def - (y: Real): Real = this + (-y)
+
+    def minus (x: Real, y: Real): Real = x - y
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply two real numbers.
+     *  @param y  multiply this times y
+     */
+    def * (y: Real): Real =
+    {
+         var cx = SPLIT * hi
+         val hx = cx - (cx - hi)
+         val tx = hi - hx
+
+         var cy = SPLIT * y.hi
+         val hy = cy - (cy - y.hi)
+         val ty = y.hi - hy
+
+         cx = hi * y.hi
+         cy = ((((hx*hy - cx) + hx*ty) + tx*hy) + tx*ty) + (hi*y.lo + lo*y.hi)
+
+         val zh = cx + cy
+         val zl = cy + (cx - zh)
+         Real (zh, zl)
+    } // *
+
+    def times (x: Real, y: Real): Real = x * y
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide two real numbers.
+     *  @param y  divide this by y
+     */
+    def / (y: Real): Real =
+    {
+        var qh = hi / y.hi
+        var c  = SPLIT * qh
+        var hc = c - (c - qh)
+        var tc = qh - hc
+
+        var u  = SPLIT * y.hi
+        var hy = u - (u - y.hi)
+        var ty = y.hi - hy
+
+        var hx = qh * y.hi
+
+        u = (((hc*hy - hx) + hc*ty) + tc*hy) + tc*ty
+        c = ((((hi - hx) - u) + lo) - qh*y.lo) / y.hi
+
+        val zh = qh + c
+        val zl = (qh - zh) + c
+        Real (zh, zl)
+    } // /
+
+    def div (x: Real, y: Real): Real = x / y
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Raise a real number  to the 'k'-th power.
+     *  FIX: only works for Int powers.
+     *  @param k  the power/exponent (as a `Int`)
+     */
+    def ~^ (k: Double): Real =
+    {
+        if (k == 0) return _1
+
+        var r = this             // the real number
+        var s = _1               // hold product
+        var n = ABS (k)
+
+        if (n > 1) {             // use binary exponentiation 
+            while (n > 0) {
+                if (n % 2 == 1) s = s * r
+                n /= 2
+                if (n > 0) r = r * r
+            } // while
+        } else {
+            s = r
+        } // if
+
+        if (k < 0) _1 / s else s
+    } // ~^
+
+    def pow (x: Real, k: Int): Real = x ~^ k
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return whether two real numbers are nearly equal.
+     *  @param y the compare 'this' with y
+     */
+    def =~ (y: Real): Boolean = (hi =~ y.hi && lo =~ y.lo)             // FIX?
+
+    def near_eq (x: Real, y: Real): Boolean = x =~ y
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the absolute value of 'this' real number.
+     */
+    def abs: Real = Real (hi.abs, lo.abs)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the 'ceil'ing (integer above) of 'this' real number.
+     */
+    def ceil: Real =
+    {
+        val chi = hi.ceil
+        val clo = if (chi == hi) lo.ceil else 0.0 
+        Real (chi, clo)
+    } // ceil
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the floor (integer below) of 'this' real number.
+     */
+    def floor: Real =
+    {
+        val fhi = hi.floor
+        val flo = if (fhi == hi) lo.floor else 0.0 
+        Real (fhi, flo)
+    } // floor
+
+    def signum: Int = if (this > _0) 1 else if (this < _0) -1 else 0
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the 'round'ed (closest) integer to 'this' real number.
+     */
+    def round: Long = (this + _1by2).floor.toLong
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the maximum of 'this' and that real numbers.
+     *  @param y  that real number to compare with this
+     */
+    def max (y: Real): Real = if (y > this) y else this
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the minimum of 'this' and that real numbers.
+     *  @param y  that real number to compare with this
+     */
+    def min (y: Real): Real = if (y < this) y else this
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compare two real numbers (negative for <, zero for ==, positive for >).
+     *  @param x  the first real number to compare
+     *  @param y  the second real number to compare
+     */
+    def compare (x: Real, y: Real): Int =
+    {
+        if (x.hi == y.hi) x.lo compare y.lo else x.hi compare y.hi
+    } // compare
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compare 'this' real number with that real number 'y'.
+     *  @param y  that real number
+     */	
+    def compare (y: Real): Int =
+    {	
+        if (hi == y.hi) lo compare y.lo else hi compare y.hi
+    } // compare
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert that/'this' real number to a `Real.
+     *  @param c  that real number to convert
+     */
+    def toReal (x: Real): Real = x
+
+    def toReal: Real = this
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert that/'this' real number to a `Double`.
+     *  @param c  that real number to convert
+     */
+    def toDouble (x: Real): Double = x.hi
+
+    def toDouble: Double = hi
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert that/'this' real number to a `Float`.
+     *  @param x  that real number to convert
+     */
+    def toFloat (x: Real): Float = x.hi.toFloat
+
+    def toFloat: Float = hi.toFloat
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert that/'this' real number to an `Int`.
+     *  @param c  that real number to convert
+     */
+    def toInt (x: Real): Int = x.hi.toInt
+
+    def toInt: Int = hi.toInt
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' real number to a `Long`.
+     *  @param c  that real number to convert
+     */
+    def toLong (x: Real): Long = x.hi.toLong
+
+    def toLong: Long = hi.toLong
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a real number from an `Int`.
+     *  @param n  the integer used to create the real number
+     */
+    def fromInt (x: Int): Real = Real (x)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a real number from an `Long`.
+     *  @param n  the long integer used to create the real number
+     */
+    def fromLong (x: Long): Real = Real (x)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Override equals to determine whether 'this' real number equals real 'y'.
+     *  @param y  the real number to compare with this
+     */
+    override def equals (x: Any): Boolean =
+    {
+        x.isInstanceOf [Real] && (hi equals x.asInstanceOf [Real].hi) &&
+                                 (lo equals x.asInstanceOf [Real].lo)
+    } // equals
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Must also override hashCode to be be compatible with equals.
+     */
+    override def hashCode: Int = hi.hashCode + 41 * lo.hashCode
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' real number to a String in standard form "dd.dd".
+     */
+    override def toString: String =
+    {
+        val (sigDigits, mag) = extractSigDigits
+        val decimalPt = mag + 1
+        println (s"(sigDigits, decimalPt) = ${(sigDigits, decimalPt)}")
+        var num = sigDigits
+
+        if (sigDigits.charAt (0) == '.') {
+            num = "0" + sigDigits;
+        } else if (decimalPt < 0) {
+            val pad = "0" * -decimalPt
+            println (s"pad = $pad")
+            num = "0." + pad + sigDigits
+        } else if (sigDigits.indexOf ('.') == -1) {
+            val pad = "0" * (decimalPt - sigDigits.length)
+            println (s"pad = $pad")
+            num = sigDigits + pad + ".0"
+        } // if
+        if (this < _0) "-" + num else num
+    } // toString
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Extract the significant digits from 'this' real number and determine
+     *  its magnitude.
+     */
+    private def extractSigDigits: Tuple2 [String, Int] =
+    {
+        var y     = abs
+        if (DEBUG) println (s"y = ${y.toString2}")
+        var mag   = magnitude (y.hi)
+        val scale = _10 ~^ mag
+        y = y / scale
+        if (y > _10)     { y = y / _10; mag += 1 }
+        else if (y < _1) { y = y * _10; mag -= 1 }
+        val decimalPt = mag + 1
+
+        val sb      = new StringBuilder ()
+        val nDigits = 31
+        breakable { for (i <- 0 until nDigits) {
+            if (i == decimalPt) sb.append ('.')
+            val digit      = y.hi.toLong
+            if (DEBUG) println (s"digit = $digit")
+            if (digit < 0) break
+
+            var rebiasBy10 = false
+            val digitChar  = if (digit > 9) { rebiasBy10 = true; '9' } else ('0' + digit).toChar
+            if (DEBUG) println (s"digitChar = $digitChar")
+            sb.append (digitChar)
+            if (DEBUG) println (s"1. y = ${y.toString2}")
+
+            y = (y - Real (digit)) * _10
+
+            if (DEBUG) println (s"2. y = ${y.toString2}")
+            if (rebiasBy10) y = y + _10
+            if (DEBUG) println (s"3. y = ${y.toString2}")
+            
+            var contExtracting = true
+            val remMag = magnitude (y.hi)
+            if (remMag < 0 && math.abs (remMag) >= (nDigits - i)) contExtracting = false
+            println (s"contExtracting = $contExtracting")
+
+            if (! contExtracting) break
+        }} // breakable for
+
+        if (DEBUG) println (s"this = $toString2")
+        if (DEBUG) println (s"sb = ${sb.toString}, mag = $mag")
+        (sb.toString, mag)
+    } // extractSigDigits
+    
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' real number to a String of the form "(hi, lo)".
+     */
+    def toString2: String = s"($hi, $lo)"
+    
+} // Real class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Real` companion object defines the origin (zero), one half and one
+ *  as well as some utility functions.
+ */
+object Real
+{
+    import java.lang.Double.NaN
+
+    /** Zero (0) as a Real number
+     */
+    val _0 = Real (0.0)
+
+    /** One Half (0.5) as a Real number
+     */
+    val _1by2 = Real (0.5)
+
+    /** One (1) as a Real number
+     */
+    val _1 = Real (1.0)
+
+    /** Ten (10) as a Real number
+     */
+    val _10 = Real (10.0)
+
+    /** 'pi' with 106 bits of precision
+     */
+    val Pi = Real (3.141592653589793116,
+                   1.224646799147353207E-16)
+
+    /** Euler's number 'e' with 106 bits of precision
+     */
+    val E = Real (2.718281828459045091,
+                  1.445646891729250158E-16)
+
+    /** Represents Not a Number
+     */
+    val NaN = Real (Double.NaN, Double.NaN)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Implicit conversion from 'Double' to 'Real'.
+     *  @param d  the Double parameter to convert
+     */
+//    implicit def double2Real (d: Double) = new Real (d, 0.0)    
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a real number from a pair (Tuple2) of Doubles.
+     *  @param ct  the tuple form of a complex number
+     */
+    def apply (xt: Tuple2 [Double, Double]): Real = Real (xt._1, xt._2)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a real number from its primary string representation "a+bi".
+     *  Examples: "2.1+3.2i", "2.1", "3.2i".
+     *  @param xs  the string form of a real number
+     */
+    def apply (xs: String): Real =
+    {
+        Real (0.0)   // FIX
+    } // apply
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the absolute value of that real number.
+     *  @param c  that real number
+     */
+    def abs (x: Real): Real = x.abs
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the square root of that real number.
+     *  @param x  that real number
+     */
+    def sqrt (x: Real): Real =
+    { 
+        if (x == _0) return _0
+        if (x < _0)  return NaN
+
+        val yd  = 1.0 / math.sqrt (x.hi)
+        val y   = Real (x.hi * yd)
+        val del = x - y * y
+        y + Real (del.hi * (yd * 0.5))
+    } // sqrt
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine the decimal magnitude of 'x', i.e., the largest integer 'k'
+     *  such that '10^k <= x'.
+     *  @param x  the number to find the magnitude of
+     */
+    def magnitude (x: Double): Int = 
+    {
+        val xAbs = ABS (x)
+        val xMag = floor (log10 (xAbs)).toInt
+        if ((10.0 ~^ xMag) * 10.0 <= xAbs) xMag + 1 else xMag   
+    } // magnitude
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Ordering for real numbers.
+     */
+    val ord = new Ordering [Real]
+            { def compare (x: Real, y: Real) = x compare y }
+
+} // Real object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RealTest` object is used to test the `Real` class.
+ *  > run-main scalation.math.RealTest
+ */
+object RealTest extends App
+{
+    val a = Real (10.0)
+    val b = Real (6.0)
+    val c = Real._1 / b
+    val r = sqrt (a)
+
+    println ("a       = " + a)
+    println ("b       = " + b)
+    println ("c       = " + c)
+/*
+    println ("-a      = " + a)
+    println ("a + c   = " + (a + c))
+    println ("a - c   = " + (a - c))
+    println ("a * c   = " + (a * c))
+    println ("a / c   = " + (a / c))
+    println ("a * a   = " + (a * a))
+    println ("a.abs   = " + a.abs)
+    println ("a max c = " + (a max c))
+    println ("a min c = " + (a min c))
+    println ("sqrt(a) = " + r)
+    println ("r * r   = " + (r * r))
+    println ("a < c   = " + (a < c))
+    println ("a > c   = " + (a > c))
+
+    println ("a ~^ 2. = " + (a ~^ 2.0))         // FIX
+*/
+
+} // RealTest object
+

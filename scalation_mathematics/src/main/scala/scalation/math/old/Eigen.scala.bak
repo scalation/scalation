@@ -1,0 +1,479 @@
+
+/**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ * @author  John Miller
+ * @version 1.0
+ * @date    Thu Jan 28 13:29:27 EST 2010
+ * @see     LICENSE (MIT style license file).
+ *
+ * This file contains classes for Hessenburg reductions, QR decompositions,
+ * finding Eigenvalues and computing Eigenvectors.  The first two are used
+ * in finding Eigenvalues, but are also useful in their own right. 
+ */
+
+package scalation.mathstat
+
+import scala.math.{abs, pow, signum, sqrt}
+import scalation.mathstat.Matrices._
+import scalation.mathstat.Vectors._
+import scalation.util.Error
+
+/**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ * This class is used to reduce, via similarity transformations, an n by n matrix
+ * 'a' to Hessenburg form 'h', where all elements two below the main diagonal are
+ * zero (or close to zero).  Note, similarity transformations do not changes the
+ * eigenvalues.
+ * @param a  the matrix to reduce to Hessenburg form
+ */
+class Hessenburg (a: MatrixD)
+      extends Error
+{
+    /** The Hessenburg h matrix
+     */
+    private var h = new MatrixN [Double] (a)
+
+    {
+        val m = a.dim1
+        val n = a.dim2
+        if (m != n) flaw ("constructor", "must have m == n")
+
+        for (j <- 0 until n) {                // for each column j
+            val x  = h.col(j, j)              // jth column from jth position
+            val u  = x + x.one (0) * x.norm * (if (x(0) < 0.) -1. else 1.)
+            val ident1 = new MatrixN [Double] (n - j, 1., 0.)
+            val ident2 = new MatrixN [Double] (j, 1., 0.)
+            val pp = ident1 - (u outer u) * (2. / u.norm2)
+            val p  = ident2 diag pp
+            h = p.t * h * p
+        } // for
+    } // primary constructor
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Get the Hessenburg h matrix.
+     */
+    def getH: MatrixD = h
+
+} // Hessenburg class
+
+/**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ * This class is used to decompose an m by n matrix 'a' into an orthogonal m by n
+ * matrix 'q' and an n by n right upper triangular matrix 'r' such that a = q * r.
+ * It uses Gram-Schmidt orthogonalization.
+ * Note, orthogonal means that * q.t * q = I.
+ * @see http://www.stat.wisc.edu/~larget/math496/qr.html
+ * @see http://en.wikipedia.org/wiki/Gram–Schmidt_process
+ *      (stabilized Gram–Schmidt orthonormalization)
+ * @param a  the matrix to decompose into q and r
+ */
+class QRdecomposition (a: MatrixD)
+      extends Error
+{
+    /** The orthogonal q matrix
+     */
+    private val q = new MatrixN [Double] (a)
+
+    /** The right upper triangular r matrix
+     */
+    private val r = new MatrixN [Double] (a.dim2, a.dim2)
+
+    {
+        val m = a.dim1
+        val n = a.dim2
+        if (n > m) flaw ("constructor", "must have m >= n")
+
+        for (j <- 0 until n) {                // for each column j
+            val _norm = q.col(j).norm         // norm of the jth column
+            r(j, j) = _norm
+
+            if (_norm != 0.) {
+                for (i <- 0 until m) q(i, j) /= _norm
+                for (k <- j + 1 until n) {
+                    r(j, k) = q.col(j) dot q.col(k)
+                    for (i <- 0 until m) q(i, k) -=  q(i, j) * r(j, k)
+                } // for
+             } // if
+
+         } // for
+    } // primary constructor
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Get the orthogonal q matrix.
+     */
+    def getQ: MatrixD = q
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Get the right upper triangular r matrix.
+     */
+    def getR: MatrixD = r
+
+} // QRdecomposition class
+
+/**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ * This class is used to find the eigenvalues of an n by n matrix 'a' using an
+ * iterative technique that applies similarity transformations to convert 'a' into
+ * an upper triangular matrix, so that the eigenvalues appear along the diagonal.
+ * To improve performance, the 'a' matrix is first reduced to Hessenburg form.
+ * During the iterative steps, a shifted QR decomposition is performed.
+ * Caveats: (i) it will not handle eigenvalues that are complex numbers,
+ *          (ii) it uses a simple shifting strategy that may slow convergence (FIX).
+ * @param a  the matrix whose eigenvalues are sought 
+ */
+class Eigenvalue (a: MatrixD)
+      extends Error
+{
+    /** Flag indicating whether tracing is on to monitor convergence
+     */
+    private val trace = true
+
+    /** The vector of eigenvalues
+     */
+    private val e = VectorN [Double] (a.dim1)
+
+    /** Error tolerance value
+     */
+    private val EPSILON = 1e-6
+
+    {
+        val m = a.dim1
+        val n = a.dim2
+        if (m != n) flaw ("constructor", "must have m == n")
+        var g = (new Hessenburg (a)).getH         // convert g matrix to upper triangular
+        var converging = true                     // still converging, has not converged yet
+        val iterations = 6                        // increase --> more precision, but slower
+        var lastE      = Double.PositiveInfinity  // save an eigenvalue from last iteration
+
+        for (k <- 0 until iterations if converging) {  // major iterations
+            converging = true
+            for (l <- 0 until iterations) {            // minor iterations
+                val s = g(n - 1, n - 1)               // the shift parameter
+                val ident = new MatrixN [Double] (g.dim1, 1., 0.)
+                val qr = new QRdecomposition (g - ident * s)
+                g = qr.getR * qr.getQ + ident * s
+            } // for
+
+            for (i <- 0 until n) e(i) = g(i, i)       // extract eigenvalues from diagonal
+            val e0 = e(0)                             // consider one eigenvalue
+            if (abs ((lastE - e0) / e0) < EPSILON) {  // relative error
+                converging = false                    // end major iterations
+            } else {
+                lastE = e0                            // save this eigenvalue
+            } // if
+
+            if (trace) {
+                println ("-------------------------------------------")
+                println ("Eigenvalue: on iteration " + k + " g = " + g)
+                println ("Eigenvalue: on iteration " + k + " e = " + e)
+                if ( ! converging) println ("Eigenvalue: converged!")
+            } // if
+        } // for
+    } // primary constructor
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Get the eigenvalue e vector.
+     */
+    def getE: VectorD = e
+
+} // Eigenvalue class
+
+/**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ * This class performs a Householder Tridiagonalization on a symmetric matrix.
+ * @see Algorithm 8.3.1 in Matrix Computations.
+ * @param a  the symmetric matrix to tridiagonalize
+ */
+class Householder (a: MatrixD)
+      extends Error
+{
+    /** The Householder tridiagonal matrix
+     */
+    private var t = new MatrixD (a)
+
+    {
+        if (a.dim1 != a.dim2) flaw ("constructor", "must have m == n")
+        if (! a.isSymmetric)  flaw ("constructor", "matrix a must be symmetric")
+        val n = t.dim1 - 1         // the last index
+        for (k <- 0 to n - 2) {
+            val ts  = t.col (k).slice (k + 1, n)
+            val v_b = house (ts)
+            val v   = v_b._1; val b = v_b._2
+            val p   = t.slice (k + 1, n, k + 1, n) * v * b 
+            val w   = p - v * (b / 2.) * (p dot v)
+            t(k + 1, k) = ts.norm
+            t(k, k + 1) = t(k + 1, k)
+            val tt = (v outer w) + (w outer v)
+            for (i <- k + 1 to n; j <- k + 1 to n) t(i, j) -= tt(i, j)
+        } // for
+    } // primary constructor
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Compute the Householder vector v and its corresponding scalar b,
+     * where I - b * v * v.t is an orthogonal matrix.
+     * @see Algorithm 5.1.1 in Matrix Computations.
+     * @param x  the vector to create the Householder vector from
+     */
+    def house (x: VectorD): Tuple2 [VectorD, Double] =
+    {
+        val xs = x.slice (1, x.dim - 1)
+        val s  = x.norm2
+        var b  = 0.
+        var v  = new VectorD (1.) ++ xs
+        if (s != 0.) {
+            val y = x(0)
+            val m = sqrt (y * y + s)
+            val z = if (y <= 0) y - m else -s / (y + m)
+            v(0) = z
+            b = 2. * z * z / (z * z + s)
+            v /= z
+        } // if
+        Tuple2 (v, b)
+    } // house
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Get the Householder Tridiagonal matrix.
+     */
+    def getT: MatrixD = t
+
+} // Householder class
+
+/**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ * This class performs a symmetric QR step with a Wilkinson shift.
+ * @see Algorithm 8.3.2 in Matrix Computations.
+ * @param t  the unreduced symmetric tridiagonal matrix
+ */
+class SymmetricQRstep (a: MatrixD)
+      extends Error
+{
+    /** The symmetric tridiagonal matrix after one reduction step
+     */
+    private var t = new MatrixD (a)
+
+    /** Error tolerance value
+     */
+    private val EPSILON = 1e-9
+
+    {
+        if (a.dim1 != a.dim2) flaw ("constructor", "must have m == n")
+        if (! a.isSymmetric)  flaw ("constructor", "matrix a must be symmetric")
+        val n  = t.dim1 - 1        // the last index
+        val d  = (t(n-1, n-1) - t(n, n)) / 2.
+        val t2 = pow (t(n, n-1), 2)
+        val m  = t(n, n) - t2 / (d + signum (d) * sqrt (d * d + t2))
+        var x  = t(0, 0) - m
+        var z  = t(1, 0)
+        for (k <- 0 until n) {
+            val c_s = givens (x, z)   // (c, s) values in Givens rotation matrix
+            val c = c_s._1
+            val s = c_s._2
+            for (j <- 0 until n) {    // G(k, k+1, theta).t * t
+                val r1 = t(k, j)
+                val r2 = t(k+1, j)
+                t(0, j) = c*r1 - s*r2
+                t(1, j) = s*r1 + c*r2
+            } // for
+            for (j <- 0 until n) {    // ... * G(k, k+1, theta)
+                val r1 = t(j, k)
+                val r2 = t(j, k+1)
+                t(j, k)   = c*r1 - s*r2
+                t(j, k+1) = s*r1 + c*r2
+            } // for
+            if (k < n - 1) {
+                x = t(k + 1, k)
+                z = t(k + 2, k)
+            } // if
+        } // for
+    } // primary constructor
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Create the values for a Givens 2-by-2 rotation matrix.  Given scalars
+     * a and b, efficiently compute c = cos(theta) and s = sin(theta) that can
+     * be used to form the rotation matrix.
+     * @see Algorithm 5.1.3 in Matrix Computation.
+     * @param a  the first scalar
+     * @param b  the second scalar
+     */
+    def givens (a: Double, b: Double): Tuple2 [Double, Double] =
+    {
+        val aa = abs (a)
+        val ba = abs (b)
+        var c  = 1.       // cos(theta)
+        var s  = 0.       // sin(theta)
+        var r  = 0.
+        if (ba > aa) {
+            r = -a/b; s = 1. / sqrt (1. + r*r); c = s*r
+        } else if (ba > EPSILON) {
+            r = -b/a; c = 1. / sqrt (1. + r*r); s = c*r
+        } // if
+        Tuple2 (c, s)
+        // new MatrixD (Array (Array ( c, s),   // need not actually manifest the matrix
+        //                     Array (-s, c)))
+    } // givens
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Get the tridiagonal matrix after reduction by Givens rotations.
+     */
+    def getT: MatrixD = t
+
+} // SymmetricQRstep class
+
+/**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ * This class is used to find the eigenvalues of an n by n symmetric matrix 'a'
+ * using an iterative technique, the Symmetric QR Algorithm.
+ * @see Algorithm 8.3.3 in Matrix Computations.
+ * Caveats: (i) it will not handle eigenvalues that are complex numbers,
+ *          (ii) it uses a simple shifting strategy that may slow convergence (FIX).
+ * @param a  the symmetric matrix whose eigenvalues are sought
+ */
+class EigenvalueSym (a: MatrixD)
+      extends Error
+{
+    /** Flag indicating whether tracing is on to monitor convergence
+     */
+    private val trace = true
+
+    /** The vector of eigenvalues
+     */
+    private val e = VectorN [Double] (a.dim1)
+
+    /** Error tolerance value
+     */
+    private val EPSILON = 1e-9
+
+    {
+        val m = a.dim1
+        val n = a.dim2
+        if (m != n)          flaw ("constructor", "must have m == n")
+        if (! a.isSymmetric) flaw ("constructor", "matrix a must be symmetric")
+        var q = 1
+        var p = n
+        var d = (new Householder (a)).getT
+        while (q < n) {
+            for (i <- 0 to n - 2 if abs (d(i, i+1)) <= abs (d(i, i)) + abs (d(i+1, i+1)) + EPSILON) {
+                d(i, i+1) = 0.
+                d(i+1, i) = 0.
+            } // for
+
+            // given d = [d11, d22, d33] find largest q and smallest p
+            // such that d33 is diagonal and d22 is unreduced
+            // CODE GOES HERE
+            val d22 = d.slice (p, p, n - q, n - q)
+            
+            if (q < n) {
+                val z = (new SymmetricQRstep (d22)).getT    // FIX ???
+                val dd = z.diag (p, q)           // form [Ip, z, Iq]
+                d = dd.t * d * dd
+            } // if
+
+            if (trace) {
+                println ("-------------------------------------------")
+                println ("EigenvalueSym: iteration with p = " + p + " , q = " + q)
+                println ("EigenvalueSym: iteration d = " + d)
+            } // if
+        } // while
+    } // primary constructor
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Get the eigenvalue e vector.
+     */
+    def getE: VectorD = e
+
+} // EigenvalueSym
+
+/**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ * This class is used to find the kth Eigenvalue for a symmetric matric.
+ * @see Matrix Compuations section 8.5.2
+ */
+class EigenvalueKth
+{
+} // EigenvalueKth
+
+/**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ * This class is used to find the eigenvectors of an n by n matrix 'a' by solving
+ * equations of the form (a - eI)v = 0 where e is the eigenvalue and v is the
+ * eigenvector.  Place the eigenvectors in a matrix column-wise to form the modal
+ * matrix.
+ * @see http://en.wikipedia.org/wiki/Modal_matrix
+ * @param a   the matrix whose eigenvectors are sought 
+ * @param _e  the vector of eigenvalues of matrix a
+ */
+class Eigenvector (a: MatrixD, _e: VectorD = null)
+      extends Error
+{
+    /** The matrix of eigenvectors (each row holds an eigenvector)
+     */
+    private val v = MatrixN [Double] (a.dim1, a.dim1)
+
+    {
+        val m = a.dim1
+        val n = a.dim2
+        if (n != m) flaw ("constructor", "must have m == n")
+
+        val e = if (_e == null) (new Eigenvalue (a)).getE else _e
+        for (i <- 0 until n) {        // compute eigenvector for ith eigenvalue
+            val ident = new MatrixN [Double] (a.dim1, 1., 0.)
+            v.setColumn (i, (a - ident * e(i)).slice (0, n - 1).nullspace)
+        } // for
+    } // primary constructor
+
+    /**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     * Get the eigenvector v matrix.
+     */
+    def getV: MatrixD = v 
+
+} // Eigenvector class
+
+/**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ * This object is used to test the all the classes used in computing Eigenvalues
+ * and Eigenvectors for the non-symmetric/general case.
+ * @see http://en.wikipedia.org/wiki/QR_decomposition
+ */
+object EigenTest extends Application
+{
+    val b = new MatrixD (Array (Array (-149., -50., -154.),
+                                Array ( 537., 180.,  546.),
+                                Array ( -27.,  -9.,  -25.) ))
+    val e = (new Eigenvalue (b)).getE
+    println ("e = " + e)                  // should give 3, 2, 1
+    val v = (new Eigenvector (b, e)).getV
+    println ("v = " + v)
+    for (i <- 0 until v.dim1) {   // check that b * v_.i = e_i * v_.i
+        println ("b    * v(.,i) = " + (b    * v.col (i)))
+        println ("v(.,i) * e(i) = " + (v.col (i) * e(i)))
+    } // for
+
+/***
+    val b = new MatrixD (Array (Array ( 2.,  1.,  3.),
+                                Array (-1.,  0.,  7.),
+                                Array ( 0., -1., -1.) ))
+    val h = (new Hessenburg (b)).getH
+    println ("h = " + h)
+
+    val b = new MatrixD (Array (Array (12.,  -51.,   4.),
+                                Array ( 6.,  167., -68.),
+                                Array (-4.,   24., -41.) ))
+    val qr = new QRdecomposition (b)
+    val q = qr.getQ
+    val r = qr.getR
+    println ("b = " + b)
+    println ("q = " + q)
+    println ("r = " + r)
+    println ("q*r = " + q * r)
+    println ("q.t*q = " + q.t * q)
+***/
+
+} // EigenTest object
+
+/**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ * This object is used to test the all the classes used in computing Eigenvalues
+ * and Eigenvectors for the symmetric/special case.
+ */
+object EigenTest2 extends Application
+{
+    val t = new MatrixD (Array (Array (1., 1., 0.,   0.),
+                                Array (1., 2., 1.,   0.),
+                                Array (0., 1., 3.,   0.01),
+                                Array (0., 0., 0.01, 4.) ))
+
+    val v = (new SymmetricQRstep (t)).getT
+    println ("t = " + t)
+    println ("v = " + v)
+
+} // EigenTest2 object
+

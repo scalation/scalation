@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Hao Peng, Zhe Jin
- *  @version 1.5
+ *  @version 1.6
  *  @date    Mon Jul 27 01:27:00 EDT 2015
  *  @see     LICENSE (MIT style license file).
  */
@@ -30,10 +30,9 @@ import BayesClassifier.me_default
  *  each class in the training-set.  Relative posterior probabilities are computed
  *  by multiplying these by values computed using conditional probabilities.  The
  *  classifier supports limited dependency between features/variables.
- *
+ *-----------------------------------------------------------------------------
  *  This classifier uses the standard cross-validation technique.
- *  -----------------------------------------------------------------------------
- *
+ *-----------------------------------------------------------------------------
  *  @param x            the integer-valued data vectors stored as rows of a matrix
  *  @param y            the class vector, where y(l) = class for row l of the matrix, x(l)
  *  @param fn           the names for all features/variables
@@ -52,18 +51,17 @@ class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
     protected var parent = new VectorI (n)                // vector holding the parent for each feature/variable
     protected val vcp    = Array.ofDim [Int] (n)          // value count for the parent
 
-    protected val f_CXP  = new HMatrix4 [Int] (k, n)      // conditional frequency counts for variable/feature j: xj
-    protected val p_X_CP = new HMatrix4 [Double] (k, n)   // conditional probabilities for variable/feature j: xj
+    protected val nu_XyP = new HMatrix4 [Int] (k, n)      // conditional frequency counts for variable/feature j: xj
+    protected val p_XyP = new HMatrix4 [Double] (k, n)    // conditional probabilities for variable/feature j: xj
 
     if (vc == null) {
         shiftToZero; vc = vc_fromData                     // set value counts from data
     } // if
 
-    f_CXZ = new HMatrix5 [Int] (k, n, n, vc, vc)          // local joint frequency (using partial dataset, i.e. when using cross validation)
-                                                          // of C, X, and Z, where X, Z are features/columns
-    f_CX  = new HMatrix3 [Int] (k, n, vc)                 // local joint frequency of C and X
-    f_X   = new HMatrix2 [Int] (n, vc)                    // local frequency of X
-
+    nu_X   = new HMatrix2 [Int] (n, vc)                   // local frequency of X
+    nu_Xy  = new HMatrix3 [Int] (k, n, vc)                // local joint frequency of X and y
+    nu_XyZ = new HMatrix5 [Int] (k, n, n, vc, vc)         // local joint frequency (using partial dataset, i.e. when using cross validation)
+                                                          // of X, y and Z, where X, Z are features/columns
     if (DEBUG) {
         println ("value count vc      = " + vc.deep)
         println ("value count vcp     = " + vcp.deep)
@@ -80,11 +78,11 @@ class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
         val idx = if (additive) 0 until m diff itest else itest
         computeParent (idx)                             // frequency computations are also done here
         computeVcp ()
-        f_CXP.alloc (vc, vcp)
-        p_X_CP.alloc (vc, vcp)
+        nu_XyP.alloc (vc, vcp)
+        p_XyP.alloc (vc, vcp)
         copyFreqCXP ()
         train2 ()
-        if (smooth) smoothParam (itest.size)
+        if (smooth) smoothP (md - itest.size)
         this
     } // train
 
@@ -94,20 +92,20 @@ class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
      */
     private def train2 ()
     {
-        p_C = f_C.toDouble / md                                             // prior probability for class yi
+        p_y = nu_y.toDouble / md                                            // prior probability for class yi
         for (i <- (0 until k).par; j <- (0 until n).par if fset(j)) {       // for each class yi & feature xj
             val me_vc = me / vc(j).toDouble
             for (xj <- (0 until vc(j)).par; xp <- (0 until vcp(j)).par) {
-                val d = if (parent(j) > -1) f_CX(i, parent(j), xp)
-                        else                f_C(i)
+                val d = if (parent(j) > -1) nu_Xy(i, parent(j), xp)
+                        else                nu_y(i)
                 // for each value for feature j: xj, par(j): xp
-                p_X_CP(i, j, xj, xp) = (f_CXP(i, j, xj, xp) + me_vc) / (d + me)
+                p_XyP(i, j, xj, xp) = (nu_XyP(i, j, xj, xp) + me_vc) / (d + me)
             } // for
         } // for
 
         if (DEBUG) {
-            println ("p_C = " + p_C)                                        // P(C = i)
-            println ("p_X_CP = " + p_X_CP)                                  // P(X_j = x | C = i)
+            println ("p_y   = " + p_y)                                     // P(y = c)
+            println ("p_XyP = " + p_XyP)                                   // P(X_j = x | y = c)
         } // if
     } // train2
 
@@ -136,30 +134,30 @@ class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
     private def copyFreqCXP ()
     {
         for (i <- (0 until k).par; j <- x.range2.par if fset(j); xj <- (0 until vc(j)).par; xp <- (0 until vcp(j)).par) {
-            f_CXP(i, j, xj, xp) = if (parent(j) > -1) f_CXZ(i, j, parent(j), xj, xp)
-                                  else                f_CX(i, j, xj)
+            nu_XyP(i, j, xj, xp) = if (parent(j) > -1) nu_XyZ(i, j, parent(j), xj, xp)
+                                   else                nu_Xy(i, j, xj)
         } // for
     } // copyFreq
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Increment frequency counters used in CMI calculations based on the 'i'th
      *  row of the data matrix.
-     *  @param i        the index for current data row
-     *  @param f_C      frequency table of class C
-     *  @param f_X      frequency table of feature X
-     *  @param f_CX     joint frequency table of C and X
-     *  @param f_CXZ    joint frequency table of C, X, and Z, where X and Z are features/columns
+     *  @param i       the index for current data row
+     *  @param nu_y    frequency table of class C
+     *  @param nu_X    frequency table of feature X
+     *  @param nu_Xy   joint frequency table of C and X
+     *  @param nu_XyZ  joint frequency table of C, X, and Z, where X and Z are features/columns
      */
-    protected override def updateFreq (i: Int, f_C: VectoI, f_X: HMatrix2 [Int], f_CX: HMatrix3 [Int], f_CXZ: HMatrix5 [Int])
+    protected override def updateFreq (i: Int, nu_y: VectoI, nu_X: HMatrix2 [Int], nu_Xy: HMatrix3 [Int], nu_XyZ: HMatrix5 [Int])
     {
-        val yi   = y(i)                                       // get the class for ith row
-        f_C(yi) += 1                                          // decrement frequency for class yi
+        val yi   = y(i)                                        // get the class for ith row
+        nu_y(yi) += 1                                          // decrement frequency for class yi
         for (j <- x.range2 if fset(j)) {
-            f_X(j, x(i, j)) += 1
-            f_CX (yi, j, x(i, j)) += 1
+            nu_X(j, x(i, j)) += 1
+            nu_Xy(yi, j, x(i, j)) += 1
             for (j2 <- j+1 until n if fset(j2)) {
-                f_CXZ (yi, j, j2, x(i, j), x(i, j2)) += 1
-                f_CXZ (yi, j2, j, x(i, j2), x(i, j)) += 1
+                nu_XyZ (yi, j, j2, x(i, j), x(i, j2)) += 1
+                nu_XyZ (yi, j2, j, x(i, j2), x(i, j)) += 1
             } // for
         } // for
     } // updateFreq
@@ -188,30 +186,24 @@ class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
     /** Perform smoothing operations on the learned parameters by using Dirichlet priors
      *  to compute the posterior probabilities of the parameters given the training dataset.
      *  @see citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.178.8884&rep=rep1&type=pdf
-     *  @param testSize  size of the test size
+     *  @param trainSize  size of the training dataset
      */
-    private def smoothParam (testSize: Int = 0)
+    private def smoothP (trainSize: Double)
     {
+        val N0 = 3
         for (i <- (0 until k).par) {
-            p_C(i) *= m / (m + N0)
-            p_C(i) += N0 * k / (m + N0)
             for (j <- (0 until n).par if fset(j)) {
                 val pj = parent(j)
                 for (xj <- (0 until vc(j)).par; xp <- (0 until vcp(j)).par) {
+                    val nu_px  = if (pj > -1) nu_Xy(i, pj, xp) else nu_y(i)
+                    val theta0 = nu_X(j, xj) / trainSize
 
-                    val f_px = if (pj > -1) f_CX(i, pj, xp) else f_C(i)
-
-                    //NOTE: two alternative priors, may work better for some datasets
-                    //val theta0 = f_CXP(i, j, xj, xp) / (md - testSize)
-                    //val theta0 = f_CX(i, j, xj) / (md - testSize)
-                    val theta0 = f_X(j, xj) / (md - testSize)
-
-                    p_X_CP(i, j, xj, xp) *= (f_px / (f_px + N0))
-                    p_X_CP(i, j, xj, xp) += (N0 / (f_px + N0) * theta0)
+                    p_XyP(i, j, xj, xp) *= nu_px / (nu_px + N0)
+                    p_XyP(i, j, xj, xp) += N0 / (nu_px + N0) * theta0
                 } // for
             } // for
         } // for
-    } // smoothParam
+    } // smoothP
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'z', classify it returning the class number
@@ -222,10 +214,10 @@ class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
      */
     def classify (z: VectoI): (Int, String, Double) =
     {
-        val prob = new VectorD (p_C)
+        val prob = new VectorD (p_y)
         for (i <- 0 until k; j <- 0 until n if fset(j)) {
-                prob(i) *=  (if (parent(j) > -1) p_X_CP(i, j, z(j), z(parent(j)))    // P(X_j = z_j | C = i), parent
-                             else                p_X_CP(i, j, z(j), 0))              // P(X_j = z_j | C = i), no parent (other than the class)
+                prob(i) *= (if (parent(j) > -1) p_XyP(i, j, z(j), z(parent(j)))    // P(X_j = z_j | y = i), x-parent
+                            else                p_XyP(i, j, z(j), 0))              // P(X_j = z_j | y = i), no x-parent
         } // for
         if (DEBUG) println ("prob = " + prob)
         val best = prob.argmax ()             // class with the highest relative posterior probability
@@ -237,10 +229,10 @@ class TANBayes0 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [St
      */
     def reset ()
     {
-        f_C.set(0)
-        f_CX.set(0)
-        f_X.set(0)
-        f_CXZ.set(0)
+        nu_y.set (0)
+        nu_X.set (0)
+        nu_Xy.set (0)
+        nu_XyZ.set (0)
     } // reset
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -258,8 +250,7 @@ object TANBayes0
 {
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create a `TANBayes0` object, passing 'x' and 'y' together in one matrix.
-     *
-     *  @param xy     the data vectors along with their classifications stored as rows of a matrix
+     *  @param xy           the data vectors along with their classifications stored as rows of a matrix
      *  @param fn           the names for all features/variables
      *  @param k            the number of classes
      *  @param cn           the names for all classes
@@ -296,11 +287,11 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
 {
     private val DEBUG  = false                                     // debug flag
 
-    private var g_f_CXZ = new HMatrix5 [Int] (k, n, n, vc, vc)     // global joint frequency (using entire dataset) of C, X, and Z, where X, Z are features/columns
-    private var g_f_CX  = new HMatrix3 [Int] (k, n, vc)            // global joint frequency of C and X
-    private val g_f_C   = new VectorI (k)                          // global frequency of C
-    private var g_f_X   = new HMatrix2[Int] (n, vc)                // global frequency of X
-
+    private val g_nu_y   = new VectorI (k)                         // global frequency of y
+    private var g_nu_X   = new HMatrix2[Int] (n, vc)               // global frequency of X
+    private var g_nu_Xy  = new HMatrix3 [Int] (k, n, vc)           // global joint frequency of X and y
+    private var g_nu_XyZ = new HMatrix5 [Int] (k, n, n, vc, vc)    // global joint frequency (using entire dataset) of C, X, and Z,
+                                                                   // where X, Z are features/columns
     additive = false
 
     if (DEBUG) {
@@ -317,16 +308,16 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
     def frequenciesAll ()
     {
         val size     = m / PARALLELISM + 1
-        val g_f_Cw   = Array.ofDim [VectorI] (PARALLELISM)
-        val g_f_Xw   = Array.ofDim [HMatrix2 [Int]] (PARALLELISM)
-        val g_f_CXw  = Array.ofDim [HMatrix3 [Int]] (PARALLELISM)
-        val g_f_CXZw = Array.ofDim [HMatrix5 [Int]] (PARALLELISM)
+        val g_nu_yw   = Array.ofDim [VectorI] (PARALLELISM)
+        val g_nu_Xw   = Array.ofDim [HMatrix2 [Int]] (PARALLELISM)
+        val g_nu_Xyw  = Array.ofDim [HMatrix3 [Int]] (PARALLELISM)
+        val g_nu_XyZw = Array.ofDim [HMatrix5 [Int]] (PARALLELISM)
 
         for (w <- (0 until PARALLELISM).par) {
-            g_f_Cw (w)   = new VectorI (k)
-            g_f_Xw (w)   = new HMatrix2 [Int] (n, vc)
-            g_f_CXw (w)  = new HMatrix3 [Int] (k, n, vc)
-            g_f_CXZw (w) = new HMatrix5 [Int] (k, n, n, vc, vc)
+            g_nu_yw (w)   = new VectorI (k)
+            g_nu_Xw (w)   = new HMatrix2 [Int] (n, vc)
+            g_nu_Xyw (w)  = new HMatrix3 [Int] (k, n, vc)
+            g_nu_XyZw (w) = new HMatrix5 [Int] (k, n, n, vc, vc)
         } // for
 
         val paraRange = (0 until PARALLELISM).par
@@ -334,23 +325,23 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
 
         for (w <- paraRange; i <- w * size until min ((w + 1) * size, m)) {
             val yi = y(i)
-            g_f_Cw(w)(yi) += 1
+            g_nu_yw(w)(yi) += 1
             for (j <- 0 until n if fset(j)) {
-                g_f_Xw(w)(j, x(i, j)) += 1
-                g_f_CXw(w)(yi, j, x(i, j)) += 1
-                for (j2 <- j+1 until n if fset(j2)) g_f_CXZw(w)(yi, j, j2, x(i, j), x(i, j2)) += 1
+                g_nu_Xw(w)(j, x(i, j)) += 1
+                g_nu_Xyw(w)(yi, j, x(i, j)) += 1
+                for (j2 <- j+1 until n if fset(j2)) g_nu_XyZw(w)(yi, j, j2, x(i, j), x(i, j2)) += 1
             } // for
         } // for
 
         for (w <- 0 until PARALLELISM) {
-            g_f_C  += g_f_Cw (w)
-            g_f_X  += g_f_Xw (w)
-            g_f_CX += g_f_CXw (w)
-            g_f_CXZ += g_f_CXZw (w)
+            g_nu_y   += g_nu_yw (w)
+            g_nu_X   += g_nu_Xw (w)
+            g_nu_Xy  += g_nu_Xyw (w)
+            g_nu_XyZ += g_nu_XyZw (w)
         } // for
 
         for (c <- 0 until k; j <- 0 until n if fset(j); j2 <- j+1 until n if fset(j2); xj <- 0 until vc(j); xj2 <- 0 until vc(j2)) {
-            g_f_CXZ(c, j2, j, xj2, xj) = g_f_CXZ(c, j, j2, xj, xj2)
+            g_nu_XyZ(c, j2, j, xj2, xj) = g_nu_XyZ(c, j, j2, xj, xj2)
         } // for
     } // frequenciesAll
 
@@ -359,16 +350,16 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
      *  row of the data matrix.
      *  @param i  the index for current data row
      */
-    protected override def updateFreq (i: Int, f_C: VectoI, f_X: HMatrix2 [Int], f_CX: HMatrix3 [Int], f_CXZ: HMatrix5 [Int])
+    protected override def updateFreq (i: Int, nu_y: VectoI, nu_X: HMatrix2 [Int], nu_Xy: HMatrix3 [Int], nu_XyZ: HMatrix5 [Int])
     {
         val yi   = y(i)                                       // get the class for ith row
-        f_C(yi) -= 1                                          // decrement frequency for class yi
+        nu_y(yi) -= 1                                          // decrement frequency for class yi
         for (j <- x.range2 if fset(j)) {
-            f_X(j, x(i, j)) -= 1
-            f_CX (yi, j, x(i, j)) -= 1
+            nu_X(j, x(i, j))      -= 1
+            nu_Xy(yi, j, x(i, j)) -= 1
             for (j2 <- j+1 until n if fset(j2)) {
-                f_CXZ (yi, j, j2, x(i, j), x(i, j2)) -= 1
-                f_CXZ (yi, j2, j, x(i, j2), x(i, j)) -= 1
+                nu_XyZ (yi, j, j2, x(i, j), x(i, j2)) -= 1
+                nu_XyZ (yi, j2, j, x(i, j2), x(i, j)) -= 1
             } // for
         } // for
     } // updateFreq
@@ -379,13 +370,13 @@ class TANBayes (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [Str
     override def reset ()
     {
         for (i <- (0 until k).par) {
-            f_C(i) = g_f_C(i)
+            nu_y(i) = g_nu_y(i)
             for (j <- x.range2.par if fset(j); xj <- (0 until vc(j)).par) {
-                if (i == 0) f_X(j, xj) = g_f_X(j, xj)
-                f_CX(i, j, xj) = g_f_CX(i, j, xj)
+                if (i == 0) nu_X(j, xj) = g_nu_X(j, xj)
+                nu_Xy(i, j, xj) = g_nu_Xy(i, j, xj)
                 for (j2 <- (j+1 until n).par if fset(j2); xj2 <- (0 until vc(j2)).par) {
-                    f_CXZ(i, j, j2, xj, xj2) = g_f_CXZ(i, j, j2, xj, xj2)
-                    f_CXZ(i, j2, j, xj2, xj) = f_CXZ(i, j, j2, xj, xj2)
+                    nu_XyZ(i, j, j2, xj, xj2) = g_nu_XyZ(i, j, j2, xj, xj2)
+                    nu_XyZ(i, j2, j, xj2, xj) = nu_XyZ(i, j, j2, xj, xj2)
                 }
             } // for
         } // for

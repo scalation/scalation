@@ -1,0 +1,362 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.4
+ *  @date    Fri Mar 16 15:13:38 EDT 2018
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  @see     hebb.mit.edu/courses/9.641/2002/lectures/lecture03.pdf
+ */
+
+package scalation.analytics
+
+import scala.math.sqrt
+
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectorI}
+import scalation.linalgebra.MatrixD.outer
+import scalation.math.double_exp
+import scalation.calculus.Differential.{FunctionM_2M, FunctionV_2V}
+import scalation.random.{PermutedVecI, RandomMatD}
+import scalation.random.RNGStream.ranStream
+import scalation.util.{banner, Error}
+
+import ActivationFun._
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `NeuralNet_3L` class supports multi-output, 2-layer (input and output)
+ *  Neural-Networks.  Although useful for both classification and prediction,
+ *  this class is used for prediction.  Given several input vectors and output
+ *  vectors (training data), fit the weights/parameters 'bb' connecting the layers,
+ *  so that for a new input vector 'z', the net can predict the output value, i.e.,
+ *  <p>
+ *      yp_j = f (bb dot z)
+ *  <p>
+ *  where 'f' is the activation function and the parameter matrix 'bb' gives the
+ *  weights between input and output layers.
+ *  Note, 'b0' is treated as the bias, so 'x0' must be 1.0.
+ *  @param x     the input matrix (training data consisting of m input vectors)
+ *  @param y     the output vector (training data consisting of m output values)
+ *  @param nz    the number of nodes in hidden layer
+ *  @param eta   the learning/convergence rate (typically less than 1.0)
+ *  @param fa    the activation function (mapping scalar => scalar)
+ *  @param faV   the vector activation function (mapping vector => vector)
+ *  @param faD  the derivative of the vector activation function 
+ */
+class NeuralNet_3L (x: MatriD, y: MatriD, private var nz: Int = -1,
+                    private var eta: Double = 0.1, bsize: Int = 5,
+                    faV:  FunctionV_2V = sigmoidV _,
+                    faM:  FunctionM_2M = sigmoidM _,
+                    faDM: FunctionM_2M = sigmoidDM _)
+      extends Error
+{
+    private val DEBUG    = true                                    // debug flag
+    private val MAX_ITER = 1000                                    // maximum number of iterations
+    private val EPSILON  = 1E-9                                    // number close to zero
+    private val m        = x.dim1                                  // number of data points (input vectors)
+    private val nx       = x.dim2                                  // dimensionality of the input
+    private val ny       = y.dim2                                  // dimensionality of the output
+    private val _1       = VectorD.one (m)                         // vector of all ones
+
+    private var aa: MatriD = null                                  // weight parameters (in to hid) - new MatrixD (nx, nz)
+    private var bb: MatriD = null                                  // weight parameters (hid to out) - new MatrixD (nz, ny)
+
+    private val fitA = Array.ofDim [Fit] (ny)
+    for (k <- fitA.indices) fitA(k) = new Fit (y.col(k), nx, (nx-1, m - nx))
+
+    if (y.dim1 != m) flaw ("constructor", "row dimensions of x and y are incompatible")
+
+    // Guidelines for setting the number of nodes in hidden layer, e.g.,
+    // 2 nx + 1, nx + 1, (nx + ny) / 2, sqrt (nx ny)
+    if (nz < 1) nz = nx + 1
+
+    println (s"Create a NeuralNet_3L with $nx input, $nz hidden and $ny output nodes")
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the weight matrices 'aa' and 'bb'.
+     */
+    def weights: (MatriD, MatriD) = (aa, bb)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the initial weight matrices 'aa' and 'bb' manually before training.
+     *  @param w0a  the initial weights for aa
+     *  @param w0b  the initial weights for bb
+     */
+    def setWeights (w0a: MatriD, w0b: MatriD) { aa = w0a; bb  = w0b }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the initial weight matrix 'bb' with values in (0, 1) before training.
+     *  @param stream  the random number stream to use
+     */
+    def setWeights (stream: Int = 0)
+    {
+        val limit = 1.0 / sqrt (nx)
+        val rmg1 = new RandomMatD (nx, nz, limit, stream = stream)    // change stream to get different random numbers
+        aa       = rmg1.gen
+        val rmg2 = new RandomMatD (nz, ny, limit, stream = stream)    // change stream to get different random numbers
+        bb       = rmg2.gen
+//        if (DEBUG) println (s"setWeights: aa = $aa \n bb = $bb")
+    } // setWeights
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reset the learning rate 'eta'.
+     *  @param eta_  the updated learning rate
+     */
+    def reset (eta_ : Double) { eta = eta_ }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given training data 'x' and 'yy', fit the parameter/weight matrix 'bb'.
+     *  @param yy  the output matrix
+     */
+    def train (yy: MatriD = y): NeuralNet_3L =
+    {
+        if (bb == null || aa == null) setWeights ()                // initialize parameters/weights
+        minimizeError ()                                           // adjust weights aa and bb to minimize sse
+//      if (DEBUG) println (s"train: aa = $aa \n bb = $bb")
+        this
+    } // train
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Minimize the error in the prediction by adjusting the weight vector 'b'.
+     *  The error 'e' is simply the difference between the target value 'yy' and the
+     *  predicted value 'yp'.  Minimize the dot product of error with itself using
+     *  gradient-descent.  The gradient is '-x.t * (e * yp * (_1 - yp))', so move in
+     *  the opposite direction of the gradient.
+     */
+    private def minimizeError ()
+    {
+    //    println (s"before (0) bb = $bb")
+    //    println (s"before (0) aa = $aa")
+        var sse0 = Double.MaxValue
+        val nBat = m / bsize
+        println (s"minimizeError: bsize = $bsize, nBat = $nBat")
+
+        var up = 0
+        for (it <- 0 until MAX_ITER) {                          // it-th learning phase
+
+            val x_aa = x * aa                                      // X A
+            val z    = faM (x_aa)                                  // Z = f (X A)
+            z.setCol (0, _1)                                       // set the bias at the hidden layer
+            val z_bb = z * bb                                      // Z B
+            val yp = faM (z_bb)                                    // Yp = f (Z B)
+            val ne = yp - y                                        // -E  where W is the error matrix
+            val dy = htimes (faDM (yp), ne)          // faDM takes yp (after going through activation func) as parameter
+            val dy_bbt = dy * bb.t
+            val dz = htimes (faDM (z), dy_bbt)       // same as above, takes z, instead of x_aa, as parameter
+
+            updateWeights (z, dy, dz, nBat)
+
+            val sse = htimes (ne, ne).sum
+
+//          if (DEBUG) println (s"weights for $it th iteration: sse = $sse")
+            if (sse > sse0 + EPSILON) up += 1 else up = 0
+            if (up > 5) { println (s"it = $it"); return }          // return early if moving up for too long
+            sse0 = sse                                             // save prior sse
+        } // for
+
+    } // minimizeError
+
+    def updateWeights (z: MatriD, dy: MatriD, dz: MatriD, nBat: Int)
+    {
+        val permutedVec  = PermutedVecI (VectorI.range(0, m), ranStream)        // stochastic gradient descent
+        val randOrder    = permutedVec.igen
+        val batchIndices = if (nBat > 1) randOrder.split (nBat) else Array (randOrder)
+        for (idx <- batchIndices) {
+            val bbu = new MatrixD (bb.dim1, bb.dim2)
+            val aau = new MatrixD (aa.dim1, aa.dim2)
+            for (i <- idx) {
+                bbu += outer (z(i), dy(i))
+                aau += outer (x(i), dz(i))
+            } // for
+            val etaM = eta / idx.dim
+            bb -= bbu * etaM
+            aa -= aau * etaM
+        } // for
+    } // updateWeights
+
+/*
+    private def minimizeError ()
+    {
+        val k = m / bsize                   // new class parameter 'batchSize'
+        println (s"minimizeError: bsize = $bsize, k = $k")
+        for (it <- 0 until MAX_ITER) {          // it-th learning phase
+            val x_aa = x * aa
+            val z = faM (x_aa)
+            z.setCol(0, _1)
+            val z_bb = z * bb
+            val yp = faM (z_bb)
+            val ne = yp - y                     // negative of e, the error matrix
+            val dy = htimes (faDM(yp), ne)      // faDM takes yp (after going through activation func) as parameter
+            val dy_bbt = dy * bb.t
+            val dz = htimes(faDM (z), dy_bbt)   // same as above, takes z, instead of x_aa, as parameter
+
+            val permutedVec  = PermutedVecI (VectorI.range(0, m), ranStream)        // stochastic gradient descent
+            val randOrder    = permutedVec.igen
+            val batchIndices = if (k > 1) randOrder.split (k) else Array (randOrder)
+            for (idx <- batchIndices) {
+                val bbu = new MatrixD (bb.dim1, bb.dim2)
+                val aau = new MatrixD (aa.dim1, aa.dim2)
+                for (i <- idx) {
+                    bbu += outer (z(i), dy(i))
+                    aau += outer (x(i), dz(i))
+                } // for
+                val etaM = eta / idx.dim
+                bb -= bbu * etaM
+                aa -= aau * etaM
+            } // for
+        } // for
+    } // minimizeError
+*/
+
+    def htimes (a: MatriD, b: MatriD): MatriD = MatrixD (for (i <- a.range1) yield a(i) * b(i), false)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given training data 'x' and 'yy', fit the parameter/weight matrix 'bb'.
+     */
+    def eval_3L ()
+    {
+        val yp = predict (x)                                       // predict output/responses
+        val e  = y - yp                                            // error matrix
+        for (k <- e.range2) fitA(k).diagnose (e.col(k))            // compute diagonostics, per column
+    } // eval
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Show 'fitMap' for each y-column.
+     */
+    def fitMap_3L ()
+    {
+        var sst, sse = 0.0
+        for (k <- fitA.indices) {
+            val fit_k = fitA(k).fitMap
+            println (s"For column $k: fitMap = \n $fit_k")
+            sst += fit_k ("sst").toDouble
+            sse += fit_k ("sse").toDouble
+        } // for
+        val rSq = (sst - sse) / sst
+        println (s"overall: rSq = $rSq, sst = $sst, sse = $sse")    
+    } // fitMap_3L
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a new input vector 'v', predict the output/response value 'f(v)'.
+     *  @param v  the new input vector
+     */
+    def predict (v: VectorD): VectoD = faV (bb * faV (aa * v))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /*  Given a new input matrix 'x', predict the output/response value 'f(x)'.
+     *  @param x  the new input matrix
+     */
+    def predict (x: MatriD): MatriD = faM (faM (x * aa) * bb)
+
+} // NeuralNet_3L class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `NeuralNet_3LTest` object is used to test the `NeuralNet_3L` class.  For this
+ *  test, the initial weights are used for used for prediction.
+ *  > runMain scalation.analytics.NeuralNet_3LTest
+ */
+object NeuralNet_3LTest extends App
+{
+    val x   = new MatrixD (1, 3)                     // training data - input vectors (not used)
+    val y   = new MatrixD (1, 2)                     // training data - output vectors (not used)
+    val ann = new NeuralNet_3L (x, y, 3)             // create a NeuralNet_3L
+
+    val bb = new MatrixD ((3, 2), 0.0, 0.3,          // weight matrix bb (input to output layer)
+                                  0.5, 0.4,
+                                  0.5, 0.4)
+    ann.setWeights (null, bb)                        // set initial weights
+
+    val z  = VectorD (1.0, 1.0, 1.0)                 // new input vector z
+    val yp = ann.predict (z)                         // predicted output values
+    println (s"input vector: z  = $z")
+    println (s"output value: yp = $yp")
+
+} // NeuralNet_3LTest object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `NeuralNet_3LTest2` object is used to test the `NeuralNet_3L` class.  For this
+ *  test, training data is used to fit the weights before using them for prediction.
+ *  @see www4.rgu.ac.uk/files/chapter3%20-%20bp.pdf
+ *  > runMain scalation.analytics.NeuralNet_3LTest2
+ */
+object NeuralNet_3LTest2 extends App
+{
+    val s = 0                                         // random number stream to use
+    val x = new MatrixD ((3, 3), 1.0, 0.35, 0.9,      // training data - input matrix (m vectors)
+                                 1.0, 0.20, 0.7,
+                                 1.0, 0.40, 0.95)
+    val y = new MatrixD ((3, 2), 0.5, 0.4,            // training data - output matrix (m vectors)
+                                 0.3, 0.3,
+                                 0.6, 0.5)
+
+    println ("input  matrix x = " + x)
+    println ("output matrix y = " + y)
+
+    val nn = new NeuralNet_3L (x, y, 3)                // create a NeuralNet_3L
+
+    banner ("NeuralNet_3LTest2: Set the parameter matrix bb manually")
+
+    val bb = new MatrixD ((3, 2), 0.0, 0.2,           // set weight matrix bb manually
+                                  0.5, 0.4,
+                                  0.5, 0.4)
+    nn.setWeights (null, bb)
+    println ("bb     = " + nn.weights)
+    nn.eval_3L ()
+    nn.fitMap_3L ()
+
+    //var yp = nn.predict (x)                           // predicted output value
+    println ("target output:    y   = " + y)
+    //println ("predicted output: yp  = " + yp)
+
+    banner ("NeuralNet_3LTest2: Set the parameter matrix bb randomly")
+
+    nn.setWeights (s)                                 // set weights randomly
+    println ("bb     = " + nn.weights)
+    nn.eval_3L ()
+    nn.fitMap_3L ()
+
+    //yp = nn.predict (x)                               // predicted output values
+    println ("target output:    y   = " + y)
+    //println ("predicted output: yp  = " + yp)
+
+    for (eta <- 0.5 to 10.0 by 0.5) {
+        banner (s"NeuralNet_3LTest2: Fit the parameter matrix bb using optimization with learning rate $eta")
+
+        nn.reset (eta)
+        nn.train ().eval_3L ()                           // fit the weights using training data
+        println ("bb     = " + nn.weights)
+        nn.fitMap_3L ()
+
+        //yp = nn.predict (x)                           // predicted output values
+        println ("target output:    y   = " + y)
+        //println ("predicted output: yp  = " + yp)
+        println ("yp = " + nn.predict (x(0)))                        // predicted output values for row 0
+    } // for
+
+    banner ("NeuralNet_3LTest2: Compare with Linear Regression - first column of y")
+
+    val y0  = y.col(0)                                // use first column of matrix y
+    val rg0 = new Regression (x, y0)                  // create a Regression model
+    rg0.train ().eval ()
+    println ("b      = " + rg0.coefficient)
+    println ("fitMap = " +  rg0.fitMap)
+
+    val y0p = rg0.predict (x)                         // predicted output value
+    println ("target output:    y0  = " + y0)
+    println ("predicted output: y0p = " + y0p)
+
+    banner ("NeuralNet_3LTest2: Compare with Linear Regression - second column of y")
+
+    val y1 = y.col(1)                                 // use second column of matrix y
+    val rg1 = new Regression (x, y1)                  // create a Regression model
+    rg1.train ().eval ()
+    println ("b      = " + rg1.coefficient)
+    println ("fitMap = " + rg1.fitMap)
+
+    val y1p = rg1.predict (x)                         // predicted output value
+    println ("target output:    y1  = " + y1)
+    println ("predicted output: y1p = " + y1p)
+
+} // NeuralNet_3LTest2 object
+

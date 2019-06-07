@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Yang Fan, John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Thu Apr 26 12:12:38 EDT 2018
  *  @see     LICENSE (MIT style license file).
  */
@@ -36,6 +36,7 @@ object RelationF
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `RelationF` class create a relation/data frame by extending the `Relation` class,
  *  and provides high order functions such as map and reduce.
+ *  FIX - should extend Tabular, not Relation
  *  @param name     the name of the relation
  *  @param colName  the names of columns
  *  @param col      the Scala Vector of columns making up the columnar relation
@@ -139,7 +140,7 @@ class RelationF (name: String, colName: Seq [String], col: Vector [Vec],
         case _ => println ("map: vector type not supported"); null
         } // match
 
-        val cNames = Seq ("1")
+        val cNames = Seq (colName)
         new RelationF (name + "_m_" + ucount (), cNames, ncol, 0, null)
     } // map
 
@@ -207,7 +208,7 @@ class RelationF (name: String, colName: Seq [String], col: Vector [Vec],
         case _ => println ("reduce: vector type not supported"); null
         } // match
 
-      val cNames = Seq ("1")
+      val cNames = Seq (colName)
       new RelationF (name + "_r_" + ucount (), cNames, ncol, 0, null)
     } // reduce
 

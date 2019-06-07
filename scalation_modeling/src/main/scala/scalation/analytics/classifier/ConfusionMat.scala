@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sun Mar 11 15:12:46 EDT 2018
  *  @see     LICENSE (MIT style license file).
  */
@@ -42,12 +42,13 @@ class ConfusionMat (y: VectoI, yp: VectoI, k: Int = 2)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the confusion matrix for 'k = 2' as a tuple (tn, fp, fn, tp).
+     *  @param con  the confusion matrix (defaults to conf)
      */
-    def pos_neg: (Double, Double, Double, Double) =
+    def pos_neg (con: MatriI = conf): (Double, Double, Double, Double) =
     {
         if (k == 2) {
-            (conf(0, 0) /* tn */, conf(0, 1) /* fp */,
-             conf(1, 0) /* fn */, conf(1, 1) /* tp */)
+            (con(0, 0) /* tn */, con(0, 1) /* fp */,
+             con(1, 0) /* fn */, con(1, 1) /* tp */)
         } else (NaN, NaN, NaN, NaN)
     } // pos_neg
 
@@ -64,6 +65,8 @@ class ConfusionMat (y: VectoI, yp: VectoI, k: Int = 2)
      *  and macro-recall that are simply their respective means. 
      *  The precision is the fraction classified as true, which are actually true.
      *  The recall is the fraction of the actually true, which are classified as true.
+     *  Note, for k = 2, ordinary precision and recall will correspond to the last
+     *  elements in the 'prec' and 'recl' micro vectors.
      */
     def prec_recl: (VectoD, VectoD, Double, Double) =
     {

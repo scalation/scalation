@@ -1,370 +1,244 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Tue May 29 14:45:32 EDT 2012
  *  @see     LICENSE (MIT style license file).
  */
 
 package scalation.analytics.clusterer
 
-import scala.collection.mutable.Set
 import scala.util.control.Breaks.{breakable, break}
 
-import scalation.math.double_exp
-import scalation.linalgebra.{MatrixD, VectorD, VectorI}
-import scalation.random.{Randi, Uniform, RandomVecD, RandomVecI}
+import scalation.linalgebra.{MatriD, MatrixD, VectoD, VectorD, VectoI, VectorI}
+import scalation.plot.Plot
+import scalation.random.{PermutedVecI, Randi}
 import scalation.util.{banner, Error}
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KMeansClusterer` class cluster several vectors/points using k-means
- *  clustering.  Either (1) randomly assign points to 'k' clusters or (2) randomly
- *  pick 'k' points as initial centroids (technique (1) to work better and is the
- *  primary technique).  Iteratively, reassign each point to the cluster containing
+ *  clustering.  Randomly assign points to 'k' clusters (primary technique).
+ *  Iteratively, reassign each point to the cluster containing
  *  the closest centroid.  Stop when there are no changes to the clusters.
+ *  @see `KMeansClusterer2` for secondary technique.
  *-----------------------------------------------------------------------------
- *  @param x        the vectors/points to be clustered stored as rows of a matrix
- *  @param k        the number of clusters to make
- *  @param s        the random number stream (to vary the clusters made)
- *  @param primary  true indicates use the primary technique for initiating the clustering
- *  @param remote   whether to take a maximally remote or a randomly selected point
- *  @param post     whether to perform post processing by randomly swapping points to reduce error
+ *  @param x      the vectors/points to be clustered stored as rows of a matrix
+ *  @param k      the number of clusters to make
+ *  @param flags  the array of flags used to adjust the algorithm
+ *                    default: no post processing, no immediate return upon change
  */
-class KMeansClusterer (x: MatrixD, k: Int, s: Int = 0, primary: Boolean = true, remote: Boolean = true, post: Boolean = true)
+class KMeansClusterer (x: MatriD, k: Int, val flags: Array [Boolean] = Array (false, false))
       extends Clusterer with Error
 {
-    if (k >= x.dim1) flaw ("constructor", "k must be less than the number of vectors")
+    if (k >= x.dim1)       flaw ("constructor", "k must be less than the number of vectors")
+    if (flags.length != 2) flaw ("constructor", "KMeansClusterer requires 2 flags")
 
-    protected val DEBUG    = false                               // debug flag
-    protected val MAX_ITER = 200                                 // the maximum number of iterations
-    protected val cent     = new MatrixD (k, x.dim2)             // the k centroids of clusters
-    protected val sizes    = new VectorI (k)                     // the cluster sizes
-    protected val myDist   = new VectorD (x.dim1)                // distances from centroids
-    protected val clustr   = Array.ofDim [Int] (x.dim1)          // assignment of vectors to clusters
-    protected val dist     = new VectorD (x.dim1)                // distance to closest centroid
+    private   val DEBUG     = false                                      // debug flag
+    protected val MAX_ITER  = 1000                                       // the maximum number of iterations
+    protected val cent      = new MatrixD (k, x.dim2)                    // the k centroids of clusters
+    protected val sz        = new VectorI (k)                            // the cluster sizes
+    protected val to_c      = Array.ofDim [Int] (x.dim1)                 // assignment of vectors to clusters
 
-    var tc1: Double = 0.0
-    var tc2: Double = 0.0
+    protected val (post, immediate) = (flags(0), flags(1))               // (post processing swapping, immediate return upon change)
+    protected var raniv: PermutedVecI = null                             // generator of permutations
 
-    dist.set (Double.PositiveInfinity)
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Iteratively recompute clusters until the assignment of points does not
+     *  change.  Initialize by randomly assigning points to 'k' clusters.
+     */
+    def train (): KMeansClusterer =
+    {
+        sz.set (0)                                                       // cluster sizes initialized to zero
+        raniv = PermutedVecI (VectorI.range (0, x.dim1), stream)         // for randomizing index order
+        assign ()                                                        // randomly assign points to clusters
+        fixEmptyClusters ()                                              // move points into empty clusters
+        if (! initCentroids ()) calcCentroids (x, to_c, sz, cent)        // pick points for initial centroids
+        if (DEBUG) show (0)
+
+        breakable { for (l <- 1 to MAX_ITER) {
+            if (reassign ()) break                                       // reassign points to clusters (no change => break)
+            calcCentroids (x, to_c, sz, cent)                            // re-calculate the centroids
+            if (DEBUG) show (l)
+        }} // for
+        val ce = sz.indexOf (0)                                          // check for empty clusters
+        if (ce != -1) throw new Exception (s"Empty cluster c = $ce")
+
+        if (post) swap ()                                                // swap points to improve sse
+        this
+    } // train
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the cluster assignment vector.  Should only be called after `train`.
+     */
+    def cluster: Array [Int] = to_c
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the sizes of the centroids. Should only be called after 
-     *  `cluster ()`. 
+    /** Return the centroids. Should only be called after `train`. 
      */
-    def csize (): VectorI = sizes
+    def centroids: MatriD = cent
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the centroids. Should only be called after `cluster ()`. 
+    /** Return the sizes of the centroids.  Should only be called after `train`. 
      */
-    def centroids (): MatrixD = cent
+    def csize: VectoI = sz
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Randomly assign each vector/point 'x(i)' to a random cluster.
      *  Primary technique for initiating the clustering.
      */
-    def assign ()
+    protected def assign ()
     {
-        val ran = new Randi (0, k-1, s)                          // for random integers: 0, ..., k-1
+        val ran = new Randi (0, k-1, stream)                             // for random integers: 0, ..., k-1
         for (i <- x.range1) {
-            clustr(i) = ran.igen                                 // randomly assign x(i) to a cluster
-            sizes(clustr(i)) += 1                                // increment size of this cluster
+            to_c(i)      = ran.igen                                      // randomly assign x(i) to a cluster
+            sz(to_c(i)) += 1                                             // increment size of that cluster
         } // for
     } // assign
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Randomly pick vectors/points to serve as the initial 'k' centroids (cent).
-     *  Secondary technique for initiating the clustering.
+    /** Fix all empty clusters by taking a point from the largest cluster.
      */
-    def pickCentroids ()
+    protected def fixEmptyClusters ()
     {
-        val rvi = RandomVecI (k, x.dim1-1, 0, stream = s).igen   // random vector of integers
-        for (i <- 0 until k) cent(i) = x(rvi(i))                 // set the centroids
-    } // pickCentroids
+        for (c <- 0 until k if sz(c) < 1) {                              // for each empty cluster
+            if (DEBUG) println (s"fixEmptyClusters: cluster c = $c is empty!")
+            val largest = sz.argmax ()                                   // largest cluster
+            val indices = to_c.indices.filter (to_c(_) == largest)       // indices of elements in largest cluster            
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Fix any empty clusters by taking a point from the largest cluster.
-     *  @param useDistance  whether to pick a random or most remote point in cluster
-     */
-    private def fixEmptyClusters (useDistance: Boolean = remote)
-    {
-        if (DEBUG) {
-            banner (s"fixemptyclusters()")
-            println (s"remote = $remote")
-            println (s"Initial clustering = ${clustr.deep}")
-        } // if
-        for (c <- 0 until k if ! (clustr contains c)) {                  // for each empty cluster
-            if (DEBUG) println (s"Cluster c=$c is empty!")
-            val biggest = sizes.argmax ()                                // biggest cluster
-            val indices = clustr.indices.filter (clustr(_) == biggest)   // indices of elements in biggest cluster            
-            if (DEBUG) {
-                println (s"Current cluster sizes = $sizes")
-                println (s"Biggest cluster = $biggest")
-                println (s"Biggest cluster indices = $indices")
-            } // if
-
-            var i       = 0                                              // element index to reassign
-            if (useDistance) {
-                i           = clustr.indexOf (biggest)                   // first element in biggest cluster
-                var max     = distance (x(i), cent(biggest))             // first distance in biggest cluster
-                for (ii <- indices) {                                    // find furthest in biggest cluster
-                    val dist = distance (x(ii), cent(biggest))
-                    if (dist > max) { max  = dist; i = ii }
-                } // for
-            } else {
-                val ran = new Randi (0, indices.size-1)                  // random integer generator
-                i       = indices(ran.igen)                              // randomly pick one point from biggest cluster
-            } // if
-            sizes(clustr(i)) -= 1                                        // decrement size of previous cluster
-            clustr(i)         = c                                        // reassign vector x(i) to cluster c
-            sizes(c)         += 1                                        // increment size of cluster c
-            if (DEBUG) println (s"New clustering = ${clustr.deep}")
+            val ran = new Randi (0, indices.size-1)                      // random integer generator
+            val i   = indices(ran.igen)                                  // randomly pick one point from largest cluster
+            sz(to_c(i)) -= 1                                             // decrement size of previous cluster
+            to_c(i)      = c                                             // reassign vector x(i) to cluster c
+            sz(c)       += 1                                             // increment size of cluster c
+            if (DEBUG) println (s"fixEmptyClusters: to_c = ${to_c.deep}")
         } // for
     } // fixEmptyClusters
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check for empty clusters and throw an execption if found.
-     */
-    private def emptyClusters ()
-    {
-        for (c <- 0 until k if ! (clustr contains c)) throw new Exception (s"Empty cluster c = $c")
-    } // emptyClusters
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reassign each vector/point to the cluster with the closest centroid.
      *  Indicate done, if no points changed clusters (for stopping rule).
      */
-    def reassign (): Boolean =
+    protected def reassign (): Boolean =
     {
-        var done = true                                          // done indicates no changes
-        for (i <- x.range1) {
-            val v = x(i)                                         // let v be the ith vector
-            for (c <- 0 until k) {
-                val newDist = distance (v, cent(c))              // calc distance to centroid c
-                if (newDist < dist(i)) {                         // is it closer than old distance
-                    dist(i)           = newDist                  // make it the new distance
-                    sizes(clustr(i)) -= 1                        // decrement size of previous cluster
-                    clustr(i)         = c                        // reassign vector x(i) to cluster c
-                    sizes(c)         += 1                        // increment size of cluster c
-                    done              = false                    // changed clusters => not done
+        var done = true                                                  // done indicates no changes
+//      for (i <- raniv.igen) {                                          // randomize order of index i
+        for (i <- x.range1) {                                            // standard order for index i
+            val c1 = to_c(i)                                             // c1 = current cluster for point x_i
+            if (sz(c1) > 1) {                                            // if size of c1 > 1
+                val d  = distance (x(i), cent)                           // distances to all centroid
+                val c2 = d.argmin ()                                     // c2 = cluster with closest centroid to x_i
+                if (d(c2) < d(c1)) {                                     // if closest closer than current
+                    sz(c1) -= 1                                          // decrement size of current cluster
+                    sz(c2) += 1                                          // increment size of new cluster
+                    to_c(i) = c2                                         // reassign point x_i to cluster c2
+                    done    = false                                      // changed clusters => not done
+                    if (immediate) return false                          // optionally return after first change
                 } // if
-            } // for
+            } // if
         } // for
-        done                                                     // return whether there were no changes
+        done                                                             // return whether there were no changes
     } // reassign
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Calculate the centroids based on current assignment of points to clusters.
-     */
-    def calcCentroids ()
-    {
-        val cx = new MatrixD (k, x.dim2)                         // to hold sum of vectors for each cluster
-        val cs = new VectorD (k)                                 // to hold number of vectors in each cluster
-        for (i <- x.range1) {
-            val ci  = clustr(i)                                  // x(i) currently assigned to cluster ci
-            cx(ci)  = cx(ci) + x(i)                              // add the next vector in cluster
-            cs(ci) += 1.0                                        // add 1 to number in cluster
-        } // for
-        for (c <- 0 until k) cent(c) = cx(c) / cs(c)             // divide to get averages/means
-    } // calcCentroids
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Iteratively recompute clusters until the assignment of points does not
-     *  change, returning the final cluster assignment vector.
-     */
-    def cluster (): Array [Int] =
-    {
-        if (primary) {
-            assign ()                                            // randomly assign points to clusters
-            fixEmptyClusters (false)                             // swap points into empty clusters
-            calcCentroids ()                                     // calculate the initial centroids
-        } else {
-            pickCentroids ()                                     // alt., pick points for initial centroids
-            fixEmptyClusters (false)                             // swap points into empty clusters
-        } // if
-
-        if (DEBUG) {
-            println ("(" + 0 + ") clustr = " + clustr.deep)
-            println ("(" + 0 + ") cent   = " + cent)
-        } // if
-
-        breakable { for (l <- 1 to MAX_ITER) {
-            if (reassign ()) break                               // reassign points to clusters (no change => break)
-            fixEmptyClusters ()                                  // check for empty clusters            
-            calcCentroids ()                                     // re-calculate the centroids
-            if (DEBUG) {
-                println ("(" + l + ") clustr = " + clustr.deep)
-                println ("(" + l + ") cent   = " + cent)
-            } // if
-        }} // for
-        emptyClusters ()                                         // should not have any empty clusters
-
-        if (post) trySwaps ()                                    // swap points to improve sse
-        clustr                                                   // return the cluster assignment vector
-    } // cluster
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Swap clusters for points 'x(i)' and 'x(j)'.
-     *  param i  the inded for point x(i)
-     *  param j  the inded for point x(j)
+     *  param i  the index for point x(i)
+     *  param j  the index for point x(j)
      */
     private def swapPoints (i: Int, j: Int)
     {
-        val temp = clustr(i)
-        clustr(i) = clustr(j)
-        clustr(j) = temp
-        calcCentroids ()
+        val temp = to_c(i)
+        to_c(i)  = to_c(j)
+        to_c(j)  = temp
+        calcCentroids (x, to_c, sz, cent)
     } // swapPoints
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Try all pairwise swaps and make them if 'sse' improves.
      */
-    private def trySwaps ()
+    protected def swap ()
     {
-        for (i <- 0 until x.dim1-1; j <- i+1 until x.dim1 if clustr(i) != clustr(j)) {
-            val sum1 = sse (clustr(i)) + sse (clustr(j))
+        for (i <- 0 until x.dim1-1; j <- i+1 until x.dim1 if to_c(i) != to_c(j)) {
+            val sum1 = sse (x, to_c(i), to_c) + sse (x, to_c(j), to_c)
             swapPoints (i, j)
-            val sum2 = sse (clustr(i)) + sse (clustr(j))
+            val sum2 = sse (x, to_c(i), to_c) + sse (x, to_c(j), to_c)
             if (DEBUG) println (s"sum1 = $sum1 vs. sum2 = $sum2")
-            if (sum2 > sum1) {                                   // if not better, swap back
-                swapPoints (i, j)
-                if (DEBUG) println (s"swapping back")
-            } // if 
+            if (sum2 > sum1) swapPoints (i, j)                           // if not better, swap back
         }  // for
-    } // randomSwaps
+    } // swap
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Given a new point/vector 'y', determine which cluster it belongs to,
+    /** Given a new point/vector 'z', determine which cluster it belongs to,
      *  i.e., the cluster whose centroid it is closest to.
-     *  @param y  the vector to classify
+     *  @param z  the vector to classify
      */
-    def classify (y: VectorD): Int =
-    {
-        var dist = distance (y, cent(0))                         // calc distance to centroid 0
-        var clus = 0                                             // assign y to cluster 0
-        for (c <- 1 until k) {
-            val newDist = distance (y, cent(c))                  // calc distance to centroid c
-            if (newDist < dist) {                                // is it closer than old distance
-                dist = newDist                                   // make it the new distance
-                clus = c                                         // assign y to cluster c
-            } // if
-        } // for
-        clus                                                     // return cluster y belongs to
-    } // classify
+    def classify (z: VectoD): Int = distance (z, cent).argmin ()
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the sum of squared errors (distance squared) from all points in
-     *  cluster 'c' to the cluster's centroid.
-     *  @param c  the current cluster
+    /** Show the state of the algorithm at iteration 'l'.
+     *  @param l  the current iteration
      */
-    def sse (c: Int): Double =
-    {
-        var sum = 0.0
-        for (i <- x.range1) {
-            val cli = clustr(i)
-            if (cli == c) sum += distance (x(i), cent(cli))
-        } // for
-        sum
-    } // sse
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Check to see if the sum of squared errors is optimum.
-     *  @param opt  the known (from human/oracle) optimum
-     */
-    def checkOpt (opt: Double): Boolean = sse (x) <= opt
+    def show (l: Int) { println (s"($l) to_c = ${to_c.deep} \n($l) cent = $cent") }
 
 } // KMeansClusterer class
 
+import Clusterer.test
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KMeansClustererTest` object is used to test the `KMeansClusterer` class.
  *  > runMain scalation.analytics.clusterer.KMeansClustererTest
  */
-trait KMeansClustererTester
+object KMeansClustererTest extends App
 {
-    import scalation.stat.Statistic
-    def test (v: MatrixD, k: Int, primary: Boolean, remote: Boolean, post: Boolean, opt: Double = -1)
-    {
-        banner (s"test (primary = $primary, remote = $remote, post = $post)")
-        val statSSE = new Statistic ()
-        val statTC1 = new Statistic ()
-        val statTC2 = new Statistic ()
-        var ok = 0
-        for (s <- 0 until 1000) {                         // test with different random streams
-            //banner ("KMeansClusterer for stream s = " + s)
-            val cl  = new KMeansClusterer (v, k, s, primary = primary, remote = remote, post = post)
-            cl.cluster ()
-            val sse = cl.sse (v)            
-            //println ("--- final cluster   = " + cl.cluster ().deep)
-            //println ("--- final sse       = " + sse)            
-            statSSE.tally (sse)
-            statTC1.tally (cl.tc1)
-            statTC2.tally (cl.tc2)
-            if ((opt != -1) && (cl.checkOpt (opt))) ok += 1
-        } // for
-        if (opt != -1) println (s"ok = $ok")
-        println (Statistic.labels)
-        println (statSSE)
-        println (statTC1)
-        println (statTC2)
+    import Clusterer.x
 
-    } // test
-} // KMeansClutererTester
+    val k   = 3
+    val opt = 3.0
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `KMeansClustererTest` object is used to test the `KMeansClusterer` class.
- *  > runMain scalation.analytics.clusterer.KMeansClustererTest
- */
-object KMeansClustererTest extends App with KMeansClustererTester
-{
-
-    val v = new MatrixD ((6, 2), 1.0, 2.0,
-                                 2.0, 1.0,
-                                 5.0, 4.0,
-                                 4.0, 5.0,
-                                 9.0, 8.0,
-                                 8.0, 9.0)
-
-    val k = 3
-
-    println ("v = " + v)
+    println ("x = " + x)
     println ("k = " + k)
     println ("----------------------------------------------------")
 
     val tf = Array (true, false)
-    for (primary <- tf; remote <- tf; post <- tf) {
-        test (v, k, primary, remote, post, 3)
+    for (fl0 <- tf; fl1 <- tf) {
+         val fls = Array (fl0, fl1)
+         test (x, fls, new KMeansClusterer (x, k, fls), opt)
     } // for
+
+    new Plot (x.col(0), x.col(1), null, "x0 vs x1")
 
 } // KMeansClustererTest object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KMeansClustererTest2` object is used to test the `KMeansClusterer` class.
- *  > runMain scalation.analytics.clusterer.KMeansClustererTest
+ *  > runMain scalation.analytics.clusterer.KMeansClustererTest2
  */
-object KMeansClustererTest2 extends App with KMeansClustererTester
+object KMeansClustererTest2 extends App
 {
-
-    val v = new MatrixD ((8, 2),  1.0,  1.0,
+    //                             x0    x1
+    val x = new MatrixD ((8, 2),  1.0,  1.0,
                                   1.0,  3.0,
                                   5.0, 18.0,
                                   5.0, 20.0,
                                   9.0, 10.0,
                                   9.0, 12.0,
-                                  15.0, 30.0,
-                                  15.0, 32.0)
+                                 15.0, 30.0,
+                                 15.0, 32.0)
 
-    val k = 4
+    val k   = 4
+    val opt = 8.0
 
-    println ("v = " + v)
+    println ("x = " + x)
     println ("k = " + k)
     println ("----------------------------------------------------")
 
     val tf = Array (true, false)
-    for (primary <- tf; remote <- tf; post <- tf) {
-        test (v, k, primary, remote, post, 8)
+    for (fl0 <- tf; fl1 <- tf) {
+         val fls = Array (fl0, fl1)
+         test (x, fls, new KMeansClusterer (x, k, fls), opt)
     } // for
+
+    new Plot (x.col(0), x.col(1), null, "x0 vs x1")
 
 } // KMeansClustererTest2 object
 
@@ -373,31 +247,31 @@ object KMeansClustererTest2 extends App with KMeansClustererTester
 /** The `KMeansClustererTest2` object is used to test the `KMeansClusterer` class.
  *  > runMain scalation.analytics.clusterer.KMeansClustererTest3
  */
-object KMeansClustererTest3 extends App with KMeansClustererTester
+object KMeansClustererTest3 extends App
 {
-
     import scalation.random.{Bernoulli, Normal}
 
     val coin  = Bernoulli ()
     val dist1 = Normal (2.0, 1.0)
     val dist2 = Normal (8.0, 1.0)
-    val v    = new MatrixD (50, 2)
+    val x    = new MatrixD (50, 2)
     val k    = 4
+    val opt  = 76.0
 
-    for (i <- v.range1) v(i) = VectorD (if (coin.gen == 0) dist1.gen else dist2.gen,
+    for (i <- x.range1) x(i) = VectorD (if (coin.gen == 0) dist1.gen else dist2.gen,
                                         if (coin.gen == 0) dist1.gen else dist2.gen)
 
-    import scalation.plot.Plot    
-    new Plot (v.col(0), v.col(1))    
-
-    println ("v = " + v)
+    println ("x = " + x)
     println ("k = " + k)
     println ("----------------------------------------------------")
 
     val tf = Array (true, false)
-    for (primary <- tf; remote <- tf; post <- tf) {
-        test (v, k, primary, remote, post, 76.6)
+    for (fl0 <- tf; fl1 <- tf) {
+         val fls = Array (fl0, fl1)
+         test (x, fls, new KMeansClusterer (x, k, fls), opt)
     } // for
+
+    new Plot (x.col(0), x.col(1))    
 
 } // KMeansClustererTest3 object
 
@@ -405,35 +279,35 @@ object KMeansClustererTest3 extends App with KMeansClustererTester
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `KMeansClustererTest4` object is used to test the `KMeansClusterer` class.
  *  > runMain scalation.analytics.clusterer.KMeansClustererTest4
- * 
-object KMeansClustererTest4 extends App with KMeansClustererTester
+ */
+object KMeansClustererTest4 extends App
 {
-    import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer
     import scalation.random.{Normal, Bernoulli}
 
     val coin  = Bernoulli ()
     val dist1 = Normal (2.0, 1.0)
     val dist2 = Normal (8.0, 1.0)
-    val v    = new MatrixD (50, 2)
+    val x    = new MatrixD (100, 2)
     val k    = 4
+    val opt  = 171.0
 
-    for (i <- v.range1) v(i) = VectorD (if (coin.gen == 0) dist1.gen else dist2.gen,
+    for (i <- x.range1) x(i) = VectorD (if (coin.gen == 0) dist1.gen else dist2.gen,
                                         if (coin.gen == 0) dist1.gen else dist2.gen)
 
-    import scalation.plot.Plot    
-    new Plot (v.col(0), v.col(1))
-
-    val cl = new KMeansPlusPlusClusterer (k)
+//  import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer
+//  val cl = new KMeansPlusPlusClusterer (k)
     
-    println ("v = " + v)
+    println ("x = " + x)
     println ("k = " + k)
     println ("----------------------------------------------------")
 
     val tf = Array (true, false)
-    for (primary <- tf; remote <- tf; post <- tf) {
-        test (v, k, primary, remote, post, 76.6)
+    for (fl0 <- tf; fl1 <- tf) {
+         val fls = Array (fl0, fl1)
+         test (x, fls, new KMeansClusterer (x, k, fls), opt)
     } // for
 
+    new Plot (x.col(0), x.col(1))
+
 } // KMeansClustererTest4 object
- */
 

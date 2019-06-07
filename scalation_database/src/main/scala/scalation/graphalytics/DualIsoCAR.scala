@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Luis A. Ibarra, Matthew Saltz, John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Mon May 1 11:28:31 EDT 2018
  *  @see     LICENSE (MIT style license file).
  *

@@ -1,0 +1,219 @@
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.2
+ *  @date    Sat Oct 31 13:53:18 EDT 2015
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  @see faculty.chicagobooth.edu/kipp.martin/root/htmls/coursework/36900/handouts/simplex2.pdf
+ *  @see faculty.chicagobooth.edu/kipp.martin/root/htmls/coursework/36900/matlab/revisedsimplexlu.m
+ */
+
+//  U N D E R   D E V E L O P M E N T
+//  FIX - wrong optimal solution, LU is not incrementally updated
+
+package scalation.minima
+
+import util.control.Breaks.{breakable, break}
+
+import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.math.ExtremeD.MAX_VALUE
+import scalation.random.Randi
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This class solves Linear Programming (LP) problems using the Revised Simplex
+ *  Algorithm with LU Decomposition.  Given a constraint matrix 'a', constant vector
+ *  'b' and cost vector 'c', find values for the solution/decision vector 'x' that
+ *  minimize the objective function 'f(x)', while satisfying all of the constraints, i.e.,
+ *
+ *  minimize    f(x) = c x
+ *  subject to  a x <= b, x >= 0
+ *
+ *  The Revised Simplex Algorithm operates on 'b_inv', which is the inverse of the
+ *  basis-matrix ('ba' = 'B').  It has benefits over the Simplex Algorithm (less memory
+ *  and reduced chance of round off errors).
+ *  Translated from MATLAB: revisedsimplexlu.m
+ *  function [X, objVal, B] = revisedsimplexlu  (A, b, c, B)
+ *-----------------------------------------------------------------------------
+ *  @param a   the constraint matrix (matrix in the system AX = b)
+ *  @param b   the constant/limit vector (right-hand-side in the system AX = b)
+ *  @param c   the cost/revenue vector (objective function coefficients)
+ *  @param xB  the initial basis (set of indices where x_i is in the basis)
+ */
+class RevisedSimplexLU (a: MatrixD, b: VectorD, c: VectorD, var xB: Array [Int] = null)
+      extends MinimizerLP
+{
+    private val DEBUG    = false                        // debug flag
+    private val CHECK    = true                         // CHECK mode => check feasibility for each pivot
+    private val zeroTol = 0.00001                       // number close to zero
+    private val numRows = b.dim                         // number of rows
+    private val numVars = c.dim                         // number of variables
+
+    // NOTE: By assumption variable B(1) is basic in row 1, B(2) basic in row 2, etc. 
+
+    // STEP 1 INITIALIZAION 
+
+    if (DEBUG) println ("Executing Step 1: Intialization")
+
+    private val xN = setdiff (xB)                       // indices of the nonbasic variables
+    private var aB = a.selectCols (xB)                  // the basis matrix
+    private var aN = a.selectCols (xN)                  // the non-basic matrix
+
+    private val numNonbasicVars = xN.length             // number of non-basic variables
+    private var cN = c.select (xN)                      // cost for non-basic variable
+    private var cB = c.select (xB)                      // cost for basic variable
+
+    private var bBAR   = aB.solve (b)                   // update b: bBAR = lusolve (aB, b)
+    private var aBAR: VectorD = null                    // ???
+    private var objVal = cB dot bBAR                    // objective value
+
+    private var negRedCost    = -1.0                    // negative reduce cost
+    private var negRedCostIdx = -1                      // negative reduces cost index
+    private var minRatioVal   = -1.0                    // minimum ratio value
+    private var minRatioIdx   = -1                      // minimum ratio index
+
+    val checker = new CheckLP (a, b, c)                     // LP checker
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the value of the objective function.
+     *  @param  x  the current solution
+     */
+    def objF (x: VectorD): Double = objVal
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Take the set difference between {0 .. numVars-1} and xB.
+     *  @param  a the array to be subtracted
+     */
+    def setdiff (a: Array [Int]): Array [Int] =
+    {
+        (for (i <- 0 until numVars if ! (xB contains i)) yield i).toArray
+    } // setdiff
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** STEP 2 PIVOT COLUMN SELECTION
+     */
+    def pivot ()
+    {
+        if (DEBUG) println ("Executing Step 2: Pivot Column Selection")
+
+        //  reduced cost calculations
+        val u  = aB.solve (cB)                // u = lusolve (aB, cB)
+        val wN = cN - u * aN
+
+        // old way: wN = cN' - (cB'*inv(AB))*AN
+
+        // find the index associated with a negative reduced cost
+
+        negRedCostIdx = 0
+        negRedCost    = 0.0
+
+        breakable { for (k <- 0 until numNonbasicVars) {
+            if (wN(k) < -zeroTol) {
+                negRedCost = wN(k)
+                negRedCostIdx = k             // record the index
+                break
+            } // if
+        }} // for
+    } // pivot
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** STEP 3 MINIMUM RATIO TEST
+     *  Calculate the ratios and get the minimum ratio index.
+     */
+    def minRatioTest ()
+    {
+        if (DEBUG) println ("Executing Step 3: Minimum Ratio Test")
+        aBAR = aB.solve (aN.col(negRedCostIdx))                  // lusolve (aB, aN.col(negRedCostIdx))
+
+        // old way below:  aBAR = inv( AB)*AN(:,negRedCostIdx)
+
+        minRatioVal = MAX_VALUE
+        for (k <- 0 until numRows) {
+            if (aBAR(k) > zeroTol) {
+                if (bBAR(k) / aBAR(k) < minRatioVal) {
+                    minRatioVal = bBAR(k) / aBAR(k)
+                    minRatioIdx = k                    // record the index
+                } // if
+            } // if
+        } // for
+    } // minRatioTest
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** STEP 4 UPDATE BASIS
+     */
+    def updateBasis ()
+    {
+        if (DEBUG) println ("Executing Step 4: Update the Basis")
+        val tmpIdx        = xB(minRatioIdx)
+        xB(minRatioIdx)   = xN(negRedCostIdx)
+        xN(negRedCostIdx) = tmpIdx
+
+        // update Basic and Non-Basic matrices and cost vectors
+        aB = a.selectCols (xB)
+        aN = a.selectCols (xN)
+        cN = c.select (xN)
+        cB = c.select (xB)
+    } // updateBasis
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Solve the Linear Program.
+     */
+    def solve (): VectorD =
+    {
+        while (negRedCost < 0) {
+            pivot ()
+ 
+            if (negRedCost < 0) {
+                minRatioTest ()
+        
+                //  now let's  pivot -- but only the RHS
+                bBAR = bBAR - aBAR * minRatioVal
+                bBAR(minRatioIdx) = minRatioVal
+       
+                //  we are going to pivot IN the nonbasic variable that associate with the nonbasic
+                //  variable with a negative reduced cost  this is variable xN(negRedCostIdx)
+                // 
+                //  we are going to pivot OUT the basic variable that is associated with 
+                //  xB(minRatioIdx)
+
+                updateBasis ()
+            } // if
+        } // while
+
+        val x = new VectorD (numVars)                     // get the solution
+        for (i <- 0 until numRows) x(xB(i)) = bBAR(i)
+        objVal = cB dot bBAR                              // get the objective value
+        x                                                 // optimal solution, call 'objF' for optimal value
+    } // solve
+
+} // RevisedSimplexLU class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RevisedSimplexLUTest` object is used to test the `RevisedSimplexLU` class.
+ *  > run-main scalation.minima.RevisedSimplexLUTest
+ */
+object RevisedSimplexLUTest extends App
+{
+    // here is an example constraint matrix
+
+    val a = new MatrixD ((4, 6), 0.0, 1.0, -1.0,  0.0, 0.0, 0.0,
+                                 1.0, 1.0,  0.0, -1.0, 0.0, 0.0,
+                                -0.5, 1.0,  0.0,  0.0, 1.0, 0.0,
+                                -1.0, 1.0,  0.0,  0.0, 0.0, 1.0)
+
+    val c  = VectorD (2, -3, 0, 0, 0, 0)          // the objective function coefficients
+    val b  = VectorD (1, 2, 8, 6)                 // the right-hand-side constants
+//  val xB = Array (1, 2, 5, 6)                   // Initial Basis
+    val xB = Array (0, 1, 4, 5)                   // Initial Basis
+
+    val lp = new RevisedSimplexLU (a, b, c, xB)
+    println ("LP solution = " + lp.solve ())
+    println ("LP objVal   = " + lp.objF (null))
+
+    // problem solution has
+    // x = (4, 10)
+    // optimal value = -22
+
+} // RevisedSimplexLUTest object
+

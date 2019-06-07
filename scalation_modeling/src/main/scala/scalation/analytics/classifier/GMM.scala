@@ -1,14 +1,15 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sat Jul 29 14:44:36 EDT 2017
  *  @see     LICENSE (MIT style license file).
  *
  *  @see brilliant.org/wiki/gaussian-mixture-model
  */
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
 import scala.util.control.Breaks.{breakable, break}
 
@@ -77,7 +78,7 @@ class GMM (x: VectoD, k: Int = 3)
     /** Train the model to determine values for the parameter vectors 'mu' and 'sig2'.
      *  @param itest  the indices of test data
      */
-    def train (itest: IndexedSeq [Int]): GMM =                 // FIX - use this argument
+    def train (itest: Ints): GMM =                                   // FIX - use this argument
     {
         breakable { for (it <- 1 to MAX_ITER) {
            exp_step ()
@@ -114,7 +115,7 @@ class GMM (x: VectoD, k: Int = 3)
     /** Test ...
      *  @param itest  the indices of test data
      */
-    def test (itest: IndexedSeq [Int]): Double = ???
+    def test (itest: Ints): Double = ???
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Reset ...  FIX

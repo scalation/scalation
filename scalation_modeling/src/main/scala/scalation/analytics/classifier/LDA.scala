@@ -1,14 +1,15 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sat Jan  9 21:48:57 EST 2016
  *  @see     LICENSE (MIT style license file).
  *
  *  FIX - extend the code to work for k > 2.
  */
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
 import scala.math.log
 
@@ -21,15 +22,14 @@ import scalation.util.banner
  *  It places a vector into a group according to its maximal discriminant function.
  *  FIX - currently only works when the number of classes 'k' = 2.
  *  @see en.wikipedia.org/wiki/Linear_discriminant_analysis
- *  @param x   the real-valued training/test data vectors stored as rows of a matrix
- *  @param y   the training/test classification vector, where y_i = class for row i of the matrix x
- *  @param fn  the names for all features/variables
- *  @param k   the number of classes (k in {0, 1, ...k-1}
- *  @param cn  the names for all classes
+ *  @param x    the real-valued training/test data vectors stored as rows of a matrix
+ *  @param y    the training/test classification vector, where y_i = class for row i of the matrix x
+ *  @param fn_  the names for all features/variables
+ *  @param k    the number of classes (k in {0, 1, ...k-1}
+ *  @param cn_  the names for all classes
  */
-class LDA (x: MatrixD, y: VectoI, fn: Array [String] = null,
-           k: Int = 2, cn: Array [String] = Array ("no", "yes"))
-      extends ClassifierReal (x, y, fn, k, cn)
+class LDA (x: MatrixD, y: VectoI, fn_ : Strings = null, k: Int = 2, cn_ : Strings = null)
+      extends ClassifierReal (x, y, fn_, k, cn_)
 {
     private val DEBUG = false                                                      // debug flag
     private val x1 = (MatrixD (for (i <- x.range1 if y(i) == 0) yield x(i))).t     // group 1
@@ -73,7 +73,7 @@ class LDA (x: MatrixD, y: VectoI, fn: Array [String] = null,
      *  These are computed in the 'classify' method.
      *  @param itest  the indices of the test data - FIX - not used yet
      */
-    def train (itest: IndexedSeq [Int]): LDA =
+    def train (itest: Ints): LDA =
     {
         val w1    = x1.dim1 / x.dim1.toDouble                      // first weigth
         val w2    = 1.0 - w1                                       // second weigth
@@ -145,8 +145,7 @@ object LDATest extends App
     val yp = lda.classify (x)
     println ("y  = " + y)
     println ("yp = " + yp)
-    println (lda.fitLabel)
-    println (lda.fit (y, yp))
+    println (lda.fitMap (y, yp))
 
     val t = VectorD.range (0, x.dim1)
     new Plot (t, y.toDouble, yp.toDouble, "y(black)/yp(red) vs. t")

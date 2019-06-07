@@ -1,0 +1,85 @@
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Michael Cotterell
+ *  @version 1.5
+ *  @date    Fri Jun  1 14:18:56 EDT 2018
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.linalgebra.dist
+
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.duration._
+import scala.language.postfixOps
+import ExecutionContext.Implicits.global
+
+import scalation.linalgebra.MatrixD
+import scalation.random.RandomMatD
+import scalation.util.time
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `ParMat` object is a sample application that implements parallel
+ *  matrix multiplication using Akka as described in "Akka Concurency" 
+ *  > runMain scalation.linalgebra.dist.ParMat
+ */
+object ParMat extends App
+{
+    val rvm     = RandomMatD(4, 4)
+    val list    = (1 to 100).map { i => rvm.gen }.toList                  // random matrices
+    val prod1   = list.reduceLeft(_ * _)                                  // serial product
+    val grouped = list.grouped(10).toList                                 // make groups of 10
+    val futures = grouped.map { grp => Future { grp.reduceLeft(_ * _) } } // multiply in each group
+    val fprod   = Future.reduceLeft(futures)(_ * _)                       // multiply group results
+    val prod2   = Await.result(fprod, 0 nanos)                            // await the answer
+    println (prod1)                                                       // SERIAL PRODUCT
+    println (prod2)                                                       // PARALLEL PRODUCT (GROUPS OF 10)
+
+} // ParMat
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `ParSum` object is a sample application that implements parallel
+ *  list summation using Akka (or not?) as described in "Akka Concurency"
+ *  > runMain scalation.linalgebra.dist.ParSum
+ */
+object ParSum extends App
+{
+    val list    = (1 to 100).toList
+    val sum1    = list.sum
+    val grouped = list.grouped(10).toList
+    val futures = grouped.map { grp => Future { grp.sum } }
+    val fsum    = Future.reduceLeft(futures)(_ + _)
+    val sum2    = Await.result(fsum, 0 nanos)
+    println (sum1)                                                           // SERIAL SUM
+    println (sum2)                                                           // PARALLEL SUM (GROUPS OF 10)
+
+} // ParSum
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `ParMat2` object ...
+ *  > runMain scalation.linalgebra.dist.ParMat2
+ */
+object ParMat2 extends App
+{
+    val n       = 100
+    val k       = 8
+    val rvm     = RandomMatD(100, 100)
+    val list    = (1 to n).map { i => rvm.gen }.toList                        // random matrices
+    val grouped = list.grouped(n/k).toList                                    // make groups of n/k
+
+    val prod1   = time {
+         list.reduceLeft(_ * _)                                               // serial product
+    } // time
+
+    val prod2   = time {
+        val futures = grouped.map { grp => Future { grp.reduceLeft(_ * _) } } // multiply in each group
+        val fprod   = Future.reduceLeft(futures)(_ * _)                       // multiply group results
+        Await.result(fprod, 0 nanos)                                          // await the answer
+    } // time
+
+//    println(prod1) // SERIAL PRODUCT
+//    println(prod2) // PARALLEL PRODUCT (GROUPS OF 10)
+
+} // ParMat2
+

@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Michael Cotterell, John Miller, Hao Peng
- *  @version 1.5
+ *  @version 1.6
  *  @date    Thu Mar  9 15:08:30 2017
  *  @see     LICENSE (MIT style license file).
   */
@@ -10,7 +10,7 @@ package scalation.analytics.clusterer
 
 import math.log
 
-import scalation.linalgebra.{MatrixD, SVD, VectorD}
+import scalation.linalgebra.{MatriD, MatrixD, SVD, VectoD, VectorD}
 import scalation.random.RandomVecD
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -30,7 +30,7 @@ object GapStatistic
      *  @param useSVD   use SVD to account for the shape of the points (default = true)
      *  @param s        the random number stream (to vary the clusters made)
      */
-    def reference (x: MatrixD, useSVD: Boolean = true, stream: Int = 0): MatrixD =
+    def reference (x: MatriD, useSVD: Boolean = true, stream: Int = 0): MatrixD =
     {
         var ref = new MatrixD (x.dim1, x.dim2)
         if (useSVD) {
@@ -62,11 +62,11 @@ object GapStatistic
      *  @param clustr  the cluster assignments
      *  @param k       the number of clusters
      */
-    def cumDistance (x: MatrixD, cl: Clusterer, clustr: Array[Int], k: Int): VectorD =
+    def cumDistance (x: MatriD, cl: Clusterer, clustr: Array [Int], k: Int): VectorD =
     {
         val sums = new VectorD (k)
         for (i <- 0 until x.dim1-1; j <- i+1 until x.dim1 if clustr(i) == clustr(j)) {
-            sums(clustr(j)) += cl.distance (x(i), x(j))
+            sums(clustr(j)) += dist (x(i), x(j))
         } // for
         sums
     } // cumDistance
@@ -79,9 +79,9 @@ object GapStatistic
      *  @param clustr  the cluster assignments
      *  @param k       the number of clusters
      */
-    def withinSSE (x: MatrixD, cl: Clusterer, clustr: Array[Int], k: Int): Double =
+    def withinSSE (x: MatriD, cl: Clusterer, clustr: Array [Int], k: Int): Double =
     {
-        (cumDistance (x, cl, clustr, k) / cl.csize().toDouble).sum
+        (cumDistance (x, cl, clustr, k) / cl.csize.toDouble).sum
     } // withinSSE
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -94,7 +94,7 @@ object GapStatistic
      *  @param useSVD  use SVD to account for the shape of the points (default = true)
      *  @param plot    whether or not to plot the logs of the within-SSEs (default = false)
      */
-    def kMeansPP (x: MatrixD, kMax: Int, algo: Algorithm = HARTIGAN, b: Int = 1, useSVD: Boolean = true,
+    def kMeansPP (x: MatriD, kMax: Int, algo: Algorithm = HARTIGAN, b: Int = 1, useSVD: Boolean = true,
                   plot: Boolean = false): (KMeansPPClusterer, Array [Int], Int) =
     {
         val awk = new VectorD (kMax)
@@ -106,12 +106,12 @@ object GapStatistic
 //      var opcls: Array [Int] = null
 
         for (k <- 0 until kMax) {
-            val ref          = GapStatistic.reference (x, useSVD)
-            val (acl, acls)  = KMeansPPClusterer (x,   k+1, algo)
-            val (rcl, rcls)  = KMeansPPClusterer (ref, k+1, algo)
-            awk(k) = log(GapStatistic.withinSSE (x,   acl, acls, k+1))
-            rwk(k) = log(GapStatistic.withinSSE (ref, rcl, rcls, k+1))
-            gap(k) = rwk(k) - awk(k)
+            val ref = GapStatistic.reference (x, useSVD)
+            val acl = KMeansPPClusterer (x,   k+1, algo)
+            val rcl = KMeansPPClusterer (ref, k+1, algo)
+            awk(k)  = log(GapStatistic.withinSSE (x,   acl, acl.cluster, k+1))
+            rwk(k)  = log(GapStatistic.withinSSE (ref, rcl, rcl.cluster, k+1))
+            gap(k)  = rwk(k) - awk(k)
             if ((k != 0) && (opk == -1) && (gap(k-1) >= gap(k) - gap(k)*0.1)) { // TODO use stddev instead of 0.01*gap
                 opk = k
             } // if
@@ -123,10 +123,9 @@ object GapStatistic
             new Plot (kv, gap, null, "Gap vs. k") // , true)
         } // if
 
-        val (cl, cls) = KMeansPPClusterer (x, opk, algo) // TODO used saved instead of reclustering
-        (cl, cls, opk)
-
-    } // KMeansPP
+        val cl = KMeansPPClusterer (x, opk, algo)   // TODO used saved instead of reclustering
+        (cl, cl.cluster, opk)
+    } // kMeansPP
 
 } // GapStatistic object
 
@@ -137,18 +136,13 @@ object GapStatistic
  */
 object GapStatisticTest extends App
 {
-    val v  = new MatrixD ((6, 2), 1.0, 2.0,
-                                  2.0, 1.0,
-                                  5.0, 4.0,
-                                  4.0, 5.0,
-                                  9.0, 8.0,
-                                  8.0, 9.0)
+    import Clusterer.x
 
     val maxK = 6
 
-    val (cl, cls, k) = GapStatistic.kMeansPP (v, maxK, useSVD = false, plot = true)
+    val (cl, cls, k) = GapStatistic.kMeansPP (x, maxK, useSVD = false, plot = true)
     println (s"  k = $k")
-    println (s"sse = ${cl.sse ()}")
+    println (s"sse = ${cl.sse (x, cls)}")
 
 } // GapStatisticTest
 
@@ -165,15 +159,15 @@ object GapStatisticTest2 extends App
     val coin  = Bernoulli ()
     val dist1 = Normal (2.0, 0.1)
     val dist2 = Normal (8.0, 0.1)
-    val v     = new MatrixD (50, 2)
+    val x     = new MatrixD (50, 2)
     val maxK  = 10 
 
-    for (i <- v.range1) v(i) = VectorD (if (coin.gen == 0) dist1.gen else dist2.gen,
+    for (i <- x.range1) x(i) = VectorD (if (coin.gen == 0) dist1.gen else dist2.gen,
                                         if (coin.gen == 0) dist1.gen else dist2.gen)
 
-    val (cl, cls, k) = GapStatistic.kMeansPP (v, maxK, useSVD = false, plot = true)
+    val (cl, cls, k) = GapStatistic.kMeansPP (x, maxK, useSVD = false, plot = true)
     println (s"  k = $k")
-    println (s"sse = ${cl.sse ()}")
+    println (s"sse = ${cl.sse (x, cls)}")
 
 } // GapStatisticTest2
 

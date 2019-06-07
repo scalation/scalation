@@ -1,12 +1,13 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author Hao Peng, John Miller, Zhe Jin
- *  @version 1.5
+ *  @version 1.6
  *  @date Mon Jul 27 01:27:00 EDT 2015
  *  @see LICENSE (MIT style license file).
  */
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
 import scalation.columnar_db.Relation
 import scalation.linalgebra.{MatrixD, MatriI, MatrixI, VectorD, VectoI, VectorI}
@@ -15,6 +16,7 @@ import scalation.random.PermutedVecI
 import scalation.random.RNGStream.ranStream
 
 import BayesClassifier.me_default
+import TANBayes0.smoothP
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `OneBAN` class implements an Integer-Based One-parent BN Augmented Naive Bayes
@@ -25,10 +27,9 @@ import BayesClassifier.me_default
  * each class in the training-set.  Relative posterior probabilities are computed
  * by multiplying these by values computed using conditional probabilities.  The
  * classifier supports limited dependency between features/variables.
- *
+ * -----------------------------------------------------------------------------
  * This classifier uses the standard cross-validation technique.
  * -----------------------------------------------------------------------------
- *
  * @param x     the integer-valued data vectors stored as rows of a matrix
  * @param y     the class vector, where y(l) = class for row l of the matrix, x(l)
  * @param fn    the names for all features/variables
@@ -39,33 +40,32 @@ import BayesClassifier.me_default
  * @param thres the correlation threshold between 2 features for possible parent-child relationship
  */
 class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String],
-             protected var vc: Array [Int] = null, me: Float = me_default, thres: Double = 0.0)
-        extends BayesClassifier(x, y, fn, k, cn)
+               protected var vc: Array [Int] = null, me: Float = me_default, thres: Double = 0.0)
+        extends BayesClassifier (x, y, fn, k, cn)
 {
-    private val DEBUG = false                           // debug flag
+    private val DEBUG = false                             // debug flag
 
-    protected val parent = new VectorI (n)              // vector holding the parent for each feature/variable
-    protected val vcp    = Array.ofDim [Int] (n)        // value count for the parent
+    protected val parent = new VectorI (n)                // vector holding the parent for each feature/variable
+    protected val vcp    = Array.ofDim [Int] (n)          // value count for the parent
 
-    protected val f_CXP  = new HMatrix4 [Int](k, n)     // conditional frequency counts for variable/feature j: xj
-    protected val p_X_CP = new HMatrix4 [Double](k, n)  // conditional probabilities for variable/feature j: xj
+    protected val nu_XyP = new HMatrix4 [Int] (k, n)      // conditional frequency counts for variable/feature j: xj
+    protected val p_XyP  = new HMatrix4 [Double] (k, n)   // conditional probabilities for variable/feature j: xj
 
     protected var featureOrder: VectoI = null
-    protected val permutedVec = PermutedVecI (VectorI.range(0, n), ranStream)
+    protected val permutedVec = PermutedVecI (VectorI.range (0, n), ranStream)
 
     if (vc == null) {
-        shiftToZero; vc = vc_fromData                   // set value counts from data
+        shiftToZero; vc = vc_fromData                     // set value counts from data
     } // if
 
-    f_CXZ   = new HMatrix5 [Int] (k, n, n, vc, vc)      // local joint frequency (using partial dataset, i.e. when using cross validation) of
-                                                        // C, X, and Z, where X, Z are features/columns
-    f_CX    = new HMatrix3 [Int] (k, n, vc)             // local joint frequency of C and X
-    f_X     = new HMatrix2 [Int] (n, vc)                // local frequency of X
-
+    nu_X   = new HMatrix2 [Int] (n, vc)                   // local frequency of X = [x_0, ... x_n-1]
+    nu_Xy  = new HMatrix3 [Int] (k, n, vc)                // local joint frequency of X and y
+    nu_XyZ = new HMatrix5 [Int] (k, n, n, vc, vc)         // local joint frequency (using partial dataset, i.e. when using cross validation) of
+                                                          // X, y and Z where X, Z are features/columns
     if (DEBUG) {
-        println("value count vc      = " + vc.deep)
-        println("value count vcp     = " + vcp.deep)
-        println("parent features parent = " + parent)
+        println ("value count vc      = " + vc.deep)
+        println ("value count vcp     = " + vcp.deep)
+        println ("parents of features = " + parent)
     } // if
 
     randomizeFeatureOrder ()
@@ -81,18 +81,18 @@ class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String
      *  the "subtraction" method to achieve efficiency.
      *  @param itest  indices of the instances considered testing data
      */
-    override def train (itest: IndexedSeq [Int]): OneBAN0 =
+    override def train (itest: Ints): OneBAN0 =
     {
         val idx = if (additive) 0 until m diff itest
                   else          itest
         computeParent (idx)               // frequency computations are also done here
         computeVcp ()
-        f_CXP.alloc (vc, vcp)
-        p_X_CP.alloc (vc, vcp)
+        nu_XyP.alloc (vc, vcp)
+        p_XyP.alloc (vc, vcp)
         // only the joint frequencies of Class, X-feature, and its Parent needs to be copied, other frequencies were done in computeParentQ
-        copyFreqCXP ()
+        copyFreqXyP ()
         train2 ()
-        if (smooth) smoothParam(itest.size)
+        if (smooth) smoothP (k, n, fset, parent, vc, vcp, md - itest.size, nu_y, nu_X, nu_Xy, p_XyP)
         this
     } // train
 
@@ -102,21 +102,21 @@ class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String
      */
     private def train2 ()
     {
-        p_C = nu_y.toDouble / md                                 // prior probability for class yi
+        p_y = nu_y.toDouble / md                                 // prior probability for class yi
         for (i <- 0 until k; j <- 0 until n if fset(j)) {
             // for each class yi & feature xj
             val me_vc = me / vc(j).toDouble
             for (xj <- 0 until vc(j); xp <- 0 until vcp(j)) {
-                val d = if (parent(j) > -1) f_CX(i, parent(j), xp)
+                val d = if (parent(j) > -1) nu_Xy(i, parent(j), xp)
                 else nu_y(i)
                 // for each value for feature j: xj, par(j): xp
-                p_X_CP(i, j, xj, xp) = (f_CXP(i, j, xj, xp) + me_vc) / (d + me)
+                p_XyP(i, j, xj, xp) = (nu_XyP(i, j, xj, xp) + me_vc) / (d + me)
             } // for
         } // for
 
         if (DEBUG) {
-            println("p_C = " + p_C)                             // P(C = i)
-            println("p_X_CP = " + p_X_CP)                       // P(X_j = x | C = i)
+            println("p_y = " + p_y)                             // P(C = i)
+            println("p_XyP = " + p_XyP)                         // P(X_j = x | C = i)
         } // if
     } // train2
 
@@ -125,7 +125,7 @@ class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String
      *  Feature x_i is only a possible candidate for parent of feature x_j if i < j.
      *  @param idx   indicies of either training or testing region
      */
-    def computeParent (idx: IndexedSeq [Int])
+    def computeParent (idx: Ints)
     {
         val cmiMx = calcCMI (idx, vc)
         for (j1 <- 0 until n if fset(j1); j2 <- 0 until j1 if fset(j2)) cmiMx(j1, j2) = cmiMx(j2, j1)
@@ -149,29 +149,29 @@ class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Clone/copy the values from global freq variables into local ones.
      */
-    private def copyFreqCXP ()
+    private def copyFreqXyP ()
     {
         for (i <- 0 until k; j <- x.range2 if fset(j); xj <- 0 until vc(j); xp <- 0 until vcp(j)) {
-            f_CXP(i, j, xj, xp) = if (parent(j) > -1) f_CXZ(i, j, parent(j), xj, xp)
-                                  else                f_CX(i, j, xj)
+            nu_XyP(i, j, xj, xp) = if (parent(j) > -1) nu_XyZ(i, j, parent(j), xj, xp)
+                                   else                nu_Xy(i, j, xj)
         } // for
-    } // copyFreqCXP
+    } // copyFreqXyP
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Increment frequency counters used in CMI calculations based on the 'i'th
      *  row of the data matrix.
      *  @param i the index for current data row
      */
-    protected override def updateFreq (i: Int)
+    protected def updateFreq (i: Int)
     {
-        val yi = y(i)                                    // get the class for ith row
-        nu_y(yi) += 1                                     // decrement frequency for class yi
+        val yi    = y(i)                                     // get the class for ith row
+        nu_y(yi) += 1                                        // increment frequency for class yi
         for (j <- x.range2 if fset(j)) {
-            f_X(j, x(i, j)) += 1
-            f_CX(yi, j, x(i, j)) += 1
+            nu_X(j, x(i, j))      += 1
+            nu_Xy(yi, j, x(i, j)) += 1
             for (j2 <- j + 1 until n if fset(j2)) {
-                f_CXZ(yi, j, j2, x(i, j), x(i, j2)) += 1
-                f_CXZ(yi, j2, j, x(i, j2), x(i, j)) += 1
+                nu_XyZ(yi, j, j2, x(i, j), x(i, j2)) += 1
+                nu_XyZ(yi, j2, j, x(i, j2), x(i, j)) += 1
             } // for
         } // for
     } // updateFreq
@@ -188,35 +188,6 @@ class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String
     } // computeVcp
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Perform smoothing operations on the learned parameters by using Dirichlet priors
-     *  to compute the posterior probabilities of the parameters given the training dataset.
-     *  @see citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.178.8884&rep=rep1&type=pdf
-     *  @param testSize  size of the test size
-     */
-    private def smoothParam (testSize: Int = 0)
-    {
-        for (i <- 0 until k) {
-            p_C(i) *= m / (m + N0)
-            p_C(i) += N0 * k / (m + N0)
-            for (j <- 0 until n if fset(j)) {
-                val pj = parent(j)
-                for (xj <- 0 until vc(j); xp <- 0 until vcp(j)) {
-
-                    val f_px = if (pj > -1) f_CX(i, pj, xp) else nu_y(i)
-
-                    // NOTE: two alternative priors, may work better for some datasets
-//                  val theta0 = f_CXP(i, j, xj, xp) / (md - testSize)
-//                  val theta0 = f_CX(i, j, xj) / (md - testSize)
-                    val theta0 = f_X(j, xj) / (md - testSize)
-
-                    p_X_CP(i, j, xj, xp) *= (f_px / (f_px + N0))
-                    p_X_CP(i, j, xj, xp) += (N0 / (f_px + N0) * theta0)
-                } // for
-            } // for
-        } // for
-    } // smoothParam
-
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a discrete data vector 'z', classify it returning the class number
      *  (0, ..., k-1) with the highest relative posterior probability.
      *  Return the best class, its name and its relative probability.
@@ -224,10 +195,10 @@ class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String
      */
     def classify (z: VectoI): (Int, String, Double) =
     {
-        val prob = new VectorD(p_C)
+        val prob = new VectorD (p_y)
         for (i <- 0 until k; j <- 0 until n if fset(j)) {
-            prob(i) *= (if (parent(j) > -1) p_X_CP(i, j, z(j), z(parent(j))) // P(X_j = z_j | C = i), parent
-            else p_X_CP(i, j, z(j), 0))                     // P(X_j = z_j | C = i), no parent (other than the class)
+            prob(i) *= (if (parent(j) > -1) p_XyP(i, j, z(j), z(parent(j)))   // P(X_j = z_j | C = i), x-parent
+                        else p_XyP(i, j, z(j), 0))                            // P(X_j = z_j | C = i), no x-parent
         } // for
         if (DEBUG) println("prob = " + prob)
         val best = prob.argmax()                            // class with the highest relative posterior probability
@@ -239,10 +210,10 @@ class OneBAN0 (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String
      */
     def reset()
     {
-        nu_y.set(0)
-        f_CX.set(0)
-        f_X.set(0)
-        f_CXZ.set(0)
+        nu_y.set (0)
+        nu_X.set (0)
+        nu_Xy.set (0)
+        nu_XyZ.set (0)
     } // reset
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -279,28 +250,26 @@ object OneBAN0
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The same classifier but uses an optimized cross-validation technique.
- * -----------------------------------------------------------------------------
- *
- * @param x     the integer-valued data vectors stored as rows of a matrix
- * @param y     the class vector, where y(l) = class for row l of the matrix, x(l)
- * @param fn    the names for all features/variables
- * @param k     the number of classes
- * @param cn    the names for all classes
- * @param vc    the value count (number of distinct values) for each feature
- * @param me    use m-estimates (me == 0 => regular MLE estimates)
- * @param thres the correlation threshold between 2 features for possible parent-child relationship
+ *-----------------------------------------------------------------------------
+ *  @param x     the integer-valued data vectors stored as rows of a matrix
+ *  @param y     the class vector, where y(l) = class for row l of the matrix, x(l)
+ *  @param fn    the names for all features/variables
+ *  @param k     the number of classes
+ *  @param cn    the names for all classes
+ *  @param vc    the value count (number of distinct values) for each feature
+ *  @param me    use m-estimates (me == 0 => regular MLE estimates)
+ *  @param thres the correlation threshold between 2 features for possible parent-child relationship
  */
 class OneBAN (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String],
               vc_ : Array [Int] = null, me: Float = me_default, thres: Double = 0.0)
         extends OneBAN0(x, y, fn, k, cn, vc_, me, thres)
 {
-    private val DEBUG  = false                                     // debug flag
-
-    private val g_f_CXZ = new HMatrix5 [Int] (k, n, n, vc, vc)     // global joint frequency (using entire dataset) of C, X, and Z, where X, Z are features/columns
-    private val g_f_CX  = new HMatrix3 [Int] (k, n, vc)            // global joint frequency of C and X
-    private val g_nu_y   = new VectorI (k)                          // global frequency of C
-    private val g_f_X   = new HMatrix2[Int] (n, vc)                // global frequency of X
-
+    private val DEBUG    = false                                    // debug flag
+    private val g_nu_y   = new VectorI (k)                          // global frequency of Y
+    private val g_nu_X   = new HMatrix2 [Int] (n, vc)               // global frequency of X = [x_0, ... x_n-1]
+    private val g_nu_Xy  = new HMatrix3 [Int] (k, n, vc)            // global joint frequency of X and y
+    private val g_nu_XyZ = new HMatrix5 [Int] (k, n, n, vc, vc)     // global joint frequency (using entire dataset) of
+                                                                    // X, Z and y where X, Z are features/columns
     additive = false
 
     if (DEBUG) {
@@ -320,14 +289,14 @@ class OneBAN (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String]
             val yi = y(i)
             g_nu_y(yi) += 1
             for (j <- 0 until n if fset(j)) {
-                g_f_X(j, x(i, j)) += 1
-                g_f_CX(yi, j, x(i, j)) += 1
-                for (j2 <- j + 1 until n if fset(j)) g_f_CXZ(yi, j, j2, x(i, j), x(i, j2)) += 1
+                g_nu_X(j, x(i, j)) += 1
+                g_nu_Xy(yi, j, x(i, j)) += 1
+                for (j2 <- j + 1 until n if fset(j)) g_nu_XyZ(yi, j, j2, x(i, j), x(i, j2)) += 1
             } // for
         } // for
 
         for (c <- 0 until k; j <- 0 until n if fset(j); j2 <- j + 1 until n if fset(j2); xj <- 0 until vc(j); xj2 <- 0 until vc(j2)) {
-            g_f_CXZ(c, j2, j, xj2, xj) = g_f_CXZ(c, j, j2, xj, xj2)
+            g_nu_XyZ(c, j2, j, xj2, xj) = g_nu_XyZ(c, j, j2, xj, xj2)
         } // for
     } // frequenciesAll
 
@@ -341,11 +310,11 @@ class OneBAN (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String]
         val yi   = y(i)                                       // get the class for ith row
         nu_y(yi) -= 1                                          // decrement frequency for class yi
         for (j <- x.range2 if fset(j)) {
-            f_X(j, x(i, j)) -= 1
-            f_CX (yi, j, x(i, j)) -= 1
+            nu_X(j, x(i, j))      -= 1
+            nu_Xy(yi, j, x(i, j)) -= 1
             for (j2 <- j+1 until n if fset(j2)) {
-                f_CXZ (yi, j, j2, x(i, j), x(i, j2)) -= 1
-                f_CXZ (yi, j2, j, x(i, j2), x(i, j)) -= 1
+                nu_XyZ(yi, j, j2, x(i, j), x(i, j2)) -= 1
+                nu_XyZ(yi, j2, j, x(i, j2), x(i, j)) -= 1
             } // for
         } // for
     } // updateFreq
@@ -358,11 +327,11 @@ class OneBAN (x: MatriI, y: VectoI, fn: Array[String], k: Int, cn: Array[String]
         for (i <- 0 until k) {
             nu_y(i) = g_nu_y(i)
             for (j <- x.range2 if fset(j); xj <- 0 until vc(j)) {
-                if (i == 0) f_X(j, xj) = g_f_X(j, xj)
-                f_CX(i, j, xj) = g_f_CX(i, j, xj)
+                if (i == 0) nu_X(j, xj) = g_nu_X(j, xj)
+                nu_Xy(i, j, xj) = g_nu_Xy(i, j, xj)
                 for (j2 <- j + 1 until n if fset(j2); xj2 <- 0 until vc(j2)) {
-                    f_CXZ(i, j, j2, xj, xj2) = g_f_CXZ(i, j, j2, xj, xj2)
-                    f_CXZ(i, j2, j, xj2, xj) = f_CXZ(i, j, j2, xj, xj2)
+                    nu_XyZ(i, j, j2, xj, xj2) = g_nu_XyZ(i, j, j2, xj, xj2)
+                    nu_XyZ(i, j2, j, xj2, xj) = nu_XyZ(i, j, j2, xj, xj2)
                 } // for
             } // for
         } // for

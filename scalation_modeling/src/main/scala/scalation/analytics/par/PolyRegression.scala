@@ -1,21 +1,23 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Wed Feb 20 17:39:57 EST 2013
  *  @see     LICENSE (MIT style license file).
  */
 
 package scalation.analytics.par
 
-import scalation.linalgebra.VectoD
+import scala.collection.mutable.Set
+
+import scalation.analytics.HyperParameter
+import scalation.analytics.RegTechnique._
+import scalation.linalgebra.{MatriD, VectoD}
 import scalation.linalgebra.par.{MatrixD, VectorD}
 import scalation.math.double_exp
 import scalation.plot.Plot
 import scalation.util.{Error, time}
 
-import scalation.analytics.Predictor
-import scalation.analytics.RegTechnique._
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `PolyRegression` class supports polynomial regression.  In this case,
@@ -33,18 +35,19 @@ import scalation.analytics.RegTechnique._
  *  @see www.ams.sunysb.edu/~zhu/ams57213/Team3.pptx
  *  @param t          the input vector: t_i expands to x_i = [1, t_i, t_i^2, ... t_i^k]
  *  @param y          the response vector
- *  @param k          the order of the polynomial
+ *  @param ord        the order of the polynomial
  *  @param technique  the technique used to solve for b in x.t*x*b = x.t*y
  */
-class PolyRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = QR)
-      extends Predictor with Error
+class PolyRegression (t: VectorD, y: VectorD, ord: Int, technique: RegTechnique = QR,
+                      raw: Boolean = true)
+      extends PredictorVec (t, y, ord)
 {
     if (t.dim != y.dim) flaw ("constructor", "dimensions of t and y are incompatible")
-    if (t.dim <= k)     flaw ("constructor", "not enough data points for the given order (k)")
+    if (t.dim <= ord)   flaw ("constructor", s"not enough data points for the given order $ord")
 
-    val x = new MatrixD (t.dim, 1 + k)                 // design matrix built from t
+    val x = new MatrixD (t.dim, 1 + ord)                     // design matrix built from t
     for (i <- 0 until t.dim) x(i) = expand (t(i))
-    val rg = new Regression (x, y, technique)          // regular multiple linear regression
+    rg = new Regression (x, y, null, null, technique)        // regular multiple linear regression
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Expand the scalar 't' into a vector of powers of 't':  [1, t, t^2 ... t^k].
@@ -52,8 +55,8 @@ class PolyRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = 
      */
     def expand (t: Double): VectorD = 
     {
-        val v = new VectorD (1 + k)
-        for (j <- 0 to k) v(j) = t~^j
+        val v = new VectorD (1 + ord)
+        for (j <- 0 to ord) v(j) = t~^j
         v
     } // expand
 
@@ -72,17 +75,19 @@ class PolyRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = 
      *  using the least squares method.
      *  @param yy  the new response vector
      */
-    def train (yy: VectoD): Regression = rg.train (yy)
+    override def train (yy: VectoD): Regression = rg.train (yy)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the error and useful diagnostics.
+     *  @param xx  the test data/input matrix
+     *  @param yy  the test response/output vector
      */
-    def eval () { rg.eval () }
+    override def eval (xx: MatriD = x, yy: VectoD = y): Regression = rg.eval (xx, yy)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit including 'rSquared'.
      */
-    def fit: VectoD = rg.fit
+    override def fit: VectoD = rg.fit
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of y = f(z) by evaluating the formula y = b dot expand (z),
@@ -96,14 +101,22 @@ class PolyRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = 
      *  e.g., (b_0, b_1, b_2) dot (1, z_1, z_2).
      *  @param z  the new vector to predict
      */
-    def predict (z: VectoD): Double = rg.predict (z)
+    override def predict (z: VectoD): Double = rg.predict (z)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform forward selection to add the most predictive variable to the existing
+     *  model, returning the variable to add, the new parameter vector and the new
+     *  quality of fit.  May be called repeatedly.
+     *  @param cols  the columns of matrix x included in the existing model
+     */
+    override def forwardSel (cols: Set [Int]): (Int, VectoD, VectoD) = rg.forwardSel (cols)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Perform backward elimination to remove the least predictive variable
      *  from the model, returning the variable to eliminate, the new parameter
      *  vector, the new R-squared value and the new F statistic.
      */
-    def backElim (): (Int, VectoD, VectoD) = rg.backElim ()
+    override def backwardElim (cols: Set [Int]): (Int, VectoD, VectoD) = rg.backwardElim (cols)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Compute the Variance Inflation Factor 'VIF' for each variable to test
@@ -111,7 +124,19 @@ class PolyRegression (t: VectorD, y: VectorD, k: Int, technique: RegTechnique = 
      *  A VIF over 10 indicates that over 90% of the variance of 'xj' can be predicted
      *  from the other variables, so 'xj' is a candidate for removal from the model.
      */
-    def vif: VectorD = rg.vif
+    override def vif: VectorD = rg.vif
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform 'k'-fold cross-validation.
+     *  @param ord    the order of the expansion (e.g., max degree in PolyRegression)
+     *  @param k      the number of folds
+     *  @param rando  whether to use randomized cross-validation
+     */
+    def crossVal (ord: Int, k: Int = 10, rando: Boolean = true)
+    {
+        // FIX
+        // crossValidate ((t: VectorD, y: VectorD, ord) => new PolyRegression (t, y, ord), k, rando)
+    } // crossVal
 
 } // PolyRegression class
 

@@ -6,8 +6,8 @@ lazy val commonSettings = Seq (
 
 name         := "scalation",
 organization := "scalation",
-version      := "1.5",
-scalaVersion := "2.12.4",
+version      := "1.6",
+scalaVersion := "2.12.8",
 fork         := true,
 
 concurrentRestrictions := Seq(Tags.limitAll(1)),
@@ -23,6 +23,7 @@ scalacOptions += "-opt:l:inline",               // enable cross-method optimizat
 scalacOptions += "-opt-inline-from:**",         // allow inlining for all classes
 scalacOptions += "-opt-warnings",
 scalacOptions += "-Xlint:-adapted-args",        // run lint - disable "adapted-args" (auto tupling used)
+
 // scalacOptions += "-feature",
 // scalacOptions += "-unchecked",
 
@@ -38,7 +39,7 @@ lazy val root = (project in file("."))
   .settings (
     commonSettings,
     name := "scalation_modeling",
-//  unmanagedBase := baseDirectory.value / "../scalation_mathstat/target/scala-2.12/scalation_mathstat_2.12-1.3.jar",
+    unmanagedBase := baseDirectory.value / "../lib",
 
 ////////////////////////////////////////////////////////////////////////////////
 // Scala Modules
@@ -54,7 +55,6 @@ libraryDependencies += "junit" % "junit" % "4.11" % "test",
 libraryDependencies += "com.novocode" % "junit-interface" % "0.8" % "test->default"
 
 ) // root
-//).dependsOn (mathstat) // root
 
 ////////////////////////////////////////////////////////////////////////////////
 // Fast Regex

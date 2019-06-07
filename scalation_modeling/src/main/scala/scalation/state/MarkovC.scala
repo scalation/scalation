@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sat Dec 12 13:11:30 EST 2009
  *  @see     LICENSE (MIT style license file).
  */
@@ -198,6 +198,7 @@ class MarkovC (tr: MatrixD) extends Error
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `MarkovCTest` object tests the `MarkovC` class (Continuous-Time Markov Chains).
+ *  > runMain scalation.state.MarkovCTest
  */
 object MarkovCTest extends App
 {

@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Hao Peng, John Miller, Michael Cotterell
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sat Jun 13 01:27:00 EST 2017
  *  @see     LICENSE (MIT style license file).
  *
@@ -389,6 +389,7 @@ import SARIMA._
 class SARIMA (y: VectoD, d: Int = 0, dd: Int = 0, period: Int = 1, xxreg: MatriD = null)
       extends Forecaster
 {
+    protected var e: VectoD = null                  // residual/error vector [e_0, e_1, ... e_m-1
     private val DEBUG        = false                          // debug flag
     private val differenced  = d > 0 || dd > 0                // whether differencing will be applied
     private val mxLag        = 100                            // maximum lag to consider
@@ -512,7 +513,7 @@ class SARIMA (y: VectoD, d: Int = 0, dd: Int = 0, period: Int = 1, xxreg: MatriD
         if (r > 0) {
             val reg = new RidgeRegression (xreg, x)
             reg.train ()
-            b = reg.coefficient
+            b = reg.parameter
             for (i <- 0 until r if (!b(i).isNaN && !b(i).isInfinity)) init(i) = b(i)
         } // if
 
@@ -599,7 +600,7 @@ class SARIMA (y: VectoD, d: Int = 0, dd: Int = 0, period: Int = 1, xxreg: MatriD
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the vector of fitted values on the training data.
      */
-    def fittedValues (): VectoD = transformBack (xp, x_, xx, d, dd, period) += mu
+    def predict (): VectoD = transformBack (xp, x_, xx, d, dd, period) += mu
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Produce h-steps-ahead forecast for SARIMA models.
@@ -720,15 +721,15 @@ object SARIMATest extends App
 
     ts.setPQ (1)
     ts.train ()
-    new Plot (t, y, ts.fittedValues(), "Plot of y, ar(1) vs. t", true)
+    new Plot (t, y, ts.predict (), "Plot of y, ar(1) vs. t", true)
 
     ts.setPQ (2)
     ts.train ()
-    new Plot (t, y, ts.fittedValues (), "Plot of y, ar(2) vs. t", true)
+    new Plot (t, y, ts.predict (), "Plot of y, ar(2) vs. t", true)
 
     ts.setPQ (0, 1)
     ts.train ()
-    new Plot (t, y, ts.fittedValues () , "Plot of y, ma(1) vs. t", true)
+    new Plot (t, y, ts.predict () , "Plot of y, ma(1) vs. t", true)
 
 } // SARIMATest object
 
@@ -757,19 +758,19 @@ object SARIMATest2 extends App
 
     ts.setPQ (p)
     ts.train ()
-    new Plot (t, y, ts.fittedValues (), s"Plot of y, ar($p) vs. t", true)
+    new Plot (t, y, ts.predict (), s"Plot of y, ar($p) vs. t", true)
     val ar_f = ts.forecast (steps)
     println (s"$steps-step ahead forecasts using AR($p) model = $ar_f")
 
     ts.setPQ (0, q)
     ts.train ()
-    new Plot (t, y, ts.fittedValues (), s"Plot of y, ma($q) vs. t", true)
+    new Plot (t, y, ts.predict (), s"Plot of y, ma($q) vs. t", true)
     val ma_f = ts.forecast (steps)
     println (s"$steps-step ahead forecasts using MA($q) model = $ma_f")
 
     ts.setPQ (p, q)
     ts.train ()
-    new Plot (t, y, ts.fittedValues (), s"Plot of y, arma($p, $q) vs. t", true)
+    new Plot (t, y, ts.predict (), s"Plot of y, arma($p, $q) vs. t", true)
     val arma_f = ts.forecast (steps)
     println (s"$steps-step ahead forecasts using ARMA($p, $q) model = $arma_f")
 
@@ -808,7 +809,7 @@ object SARIMATest3 extends App
     ts.setPQ (p)
     ts.train ()
 //  ts.est_ar (p)     // depreciated, to use, uncomment this line and comment out two previous lines, also turn DEBUG flag to true
-    var xp = ts.fittedValues ()
+    var xp = ts.predict ()
     println(s"xp = $xp")
     new Plot (t, y, xp , s"Plot of y, ar($p) vs. t", true)
     val ar_f = ts.forecast (steps)
@@ -817,8 +818,8 @@ object SARIMATest3 extends App
 
     ts.setPQ (0, q)
     ts.train ()
-//  ts.est_ma (q)     // depreciated
-    xp = ts.fittedValues ()
+//  ts.est_ma (q)               // depreciated
+    xp = ts.predict ()
     println(s"xp = $xp")
     new Plot (t, y, xp, s"Plot of y, ma($q) vs. t", true)
     val ma_f = ts.forecast (steps)
@@ -827,7 +828,7 @@ object SARIMATest3 extends App
     ts.setPQ (p, q)
     ts.train ()
 //  ts.est_arma(p, q) // depreciated
-    xp = ts.fittedValues ()
+    xp = ts.predict ()
     println(s"xp = $xp")
     new Plot (t, y, xp, s"Plot of y, arma($p, $q) vs. t", true)
     val arma_f = ts.forecast (steps)
@@ -862,19 +863,19 @@ object SARIMATest4 extends App
 
     ts.setPQ (p)
     ts.train ()
-    new Plot (t, y, ts.fittedValues (), s"Plot of y, ar($p) vs. t", true)
+    new Plot (t, y, ts.predict (), s"Plot of y, ar($p) vs. t", true)
     val ar_f = ts.forecast (steps)
     println (s"$steps-step ahead forecasts using AR($p) model = $ar_f")
 
     ts.setPQ (0, q)
     ts.train ()
-    new Plot (t, y, ts.fittedValues (), s"Plot of y, ma($q) vs. t", true)
+    new Plot (t, y, ts.predict (), s"Plot of y, ma($q) vs. t", true)
     val ma_f = ts.forecast (steps)
     println (s"$steps-step ahead forecasts using MA($q) model = $ma_f")
 
     ts.setPQ (p, q)
     ts.train ()
-    new Plot (t, y, ts.fittedValues (), s"Plot of y, arma($p, $q) vs. t", true)
+    new Plot (t, y, ts.predict (), s"Plot of y, arma($p, $q) vs. t", true)
     val arma_f = ts.forecast (steps)
     println (s"$steps-step ahead forecasts using ARMA($p, $q) model = $arma_f")
 

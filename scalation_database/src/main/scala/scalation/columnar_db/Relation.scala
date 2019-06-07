@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** @author  John Miller, Yang Fan
- *  @version 1.5
+/** @author  John Miller, Yang Fan, Vinay Bingi, Santosh Uttam Bobade
+ *  @version 1.6
  *  @date    Sun Aug 23 15:42:06 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *
@@ -14,6 +14,9 @@
  *  @see db.csail.mit.edu/projects/cstore/vldb.pdf
  *
  *  Some of the operators have unicode versions: @see `scalation.util.UnicodeTest`
+ *
+ *  Supports Time Series Databases (TSDB) via `TimeNum` domain/datatype and 'leftJoinApx'
+ *  'rightJoinApx' methods.
  */
 
 package scalation
@@ -21,18 +24,21 @@ package columnar_db
 
 import java.io._
 
-import scala.reflect.ClassTag
-import scala.collection.mutable.{ArrayBuffer, Map}
+import scala.collection.mutable.{ArrayBuffer, HashMap, Map}
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.collection.mutable.HashMap
+import scala.math.{min => MIN}
+import scala.reflect.ClassTag
 
-import scalation.linalgebra.{Vec, _}
+import scalation.linalgebra._
+import scalation.linalgebra.Vec_Elem.{<, =~, !=~}
 import scalation.linalgebra.MatrixKind._
 import scalation.math.{Complex, Rational, Real}
 import scalation.math.StrO.StrNum
-import scalation.util.{banner, Error, ReArray, getFromURL_File, time}
+import scalation.math.TimeO.{TimeNum, setThreshold}
+import scalation.math.{noComplex, noDouble, noInt, noLong, noRational, noReal, noStrNum, noTimeNum}
+import scalation.util.{banner, Error, getFromURL_File, MergeSortIndirect, ReArray, removeAt, time}
 
 import TableObj._
 import columnar_db._
@@ -42,6 +48,7 @@ import columnar_db._
  *  class.
  */
 object Relation
+       extends Error
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Create an unpopulated relation.
@@ -105,6 +112,7 @@ object Relation
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Read the relation with the given 'name' into memory loading its columns
      *  with data from the CSV file named 'fileName'.
+     *  Note: "ln.split (eSep, -1)" will keep all values even if empty "one,,three" -> "one","",three"
      *  @param fileName  the file name of the data file
      *  @param name      the name of the relation
      *  @param colName   the names of columns
@@ -121,7 +129,7 @@ object Relation
         val newCol = Vector.fill [Vec] (colName.length)(null)
         val r3     = new Relation (name, colName, newCol, key, domain)
         for (ln <- lines) {
-            if (cnt <= 0) r3.add (r3.row (ln.split (eSep), domain)) else cnt -= 1
+            if (cnt <= 0) r3.add (r3.row (ln.split (eSep, -1), domain)) else cnt -= 1
         } // for
         r3.materialize ()
     } // apply
@@ -135,28 +143,89 @@ object Relation
      *  @param key       the column number for the primary key (< 0 => no primary key)
      *  @param domain    an optional string indicating domains for columns (e.g., 'SD' = 'StrNum', 'Double')
      *  @param eSep      the element separation string/regex (e.g., "," ";" " +")
+     *  @param cPos      the sequence of column positions in the input file to be used (null => select all)
      */
-    def apply (fileName: String, name: String, key: Int, domain: String, eSep: String): Relation =
+    def apply (fileName: String, name: String, key: Int, domain: String, eSep: String,
+               cPos: Seq [Int]): Relation =
     {
-        var first = true
         val lines = getFromURL_File (fileName)
+        var first = true
         var colBuffer: Array [ArrayBuffer [String]] = null
-        var colName: Seq [String] = null
-        var newCol: Vector [Vec] = null
+        var colName:   Array [String] = null
+        var newCol:    Vector [Vec] = null
 
-        for (ln <- lines) {
-            if (first) {
-                colName   = ln.split (eSep).map (_.trim)
-                colBuffer = Array.ofDim (colName.length)
-                for (i <- colBuffer.indices) colBuffer(i) = new ArrayBuffer ()
-                first = false
-            } else {
-                val values = ln.split (eSep).map (_.trim)
-                values.indices.foreach (i => { colBuffer(i) += values(i) })
+        if (cPos == null) {                                              // select all columns
+            for (ln <- lines) {
+                if (first) {
+                    colName   = ln.split (eSep, -1).map (_.trim)
+                    colBuffer = Array.fill (colName.length)(new ArrayBuffer ())
+                    first = false
+                } else {
+                    val values = ln.split (eSep, -1).map (_.trim)
+                    for (i <- colName.indices) colBuffer(i) += values(i)
+                } // if
+            } // for
+        } else {                                                        // select cPos columns
+            if (domain.length != cPos.length) {
+                flaw ("apply", "cPos length should be same as domain length")
             } // if
-        } // for
-        new Relation (name, colName, colBuffer.indices.map (i => VectorS (colBuffer(i).toArray)).toVector, key, domain)
+            for (ln <- lines) {
+                if (first) {
+                    val name  = ln.split (eSep, -1).map (_.trim)
+                    colName   = Array.ofDim (cPos.length)
+                    colBuffer = Array.fill (cPos.length)(new ArrayBuffer ())
+                    for (i <- colBuffer.indices) colName(i) = name(cPos(i))
+                    first = false
+                } else {
+                    val values = ln.split (eSep, -1).map (_.trim)
+                    for (i <- colName.indices) colBuffer(i) += values(cPos(i))
+                } // if
+            } // for
+        } // if
+        new Relation (name, colName, makeCol (colBuffer, domain), key, domain)
     } // apply
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Make the columns for the columnar table from data stored in 'colBuffer'.
+     *  @param colBuffer  the column buffer holding the data
+     *  @param domain     the domains/datatypes for the columns
+     */
+    private def makeCol (colBuffer: Array [ArrayBuffer [String]], domain: String): Vector [Vec] =
+    {
+        colBuffer.indices.map (i =>
+            if (domain == null || domain == "") VectorS (colBuffer(i).toArray)
+            else domain(i) match {
+                case 'C' => VectorC (colBuffer(i).toArray)             // dense vectors
+                case 'D' => VectorD (colBuffer(i).toArray)
+                case 'I' => VectorI (colBuffer(i).toArray)
+                case 'L' => VectorL (colBuffer(i).toArray)
+                case 'Q' => VectorQ (colBuffer(i).toArray)
+                case 'R' => VectorR (colBuffer(i).toArray)
+                case 'S' => VectorS (colBuffer(i).toArray)
+                case 'T' => VectorT (colBuffer(i).toArray)
+
+                case 'c' => RleVectorC (colBuffer(i).toArray)          // compressed vectors
+                case 'd' => RleVectorD (colBuffer(i).toArray)
+                case 'i' => RleVectorI (colBuffer(i).toArray)
+                case 'l' => RleVectorL (colBuffer(i).toArray)
+                case 'q' => RleVectorQ (colBuffer(i).toArray)
+                case 'r' => RleVectorR (colBuffer(i).toArray)
+                case 's' => RleVectorS (colBuffer(i).toArray)
+                case 't' => RleVectorT (colBuffer(i).toArray)
+
+                case 'χ' => SparseVectorC (colBuffer(i).toArray)       // sparse vectors
+                case 'δ' => SparseVectorD (colBuffer(i).toArray)
+                case 'ι' => SparseVectorI (colBuffer(i).toArray)
+                case 'λ' => SparseVectorL (colBuffer(i).toArray)
+                case 'ϟ' => SparseVectorQ (colBuffer(i).toArray)
+                case 'ρ' => SparseVectorR (colBuffer(i).toArray)
+                case 'σ' => SparseVectorS (colBuffer(i).toArray)
+                case 'τ' => SparseVectorT (colBuffer(i).toArray)
+
+                case _   => flaw ("makeCol", s"domain type ${domain(i)} not supported")
+                            null.asInstanceOf [Vec]
+        }).toVector
+    } // makeCol
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Read the relation with the given 'name' into memory loading its columns
@@ -178,13 +247,13 @@ object Relation
 
         for (ln <- lines) {
             if (first) {
-                val colName = ln.split (eSep)
+                val colName = ln.split (eSep, -1)
                 val newCol  = Vector.fill [Vec] (colName.length)(null)
                 r3    = new Relation (name, colName, newCol, key, domain)
                 first = false
             } else {
                 if (currentlineno % 1000 == 0) println (s"$currentlineno")
-                r3.add (r3.row (ln.split (eSep), domain))
+                r3.add (r3.row (ln.split (eSep, -1), domain))
                 currentlineno += 1
             } // if
         } // for
@@ -208,7 +277,7 @@ object Relation
         val lines  = getFromURL_File (fileName)
         val newCol = Vector.fill [Vec] (colName.length)(null)
         val r3     = new Relation (name, colName, newCol, key, domain)
-        for (ln <- lines) r3.add (r3.row (ln.split (eSep), domain))
+        for (ln <- lines) r3.add (r3.row (ln.split (eSep, -1), domain))
         r3.materialize ()
     } // apply
 
@@ -232,15 +301,15 @@ object Relation
             if (ln.indexOf ("%") == 0) {
                 // skip comment
             } else if (ln.indexOf ("@relation") == 0) {
-                name = ln.split (eSep)(1)
+                name = ln.split (eSep, -1)(1)
             } else if (ln.indexOf ("@attribute") == 0) {
-                colName += ln.split(eSep)(1)
+                colName += ln.split(eSep, -1)(1)
             } else if (ln.indexOf ("@data") == 0) {
                 foundData = true
                 colBuffer = Array.ofDim (colName.length)
                 for (i <- colBuffer.indices) colBuffer (i) = new ArrayBuffer ()
             } else if (foundData) {
-                val values = ln.split (eSep)
+                val values = ln.split (eSep, -1)
                 values.indices.foreach (i => { colBuffer (i) += values (i) })
             } // if
         } // for
@@ -383,7 +452,7 @@ object Relation
      *  @param r      the relation to operate on
      *  @param cName  sum on column "cName"
      */
-    def sum2 (r: Relation, cName: String): Vec =
+    def sum (r: Relation, cName: String): Vec =
     {
         val cPos    = r.colMap.get(cName).get
         val domainc = r.domain(cPos)
@@ -404,14 +473,14 @@ object Relation
             count += 1
         } // for
         sumlist
-    } // sum2
+    } // sum
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get a Vec of max of the 'cName' column for the 'r' relation.
      *  @param r the relation you want to operate on
      *  @param cName  max on column "cName"
      */
-    def max2 (r: Relation, cName: String): Vec =
+    def max (r: Relation, cName: String): Vec =
     {
         val cPos    = r.colMap.get(cName).get
         val domainc = r.domain(cPos)
@@ -432,14 +501,14 @@ object Relation
             count += 1
         } // for
         maxlist
-    } // max2
+    } // max
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get a Vec of min of the 'cName' column for the 'r' relation
      *  @param r      the relation you want to operate on
      *  @param cName  min on column "cName"
      */
-    def min2 (r: Relation, cName: String): Vec =
+    def min (r: Relation, cName: String): Vec =
     {
         val cPos    = r.colMap.get(cName).get
         val domainc = r.domain(cPos)
@@ -460,14 +529,14 @@ object Relation
             count += 1
         } // for
         minlist
-    } // min2
+    } // min
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get a Vec of average of the 'cName' column for the 'r' relation.
      *  @param r      the relation you want to operate on
      *  @param cName  average on column "cName"
      */
-    def avg2 (r: Relation, cName: String): Vec =
+    def avg (r: Relation, cName: String): Vec =
     {
         val cPos    = r.colMap.get(cName).get
         val domainc = r.domain(cPos)
@@ -488,26 +557,26 @@ object Relation
             count += 1
         } // for
         avglist
-    } // avg2
+    } // avg
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Get a Vec of count of the 'cName' column for the 'r' relation.
      *  @param r      the relation you want to operate on
-     *  @param cName  count of column "cName"
+     *  @param cName  the column name for the column to be counted
      */
-    def count2 (r: Relation, cName: String): Vec =
+    def count (r: Relation, cName: String): Vec =
     {
-        val cPos   = r.colMap.get(cName).get
-        var countlist:Vec = null
-        var i: Int = 0
-        for(p<-r.grouplist) {
+        val cPos = r.colMap.get(cName).get
+        var countlist: Vec = null
+        var i = 0
+        for (p <- r.grouplist) {
             val count = p - i
-//           countlist = Vec.:+ (countlist, count, r.domain, cPos)
+//          countlist = Vec.:+ (countlist, count, r.domain, cPos)
             countlist = Vec.:+ (countlist, count)
             i = p
         } // for
         countlist
-    } // count2
+    } // count
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** From function return cartesian product of all the relations.
@@ -516,28 +585,11 @@ object Relation
     def from (relations: Relation*): Relation =
     {
         var result = relations(0)
-        for (i <- 1 until relations.size) result = result.cproduct(relations(i))
+        for (i <- 1 until relations.size) result = result product relations(i)
         result
     } // from
 
 } // Relation object
-
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** `RelationPair` defines a case class: a relation pair of relation1 and relation2
-  * @param r1  relation 1
-  * @param r2  relation 2
-  */
-case class RelationPair (val r1: Relation, val r2: Table)
-{
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** on function call thetajoin on predicate 'p'.
-      * @param  p  the predicate to do theatjoin
-      * @tparam T  the predicate type
-      */
-    def on [T] (p: Predicate2 [T]): Relation = r1.thetajoin (r2, p)
-
-} // RelationPair class
 
 import Relation._
 
@@ -553,6 +605,7 @@ import Relation._
  *      Q - `Rational` - `VectorQ` - 128 bit ratio of two long integers
  *      R - `Real`     - `VectorR` - 128 bit quad precision floating point number
  *      S - `StrNum`   - `VectorS` - variable length numeric string
+ *      T - `TimeNum`  - `VectorT` -  96 bit time Instant = (Long, Int)
  *  <p>
  *  FIX - (1) don't allow (public) var
           (2) avoid unchecked or incomplete .asInstanceOf [T]
@@ -563,29 +616,45 @@ import Relation._
  *  @param key      the column number for the primary key (< 0 => no primary key)
  *  @param domain   an optional string indicating domains for columns (e.g., 'SD' = 'StrNum', 'Double')
  *  @param fKeys    an optional sequence of foreign keys - Seq (column name, ref table name, ref column position)
+ *  @param enter    whether to enter the newly created relation into the `Catalog`
  */
 class Relation (val name: String, val colName: Seq [String], var col: Vector [Vec],
-                val key: Int = 0, val domain: String = null, var fKeys: Seq [(String, String, Int)] = null)
-     extends Table with Error
+                val key: Int = 0, val domain: String = null, var fKeys: Seq [(String, String, Int)] = null,
+                enter: Boolean = true)
+     extends Table with Error with Serializable
 {
-//  private   val serialVersionUID = 1L
-    private   val DEBUG        = true                                           // debug flag
-    protected val colMap       = Map [String, Int] ()                           // map column name -> column number
+    private   val DEBUG              = true                                           // debug flag
+    private [columnar_db] val colMap = Map [String, Int] ()                           // map column name -> column number
     @transient
-    private   val col2         = Vector.fill (colName.size)(new ReArray [Any])  // efficient holding area for building columns
-    private   var grouplist    = Vector [Int] ()                                // rows in group
-    protected val index        = Map [KeyType, Row] ()                          // index that maps a key into row
-    protected val indextoKey   = HashMap [Int, KeyType] ()                      // map index -> key
-    private   var keytoIndex   = HashMap [KeyType, Int] ()                      // map key -> index
-    protected var orderedIndex = Vector [KeyType] ()                            // re-ordering of the key column
+//  private   val col2               = Vector.fill (colName.size)(new ReArray [Any])  // efficient holding area for building columns
+//  private   val col2               = Vector [ReArray [Any]] ()                      // efficient holding area for building columns
+    private   var grouplist          = Vector [Int] ()                                // rows in group
+    protected val index              = Map [KeyType, Row] ()                          // index that maps a key into row
+    protected val indextoKey         = HashMap [Int, KeyType] ()                      // map index -> key
+    private   var keytoIndex         = HashMap [KeyType, Int] ()                      // map key -> index
+    protected var orderedIndex       = Vector [KeyType] ()                            // re-ordering of the key column
 
     if (colName.length != col.length) flaw ("constructor", "incompatible sizes for 'colName' and 'col'")
-    Catalog.add (name, colName, key, domain)
+    if (enter) Catalog.add (name, colName, key, domain)
 
     for (j <- colName.indices) colMap += colName(j) -> j
+    private val col2 = 
+        if (domain == null) (for (j <- colName.indices) yield new ReArray [Any] ()).toVector
+        else (for (j <- colName.indices) yield 
+            domain(j) match {
+            case 'C' => new ReArray [Complex] ()
+            case 'D' => new ReArray [Double] ()
+            case 'I' => new ReArray [Int] ()
+            case 'L' => new ReArray [Long] ()
+            case 'Q' => new ReArray [Rational] ()
+            case 'R' => new ReArray [Real] ()
+            case 'S' => new ReArray [StrNum] ()
+            case 'T' => new ReArray [TimeNum] ()
+            case _   => { flaw ("constructor", s"unsupported column type ${domain(j)} for column $j"); null }
+        }).toVector
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The 'generateIndex' method helps, e.g., the popTable, methods to generate
+    /** The 'generateIndex' method helps, e.g., the 'popTable', methods to generate
      *  an index for the table.
      *  @param reset  if reset is true, use old index to build new index; otherwise, create new index
      */
@@ -622,9 +691,15 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
     def cols: Int = col.length
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the columns in the relation.
+    /** Return all of the columns in the relation.
      */
-    override def columns: Vector [Vec] = col
+    def columns: Vector [Vec] = col
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the column in the relation with column name 'cName'.
+     *  @param cName  column name used to retrieve the column vector
+     */
+    def column (cName: String): Vec = col(colMap (cName))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the names of columns in the relation.
@@ -642,45 +717,93 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
     def domains: String = domain
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a row by pulling values from all columns at position 'i'.
+     *  @param i  the 'i'th position
+     */
+    def row (i: Int): Row = col.map (Vec (_, i)).toVector
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the size in terms of number of rows in the relation.
      */
     def rows: Int = if (col(0) == null) 0 else col(0).size
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine whether 'this' relation contains a row matching the given 'tuple'.
+     *  @param tuple  an aggregation of columns values (potential row)
+     */
+    def contains (tuple: Row): Boolean =
+    {
+        for (i <- 0 until rows if row(i) sameElements tuple) return true
+        false
+    } // contains
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Rename 'this' table, returning a shallow copy of 'this' table.
+     *  @param newName  the new name for the table.
+     */
+    def rename (newName: String): Relation =
+    {
+        new Relation (newName, colName, col, key, domain, fKeys)
+    } // rename
+
+    // ================================================================= PROJECT
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Project onto the columns with the given column names.
      *  @param cName  the names of the columns to project onto
      */
-    def pi (cName: String*): Relation = pi (cName.map (colMap (_)), cName)
+    def project (cName: String*): Relation = project (cName.map (colMap (_)), cName)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Method 'epi' used to project aggregate functions columns,
-     *  @param aggF       the aggregate functions you want to use
-     *  @param funName   the newly created aggregate columns'names
-     *  @param aggFAttr  the columns you want to use of correspondent aggregate functions
-     *  @param cName     the columns you want to project on
+    /** Project onto the columns with the given column positions using the given
+     *  column names.
+     *  @param cPos   the positions of the columns to project onto
+     *  @param cName  the names of the columns to project onto
      */
-    def epi (aggF: Seq [AggFunction], funName: Seq [String], aggFAttr: Seq [String], cName: String*): Relation =
+    def project (cPos: Seq [Int], cName: Seq [String] = null): Relation =
     {
-        aggFAttr.foreach (a =>
-            if (! colName.contains(a)) throw new IllegalArgumentException ("the attribute you want to aggregate on does not exist"))
-        cName.foreach (a =>
-            if (! colName.contains(a)) throw new IllegalArgumentException ("the attribute you want to project on does not exist"))
+        val newCName  = if (cName == null) cPos.map (colName(_)) else cName
+        val newCol    = cPos.map (col(_)).toVector
+        val newKey    = if (cPos contains key) cPos.indexOf (key) else -1
+        val newDomain = projectD (domain, cPos)
+        new Relation (name + "_p_" + ucount (), newCName, newCol, newKey, newDomain)
+    } // project
+
+    // ======================================================== EXTENDED PROJECT
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Aggregate/project on the given columns (an extended projection operator that
+     *  applies aggregate operators to aggregation columns and regular projection
+     *  to projection columns).
+     *  @see en.wikipedia.org/wiki/Relational_algebra
+     *  @param aggCol  the columns to aggregate on: (aggregate function, new column name, old column name)*
+     *  @param cName   the other columns to project on
+     */
+    def eproject (aggCol: AggColumn*)(cName: String*): Relation =
+    {
+        val aRange  = 0 until aggCol.size
+        val nCols   = aggCol.size + cName.size
+        val funName = ArrayBuffer [String] ()
+        for (c <- aggCol) {
+            if (! (colName contains c._3)) throw new IllegalArgumentException (s"column ${c._3} to aggregate on does not exist")
+            else funName += c._2
+        } // for
 
         if (grouplist.isEmpty) groupBy (colName(key))
-        val newCol     = Vector.fill [Vec](aggFAttr.size + cName.size)(null)
-        val colNamenew = cName ++ funName
-        var newDomain  = cName.map(n => colMap(n)).map (i => domain(i))
-        for (i <- funName.indices) {
-            if (funName(i) contains "count") newDomain = newDomain :+ 'I'          // other aggregate's result domain is based on the aggreagte column
-            else newDomain = newDomain :+ domain(colMap(aggFAttr(i)))
+        val newCol    = Vector.fill [Vec] (nCols)(null)
+        val newCName  = cName ++ funName
+        var newDomain = cName.map (n => colMap(n)).map (i => domain(i))
+        for (i <- aRange) {
+            newDomain = if (funName(i) contains "count") newDomain :+ 'I'          // aggregate's result domain is based on aggregate column
+                        else newDomain :+ domain(colMap(aggCol(i)._3))
         } // for
-        val r2 = new Relation (name + "_e_" + ucount (), colNamenew, newCol, key, newDomain.mkString (""))
+        val r2 = new Relation (name + "_e_" + ucount (), newCName, newCol, key, newDomain.mkString (""))
         if (rows == 0) return r2                                                   // no rows means early return
 
-        val agglist = for (i <- aggF.indices) yield aggF(i)(this, aggFAttr(i))
+        val agglist = for (i <- aRange) yield aggCol(i)._1(this, aggCol(i)._3)
         if (cName.size != 0) {
             val cPos    = cName.map (colMap(_))                                    // position of cName
-            val cPos2   = aggFAttr.map (colMap(_))                                 // position of aggregate columns
+            val cPos2   = aggCol.map ((a: AggColumn) => colMap(a._3))              // position of aggregate columns
             val shrinkR = pi(cPos, null)                                           // projected relation
             var row_i   = 0
             var group_j = 0
@@ -693,16 +816,17 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
             }) // foreach
             r2.materialize ()
         } else {                                                                   // only project on the aggregate column
-            for (i <- aggF.indices) {
+            for (i <- aRange) {
                 r2.col = if (i == 0) Vector (agglist(i)) else r2.col :+ agglist(i)
             } // for
         } // if
         r2
-    } // epi
+    } // eproject
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Method 'epiAny' is a special case of epi.  When the projected columns can not be
      *  decided by the group by columns, only one representative will be shown for each group.
+     *  FIX - change name
      *  @param aggF      the aggregate functions you want to use
      *  @param funName   the newly created aggregate columns'names
      *  @param aggFAttr  the columns you want to use of correspondent aggregate functions
@@ -746,31 +870,7 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
         r2.materialize ()
     } // epiAny
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Project onto the columns with the given column names.
-     *  @param cName  the names of the columns to project onto
-     */
-    def π (cName: String*): Relation = pi (cName.map(colMap (_)), cName)
-
-    def pi (cPos: Seq [Int], cName: Seq [String] = null): Relation =
-    {
-        val newCName  = if (cName == null) cPos.map (colName(_)) else cName
-        val newCol    = cPos.map (col(_)).toVector
-        val newKey    = if (cPos contains key) key else -1
-        val newDomain = projectD (domain, cPos)
-        val r2 = new Relation (name + "_p_" + ucount (), newCName, newCol, newKey, newDomain)
-        r2
-    } // pi
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** FIX - describe and given return type.
-     *  @param cName  the names of the columns
-     */
-    private def getNew (cName: String) = { val cn = colMap (cName)
-                                           (cn,
-                                            Seq (cName),
-                                            if (cn == key) key else -1,
-                                            projectD (domain, Seq (cn))) }
+    // ========================================================== PROJECT-SELECT
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select elements from column 'cName' in 'this' relation that satisfy the
@@ -780,74 +880,64 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
      */
     def pisigmaC (cName: String, p: Complex => Boolean): Relation =
     {
-        val nu     = getNew (cName)
+        val nu     = getMeta (cName)
         val newCol = Vector (col (nu._1).asInstanceOf [VectorC].filter (p))
         new Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
     } // pisigmaC
 
     def pisigmaD (cName: String, p: Double => Boolean): Relation =
     {
-        val nu     = getNew (cName)
+        val nu     = getMeta (cName)
         val newCol = Vector (col (nu._1).asInstanceOf [VectorD].filter (p))
         new Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
     } // pisigmaD
 
     def pisigmaI (cName: String, p: Int => Boolean): Relation =
     {
-        val nu     = getNew (cName)
+        val nu     = getMeta (cName)
         val newCol = Vector (col (nu._1).asInstanceOf [VectorI].filter (p))
         new Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
     } // pisigmaI
 
     def pisigmaL (cName: String, p: Long => Boolean): Relation =
     {
-        val nu     = getNew (cName)
+        val nu     = getMeta (cName)
         val newCol = Vector (col (nu._1).asInstanceOf [VectorL].filter (p))
         new Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
     } // pisigmaL
 
     def pisigmaQ (cName: String, p: Rational => Boolean): Relation =
     {
-        val nu     = getNew (cName)
+        val nu     = getMeta (cName)
         val newCol = Vector (col (nu._1).asInstanceOf [VectorQ].filter (p))
         new Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
     } // pisigmaQ
 
     def pisigmaR (cName: String, p: Real => Boolean): Relation =
     {
-        val nu     = getNew (cName)
+        val nu     = getMeta (cName)
         val newCol = Vector (col (nu._1).asInstanceOf [VectorR].filter (p))
         new Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
     } // pisigmaR
 
     def pisigmaS (cName: String, p: StrNum => Boolean): Relation =
     {
-        val nu     = getNew (cName)
+        val nu     = getMeta (cName)
         val newCol = Vector (col (nu._1).asInstanceOf [VectorS].filter (p))
         new Relation (name + "_s_" + ucount (), nu._2, newCol, nu._3, nu._4)
     } // pisigmaS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Select elements from columns in 'cName' in 'this' relation that satisfy
-     *  the predicate 'p'.
-     *  @param cName  the name of the column used for selection
-     *  @param p      the predicate (`Boolean` function) to be satisfied
+    /** Get meta-data about the column with name 'cName'.
+     *  @param cName  the name of the column
      */
-    def sigma [T <: Any] (cName: String, p: T => Boolean): Relation =
+    private def getMeta (cName: String): (Int, Seq [String], Int, String) =
     {
-        if (domain != null) {
-            domain(colMap (cName)) match {
-            case 'D' => selectAt (selectD (cName, p.asInstanceOf [Double => Boolean]))
-            case 'I' => selectAt (selectI (cName, p.asInstanceOf [Int => Boolean]))
-            case 'L' => selectAt (selectL (cName, p.asInstanceOf [Long => Boolean]))
-            case 'S' => selectAt (selectS (cName, p.asInstanceOf [StrNum => Boolean]))
-            case _  => { flaw ("sigma", "predicate type not supported"); null }
-            } // match
-        } else {
-            flaw ("sigma", "optional domains not given - use type specific sigma?")
-            null
-        } // if
-    } // sigma
+        val cn = colMap (cName)                                 // column position
+        (cn, Seq (cName), if (cn == key) key else -1, projectD (domain, Seq (cn)))
+    } // getMeta
+
+    // ================================================================== SELECT
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select elements from columns in 'cName' in 'this' relation that satisfy
@@ -855,21 +945,25 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
      *  @param cName  the name of the column used for selection
      *  @param p      the predicate (`Boolean` function) to be satisfied
      */
-    def σ [T <: Any] (cName: String, p: T => Boolean): Relation =
+    def select [T : ClassTag] (cName: String, p: T => Boolean): Relation =
     {
         if (domain != null) {
             domain(colMap (cName)) match {
-            case 'D' => selectAt (selectD (cName, p.asInstanceOf [Double => Boolean]))
-            case 'I' => selectAt (selectI (cName, p.asInstanceOf [Int => Boolean]))
-            case 'L' => selectAt (selectL (cName, p.asInstanceOf [Long => Boolean]))
-            case 'S' => selectAt (selectS (cName, p.asInstanceOf [StrNum => Boolean]))
-            case _  => { flaw ("σ", "predicate type not supported"); null }
+            case 'C' | 'c' | 'χ' => selectAt (selectC (cName, p.asInstanceOf [Complex => Boolean]))
+            case 'D' | 'd' | 'δ' => selectAt (selectD (cName, p.asInstanceOf [Double => Boolean]))
+            case 'I' | 'i' | 'ι' => selectAt (selectI (cName, p.asInstanceOf [Int => Boolean]))
+            case 'L' | 'l' | 'λ' => selectAt (selectL (cName, p.asInstanceOf [Long => Boolean]))
+            case 'Q' | 'q' | 'ϟ' => selectAt (selectQ (cName, p.asInstanceOf [Rational => Boolean]))
+            case 'R' | 'r' | 'ρ' => selectAt (selectR (cName, p.asInstanceOf [Real => Boolean]))
+            case 'S' | 's' | 'σ' => selectAt (selectS (cName, p.asInstanceOf [StrNum => Boolean]))
+            case 'T' | 't' | 'τ' => selectAt (selectT (cName, p.asInstanceOf [TimeNum => Boolean]))
+            case _  => { flaw ("sigma", "predicate type not supported"); null }
             } // match
         } else {
-            flaw ("σ", "optional domains not given - use type specific sigma?")
+            flaw ("select", "optional domains not given - use type specific sigma?")
             null
         } // if
-    } // σ
+    } // select
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select elements from columns in 'cName' in 'this' relation that satisfy
@@ -882,14 +976,15 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
     def sigmaD (cName: String, p: Double => Boolean): Relation = selectAt (selectD (cName, p))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The parellel version of 'selectD',
+    /** The parellel version of 'selectD'.
+     *  FIX - move to .par package
      *  @param cName column to select on
      *  @param p  predicate to select
      */
     def sigmaDpar (cName: String, p: Double => Boolean): Relation =
     {
         val filtercol = new scalation.linalgebra.par.VectorD (col (colMap (cName)).asInstanceOf [VectorD].toArray)
-        selectAt(filtercol.filterPos (p))
+        selectAt (filtercol.filterPos (p))
     } // sigmaDpar
 
     def sigmaI (cName: String, p: Int => Boolean): Relation = selectAt (selectI (cName, p))
@@ -943,6 +1038,11 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
         col (colMap (cName)).asInstanceOf [VectorS].filterPos (p)
     } // selectS
 
+    def selectT (cName: String, p: TimeNum => Boolean): Seq [Int] =
+    {
+        col (colMap (cName)).asInstanceOf [VectorT].filterPos (p)
+    } // selectT
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Select across all columns at the specified column positions.
      *  @param pos  the specified column positions
@@ -953,138 +1053,93 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
         new Relation (name + "_s_" + ucount (), colName, newCol, key, domain)
     } // selectAt
 
+    // =========================================================== SET OPERATORS
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** The where function filters on predicates (logic is and),
-     *  returning the relation satisfying the predicates (column compare with constant)
-     *  @param  p  tuple(1): column name, tuple(2): predicate (T => Boolean)
-     *  @tparam T  the predicate type
+    /** Union 'this' relation and 'r2'.  Check that the two relations are compatible.
+     *  If they are not, return the first 'this' relation.
+     *  @param r2  the other relation
      */
-    def where [T] (p: Predicate [T]*): Relation =
+    def union (r2: Table): Relation =
     {
-        var pos = ArrayBuffer [Int] ()
-        for (i <- p.indices) {
-            domain(colMap(p(i)._1)) match {
-            case 'D' =>
-                val pos1 = col(colMap(p(i)._1)).asInstanceOf [VectorD].filterPos (p(i)._2.asInstanceOf [Double => Boolean])
-                if (i > 0) pos = pos intersect pos1 else pos ++= pos1
-            case 'I' =>
-                val pos1 = col(colMap(p(i)._1)).asInstanceOf [VectorI].filterPos (p(i)._2.asInstanceOf [Int => Boolean])
-                if (i > 0) pos = pos intersect pos1 else pos ++= pos1
-            case 'L' =>
-                val pos1 = col(colMap(p(i)._1)).asInstanceOf [VectorL].filterPos (p(i)._2.asInstanceOf [Long => Boolean])
-                if (i > 0) pos = pos intersect pos1 else pos ++= pos1
-            case 'S' =>
-                val pos1 = col(colMap(p(i)._1)).asInstanceOf [VectorS].filterPos (p(i)._2.asInstanceOf [StrNum => Boolean])
-                if (i > 0) pos = pos intersect pos1 else pos ++= pos1
-            case _ =>
-                flaw ("where", "predicate type not supported")
-                null
-            } // match
-        } // for
-        selectAt (pos)
-    } // where
+        if (incompatible (r2)) return this                // take only this relation
 
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Group the relation by specified column names, return a relation
-     *  @param cName group columns
+//      if (col(0) == null) return if (r2.col(0) == null) null else r2
+//      else if (r2.col(0) == null) return this
+
+        val newCol = (for (j <- col.indices) yield Vec.++ (col(j), r2.columns(j)))
+        new Relation (name + "_u_" + ucount (), colName, newCol.toVector, -1, domain)
+    } // union
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Intersect 'this' relation and 'r2'.  Check that the two relations are compatible.
+     *  Use index to finish intersect operation.
+     *  @param _r2  the other relation
      */
-    def groupBy (cName: String*): Relation =
+    def intersect (_r2: Table): Relation =
     {
-        if (! cName.map (c => colName contains(c)).reduceLeft (_ && _))
-            flaw ("groupBy", "groupbyName used to groupby doesn't exist in the cName")
-        val equivCol = Vector.fill [Vec] (colName.length)(null)
-        if (rows == 0) return this
+        val r2 = _r2.asInstanceOf [Relation]
+        if (incompatible (r2)) return null
 
-        val cPos = cName.map (colMap (_))
-
-        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /*  Sort on the given columns.
-         *  @param sortColumn  the set of columns to sort on
-         */
-        def sortcol (sortColumn: Set [Any]): Vec =
-        {
-            var colcol: Vec = null
-            val domain = null
-//          for (x <- sortColumn) colcol = Vec.:+ (colcol, x, domain, 0)
-            for (x <- sortColumn) colcol = Vec.:+ (colcol, x)
-
-            colcol match {
-            case _: VectoC => val sortcol = colcol.asInstanceOf [VectoC]; sortcol.sort (); sortcol
-            case _: VectoD => val sortcol = colcol.asInstanceOf [VectoD]; sortcol.sort (); sortcol
-            case _: VectoI => val sortcol = colcol.asInstanceOf [VectoI]; sortcol.sort (); sortcol
-            case _: VectoL => val sortcol = colcol.asInstanceOf [VectoL]; sortcol.sort (); sortcol
-            case _: VectoQ => val sortcol = colcol.asInstanceOf [VectoQ]; sortcol.sort (); sortcol
-            case _: VectoR => val sortcol = colcol.asInstanceOf [VectoR]; sortcol.sort (); sortcol
-            case _: VectoS => val sortcol = colcol.asInstanceOf [VectoS]; sortcol.sort (); sortcol
-            case _ => println ("sortcol: vector type not supported"); null.asInstanceOf [Vec]
-            } // match
-        } // sortcol
-
-        var groupIndexMap = Map [Any, Vector [KeyType]] ()
-        val tempIndexMap  = Map [Any, Vector [KeyType]] ()
-        var sortlst: Vec  = null
-
-        for (i <- cPos.indices) {
-            if (i == 0) {
-                index.foreach(indexmap => {
-                    val key   = StrNum(indexmap._2(cPos(i)).toString)
-                    val value = indexmap._1
-                    if (groupIndexMap.contains(key)) groupIndexMap += key -> (groupIndexMap(key) :+ value)
-                    else groupIndexMap += key -> Vector(value)
-                }) // foreach
-            } else {
-                tempIndexMap.clear ()
-                groupIndexMap.foreach (groupindexmap => {
-                    val tempidxlist = groupindexmap._2
-                    for (idx <- tempidxlist) {
-                        val key   = StrNum(groupindexmap._1.toString + "," + index(idx)(cPos(i)))
-                        val value = idx
-                        if (tempIndexMap.contains(key)) tempIndexMap += key -> (tempIndexMap(key) :+ value)
-                        else tempIndexMap += key -> Vector(value)
-                    } // for
-                }) // for each
-                groupIndexMap = tempIndexMap
-            } // if
-
-            if (i == cPos.size - 1) {
-                orderedIndex = Vector ()
-                grouplist    = Vector [Int] ()
-                sortlst      = sortcol(groupIndexMap.keySet.toSet)
-                for (k <- 0 until sortlst.size) {
-                    val indexes  = groupIndexMap(Vec(sortlst, k))
-                    orderedIndex = orderedIndex ++ indexes
-                    grouplist    = grouplist :+ orderedIndex.length
-                } // for
+        val newCol = Vector.fill [Vec] (colName.length) (null)
+        val r3     = new Relation (name + "_u_" + ucount (), colName, newCol, -1, domain)
+        for (i <- orderedIndex.indices) {
+            if (r2.keytoIndex isDefinedAt orderedIndex(i)) {
+                if (row(i) sameElements r2.row(r2.keytoIndex (orderedIndex(i)))) r3.add_ni (row(i))
             } // if
         } // for
-        this
-    } // groupby
+        r3.materialize ()
+    } // intersect
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Update the column named 'cName' using function 'func' for elements with
-     *  value 'matchStr'.
-     *  @param cName     the name of the column to be updated
-     *  @param func      the function used to assign updated values
-     *  @param matchStr  the string to be matched to elements
-     */
-    def update [T <: Any] (cName: String, func: () => String, matchStr: String)
+    /** Intersect 'this' relation and 'r2'.  Check that the two relations are compatible.
+     *  Use index to finish intersect operation.  Superceded by method above.
+     *  @param _r2  the other relation
+     *
+    def intersect (_r2: Table): Relation =
     {
-        val colPos = colMap (cName)
-        val c = col(colPos)
-        for (i <- 0 until c.size if Vec(c, i) == matchStr) Vec(c, i) = func
-    } // update
+        val r2 = _r2.asInstanceOf [Relation]
+        if (incompatible (r2)) return null
+
+        val newCol = Vector.fill [Vec] (colName.length)(null)
+        val r3     = new Relation (name + "_u_" + ucount (), colName, newCol, -1, domain)
+        for (key <- orderedIndex) {
+            if (r2.orderedIndex contains key) {
+                val thisrow = index(key)
+                if (thisrow sameElements (r2.index(key))) r3.add_ni (thisrow)
+            } // if
+        } // for
+        r3.materialize ()
+    } // intersect
+     */
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Update the column named 'cName' using function 'func' for elements where
-     *  the predicate 'pred' evaluates to true.
-     *  @param cName  the name of the column to be updated
-     *  @param func   the function used to assign updated values         // FIX - generalize type
-     *  @param pred   the predicated used to select elements for update
+    /** Intersect 'this' relation and 'r2'.  Check that the two relations are compatible.
+     *  Slower and only to be used if there is no index.
+     *  @param r2  the other relation
      */
-//  def update [T <: Any] (cName: String, func: () => String, pred: () => Boolean)
-//  {
-//      // FIX - to be implemented
-//  } // update
+    def intersect2 (r2: Table): Relation =
+    {
+        if (incompatible (r2)) return null
+        val newCol = Vector.fill [Vec] (colName.length)(null)
+        val r3 = new Relation (name + "_u_" + ucount (), colName, newCol.toVector, -1, domain)
+        for (i <- 0 until rows if r2 contains row(i)) r3.add (row(i))
+        r3.materialize ()
+    } // intersect2
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Take the difference of 'this' relation and 'r2' ('this - r2').  Check that
+     *  the two relations are compatible.
+     *  @param r2  the other relation
+     */
+    def minus (r2: Table): Relation =
+    {
+        if (incompatible (r2)) return null
+        val newCol = Vector.fill [Vec] (colName.length)(null)
+        val r3 = new Relation (name + "_m_" + ucount (), colName, newCol, key, domain)
+        for (i <- 0 until rows if ! (r2 contains row(i))) r3.add (row(i))
+        r3.materialize ()
+    } // minus
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Determine whether 'this' relation and 'r2' are incompatible by having
@@ -1104,87 +1159,13 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
          } // if
     } // incompatible
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Union 'this' relation and 'r2'.  Check that the two relations are compatible.
-     *  If they are not, return the first 'this' relation.
-     *  @param r2  the other relation
-     */
-    def union (r2: Table): Relation =
-    {
-        if (incompatible (r2)) return this                // take only this relation
-
-//      if (col(0) == null) return if (r2.col(0) == null) null else r2
-//      else if (r2.col(0) == null) return this
-
-        val newCol = (for (j <- col.indices) yield Vec.++ (col(j), r2.columns(j)))
-        new Relation (name + "_u_" + ucount (), colName, newCol.toVector, -1, domain)
-    } // union
+    // ================================================================= PRODUCT
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Union 'this' relation and 'r2'.  Check that the two relations are compatible.
-     *  @param r2  the other relation
-     */
-    def ⋃ (r2: Table): Relation = this union r2
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Intersect 'this' relation and 'r2'.  Check that the two relations are compatible.
-     *  @param r2  the other relation
-     */
-    def intersect (r2: Table): Relation =
-    {
-        if (incompatible (r2)) return null
-        val newCol = Vector.fill [Vec] (colName.length)(null)
-        val r3 = new Relation (name + "_u_" + ucount (), colName, newCol.toVector, -1, domain)
-        for (i <- 0 until rows if r2 contains row(i)) r3.add (row(i))
-        r3.materialize ()
-    } // intersect
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Intersect2 'this' relation and 'r2'.  Check that the two relations are compatible.
-     *  Use index to finish intersect operation.
-     *  @param _r2  the other relation
-     */
-    def intersect2 (_r2: Table): Relation =
-    {
-        val r2 = _r2.asInstanceOf [Relation]
-        if (incompatible (r2)) return null
-
-        val newCol = Vector.fill [Vec] (colName.length)(null)
-        val r3     = new Relation (name + "_u_" + ucount (), colName, newCol, -1, domain)
-        for (key <- orderedIndex) {
-            if (r2.orderedIndex contains key) {
-                val thisrow = index(key)
-                if (thisrow sameElements (r2.index(key))) r3.add_ni (thisrow)
-            } // if
-        } // for
-        r3.materialize ()
-    } // intersect2
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Intersect 'this' relation and 'r2'.  Check that the two relations are compatible.
-     *  @param r2  the other relation
-     */
-    def ⋂ (r2: Table): Relation = this intersect r2
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Take the difference of 'this' relation and 'r2' ('this - r2').  Check that
-     *  the two relations are compatible.
-     *  @param r2  the other relation
-     */
-    def - (r2: Table): Relation =
-    {
-        if (incompatible (r2)) return null
-        val newCol = Vector.fill [Vec] (colName.length)(null)
-        val r3 = new Relation (name + "_m_" + ucount (), colName, newCol, key, domain)
-        for (i <- 0 until rows if ! (r2 contains row(i))) r3.add (row(i))
-        r3.materialize ()
-    } // -
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the Cartesian product of two tables and return it.
+    /** Compute the Cartesian product of this' relation and 'r2' ('this × r2').
      *  @param r2  the second relation
      */
-    def cproduct (r2: Table): Relation =
+    def product (r2: Table): Relation =
     {
         val ncols     = cols + r2.cols
         val newCName  = disambiguate (colName, r2.colNames)
@@ -1195,16 +1176,15 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
 
         for (i <- 0 until rows) {
             val t = row(i)
-            for (j <- 0 until r2.rows){
-                val u = r2.row(j)
-                r3.add (t ++ u)
-            } // for
+            for (j <- 0 until r2.rows) r3.add (t ++ r2.row(j))
         } // for
         r3.materialize ()
-    } // cproduct
+    } // product
+
+    // ==================================================================== JOIN
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Join 'this' relation and 'r2 by performing an "equi-join".  Rows from both
+    /** Join 'this' relation and 'r2' by performing an "equi-join".  Rows from both
      *  relations are compared requiring 'cName1' values to equal 'cName2' values.
      *  Disambiguate column names by appending "2" to the end of any duplicate column name.
      *  FIX - only allows single attribute in join condition
@@ -1236,20 +1216,7 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
     } // join
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Join 'this' relation and 'r2 by performing an "equi-join".  Rows from both
-     *  relations are compared requiring 'cName1' values to equal 'cName2' values.
-     *  Disambiguate column names by appending "2" to the end of any duplicate column name.
-     *  @param cName1  the string of join column names of this relation (e.g., the Foreign Key)
-     *  @param cName2  the string of join column names of relation r2 (e.g., the Primary Key)
-     *  @param r2      the rhs relation in the join operation
-     */
-    def join (cName1: String, cName2: String, r2: Table): Relation =
-    {
-        join (cName1.split (" "), cName2.split (" "), r2)
-    } // join
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Join 'this' relation and 'r2 by performing an "equi-join", use index to join
+    /** Join 'this' relation and 'r2' by performing an "equi-join", use index to join
      *  FIX - only allows single attribute in join condition
      *  @param cName1  the join column names of this relation (e.g., the Foreign Key)
      *  @param cName2  the join column names of relation r2 (e.g., the Primary Key)
@@ -1298,66 +1265,47 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
     } // joinindex
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Join 'this' relation and 'r2 by performing a "natural-join".  Rows from both
+    /** Join 'this' relation and 'r2' by performing a "natural-join".  Rows from both
      *  relations are compared requiring 'cName' values to be equal.
      *  @param cName  the common join column names for both relation
      *  @param _r2    the rhs relation in the join operation
      */
     def join (cName: Seq [String], _r2: Table): Relation =
     {
-        val r2 = _r2.asInstanceOf [Relation]
+       val r2 = _r2.asInstanceOf [Relation]
         val ncols = cols + r2.cols - cName.length
         val cp1   = cName.map (colMap (_))                         // get column positions in 'this'
         val cp2   = cName.map (r2.colMap (_))                      // get column positions in 'r2'
+        var newDomain2 = r2.domain
+        for (i <- 0 until cp1.length) {
+            if (domain(cp1(i)) != r2.domain(cp2(i))) flaw ("join", "column types do not match")
+            newDomain2 = removeAt (newDomain2, cp2(i))
+        } // for
         val cp3   = r2.colName.map (r2.colMap (_)) diff cp2        // 'r2' specific columns
 
         val newCName  = uniq_union (colName, r2.colName)
         val newCol    = Vector.fill [Vec] (ncols) (null)
         val newKey    = key                                        // FIX
-        val newDomain = domain + r2.domains
+        val newDomain = domain + newDomain2
         val r3 = new Relation (name + "_j_" + ucount (), newCName, newCol, newKey, newDomain)
 
         for (i <- 0 until rows) {
             val t = row(i)
             for (j <- 0 until r2.rows) {
                 val u = r2.row(j)
-                if (sameOn (t, u, cp1, cp2)) { val u3 = project (u, cp3); r3.add (t ++ u3) }
-
+                if (sameOn (t, u, cp1, cp2)) { val u3 = TableObj.project (u, cp3); r3.add (t ++ u3) }
             } // for
         } // for
         r3.materialize ()
     } // join
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Join 'this' relation and 'r2 by performing a "natural-join".  Rows from both
-     *  relations are compared requiring agreement on common attributes (column names).
-     *  @param r2  the rhs relation in the join operation
-     */
-    def >< (r2: Table): Relation =
-    {
-        val common = colName intersect r2.colNames
-        join (common, r2)
-    } // ><
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Join 'this' relation and 'r2 by performing a "natural-join".  Rows from both
-     *  relations are compared requiring agreement on common attributes (column names).
-     *  @param r2  the rhs relation in the join operation
-     */
-    def ⋈ (r2: Table): Relation = this >< r2
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Join 'this' and table 'r2' returning a `RelationPair`.
-     *  @param r2  the other relation/tabel
-     */
-    def join (r2: Table): RelationPair = RelationPair (this, r2)
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The theta join, handle the predicates in where are connect by "and" (where a....and b....).
      *  @param _r2  the second relation
-     *  @param p    the theta join,  r1 column name, r2 column name, predicate to compare these two column
+     *  @param p0   the first theta join predicate (r1 cName, r2 cName, predicate to compare these two column)
+     *  @param p    the rest of theta join predicates (r1 cName, r2 cName, predicates to compare these two column)
      */
-    def thetajoin [T] (_r2: Table, p: Predicate2 [T]*): Relation =
+    def join [T] (_r2: Table, p0: Predicate2 [T], p: Predicate2 [T]*): Relation =
     {
         val r2        = _r2.asInstanceOf [Relation]
         val ncols     = cols + r2.cols
@@ -1365,39 +1313,74 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
         val newCol    = Vector.fill [Vec] (ncols) (null)
         val newKey    = key                                        // FIX
         val newDomain = domain + r2.domain
-        val r3 = new Relation (name + "_j_" + ucount (), newCName, newCol, newKey, newDomain, null)
+        val r3        = new Relation (name + "_j_" + ucount (), newCName, newCol, newKey, newDomain, null)
 
         var resultlist = Seq [(Int, Int)] ()
-        for (i <- p.indices) {
-            var resulttemp = Seq [(Int, Int)] ()
-            val cp1 = colMap (p(i)._1)
-            val cp2 = r2.colMap (p(i)._2)
-            if (domain.charAt (cp1) != r2.domain.charAt (cp2))  flaw ("thetajoin", "differing domain strings")
-            val psingle = p(i)._3                          // single predicate
+        for (i <- 0 to p.size) {
+            var result = Seq [(Int, Int)] ()
+            val p_i = if (i == 0) p0 else p(i-1)
+            val cp1 = colMap (p_i._1)
+            val cp2 = r2.colMap (p_i._2)
+            if (domain.charAt (cp1) != r2.domain.charAt (cp2))  flaw ("join", "differing domain strings")
+            val psingle = p_i._3                                    // single predicate
 
-            domain (colMap(p(i)._1)) match {
-            case 'D' => resulttemp = col(cp1).asInstanceOf [VectorD].filterPos2 (r2.col (cp2).asInstanceOf [VectorD],
-                                                           psingle.asInstanceOf [(Double, Double) => Boolean])
-            case 'I' => resulttemp = col(cp1).asInstanceOf [VectorI].filterPos2 (r2.col (cp2).asInstanceOf [VectoI],
-                                                           psingle.asInstanceOf [(Int, Int) => Boolean])
-            case 'L' => resulttemp = col(cp1).asInstanceOf [VectorL].filterPos2 (r2.col (cp2).asInstanceOf [VectorL],
-                                                           psingle.asInstanceOf [(Long, Long) => Boolean])
-            case 'S' => resulttemp = col(cp1).asInstanceOf [VectorS].filterPos2 (r2.col (cp2).asInstanceOf [VectorS],
-                                                           psingle.asInstanceOf [(StrNum, StrNum) => Boolean])
-            case 'd' => resulttemp = col(cp1).asInstanceOf [RleVectorD].filterPos2 (r2.col (cp2).asInstanceOf [RleVectorD],
-                                                           psingle.asInstanceOf [(Double, Double) => Boolean])
-            case 'i' => resulttemp = col(cp1).asInstanceOf [RleVectorI].filterPos2 (r2.col (cp2).asInstanceOf [RleVectorI],
-                                                           psingle.asInstanceOf [(Int, Int) => Boolean])
-            case 'l' => resulttemp = col(cp1).asInstanceOf [RleVectorL].filterPos2 (r2.col (cp2).asInstanceOf [RleVectorL],
-                                                           psingle.asInstanceOf [(Long, Long) => Boolean])
-            case 's' => resulttemp = col(cp1).asInstanceOf [RleVectorS].filterPos2 (r2.col (cp2).asInstanceOf [RleVectorS],
-                                                           psingle.asInstanceOf [(StrNum, StrNum) => Boolean])
-            case _ => flaw ("thetajoin", "domain string is missing"); null
+            domain (colMap(p_i._1)) match {
+            case 'C' => result = col(cp1).asInstanceOf [VectorC].filterPos2 (r2.col (cp2).asInstanceOf [VectorC],
+                                                       psingle.asInstanceOf [(Complex, Complex) => Boolean])
+            case 'D' => result = col(cp1).asInstanceOf [VectorD].filterPos2 (r2.col (cp2).asInstanceOf [VectorD],
+                                                       psingle.asInstanceOf [(Double, Double) => Boolean])
+            case 'I' => result = col(cp1).asInstanceOf [VectorI].filterPos2 (r2.col (cp2).asInstanceOf [VectoI],
+                                                       psingle.asInstanceOf [(Int, Int) => Boolean])
+            case 'L' => result = col(cp1).asInstanceOf [VectorL].filterPos2 (r2.col (cp2).asInstanceOf [VectorL],
+                                                       psingle.asInstanceOf [(Long, Long) => Boolean])
+            case 'Q' => result = col(cp1).asInstanceOf [VectorQ].filterPos2 (r2.col (cp2).asInstanceOf [VectorQ],
+                                                       psingle.asInstanceOf [(Rational, Rational) => Boolean])
+            case 'R' => result = col(cp1).asInstanceOf [VectorR].filterPos2 (r2.col (cp2).asInstanceOf [VectorR],
+                                                       psingle.asInstanceOf [(Real, Real) => Boolean])
+            case 'S' => result = col(cp1).asInstanceOf [VectorS].filterPos2 (r2.col (cp2).asInstanceOf [VectorS],
+                                                       psingle.asInstanceOf [(StrNum, StrNum) => Boolean])
+            case 'T' => result = col(cp1).asInstanceOf [VectorT].filterPos2 (r2.col (cp2).asInstanceOf [VectorT],
+                                                       psingle.asInstanceOf [(TimeNum, TimeNum) => Boolean])
+
+            case 'c' => result = col(cp1).asInstanceOf [RleVectorC].filterPos2 (r2.col (cp2).asInstanceOf [RleVectorC],
+                                                       psingle.asInstanceOf [(Complex, Complex) => Boolean])
+            case 'd' => result = col(cp1).asInstanceOf [RleVectorD].filterPos2 (r2.col (cp2).asInstanceOf [RleVectorD],
+                                                       psingle.asInstanceOf [(Double, Double) => Boolean])
+            case 'i' => result = col(cp1).asInstanceOf [RleVectorI].filterPos2 (r2.col (cp2).asInstanceOf [RleVectorI],
+                                                       psingle.asInstanceOf [(Int, Int) => Boolean])
+            case 'l' => result = col(cp1).asInstanceOf [RleVectorL].filterPos2 (r2.col (cp2).asInstanceOf [RleVectorL],
+                                                       psingle.asInstanceOf [(Long, Long) => Boolean])
+            case 'q' => result = col(cp1).asInstanceOf [RleVectorQ].filterPos2 (r2.col (cp2).asInstanceOf [RleVectorQ],
+                                                       psingle.asInstanceOf [(Rational, Rational) => Boolean])
+            case 'r' => result = col(cp1).asInstanceOf [RleVectorR].filterPos2 (r2.col (cp2).asInstanceOf [RleVectorR],
+                                                       psingle.asInstanceOf [(Real, Real) => Boolean])
+            case 's' => result = col(cp1).asInstanceOf [RleVectorS].filterPos2 (r2.col (cp2).asInstanceOf [RleVectorS],
+                                                       psingle.asInstanceOf [(StrNum, StrNum) => Boolean])
+            case 't' => result = col(cp1).asInstanceOf [RleVectorT].filterPos2 (r2.col (cp2).asInstanceOf [RleVectorT],
+                                                       psingle.asInstanceOf [(TimeNum, TimeNum) => Boolean])
+
+            case 'χ' => result = col(cp1).asInstanceOf [SparseVectorC].filterPos2 (r2.col (cp2).asInstanceOf [SparseVectorC],
+                                                       psingle.asInstanceOf [(Complex, Complex) => Boolean])
+            case 'δ' => result = col(cp1).asInstanceOf [SparseVectorD].filterPos2 (r2.col (cp2).asInstanceOf [SparseVectorD],
+                                                       psingle.asInstanceOf [(Double, Double) => Boolean])
+            case 'ι' => result = col(cp1).asInstanceOf [SparseVectorI].filterPos2 (r2.col (cp2).asInstanceOf [SparseVectorI],
+                                                       psingle.asInstanceOf [(Int, Int) => Boolean])
+            case 'λ' => result = col(cp1).asInstanceOf [SparseVectorL].filterPos2 (r2.col (cp2).asInstanceOf [SparseVectorL],
+                                                       psingle.asInstanceOf [(Long, Long) => Boolean])
+            case 'ϟ' => result = col(cp1).asInstanceOf [SparseVectorQ].filterPos2 (r2.col (cp2).asInstanceOf [SparseVectorQ],
+                                                       psingle.asInstanceOf [(Rational, Rational) => Boolean])
+            case 'ρ' => result = col(cp1).asInstanceOf [SparseVectorR].filterPos2 (r2.col (cp2).asInstanceOf [SparseVectorR],
+                                                       psingle.asInstanceOf [(Real, Real) => Boolean])
+            case 'σ' => result = col(cp1).asInstanceOf [SparseVectorS].filterPos2 (r2.col (cp2).asInstanceOf [SparseVectorS],
+                                                       psingle.asInstanceOf [(StrNum, StrNum) => Boolean])
+            case 'τ' => result = col(cp1).asInstanceOf [SparseVectorT].filterPos2 (r2.col (cp2).asInstanceOf [SparseVectorT],
+                                                       psingle.asInstanceOf [(TimeNum, TimeNum) => Boolean])
+
+            case _ => flaw ("join", "domain string is missing"); null
             } // match
 
-            if (DEBUG) println (s"thetajoin: after predicate $i: resulttemp = $resulttemp")
-            if (i == 0) resultlist = resulttemp
-            else resultlist = resultlist intersect resulttemp
+            if (DEBUG) println (s"join: after predicate $i: result = $result")
+            resultlist = if (i == 0) result else resultlist intersect result
         } // for
 
         val smallmapbig = resultlist.groupBy (_._1)
@@ -1410,11 +1393,139 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
             } // for
         } // for
         r3.materialize ()
-    } // thetajoin
+    } // join
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Parallel Join 'this' relation and 'r2 by performing an equi join on cName1 = cName2 and into k -threads
+    /** Join 'this' relation and 'r2' by performing an "left-join".  Rows from both
+     *  relations are compared requiring 'cName1' values to equal 'cName2' values.
+     *  Disambiguate column names by appending "2" to the end of any duplicate column name.
+     *  All rows from the left table are maintained with missing values indicators used
+     *  where needed.
+     *  @param cName1  the join column names of this relation (e.g., the Foreign Key)
+     *  @param cName2  the join column names of relation r2 (e.g., the Primary Key)
+     *  @param r2      the rhs relation in the join operation
+     */
+    def leftJoin (cName1: String, cName2: String, r2: Table): Relation =
+    {
+        leftJoin (colMap (cName1), colMap (cName2), r2.asInstanceOf [Relation])
+    } // leftJoin
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Join 'this' relation and 'r2' by performing a "left join".  Rows from both
+     *  relations are compared requiring 'cp1' values to equal 'cp2' values.
+     *  This method returns all the rows from 'this' relation, and the matched rows
+     *  from relation 'r2'.  It adds a 'null' tuples for the unmatched rows of relation 'r2'
+     *  FIX: It requires relations 'this' and 'r2' to be sorted on column 'cp1' and 'cp2' resp., as it uses Sort-Merge join
+     *  @param cp1  the position of the join column of this relation
+     *  @param cp2  the position of the join column of 'r2' relation
+     *  @param r2   the rhs relation in the join operation
+     */
+    def leftJoin (cp1: Int, cp2: Int, r2: Relation): Relation =
+    {
+        val r3 = Relation (name + "_leftJoin_" + r2.name, key, domain + r2.domain,(colName ++ r2.colName):_*)
+        val absentTuple = nullTuple (r2.domain)
+        var j = 0
+        for (i <- 0 until rows) {
+            val t = row(i)
+            val t_cp1 = t(cp1)
+            while (j < r2.rows-1 && <(Vec (r2.col(cp2), j), t_cp1)) j += 1
+            val j_aux = j
+            if (t_cp1 == r2.row(j)(cp2)) {
+                while (j < r2.rows && Vec (r2.col(cp2), j) == t_cp1) {
+                    val u = r2.row(j)
+                    r3.add_ni (t ++ u)
+                    j += 1
+                } // while
+                j = j_aux
+            } else r3.add_ni (t ++ absentTuple)
+        } // for
+        r3.materialize ()
+    } // leftJoin
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Join 'this' relation and 'r2' by performing a "right join".  Rows from both
+     *  relations are compared requiring 'cp1' values to equal 'cp2' values.
+     *  This method returns all the rows from 'this' relation, and the matched rows
+     *  from relation 'r2'.  It adds a 'null' tuples for the unmatched rows of relation 'r2'
+     *  @param cp1  the position of the join column of this relation
+     *  @param cp2  the position of the join column of 'r2' relation
+     *  @param r2   the rhs relation in the join operation
+     */
+    def rightJoin (cp1: Int, cp2: Int, r2: Relation): Relation =
+    {
+        r2.leftJoin (cp2, cp1, this)
+    } // rightJoin
+
+
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Join 'this' relation and 'r2' by performing an "apprimate left-join".  Rows from both
+     *  relations are compared requiring 'cName1' values to apprximately equal 'cName2' values.
+     *  Disambiguate column names by appending "2" to the end of any duplicate column name.
+     *  All rows from the left table are maintained with missing values indicators used
+     *  where needed.
+     *  @param thres   the approximate equality threshold
+     *  @param cName1  the join column names of this relation (e.g., the Foreign Key)
+     *  @param cName2  the join column names of relation r2 (e.g., the Primary Key)
+     *  @param r2      the rhs relation in the join operation
+     */
+    def leftJoin (thres: Double = 0.001) (cName1: String, cName2: String, r2: Table): Relation =
+    {
+        setThreshold (thres)
+        leftJoinApx (colMap (cName1), colMap (cName2), r2.asInstanceOf [Relation])
+    } // leftJoin
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Join 'this' relation and 'r2' by performing a "left join".  Rows from both
+     *  relations are compared requiring 'cp1' values to approximately equal 'cp2' values.
+     *  This method returns all the rows from 'this' relation, and the matched rows
+     *  from relation 'r2'.  It adds a 'null' tuples for the unmatched rows of relation 'r2'
+     *  FIX: It requires relations 'this' and 'r2' to be sorted on column 'cp1' and 'cp2' resp.,
+     *  as it uses Sort-Merge join
+     *  @param cp1  the position of the join column of this relation
+     *  @param cp2  the position of the join column of 'r2' relation
+     *  @param r2   the rhs relation in the join operation
+     */
+    def leftJoinApx (cp1: Int, cp2: Int, r2: Relation): Relation =
+    {
+        val r3 = Relation (name + "_leftJoinApx_" + r2.name, 1, domain + r2.domain, (colName ++ r2.colName):_*)
+        val absentTuple = nullTuple (r2.domain)
+        var j = 0
+
+        for (i <- 0 until rows) {
+            val t = row(i)
+            val t_cp1 = t(cp1)
+            while (j < r2.rows-1 && !=~ (Vec (r2.col(cp2), j), t_cp1) && < (Vec (r2.col(cp2), j), t_cp1)) j += 1
+            val j_aux = j
+            if (=~ (t_cp1, r2.row(j)(cp2))) {
+                while (j < r2.rows && =~ (Vec (r2.col(cp2), j), t_cp1)) {
+                    val u = r2.row(j)
+                    r3.add_ni (t ++ u)
+                    j += 1
+                } // while
+                j = j_aux
+            } else r3.add_ni (t ++ absentTuple)
+        } // for
+        r3.materialize ()
+    } // leftJoinApx
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Join 'this' relation and 'r2' by performing a "right join".  Rows from both
+     *  relations are compared requiring 'cp1' values to approximately equal 'cp2' values.
+     *  This method returns all the rows from 'this' relation, and the matched rows
+     *  from relation 'r2'.  It adds a 'null' tuples for the unmatched rows of relation 'r2'
+     *  @param cp1  the position of the join column of this relation
+     *  @param cp2  the position of the join column of 'r2' relation
+     *  @param r2   the rhs relation in the join operation
+     */
+    def rightJoinApx (cp1: Int, cp2: Int, r2: Relation): Relation =
+    {
+        r2.leftJoinApx (cp2, cp1, this)
+    } // rightJoinApx
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Parallel Join 'this' relation and 'r2' by performing an equi join on cName1 = cName2 and into k -threads
      *  seperate the lhs into k part join with rhs.
+     *  FIX - move to .par package
      *  @param cName1  the join column names of lhs relation
      *  @param cName2  the join column names of rhs relation
      *  @param _r2     the rhs relation in the join operation
@@ -1461,6 +1572,7 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** The 'parjoinsmall' method serves as the core part for parjoin function, do the
      *  nth part of the parellel join returning  the relation of join of two tables.
+     *  FIX - move to .par package
      *  @param cName1  the join column names of lhs relation
      *  @param cName2  the join column names of rhs relation
      *  @param _r2     the rhs relation in the join operation
@@ -1501,27 +1613,184 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
         r3.materialize ()
     } // parjoinsmall
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Determine whether 'this' relation contains a row matching the given 'tuple'.
-     *  @param tuple  an aggregation of columns values (potential row)
-     */
-    def contains (tuple: Row): Boolean =
-    {
-        for (i <- 0 until rows if row(i) sameElements tuple) return true
-        false
-    } // contains
+    // ================================================================ GROUP BY
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Create a row by pulling values from all columns at position 'i'.
-     *  @param i  the 'i'th position
+    /** Group 'this' relation by the specified column names, returning 'this' relation.
+     *  @param cName  the group column names
      */
-    def row (i: Int): Row = col.map (Vec (_, i)).toVector
+    def groupBy (cName: String*): Relation =
+    {
+        if (! cName.map (c => colName contains(c)).reduceLeft (_ && _))
+            flaw ("groupBy", "groupbyName used to groupby doesn't exist in the cName")
+        val equivCol = Vector.fill [Vec] (colName.length)(null)
+        if (rows == 0) return this
+
+        val cPos = cName.map (colMap (_))
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        /*  Sort on the given columns.
+         *  @param sortColumn  the set of columns to sort on
+         */
+        def sortcol (sortColumn: Set [Any]): Vec =
+        {
+            var colcol: Vec = null
+            val domain = null
+//          for (x <- sortColumn) colcol = Vec.:+ (colcol, x, domain, 0)
+            for (x <- sortColumn) colcol = Vec.:+ (colcol, x)
+
+            colcol match {
+            case _: VectoC => val sortcol = colcol.asInstanceOf [VectoC]; sortcol.sort (); sortcol
+            case _: VectoD => val sortcol = colcol.asInstanceOf [VectoD]; sortcol.sort (); sortcol
+            case _: VectoI => val sortcol = colcol.asInstanceOf [VectoI]; sortcol.sort (); sortcol
+            case _: VectoL => val sortcol = colcol.asInstanceOf [VectoL]; sortcol.sort (); sortcol
+            case _: VectoQ => val sortcol = colcol.asInstanceOf [VectoQ]; sortcol.sort (); sortcol
+            case _: VectoR => val sortcol = colcol.asInstanceOf [VectoR]; sortcol.sort (); sortcol
+            case _: VectoS => val sortcol = colcol.asInstanceOf [VectoS]; sortcol.sort (); sortcol
+            case _: VectoT => val sortcol = colcol.asInstanceOf [VectoT]; sortcol.sort (); sortcol
+            case _ => flaw ("sortcol", s"vector type ${colcol.getClass} not supported"); null.asInstanceOf [Vec]
+            } // match
+        } // sortcol
+
+        var groupIndexMap = Map [Any, Vector [KeyType]] ()
+        val tempIndexMap  = Map [Any, Vector [KeyType]] ()
+        var sortlst: Vec  = null
+
+        for (i <- cPos.indices) {
+            if (i == 0) {
+                index.foreach (indexmap => {
+                    val key   = StrNum (indexmap._2(cPos(i)).toString)
+                    val value = indexmap._1
+                    if (groupIndexMap contains key) groupIndexMap += key -> (groupIndexMap(key) :+ value)
+                    else groupIndexMap += key -> Vector(value)
+                }) // foreach
+            } else {
+                tempIndexMap.clear ()
+                groupIndexMap.foreach (groupindexmap => {
+                    val tempidxlist = groupindexmap._2
+                    for (idx <- tempidxlist) {
+                        val key   = StrNum(groupindexmap._1.toString + "," + index(idx)(cPos(i)))
+                        val value = idx
+                        if (tempIndexMap.contains(key)) tempIndexMap += key -> (tempIndexMap(key) :+ value)
+                        else tempIndexMap += key -> Vector(value)
+                    } // for
+                }) // for each
+                groupIndexMap = tempIndexMap
+            } // if
+
+            if (i == cPos.size - 1) {
+                orderedIndex = Vector ()
+                grouplist    = Vector [Int] ()
+                sortlst      = sortcol(groupIndexMap.keySet.toSet)
+                for (k <- 0 until sortlst.size) {
+                    val indexes  = groupIndexMap(Vec(sortlst, k))
+                    orderedIndex = orderedIndex ++ indexes
+                    grouplist    = grouplist :+ orderedIndex.length
+                } // for
+            } // if
+        } // for
+        this
+    } // groupby
+
+    // ================================================================= ORDER BY
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Order (ascending) the rows in the relation by the selected columns '_cName'.
+     *  A stable sorting is used to allow sorting on multiple columns.
+     *  @param _cName  the column names that are to be sorted
+     */
+    def orderBy (_cName: String*): Relation =
+    {
+        val cName = _cName.distinct
+        if (! cName.map (c => colName contains (c)).reduceLeft (_ && _))
+            flaw ("orderBy", "cName used to orderBy does not exist in relation")
+
+        val newCol = Vector.fill [Vec] (cols)(null)
+        val r2 = new Relation (name + "_j_" + ucount (), colName, newCol, key, domain)
+
+        val perm = orderByHelper (cName.map (colMap (_)), rows)
+        for (i <- perm) r2.add (row(i))
+        r2.materialize ()
+    } // orderBy
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Order (descending) the rows in the relation by the selected columns '_cName'.
+     *  A stable sorting is used to allow sorting on multiple columns.
+     *  @param _cName  the column names that are to be sorted
+     */
+    def reverseOrderBy (_cName: String*): Relation =
+    {
+        val cName = _cName.distinct
+        if (! cName.map (c => colName contains (c)).reduceLeft (_ && _))
+            flaw ("orderBy", "cName used to orderBy does not exist in relation")
+
+        val newCol = Vector.fill [Vec] (cols) (null)
+        val r2 = new Relation (name + "_j_" + ucount (), colName, newCol, key, domain)
+
+        val perm = orderByHelper (cName.map (colMap (_)), rows)
+        for (i <- perm.reverse) r2.add (row(i))
+        r2.materialize ()
+    } // reverseOrderBy
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Helper method for 'orderBy' and 'reverseOrderBy'.  Performs indirect merge sort.
+     *  @param cPos  sequence of column positions to sort
+     *  @param n     total number of rows in this Relation
+     */
+    private def orderByHelper (cPos: Seq [Int], n: Int = rows): Array [Int] =
+    {
+        var perm: Array [Int] = null
+
+        for (i <- cPos.indices) {
+            val col_i: Array [Any] = col (cPos(i)) match {
+                case _: VectorC => col(cPos(i)).asInstanceOf [VectorC]().toArray
+                case _: VectorD => col(cPos(i)).asInstanceOf [VectorD]().toArray
+                case _: VectorI => col(cPos(i)).asInstanceOf [VectorI]().toArray
+                case _: VectorL => col(cPos(i)).asInstanceOf [VectorL]().toArray
+                case _: VectorQ => col(cPos(i)).asInstanceOf [VectorQ]().toArray
+                case _: VectorR => col(cPos(i)).asInstanceOf [VectorR]().toArray
+                case _: VectorS => col(cPos(i)).asInstanceOf [VectorS]().toArray
+                case _: VectorT => col(cPos(i)).asInstanceOf [VectorT]().toArray
+            } // match
+
+            perm = if (i == 0) (new MergeSortIndirect (col_i)()).isort ()
+                   else        (new MergeSortIndirect (col_i)(perm)).isort ()
+        }// for
+        perm
+    } // orderByHelper
+
+    // ================================================================ COMPRESS 
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compress the selected columns 'cName' in 'this' table.
+     *  @param cName  the names of the columns to be compressed
+     */
+    def compress (cName: String*)
+    {
+        for (c <- cName) {
+            val i = colMap (c)
+//          col(i).compress ()      // FIX - add compress to Vec
+        } // for
+    } // compress
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Uncompress the selected columns 'cName' in 'this' table.
+     *  @param cName  the names of the columns to be uncompressed
+     */
+    def uncompress (cName: String*)
+    {
+        for (c <- cName) {
+            val i = colMap (c)
+//          col(i).uncompress ()      // FIX - add uncompress to Vec
+        } // for
+    } // uncompress
+
+    // ================================================================= UPDATES 
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'tuple' to 'this' relation as a new row.
      *  FIX:  want an efficient, covariant, mutable data structure, but `Array` is invariant.
      *  @param tuple  an aggregation of columns values (new row)
-     *  @param typ    the string of corresponding types, e.g., 'SDI'
      *
     def add (tuple: Row)
     {
@@ -1537,23 +1806,22 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
      */
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add 'tuple' to 'this' relation as a new row.  It use 'col2' as a temp 'col'
+    /** Add 'tuple' to 'this' relation as a new row.  It uses 'col2' as a temp 'col'
      *  to improve performance.
      *  @param tuple  an aggregation of columns values (new row)
-     *  @param typ    the string of corresponding types, e.g., 'SDI'
      */
     @throws (classOf [Exception])
     def add (tuple: Row)
     {
         try {
             if (tuple == null) throw new Exception ("add function: tuple is null")
-            val rowindex = col2(0).length
-            val newkey   = if (key < 0) new KeyType (rowindex) else new KeyType (tuple(key))
+            val rowIdx   = col2(0).length
+            val newkey   = if (key < 0) new KeyType (rowIdx) else new KeyType (tuple(key))
             index       += newkey -> tuple
-            keytoIndex  += newkey -> rowindex
+            keytoIndex  += newkey -> rowIdx
             orderedIndex = orderedIndex :+ newkey
-            indextoKey  += rowindex -> newkey
-            for (i <- tuple.indices) col2(i).update (rowindex, tuple(i))
+            indextoKey  += rowIdx -> newkey
+            for (j <- tuple.indices) addElem (j, rowIdx, tuple(j))
         } catch {
             case ex: NullPointerException =>
                 println ("tuple'size is: " + tuple.size)
@@ -1563,13 +1831,62 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
     } // add
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add an element into 'col2', the holding area for input.  If the types
+     *  of column domains are specified, the types are checked.
+     *  @param j       the j-th column of col2
+     *  @param rowIdx  the row index
+     *  @param elem    the element to added
+     */
+    private def addElem (j: Int, rowIdx: Int, elem: Any)
+    {
+        val typ = if (domain == null) 'X' else domain(j)
+        try {
+            if (typ == 'X') col2(j).asInstanceOf [ReArray [Any]](rowIdx) = elem      // no domains => assume Any type
+            else { typ match {
+                case 'C' => col2(j).asInstanceOf [ReArray [Complex]](rowIdx)  = elem.asInstanceOf [Complex]
+                case 'D' => col2(j).asInstanceOf [ReArray [Double]](rowIdx)   = elem.asInstanceOf [Double]
+                case 'I' => col2(j).asInstanceOf [ReArray [Int]](rowIdx)      = elem.asInstanceOf [Int]
+                case 'L' => col2(j).asInstanceOf [ReArray [Long]](rowIdx)     = elem.asInstanceOf [Long]
+                case 'Q' => col2(j).asInstanceOf [ReArray [Rational]](rowIdx) = elem.asInstanceOf [Rational]
+                case 'R' => col2(j).asInstanceOf [ReArray [Real]](rowIdx)     = elem.asInstanceOf [Real]
+                case 'S' => col2(j).asInstanceOf [ReArray [StrNum]](rowIdx)   = elem.asInstanceOf [StrNum]
+                case 'T' => col2(j).asInstanceOf [ReArray [TimeNum]](rowIdx)  = elem.asInstanceOf [TimeNum]
+                case _   => flaw ("constructor", s"unsupported column type ${domain(j)} for column $j")
+                } // match
+            } // if
+        } catch {
+            case ex: ClassCastException =>
+                if (typ == 'S') {
+                    println (s"warning in addElem: colIdx j = $j, rowIdx = $rowIdx, elem = $elem, class = ${elem.getClass}, typ = $typ")
+                    col2(j).asInstanceOf [ReArray [StrNum]](rowIdx) = StrNum (elem.toString)                 // anything can be a string
+                } else if (elem.isInstanceOf [String] || elem.isInstanceOf [Char]) {
+                    println (s"warning in addElem: colIdx j = $j, rowIdx = $rowIdx, elem = $elem, class = ${elem.getClass}, typ = $typ")
+                    typ match {
+                    case 'C' => col2(j).asInstanceOf [ReArray [Complex]](rowIdx)  = noComplex
+                    case 'D' => col2(j).asInstanceOf [ReArray [Double]](rowIdx)   = noDouble
+                    case 'I' => col2(j).asInstanceOf [ReArray [Int]](rowIdx)      = noInt
+                    case 'L' => col2(j).asInstanceOf [ReArray [Long]](rowIdx)     = noLong
+                    case 'Q' => col2(j).asInstanceOf [ReArray [Rational]](rowIdx) = noRational
+                    case 'R' => col2(j).asInstanceOf [ReArray [Real]](rowIdx)     = noReal
+                    case 'T' => col2(j).asInstanceOf [ReArray [TimeNum]](rowIdx)  = noTimeNum
+                    case _   => flaw ("constructor", s"unsupported column type ${domain(j)} for column $j")
+                    } // match
+                } else {
+                    println (s"exception in addElem: colIdx j = $j, rowIdx = $rowIdx, elem = $elem, class = ${elem.getClass}, typ = $typ")
+                    throw ex
+                } // if
+        } // try
+        
+    } // addElem
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Add 'tuple' to 'this' relation as a new row.  It is slower than 'add' method.
      *  Type is determined by sampling values for columns.
      *  @param tuple  an aggregation of columns values (new row)
      *
     def add_2 (tuple: Row)
     {
-        index += new KeyType (tuple(key))-> tuple  // hashmap way
+        index      += new KeyType (tuple(key))-> tuple  // hashmap way
         keytoIndex += new KeyType (tuple(key)) ->rows
         col = (for (j <- tuple.indices) yield
                    try {
@@ -1584,27 +1901,37 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
      */
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Add a tuple into the col2, without maintaining the index (No Index (ni),
+    /** Add a tuple into the 'col2', without maintaining the index (No Index (ni),
      *  orderedIndex, keytoIndex and indextoKey.
      *  @param tuple  the tuple to add
      */
-    def add_ni (tuple: Row)
+    private def add_ni (tuple: Row)
     {
-        val rowindex = col2(0).length
-        for (i <- tuple.indices) col2(i).update (rowindex, tuple(i))
+        val rowIdx = col2(0).length
+        for (j <- tuple.indices) addElem (j, rowIdx, tuple(j))
     } // add_ni
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Materialize function copy the temporary 'col2' into 'col'.  It needs to be called
-     *  by the end of the relation construction.
+    /** Materialize the relation by copying the temporary 'col2' into 'col'.
+     *  It needs to be called by the end of the relation construction.
      */
-    def materialize (): Relation =
+    private [columnar_db] def materialize (): Relation =
+    {
+        if (domain == null || domain == "") materialize1 () else materialize2 ()
+    } // materialize
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Materialize the relation by copying the temporary 'col2' into 'col'.
+     *  It needs to be called by the end of the relation construction.
+     *  This version uses the type/domain of the first value to transform the 'col2' to 'col'.
+     */
+    private [columnar_db] def materialize1 (): Relation =
     {
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         /*  Transform the j-th column to the appropriate vector type.
          *  @param j  the j-th column index in the relation
          */
-        def transform (j: Int): Vec =
+        def transform1 (j: Int): Vec =
         {
             val first = col2(j)(0)
             if (first != null) col2(j).reduceToSize (col2(j).size)
@@ -1617,38 +1944,39 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
             case _: Real     => val rs = VectorR (col2(j).asInstanceOf [Seq [Real]]);     col2(j).clear (); rs
             case _: StrNum   => val rs = VectorS (col2(j).asInstanceOf [Seq [StrNum]]);   col2(j).clear (); rs
             case _: String   => val rs = VectorS (col2(j).asInstanceOf [Seq [String]].toArray); col2(j).clear (); rs
-            case _           => println (s"materialize.transform ($j): vector type ($first) not supported"); null
+            case _: TimeNum  => val rs = VectorT (col2(j).asInstanceOf [Seq [TimeNum]]);  col2(j).clear (); rs
+            case _           => flaw ("materialize1.transform", s"($j): vector type ($first) not supported"); null
             } // match
-        } // transform
+        } // transform1
 
-//      if (DEBUG) println (s"col2 = $col2")
-        col = (for (j <- col.indices) yield transform(j)).toVector
+//      if (DEBUG) println (s"materialize1: col2 = $col2")
+        col = (for (j <- col.indices) yield transform1(j)).toVector
         this
-    } // materialize
+    } // materialize1
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Materialize2 function copy the temporary 'col2' into 'col'.  It needs to be
-     *  called by the end of the relation construction.  It uses domain to transform
-     *  the 'col2' to 'col' according to the domain indicator:
+    /** Materialize the relation by copying the temporary 'col2' into 'col'.
+     *  It needs to be called by the end of the relation construction.
+     *  This version uses 'domain' to transform the 'col2' to 'col' according to the domain indicator:
      *  <p>
-     *      Dense:      C, D, I, L. Q, R, S
-     *      Compressed: c, d, i, l. q, r, s
-     *      Sparse:     ???
+     *      Dense:      'C', 'D', 'I', 'L'. 'Q', 'R', 'S', 'T'
+     *      Compressed: 'c', 'd', 'i', 'l', 'q', 'r', 's', 't'
+     *      Sparse:     'χ', 'δ', 'ι', 'λ', 'ϟ', 'ρ', 'σ', 'τ'
      *  <p>
      */
-    def materialize2 (): Relation =
+    private [columnar_db] def materialize2 (): Relation =
     {
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         /*  Transform the j-th column to the appropriate vector type.
          *  @param j  the j-th column index in the relation
          */
-        def transform (j: Int): Vec =
+        def transform2 (j: Int): Vec =
         {
             val dj = domain(j)
             col2(j).reduceToSize (col2(j).size)
             dj match {
 
-            // Upper case type/domain indictors for Dense Vectors
+            // Upper case letter type/domain indictors for Dense Vectors
             case 'C' => val rs = VectorC (col2(j).asInstanceOf [Seq [Complex]]);  col2(j).clear; rs
             case 'D' => val rs = VectorD (col2(j).asInstanceOf [Seq [Double]]);   col2(j).clear; rs
             case 'I' => val rs = VectorI (col2(j).asInstanceOf [Seq [Int]]);      col2(j).clear; rs
@@ -1656,8 +1984,9 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
             case 'Q' => val rs = VectorQ (col2(j).asInstanceOf [Seq [Rational]]); col2(j).clear; rs
             case 'R' => val rs = VectorR (col2(j).asInstanceOf [Seq [Real]]);     col2(j).clear; rs
             case 'S' => val rs = VectorS (col2(j).asInstanceOf [Seq [StrNum]]);   col2(j).clear; rs
+            case 'T' => val rs = VectorT (col2(j).asInstanceOf [Seq [TimeNum]]);  col2(j).clear; rs
 
-            // Lower case type/domain indictors for Compressed Vectors
+            // Lower case letter type/domain indictors for Compressed Vectors
             case 'c' => val rs = RleVectorC (col2(j).asInstanceOf [Seq [Complex]]);  col2(j).clear; rs
             case 'd' => val rs = RleVectorD (col2(j).asInstanceOf [Seq [Double]]);   col2(j).clear; rs
             case 'i' => val rs = RleVectorI (col2(j).asInstanceOf [Seq [Int]]);      col2(j).clear; rs
@@ -1665,18 +1994,108 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
             case 'q' => val rs = RleVectorQ (col2(j).asInstanceOf [Seq [Rational]]); col2(j).clear; rs
             case 'r' => val rs = RleVectorR (col2(j).asInstanceOf [Seq [Real]]);     col2(j).clear; rs
             case 's' => val rs = RleVectorS (col2(j).asInstanceOf [Seq [StrNum]]);   col2(j).clear; rs
+            case 't' => val rs = RleVectorT (col2(j).asInstanceOf [Seq [TimeNum]]);  col2(j).clear; rs
 
-            // ??? case type/domain indictors for Sparse Vectors
-            // FIX - add option for SparseVectorC ...
+            // Lower case Greek letter type/domain indictors for Sparse Vectors
+            // @see web.mit.edu/jmorzins/www/greek-alphabet.html
+            // @see en.wikipedia.org/wiki/List_of_Unicode_characters#Greek_and_Coptic
+            case 'χ' => val rs = SparseVectorC (col2(j).asInstanceOf [Seq [Complex]]);  col2(j).clear; rs
+            case 'δ' => val rs = SparseVectorD (col2(j).asInstanceOf [Seq [Double]]);   col2(j).clear; rs
+            case 'ι' => val rs = SparseVectorI (col2(j).asInstanceOf [Seq [Int]]);      col2(j).clear; rs
+            case 'λ' => val rs = SparseVectorL (col2(j).asInstanceOf [Seq [Long]]);     col2(j).clear; rs
+            case 'ϟ' => val rs = SparseVectorQ (col2(j).asInstanceOf [Seq [Rational]]); col2(j).clear; rs
+            case 'ρ' => val rs = SparseVectorR (col2(j).asInstanceOf [Seq [Real]]);     col2(j).clear; rs
+            case 'σ' => val rs = SparseVectorS (col2(j).asInstanceOf [Seq [StrNum]]);   col2(j).clear; rs
+            case 'τ' => val rs = SparseVectorT (col2(j).asInstanceOf [Seq [TimeNum]]);  col2(j).clear; rs
 
-            case  _  => println ("materialize2.transform ($j) vector type not supported domain ($dj)"); null
+            case  _  => flaw ("materialize2.transform", s"($j) vector type not supported domain ($dj)"); null
             } // match 
-        } // transform
+        } // transform2
 
-//      if (DEBUG) println (s"col2 = $col2")
-        col = (for (j <- col.indices) yield transform (j)).toVector
+//      if (DEBUG) println (s"materialize2: col2 = $col2")
+        col = (for (j <- col.indices) yield transform2(j)).toVector
         this
-    } //  materialize2
+    } // materialize2
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Update the column named 'cName' using function 'func' for elements with
+     *  value 'matchStr'.
+     *  @param cName     the name of the column to be updated
+     *  @param newVal    the value used to assign updated values
+     *  @param matchVal  the value to be matched to elements
+     *  @tparam T        type of the column
+     */
+    def update [T] (cName: String, newVal: T, matchVal: T)
+    {
+        val colPos = colMap(cName)
+        val c = col(colPos)
+        for (i <- 0 until c.size if Vec(c, i) == matchVal) Vec(c, i) = newVal
+    } // update
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Update the column named 'cName' using function 'func' for elements with
+     *  value 'matchStr'.
+     *  @param cName     the name of the column to be updated
+     *  @param func      the function used to assign updated values
+     *  @param matchVal  the value to be matched to elements
+     *  @tparam T        type of the column
+     */
+    def update [T] (cName: String, func: (T) => T, matchVal: T)
+    {
+        val colPos = colMap (cName)
+        val c = col (colPos)
+        for (i <- 0 until c.size if Vec(c, i) == matchVal) Vec(c, i) = func (Vec(c, i).asInstanceOf [T])
+    } // update
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Update the column named 'cName' using function 'func' for elements where
+     *  the predicate 'pred' evaluates to true.
+     *  @param cName  the name of the column to be updated
+     *  @param func   the function used to assign updated values
+     *  @param pred   the predicated used to select elements for update
+     *  @tparam T     type of the column
+     */
+    def update [T] (cName: String, func: (T) => T, pred: (T) => Boolean)
+    {
+        val colPos = colMap (cName)
+        val c      = col (colPos)
+        var pos    = ArrayBuffer [Int] ()
+        for (i <- 0 until c.size) {
+            val v_ci = Vec(c, i).asInstanceOf [T]
+            if (pred (v_ci)) Vec(c, i) = func (v_ci)
+        } // for
+    } // update
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Delete the rows from 'this' relation that satisfy the predicates.
+     *  FIX - handle all 24 domain types
+     *  @param  p  tuple(1): column name, tuple(2): predicate (T => `Boolean`)
+     *  @tparam T  the predicate type
+     */
+    def delete [T] (p: Predicate [T]*): Relation =
+    {
+        null
+/*
+        var pos = ArrayBuffer [Int] ()
+        for (i <- p.indices) {
+            domain (colMap(p(i)._1)) match {
+            case 'D' => val pos1 = col (colMap(p(i)._1)).asInstanceOf [VectorD].filterPos (p(i)._2.asInstanceOf [Double => Boolean])
+                        if (i > 0) pos = pos intersect pos1 else pos ++= pos1
+            case 'I' => val pos1 = col (colMap(p(i)._1)).asInstanceOf [VectorI].filterPos (p(i)._2.asInstanceOf [Int => Boolean])
+                        if (i > 0) pos = pos intersect pos1 else pos ++= pos1
+            case 'L' => val pos1 = col (colMap(p(i)._1)).asInstanceOf [VectorL].filterPos (p(i)._2.asInstanceOf [Long => Boolean])
+                        if (i > 0) pos = pos intersect pos1 else pos ++= pos1
+            case 'S' => val pos1 = col (colMap(p(i)._1)).asInstanceOf [VectorS].filterPos (p(i)._2.asInstanceOf [StrNum => Boolean])
+                        if (i > 0) pos = pos intersect pos1 else pos ++= pos1
+            case _   => flaw ("delete", "predicate type not supported")
+                        null
+            } // match
+        } // for
+        val indices = Set (0 to rows-1 :_*) diff pos.toSet
+        for (i <- 0 until cols) Vec.delete (col(i), pos.asInstanceOf [Seq [Int]])
+        selectAt (indices.toSeq.sorted)
+*/
+    } // delete
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Convert 'this' relation into a string column by column.
@@ -1690,19 +2109,20 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Show 'this' relation row by row.
+     *  @param limit  the limit on the number of rows to display
      */
-    def show ()
+    def show (limit: Int = Int.MaxValue)
     {
-        val wid    = 18                                             // column width
-        val rep    = wid * colName.length                           // repetition = width * # columns
-        val title  = s"| Relation name = $name, key-column = $key "
+        val wid   = 18                                             // column width
+        val rep   = wid * colName.length                           // repetition = width * # columns
+        val title = s"| Relation name = $name, key-column = $key "
 
         println (s"|-${"-"*rep}-|")
         println (title + " "*(rep-title.length) + "   |")
         println (s"|-${"-"*rep}-|")
         print ("| "); for (cn <- colName) print (s"%${wid}s".format (cn)); println (" |")
         println (s"|-${"-"*rep}-|")
-        for (i <- 0 until rows) {
+        for (i <- 0 until MIN (rows, limit)) {
             print ("| ")
             for (cv <- row(i)) {
                 if (cv.isInstanceOf [Double]) print (s"%${wid}g".format (cv))
@@ -1740,7 +2160,7 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
      */
     def toMatriD (colPos: Seq [Int], kind: MatrixKind = DENSE): MatriD =
     {
-        val colVec = for (x <- pi (colPos).col) yield Vec.toDouble (x)
+        val colVec = for (x <- project (colPos).col) yield Vec.toDouble (x)
         kind match {
         case DENSE           => MatrixD (colVec)
         case SPARSE          => SparseMatrixD (colVec)
@@ -1761,7 +2181,7 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
      */
     def toMatriDD (colPos: Seq [Int], colPosV: Int, kind: MatrixKind = DENSE): (MatriD, VectorD) =
     {
-        val colVec = for (x <- pi (colPos).col) yield Vec.toDouble (x)
+        val colVec = for (x <- project (colPos).col) yield Vec.toDouble (x)
         kind match {
         case DENSE           => (MatrixD (colVec),       Vec.toDouble (col(colPosV)).toDense.asInstanceOf [VectorD])
         case SPARSE          => (SparseMatrixD (colVec), Vec.toDouble (col(colPosV)).toDense.asInstanceOf [VectorD])
@@ -1782,7 +2202,7 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
      */
     def toMatriDI (colPos: Seq [Int], colPosV: Int, kind: MatrixKind = DENSE): (MatriD, VectorI) =
     {
-        val colVec = for (x <- pi (colPos).col) yield Vec.toDouble (x)
+        val colVec = for (x <- project (colPos).col) yield Vec.toDouble (x)
         kind match {
         case DENSE           => (MatrixD (colVec),       Vec.toInt (col(colPosV)).toDense.asInstanceOf [VectorI])
         case SPARSE          => (SparseMatrixD (colVec), Vec.toInt (col(colPosV)).toDense.asInstanceOf [VectorI])
@@ -1802,7 +2222,7 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
      */
     def toMatriI (colPos: Seq [Int], kind: MatrixKind = DENSE): MatriI =
     {
-        val colVec = for (x <- pi (colPos).col) yield Vec.toInt (x)
+        val colVec = for (x <- project (colPos).col) yield Vec.toInt (x)
         kind match {
         case DENSE           => MatrixI (colVec)
         case SPARSE          => SparseMatrixI (colVec)
@@ -1825,11 +2245,11 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
     {
         import Converter._
         val cp = if (colPos == null) Seq.range(0, cols) else colPos
-        val colVec = for (x <- pi (cp).col) yield {
+        val colVec = for (x <- project (cp).col) yield {
             try {
                 Vec.toInt (x)
             } catch {
-                case num: NumberFormatException => mapToInt (x.asInstanceOf [VectorS])._1
+                case num: NumberFormatException => map2Int (x.asInstanceOf [VectorS])._1
             } // trys
         } // for
         kind match {
@@ -1852,7 +2272,7 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
      */
     def toMatriII (colPos: Seq [Int], colPosV: Int, kind: MatrixKind = DENSE): Tuple2 [MatriI, VectorI] =
     {
-        val colVec = for (x <- pi (colPos).col) yield Vec.toInt (x)
+        val colVec = for (x <- project (colPos).col) yield Vec.toInt (x)
         kind match {
             case DENSE           => (MatrixI (colVec),       Vec.toInt (col(colPosV)).toDense.asInstanceOf [VectorI])
             case SPARSE          => (SparseMatrixI (colVec), Vec.toInt (col(colPosV)).toDense.asInstanceOf [VectorI])
@@ -1990,20 +2410,44 @@ class Relation (val name: String, val colName: Seq [String], var col: Vector [Ve
         // FIX - to be implemented
     } // writeJSON
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    def min (cName: String) = Vec.min (col(colMap(cName)))
+    // ============================================ BUILT-IN AGGREGATE FUNCTIONS
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    def max (cName: String) = Vec.max (col(colMap(cName)))
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    def sum (cName: String) = Vec.sum (col(colMap(cName)))
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the mean of the values in column 'cName'.
+     *  @param cName  the column name
+     */
+    def avg (cName: String) = Vec.mean (col(colMap(cName)))
     def mean (cName: String) = Vec.mean (col(colMap(cName)))
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the number of values in column 'cName'.
+     *  @param cName  the column name
+     */
     def count (cName: String) = rows
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the maximum value in column 'cName'.
+     *  @param cName  the column name
+     */
+    def max (cName: String) = Vec.max (col(colMap(cName)))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the minimum value in column 'cName'.
+     *  @param cName  the column name
+     */
+    def min (cName: String) = Vec.min (col(colMap(cName)))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the sum of the values in column 'cName'.
+     *  @param cName  the column name
+     */
+    def sum (cName: String) = Vec.sum (col(colMap(cName)))
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the variance of the values in column 'cName'.
+     *  @param cName  the column name
+     */
+    def variance (cName: String) = Vec.variance (col(colMap(cName)))
 
 } // Relation class
 
@@ -2103,7 +2547,7 @@ object RelationTest extends App
     banner ("Test join")
     println ("week.join (\"day\", \"day\" weekend)      = " + week.join ("day", "day", weekend))
     println ("-" * 60)
-    println ("week >< weekend                           = " + (week >< weekend))
+    println ("week join weekend                         = " + (week join weekend))
 
     week.writeCSV ("columnar_db" + ⁄ + "week.csv")
 
@@ -2173,12 +2617,12 @@ object RelationTest3 extends App
     import Relation.{max, min}
     import RelationEx.productSales
 
-    val costVprice = productSales.π ("ProductActualCost", "SalesTotalCost")
+    val costVprice = productSales.project ("ProductActualCost", "SalesTotalCost")
 
     productSales.show ()
 
     println ("productSales = " + productSales)
-    println ("productSales.π (\"ProductActualCost\", \"SalesTotalCost\") = " + costVprice)
+    println ("productSales.project (\"ProductActualCost\", \"SalesTotalCost\") = " + costVprice)
 
     banner ("Test count")
     println ("count (productSales) = " + count (productSales))
@@ -2299,19 +2743,17 @@ object RelationTest6 extends App
     teaching.showFk ()
 
     banner ("joinindex")
-    teaching.joinindex (Seq("pid"), Seq("pid"), professor).show ()
+    teaching.joinindex (Seq ("pid"), Seq("pid"), professor).show ()
     banner ("parjoin")
-    teaching.parjoin (Seq("pid"), Seq("pid"), professor, 4).show ()
-    banner ("groupBy")
-    teaching.groupBy ("cid").epi (Seq (count2), Seq("count"), Seq ("pid"), "tid", "semester").show
-    banner ("join ... on")
-    teaching.join (professor).on [Int] ("pid", "pid", _ ==_).show
+    teaching.parjoin (Seq ("pid"), Seq ("pid"), professor, 4).show ()
+    banner ("groupBy.eproject")
+    teaching.groupBy ("cid").eproject ((count, "pid_count", "pid"))("tid", "semester").show ()
 
 } // RelationTest6
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `RelationTest7` object tests 'thetajoin' and 'where' methods.
+/** The `RelationTest7` object tests 'join' method.
  *  > runMain scalation.columnar_db.RelationTest7
  */
 object RelationTest7 extends App
@@ -2341,13 +2783,54 @@ object RelationTest7 extends App
     banner ("professor2")
     professor2.show ()
 
-    banner ("thetajoin")
-    professor.thetajoin [Int] (professor2,("pid", "pid", (x, y) => x < y)).show ()
-//  professor.where (("pid", (x: Int) => x == 6)).show ()
-    banner ("where")
-    professor.where [Int] (("pid", _ == 6)).show ()
-    banner ("where")
-    professor.where (("department", (x: StrNum) => x == "cs"),("pid", (x: Int) => x < 6)).show ()
+    banner ("join")
+    professor.join [Int] (professor2, ("pid", "pid", (x, y) => x < y)).show ()
+    professor.join [Int] (professor2, ("pid", "pid", _ < _)).show ()
 
 } // RelationTest7
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RelationTest8` object tests 'save' method.
+ *  > runMain scalation.columnar_db.RelationTest8
+ */
+object RelationTest8 extends App
+{
+    val professor = Relation ("professor",
+        Seq("pid", "name", "department", "title"),
+        Seq (Vector [Any] (1, "jackson", "pharm", 4),
+             Vector [Any] (2, "ken", "cs", 2),
+             Vector [Any] (3, "pan", "pharm", 0),
+             Vector [Any] (4, "yang", "gis", 3),
+             Vector [Any] (5, "zhang", "cs", 0),
+             Vector [Any] (6, "Yu", "cs", 0)),
+        -1, "ISSI")
+
+    professor.save ()
+
+} // RelationTest8
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RelationTest9` object tests 'apply' method to load a saved relation.
+ *  > runMain scalation.columnar_db.RelationTest9
+ */
+object RelationTest9 extends App
+{
+    Relation ("professor").show ()
+
+} // RelationTest9
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `RelationTest10` object tests the 'orderBy' method.
+ *  > runMain scalation.columnar_db.RelationTest10
+ */
+object RelationTest10 extends App
+{
+    import RelationEx.productSales
+
+    productSales.orderBy ("SalesTotalCost", "Deviation").show ()
+
+} // RelationTest10
 

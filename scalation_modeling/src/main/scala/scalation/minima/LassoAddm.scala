@@ -1,11 +1,13 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author John Miller, Mustafa Nural
- *  @version 1.5
+ *  @version 1.6
  *  @date Mon Apr 24 21:28:06 EDT 2017
  *  @see LICENSE (MIT style license file).
-
- *  @see https://web.stanford.edu/~boyd/papers/admm_distr_stats.html
+ *
+ *  @see www.simonlucey.com/lasso-using-admm/
+ *  @see statweb.stanford.edu/~candes/math301/Lectures/Consensus.pdf
+ *  @see web.stanford.edu/~boyd/papers/admm_distr_stats.html
  *  Adjusted from Boyd implementation
  */
 
@@ -17,22 +19,23 @@ import scala.util.control.Breaks._
 
 import scalation.linalgebra._
 import scalation.math.{double_exp, sign}
+import scalation.plot.Plot
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** The `LassoAdmm` class performs LASSO regression using Alternating Direction
- * Method of Multipliers (ADMM).  Minimize the following objective function to
- * find an optimal solutions for 'x'.
- * <p>
- *     argmin_x (1/2)||Ax − b||_2^2 + λ||x||_1
+ *  Method of Multipliers (ADMM).  Minimize the following objective function to
+ *  find an optimal solutions for 'x'.
+ *  <p>
+ *      argmin_x (1/2)||Ax − b||_2^2 + λ||x||_1
  *
- *     A = data matrix
- *     b = response vector
- *     λ = weighting on the l_1 penalty
- *     x = solution (coefficient vector)
- * <p>
+ *      A = data matrix
+ *      b = response vector
+ *      λ = weighting on the l_1 penalty
+ *      x = solution (coefficient vector)
+ *  <p>
  *
- * @see euler.stat.yale.edu/~tba3/stat612/lectures/lec23/lecture23.pdf
- * @see https://web.stanford.edu/~boyd/papers/admm_distr_stats.html
+ *  @see euler.stat.yale.edu/~tba3/stat612/lectures/lec23/lecture23.pdf
+ *  @see https://web.stanford.edu/~boyd/papers/admm_distr_stats.html
  */
 object LassoAdmm
 {
@@ -161,4 +164,52 @@ object LassoAdmmTest extends App
     println (s"rSquared = $rSquared")
 
 } // LassoAdmmTest object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `LassoAdmmTest2` object tests `LassoAdmm` class using the following
+ *  regression equation.
+ *  <p>
+ *      y  =  b dot x  =  b_0 + b_1*x_1 + b_2*x_2.
+ *  <p>
+ *  @see www.cs.jhu.edu/~svitlana/papers/non_refereed/optimization_1.pdf
+ *  > runMain scalation.minima.LassoAdmmTest2
+ */
+object LassoAdmmTest2 extends App
+{
+    val MAX_ITER = 30
+
+    // function to optimize
+    def f(x: VectoD): Double = (x(0) - 4)~^2 + (x(1) - 2)~^2
+
+    // equality constraint to maintain
+    def h(x: VectoD): Double = x(0) - x(1)
+
+    // augmented Lagrangian
+    def lg (x: VectoD): Double = f(x) + (p/2) * h(x)~^2 - l * h(x)
+
+    // gradient of Augmented Lagrangian
+    def grad (x: VectoD): VectoD = 
+    {
+        VectorD (2 * (x(0) - 4) + p * (x(0) - x(1)) - l,
+                 2 * (x(1) - 2) - p * (x(0) - x(1)) + l)
+    } // grad
+
+    val x   = new VectorD (2)                   // vector to optimize
+    val z   = new MatrixD (MAX_ITER, 2)         // store x's trajectory
+    val eta = 0.1                               // learning rate
+    val p0  = 0.25; var p = p0                  // initial penalty (p = p0)
+    var l   = 0.0                               // initial value for Lagrange multiplier
+
+    for (k <- 1 to MAX_ITER) {
+        l -= p * h(x)                           // comment out for Penalty Method
+        x -= grad (x) * eta
+        z(k-1) = x.copy
+        println (s"$k: x = $x, f(x) = ${f(x)}, lg(x) = ${lg(x)}, p = $p, l = $l")
+        p += p0
+    } // for
+
+    new Plot (z.col(0), z.col(1))
+
+} // LassoAdmmTest2 object
 

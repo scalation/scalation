@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Michael Cotterell, John Miller, Hao Peng, Dong-Yu Yu
- *  @version 1.5
+ *  @version 1.6
  *  @date    Fri Mar 24 20:24:40 2017
  *  @see     LICENSE (MIT style license file).
  *
@@ -318,7 +318,7 @@ object Smoothing_FTest extends App
     val w    = 2.0 * Pi / L                                          // fundamental frequency estimate
 
     val radialType = GAUSSIAN
-    val centers = VectorD (0.0 until 100.0/17 by 0.5)
+//  val centers = VectorD (0.0 until 100.0/17 by 0.5)
 
     for (ord <- mMin to mMax) {
         val bf = new DB_Spline (t, ord)                              // choose a basis function to use

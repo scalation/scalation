@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Fri Feb 16 16:14:34 EST 2018
  *  @see     LICENSE (MIT style license file).
  */
@@ -189,8 +189,10 @@ object ExampleIris
 
      // data for binary classifiers
      val kk = 2
-     val xx = x.slice (0, 100)       // first 100 rows
+     val xx = x.slice (0, 100)          // first 100 rows
      val yy = y.slice (0, 100)          // first 100 elements
+     val yb = y.copy                    // imbalanced copy of y
+     for (i <- 100 until 150) yb(i) = 1
 
 } // ExampleIris object
 
@@ -207,47 +209,41 @@ object ExampleIrisTest extends App
     var yp: VectoI = null
 
     banner ("NullModel")
-    val nm  = new NullModel (yy)
+    val nm = new NullModel (yy)
     nm.train ()
     yp = nm.classify (xr)
-    println (nm.fitLabel)
-    println (nm.fit (yy, yp))
+    println (nm.fitMap (yy, yp))
     println ((new ConfusionMat (yy, yp, 2)).confusion)
 
     banner ("NaiveBayes")
-    val nb  = new NaiveBayes (xr, yy)
+    val nb = new NaiveBayes (xr, yy)
     nb.train ()
     yp = nb.classify (xr)
-    println (nb.fitLabel)
-    println (nb.fit (yy, yp))
+    println (nb.fitMap (yy, yp))
 
     banner ("TANBayes")
     val tan = new TANBayes (xr, yy)
     tan.train ()
     yp = tan.classify (xr)
-    println (tan.fitLabel)
-    println (tan.fit (yy, yp))
+    println (tan.fitMap (yy, yp))
 
     banner ("LogisticRegression")
     val lrg = new LogisticRegression (xx, yy)
     lrg.train ()
     yp = lrg.classify (xx)
-    println (lrg.fitLabel)
-    println (lrg.fit (yy, yp))
+    println (lrg.fitMap (yy, yp))
 
     banner ("LDA")
     val lda = new LDA (xx, yy)
     lda.train ()
     yp = lda.classify (xx)
-    println (lda.fitLabel)
-    println (lda.fit (yy, yp))
+    println (lda.fitMap (yy, yp))
 
     banner ("KNN_Classifier")
     val knn = new KNN_Classifier (xx, yy)
     knn.train ()
     yp = knn.classify (xx)
-    println (knn.fitLabel)
-    println (knn.fit (yy, yp))
+    println (knn.fitMap (yy, yp))
 
 } // ExampleIrisTest
 

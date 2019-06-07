@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Zhe Jin
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sat Jul 2 01:27:00 EDT 2016
  *  @see     LICENSE (MIT style license file).
  */

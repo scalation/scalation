@@ -1,0 +1,68 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Usman Nisar, John Miller
+ *  @version 1.0
+ *  @date    Mon May  6 10:50:37 EDT 2013
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  @see     www2012.wwwconference.org/proceedings/proceedings/p949.pdf
+ */
+
+package scalation.graphalytics
+
+import collection.mutable.{Set, HashMap}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This object implements the HHK algorithm for Dual Graph Simulation.
+ */
+
+object DualSim extends App
+{  
+    if (args.length != 4) {
+        println ("usage: scala scalation.graphalytics.DualSim [DataGraph] [QueryGraph] [TimesToRun] [DisplayResults(0/1)]")
+        sys.exit
+    } // if
+
+    private val g = new Graph (args(0), true)               // data graph
+    private val q = new Graph (args(1), true)               // query graph
+
+    for (i <- 0 until args(2).toInt) {
+        g.labelMap.clear ()
+        System.gc ()                                        // run garbage collector (gc)
+        Thread.sleep (2000)                                 // give gc time to work
+        var t0 = System.nanoTime ()
+        g.initialize ()
+        hhk ()
+        println ("Time taken for the " + (i+1) + " run: " + ((System.nanoTime () - t0) / 1000000) + "ms")
+    } // for
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform dual graph simulation by forming a sim set for each vertex u in the query graph.
+     *  A vertex w in the data graph will be in u's sim set, if (1) their labels match,
+     *  (2) each child of u matches a child of w, and (3) each parent of u matches a parent of w.
+     */
+    def hhk ()
+    {
+        val sim = HashMap [Int, Set [Int]] ()               // map holding all sim sets
+    
+        // form sim sets for each vertex u (with id i) in the query graph
+        for (i <- 0 until q.n) sim += i -> g.labelMap (q.labels(i)).clone
+
+        var change = true
+        while (change) {                                    // check for matching children/parents
+            change = false
+            for (u <- 0 until q.n; w <- sim(u); v <- q.post(u) if (g.post(w) & sim(v)).isEmpty) { 
+                sim(u) -= w                                 // remove w due to lack of child match 
+                change  = true
+            } //for           
+            for (u <- 0 until q.n; w <- sim(u); v <- q.pre(u) if (g.pre(w) & sim(v)).isEmpty) { 
+                sim(u) -= w                                 // remove w due to lack of parent match
+                change  = true
+            } //for
+        } // while
+
+        if (args(3).toInt == 1) for (u <- 0 until q.n) println (u + " -> " + sim(u))
+    } // hhk
+
+} // DualSim object
+

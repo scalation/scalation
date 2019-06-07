@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Vinay Kumar Bingi, Supriya Ramireddy
- *  @version 1.5
+ *  @version 1.6
  *  @date    Fri Oct  20 15:41:16 EDT 2017
  *  @see     LICENSE (MIT style license file).
  */

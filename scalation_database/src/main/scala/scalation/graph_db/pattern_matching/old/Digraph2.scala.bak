@@ -1,0 +1,159 @@
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller, Matthew Saltz
+ *  @version 1.1
+ *  @date    Tue May 12 11:08:56 EDT 2015
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.graphalytics
+
+import collection._
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Digraph2` class stores vertex-labeled directed graphs using an adjacency
+ *  set ('ch') representation, e.g., ch = { {1, 2}, {0}, {1} } means that the
+ *  graph has the following edges { (0, 1), (0, 2), (1, 0), (2, 1) }.
+ *  Optionally, inverse adjacency via the 'pa' array can be stored at the cost
+ *  of nearly doubling the storage requirements.
+ *  @param ch      the array of child (adjacency) vertex sets (outgoing edges)
+ *  @param label    the array of verter labels
+ *  @param inverse  whether to store inverse adjacency sets (parents)
+ */
+case class Digraph2 (ch:     Array [mutable.HashSet [Int]],
+                    label:   Array [Int] = Array.ofDim (0),
+                    inverse: Boolean = false)
+      extends Cloneable 
+{
+    /** the map from label to the set of vertices with the label
+     */
+    val labelMap =  buildLabelMap (label)
+
+    /** The optional array of vertex inverse (parent) adjacency sets (incoming edges)
+     */
+    val pa = Array.ofDim [mutable.HashSet [Int]] (ch.size)     // by default, don't use 'pa'
+
+    if (inverse) addPa ()
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Clone (make a deep copy) of this graph.
+     */
+    override def clone (): Digraph2 = Digraph2 (ch.clone (), label.clone (), inverse)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add the inverse adjacency sets for rapid accesses to parent vertices.
+     */
+    def addPa ()
+    {
+        for (j <- pa.indices) pa(j) = mutable.HashSet [Int] ()
+        for (i <- ch.indices; j <- ch(i)) pa(j) += i
+    } // addPa
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Returns the number of vertices in the graph.
+     */
+    def size = ch.size
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Returns the number of edges in the graph.
+     */
+    def nEdges = ch.foldLeft (0) { (n, i) => n + i.size }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given an array of labels, returns an index from labels to the sets of
+     *  vertices containing those labels.
+     *  @param label  the array of vertex labels of type Int
+     */
+    def buildLabelMap (label: Array [Int]): Map [Int, mutable.HashSet [Int]] =
+    {
+        var labelMap = Map [Int, mutable.HashSet [Int]] ()
+        for (i <- label.indices) {
+            val lab = label(i)
+            val vc  = labelMap (lab)
+            if (vc == null) labelMap += lab -> mutable.HashSet [Int] (i) else vc += lab
+        } // for
+//      label.foldLeft(0) ( (i, label) => {
+//          labelMap = labelMap + (label -> (labelMap.getOrElse (label, mutable.HashSet [Int] ()) + i))
+//          i + 1
+//      })  // foldLeft
+        labelMap
+    } // buildLabelMap
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Returns the maximum label value.
+     */ 
+    def nLabels = labelMap.keys.max
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determines the number of vertices in the graph that have outgoing edges
+     *  to themselves.
+     */ 
+    def nSelfLoops: Int =
+    {
+        ch.indices.foldLeft (0) { (sum, i) => if (ch(i) contains i) sum + 1 else sum }
+    } // nSelfLoops
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determines whether or not the graph is connected.
+     */
+    def isConnected: Boolean =
+    {
+        var connectedNodes = Set [Int]()
+        ch.foldLeft(0) { (i, set) =>
+            if (! set.isEmpty) connectedNodes += i
+            connectedNodes ++= set
+            i + 1
+        } // foldLeft
+        connectedNodes.size == size
+    } // isConnected
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Returns the set of vertices in the graph with label l.
+     */
+    def getVerticesWithLabel (l: Int) = labelMap.getOrElse (l, Set [Int] ())
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Indicate basic information about this graph.  Due to its potential size,
+     *  use print to show graph details.
+     */
+    override def toString: String = "Digraph with " + size + " vertices"
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Prints the adjacency list and labelMap of the graph.
+     *  @param name  the name of the graph
+     */
+    def print (name: String = "g")
+    {
+        println ("Digraph " + name + " ---------------------------------------")
+        println ("ch: "); ch.foldLeft (0) { (i, u) => { println (i + " -> " + u); i+1 } }
+        println ("labelMap: "); labelMap.foreach { case (k, v) => println (k + " -> " + v) }
+    } // print
+
+} // Digraph2 class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Digraph2Test` object is used to test the `Digraph2` class.
+ *  run-main scalation.graphalytics.Digraph2Test
+ */
+object Digraph2Test extends App
+{
+    val g = Digraph2 (Array (mutable.HashSet [Int] (4, 5),                // 0
+                             mutable.HashSet [Int] (5),                   // 1
+                             mutable.HashSet [Int] (6, 7),                // 2
+                             mutable.HashSet [Int] (7, 8),                // 3
+                             mutable.HashSet [Int] (0, 5, 9),             // 4
+                             mutable.HashSet [Int] (0, 1, 4, 6, 10),      // 5
+                             mutable.HashSet [Int] (2, 5, 7, 10, 11),     // 6
+                             mutable.HashSet [Int] (2, 3, 6, 8),          // 7
+                             mutable.HashSet [Int] (3, 7, 12),            // 8
+                             mutable.HashSet [Int] (4),                   // 9
+                             mutable.HashSet [Int] (5, 6),                // 10
+                             mutable.HashSet [Int] (),                    // 11
+                             mutable.HashSet [Int] (8)))                  // 12
+    g.print ()
+
+} // Digraph2Test
+
+

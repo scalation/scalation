@@ -1,0 +1,176 @@
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.1
+ *  @date    Sat Mar 15 15:28:44 EDT 2014
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  Many of the algorithms used are from:
+ *    Averill M. Law and W. David Kelton
+ *    Simulation Modeling and Analysis, 2nd Edition
+ *    McGraw-Hill, Inc., NY, 1991.
+ */
+
+package scalation.random
+
+import math.{exp, floor}
+
+import scalation.linalgebra.VectorD
+import scalation.math.DoubleWithExp._
+import scalation.math.Combinatorics.fac
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `TimeVariate` abstract class serves as a superclass for time-based
+ *  random variates such Poisson Processes.
+ *  @param stream  the random number stream
+ */
+abstract class TimeVariate (stream: Int)
+         extends Variate (stream)
+{
+    val mean = -1.0    // mean changes with time, use function instead
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the mean as a function of time.
+     *  @param tt  the time point for computing the mean
+     */
+    def meanF (tt: Double): Double
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the probability function (pf):
+     *  The probability density function (pdf) for continuous RV's or
+     *  the probability mass function (pmf) for discrete RV's.
+     *  @param z  the mass point whose probability is sought
+     */
+    def pf (z: Double): Double = pf (floor (z).toInt)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Comute the mean as a function of time.
+     *  @param tt  the time point for computing the mean
+     */
+    def count (tt: Double): Int =
+    {
+        var i = 0
+        while (gen < tt) i += 1
+        i
+    } // count
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reset the time-based process to the beginning.
+     */
+    def reset ()
+
+} // TimeVariate class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This class generates arrival times according to a `PoissonProces`.
+ *  Given the current arrival time 't', generate the next arrival time.
+ *  @param lambda  the arrival rate (arrivals per unit time)
+ *  @param stream  the random number stream
+ */
+case class PoissonProcess (lambda: Double, stream: Int = 0)
+     extends TimeVariate (stream)
+{
+    if (lambda <= 0.0) flaw ("constructor", "parameter lambda must be positive")
+    private val e_rv = Exponential (1.0 / lambda, stream)    // exponential rv generator
+    private var t    = 0.0                                   // current time
+    
+    def meanF (tt: Double): Double = lambda * tt
+
+    def pf (k: Int): Double = (lambda * t)~^k * exp (-lambda * t) / fac (k)
+    
+    def gen: Double = { t += e_rv.gen; t }
+
+    def reset () { t = 0.0 }
+
+} // PoissonProcess class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** This class generates arrival times according to a `NHPoissonProces`, an
+ *  Non-Homogeneous Process Process (NHPP), where the arrival rate function
+ *  'lambda(t)' is piecewise constant.  Rates are constant over basic time
+ *  intervals of length 'dt'.
+ *  @param lambda  the vector or arrival rates
+ *  @param dt      the length the basic time intervals
+ *  @param stream  the random number stream
+ */
+case class NHPoissonProcess (lambda: VectorD, dt: Double = 1.0, stream: Int = 0)
+     extends TimeVariate (stream)
+{
+    if (! lambda.isNonnegative) flaw ("constructor", "parameter vector lambda must be nonnegative")
+    private val lsum = lambda.cumulate * dt        // cumulative lambda
+    private val e_rv = Exponential (1.0, stream)   // exponential rv generator with mean 1
+    private var e    = 0.0                         // cumulative exponential rv's
+
+    def meanF (tt: Double): Double = 
+    {
+        for (i <- 0 until lsum.dim if tt <= lsum(i)) {      // find where lsum(i-1) < tt <= lsum(i)
+           val lsum_i_1 = if (i == 0) 0.0 else lsum(i-1)
+           return lsum_i_1 + (tt - dt * i) * (lsum(i) - lsum_i_1) / dt
+        } // for
+        flaw ("meanF", "cumulative e value larger than last lsum")
+        -1.0
+    } // meanF
+
+    def pf (k: Int): Double =                       // FIX
+    { 
+        flaw ("pf", "probability function not yet implemented for NHPoissonProcess")
+        -1.0
+    } // pf
+
+    def gen: Double =
+    {
+        e += e_rv.gen                                      // add next exponential rv
+        for (i <- 0 until lsum.dim if e <= lsum(i)) {      // find where lsum(i-1) < e <= lsum(i)
+           val lsum_i_1 = if (i == 0) 0.0 else lsum(i-1)
+           val d = e - lsum_i_1                            // distance past lsum(i-1)
+           return dt * (i + d / (lsum(i) - lsum_i_1))      // return new arrival time
+        } // 
+        flaw ("gen", "cumulative e value larger than last lsum")
+        -1.0
+    } // gen
+
+    def reset () { e = 0.0 }
+
+} // NHPoissonProcess class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `PoissonProcessTest` object is used to test both the `PoissonProcess` and
+ *  `NHPoissonProcess` classes.
+ */
+object PoissonProcessTest extends App
+{
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform a means test (average of generated rv's close to mean for distribution).
+     *  @param rv  the random variate to test
+     *  @param tt  the time point for the test
+     */
+    def meansTest (rv: TimeVariate, tt: Double)
+    {
+        println ("\nTest the " + rv.getClass.getSimpleName () + " random variate generator")
+
+        var ran = 0.0
+        var sum = 0.0
+        val rep = 10000
+        for (i <- 1 to rep) {
+            rv.reset ()
+            sum += rv.count (tt)
+        } // for
+        println ("rv.mean = " + rv.meanF (tt) + " estimate = " + sum / rep.toDouble)
+    } // meansTest
+
+    val lambda = VectorD (2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+                          4, 4, 4, 4, 4, 4, 4, 4, 4, 4)
+
+    val pp   = PoissonProcess (lambda.sum / lambda.dim.toDouble)
+    val nhpp = NHPoissonProcess (lambda)
+
+    for (j <- 0 until 60) println ("arrival time: PP = " + pp.gen + ",\t NHPP = " + nhpp.gen)
+
+    meansTest (pp,   12.0)
+    meansTest (nhpp, 12.0)
+
+} // PoissonProcessTest
+

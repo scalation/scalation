@@ -1,0 +1,153 @@
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.1
+ *  @date    Wed Aug 26 18:41:26 EDT 2009, Fri Feb  3 13:19:40 EST 2012
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.analytics
+
+import scalation.linalgebra.{MatrixD, VectorD}
+import scalation.math.DoubleWithExp._
+import scalation.plot.Plot
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The Regression object supports both simple and multiple linear regression.
+ *  Given a regression equation y = b_0 + b_1 x_1 + ... b_k x_k
+ */
+object Regression
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Evaluate the formula y = x dot b.
+     *  @param x  the input/design vector
+     *  @param b  the parameter vector
+     */
+    def eval (x: VectorD, b: VectorD): VectorD =
+    {
+        x * b(1) + b(0)
+    } // eval
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Fit the parameter vector (b-vector) in the simple regression equation
+     *  y = b_0 + b_1 * x + e using the least squares method.
+     *  @see http://www.analyzemath.com/statistics/linear_regression.html
+     *  @param x  the input/design vector
+     *  @param y  the response vector
+     */
+    def fit (x: VectorD, y: VectorD): Tuple2 [VectorD, Double] =
+    {
+        val n   = y.dim.toDouble                       // number of data points
+        val xx  = x.sum                                // sum of x values
+        val yy  = y.sum                                // sum of y values
+        val b   = new VectorD (2)                      // parameter vector
+        b(1)    = (n * (y dot x) - yy * xx) / (n * (x dot x) - xx ~^ 2.)  // slope
+        b(0)    = (yy - b(1) * xx) / n                                    // intercept
+        val e   = y - (x * b(1) + b(0))                // residual/error vector
+        val sse = e.normSq                             // residual/error sum of squares
+        val sst = y.normSq - y.sum ~^ 2. / n           // total sum of squares
+        val r2  = (sst - sse) / sst                    // coefficient of determination
+        (b, r2)
+    } // fit
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Evaluate the formula y = x * b.
+     *  @param x  the input/design matrix augmented with a first column of ones
+     *  @param b  the parameter vector
+     */
+    def eval (x: MatrixD, b: VectorD): VectorD =
+    {
+        x * b
+    } // eval
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Fit the parameter vector (b-vector) in the multiple regression equation
+     *  y = x * b + e using the least squares method.
+     *  @param x  the input/design matrix augmented with a first column of ones
+     *  @param y  the response vector
+     */
+    def fit (x: MatrixD, y: VectorD): Tuple2 [VectorD, Double] =
+    {
+        val n   = y.dim.toDouble                       // number of data points
+        val b   = (x.t * x).inverse * x.t * y          // parameter vector
+        val e   = y - x * b                            // residual/error vector
+        val sse = e.normSq                             // residual/error sum of squares
+        val sst = y.normSq - y.sum ~^ 2. / n           // total sum of squares
+        val r2  = (sst - sse) / sst                    // coefficient of determination
+        (b, r2)
+    } // fit
+
+} // Regression object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Object to test Regression object (y = x * b = b0 + b1*x).
+ *  @see http://mathbits.com/mathbits/tisection/Statistics2/linear.htm
+ */
+object RegressionTest extends App
+{
+    // four data points
+    val x = new VectorD (  4.,   9.,  10.,  14.,   4.,   7.,  12.,  22.,   1.,   3.,
+                           8.,  11.,   5.,   6.,  10.,  11.,  16.,  13.,  13.,  10.)
+    val y = new VectorD (390., 580., 650., 730., 410., 530., 600., 790., 350., 400.,
+                         590., 640., 450., 520., 690., 690., 770., 700., 730., 640.)
+
+    val tp = Regression.fit (x, y)
+    val yp = Regression.eval (x, tp._1)    // y-predicted
+    println ("b  = " + tp._1)
+    println ("r2 = " + tp._2)
+    println ("x  = " + x)
+    println ("y  = " + y)
+    println ("yp = " + yp)
+
+    new Plot (x, y, yp)
+
+} // RegressionTest object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Object to test Regression object (y = x * b = b0 + b1*x1 + b2*x2).
+ */
+object RegressionTest2 extends App
+{
+    // five data points: constant term, x1 coordinate, x2 coordinate
+    val x = new MatrixD ((5, 3), 1., 36.,  66.,               // 5-by-3 matrix
+                                 1., 37.,  68.,
+                                 1., 47.,  64.,
+                                 1., 32.,  53.,
+                                 1.,  1., 101.)
+    // five data points: y coordinate
+    val y = new VectorD (745., 895., 442., 440., 1598.)
+
+    val tp = Regression.fit (x, y)
+    val yp = Regression.eval (x, tp._1)    // y-predicted
+    println ("b  = " + tp._1)
+    println ("r2 = " + tp._2)
+    println ("y  = " + y)
+    println ("yp = " + yp)
+
+} // RegressionTest2 object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** Object to test Regression object (y = x * b = b0 + b1*x1 + b2*x2).
+ */
+object RegressionTest3 extends App
+{
+    // four data points: constant term, x1 coordinate, x2 coordinate
+    val x = new MatrixD ((4, 3), 1., 1., 1.,                  // 4-by-3 matrix
+                                 1., 1., 2.,
+                                 1., 2., 1.,
+                                 1., 2., 2.)
+    // four data points: y coordinate
+    val y = new VectorD (6., 8., 7., 9.)
+
+    val tp = Regression.fit (x, y)
+    val yp = Regression.eval (x, tp._1)    // y-predicted
+    println ("b  = " + tp._1)
+    println ("r2 = " + tp._2)
+    println ("y  = " + y)
+    println ("yp = " + yp)
+
+} // RegressionTest3 object
+

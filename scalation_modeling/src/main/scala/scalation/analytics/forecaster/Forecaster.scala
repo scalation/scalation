@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Vamsi Nadella, Hao Peng
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sun Sep 23 21:14:14 EDT 2012
  *  @see     LICENSE (MIT style license file).
  */
@@ -29,7 +29,6 @@ trait Forecaster extends Error
     protected var mse       = -1.0                  // mean squared error
     protected var rmse      = -1.0                  // root mean squared error
     protected var rSq       = -1.0                  // coefficient of determination (quality of fit)
-    protected var e: VectoD = null                  // residual/error vector [e_0, e_1, ... e_m-1]
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Given a time series 'y', train the prediction function 'y = f(y_)', where
@@ -43,7 +42,7 @@ trait Forecaster extends Error
     def eval ()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute diagnostics for the forecaster. Override to add more diagnostics.
+    /** Compute diagnostics for the forecaster.  Override to add more diagnostics.
      *  Note, for 'mse' and 'rmse', 'sse' is divided by the number of instances
      *  'm' rather than the degrees of freedom.
      *  @see en.wikipedia.org/wiki/Mean_squared_error
@@ -83,7 +82,7 @@ trait Forecaster extends Error
     /** Format a double value.
      *  @param z  the double value to format
      */
-    def f_ (z: Double): String = "%.5f".format (z)
+    private def f_ (z: Double): String = "%.5f".format (z)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Build a map of quality of fit measures (use of `LinedHashMap` makes it ordered).
@@ -99,18 +98,18 @@ trait Forecaster extends Error
     } // fitMap
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Return the vector of fitted values on the training data
+    /** Return the vector of predicted values on the training data
      */
-    def fittedValues (): VectoD
+    def predict (): VectoD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Produce forecasts for 'h' steps ahead into the future
+    /** Produce forecasts for 'h' steps ahead into the future.
      *  @param h  the forecasting horizon, number of steps ahead to produce forecasts
      */
     def forecast (h: Int): VectoD
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Produce forecasts for one step ahead into the future
+    /** Produce forecasts for one step ahead into the future.
      */
     def forecast (): VectoD = forecast (1)
 

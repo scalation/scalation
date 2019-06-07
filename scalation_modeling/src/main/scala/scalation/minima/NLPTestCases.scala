@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sun Oct  2 22:43:44 EDT 2011
  *  @see     LICENSE (MIT style license file).
  *  @see     http://www.ai7.uni-bayreuth.de/test_problem_coll.pdf
@@ -11,8 +11,8 @@ package scalation.minima
 
 import scala.math.pow
 
+import scalation.linalgebra.FunctionV2S
 import scalation.linalgebra.VectorD
-import scalation.math.FunctionV2S
 import scalation.math.double_exp
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

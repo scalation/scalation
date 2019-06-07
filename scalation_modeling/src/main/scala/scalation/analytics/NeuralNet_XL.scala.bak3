@@ -1,0 +1,427 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller, Hao Peng
+ *  @version 1.6
+ *  @date    Fri Mar 16 15:13:38 EDT 2018
+ *  @see     LICENSE (MIT style license file).
+ *
+ *  @see     hebb.mit.edu/courses/9.641/2002/lectures/lecture03.pdf
+ *  @see     http://neuralnetworksanddeeplearning.com/
+ */
+
+package scalation.analytics
+
+import scala.collection.mutable.Set
+
+import scalation.linalgebra.{FunctionV_2V, MatriD, MatrixD, VectoD, VectorD, VectorI}
+import scalation.math.double_exp
+import scalation.stat.Statistic
+import scalation.util.banner
+
+import ActivationFun._
+import Initializer._
+import MatrixTransform._
+import Optimizer._                              // Stochastic Gradient Descent
+//import OptimizerM._                               // Stochastic Gradient Descent with Momentum
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `NeuralNet_XL` class supports multi-output, multi-layer (input, multiple hidden and output)
+ *  Neural-Networks.  It can be used for both classification and prediction,
+ *  depending on the activation functions used.  Given several input vectors and output
+ *  vectors (training data), fit the weight and bias parameters connecting the layers,
+ *  so that for a new input vector 'v', the net can predict the output value
+ *  This implementation is partially adapted from Michael Nielsen's Python implementation found in
+ *  @see  github.com/mnielsen/neural-networks-and-deep-learning/blob/master/src/network2.py
+ *  @see  github.com/MichalDanielDobrzanski/DeepLearningPython35/blob/master/network2.py
+ *------------------------------------------------------------------------------
+ *  @param x       the m-by-nx input matrix (training data consisting of m input vectors)
+ *  @param y       the m-by-ny output matrix (training data consisting of m output vectors)
+ *  @param nh      the number of nodes in each hidden layer, e.g., Array (5, 10) means 2 hidden with sizes 5 and 10
+ *  @param fname_  the feature/variable names (if null, use x_j's)
+ *  @param hparam  the hyper-parameters for the model/network
+ *  @param actf    the array of activation function families between every pair of layers
+ *  @param itran   the inverse transformation function returns responses to original scale
+ */
+class NeuralNet_XL (x: MatriD, y: MatriD,
+                    private var nh: Array [Int] = null,
+                    fname_ : Strings = null, hparam: HyperParameter = Optimizer.hp,
+                    actf:  Array [AFF] = Array (f_sigmoid, f_sigmoid, f_lreLU),
+                    val itran: FunctionV_2V = null)
+      extends PredictorMat2 (x, y, fname_, hparam)                             // sets eta in parent class
+{
+    private val DEBUG     = false                                              // debug flag
+    private val bSize     = hp ("bSize").toInt                                 // mini-batch size
+    private val maxEpochs = hp ("maxEpochs").toInt                             // maximum number of training epochs/iterations
+    private val lambda    = hp ("lambda")                                      // regularization hyper-parameter
+
+    // Guidelines for setting the number of nodes in hidden layers, e.g.,
+    // 2 nx + 1, nx + 1, (nx + ny) / 2, sqrt (nx ny)
+    if (nh == null) nh = Array (nx + 1, nx - 1)
+    if (actf.length != nh.length + 1) {
+        flaw ("NeuralNet_XL Constructor", "dimension mismatch among number of layers or activation functions")
+    } // if
+
+    private val sizes  = nx +: nh :+ ny                                         // sizes of all layers
+    private val nl     = sizes.length - 1                                       // number of active layers
+    private val layers = 0 until nl
+
+    private var b = for (l <- layers) yield
+                    new NetParam (weightMat (nh(l), ny), weightVec (ny))        // parameters (weights & biases) per active layer
+
+    println (s"Create a NeuralNet_XL with $nx input, ${nh.deep} hidden and $ny output nodes")
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the parameters (weight matrices and bias vectors).
+     */
+    def parameters: NetParams = b
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given training data 'x' and 'yy', fit the parameters 'b' (weight matrices and
+     *  bias vectors).
+     *  Iterate over several epochs (no batching).
+     *  @param yy  the response/output matrix
+     */
+    def train0 (yy: MatriD = y): NeuralNet_XL =
+    {
+        println (s"train0: eta = $eta")
+        var sse0 = Double.MaxValue                                              // hold prior value of sse
+
+        for (epoch <- 1 to maxEpochs) {                                         // iterate over each epoch
+            val as = Array.ofDim [MatriD] (nl + 1)                              // array to store the activations, layer by layer
+            as(0)  = x                                                          // initial activation, which is the input matrix
+            for (l <- layers) as(l+1) = actf(l).fM (b(l) * as(l))               // feedforward and store all activations
+
+            val yp  = as.last                                                   // predicted value of y
+            ee      = yp - y                                                    // -E where E is the error matrix
+            val d   = Array.ofDim [MatriD] (nl)                                 // array to store all deltas
+            d(nl-1) = actf.last.dM (yp) ** ee                                   // delta for the last layer before output
+            for (l <- nl-2 until 0 by -1)
+                d(l) = actf (l).dM(as (l+1)) ** (d(l+1) * b(l+1).w.t)           // deltas for all previous hidden layers
+
+            for (l <- layers) {
+//              b.w(l) *= 1.0 - eta * (lambda / m)                              // regularization factor, weight decay
+                b(l) -= (as(l).t * d(l) * eta,                                  // update weights
+                         d(l).mean * eta)                                       // update biases
+            } // for
+
+            val sse = ee.normF ~^ 2
+            if (DEBUG) println (s"train0: parameters for $epoch th epoch: sse = $sse")
+            if (sse > sse0) return this                                         // return early if moving up
+            sse0 = sse                                                          // save prior sse
+            this
+        } // for
+        this
+    } // train0
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given training data 'x' and 'y', fit the parameters 'b' (weight matrices and
+     *  bias vectors).  Iterate over several epochs, where each epoch divides the
+     *  training set into 'nbat' batches.  Each batch is used to update the weights.
+     *  @param yy  the response/output matrix
+     */
+    def train (yy: MatriD = y): NeuralNet_XL =
+    {
+        val epochs = optimizeX (x, y, b, eta, bSize, maxEpochs, lambda, actf)   // optimize parameters (weights & biases)
+        println (s"ending epoch = $epochs")
+        this
+    } // train
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given training data 'x' and 'y', fit the parameters 'b' (weight matrices and
+     *  bias vectors).  Iterate over several epochs, where each epoch divides the
+     *  training set into 'nbat' batches.  Each batch is used to update the weights.
+     *  This version preforms an interval search for the best 'eta' value.
+     *  @param yy  the response/output matrix
+     */
+    def train2 (yy: MatriD = y): NeuralNet_XL =
+    {
+        val etaI = (0.25 * eta, 4.0 * eta)                                        // quarter to four times eta
+        val epochs = optimizeXI (x, y, b, etaI, bSize, maxEpochs, lambda, actf)   // optimize parameters (weights & biases)
+        println (s"ending epoch = $epochs")
+        this
+    } // train2
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform forward selection to add the most predictive variable to the existing
+     *  model, returning the variable to add, the new parameter vector and the new
+     *  Quality of Fit (QoF).  May be called repeatedly.
+     *  Only selects based on the first response/output column.
+     *  @see `Fit` for 'ir' index of QoF measures.
+     *  @param cols      the columns of matrix x included in the existing model
+     *  @param adjusted  whether to use rSqBar or rSq as the criterion
+     */
+    def forwardSel (cols: Set [Int], adjusted: Boolean = true): (Int, NetParams, VectoD) =
+    {
+        val ft0   =  fitA(0)
+        val ir    =  if (adjusted) ft0.index_rSqBar else ft0.index_rSq   // qof = fit(ir) either rSqBar/rSq
+        var j_max = -1                                                   // index of variable to add
+        var b_max: NetParams = b                                         // parameter values for best solution
+        var ft_max: VectoD = VectorD.fill (fitLabel.size)(-1.0)          // optimize on quality of fit
+
+        for (j <- x.range2 if ! (cols contains j)) {
+            val cols_j = cols + j                                        // try adding x_j
+            val x_cols = x.selectCols (cols_j.toArray)                   // x projected on cols
+            val nn_j   = new NeuralNet_XL (x_cols, y, null, null, hparam, actf, itran)  // regress with x_j added
+            nn_j.train ().eval ()                                        // train model, evaluate QoF
+            val bb  = nn_j.parameters
+            val ft  = nn_j.fitA(0).fit
+            val qof = ft(ir)                                             // rSqBar/rSq
+            if (DEBUG) println (s"forwardSel: cols_$j = $cols_j, qof_$j = $qof")
+            if (qof > ft_max(ir)) { j_max = j; b_max = bb; ft_max = ft }
+        } // for
+        if (DEBUG) println (s"forwardSel: add variable $j_max, parameter b = $b_max, qof = ${ft_max(ir)}")
+        (j_max, b_max, ft_max)
+    } // forwardSel
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a new input vector 'v', predict the output/response vector 'f(v)'.
+     *  @param v  the new input vector
+     */
+    def predictV (v: VectoD): VectoD =
+    {
+        var u = v
+        for (l <- layers) u = actf(l).fV (b(l) dot u)
+        u
+    } // predictV
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given an input matrix 'x', predict the output/response matrix 'f(x)'.
+     *  @param v  the input matrix
+     */
+    def predict (v: MatriD = x): MatriD =
+    {
+        var u = v
+        for (l <- layers) u = actf(l).fM (b(l) * u)
+        u
+    } // predict
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Perform 'k'-fold cross-validation.
+     *  @param k      the number of folds
+     *  @param rando  whether to use randomized cross-validation
+     */
+    def crossVal (k: Int = 10, rando: Boolean = true): Array [Statistic] =
+    {
+        crossValidate ((x: MatriD, y: MatriD) => new NeuralNet_XL (x, y, nh, fname, hparam, actf),
+                                                 k, rando)
+    } // crossVal
+
+} // NeuralNet_XL class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `NeuralNet_XL` companion object provides factory functions for buidling two-layer
+ *  neural nets.
+ */
+object NeuralNet_XL
+{
+    import PredictorMat.pullResponse
+
+    private val DEBUG = false                                       // debug flag
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a `NeuralNet_XL` for a combined data matrix.
+     *  @param xy       the combined input and output matrix
+     *  @param nh       the number of nodes in each hidden layer, e.g., Array (5, 10) means 2 hidden with sizes 5 and 10
+     *  @param fname    the feature/variable names
+     *  @param hparam   the hyper-parameters
+     *  @param af       the array of activation function families over all layers
+     *  @param rescale  the whether to rescale matrix xy to match activation function
+     */
+    def apply (xy: MatriD, fname: Strings = null,
+               nh: Array [Int] = null, 
+               hparam: HyperParameter = Optimizer.hp,
+               af: Array [AFF] = Array (f_sigmoid, f_sigmoid, f_lreLU),
+               rescale: Boolean = true): NeuralNet_XL =
+    {
+        var itran: FunctionV_2V = null                              // inverse transform -> orginal scale
+        val cy   = xy.dim2 - 1                                      // response column
+
+        val xy_s =
+            if (rescale) {
+                if (af(0).bounds != null) {                         // scale to bounds
+                   val (min_xy, max_xy) = (min (xy), max (xy))
+                   itran = unscaleV ((min_xy(cy), max_xy(cy)), af(0).bounds) _
+                   scale (xy, (min_xy, max_xy), af(0).bounds)
+               } else {                                             // normalize
+                  val (mu_xy, sig_xy) = (xy.mean, stddev (xy))
+                  itran = denormalizeV ((mu_xy(cy), sig_xy(cy))) _
+                  normalize (xy, (mu_xy, sig_xy))
+               } // if
+           } else {                                                 // do not rescale
+               xy
+           } // if
+
+        val (x, y) = pullResponse (xy_s)
+//      setCol2One (x)
+        if (DEBUG) println ("scaled: x = " + x + "\nscaled y = " + y)
+        new NeuralNet_XL (x, MatrixD (Seq (y)), nh, fname, hparam, af, itran)
+    } // apply
+
+} // NeuralNet_XL object
+
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `NeuralNet_XLTest` object is used to test the `NeuralNet_XL` class.
+ *  @see www4.rgu.ac.uk/files/chapter3%20-%20bp.pdf
+ *  > runMain scalation.analytics.NeuralNet_XLTest
+ */
+object NeuralNet_XLTest extends App
+{
+    val s = 0                                                    // random number stream to use
+    val x = new MatrixD ((3, 3), 1.0, 0.35, 0.9,                 // training data - input matrix (m vectors)
+                                 1.0, 0.20, 0.7,
+                                 1.0, 0.40, 0.95)
+    val y = new MatrixD ((3, 2), 0.5, 0.4,                       // training data - output matrix (m vectors)
+                                 0.3, 0.3,
+                                 0.6, 0.5)
+
+    println ("input  matrix x = " + x)
+    println ("output matrix y = " + y)
+
+    val hp2 = hp.updateReturn ("bSize", 1)
+    val nn  = new NeuralNet_XL (x, y, Array (3), hparam = hp2)   // create a NeuralNet_XL
+
+    for (i <- 1 to 20) {
+        val eta = i * 0.5
+        banner (s"NeuralNet_XLTest: Fit the parameter b using optimization with learning rate $eta")
+
+        nn.reset (eta_ = eta)
+        nn.train ().eval ()                                      // fit the weights using training data
+        println (nn.report)
+
+//      yp = nn.predict (x)                                      // predicted output values
+//      println ("target output:    y   = " + y)
+//      println ("predicted output: yp  = " + yp)
+        println ("yp0 = " + nn.predict (x(0)))                   // predicted output values for row 0
+    } // for
+
+    banner ("NeuralNet_XLTest: Compare with Linear Regression - first column of y")
+
+    val y0  = y.col(0)                                           // use first column of matrix y
+    val rg0 = new Regression (x, y0)                             // create a Regression model
+    rg0.train ().eval ()
+    println (rg0.report)
+
+    val y0p = rg0.predict (x)                                    // predicted output value
+    println ("target output:    y0  = " + y0)
+    println ("predicted output: y0p = " + y0p)
+
+    banner ("NeuralNet_XLTest: Compare with Linear Regression - second column of y")
+
+    val y1 = y.col(1)                                            // use second column of matrix y
+    val rg1 = new Regression (x, y1)                             // create a Regression model
+    rg1.train ().eval ()
+    println (rg1.report)
+
+    val y1p = rg1.predict (x)                                    // predicted output value
+    println ("target output:    y1  = " + y1)
+    println ("predicted output: y1p = " + y1p)
+
+} // NeuralNet_XLTest object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `NeuralNet_XLTest2` object trains a neural netowrk on the `ExampleBasketBall` dataset.
+ *  > runMain scalation.analytics.NeuralNet_XLTest2
+ */
+object NeuralNet_XLTest2 extends App
+{
+    import ExampleBasketBall._
+    banner ("NeuralNet_XL vs. Regession - ExampleBasketBall")
+
+    println ("ox = " + ox)
+    println ("y  = " + y)
+
+    banner ("Regression")
+    val rg = Regression (oxy)
+    rg.train ().eval ()
+    println (rg.report)
+
+    banner ("prediction")                                 // not currently rescaling
+    val yq = rg.predict ()                                // scaled predicted output values for all x
+    println ("target output:    y  = " + y)
+    println ("predicted output: yq = " + yq)
+    println ("error:            e  = " + (y - yq))
+
+    banner ("NeuralNet_XL with scaled y values")
+    val nn  = NeuralNet_XL (xy)                           // factory function automatically rescales
+//  val nn  = new NeuralNet_XL (x, MatrixD (Seq (y)))     // constructor does not automatically rescale
+
+    nn.reset (eta_ = 3.7)                                 // try several values
+    nn.train0 ().eval ()                                  // fit the weights using training data - simple alg.
+
+//  nn.reset (eta = 3.7)                                  // try several values
+//  nn.train ().eval ()                                   // fit the weights using training data
+    println (nn.report)
+
+    banner ("scaled prediction")
+    val yp = nn.predict ().col (0)                        // scaled predicted output values for all x
+    println ("target output:    y  = " + y)
+    println ("predicted output: yp = " + yp)
+    println ("error:            e  = " + (y - yp))
+
+/*
+    banner ("unscaled prediction")
+//  val (ymu, ysig) = (y.mean, sqrt (y.variance))         // should obtain from apply - see below
+//  val ypu = denormalizeV ((ymu, ysig))(yp)              // denormalize predicted output values for all x
+    val ypu = nn.itran (yp)                               // denormalize predicted output values for all x
+    println ("target output:   y   = " + y)
+    println ("unscaled output: ypu = " + ypu)
+*/
+
+} // NeuralNet_XLTest2 object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `NeuralNet_XLTest3` object trains a neural netowrk on the `ExampleAutoMPG` dataset.
+ *  > runMain scalation.analytics.NeuralNet_XLTest3
+ */
+object NeuralNet_XLTest3 extends App
+{
+    import ExampleAutoMPG._
+    banner ("NeuralNet_XL vs. Regession - ExampleAutoMPG")
+
+    println ("ox = " + ox)
+    println ("y  = " + y)
+
+    banner ("Regression")
+    val rg = Regression (oxy)
+    rg.train ().eval ()
+    println (rg.report)
+
+    banner ("prediction")                                 // not currently rescaling
+    val yq = rg.predict ()                                // scaled predicted output values for all x
+    println ("target output:    y  = " + y)
+    println ("predicted output: yq = " + yq)
+    println ("error:            e  = " + (y - yq))
+
+    banner ("NeuralNet_XL with scaled y values")
+    val nn  = NeuralNet_XL (xy)                           // factory function automatically rescales
+//  val nn  = new NeuralNet_XL (x, MatrixD (Seq (y)))     // constructor does not automatically rescale
+
+    nn.reset (eta_ = 0.2)                                 // try several values
+    nn.train0 ().eval ()                                  // fit the weights using training data - simple alg.
+
+//  nn.reset (eta_ = 0.2)                                 // try several values
+//  nn.train ().eval ()                                   // fit the weights using training data
+    println (nn.report)
+
+/*
+    banner ("scaled prediction")
+    val yp = nn.predict ().col (0)                        // scaled predicted output values for all x
+    println ("target output:    y  = " + y)
+    println ("predicted output: yp = " + yp)
+    println ("error:            e  = " + (y - yp))
+
+    banner ("unscaled prediction")
+//  val (ymu, ysig) = (y.mean, sqrt (y.variance))         // should obtain from apply - see below
+//  val ypu = denormalizeV ((ymu, ysig))(yp)              // denormalize predicted output values for all x
+    val ypu = nn.itran (yp)                               // denormalize predicted output values for all x
+    println ("target output:   y   = " + y)
+    println ("unscaled output: ypu = " + ypu)
+*/
+
+} // NeuralNet_XLTest3 object
+

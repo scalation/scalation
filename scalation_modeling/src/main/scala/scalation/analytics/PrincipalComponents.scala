@@ -1,7 +1,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Mon Mar 25 14:58:13 EDT 2013
  *  @see     LICENSE (MIT style license file).
 
@@ -90,7 +90,7 @@ class PrincipalComponents (x: MatriD)
      */
     def reduce (): MatriD =
     {
-        reducedMat = x * featureMat                     // store in reduced matrix
+        reducedMat = xc * featureMat                    // store in reduced matrix
         reducedMat
     } // reduce
 

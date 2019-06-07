@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Sun Dec 28 21:52:38 EST 2014
  *  @see     LICENSE (MIT style license file).
  */
@@ -30,14 +30,13 @@ import ActivationFun.sigmoid
  *  where 'e' represents the residuals (the part not explained by the model)
  *  and 'y' is now binary.
  *  @see see.stanford.edu/materials/lsoeldsee263/05-ls.pdf
- *  @param x   the input/design matrix augmented with a first column of ones
- *  @param y   the binary response vector, y_i in {0, 1}
- *  @param fn  the names for all features/variables
- *  @param cn  the names for both classes
+ *  @param x    the input/design matrix augmented with a first column of ones
+ *  @param y    the binary response vector, y_i in {0, 1}
+ *  @param fn_  the names for all features/variables
+ *  @param cn_  the names for both classes
  */
-class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String] = null,
-                          cn: Array [String] = Array ("no", "yes"))
-      extends ClassifierReal (x, y, fn, 2, cn)
+class LogisticRegression (x: MatriD, y: VectoI, fn_ : Strings = null, cn_ : Strings = null)
+      extends ClassifierReal (x, y, fn_, 2, cn_)
 {
     if (y != null && x.dim1 != y.dim) flaw ("constructor", "dimensions of x and y are incompatible")
 
@@ -95,14 +94,14 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String] = null,
      *  @see en.wikipedia.org/wiki/Iteratively_reweighted_least_squares
      *  @param itestStart  the indices of test test data
      */
-    def train (itest: IndexedSeq [Int]): LogisticRegression =     // FIX - use these parameters
+    def train (itest: Ints): LogisticRegression =           // FIX - use these parameters
     {
          train_null ()
-         val b0   = new VectorD (x.dim2)        // use b_0 = 0 for starting guess for parameters
-         val bfgs = new QuasiNewton (ll)        // minimizer for -2l
-         b     = bfgs.solve (b0)                // find optimal solution for parameters
+         val b0   = new VectorD (x.dim2)                    // use b_0 = 0 for starting guess for parameters
+         val bfgs = new QuasiNewton (ll)                    // minimizer for -2l
+         b     = bfgs.solve (b0)                            // find optimal solution for parameters
 
-         r_dev = ll (b)                         // measure of fitness for full model
+         r_dev = ll (b)                                     // measure of fitness for full model
          aic   = r_dev + 2.0 * x.dim2
          this
     } // train
@@ -114,11 +113,11 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String] = null,
      */
     def train_null ()
     {
-         val b0   = new VectorD (x.dim2)        // use b0 = 0 for starting guess for parameters
-         val bfgs = new QuasiNewton (ll_null)   // minimizer for -2l
-         val b_n = bfgs.solve (b0)              // find optimal solution for parameters
+         val b0   = new VectorD (x.dim2)                    // use b0 = 0 for starting guess for parameters
+         val bfgs = new QuasiNewton (ll_null)               // minimizer for -2l
+         val b_n = bfgs.solve (b0)                          // find optimal solution for parameters
 
-         n_dev   = ll_null (b_n)                // measure of fitness for null model
+         n_dev   = ll_null (b_n)                            // measure of fitness for null model
     } // train_null
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -222,7 +221,9 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String] = null,
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `LogisticRegressionTest` object tests the `LogisticRegression` class.
+/** The `LogisticRegressionTest` object tests the `LogisticRegression` class
+ *  on the mtcars dataset.
+ *  @see ExampleMtcars.scala
  *  @see www.cookbook-r.com/Statistical_analysis/Logistic_regression/
  *  Answer: b = (-8.8331, 0.4304),
  *          n_dev = 43.860, r_dev = 25.533, aci = 29.533, pseudo_rSq = 0.4178
@@ -230,52 +231,18 @@ class LogisticRegression (x: MatriD, y: VectoI, fn: Array [String] = null,
  */
 object LogisticRegressionTest extends App
 {
-    // 32 data points:            One    Mpg
-    val x = new MatrixD ((32, 2), 1.0,  21.0,        //  1 - Mazda RX4 
-                                  1.0,  21.0,        //  2 - Mazda RX4 Wa
-                                  1.0,  22.8,        //  3 - Datsun 710
-                                  1.0,  21.4,        //  4 - Hornet 4 Drive
-                                  1.0,  18.7,        //  5 - Hornet Sportabout
-                                  1.0,  18.1,        //  6 - Valiant
-                                  1.0,  14.3,        //  7 - Duster 360
-                                  1.0,  24.4,        //  8 - Merc 240D 
-                                  1.0,  22.8,        //  9 - Merc 230
-                                  1.0,  19.2,        // 10 - Merc 280
-                                  1.0,  17.8,        // 11 - Merc 280C
-                                  1.0,  16.4,        // 12 - Merc 450S
-                                  1.0,  17.3,        // 13 - Merc 450SL
-                                  1.0,  15.2,        // 14 - Merc 450SLC
-                                  1.0,  10.4,        // 15 - Cadillac Fleetwood
-                                  1.0,  10.4,        // 16 - Lincoln Continental
-                                  1.0,  14.7,        // 17 - Chrysler Imperial
-                                  1.0,  32.4,        // 18 - Fiat 128
-                                  1.0,  30.4,        // 19 - Honda Civic
-                                  1.0,  33.9,        // 20 - Toyota Corolla
-                                  1.0,  21.5,        // 21 - Toyota Corona
-                                  1.0,  15.5,        // 22 - Dodge Challenger
-                                  1.0,  15.2,        // 23 - AMC Javelin
-                                  1.0,  13.3,        // 24 - Camaro Z28
-                                  1.0,  19.2,        // 25 - Pontiac Firebird
-                                  1.0,  27.3,        // 26 - Fiat X1-9
-                                  1.0,  26.0,        // 27 - Porsche 914-2
-                                  1.0,  30.4,        // 28 - Lotus Europa
-                                  1.0,  15.8,        // 29 - Ford Pantera L
-                                  1.0,  19.7,        // 30 - Ferrari Dino
-                                  1.0,  15.0,        // 31 - Maserati Bora
-                                  1.0,  21.4)        // 32 - Volvo 142E
-
-    val y = VectorI (0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0,
-                     0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1)
-
-    var z: VectoD = null
+    val x  = ExampleMtcars.xy.sliceCol (0, 2)
+    val x1 = ExampleMtcars.xy.col (1)
+    val y  = ExampleMtcars.xy.col (2).toInt
 
     println ("x = " + x)
+    println ("y = " + y)
 
-    val fn = Array ("One", "Mpg")
+    val fn = Array ("One", "Mpg")                         // feature names
 
-    val lrg = new LogisticRegression (x, y, fn)
-//  lrg.train_null ()                                    // train based on null model
-    lrg.train ()                                         // train based on full model
+    val lrg = new LogisticRegression (x, y, fn)           // Logistic Regression classifier
+//  lrg.train_null ()                                     // train based on null model
+    lrg.train ()                                          // train based on full model
 
     banner ("Logistic Regression Results")
     println ("b = " + lrg.coefficient)
@@ -283,23 +250,22 @@ object LogisticRegressionTest extends App
     val yp = lrg.classify (x)
     println ("y  = " + y)
     println ("yp = " + yp)
-    println (lrg.fitLabel)
-    println (lrg.fit (y, yp))
+    println (lrg.fitMap (y, yp))
 
-    z = VectorD (1.0, 15.0)                              // classify point z
+    banner ("classify new instances")
+    var z = VectorD (1.0, 15.0)                           // classify point z = [1, 15]
     println ("classify (" + z + ") = " + lrg.classify (z))
-
-    z = VectorD (1.0, 30.0)                              // classify point z
+    z = VectorD (1.0, 30.0)                               // classify point z = [1, 30]
     println ("classify (" + z + ") = " + lrg.classify (z))
 
 } // LogisticRegressionTest object
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-/** The `LogisticRegressionTest` object tests the `LogisticRegression` class.
+/** The `LogisticRegressionTest2` object tests the `LogisticRegression` class.
  *  @see statmaster.sdu.dk/courses/st111/module03/index.html
  *  @see www.stat.wisc.edu/~mchung/teaching/.../GLM.logistic.Rpackage.pdf
- *  > runMain scalation.analytics.classifier.classifier.LogisticRegressionTest2
+ *  > runMain scalation.analytics.classifier.LogisticRegressionTest2
  */
 object LogisticRegressionTest2 extends App
 {
@@ -355,20 +321,19 @@ object LogisticRegressionTest2 extends App
 
 //  val lrg = new LogisticRegression (x(0 until x.dim1, 0 until 2), y, fn, cn)
     val lrg = new LogisticRegression (x, y, fn, cn)
-//  lrg.train_null ()                                    // train based on null model
-    lrg.train ()                                         // train based on full model
+//  lrg.train_null ()                                      // train based on null model
+    lrg.train ()                                           // train based on full model
 
     banner ("Logistic Regression Results")
     println ("b = " + lrg.coefficient)
 
-    val z  = VectorD (1.0, 100.0, 100.0, 100.0)         // classify point z
+    val z  = VectorD (1.0, 100.0, 100.0, 100.0)           // classify point z
     println ("classify (" + z + ") = " + lrg.classify (z))
 
     val yp = lrg.classify (x)
     println ("y  = " + y)
     println ("yp = " + yp)
-    println (lrg.fitLabel)
-    println (lrg.fit (y, yp))
+    println (lrg.fitMap (y, yp))
 
 //  new Plot (x.col(1), y, yyp)
 //  new Plot (x.col(2), y, yyp)

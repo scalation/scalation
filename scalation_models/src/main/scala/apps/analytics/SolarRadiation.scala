@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  Vishnu Gowda Harish, John Miller, 
- *  @version 1.5
+ *  @version 1.6
  *  @date    Thu Dec 22 17:00:46 EST 2016
  *  @see     LICENSE (MIT style license file).
  */
@@ -27,7 +27,7 @@ object SolarRadiation extends App
 {
     val fName = BASE_DIR + "solar-radiation-40.csv"                                             
     
-    val solarRel    = Relation (fName, "solarRel", -1, null, ",")                                  
+    val solarRel    = Relation (fName, "solarRel", -1, null, ",", null)                                  
     val solarMat    = solarRel.toMatriD (0 to 39)                                                  
     val solarRleMat = solarRel.toMatriD (0 to 39, MatrixKind.COMPRESSED).asInstanceOf [RleMatrixD] 
     val siteInfo    = solarRel.colName

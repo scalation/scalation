@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Mon Oct 12 15:38:31 EDT 2015
  *  @see     LICENSE (MIT style license file).
  *
@@ -14,10 +14,11 @@
 
 package scalation.dynamics
 
-import scalation.analytics.Predictor
-import scalation.linalgebra.{VectoD, VectorD}
+import scala.collection.mutable.{LinkedHashMap, Map}
+
+import scalation.analytics.{HyperParameter, Predictor}
+import scalation.linalgebra.{FunctionV_2S, MatriD, VectoD, VectorD}
 import scalation.linalgebra.VectorD.one
-import scalation.math.FunctionV_2S
 import scalation.minima.QuasiNewton
 import scalation.util.Error
 
@@ -45,13 +46,11 @@ class NLS_ODE (z: VectorD, ts: VectorD, b_init: VectorD, private var w: VectorD 
     if (z.dim != ts.dim) flaw ("constructor", "number of observations z must match time series ts")
     if (w == null) w = one (z.dim)
 
-    /** The objective function to be minimized (measures quality of fit)
-     */
-    private var objectiveF: FunctionV_2S = null
+    private var objectiveF: FunctionV_2S = null             // objective function to minimize (measures quality of fit)
+    private var y0 = 0.0                                    // initial value/condition y(0) = y0
 
-    /** The initial value/condition y(0) = y0
-     */
-    private var y0 = 0.0
+    private var b: VectoD = null                            // parameter/coefficient vector [b_0, b_1, ... b_k]
+    private var e: VectoD = null                            // residual/error vector [e_0, e_1, ... e_m-1
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Initialize `NLS-ODE` with the objective function and initial value/condition.
@@ -102,13 +101,46 @@ class NLS_ODE (z: VectorD, ts: VectorD, b_init: VectorD, private var w: VectorD 
     } // train
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /** Compute the error and useful diagnostics.  FIX
+    /** Compute the error and useful diagnostics.
+     *  @param xx  the test data/input matrix
+     *  @param yy  the test response/output vector
      */
-    def eval ()
+    def eval (xx: MatriD, yy: VectoD): NLS_ODE =
     {
-//      e = yy - x * b                                         // compute residual/error vector e
-//      diagnose (yy)                                          // compute diagnostics
+        val yp = xx * b                                        // predicted y value - FIX
+        e = yy - yp                                            // compute residual/error vector e
+//      diagnose (e, yy)                                       // compute diagnostics - FIX
+        this
     } // eval
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the hyper-parameters.
+     */
+    def hparameter: HyperParameter = null
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the vector of parameter/coefficient values.
+     */
+    def parameter: VectoD = b
+
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return a basic report on the trained model.
+     *  @see 'summary' method for more details
+     */
+    def report: String =
+    {
+        s"""
+REPORT
+    hparameter hp  = $hparameter
+    parameter  b   = $parameter
+    fitMap     qof = $fitMap
+        """
+    } // report
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the vector of residuals/errors.
+     */
+    def residual: VectoD = e
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the quality of fit.
@@ -118,7 +150,26 @@ class NLS_ODE (z: VectorD, ts: VectorD, b_init: VectorD, private var w: VectorD 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Return the labels for the fit.
      */
-    def fitLabels: Seq [String] = Seq ("objectiveF")
+    def fitLabel: Seq [String] = Seq ("objectiveF")
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Format a double value.
+     *  @param z  the double value to format
+     */
+    private def f_ (z: Double): String = "%.5f".format (z)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Build a map of quality of fit measures (use of `LinedHashMap` makes it ordered).
+     *  Override to add more quality of fit measures.
+     */
+    def fitMap: Map [String, String] =
+    {
+        val lm = LinkedHashMap [String, String] ()          // empty list map
+        val fl = fitLabel                                   // fit labels
+        val fv = fit                                        // fit values
+        for (i <- fl.indices) lm += fl(i) -> f_(fv(i))
+        lm
+    } // fitMap
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     /** Predict the value of 'y = f(zz)'.
@@ -151,7 +202,7 @@ object NLS_ODETest extends App
 
     nls.init (objectiveF, y0)
     nls.train ()
-    println ("b = " + nls.coefficient)
+    println ("b = " + nls.parameter)
 
 } // NLS_ODETest object
 

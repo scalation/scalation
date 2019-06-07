@@ -1,7 +1,7 @@
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller
- *  @version 1.5
+ *  @version 1.6
  *  @date    Wed Aug 24 19:53:22 EDT 2011
  *  @see     LICENSE (MIT style license file).
  */
@@ -30,8 +30,6 @@ class GoldenSectionLS (f: FunctionS2S)
 {
     private val DEBUG     = false                       // debug flag
     private val MAX_ITER  = 10                          // maximum number of expansion iterations
-    private val G_RATIO   = (1.0 + sqrt (5.0)) / 2.0    // the golden ratio (1.618033988749895)
-    private val G_SECTION = G_RATIO / (1.0 + G_RATIO)   // the golden section number (0.6180339887498949)
     private val τ         = 0.005                       // tolerance for breaking the iterations - FIX - generalize
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

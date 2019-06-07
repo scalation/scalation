@@ -1,14 +1,15 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /** @author  John Miller, Naman Fatehpuria
- *  @version 1.5
+ *  @version 1.6
  *  @date    Mon Mar  3 14:39:17 EST 2014
  *  @see     LICENSE (MIT style license file).
  *
  *  @see     fbim.fh-regensburg.de/~saj39122/Diplomarbeiten/Miklos/Papers/Keerthi%20improvement%20on%20SMO.pdf
  */
 
-package scalation.analytics.classifier
+package scalation.analytics
+package classifier
 
 import scala.collection.mutable.Set
 import scala.math.abs
@@ -22,15 +23,15 @@ import scalation.util.Error
  *  modified SMO (Modification 2) found at the above URL's into Scala and includes
  *  a few simplifications (e.g., currently only works for linear kernels, dense
  *  data and binary classification).
- *  @param x   the training data points stored as rows in a matrix
- *  @param y   the classification of the data points stored in a vector
- *  @param fn  the factor names
- *  @param cn  the class names
+ *  @param x    the training data points stored as rows in a matrix
+ *  @param y    the classification of the data points stored in a vector
+ *  @param fn_  the factor names
+ *  @param cn_  the class names
  */
-class SupportVectorMachine (x: MatrixD, y: VectoI, fn: Array [String] = Array (), cn: Array [String] = Array ("-", "+"))
-      extends ClassifierReal (x, y, fn, 2, cn)
+class SupportVectorMachine (x: MatrixD, y: VectoI, fn_ : Strings = null, cn_ : Strings = Array ("-", "+"))
+      extends ClassifierReal (x, y, fn_, 2, cn_)
 {
-    type Pair = Tuple2 [Double, Double]
+    type Pair = (Double, Double)
     
     private val DEBUG   = true               // debug flag
     private val EPSILON = 1E-3               // a number close to zero
@@ -63,7 +64,7 @@ class SupportVectorMachine (x: MatrixD, y: VectoI, fn: Array [String] = Array ()
      *  the model '(w dot z) - b'.
      *  @param itest  the indices of the test data
      */
-    def train (itest: IndexedSeq [Int]): SupportVectorMachine =      // FIX - use this parameters
+    def train (itest: Ints): SupportVectorMachine =          // FIX - use this parameters
     {
         // Fill Set I_1 and I_4, as initially alp[i] = 0
         // Initialize i_Up to any index of class +1 
@@ -120,7 +121,7 @@ class SupportVectorMachine (x: MatrixD, y: VectoI, fn: Array [String] = Array ()
      *  -1 means it belongs to the negative class.
      *  @param z  the vector to classify
      */
-//  def classify (z: VectoI): Tuple2 [Int, String] =
+//  def classify (z: VectoI): (Int, String) =
 //  {
 //      val zd = new VectorD (z.dim)
 //      for (j <- 0 until z.dim) zd(j) = z(j).toDouble

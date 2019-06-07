@@ -1,0 +1,349 @@
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.2
+ *  @date    Sun Aug 23 13:32:01 EDT 2015
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.math
+
+import collection.immutable._
+import language.implicitConversions
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `StrNum` class is used to represent and operate on string numbers.
+ *  Internally, a string number is represented as String.
+ *  The semantics of `StrNum` operators are similar those in Pike.
+ *  @see http://docs.roxen.com/pike/7.0/tutorial/strings/operators.xml
+ *-------------------------------------------------------------------------
+ *  @param str  the underlying string
+ */
+case class StrNum (val str: String)
+//object Strnum {
+//implicit class StrNum (val str: String)
+     extends Numeric [StrNum] with Ordered [StrNum]
+{
+    /** the element seperator in files for CSV files
+     */
+    private val SEP = ","
+
+    /** Format String used for printing parts of string numbers (change using setFormat)
+     */
+    private var fString = "%s"
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the unary minus (-).
+     */
+    def unary_- (): StrNum = StrNum (str.reverse)
+
+    def negate (s: StrNum) = -s
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add two string numbers.
+     *  @param s  add string s to this
+     */
+    def + (s: StrNum): StrNum = StrNum (str + s.str)
+
+    def plus (s: StrNum, t: StrNum): StrNum = s + t
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Subtract two string numbers.
+     *  @param s  subtract s from this
+     */
+    def - (s: StrNum): StrNum = StrNum (str diff s.str)
+
+    def minus (s: StrNum, t: StrNum): StrNum = s - t
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Multiply two string numbers, by replacing 'SEP' by 's'.
+     *  @param s  multiply this times s
+     */
+//   def * (s: StrNum): StrNum = StrNum (str intersect s.str)
+     def * (s: StrNum): StrNum = StrNum (str.replace (SEP, s.str))
+
+    def times (s: StrNum, t: StrNum): StrNum = s * t
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Divide two string numbers, by replacing 's' by 'SEP.
+     *  @param s  divide this by s
+     */
+    def / (s: StrNum): StrNum =  StrNum (str.replace (s.str, SEP))
+
+    def div (s: StrNum, t: StrNum): StrNum = s / t
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Raise a string to the 'r'-th power.
+     *  @param r  the power/exponent
+     */
+    def ~^ (r: StrNum): StrNum =
+    {
+        val is = r.str
+        val k = if (is matches "\\d*") is.toInt else is.size
+        var ss = str
+        for (i <- 1 until k) ss = ss intersect str
+        StrNum (ss)
+    } // ~^
+
+    def pow (s: StrNum, r: StrNum): StrNum = s ~^ r
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return whether two string numbers are nearly equal.
+     *  @param s  compare this with s
+     */
+    def =~ (s: StrNum): Boolean = str == s.str
+    def !=~ (s: StrNum): Boolean = str != s.str
+
+    def near_eq (s: StrNum, t: StrNum): Boolean = s =~ t
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the absolute value of 'this' string number.
+     */
+    def abs: StrNum = StrNum (str.capitalize)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the maximum of 'this' and 's' string numbers.
+     *  @param s  that string number to compare with this
+     */
+    def max (s: StrNum): StrNum = if (s > this) s else this
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the minimum of 'this' and 's' string numbers.
+     *  @param s  that string number to compare with this
+     */
+    def min (s: StrNum): StrNum = if (s < this) s else this
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compare two string numbers (negative for <, zero for ==, positive for >).
+     *  @param s  the first string number to compare
+     *  @param t  the second string number to compare
+     */
+    def compare (s: StrNum, t: StrNum): Int = s.str compare t.str
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compare 'this' string number with that string number 't'.
+     *  @param t  that string number
+     */	
+    def compare (t: StrNum): Int = str compare t.str
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' string number to a StrNum.
+     *  @param s  that string number to convert
+     */
+    def toStrNum (s: StrNum): StrNum = s
+
+    def toStrNum: StrNum = this
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' string number to a Complex.
+     *  @param s  that string number to convert
+     */
+    def toComplex (s: StrNum): Complex = Complex (s.str)
+
+    def toComplex: Complex = toComplex (this)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' string number to a Rational.
+     *  @param s  that string number to convert
+     */
+    def toRational (s: StrNum): Rational = Rational (s.str)
+
+    def toRational: Rational = toRational (this)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' string number to a Real.
+     *  @param s  that string number to convert
+     */
+    def toReal (s: StrNum): Real = Real (s.str)
+
+    def toReal: Real = toReal (this)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' string number to a Double.
+     *  @param s  that string number to convert
+     */
+    def toDouble (s: StrNum): Double = s.str.toDouble
+
+    def toDouble: Double = str.toDouble
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' string number to a Float.
+     *  @param s  that string number to convert
+     */
+    def toFloat (s: StrNum): Float = s.str.toFloat
+
+    def toFloat: Float = str.toFloat
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' string number to an Int.
+     *  @param s  that string number to convert
+     */
+    def toInt (s: StrNum): Int = s.str.toInt
+
+    def toInt: Int = str.toInt
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' string number to a Long.
+     *  @param s  that string number to convert
+     */
+    def toLong (s: StrNum): Long = s.str.toLong
+
+    def toLong: Long = str.toLong
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a string number from a Double.
+     *  @see StrNum.double2StrNum
+     *  @param x  the double used to create the string number
+     */
+    def fromDouble (x: Double): StrNum = StrNum (x.toString)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a string number from a Float.  Float currently not fully supported.
+     *  @param x  the float used to create the string number
+     */
+    def fromFloat (x: Float): StrNum = StrNum (x.toString)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a string number from an Int.
+     *  @param n  the integer used to create the string number
+     */
+    def fromInt (n: Int): StrNum = StrNum (n.toString)
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Create a string number from a Long.
+     *  @param n  the long used to create the string number
+     */
+    def fromLong (n: Long): StrNum = StrNum (n.toString)
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Override equals to determine whether 'this' string number equals string 's'.
+     *  @param s  the string number to compare with this
+     */
+    override def equals (s: Any): Boolean =
+    {
+         s.isInstanceOf [StrNum] && (str equals (s.asInstanceOf [StrNum]).str)
+    } // equals
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Must also override hashCode to be be compatible with equals.
+     */
+    override def hashCode: Int = str.hashCode
+
+   //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the format to the 'newFormat'.
+     *  @param  newFormat  the new format String
+     */
+    def setFormat (newFormat: String) { fString = newFormat }
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert 'this' string number to a String.
+     */
+    override def toString: String = fString.format (str)
+
+} // StrNum class
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `StrNum` companion object defines 'zero' and 'one' as well as some utility
+ *  functions.
+ */
+object StrNum
+{
+    /** Zero (0) as a StrNum number
+     */
+    val _0  = StrNum ("0")
+
+    /** One (1) as a StrNum number
+     */
+    val _1  = StrNum ("1")
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Implicit conversion from 'Double' to 'StrNum'.
+     *  @param d  the Double parameter to convert
+     */
+    implicit def double2StrNum (d: Double): StrNum = new StrNum (d.toString)
+
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the absolute value of that string number.
+     *  @param s  that string number
+     */
+    def abs (s: StrNum): StrNum = s.abs
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the maximum of two string number, 's' and 't'.
+     *  @param s  the first string number to compare
+     *  @param t  the second string number to compare
+     */
+    def max (s: StrNum, t: StrNum): StrNum = if (t > s) t else s
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the minimum of two string numbers, 's' and 't'.
+     *  @param s  the first string number to compare
+     *  @param t  the second string number to compare
+     */
+    def min (s: StrNum, t: StrNum): StrNum = if (t < s) t else s
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Return the square root of that string number (currently not supported).
+     *  @param s  that string number
+     */
+    def sqrt (s: StrNum): StrNum =
+    {
+//      throw new NoSuchMethodException ("StrNum does not support sqrt function")
+        println ("StrNum.sqrt: sqrt function not supported")
+        _0
+    } // sqrt
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Ordering for string numbers.
+     */
+    val ord = new Ordering [StrNum]
+            { def compare (s: StrNum, t: StrNum) = s compare t }
+
+} // StrNum class
+//} // Strnum object
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `StrNumTest` object is used to test the `StrNum` class.
+ *  > run-main scalation.math.StrNumTest
+ */
+object StrNumTest extends App
+{
+    //import Strnum._
+    import util.Sorting.quickSort
+
+    val sop = new StringOps ("one")
+    val so: StringOps = "two"
+    println (sop + ", " + so + ", " + (sop + so))
+
+    val s1 = StrNum ("abc")
+    val s2 = StrNum ("def")
+    val s3 = StrNum ("defghi")
+//  val s4: StrNum = "defghi4"           // need this capability
+
+    println ("s1 = " + s1)
+    println ("s2 = " + s2)
+    println ("s3 = " + s3)
+
+    println ("-s1     = " + -s1)
+    println ("s1 + s2 = " + (s1 + s2))
+    println ("s3 - s2 = " + (s3 - s2))
+    println ("s2 * s3 = " + (s2 * s3))
+
+    println ("s1.abs    = " + s1.abs)
+    println ("s1 max s2 = " + (s1 max s2))
+    println ("s1 min s2 = " + (s1 min s2))
+    println ("s1 < s2   = " + (s1 < s2))
+    println ("s2 < s1   = " + (s2 < s1))
+
+    def sort (arr: Array [StrNum]) { quickSort (arr)(StrNum.ord) }
+
+    val arr = Array (s2, s3, s1)
+    println ("arr = " + arr.deep)
+    sort (arr)
+    println ("arr = " + arr.deep)
+
+} // StrNumTest object
+

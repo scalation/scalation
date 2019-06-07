@@ -1,0 +1,640 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  Kevin Warrick, John Miller, Susan George
+ *  @version 1.5
+ *  @date    Wed Jan  9 15:07:13 EST 2013
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.analytics.classifier
+
+import scala.collection.Set
+import scala.collection.mutable.{ArrayBuffer, HashMap}
+import scala.math.{ceil, floor, log, pow}
+import scala.util.control.Breaks._
+
+import scalation.analytics.Probability.entropy
+import scalation.linalgebra.{MatriI, MatrixI, VectoD, VectorD, VectoI, VectorI}
+import scalation.random.PermutedVecI
+import scalation.random.RNGStream.ranStream
+import scalation.util.banner
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `Node` class is used to hold inormation about a node in the decision tree.
+ *  @param distr_ct  the distribution count
+ */
+abstract class Node (distr_ct: VectoI)
+         extends Cloneable
+{
+    /** The sum of distribution count
+     */
+    val distr_sum = distr_ct.sum
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Copy a node and all of its child nodes.
+     *  @param vc  the value count
+     */
+    def copy (vc: Array [Int]): Node =
+    {
+        var n: Node = null
+        this match {
+        case FeatureNode (f, branches, path, distr_ct) => 
+            n = new FeatureNode (f, branches.clone (), path, distr_ct)
+            deepCopy (n, vc)                                          // implement deep copy
+        case LeafNode (y, distr_ct) => n = new LeafNode (y, distr_ct)
+        } // match
+        n
+    } // copy
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** This method deep copies a node all the way down by creating new instances of feature node.
+     *  This is required while pruning.
+     *  @param currNode
+     */
+    def deepCopy (currNode: Node, vc: Array [Int]): Node =
+    {
+        val fn = currNode.asInstanceOf [FeatureNode]
+        for (i <- 0 until vc(fn.f)) {
+            if (fn.branches.get(i) != None) {
+                val node = fn.branches(i)
+                if (node.isInstanceOf [FeatureNode]) {
+                    val tempFn = node.asInstanceOf [FeatureNode]
+                    val tempNewFn = new FeatureNode (tempFn.f, tempFn.branches.clone (), tempFn.path, tempFn.distr_ct)
+                    fn.branches  += i -> tempNewFn
+                } // if
+            } // if
+        } // for
+        fn
+    } // deepCopy
+
+} // Node class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `FeatureNode` class is for internal nodes.
+ *  @param f         the feature/variable number used for splitting
+ *  @param branches  maps the branch value, e.g., f2 has values 0, 1, 3, for a node 
+ *  @param path      the path from the current node to the root {(parent node feature, branch)}
+ *  @param distr_ct  the distribution count
+ */
+case class FeatureNode (f: Int, branches: HashMap [Int, Node], path: List [(Int, Int)], distr_ct: VectoI)
+     extends Node (distr_ct) with Cloneable
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `LeafNode` class is for leaf nodes.
+ *  @param y         the respone/decision value
+ *  @param distr_ct  the distribution count (count for each possible decision value for y)
+ */
+case class LeafNode (y: Int, distr_ct: VectoI)
+     extends Node (distr_ct) with Cloneable
+{
+    var parentNode: FeatureNode = null
+} // LeafNode class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `DecisionTreeID3` class implements a Decision Tree classifier using the
+ *  ID3 algorithm.  The classifier is trained using a data matrix 'x' and a
+ *  classification vector 'y'.  Each data vector in the matrix is classified into
+ *  one of 'k' classes numbered '0, ..., k-1'.  Each column in the matrix represents
+ *  a feature (e.g., Humidity).  The 'vc' array gives the number of distinct values
+ *  per feature (e.g., 2 for Humidity).
+ *  @param x   the data vectors stored as rows of a matrix
+ *  @param y   the class array, where y_i = class for row i of the matrix x
+ *  @param fn  the names for all features/variables
+ *  @param k   the number of classes
+ *  @param cn  the names for all classes
+ *  @param vc  the value count array indicating number of distinct values per feature
+ */
+class DecisionTreeID3 (x: MatriI, y: VectoI, fn: Array [String], k: Int, cn: Array [String],
+                       private var vc: Array [Int] = null, treeDepth: Int = -1)
+      extends ClassifierInt(x, y, fn, k, cn)
+{
+    private val DEBUG = false                             // debug flag
+    private val y_prob = new VectorD(k)                   // probability that class c occurs
+
+    if (vc == null) vc = vc_default                       // set value count (vs) to default for binary data (2)
+    for (i <- 0 until m) y_prob(y(i)) += 1
+    y_prob /= md
+    private val entropy_0 = entropy (y_prob)               // the initial entropy
+    println ("the initial entropy entropy_0 = " + entropy_0)
+
+    private var root: Node = null                         // the root node
+    var listOfLeaves    = ArrayBuffer [LeafNode] ()
+    var optPruneEntropy = Double.MaxValue                 // variable to hold optimal entropy of node to prune
+    var toPruneNode: Node = null                          // stores the node to be pruned
+
+    var hasDepthConstraint=false                          //tree depth constraint flag
+    if(treeDepth>=0) hasDepthConstraint=true
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Set the root.
+     *  @param root  the root node
+     */
+    def setRoot (root: Node) { this.root = root }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a feature column (e.g., 2 (Humidity)) and a value (e.g., 1 (High))
+     *  use the frequency of occurrence of the value for each classification
+     *  (e.g., 0 (no), 1 (yes)) to estimate k probabilities.  Also, determine
+     *  the fraction of training cases where the feature has this value
+     *  (e.g., fraction where Humidity is High = 7/14).
+     *  @param dset   the list of data set tuples to consider (e.g., value, row index)
+     *  @param value  one of the possible values for this feature (e.g., 1 (High))
+     */
+    def frequency (dset: Array [(Int, Int)], value: Int): (Double, VectoI, VectoD) =
+    {
+        val prob     = new VectorD (k)                   // probability vector for a given feature and value
+        val distr_ct = new VectorI (k)
+        var count = 0.0
+        for ((i, j) <- dset if i == value) {
+            count       += 1.0
+            prob(j)     += 1.0
+            distr_ct(j) += 1
+        } // for
+        (count / dset.size, distr_ct, prob / count)      // return the fraction and the probability vector
+    } // frequency
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Extract column from matrix, filtering out values rows that are not on path.
+     *  @param f  the feature to consider (e.g., 2 (Humidity))
+     *  @param p  the path
+     */
+    def dataset (f: Int, path: List [(Int, Int)]): Array [(Int, Int)] =
+    {
+        val col = x.col(f).apply.zipWithIndex
+        col.filter (t => path.forall (tt => x(t._2, tt._1) == tt._2)).map (t => (t._1, y(t._2))).toArray
+    } // dataset
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Find the most frequent classification.
+     *  @param a  array of discrete classifications
+     */
+    def mode (a: Array [Int]): Int =
+    {
+        a.groupBy (i => i).map (t => (t._1, t._2.size)).maxBy (_._2)._1
+    } // mode
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Compute the information gain due to using the values of a feature/attribute
+     *  to distinguish the training cases (e.g., how well does Humidity with its
+     *  values Normal and High indicate whether one will play tennis).
+     *  @param f     the feature to consider (e.g., 2 (Humidity))
+     *  @param path  the path
+     */
+    def gain (f: Int, path: List [(Int, Int)]): (Double, VectoI) =
+    {
+        val dset = dataset (f, path)                           // extract values from column f indata matrix x
+//      val vals = dset.map (_._1).toSet.size
+        val vals = vc(f)                                       // number of distinct values for feature f
+        var sum  = 0.0
+        val distr_ct = new VectorI (k)
+        for (i <- 0 until vals) {
+            val (coun_fi, distr_fi, prob_fi) = frequency (dset, i)
+            val entr_fi = entropy (prob_fi)                    // entropy for feature f value i
+//          println ("gain from feature " + f + " for value " + i + " is " + entr_fi)
+            sum += coun_fi * entr_fi
+            distr_ct += distr_fi
+        } // for
+        val igain = entropy_0 - sum                            // the drop in entropy
+//      println ("entropy = " + sum + ": overall gain from feature " + f + " is " + igain)
+        (igain, distr_ct)                                      // return the fraction and the probability vector
+    } // gain
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Train the decision tree.
+     *  @param itest  the indices for the test data
+     */
+    def train (itest: IndexedSeq [Int]): DecisionTreeID3 = // FIX - use these parameters
+    {
+        root = buildTree (List [(Int, Int)] (), 0)
+        printTree ()
+        println ("Entropy of tree = " + calcEntropy (listOfLeaves))
+        println ("No of leaves (original) = " + listOfLeaves.size)
+        this
+    } // train
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Calculate the entropy given the list of leaves.
+     *  @param listOfLeaves  list of leaves whose entropy needs to be calculated
+     */
+    def calcEntropy (listOfLeaves: ArrayBuffer [LeafNode]): Double =
+    {
+        var sum = 0.0
+        for (n <- listOfLeaves) {
+            val weight = n.distr_ct.sum / md
+            sum += weight * entropy (n.distr_ct)
+        } // for
+        sum
+    } // calcEntropy
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Extend the tree given a path e.g. ((outlook, sunny), ...).
+     *  @param path  an existing path in the tree ((feature, value), ...)
+     */
+    def buildTree (path: List [(Int, Int)], depth: Int): FeatureNode =
+    {
+        val features = ((0 until x.dim2) diff path.map(_._1))
+        
+        var opt = (0, gain(0, path))
+        for (f <- features) {
+            val (fGain, distr_ct) = gain (f, path)
+//          println ("for feature " + f + " the gain is " + fGain)
+            if (fGain > opt._2._1) opt = (f, (fGain, distr_ct))
+        } // for
+//      println ("optimal feature is " + opt._1 + " with a gain of " + opt._2._1)
+
+        val f = opt._1
+        val node = FeatureNode (f, new HashMap [Int, Node], path, opt._2._2)
+
+        breakable { for (b <- 0 until vc(f)) {               // build subtree or leaf for each branch value
+            if (hasDepthConstraint && depth == treeDepth - 1) {
+                addLeaf (node.distr_ct.argmax (), node.distr_ct, node, b); break
+            } else {
+                // base case
+                val dset = dataset (f, (f, b) :: path)
+                if (dset.size > 0) {
+                    if (features.size == 0 || dset.map (_._2).toSet.size == 1) {
+                        addLeaf (mode (dset.map(_._2)), getDistCt(dset), node, b)
+                    } else {
+                        node.branches += b -> buildTree ((f, b) :: path, depth+1)
+                    } // if
+                } // if
+            } // if
+        }} // breakable for
+        node
+    } // buildTree
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Add leaf to tree.
+     *  @param y         output value of leaf node
+     *  @param distr_ct  distribution count of leaf
+     *  @param node      parent node
+     *  @param b         branch identifier to add leaf
+     */
+    def addLeaf(y: Int, distr_ct: VectoI, node: FeatureNode, b: Int)=
+    {
+        var leaf = LeafNode (y, distr_ct)
+        leaf.parentNode = node
+        node.branches += b -> leaf
+        listOfLeaves.+= (leaf)
+    } // addLeaf
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Get the distribution count of a node, i.e., determines the number of
+     *  positive and negative samples under it.
+     *  @param dset  the dataset under a node
+     */
+    def getDistCt (dset: Array [(Int, Int)]): VectoI =
+    {
+        val distr_ct = new VectorI (k)
+        for ((i, j) <- dset) distr_ct(j) += 1
+        distr_ct
+    } // getDistCt
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Prune the tree.  If entropy of node considered for pruning < threshold,
+     *  then remove the node from the decision tree.
+     *  @param threshold   user-specified threshold which controls pruning.
+     *  @param fold        defines cross-validation folds
+     */
+    def prune (threshold: Double, fold: Int): DecisionTreeID3 =
+    {
+        println ("Pruning")
+        val unprunedTree = this                                 // get an instance of current tree which is an unpruned tree
+        val prunedTree   = new DecisionTreeID3(x, y, fn, 2, cn, vc, treeDepth)
+        prunedTree.setRoot (unprunedTree.root.copy (vc))        // set the root of pruned tree same as that of unpruned tree but a diffrent instance
+        unprunedTree.listOfLeaves.copyToBuffer (prunedTree.listOfLeaves)
+        performPruning (prunedTree, threshold)
+
+        println (unprunedTree.root)
+        println (prunedTree.root)
+        println ("Entropy of unpruned tree: " + calcEntropy (unprunedTree.listOfLeaves))
+        println ("Entropy of pruned tree:   " + calcEntropy (prunedTree.listOfLeaves))
+
+        compareModel (fold, threshold)                              // compare pruned and unpruned tree using CV
+        prunedTree
+    } // prune
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Prune the tree if entropy of the identified pruneNode is less than threshold
+     *  @param prunedTree  tree to prune
+     *  @param threshold   user-specified threshold which controls pruning
+     */
+    def performPruning (prunedTree: DecisionTreeID3, threshold: Double): Boolean =
+    {
+        var isPruned = false
+        val ret = findNodeToPrune (prunedTree)                      // returns the node along with entropy difference
+        if (ret._1 != null) {
+            val nodeToPrune = ret._1.asInstanceOf[FeatureNode]      // node to prune
+            val diffEntropy = ret._2                                // min entropy difference
+            println ("Node identified to be pruned: " + nodeToPrune + " : " + diffEntropy)
+            if (diffEntropy < threshold) {                          // if entropy diffrence < threshold,remove the node from tree
+                val dset = dataset(nodeToPrune.f, nodeToPrune.path)
+                val m    = mode(dset.map (_._2))
+                var pt   = getPrunedTree (prunedTree, prunedTree.root, nodeToPrune, m)    // get the pruned tree
+                isPruned = true
+                toPruneNode = null
+                optPruneEntropy = Double.MaxValue
+                if (!pt._2) {
+                    println ("Entropy of prunedTree " + calcEntropy (prunedTree.listOfLeaves) + " : " + prunedTree.listOfLeaves.size)
+                    performPruning (prunedTree, threshold)          // repeat this process until entropy of node > threshold
+                } // if
+            } // if
+      } // if
+      isPruned
+    } // performPruning
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** This method identifies the node with min entropy as node to prune.
+     *  @param prunedTree  finds if any child of the current node has its c
+     */
+    def findNodeToPrune (prunedTree: DecisionTreeID3): (Node, Double) =
+    {
+        var tLeavesList = ArrayBuffer [LeafNode] ()
+        prunedTree.listOfLeaves.copyToBuffer (tLeavesList)
+        for (n <- prunedTree.listOfLeaves) {
+            if (tLeavesList contains n) {
+                val parent = n.parentNode
+                var isChildrenLeaf = checkIfChildrenLeaf (parent)
+                if (isChildrenLeaf) {
+                    val sibling       = tLeavesList.filter (leafNode => leafNode.parentNode == parent)
+                    tLeavesList       = tLeavesList diff sibling
+                    val parentEntropy = entropy (parent.distr_ct)                // calculate the entropy of the parent node
+                    val childEntropy  = calcEntropy (sibling)                    // calculate the entropy of all the leaf nodes under the parent
+                    val delta         = parentEntropy - childEntropy             // find the difference between parent and children entropy
+                    if (delta < optPruneEntropy) {                               // get the min entropy diffrence
+                        optPruneEntropy = delta
+                        toPruneNode     = parent
+                    } // if
+                } else {
+                    tLeavesList = tLeavesList.filter (leafNode => leafNode.parentNode != parent)
+                } // if
+            } // if
+        } // for
+        (toPruneNode, optPruneEntropy)
+    } // findNodeToPrune
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Checks if all the children of a feature node are instances of LeafNode.
+     *  @param node  checks if all the children of this node are instances of LeafNode
+     */
+    def checkIfChildrenLeaf (node: FeatureNode): Boolean =
+    {
+          var isChildrenLeaf = true
+          var it = node.branches.valuesIterator
+          it.foreach((cNode) => if (! cNode.isInstanceOf [LeafNode]) isChildrenLeaf = false)
+          isChildrenLeaf
+    } // checkIfChildrenLeaf
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** This method returns the pruned tree by deleting the node identified to prune.
+     *  @param tree      tree to prune
+     *  @param currNode  current node
+     *  @param delNode   node to remove
+     *  @param m         most frequent classification of 'delNode'
+     */
+    def getPrunedTree (tree: DecisionTreeID3, currNode: Node, delNode: FeatureNode, m: Int): (DecisionTreeID3, Boolean) =
+    {
+        var isRoot     = false
+        val prunedTree = tree
+        val n          = currNode
+        if (delNode.path.size > 0) {                                      // checks if the node to be pruned is root
+            val parBranch = delNode.path(0)._2
+            var parPath   = delNode.path.drop (1)
+            if (n.isInstanceOf [FeatureNode]) {
+                val parentNode = n.asInstanceOf [FeatureNode]
+                if (parentNode.path equals parPath) {
+                    convertFeature2Leaf (prunedTree, parentNode, parBranch, m)    // converts feature node to leaf node
+                } else {
+                    var it = parentNode.branches.valuesIterator
+                    it.foreach ((cNode) => if (cNode.isInstanceOf [FeatureNode]) {
+                        val temp = cNode.asInstanceOf [FeatureNode]
+                        getPrunedTree (prunedTree, temp, delNode, m)
+                    }) // foreach
+                } // if
+            } // if
+        } else {
+            println ("At Root level:cannot be further pruned")
+            isRoot = true
+        } // if
+        (prunedTree, isRoot)
+    } // getPrunedTree
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Convert a feature node to leaf node.
+     *  @param tree    the tree to prune
+     *  @param fn      the parent node
+     *  @param branch  the index of child under parent node to be converted to leaf
+     *  @param m       mode of child under index=branch
+     */
+    def convertFeature2Leaf (tree: DecisionTreeID3, parentNode: FeatureNode, branch: Int, m: Int): LeafNode =
+    {
+        val fn = parentNode.branches (branch).asInstanceOf [FeatureNode]
+        tree.listOfLeaves = tree.listOfLeaves.filterNot (leafNode => leafNode.parentNode == fn)    // updates the listOfLeaves to remove all leaf nodes under fn
+        val ln = new LeafNode (m, fn.distr_ct)
+        parentNode.branches.put (branch, ln)                    // updates the branch with new leaf
+        ln.parentNode = parentNode                              // updates the parent node of leaf
+        tree.listOfLeaves += ln                                 // add the new leaf node to listOfLeaves
+        ln
+    } // convertFeature2Leaf
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** This method is used to compare pruned versus unpruned via cross validation.
+     *  @param folds      specfies the fold required for CV
+     *  @param threshold  specifies the user-defined threshold for pruning
+     */
+    def compareModel (folds: Int, threshold: Double) =
+    {
+        banner ("Compare Models")
+
+        // for random cross validation
+        var u_score     = new MatrixI (k, k)                                      // unpruned scores
+        var p_score     = new MatrixI (k, k)                                      // pruned scores
+        val permutedVec = PermutedVecI (VectorI.range (0, x.dim1), ranStream)
+        val randOrder   = permutedVec.igen
+        val itestA      = randOrder.split (folds)                                 // array of testset indices
+
+        for (it <- 0 until folds) {
+            val itest = itestA(it)().toArray                                      // get test data
+            val testX = x.selectRows (itest)
+            val testY = y.select (itest)
+
+            val itrain = Array.range (0, x.dim1) diff itest                       // get training data
+            val trainX = x.selectRows (itrain)
+            val trainY = y.select (itrain)
+
+            banner ("Model for fold = " + it)
+
+            var uTree = new DecisionTreeID3 (trainX, trainY, fn, 2, cn, vc, treeDepth)       // create an unpruned tree with (n-1) fold data
+            uTree.train (itest)
+            var yp = VectorI (for (i <- testX.range1) yield
+                                  uTree.classify (testX(i))._1)                   // test the unpruned tree with the remaining 1 fold data
+            u_score += new ConfusionMat (testY, yp, k).confusion                  // get the score metrics for unpruned tree
+
+            var pTree = new DecisionTreeID3 (trainX, trainY, fn, 2, cn, vc, treeDepth)       // create pruned tree with (n-1) fold data
+            pTree.setRoot (uTree.root.copy (vc))
+            uTree.listOfLeaves.copyToBuffer (pTree.listOfLeaves)
+            performPruning (pTree, threshold)
+            var yp1 = VectorI (for (i <- testX.range1) yield
+                                   pTree.classify (testX(i))._1)                  // test the pruned tree with the remaining 1 fold data
+            p_score += new ConfusionMat(testY,yp1,k).confusion                    // get the score metrics for pruned tree
+
+            println ("Entropy Unpruned = " + calcEntropy (uTree.listOfLeaves) +
+                     " Entropy Pruned = "  + calcEntropy (pTree.listOfLeaves))
+        } // for
+
+        u_score /= folds                                                          // average of unpruned scores
+        p_score /= folds                                                          // average of pruned scores
+
+        println ("Unpruned tree: \t TN = " + u_score(0, 0) + " FP = " + u_score(0, 1) +
+                                  " FN = " + u_score(1, 0) + " TP = " + u_score(1, 1))
+        println ("Pruned tree:   \t TN = " + p_score(0, 0) + " FP = " + p_score(0, 1) +
+                                  " FN = " + p_score(1, 0) + " TP = " + p_score(1, 1))
+
+    } // compareModel
+  
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Print the decision tree.
+     */
+    def printTree () { println ("Decision Tree"); printT (root, 0,-1); println () }
+  
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Recursively print the decision tree nodes.
+     *  @param n       the current node
+     *  @param level   level of the tree
+     *  @param branch  branch of the tree
+     */
+    private def printT (n: Node, level: Int, branch: Int)
+    {
+        print ("\n" + "\t" * level + "[ ")
+        n match {
+        case FeatureNode (f, branches, path, distr_ct) =>
+            print (s"Node b$branch : f = $f ( ${distr_ct(0)}-, ${distr_ct(1)}+ ) ]")
+            for (b <- 0 until vc(f)) {
+                if (branches.get(b) != None) {
+                    val node = branches.get(b).get
+                    printT (node, level + 1, b)
+                } // if
+            } // for
+        case LeafNode (y,distr_ct) =>
+            print (s"Leaf b$branch : y = $y ( ${distr_ct(0)}-, ${distr_ct(1)}+ ) ]")
+        } // match
+    } // printT
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Given a data vector z, classify it returning the class number (0, ..., k-1)
+     *  by following a decision path from the root to a leaf.  If no branch found
+     *  given maximal decision of current node.
+     *  Return the best class, its name and FIX.
+     *  @param z  the data vector to classify
+     */
+    def classify (z: VectoI): (Int, String, Double) =
+    {
+        var n = root
+        for (j <- z.range) {
+            n match {
+            case FeatureNode (f, branches, path, count) => 
+                try { n = branches (z(f)) }
+                catch { case nse: NoSuchElementException =>
+                    val best = n.asInstanceOf [FeatureNode].distr_ct.argmax ()
+                    return (best, cn(best), -1.0)
+                } // try
+            case LeafNode (y, count) => 
+                val best = y
+                return (best, cn(best), -1.0)
+            case _ =>
+                println (s"classify: 'n match' failed for node n = $n")   // FIX - null branch?
+                return (-1, "?", -1.0)
+            } // match
+        } // for
+        println ("classify: failed at leaf node")
+        (-1, "?", -1.0)
+    } // classify
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Reset or re-initialize the frequency tables and the probability tables.
+     */
+    def reset ()
+    {
+        // FIX: to be implemented
+    } // reset
+
+} // DecisionTreeID3 class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `DecisionTreeID3Test` object is used to test the `DecisionTreeID3` class.
+ *  Ex: Classify (No/Yes) whether a person will play tennis based on the measured features.
+ *  @see http://www.cise.ufl.edu/~ddd/cap6635/Fall-97/Short-papers/2.htm
+ *  > runMain scalation.analytics.classifier.DecisionTreeID3Test
+ */
+object DecisionTreeID3Test extends App
+{
+    // training-set -----------------------------------------------------------
+    // Outlook:     Rain (0), Overcast (1), Sunny (2)
+    // Temperature: Cold (0), Mild (1), Hot (2)
+    // Humidity:    Normal (0), High (1)
+    // Wind:        Weak (0), Strong (1)
+    // features:                Outlook Temp Humidity Wind
+    val x  = new MatrixI ((14, 4),  2,     2,     1,     0,       // day  1 - data matrix
+                                    2,     2,     1,     1,       // day  2
+                                    1,     2,     1,     0,       // day  3
+                                    0,     1,     1,     0,       // day  4
+                                    0,     0,     0,     0,       // day  5
+                                    0,     0,     0,     1,       // day  6
+                                    1,     0,     0,     1,       // day  7
+                                    2,     1,     1,     0,       // day  8
+                                    2,     0,     0,     0,       // day  9
+                                    0,     1,     0,     0,       // day 10
+                                    2,     1,     0,     1,       // day 11
+                                    1,     1,     1,     1,       // day 12
+                                    1,     2,     0,     0,       // day 13
+                                    0,     1,     1,     1)       // day 14
+    // day:           1  2  3  4  5  6  7  8  9 10 11 12 13 14
+    val y  = VectorI (0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0)   // classification vector: 0(No), 1(Yes))
+    val vc = Array (3, 3, 2, 2)                                   // distinct values for each feature
+    val fn = Array ("Outlook", "Temp", "Humidity", "Wind")
+    val cn = Array("Yes","No")
+    println ("x  = " + x)
+    println ("y  = " + y)
+    println ("vc = " + vc.deep)
+    println ("---------------------------------------------------------------")
+
+    // train the classifier ---------------------------------------------------
+    val id3 = new DecisionTreeID3 (x, y, fn, 2, cn, vc)        // create the classifier            
+    id3.train ()
+    //var yp= VectorI( for (i <- x.range1) yield id3.classify (x(i))._1)
+    //println(yp)
+    
+    id3.prune (0.98,5)
+   
+    val z = VectorI (2, 2, 1, 1)                                 // new data vector to classify
+    println ("classify (" + z + ") = " + id3.classify (z))
+
+} // DecisionTreeID3Test object
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `DecisionTreeID3Test2` object is used to test the `DecisionTreeID3` class.
+ *  Ex: Classify (No/Yes) whether a there is breast cancer.
+ *  > runMain scalation.analytics.classifier.DecisionTreeID3Test2
+ */
+object DecisionTreeID3Test2 extends App
+{
+    val fname   = BASE_DIR + "breast_cancer.csv"
+    val dataset = MatrixI (fname)
+    val cn = Array ("benign", "malignant")
+    val fn = Array ("Clump Thickness", "Uniformity of Cell Size", "Uniformity of Cell Shape", "Marginal Adhesion",
+                    "Single Epithelial Cell Size", "Bare Nuclei", "Bland Chromatin", "Normal Nucleoli", "Mitoses")
+    val x  = dataset.sliceCol (0, dataset.dim2 - 1)
+    val y  = dataset.col (dataset.dim2 - 1)
+    val vc = (for (j <- x.range2) yield x.col(j).max () + 1).toArray
+    val k  = cn.size
+    val id3 = new DecisionTreeID3 (x, y, fn, 2, cn, vc, 2)        // create the classifier            
+    id3.train ()
+    id3.prune (0.4, 5)
+
+} // DecisionTreeID3Test2 object
+

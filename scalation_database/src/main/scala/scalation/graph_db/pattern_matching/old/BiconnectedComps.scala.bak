@@ -1,0 +1,91 @@
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** @author  John Miller
+ *  @version 1.2
+ *  @date    Wed Jul 31 13:54:40 EDT 2013
+ *  @see     LICENSE (MIT style license file).
+ */
+
+package scalation.graphalytics
+
+import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.{Set => SET}
+import scala.math.min
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `BiconnectedComp` class provides a means for finding biconnected
+ *  components (block) in an undirected graph.
+ *  @param g_  the graph whose components are sought
+ */
+case class BiconnectedComp (g_ : Digraph)
+{
+    val DEBUG   = true                                    // debug flag
+    val g       = g_.clone.makeUndirected ()              // the undirected version of g_
+    if (DEBUG) g.print ()
+    val cp      = ArrayBuffer [Int] ()                    // the cut points in graph g
+    val visited = Array.fill [Boolean] (g.size)(false)    // array of visited flags
+    val parent  = Array.fill [Int] (g.size)(-1)           // array of vertex parents
+    val depth   = Array.fill [Int] (g.size)(-1)           // array of vertex depths
+    val low     = Array.fill [Int] (g.size)(-1)           // array of vertex lowpoints
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** Determine all the cut points for the graph.
+     *  @see https://en.wikipedia.org/wiki/Biconnected_component
+     *  @param i    the current vertex 
+     *  @param dep  its depth in spanning tree
+     */
+    def cutPoints (i: Int, dep: Int): ArrayBuffer [Int] =
+    {
+        visited(i)   = true
+        depth(i)     = dep
+        low(i)       = dep
+        var childCnt = 0
+        var isCut    = false
+
+        for (ni <- g.ch(i)) {
+            if (! visited(ni)) {
+                parent(ni) = i
+                cutPoints (ni, dep + 1)
+                childCnt += 1
+                if (low(ni) >= depth(i)) isCut = true
+                low(i) = min (low(i), low(ni))
+            } else if (ni != parent(i)) {
+                low(i) = min (low(i), depth(ni))
+            } // if
+        } // for
+
+        if (parent(i) != -1 && isCut || parent(i) == -1 && childCnt > 1) {
+            cp += i
+        } // if
+        cp
+    } // cutPoints
+
+} // BiconnectedComp class
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/** The `BiconnectedCompTest` object tests the `BiconnectedComp` class.
+ *  @see www.geeksforgeeks.org/biconnected-components
+ *  > run-main scalation.graphalytics.BiconnectedCompTest
+ */
+object BiconnectedCompTest extends App
+{
+    val g = new Digraph (Array (SET (1, 6),        // edges from 0
+                                SET (2, 3),        // edges from 1
+                                SET (3, 4),        // edges from 2
+                                SET (4),           // edges from 3
+                                SET (),            // edges from 4
+                                SET (6, 7, 8),     // edges from 5
+                                SET (),            // edges from 6
+                                SET (8),           // edges from 7
+                                SET (9),           // edges from 8
+                                SET ()),           // edges from 9
+                        Array.fill (10)(0))        // vertex labels
+
+    val bcc = BiconnectedComp (g)
+    println ("- * 60")
+    g.print ()
+    println ("cut points = " + bcc.cutPoints (0, 0))
+    
+} // BiconnectedCompTest object
+
